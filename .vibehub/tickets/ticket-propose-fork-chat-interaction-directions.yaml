@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "fork-protocol-and-desktop-facts-are-established",
+      "criterion": "The proposal records from the 0.149.0 schema and upstream source whether thread/fork supports forking from a chosen Turn or item or only from the head, what lineage fields exist and survive restart, how forks interact with ThreadSection placement including the placement race, and what Codex desktop exposes for forks in its UI; every claim carries a source reference and unverifiable points are named unverified rather than assumed."
+    },
+    {
+      "acceptance_id": "daily-scenarios-ground-the-directions",
+      "criterion": "The proposal names at least three concrete daily engineering scenarios for fork drawn from real use, such as trying a risky instruction without polluting the main stream, comparing prompt variants, and exploring an alternative approach, and evaluates every proposed affordance against those scenarios rather than abstract completeness; scenarios that fork should not serve are listed with the existing decision that excludes them, including that a fork is never a Task or dependency."
+    },
+    {
+      "acceptance_id": "lineage-visibility-directions-are-reviewable",
+      "criterion": "At least two distinct lineage directions are made reviewable in the real shell against fixtures, covering at minimum a navigable source chip replacing the raw UUID line and a grouped or indented presentation of a Thread's forks in the sidebar or thread heading, each with wide and narrow, Light and Dark states, keyboard paths and honest empty states, and each annotated with what canonical data it needs and what the host must project."
+    },
+    {
+      "acceptance_id": "compare-and-bring-back-are-scoped-honestly",
+      "criterion": "The proposal defines what Compare and Bring Back would mean on the current architecture, shows at least one reviewable Bring Back direction built on the existing quote, origin and text_elements machinery that returns a fork's result into its source Chat as an explicit reviewable action, states what a side-by-side Compare would require and what it costs, and recommends which of the two enters the next implementation and which waits, with reasons."
+    },
+    {
+      "acceptance_id": "proposal-pack-is-decision-ready",
+      "criterion": "A checked-in proposal document presents the directions with captures, the recommended composition, exact costs, what stays out, and the exact decision list for the owner; the review surfaces run from one command against fixtures without model spend; npm test, npm run verify and the guard stay green; and no production behavior changes ship beyond review-only surfaces gated from ordinary use."
+    }
+  ],
+  "constraints": [
+    "This Ticket proposes and prototypes for review only; production fork behavior does not change.",
+    "A Chat fork is never presented as a Subtask, Task or dependency.",
+    "Review surfaces run against fixtures with no model spend and are gated from ordinary use.",
+    "Every protocol claim is source-referenced; nothing is assumed from the desktop UI without evidence.",
+    "Final visual identity remains owned by the visual-system Ticket."
+  ],
+  "context": "Fork today is one header button that copies the whole Thread; lineage renders as a raw Fork-of UUID line and nothing else in the product shows branch relationships. The pinned 0.149.0 protocol carries thread/fork with forkedFromId lineage; whether a fork can start from a chosen point rather than the head must be established from the schema and upstream source, not assumed. The pre-Codex vision proved Fork, Compare and Bring Back as product-owned projections, and the shipped origin, quote and text_elements machinery gives Bring Back a cheap honest carrier. The proposal researches real scenarios, audits what Codex desktop offers for forks, and produces reviewable interaction directions in the real shell against fixtures, without shipping product behavior. The owner decision Ticket consumes this proposal; implementation waits for it.",
+  "context_refs": [
+    {
+      "purpose": "The owner intent this proposal serves.",
+      "ref": ".vibehub/rooms/product/intent-fork-chat-needs-a-product-and-interaction-direction.yaml"
+    },
+    {
+      "purpose": "Fork is never a Task or dependency.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
+    },
+    {
+      "purpose": "Pinned thread/fork seam and lineage fields.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "Proven fork lineage and placement race behavior.",
+      "ref": "docs/proposals/codex-projects/project-object-contract.json"
+    },
+    {
+      "purpose": "Origin and quote machinery a Bring Back direction builds on.",
+      "ref": "apps/codex-first-shell/quote-source.mjs"
+    },
+    {
+      "purpose": "The original Fork, Compare and Bring Back product validation.",
+      "ref": ".vibehub/outcomes/ticket-spike-deepseek-harness-foundations.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reviewable proposal grounds fork chat in real daily scenarios and offers the owner exactly the decisions that matter: what fork is for, how lineage becomes visible and navigable, whether and how Compare and Bring Back return on the existing origin and quote machinery, and what stays out.",
+  "provenance_refs": [
+    "conversation:2026-08-23-owner-flags-fork-chat-product-state"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-propose-fork-chat-interaction-directions"
+}

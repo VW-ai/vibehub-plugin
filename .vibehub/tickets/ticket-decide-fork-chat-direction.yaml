@@ -1,0 +1,37 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "fork-chat-direction-decided",
+      "authority": "human",
+      "criterion": "After reviewing the proposal pack's directions in representative wide, narrow, Light and Dark states, the owner explicitly selects one lineage presentation, decides whether Bring Back, Compare, both or neither enter the next implementation, names anything explicitly excluded, and accepts the stated costs; the choice is recorded as human-origin Evidence referencing the reviewed pack."
+    }
+  ],
+  "constraints": [
+    "Only explicit human-origin Evidence satisfies the criterion.",
+    "A bounded owner correction is replanned rather than absorbed.",
+    "This Ticket records the choice only; implementation is planned separately."
+  ],
+  "context": "Protected product composition. The owner reviews the fork proposal pack in representative states and records one explicit choice; implementation Tickets are planned only after this succeeds.",
+  "context_refs": [
+    {
+      "purpose": "The intent that opened this decision.",
+      "ref": ".vibehub/rooms/product/intent-fork-chat-needs-a-product-and-interaction-direction.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly selects the fork chat composition for implementation: which lineage presentation ships, whether Bring Back or Compare enters next, and what stays out.",
+  "provenance_refs": [
+    "conversation:2026-08-23-owner-flags-fork-chat-product-state"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner decides over the reviewable proposal pack this prerequisite produces.",
+      "target_ticket_id": "ticket-propose-fork-chat-interaction-directions",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-fork-chat-direction"
+}

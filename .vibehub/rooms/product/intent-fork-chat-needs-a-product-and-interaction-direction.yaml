@@ -1,0 +1,47 @@
+{
+  "context_id": "intent-fork-chat-needs-a-product-and-interaction-direction",
+  "detail": "During daily-use review the owner noted that the fork part of the product deserves deliberate thought. Today fork is a header button that copies the whole Thread and opens it, lineage renders only as a raw Fork-of UUID line, and nothing shows fork relationships, per-Turn forking, branch comparison or bringing a fork's result back to its source. The original pre-Codex vision validated Fork, Compare and Bring Back as a trio, and the shipped origin and quote machinery could power a bring-back cheaply. Open questions are which daily scenarios fork serves, how lineage should be visible, and whether Compare and Bring Back return. A proposal Ticket produces reviewable directions; the owner decides before implementation. A Chat fork is never a Subtask or Task dependency, per the accepted Chat and Task decision.",
+  "evidence": [
+    {
+      "note": "The owner asked for deliberate product thinking on fork chat.",
+      "ref": "conversation:2026-08-23-owner-flags-fork-chat-product-state"
+    },
+    {
+      "note": "The binding rule that a Chat fork is never a Task or dependency.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
+    },
+    {
+      "note": "The spike that validated Fork, Compare and Bring Back as product-owned projections.",
+      "ref": ".vibehub/outcomes/ticket-spike-deepseek-harness-foundations.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-chat-streams-birth-and-associate-independent-tasks",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-codex-daily-use-parity-major-features-not-niche",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-24T02:13:30Z",
+    "quote": "我们可能是需要思考一下，我们这个 fork chat 的这一部分的产品和交互的状态。",
+    "ref": "conversation:2026-08-23-owner-flags-fork-chat-product-state"
+  },
+  "state": "active",
+  "summary": "The owner flags that fork chat has an implementation but no thought-through product and interaction state; direction work is needed before deeper investment",
+  "tags": [
+    "fork",
+    "chat",
+    "lineage",
+    "compare",
+    "bring-back",
+    "interaction",
+    "direction"
+  ],
+  "type": "intent"
+}
