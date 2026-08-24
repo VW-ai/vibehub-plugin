@@ -567,6 +567,7 @@ const assets = new Map([
   ["/composer-queue.mjs", script("composer-queue.mjs")],
   ["/composer-settings.mjs", script("composer-settings.mjs")],
   ["/composer-attachments.mjs", script("composer-attachments.mjs")],
+  ["/composer-recording.mjs", script("composer-recording.mjs")],
   ["/composer-mentions.mjs", script("composer-mentions.mjs")],
   ["/context-usage.mjs", script("context-usage.mjs")],
   ["/thread-name.mjs", script("thread-name.mjs")],
