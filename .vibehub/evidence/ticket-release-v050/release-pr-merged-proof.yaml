@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-pr-merged",
+      "digest": "63085728d675b142063c341e9740c9774cbdd33ee3369f0c97ee12cf53cba76e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8453e0423812e085ce75b5cc21d98e95776f5bb0"
+    }
+  ],
   "acceptance_ids": [
     "release-pr-merged"
   ],
@@ -10,7 +18,7 @@
     "commit:33effbb",
     "conversation:2026-08-04-v050-release-migration"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "PR 13 (feat/v050-release-and-migration) carried the migration skill's closed Outcome, its Evidence chain, and the version identity commit, and was merged into main by the owner as commit 33effbb after explicit authorization in conversation (发, then merge了).",
   "ticket_id": "ticket-release-v050"
 }

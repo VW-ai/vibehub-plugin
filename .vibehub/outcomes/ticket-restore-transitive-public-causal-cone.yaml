@@ -6,12 +6,16 @@
     "transitive-focus-is-production-verified"
   ],
   "closed_at": "2026-08-20T20:23:37Z",
+  "contract_binding": {
+    "digest": "bd1305dc40ddc1bfa6d9bd6b00c591900b243227cb0986a1856af48e1ad1c248",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "transitive-causal-cone-implementation-and-browser-proof",
     "transitive-causal-cone-production-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all four criteria. Direct algorithm inspection confirms separate breadth-first upstream and downstream traversals, visited Ticket sets for repeated or cyclic references, exact traversed-relation sets, and union only after each directional cone is complete. Node focus reads the Ticket set and edge focus reads the relation set, so shared siblings are not inferred into a cone. Existing selection, Inspector, Rooms, pan, responsive geometry, and visual language remain intact. Fresh release preflight, 8/8 rendered contracts, 104/104 repository tests, Plugin artifact, and canonical validation passed. Sites version 4 is bound to exact commit d5b378e and its production deployment succeeded; acceptance-linked browser Evidence verifies both endpoint selections on the live canonical graph.",
   "ticket_id": "ticket-restore-transitive-public-causal-cone",

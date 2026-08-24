@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "command-surface-welded",
+      "digest": "fa5ca906230d054993584b9868c6ccea5a3ebbf813ed5aa191866694055dccc5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67ef8ad5780acc0c0853d7ba7f34bb55c75692ee"
+    }
+  ],
   "acceptance_ids": [
     "command-surface-welded"
   ],
@@ -9,7 +17,7 @@
     "commit:6d16979",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "test/skill-contracts.test.mjs extracts every vh.mjs domain-and-operation citation from all SKILL.md files (fenced and backticked forms, over ten distinct commands found) and executes each against a scratch repo, failing on unsupported_domain, unsupported_operation, or invalid_argument — the script itself is the registry, so no second source of truth; a dedicated case proves the --room flag parses.",
   "ticket_id": "ticket-contractize-skill-system"
 }

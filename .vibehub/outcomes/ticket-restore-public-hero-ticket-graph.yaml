@@ -7,12 +7,16 @@
     "responsive-accessible-static-site-is-verifiable"
   ],
   "closed_at": "2026-08-09T08:43:15Z",
+  "contract_binding": {
+    "digest": "44e92b9f65e67808488a9d0cac33b3fe0a22932e5b0104996205934cd9a87f1b",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "ticket-shelf-implementation-proof",
     "ticket-shelf-browser-and-build-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted every criterion. Source inspection confirms the default Product dossier, truthful install and copy actions, persistent five-Ticket shelf with URL and keyboard selection, tactile book and one-Ticket causal model, cancellable origin-aware transform motion, fine-pointer hover and reduced-motion handling, and responsive accessible static implementation. Fresh lint, production build, four rendered-contract tests, canonical project and Ticket validation, and 51-file Plugin artifact verification passed; the acceptance-linked browser Evidence records the required 1440px and 390px interaction and overflow observations.",
   "ticket_id": "ticket-restore-public-hero-ticket-graph",

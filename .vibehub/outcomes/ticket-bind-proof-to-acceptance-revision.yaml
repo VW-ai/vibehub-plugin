@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "contract-identity-is-deterministic",
+    "proof-schemas-gain-one-optional-binding",
+    "legacy-migration-is-mechanical-and-replayable",
+    "unresolved-fallback-preserves-retention-semantics",
+    "closed-contract-mutation-is-refused",
+    "projection-explains-proof-without-a-new-status",
+    "regression-rollback-and-artifacts-hold"
+  ],
+  "closed_at": "2026-08-24T02:42:57Z",
+  "contract_binding": {
+    "binding": "native",
+    "digest": "5804185d57919d01e2defc0568729a8e959957e884a66d94f4876f576a63c46c"
+  },
+  "evidence_ids": [
+    "contract-identity-and-binding-schemas",
+    "migration-ran-replayable-with-unresolved-fallback",
+    "closed-contract-guard-and-projection-explanation",
+    "regression-rollback-and-artifacts-green"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication at HEAD 703b378 reproduced every criterion without accepting executor summaries. Identity: eleven sampled bindings (three reconstructed documents plus this Ticket's four native ones) were re-derived with raw sha256 over the canonical [ticket_id, acceptance_id, defaulted authority, criterion] arrays outside contractIdentity and all match; Ticket documents and ticket.schema.json store no digest. Schemas: each contract gains exactly one optional addition with schema_version const 1 becoming enum [1,2] once, additionalProperties stays false, and a crafted successful Outcome carrying a fabricated digest under the no-addition-commit reason was rejected at outcome.contract_binding.digest before any write. Migration: a fresh dry run at this HEAD equals the committed docs/proof-binding-migration-report.json except live-recomputed deltas (evidence 327 to 331, all four new documents skipped as native; close_out 0 to 1 for this Ticket), proving counts are recomputed rather than stored; replaying --apply rewrote 0 of 435 documents and left the tree clean; the cloudflare Outcome's reconstruction was replayed from raw git (addition 915587a) and equals the stored digest while differing from the current contract with exactly the three recorded drifted ids; sampled 1ab39f7 diffs change only the schema_version value and the one inserted field, and no other commit in the range touches historical documents. Retention: DONE 104 to 102, archive 43 to 42, and the 14 stale evidence documents were recomputed independently and match; flipping a copy to format 2 restored 104/43 with bindings intact and legacy DONE, and flipping back restored REPLAN/102/42. Guard: rewording a criterion of DONE ticket-publish-v070-ui-release was refused contract_closed through the CLI and the in-process applyTickets choke point every shell host path uses, while a context-only edit applied. Projection: exactly seven actions; ticket-deploy-public-site-cloudflare and ticket-encode-human-acceptance-authority project REPLAN unresolved_legacy_outcome naming their drifted ids; with an Outcome removed in a probe copy, stale coverage projects EXECUTE naming the stale ids in the detail; frontier, ticket get, buildTicketHandoff, the shell readTask workspace and the Workbench phase slot carry the one derivation verbatim. Artifacts: npm test reports 323/321/0/2 and npm run verify plus both marketplace builds pass. Correction of record: the regression Evidence also claims npm run guard:codex passes, but at this same HEAD it fails deterministically because test/fixtures/bridge-repository.mjs still seeds format_version 2, so the guard's driver-owned repository projects scope migration-required and its bridge-write and task-reload checks fail; that command is outside this contract's required artifact list, so acceptance stands, and bumping the bridge fixture to the format-3 world is required follow-up work.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision",
+  "unresolved_acceptance_ids": []
+}

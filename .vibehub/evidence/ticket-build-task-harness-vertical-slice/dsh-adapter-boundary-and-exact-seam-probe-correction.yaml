@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "current-dsh-baseline-and-adapter-are-pinned",
+      "digest": "9d8401aea8394ad18cc19143db490dda4f3947bdef7c01ebe5f3c20aad9e48fe",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70f28a01c0ce01881cb56c843d1f72be488a9d4f"
+    },
+    {
+      "acceptance_id": "installable-bundle-preserves-native-dsh",
+      "digest": "434b0e8942e478958cc81e56b48bcc3010e514d243152080a9a7b129bb29fc44",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70f28a01c0ce01881cb56c843d1f72be488a9d4f"
+    },
+    {
+      "acceptance_id": "production-and-installed-regressions-pass",
+      "digest": "71f38f8c9f290b807f4a2909945bceef3f7a51a0d8373976a0985dd3e9ad54f0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70f28a01c0ce01881cb56c843d1f72be488a9d4f"
+    }
+  ],
   "acceptance_ids": [
     "current-dsh-baseline-and-adapter-are-pinned",
     "installable-bundle-preserves-native-dsh",
@@ -21,7 +41,7 @@
     "test/dsh-adapter.test.mjs",
     "test/dsh-bundle.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A strict follow-up to the initial implementation audit moved every rc.8 Host API call out of the Bundle entry and into packages/dsh-adapter/host.js; packages/dsh-bundle/index.js is now exactly one re-export and contains no DSH service call. The source-contract probe expanded from 14 upstream-existence checks to 20 compatibility checks: 17 bind an exact official rc.8 signature to the corresponding real Adapter use, while three pin the release/runtime and unsupported custom-event boundary. All 20 passed against official commit 141eb6fef83422698aef7a981029e843e8161534. Focused Adapter/Bundle tests passed 7/7 and the full repository verification passed 141/141 with a 62-file installed VibeHub artifact. A newly packed 68-file DSH Bundle installed through the official rc.8 plugin command into a fresh temporary Web Profile, booted with the native shell, served the read-only bootstrap GET with canonical source identity, rejected POST with 405 read_only, and served the same bootstrap again after a full Profile restart.",
   "ticket_id": "ticket-build-task-harness-vertical-slice"
 }

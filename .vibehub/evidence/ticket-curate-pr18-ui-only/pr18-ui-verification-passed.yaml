@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "ui-verification-passes",
+      "digest": "ea173e82e41bd23eab0ebc5dd4b5aeeb12cd0bc74bd0fd5f2038c291acb203cd",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ad21554e334cc88b434feb6f7e7145aad002af2a"
+    }
+  ],
   "acceptance_ids": [
     "ui-verification-passes"
   ],
@@ -13,7 +21,7 @@
     "test:vibehub-project-validate-success",
     "test:vibehub-room-drift-all-fresh"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The focused UI suite passed 8 of 8 tests, the full project suite passed 48 of 48 tests, artifact verification succeeded, canonical project validation succeeded, and all four Rooms report FRESH after recomputed alignment.",
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

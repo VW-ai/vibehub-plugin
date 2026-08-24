@@ -11,6 +11,18 @@
     "rooms-flow-proves-graph-boundary"
   ],
   "closed_at": "2026-08-11T01:19:26Z",
+  "contract_binding": {
+    "digest": "0232921a059a6a83daab4024b3964baa124b0a8af80001b2cd9ab118c8af0e68",
+    "binding": "reconstructed",
+    "unresolved": {
+      "reason": "contract-drifted-since-addition",
+      "acceptance_ids": [
+        "decision-boundary-policy-approved",
+        "plan-and-run-handle-human-decisions",
+        "rooms-flow-proves-graph-boundary"
+      ]
+    }
+  },
   "evidence_ids": [
     "authority-contract-and-skill-proof",
     "clean-authority-plugin-verification",
@@ -21,7 +33,7 @@
     "rooms-decision-graph-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Fresh independent closeout accepted all nine current criteria against the updated authority-and-maturity policy and all seven Evidence documents. Per-acceptance authority and human-origin closeout enforcement remain compatible and lightweight; Plan, Run, and Validate make independently schedulable human decisions explicit graph boundaries without another execution package. The Rooms dogfood chain now states firm proposal, firm human decision, and draft implementation. Its current states are proposal READY, decision BLOCKED with UPCOMING human attention, and implementation BLOCKED. A disposable exact-chain replay proved proposal success makes the decision READY/PENDING while implementation remains BLOCKED; human-origin decision Evidence plus independent Outcome then makes the decision DONE/COMPLETE and moves implementation only to REFINE, never directly to READY. Ticket Plan must rewrite the same downstream Ticket from draft to explicit firm before execution. Relevant tests pass 17/17, the complete suite passes 46/46 with the 52-file Codex/Claude-compatible artifact, project and Ticket validation pass, all Rooms are FRESH, and git diff check is clean.",
   "ticket_id": "ticket-encode-human-acceptance-authority",

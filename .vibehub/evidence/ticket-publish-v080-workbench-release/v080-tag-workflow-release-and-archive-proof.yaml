@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "v080-tags-the-final-main-commit",
+      "digest": "2a6156ca9a316ffdf3fac927c157f628180187d03735f76421c0a66d870bdd3c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    },
+    {
+      "acceptance_id": "v080-github-release-is-verified",
+      "digest": "50e83714c8371364a3d7094677157874b6cf092816b774e33aa7f7602b1cb3be",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    }
+  ],
   "acceptance_ids": [
     "v080-tags-the-final-main-commit",
     "v080-github-release-is-verified"
@@ -16,7 +30,7 @@
     "command:fresh-v080-shasum-verified-ok",
     "command:fresh-v080-tar-list-readable"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Remote lightweight tag v0.8.0 resolves exactly to the final authoritative-delivery main commit 648c5f62d27b0164b631245e52ddd805e9ff5337. Tag-triggered Release VibeHub run 31731296269 completed successfully for that exact SHA. GitHub Release v0.8.0 is published as neither draft nor prerelease and contains vibehub-plugin-0.8.0.tar.gz plus vibehub-plugin-0.8.0.tar.gz.sha256. A fresh 2026-08-20 download verified the checksum with `shasum -a 256 -c` and returned OK, and `tar -tzf` successfully listed the archive contents.",
   "ticket_id": "ticket-publish-v080-workbench-release"
 }

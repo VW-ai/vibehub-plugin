@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "copy-feature-is-statically-verified",
+      "digest": "424ccce79d3fbaf8a88721dd14009d7a8a9bc43bb70cd2350dde0554d89f4954",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "copy-feature-is-statically-verified"
   ],
@@ -12,7 +20,7 @@
     "command:root/npm-run-verify 43-pass and Plugin artifact 51-files-361397-bytes",
     "site/dist/client/index.html"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The revised static export, rendered-source assertions, lint, canonical project validation, complete repository suite, and Plugin artifact verification pass; the clipboard fallback handles embedded-browser denial without adding services or persistence.",
   "ticket_id": "ticket-add-site-copy-for-agent"
 }

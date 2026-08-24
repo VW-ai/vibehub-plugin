@@ -7,12 +7,16 @@
     "agent-first-site-is-accessible-and-verifiable"
   ],
   "closed_at": "2026-08-09T21:11:50Z",
+  "contract_binding": {
+    "digest": "6e6cb3e27a385c71a1c0bf094bf9aca5d204fa5733f49302c121f52fdb13dcb9",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "agent-first-interaction-implementation",
     "agent-first-browser-and-build-verification"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted every criterion. Source inspection confirms the conversation-only generic Coding Agent arrival, truthful host installation and source actions, deterministic single-example lifecycle, explicit human palette boundary, immediate app update, contextual App/Ticket switching, one-Ticket audit graph, and returned Context without raw schema exposure. Fresh lint, static production build, five rendered-contract tests, project and Ticket validation, and 51-file Plugin artifact verification passed. Acceptance-linked browser Evidence covers the required 1440px and 390px interaction, viewport, and overflow observations; browser control was unavailable in this independent task, so that visual observation could not be rerun here.",
   "ticket_id": "ticket-coding-agent-first-public-site",

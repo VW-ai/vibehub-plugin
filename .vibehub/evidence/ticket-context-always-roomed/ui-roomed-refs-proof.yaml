@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "ui-context-refs-roomed",
+      "digest": "966328ff12e4a65cd43057068f5441a94b6a5ea77e6051a4c4f7d0743226d506",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:25358f3ac9ee8fc1234429e32174486dd6af8d9c"
+    }
+  ],
   "acceptance_ids": [
     "ui-context-refs-roomed"
   ],
@@ -11,7 +19,7 @@
     "skills/vibehub-ticket-review/assets/app.js",
     "test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "canonicalContextFromRef in vh-ui.mjs now resolves room-held refs (any .vibehub/rooms/ path except room.yaml itself) into context cards and carries the owning room path, the card heading renders a quiet room chip, and ui-host.test.mjs asserts canonicalContext.room on a roomed ref — closing the regression where migrated refs silently stopped rendering.",
   "ticket_id": "ticket-context-always-roomed"
 }

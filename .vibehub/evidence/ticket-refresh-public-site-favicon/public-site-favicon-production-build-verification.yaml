@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "favicon-change-is-production-ready",
+      "digest": "a3b5da20c5e111279614446d35420fdfa9844a0da3c7b3f9a8e14f1b7fb13025",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:39b153774a429c0869d72af3c346dbe7f9213998"
+    }
+  ],
   "acceptance_ids": [
     "favicon-change-is-production-ready"
   ],
@@ -15,7 +23,7 @@
     "site/dist/client/index.html",
     "site/dist/client/index.rsc"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "SHA-256 verification proved site/public/vibehub-favicon.svg is byte-identical to site/public/vibehub-mark.svg. The repository-local release preflight passed site lint, the Vinext production build, and all 8 rendered contracts. Built HTML and RSC emit only https://vibehub.icu/vibehub-favicon.svg for shortcut and standard icon links, and canonical VibeHub project and Ticket validation passed with format 2 and 67 Tickets.",
   "ticket_id": "ticket-refresh-public-site-favicon"
 }

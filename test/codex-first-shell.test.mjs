@@ -13,6 +13,7 @@ import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.m
 import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
 import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
+import { contractIdentity } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -837,7 +838,7 @@ test("an unbound Git repository hides foreign Codex history, refuses Task action
   assert.equal(imported.body.data.scaffold.created, true);
   assert.deepEqual(imported.body.data.writtenPaths, [".vibehub/version.yaml", ".vibehub/rooms/", ".vibehub/tickets/", ".vibehub/evidence/", ".vibehub/outcomes/", ".vibehub/codex-project.yaml"]);
   for (const path of [".vibehub/version.yaml", ".vibehub/rooms", ".vibehub/tickets", ".vibehub/evidence", ".vibehub/outcomes", ".vibehub/codex-project.yaml"]) assert.ok(existsSync(join(folder, path)), path);
-  assert.deepEqual(JSON.parse(await readFile(join(folder, ".vibehub/version.yaml"), "utf8")), { format_version: 2, kind: "vibehub_project", schema_version: 1 });
+  assert.deepEqual(JSON.parse(await readFile(join(folder, ".vibehub/version.yaml"), "utf8")), { format_version: 3, kind: "vibehub_project", schema_version: 1 });
   const binding = JSON.parse(await readFile(join(folder, ".vibehub/codex-project.yaml"), "utf8"));
   assert.deepEqual(Object.keys(binding).sort(), ["codex_version", "folder", "harness", "imported_at", "kind", "schema_version", "section_id", "section_name_at_import"]);
   assert.deepEqual([binding.kind, binding.harness, binding.section_id, binding.section_name_at_import, binding.folder, binding.codex_version], ["codex_project_binding", "codex", "section-match", "Matching single folder", realFolder, "0.149.0"]);
@@ -970,7 +971,7 @@ async function proofRepository(context) {
     await mkdir(join(folder, path, ".."), { recursive: true });
     await writeFile(join(folder, path), `${JSON.stringify(document, null, 2)}\n`);
   };
-  await write(".vibehub/version.yaml", { format_version: 2, kind: "vibehub_project", schema_version: 1 });
+  await write(".vibehub/version.yaml", { format_version: 3, kind: "vibehub_project", schema_version: 1 });
   await write(".vibehub/rooms/product/room.yaml", { schema_version: 1, kind: "room", room_id: "product", description: "Product direction", boundary: "What the shell promises", anchors: ["README.md"], stale: false });
   await write(".vibehub/rooms/product/decision-proof-direction.yaml", {
     schema_version: 1, kind: "context", context_id: "decision-proof-direction", type: "decision", state: "active",
@@ -997,9 +998,11 @@ async function proofRepository(context) {
     relations: [{ type: "depends_on", target_ticket_id: "ticket-proof-prerequisite", rationale: "Prerequisite must be accepted first." }],
     provenance_refs: ["conversation:proof-direction"],
   });
-  await write(".vibehub/evidence/ticket-proof-prerequisite/prereq-proof.yaml", { schema_version: 1, kind: "ticket_evidence", evidence_id: "prereq-proof", ticket_id: "ticket-proof-prerequisite", acceptance_ids: ["prereq-holds"], summary: "Prerequisite proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" });
-  await write(".vibehub/evidence/ticket-proof-workspace/workspace-proof.yaml", { schema_version: 1, kind: "ticket_evidence", evidence_id: "workspace-proof", ticket_id: "ticket-proof-workspace", acceptance_ids: ["workspace-renders"], summary: "The Workspace rendered the contract.", refs: ["apps/codex-first-shell/app.js"], origin: "agent", recorded_at: "2026-08-21T09:00:00Z" });
-  await write(".vibehub/outcomes/ticket-proof-prerequisite.yaml", { schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-proof-prerequisite", status: "successful", accepted_acceptance_ids: ["prereq-holds"], unresolved_acceptance_ids: [], evidence_ids: ["prereq-proof"], summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" });
+  const prereqIdentity = contractIdentity({ ticket_id: "ticket-proof-prerequisite", acceptance: [{ acceptance_id: "prereq-holds", criterion: "The prerequisite holds." }] });
+  const workspaceIdentity = contractIdentity({ ticket_id: "ticket-proof-workspace", acceptance: [{ acceptance_id: "workspace-renders", criterion: "The Workspace renders the contract." }, { acceptance_id: "packet-is-exact", criterion: "The packet is byte-exact." }] });
+  await write(".vibehub/evidence/ticket-proof-prerequisite/prereq-proof.yaml", { schema_version: 2, kind: "ticket_evidence", evidence_id: "prereq-proof", ticket_id: "ticket-proof-prerequisite", acceptance_ids: ["prereq-holds"], acceptance_bindings: [{ acceptance_id: "prereq-holds", digest: prereqIdentity.criterion_digests["prereq-holds"], binding: "native" }], summary: "Prerequisite proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" });
+  await write(".vibehub/evidence/ticket-proof-workspace/workspace-proof.yaml", { schema_version: 2, kind: "ticket_evidence", evidence_id: "workspace-proof", ticket_id: "ticket-proof-workspace", acceptance_ids: ["workspace-renders"], acceptance_bindings: [{ acceptance_id: "workspace-renders", digest: workspaceIdentity.criterion_digests["workspace-renders"], binding: "native" }], summary: "The Workspace rendered the contract.", refs: ["apps/codex-first-shell/app.js"], origin: "agent", recorded_at: "2026-08-21T09:00:00Z" });
+  await write(".vibehub/outcomes/ticket-proof-prerequisite.yaml", { schema_version: 2, kind: "ticket_outcome", ticket_id: "ticket-proof-prerequisite", status: "successful", accepted_acceptance_ids: ["prereq-holds"], unresolved_acceptance_ids: [], evidence_ids: ["prereq-proof"], contract_binding: { digest: prereqIdentity.contract_digest, binding: "native" }, summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" });
   git(folder, ["add", ".vibehub"]);
   git(folder, ["commit", "-q", "-m", "vibehub proof graph"]);
   return { folder, realFolder };
@@ -1101,7 +1104,8 @@ test("Graph and Task Workspace routes serve the canonical projection, and the Wo
   assert.deepEqual(workspace.body.data.evidence, handoff.evidence);
   assert.deepEqual(workspace.body.data.evidence.map((item) => [item.evidenceId, item.acceptanceIds, item.origin, item.refs]), [["workspace-proof", ["workspace-renders"], "agent", ["apps/codex-first-shell/app.js"]]]);
   assert.equal(workspace.body.data.outcome, null, "no Outcome is recorded for the open Ticket");
-  assert.deepEqual(workspace.body.data.nextAction, { action: "EXECUTE", reason: "acceptance_evidence_incomplete", detail: "Executable criteria still need reproducible acceptance-linked Evidence.", acceptanceIds: ["packet-is-exact"], blockingTicketIds: [] });
+  assert.deepEqual(workspace.body.data.nextAction, { action: "EXECUTE", reason: "acceptance_evidence_incomplete", detail: "Executable criteria still need reproducible acceptance-linked Evidence.", acceptanceIds: ["packet-is-exact"], blockingTicketIds: [], proof: handoff.nextAction.proof }, "readTask carries the canonical next action with its proof explanation, not a re-derivation");
+  assert.ok(workspace.body.data.nextAction.proof, "the Workspace surface carries the proof-binding explanation");
   assert.equal(workspace.body.data.packet.context.items[0].contextId, "decision-proof-direction");
   assert.deepEqual(workspace.body.data.source, { handoff: "vh-ui.buildTicketHandoff", packet: "codex-adapter/task-context.buildTaskContextPacket", contexts: "canonical_room_projection", snapshotId: snapshot.state.graph.snapshotId });
   const closed = (await action({ action: "readTask", ticketId: "ticket-proof-prerequisite" })).body.data;

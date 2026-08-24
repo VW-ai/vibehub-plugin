@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "one-cross-cutting-substate-slot-is-defined",
+      "digest": "79277355f9527f303daa71b4baed31c0ba1a107f38edb3747f3a3600a8594dcf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "running-substages-and-live-presence-are-distinct",
+      "digest": "d48db2cb75c757fe83cd53ece083ea998abafd8afedc6d911d6dd9067a9a85ad",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "quiet-visual-and-language-system-is-reviewable",
+      "digest": "0987db5c106975e1b2512cba773fe1a95545658eac2577861ee5334b9e31129a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "recommendation-and-downstream-boundaries-are-decision-ready",
+      "digest": "c5498941076f3ca0ec7b51bd47ef426fae356ecc819515df2e56fc0cb5629f9c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    }
+  ],
   "acceptance_ids": [
     "one-cross-cutting-substate-slot-is-defined",
     "running-substages-and-live-presence-are-distinct",
@@ -19,7 +45,7 @@
     "command:git-diff-no-production-workbench-or-contract-files",
     "command:npm-run-verify-126-of-126"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A dependency-free production-shaped review board renders eleven representative cards using the accepted compact graph anatomy, four primary legend entries, one upper-right icon-plus-text signal, and a separate trusted-live affordance. Real headless Chrome review confirmed the 1440x1000 wide graph plus right Inspector and the explicit 390x844 narrow frame with a scrollable graph plus lower Inspector; long copy remains bounded, cards without a substate stay quiet, selected and causal-dimmed states remain readable, and RUNNING+VERIFYING correctly claims no live presence when only CLOSE_OUT exists. Pointer and keyboard focus update the exact derivation Inspector, hover/focus reveal the same explanation, narrow targets are at least 44px, and reduced motion replaces pulse with a static ring. The palette uses neutrals plus shared action blue, proof green, attention amber, and exception red rather than one color per fact, and production Workbench assets remain untouched.",
   "ticket_id": "ticket-propose-card-corner-signal-contract"
 }

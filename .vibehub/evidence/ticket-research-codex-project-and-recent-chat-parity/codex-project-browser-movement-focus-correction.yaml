@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "project-parity-review-is-decision-ready",
+      "digest": "7afec6f5e10b610edc2b3e907bc7b72f368362fa42be6780262ce29fc16dc6a8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:f4147732099dbb77577bd6020a04ab42fe373018"
+    }
+  ],
   "acceptance_ids": [
     "project-parity-review-is-decision-ready"
   ],
@@ -25,7 +33,7 @@
     "command:npm run probe:codex:projects:browser-cleanup (removed exact marker Project and Thread; repeat returned empty IDs)",
     "commit:443ccad8842c791d359448ef01389040cfb41f07"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Correction at commit 443ccad8842c791d359448ef01389040cfb41f07 replaces the structurally asserted HTML5 dataTransfer path with a real PointerEvent gesture, preserves explicit focus across Project-membership rerenders, and records a real authenticated browser matrix. One temporary official Codex Thread moved Recents to the temporary Project by actual pointer drag in Wide Light and Narrow Light; it moved Project to Recents through the labeled native Project select in Wide Dark and Narrow Dark. Fresh app-server bootstrap recovered each membership, opening focused H1#activeThreadTitle instead of BODY, rerenders restored the moved Thread button or native select, exact polite atomic status messages were observed, and all four surfaces had no horizontal overflow. The native select was exercised end-to-end with browser selectOption because the in-app-browser OS arrow-key synthesis did not change its value; physical key-event coverage is explicitly not claimed. The marker Project and Thread were hard-deleted, and a second cleanup pass returned empty IDs. Focused real-runtime tests passed 14/14 and full verification passed 181 with two intentional skips and an artifact check.",
   "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
 }

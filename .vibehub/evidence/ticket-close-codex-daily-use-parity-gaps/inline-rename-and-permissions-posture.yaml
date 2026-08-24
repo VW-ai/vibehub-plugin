@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rename-and-settings-posture-per-thread",
+      "digest": "31bb7bfeded8f114ca3f1272b4808f9441b244a788771cccea13a61d58cdfb68",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "rename-and-settings-posture-per-thread"
   ],
@@ -15,7 +23,7 @@
     "test/codex-chat-conformance.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 1ac28cd adds inline rename in the Chat header and the sidebar row through the existing setThreadName host action and thread/name/set, and the sidebar reflects thread/name/updated without a refresh; the header shows the approval policy and sandbox from the settings record, and a Permissions control switches between Ask for approval, sent as approvalPolicy on-request with sandboxPolicy type workspaceWrite, and Full access, sent as approvalPolicy never with sandboxPolicy type dangerFullAccess, on the next turn/start after a confirmation dialog with focus trap, Escape and focus restore, while each Turn shows the posture it used. The chat-model test proves thread/name/updated renames the record and the POSTURES constant deep-equals the contract; guard checks cover the posture line, the confirmation, the posture keys on turn/start and header plus sidebar rename on a seeded real Thread; the driver walk shows thread/name/set followed by thread/name/updated and the Full access keys then the Ask keys on successive turn/start requests.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

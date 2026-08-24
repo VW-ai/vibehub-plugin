@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "search-console-discovery-is-configured",
+      "digest": "478420935138828216fc94a189ed34ed2d1f8413af3a8f590bd54af191e3b4e7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    },
+    {
+      "acceptance_id": "domain-discovery-is-production-verified",
+      "digest": "21a88cc87fb54b31729fb65b4960ebd95c3430533d68eaadfc96d2ec5ef2ef18",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    }
+  ],
   "acceptance_ids": [
     "search-console-discovery-is-configured",
     "domain-discovery-is-production-verified"
@@ -19,7 +33,7 @@
     "command:curl-googlebot-sitemap-http-200-application-xml",
     "command:xmllint-sitemap-valid"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "In the ownership-verified Google Search Console Domain Property vibehub.icu under the account label w.wayne.vip@gmail.com, the retained apex TXT method remained valid after the Pages cutover. Search Console accepted https://vibehub.icu/sitemap.xml with a Sitemap submitted successfully acknowledgement on 2026-08-20, and URL Inspection reported https://vibehub.icu/ is on Google, indexed, and served over HTTPS. Request indexing completed with an Indexing requested acknowledgement placing the homepage in the priority crawl queue. The sitemap table's immediate processing status was Couldn't fetch even though direct public and Googlebot requests returned HTTP 200 application/xml and xmllint accepted the document; this transient Google status is recorded truthfully and Google stated that it will periodically process the submitted sitemap. No Google verification value, credential, cookie, or authorization state is recorded.",
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

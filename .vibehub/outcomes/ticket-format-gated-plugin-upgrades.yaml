@@ -7,6 +7,10 @@
     "cross-host-clean-install-proof"
   ],
   "closed_at": "2026-08-05T00:12:56Z",
+  "contract_binding": {
+    "digest": "2daef6e5d3cfd7beb1725200fdb7dd4e3e15cbdab4d34ab341cca8c75ba79906",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "project-format-contract-proof",
     "compatibility-write-gate-proof",
@@ -15,7 +19,7 @@
     "cross-host-clean-install-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all five criteria against the complete working-tree diff and five Evidence records. project-format-contract: the new owned schema defines positive integer format_version independently of plugin SemVer, project init writes .vibehub/version.yaml, this repository dogfoods format 1, and malformed/newer markers are rejected without mutation. compatibility-preflight-and-write-gate: the helper deterministically reports CURRENT, MIGRATION_REQUIRED for unversioned 0.4/0.5, or UNSUPPORTED_NEWER with machine-readable current/target data, and gates Context, Room alignment/stale, Ticket, Evidence, and Outcome writes while non-current. explicit-reviewable-migration: the migrate Skill and single registry require compatibility preflight, affected-path preview, the explicit write boundary, the complete 0.4-to-0.5-unversioned-to-format-1 path, then CURRENT, project validate, and room drift proof; install, refresh, query, validation, and UI paths contain no migration mutation. codex-claude-update-contracts: README and INSTALL separate host bundle refresh from reviewed repository migration, accurately document Claude auto-update/reload and Codex marketplace refresh/new-session behavior, and both builders package matching version, Skills, format schema, and migration bytes. cross-host-clean-install-proof: the fresh-artifact test executes both installed helpers over current, migration-required, and newer fixtures with identical write refusal, and now removes every test-owned fixture/artifact root on success or failure. Independent reproduction passed npm run verify 43/43 plus the 51-file artifact verifier, both standalone marketplace builders, git diff --check, Ticket/project validation, CURRENT format 1, and four FRESH Rooms. All constraints held: no updater daemon/hook/service/hidden state, code refresh never writes project data, no live dual format or forward shim, migration remains ordinary Git changes, and installed host behavior is equivalent despite host lifecycle differences.",
   "ticket_id": "ticket-format-gated-plugin-upgrades",

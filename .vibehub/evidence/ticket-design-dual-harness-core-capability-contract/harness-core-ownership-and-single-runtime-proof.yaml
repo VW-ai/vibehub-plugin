@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "core-and-harness-ownership-matrix-is-explicit",
+      "digest": "03b14139cb8b8948500deef9ba3066356705c9f63e9301dd9730e90ea9887d5a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8792e954ffedfedde707c4ec9ceff785a06be520"
+    },
+    {
+      "acceptance_id": "capability-negotiation-and-single-runtime-routing-are-executable",
+      "digest": "c4cda6eecbe6f0488265ee3154eebcaf8e8088d95e6c5826b653d5e4eb96b472",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8792e954ffedfedde707c4ec9ceff785a06be520"
+    }
+  ],
   "acceptance_ids": [
     "core-and-harness-ownership-matrix-is-explicit",
     "capability-negotiation-and-single-runtime-routing-are-executable"
@@ -19,7 +33,7 @@
     "test/harness-core-contract.test.mjs",
     "command:node-test-harness-core-contract-7-of-7"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in architecture contract and executable schema assign VibeHub Task, Project, Room, Context, origin association, Evidence and Outcome truth to shared core while assigning transcript, Agent runtime, models, tools, permissions, approvals, audio and live execution to exactly one selected harness. Twelve versioned capabilities expose native, adapted or unsupported behavior with truthful fallbacks. The core router rejects a mismatched harness id, rejects unsupported DSH audio before adapter dispatch, requires every result to retain the selected harness id and never falls through to the other runtime; fixture Codex and DSH adapters preserve exact Task handoff without creating a second Task or transcript store.",
   "ticket_id": "ticket-design-dual-harness-core-capability-contract"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "production-visual-system-matches-owner-direction",
+      "digest": "1b38eeadcee362bd32db945cf299fcc053ed37ad05676d6a4e69b5976fc577b4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a87f8dcfb1946829f01eeb421ec74b0668882a61"
+    },
+    {
+      "acceptance_id": "production-capabilities-and-truth-remain-intact",
+      "digest": "00ef9c2d37a75e85f10a1814e2111863a966182b61142babaa96e1c87ea12291",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a87f8dcfb1946829f01eeb421ec74b0668882a61"
+    },
+    {
+      "acceptance_id": "overview-and-progressive-detail-stay-quiet",
+      "digest": "6b3978f7d6fffad1b3a73267b0f98bdca08800edfeef165e95e4f1f689550ff9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a87f8dcfb1946829f01eeb421ec74b0668882a61"
+    },
+    {
+      "acceptance_id": "visual-accessibility-and-regression-proof-pass",
+      "digest": "0296b628ca335b9bd89d5dc001f7d5fd278410c84fb517bb799889fbd555b369",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a87f8dcfb1946829f01eeb421ec74b0668882a61"
+    }
+  ],
   "acceptance_ids": [
     "production-visual-system-matches-owner-direction",
     "production-capabilities-and-truth-remain-intact",
@@ -17,7 +43,7 @@
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app.js"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Production applies one dependency-free global system-monospace and 16px stroke-SVG visual system, restrained whole-card operational states, separate ARCHIVED boundaries, orthogonal human-attention badges, compact semantic counts, and a two-axis on-demand Overview while preserving the canonical graph and Inspector. Fresh npm run verify passes 74/74 and the installed artifact verifies at 54 files / 698554 bytes; project and Ticket validation pass and all four Rooms are FRESH after the implementation commit alignment. In-app Browser execution verified the live production host in LTR and TTB with exact focus/Log URL restoration, selected causal dimming, all Inspector lenses, 45 labeled card states, six attention badges, Overview closed by default and opening with both legends, no banned proposal copy or emoji, no console warnings/errors, and no horizontal overflow. A 390x844 pass caught and then verified the fix for the Inspector bottom-sheet CSS cascade: it now measures 390x403.375, aligns to the workspace bottom, leaves the graph visible, and the narrow Overview fits at 370x384. Automated responsive contracts cover the specified wide/medium breakpoints and 44px/reduced-motion requirements; independent closeout must reproduce the complete specified viewport matrix before acceptance.",
   "ticket_id": "ticket-apply-codex-like-workbench-visual-language"
 }

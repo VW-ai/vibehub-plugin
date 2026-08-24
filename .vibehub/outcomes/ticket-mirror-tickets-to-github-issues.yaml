@@ -8,6 +8,10 @@
     "live-mirror-looks-good-on-github"
   ],
   "closed_at": "2026-08-22T23:59:00Z",
+  "contract_binding": {
+    "digest": "31fb243cbcaa784abc22d890a954fff2f386da4ae6ffda9b46c10a50afcd7025",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "projection-script-and-idempotency-tests",
     "dry-run-transcript-real-repository",
@@ -17,7 +21,7 @@
     "owner-judges-live-mirror-readable"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent adjudication at HEAD aa83b30. Reproduced: npm test passes 136/136 including fixture tests for empty-remote creates, zero-operation match, and drift repair; verify:artifact ok with the script excluded from the bundle; ticket validate ok. scripts/sync-github-issues.mjs uses only node and gh, and in --dry-run the sole gh call is issue list (read). A fresh dry run against the live repository planned 0 creates and exactly 2 operations, both explained by Evidence on this branch not yet on main, confirming idempotency against the 87 Issues the live run created. sync-issues.yml triggers on push to main with the required paths filter plus workflow_dispatch dry_run, requests only contents:read and issues:write, and has no commit step; no Skill, CLAUDE.md rule, or hook references the sync (only a human package script). gh issue view confirmed #69 open with 5 Evidence comments and ticket marker, #35 with resolved Blocked by #44/#51 and blocked/draft labels, #95 closed with 3 checked criteria, 3 comments, and footer link to the Ticket file on main. The product room decision records the one-way, Git-as-truth rule. The human-authority criterion is accepted through human-origin Evidence owner-judges-live-mirror-readable, which records the owner's explicit judgment in conversation. Owner-requested follow-ups (native GitHub issue dependencies, recommended GitHub view) are out of scope for this Ticket.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues",

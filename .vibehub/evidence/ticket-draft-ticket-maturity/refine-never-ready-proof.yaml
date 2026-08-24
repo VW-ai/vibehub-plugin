@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "refine-never-ready",
+      "digest": "09296253104681ae05bc0d8a55a74958448db58c29410c26200655720cd25cc9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1d7d379009105bd85dbdd9c1d753c92fe52b6969"
+    }
+  ],
   "acceptance_ids": [
     "refine-never-ready"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/draft-maturity.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "ticketStatus returns REFINE for a draft whose blockers are all closed and the frontier filters on READY so drafts are excluded unconditionally; the test builds the decision's own scenario — blocker, draft frontend, draft e2e — and proves closing the blocker flips frontend to REFINE (not READY) with an empty frontier, while rewriting frontend without the marker makes it READY and frontier-visible in place.",
   "ticket_id": "ticket-draft-ticket-maturity"
 }

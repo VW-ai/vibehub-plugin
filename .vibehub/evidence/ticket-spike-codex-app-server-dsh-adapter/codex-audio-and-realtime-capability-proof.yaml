@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "audio-and-realtime-capabilities-are-bounded",
+      "digest": "89aaeb8a18169cfec0c908cb62eccb1a2808d1935d03afeb1375e2c6d051bcea",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1caf170519af7edc0a7484afc85dd8e908f16818"
+    }
+  ],
   "acceptance_ids": [
     "audio-and-realtime-capabilities-are-bounded"
   ],
@@ -14,7 +22,7 @@
     "command:generated-schema-audio-local-audio-and-realtime-notification-proof",
     "command:experimental-realtime-current-thread-unsupported"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact generated Codex 0.147.0 Turn schema contains both audio URL and localAudio path inputs. The generated stable client request union does not publish realtime methods, while the server notification schema contains started, transcript delta/done, output audio delta, error and closed notifications. With experimentalApi enabled, the live pinned app-server recognized thread/realtime/start with outputModality audio but reported that the ephemeral Thread does not support realtime conversation. The lock and recommendation therefore require stable ordinary audio first, capability-gate experimental realtime, and prohibit microphone-live, transcript-live or audio-output claims when the capability is absent.",
   "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
 }

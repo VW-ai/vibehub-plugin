@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "digest": "f572425a74e5a63da5517a077f7be927078c5b37f0c16aba1bfccb2316c513b7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:617e0339a053b60bcefee373daf3b4e6ac2ff535"
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "digest": "1e717555abeccb63093b06f20d71c15ce4e28d9d8393054f75047548ed8c0e60",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:617e0339a053b60bcefee373daf3b4e6ac2ff535"
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "digest": "8af04c2d24bb469e32a3a76ab64875f5319b966d09595d5cea909b19f87f4fff",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:617e0339a053b60bcefee373daf3b4e6ac2ff535"
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "digest": "6e78f40cb1d5d33856129ee905f4b617a0ba1c66f0ac6b0b6eca9f4d18ab7ea8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:617e0339a053b60bcefee373daf3b4e6ac2ff535"
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "digest": "cbaaa6d225ec47f9acb3e7dd33ec4dc161200a04a26f07fdcdb48531a7a9d2e9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:617e0339a053b60bcefee373daf3b4e6ac2ff535"
+    }
+  ],
   "acceptance_ids": [
     "evidence-references-are-typed-and-compact",
     "bound-context-is-inspectable",
@@ -19,7 +51,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood found Contract substantially less direct than Execution and Proof because Acceptance, Guardrails, Context, dependency rationale, and provenance were all presented at equal weight. Commit eb6e8ba turns Contract into a definition-of-done view: one brief leads with acceptance count, Evidence coverage, and independent Outcome state; acceptance conditions remain the sole default-expanded body; and Working boundaries, Required context, plus Dependency & source become three counted supporting disclosures. Execution, Contract, and Proof remain separate because they answer execution state, completion conditions, and recorded evidence respectively. Real-browser review on the current READY Ticket confirmed 8 acceptance conditions, live 8/8 Evidence coverage with Outcome pending, three closed support disclosures, intact expandable canonical Context, and 16 commit-pinned Proof file links carrying a visible external-link glyph and explicit GitHub hover title. Runtime logs were empty. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237396 bytes. Final owner approval of the overall visual direction remains protected.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

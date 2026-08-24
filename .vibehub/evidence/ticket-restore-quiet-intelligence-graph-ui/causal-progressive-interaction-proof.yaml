@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "causal-graph-is-primary",
+      "digest": "15fee879b732f66ab6af2f9120885fb8950b01b5b86e2f98b494b7bad1d4219b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7f60b3bdb529a28def533f09d4040fc0df4369b4"
+    },
+    {
+      "acceptance_id": "quiet-progressive-disclosure",
+      "digest": "70b86f28369889822d69e4e16c9cd595cf27452f5a6e818deaccfca073fbadae",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7f60b3bdb529a28def533f09d4040fc0df4369b4"
+    },
+    {
+      "acceptance_id": "interaction-is-deliberate-and-accessible",
+      "digest": "830a2ca5d7fc915f65e263602c3024e34748bf842a292b8606f536538b66bd5e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7f60b3bdb529a28def533f09d4040fc0df4369b4"
+    }
+  ],
   "acceptance_ids": [
     "causal-graph-is-primary",
     "quiet-progressive-disclosure",
@@ -18,7 +38,7 @@
     "browser-test:desktop-ticket-selection-and-progressive-disclosure",
     "browser-test:390x720-full-screen-inspector"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The real browser rendered the complete deterministic left-to-right eight-Ticket graph with a three-way fork, two joins, nine direct unlocks, stable selection, minimap, fit, pan/zoom controls, causal dimming, and visible relation handles. Selecting the exact foundation-to-graph-layout handle opened that relation rather than an overlapping sibling. Ticket selection preserved the graph on desktop; state stayed immediately visible while execution Context, exact source, acceptance, constraints, bound Context, dependencies, provenance, and Git trace each remained one further disclosure away. The 390px state kept all graph controls in the toolbar and opened one full-screen Inspector with close/back, focusable disclosure rows, honest source/Copy controls, and no unsupported write affordances.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

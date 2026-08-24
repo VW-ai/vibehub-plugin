@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "connectors-use-rendered-card-geometry",
+      "digest": "9bd8236034005342b31944be8ec70819d322f23b58227b8b71ac6c476ebc17e2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:e16a8348531f75aa36fe291e24e01f5ef3a6715d"
+    },
+    {
+      "acceptance_id": "connectors-stay-attached-through-layout-change",
+      "digest": "97611e21981ff6ee33643373f4c101dd75306bdca95d75f089c65facda51dae0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:e16a8348531f75aa36fe291e24e01f5ef3a6715d"
+    },
+    {
+      "acceptance_id": "graph-language-and-interaction-remain-intact",
+      "digest": "077d53cff0db43c994b888a366208511d2dce760688055f45a926dad85fd0d0c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:e16a8348531f75aa36fe291e24e01f5ef3a6715d"
+    },
+    {
+      "acceptance_id": "connector-fix-is-production-verified",
+      "digest": "d90671edbecd4d6d802e808bc16f37a529f83de00c4d3f10f251404345e1af6f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:e16a8348531f75aa36fe291e24e01f5ef3a6715d"
+    }
+  ],
   "acceptance_ids": [
     "connectors-use-rendered-card-geometry",
     "connectors-stay-attached-through-layout-change",
@@ -19,7 +45,7 @@
     "command:node-site-release-verify-vibehub-icu",
     "command:browser-live-expanded-graph-attachment-check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Sites version 3 deployed the exact connector-fix commit to the existing public VibeHub project. The immutable URL and vibehub.icu both returned HTTPS 200; the custom domain, provider, and SSL remained active. On the live canonical site with the first Inspector closed, the graph map expanded to about 733px and direct DOM measurement confirmed all three source and target endpoints remained attached within 0.1px. A live screenshot showed the routed paths continuously connecting VH-201 and VH-202 into VH-204 and VH-204 into VH-205 with the existing arrow and control-knot language.",
   "ticket_id": "ticket-fix-public-graph-connector-alignment"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "digest": "f5773cf85b34907b4c94c5920a9c24e6706fc2621952ffe5fdf80a07a057fb28",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "graph-projects-progressive-causality",
+      "digest": "b75af35c9e9ae9e59372019d3c310b1f3acfd82f073f668bb10502d5fe7919bb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "motion-explains-without-obstructing",
+      "digest": "892aa5399e1d065765a4284774a93dccfaccf7c12261080bb5afe38261e66725",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "reduced-motion-preserves-the-sequence",
+      "digest": "83ee1d9a11bf3f8430169632a6857c8733b8487f130326c770ee8e1161f84172",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "post-decision-cycle-evolves-in-order",
     "graph-projects-progressive-causality",
@@ -12,7 +38,7 @@
     "file:site/app/page.tsx",
     "file:site/app/globals.css"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public walkthrough now exposes one causal evolution rather than jumping from human choice to completion. Choosing a palette still changes the App immediately; after 520ms the View returns to the Ticket while Evidence is the mechanically projected current stage, and only at 1680ms does successful Outcome and returned Context appear. Request, Context, Ticket, Human, Evidence, Outcome, and all four edges derive future/current/done presentation directly from the existing Phase. A compact 01 Ticket / 02 Human / 03 Evidence / 04 Outcome marker names the current lifecycle without creating another progress state. Graph nodes, edges, workspace entry, and returned Context use the existing motion tokens with transform/opacity transitions under 300ms; controls remain immediate. Reduced-motion removes spatial travel while retaining semantic state opacity and color, and the existing narrow-layout graph remains vertically reachable.",
   "ticket_id": "ticket-public-cycle-evolution"
 }

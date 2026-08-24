@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "bridge-surfaces-hold-the-baseline",
+      "digest": "60d684c538d505e62c8580d38dc540fa65ecb30656942e07d3fe5362881ac50e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "bridge-surfaces-hold-the-baseline"
   ],
@@ -20,7 +28,7 @@
     "scripts/vh-codex-first-shell-guard.mjs",
     "docs/proposals/codex-chat-conformance/browser-runtime-review.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits a5b631f, ab414e6, d8facc3 and 2624251 hold the baseline on the new surfaces. A shared focus trap covers the Create Task, Attach and Remember sheets; Escape and the scrim close them, while the selection sheet is a toolbar outside the trap and focus returns to the trigger, asserted after every write; the guard keyboard audit run inside each sheet and over the provenance Graph reports zero gaps; the page has no horizontal overflow at 390. The contrast test gains 24 modelled rules and 25 pairs for the new elements and passes in Light and Dark after the accent border mix it caught at 2.19 to 1 was raised to at least 3.22 to 1. The hookPrompt divider now reads Repository instructions, both fixtures carry a hookPrompt item so it renders in the guard, and a static test proves the UI never says Project instructions. At merge commit 34d7b23 npm test reports 267 tests, 265 pass, 0 fail, 2 DSH skips, npm run verify exits 0, and npm run guard:codex passes 79 of 79 wide and 80 of 80 narrow in Light and Dark with bridge writes verified 7 of 7 on all six frames and the lifecycle walk 6 of 6 on the fixture; the same driver in --runtime real mode passes the lifecycle walk 6 of 6 on the installed Codex 0.149.0. Against the pre-change UI the new guard exits 1 with three failing checks and the driver's bridge write verification fails 5 of 7; guard summaries print passed over total, never failure counts.",
   "ticket_id": "ticket-build-codex-chat-task-bridges"
 }

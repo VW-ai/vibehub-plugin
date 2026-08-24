@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "real-regression-corpus-covers-observed-gaps",
+      "digest": "7885bd8b77a78d5815c339f174df038153bb8123600e08b70eee27131c79ea76",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "digest": "a319af13f7804728696d33c0afe232b1ec19bc1c92182befcb265eb40c06df42",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+      "digest": "036729afc5c171b818adb4a676c130f20a42efc1cfb1ae3702aa8cb0a8321fdf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+      "digest": "6f246fe8ad3e7015a56ec975056f7b5503aed197becdd1a06c6a2c8d4ccbb6c9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+      "digest": "0754ec43a9601b5bb66f4108e29320ab08daa89d94e927169423d9c408d82179",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    }
+  ],
   "acceptance_ids": [
     "real-regression-corpus-covers-observed-gaps",
     "next-action-table-is-complete-and-authority-aware",
@@ -19,7 +51,7 @@
     "command:vh-project-validate-format-2-79-tickets-202-evidence-59-outcomes",
     "command:vh-ticket-validate-79-tickets-202-evidence-59-outcomes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The regression corpus names and reproduces v0.8 publication and six-criterion dogfood repair as CLOSE_OUT-only, plus ordinary execution, incomplete human and mixed authority, unresolved dependency, draft refinement, successful Outcome, and partial, failed, and deviated Outcomes. Complete verification passed 110 of 110 tests, including current/all graph and real loopback Workbench host behavior; project and Ticket validation pass at format 2 with 79 Tickets, 202 Evidence, and 59 Outcomes before this Ticket's Evidence was appended; the dependency-free installed Plugin artifact passed with 56 files and exercised EXECUTE to CLOSE_OUT to DONE without writable Web state or automatic success.",
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

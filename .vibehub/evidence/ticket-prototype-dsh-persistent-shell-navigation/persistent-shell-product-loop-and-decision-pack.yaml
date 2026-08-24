@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "persistent-shell-information-architecture-is-reviewable",
+      "digest": "a7c106e06c78dd7ead15621e134b1912b1c0a17bbe520d6b5a65a87807d7aaf8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    },
+    {
+      "acceptance_id": "chat-graph-task-loop-is-complete",
+      "digest": "27ae167e704306b5f4178567c86c99739921dc2aa6c705f53585fcb98e1ad7c1",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    },
+    {
+      "acceptance_id": "owner-decision-pack-is-exact",
+      "digest": "7d2fdfc2e08089a1b6bb6a95cff8012d632d000bf9dbf2add026a2c4de2c14e4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    }
+  ],
   "acceptance_ids": [
     "persistent-shell-information-architecture-is-reviewable",
     "chat-graph-task-loop-is-complete",
@@ -16,7 +36,7 @@
     "docs/proposals/dsh-persistent-shell/composition-contract.json",
     "test/dsh-persistent-shell-prototype.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production-shaped review carrier keeps one persistent DSH/Codex-like sidebar across native Chat, Tasks Graph and focused Task Workspace, with New Chat, Chat history, Workspace, Task focus, Rooms, Settings and profile continuously available. A clean browser run traversed native Chat to Tasks, the canonical Graph, the selected Task Workspace, Recommended action, Needs You and owner choice, then returned to the exact prior Graph focus. Variant A is the explicit Tasks-first recommendation and Variant B is the bounded Chat-first alternative; the checked-in review guide states default landing, hierarchy, Focus Route, exact DSH composition, tradeoffs, fallback and the precise owner decisions required before production implementation.",
   "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation"
 }

@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "lifecycle-contract-is-single-and-testable",
+      "digest": "1ebb8df4dbea7b6fc15368f346e985319356c673bc1ee02ffafb4fb921409515",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    },
+    {
+      "acceptance_id": "ticket-skills-have-narrow-ownership",
+      "digest": "cdf4e853d94172cac9717e6ce9f000277bb6981c5b2524d13c782d2f6f1ea980",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    },
+    {
+      "acceptance_id": "focused-review-links-are-mechanical",
+      "digest": "4e9cd773f05b4b96986024cc3a15ad7e3f14ff2ad27e76d49da79fe79c260b04",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    },
+    {
+      "acceptance_id": "presentation-reuses-current-task-resources",
+      "digest": "91237aa270509e4d4b29337ce96fc2085c830cf23391206ecb195fed24bae043",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    },
+    {
+      "acceptance_id": "prompt-behavior-has-scenario-coverage",
+      "digest": "f9627ae6f6ff67e5879f6eed8fc2faff5e40fbeb43658046df8b61f0ef20fccb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    },
+    {
+      "acceptance_id": "plugin-remains-lightweight",
+      "digest": "8ffa4759733589b393371f5b08c0e88ad12bae0493a3098f796c22fae64b0060",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0abce67044a6b73c947669529b14cd9ee63bff7a"
+    }
+  ],
   "acceptance_ids": [
     "lifecycle-contract-is-single-and-testable",
     "ticket-skills-have-narrow-ownership",
@@ -24,7 +62,7 @@
     "file:test/ticket-lifecycle.test.mjs",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 953156e treats the Ticket Skills as one distributed workflow without adding a prompt runtime. A compact bundled lifecycle contract defines seven observable events, sole semantic owners, presentation modes, target surfaces, continuation semantics, conversation fallback, and a current-Agent-task-only host/tab reuse policy. Plan, Validate, Run, Closeout, PR, and Review now read that contract and own only their named events: plan presents the new Ticket Execution surface without adding an approval gate; ordinary READY execution stays quiet; protected execution presents Contract and waits; unapplied validation choices remain honest in conversation; closeout presents Log; PR presents the branch graph; explicit review remains a fallback. Ticket Review alone owns presentation mechanics. The launcher adds only validated --ticket and --view execution|contract|log inputs, preserves the bearer in the fragment, rejects unknown Tickets before binding, and the UI mechanically selects the requested Ticket and tab. Real-browser dogfood reused one host and one tab while navigating the current Ticket automatically through Execution, Contract, and Log with no manual Ticket click and empty runtime logs. Lifecycle tests reject duplicate ownership, unknown owners/surfaces, and contradictory human-boundary continuation, then cover all required scenarios. All six modified Skills passed Skill Creator validation; full verification passed 13 of 13 tests and the dependency-free 33-file artifact at 244335 bytes; project validation remained valid with no hook, dispatcher, prompt engine, registry, daemon, cache, database, or durable UI state.",
   "ticket_id": "ticket-make-workflow-present-itself"
 }

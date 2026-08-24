@@ -7,13 +7,17 @@
     "dual-harness-package-boundaries-are-decision-ready"
   ],
   "closed_at": "2026-08-21T23:19:39Z",
+  "contract_binding": {
+    "digest": "301a981225121deca38a8778785793b70838a274deaeeb0be5c3f4187c3a52e7",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "harness-core-ownership-and-single-runtime-proof",
     "clean-codex-only-shell-route-restart-removal-proof",
     "pinned-dsh-seams-and-dual-package-isolation-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts the versioned harness-neutral ownership and capability contract, single-selected-runtime router, bounded Codex and DSH adapters, clean fixture-backed Codex-only Chat and exact Task handoff route with restart/removal recovery, and static package isolation. A fresh probe against the clean official DSH rc.8 checkout at 141eb6fef83422698aef7a981029e843e8161534 reproduced all 30 source and manifest seam checks; it is intentionally source proof only and makes no DSH install, boot, Chat, Task, Context or Evidence execution claim. Full verification passed 174 tests with zero failures and two expected skips when run with local process and loopback access. The DSH carrier remains separately owned by ticket-package-dsh-compatibility-plugin and does not gate the Codex production route.",
   "ticket_id": "ticket-design-dual-harness-core-capability-contract",

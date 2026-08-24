@@ -3,11 +3,15 @@
     "codex-first-shell-direction-decided"
   ],
   "closed_at": "2026-08-22T07:46:21Z",
+  "contract_binding": {
+    "digest": "9118ef07a54c905fb68783284fcd25a3aba00d41bdc442584002701fb12744e3",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "owner-accepts-one-project-single-repository-codex-v1"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts the single human-authority criterion. The sole Evidence owner-accepts-one-project-single-repository-codex-v1 carries origin: human and records the owner's explicit choice in their own words, preserved as source quotes in decision-one-visible-project-single-repository-v1 and constraint-v1-git-native-single-repository-scope. It covers every element of the criterion except the prior-review clause: a Codex-familiar Chat-first shell with sidebar, Recents, Search, Thread and Turn rendering, fork, Composer and voice; one visible Project bound one-to-one to the active folder or Git repository in v1; Codex authoritative for native Chat grouping and execution while VibeHub adds that Project's Task Graph, Rooms, governed Context, Evidence and Outcomes without merging internal identifiers or creating a second membership store; Workspace and cwd as inspectable implementation properties rather than a peer container; one continuing Chat creating several independent Tasks with immutable origin and task-scoped conversation; Codex-first implementation now with DSH as a later independently deliverable carrier; and multi-folder or Git-detached Context storage deferred rather than a v1 prerequisite. The prior-review clause is satisfied through the seven direct dependencies, all of which hold successful Outcomes, including explicit Light and Dark, 1280-wide and 390x844 narrow browser proofs on the prototype shell, the Chat conformance audit, and the Search and attention study; final visual and interaction sign-off on the built application remains separately owned by ticket-approve-codex-first-product-experience. Constraints hold: the change touched only .vibehub documents and published no artifact; the criterion was satisfied by human-origin Evidence alone, not enthusiasm or screenshots; Codex and DSH runtime ownership, ordinary Chat without Task protocol, explicit Chat-to-Task transfer, VibeHub Task and Context truth and the absence of a duplicate Agent loop are preserved; and cross-folder Context, a local database, automatic Git mutation and a second Workspace hierarchy are explicitly deferred. The bounded-owner-correction constraint is read as its governing rule and is not triggered: no Ticket carries a partial, failed or deviated Outcome, so the frontier holds no unresolved replanned correction. Its current wording states that condition as a present fact rather than a rule; the closeout Agent deliberately adjudicated it rather than editing the contract it was judging, and the wording is left for a separate planning pass.",
   "ticket_id": "ticket-decide-codex-first-shell-direction",

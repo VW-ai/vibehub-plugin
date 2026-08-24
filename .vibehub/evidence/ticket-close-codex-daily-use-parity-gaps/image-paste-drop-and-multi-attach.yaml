@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "images-paste-drop-and-multi-attach",
+      "digest": "ffb41a1d55d38e8459417524caa6fb78769ec11770742d78d34cbf90b541e696",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "images-paste-drop-and-multi-attach"
   ],
@@ -13,7 +21,7 @@
     "test/codex-chat-conformance.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit c7cadde attaches clipboard image paste and dropped image files to the composer beside the existing plus file picker, allows several images per Turn, renders attachments as removable chips with accessible names before send and as images in the user message after send, and sends every pasted, dropped or picked image as the image variant with a data URL inside the existing bound; the host validInputs accepts text, image and audio plus the skill and mention variants from the mentions criterion and produces no localImage. A node test proves pasted and dropped images attach as bounded data-URL inputs, and guard checks cover the paste chip, drop with removal and two image inputs rendered as images after send.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

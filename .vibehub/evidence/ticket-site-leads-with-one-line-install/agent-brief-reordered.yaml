@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "agent-brief-matches-readme-order",
+      "digest": "8a4c7197bbe77ff02f88408a5b50e856efa701a0fe8e3311dc1f5160523ccdd5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9eb34850f2d834da545092273751d80fd9865e28"
+    }
+  ],
   "acceptance_ids": [
     "agent-brief-matches-readme-order"
   ],
@@ -10,7 +18,7 @@
     "site/app/page.tsx",
     "site/tests/rendered-html.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "SITE_AGENT_BRIEF now opens with the skills.sh command and the Select all hint, lists the Codex and Claude Code marketplace commands as alternatives, keeps the Start this with VibeHub entry, and adds that Tickets mirror one-way to GitHub Issues when the project opts in during setup; a test asserts the skills.sh command precedes the marketplace commands in the source.",
   "ticket_id": "ticket-site-leads-with-one-line-install"
 }

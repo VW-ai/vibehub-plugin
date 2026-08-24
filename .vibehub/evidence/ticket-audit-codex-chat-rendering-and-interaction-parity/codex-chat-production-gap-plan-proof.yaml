@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "chat-production-gap-plan-is-decision-ready",
+      "digest": "282f6c303ec1fcdbd78c7a2a7258d83cc2e362ef22f81d20cdb4db44a9e2b05e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:da8ee812d8d1b10474b8059500f1eb8c825f7298"
+    }
+  ],
   "acceptance_ids": [
     "chat-production-gap-plan-is-decision-ready"
   ],
@@ -15,7 +23,7 @@
     "browser:2026-08-21-narrow-390x844-no-overflow",
     "command:2026-08-22-verify-artifact-62-files-2832437-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Final browser/runtime review covers Light and Dark, 1280-wide and 390x844 narrow, long rich messages, code, diff, tools, approvals, plans, delegation, citations, attachments, request-user-input, cancellation/interruption, keyboard/focus return, reduced motion, no horizontal overflow, bounded DOM/live state and zero false live posture. It records the before/after matrix and explicitly defers only medium/low work: mature CommonMark and virtualization, durable Quote serialization, long-selection policy, route-persistent input drafts, Composer height convergence, current-Thread URL recovery, model/mode/realtime breadth, theme persistence and final visual-system polish. Artifact verification passed with 62 files and 2,832,437 bytes.",
   "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
 }

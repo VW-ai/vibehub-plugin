@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "real-shell-prototype-makes-direction-reviewable",
+      "digest": "1c521d27cfa91c973ae87eaf65728c9beb6780eba819c621c598f85122854f12",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b76bb3069f9e2bcf35b22b634740003f8d666dec"
+    },
+    {
+      "acceptance_id": "wide-narrow-keyboard-review-is-decision-ready",
+      "digest": "1cb65467317ce7bcc21dfe5abe9c0a84a0caf1fda7c9b819968c3a71a5add4ae",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b76bb3069f9e2bcf35b22b634740003f8d666dec"
+    }
+  ],
   "acceptance_ids": [
     "real-shell-prototype-makes-direction-reviewable",
     "wide-narrow-keyboard-review-is-decision-ready"
@@ -22,7 +36,7 @@
     "command:npm-run-verify-162-pass-1-expected-skip",
     "command:verify-plugin-artifact-62-files-2832437-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The real-runtime Codex-first shell now lands on ordinary Chat with real Codex Threads, keeps canonical VibeHub Tasks separate, and adds grouped global Search, a bounded Needs You sidebar group, and a quiet Task Inbox for current human boundaries plus repository completion history. In the live authenticated loopback shell, grouped Search opened exact Chat, Task Workspace, and Context destinations; the Inbox exposed one current Needs You item and durable completion history without treating Running as notification. Keyboard navigation, Enter, Escape, and trigger focus return passed. Wide review had zero horizontal overflow and no console errors; the explicit 390x844 production frame measured clientWidth equal to scrollWidth at 390, kept the 362px Search dialog and 390px Inbox inside the frame, and also logged zero console errors. Reduced-motion and source-truth assertions are enforced in the focused suite and decision-ready review pack.",
   "ticket_id": "ticket-research-codex-native-search-and-task-attention"
 }

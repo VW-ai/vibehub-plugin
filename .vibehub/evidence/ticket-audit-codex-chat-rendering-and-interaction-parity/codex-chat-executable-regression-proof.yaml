@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "renderer-conformance-regressions-are-executable",
+      "digest": "e9445c9333b09cd41086a3bcbb0342c3ea559620ff2b356503ac0bf7806c68d1",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:da8ee812d8d1b10474b8059500f1eb8c825f7298"
+    }
+  ],
   "acceptance_ids": [
     "renderer-conformance-regressions-are-executable"
   ],
@@ -17,7 +25,7 @@
     "command:2026-08-22-npm-test-185-pass-0-fail-2-skip",
     "command:2026-08-22-npm-run-probe-codex-pass"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Executable pure reducer, renderer, request-registry, event-window, Composer-draft and host tests bind replay and live behavior to compound Thread/Turn/item identity, authoritative completion, deterministic ordering, escape-first sanitization, unknown-item fallback, bounded live state, interruption and recovery. The final full suite passed 185 of 187 tests with zero failures and two intentional environment skips; the pinned schema probe passed Codex 0.147.0 and protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2.",
   "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
 }

@@ -6,13 +6,17 @@
     "quiet-accessible-visual-contract-is-preserved"
   ],
   "closed_at": "2026-08-20T20:43:15Z",
+  "contract_binding": {
+    "digest": "f69f578e4516a3afb446bd2a0be7a1ea00ef83decfcb7bba1150b695b487c44a",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "archived-stub-geometry-and-focus-regression",
     "archived-stub-direction-and-narrow-automated-proof",
     "archived-stub-integrated-browser-matrix"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent re-closeout accepted all four criteria. Source and diff inspection confirm deterministic collision-aware 132 by 70 archived-stub geometry in LTR and TTB, an opaque two-line count/action surface outside cards and routed relations, a causal leader and knot, exact canonical nextTicketIds in the accessible name, pointer plus Enter/Space expansion, sorted URL history, preserved layout, and focus transfer to the first actually revealed Ticket. The new integrated-main browser Evidence closes the prior visual gap: all three real boundaries were legible in LTR and TTB, the 760 by 900 narrow viewport had clientWidth equal to scrollWidth at 760 with a usable Inspector, and Enter on the 18-Ticket upstream boundary added exactly ticket-rooms-into-workbench, revealed and focused it, then exposed the exact 17-Ticket continuation. The implementation files are unchanged from the verified f285778 integration through current HEAD. Independent focused verification passed 33 of 33 tests; full verification passed 116 of 116 with the loopback host, exact current/all projection, responsive and reduced-motion contracts, and the 57-file dependency-free artifact. The patch preserves quiet Workbench tokens and changes no Ticket, Evidence, Outcome, delivery, archive, query, or writable-state semantics. No human-authority criterion applies.",
   "ticket_id": "ticket-fix-archived-stub-label-visibility",

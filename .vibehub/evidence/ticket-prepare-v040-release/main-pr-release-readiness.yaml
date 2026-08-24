@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-candidate-is-merge-ready",
+      "digest": "251b5a934e498dda773e80da68dc1999a7291385233444d4514084c7de9e40e0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5e21058a3b77c555658a72c1cc81426f99a87823"
+    }
+  ],
   "acceptance_ids": [
     "release-candidate-is-merge-ready"
   ],
@@ -14,7 +22,7 @@
     "artifact:private-tmp-vibehub-plugin-0.4.0-tar-gz-sha256-e182733bf4c70e9ef55e2a7897a71fb996cf7f94f397be8878931b9b9f1ceafc",
     "ticket:ticket-encode-human-acceptance-authority-ready-open"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "At commit 7993a7f, a fresh fetch proves origin/main@63043ad is an ancestor of the release branch with left/right count 0/46 and a clean worktree. Project validation reports 6 Context items, 10 Tickets, 39 Evidence documents, and 8 Outcomes with no schema or graph error. The complete suite passes 16/16 and clean-install verification builds a deliberately bounded 40-file, 324497-byte plugin artifact; the final checksum file records the archive basename so downloaded assets verify together. The prepared PR story explicitly calls out the v0.4.0 deletion-first Core/CLI/MCP/npm architecture break, the Skill-first Git-native Ticket/Context model, proactive Execution/Contract/Log workflow, GitHub-only artifact release, and the still-open READY follow-up ticket-encode-human-acceptance-authority.",
   "ticket_id": "ticket-prepare-v040-release"
 }

@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "create-task-from-finalized-message-is-exact",
+      "digest": "cec71252ab1acf932512d0a63832954b8fc1438b82a9e850d420256bb0d300a0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "create-task-from-finalized-message-is-exact"
   ],
@@ -19,7 +27,7 @@
     "test/codex-first-shell-bridge-ui.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 2984481, e6f7e5c, fc4c1fd and 3ddbabf implement Create Task. The renderer offers bridge actions only on finalized assistant messages of settled Turns and on a selection inside one, never on live items or user messages, and disables them with a title, aria-describedby and visible hint naming the missing scope when the Project is not bound; review fixtures render them disabled so a fixture can never write. The Create Task sheet shows the Task title, the ticketId derived live by previewCreateTask, a required outcome, context prefilled with the quoted text and exact source identity, and a verbatim pre of the host packetText; Confirm calls createTask with the previewed id, and the host writes exactly one draft Ticket through applyTickets with origin harness codex, thread_id, forked_from_id, turn_id, item_id, selection and captured_at and one placeholder acceptance, never creating a Thread or Turn. The guard proves on the fixture that the packet pre equals previewCreateTask.packetText byte for byte, that after Confirm the Ticket is on disk, valid, draft, carrying the seeded origin verbatim, that the source Thread still has one Turn and unchanged text with an association marker at the origin Turn, that the Graph lists the Task as DRAFT REFINE, and that a second Task previews a free id; test/codex-first-shell-bridges.test.mjs proves previewCreateTask, readTask and startTask packet text and the thread/read replay are byte-identical, ticket_exists, malformed origin 400 and unbound 409. Unit tests pin placement, the schema-valid origin and locateSelection plus sha256 exactness; against the pre-change UI the new guard exits 1 with three failing checks, hookPrompt divider, finalized-only placement and the bridge flow throwing at its first missing hook, and the driver's bridge write verification fails 5 of 7.",
   "ticket_id": "ticket-build-codex-chat-task-bridges"
 }

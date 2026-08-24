@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "projects-recents-and-fork-prototype-is-real",
+      "digest": "21bfe2be4e4feb2f77b0c4071b5904c06ae408aca6df7a279379ed167be48d9f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4be210440b77f1c3c29435da5d5f0b738054056e"
+    },
+    {
+      "acceptance_id": "project-parity-review-is-decision-ready",
+      "digest": "7afec6f5e10b610edc2b3e907bc7b72f368362fa42be6780262ce29fc16dc6a8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4be210440b77f1c3c29435da5d5f0b738054056e"
+    }
+  ],
   "acceptance_ids": [
     "projects-recents-and-fork-prototype-is-real",
     "project-parity-review-is-decision-ready"
@@ -24,7 +38,7 @@
     "command:npm run probe:codex:projects (ok; restart recovered; cleanup complete)",
     "commit:c517dcc"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The authenticated Codex-first shell now renders built-in Pinned separately, custom native Projects with nested real Threads, and Recents only from thread/list sectionId:null. Create, rename, delete, drag, keyboard-select move, fork, Search and archive route to the versioned adapter; fork lineage and placement are visible, deleting a Project returns member Chats to Recents, and no localStorage, IndexedDB or fixture authority exists. Deterministic states cover empty, projected, unprojected, forked and archived; browser review covered Light, Dark, 1280x720, 390x844, native transcript replay and keyboard controls. Full verification passed 173 tests with two intentional skips, and the real lifecycle probe recovered the same server-owned identities after app-server restart before cleaning all probe data. The checked-in review matrix explicitly records production follow-ups without overstating this non-final visual slice.",
   "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
 }

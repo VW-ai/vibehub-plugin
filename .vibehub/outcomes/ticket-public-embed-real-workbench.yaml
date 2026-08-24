@@ -15,6 +15,10 @@
     "workbench-embedding-preserves-product-quality"
   ],
   "closed_at": "2026-08-19T18:17:44Z",
+  "contract_binding": {
+    "digest": "7af9718a4f6ee07e5903512f1c4cb204ce82327255f6264eee8c021381813e1a",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "owner-accepts-public-site-product-feel",
     "public-dark-storytelling-implementation",
@@ -26,7 +30,7 @@
     "public-workbench-scene-verification"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all thirteen current criteria. Direct source and built-artifact inspection confirms the deep-graphite vertical story, single authentic coding-agent message, sticky truthful entry points, deterministic five-Ticket Workbench, schema-valid Ticket and Room/Decision/Constraint/Contract educational source viewers, Ticket-to-Room Context binding, acceptance-linked Evidence, independent Outcome, returned Context, and a later separate Git/GitHub explanation. The fixture remains browser-only and adds no backend, persistence, analytics, iframe, video, model call, motion library, or parallel lifecycle; selection and bounded panning are disposable view state. Responsive, focus, hover, forced-colors, and reduced-motion safeguards are present, and independently reproduced checks pass site lint, static production export, all 8 rendered contracts, all 81 repository tests, canonical Ticket/project validation, and the unchanged 54-file/568449-byte Plugin artifact. The owner inspected the retained localhost preview, said the result felt good, and explicitly authorized closeout, satisfying the sole human-authority criterion through human-origin Evidence.",
   "ticket_id": "ticket-public-embed-real-workbench",

@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "refine-is-first-class-in-workbench",
+      "digest": "f6eb0ae8ea1ac6b742ffcd43168b8569c48a0f165097645cf2c8b59af2c8e028",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:161bca785637c6803071da7ffa7e200e92aae098"
+    },
+    {
+      "acceptance_id": "refine-remains-non-executable",
+      "digest": "88390eb436be2f25125ce53bf9bfc8d2d60d14731f718393d051ffc01a9df2c5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:161bca785637c6803071da7ffa7e200e92aae098"
+    },
+    {
+      "acceptance_id": "browser-regression-catches-refine-omission",
+      "digest": "87124491ba87c6167097f6db8833b7d9085e29dab18bc0324f49a6b7fb4abc19",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:161bca785637c6803071da7ffa7e200e92aae098"
+    },
+    {
+      "acceptance_id": "pr15-authority-contract-stays-intact",
+      "digest": "8b9103c018f733cdb3f32504893aacb2177b46f7e011bb7bb8df28b80df50079",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:161bca785637c6803071da7ffa7e200e92aae098"
+    },
+    {
+      "acceptance_id": "refine-repair-verifies-cleanly",
+      "digest": "7222673ff21057f12a28442b3e12cc9236ac9e5f53d8dda5a60739958979c0b6",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:161bca785637c6803071da7ffa7e200e92aae098"
+    }
+  ],
   "acceptance_ids": [
     "refine-is-first-class-in-workbench",
     "refine-remains-non-executable",
@@ -23,7 +55,7 @@
     "browser:in-app-browser-refine-narrow-700x900",
     "browser:copy-for-agent-refine-interaction-confirmed"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The shared browser/Node presentation model now recognizes REFINE across graph-card text and dashed semantics, minimap, summary, Inspector, accessibility, causal sorting, and the non-executable Ticket Plan handoff. The production-model behavior regression exercises an unlocked draft with separate PENDING human attention and would fail if REFINE were removed. The full 49-test suite, 53-file artifact verification, project/Ticket validation, git diff check, and real in-app-browser smoke at 1440x900 and 700x900 passed; wide and narrow captures show REFINE without overflow. Existing PR #15 authority, human-origin Evidence, four attention states, exact human-boundary payload, and operational/attention separation remain covered by the unchanged passing suite.",
   "ticket_id": "ticket-repair-refine-workbench-projection"
 }

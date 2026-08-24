@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "tag-and-release-verified",
+      "digest": "d5837c4b1c07603d1d695eaa0650792ef1c7234b7f2af2186e6c916bea75f1c3",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8453e0423812e085ce75b5cc21d98e95776f5bb0"
+    }
+  ],
   "acceptance_ids": [
     "tag-and-release-verified"
   ],
@@ -10,7 +18,7 @@
     "commit:33effbb",
     "conversation:2026-08-04-v050-release-migration"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Tag v0.5.0 was created on the exact merged main commit 33effbb and pushed; the Release workflow completed successfully and the GitHub Release targets main with both assets present (vibehub-plugin-0.5.0.tar.gz and its .sha256). The archive was downloaded and its SHA-256 checksum verified OK locally, and the archive contains the vibehub-migrate skill files.",
   "ticket_id": "ticket-release-v050"
 }

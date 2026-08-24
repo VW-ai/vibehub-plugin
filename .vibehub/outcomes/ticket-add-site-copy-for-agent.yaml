@@ -5,12 +5,16 @@
     "copy-feature-is-statically-verified"
   ],
   "closed_at": "2026-08-05T08:47:33Z",
+  "contract_binding": {
+    "digest": "ca99bf28a171909ebe716f9e426fd37819a534ac88eec7c670e513e262fa37d6",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "site-copy-agent-brief-and-action",
     "site-copy-agent-verification"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all three criteria. The global top-right action is keyboard reachable and copies in one activation with in-control success feedback; desktop and 390px layouts retain Copy, Install, and one accessible GitHub action without opening another panel. The 2317-character plain-text payload truthfully covers product identity, exact Codex and Claude Code installation, the canonical entry, the Request-to-one-Ticket-to-Evidence-to-Outcome-to-Context loop, durable Context guidance, Git-native truth, setup safety, and a concrete next action. Independently rerun verification passed: site lint, static production build and rendered assertions 3/3, canonical Ticket and project validation, repository suite 43/43, and the unchanged Plugin artifact at 51 files and 361397 bytes.",
   "ticket_id": "ticket-add-site-copy-for-agent",

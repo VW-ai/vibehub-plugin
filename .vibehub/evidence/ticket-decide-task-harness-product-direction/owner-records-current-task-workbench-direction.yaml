@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "core-loop-direction-decided",
+      "digest": "55d9bffa66daf18b220d138d2518cf78c9dc397a92fd4b5da32a064f72227983",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    },
+    {
+      "acceptance_id": "information-language-decided",
+      "digest": "2b68936291ff0550fa7b3bc5c383329f9fa17bbdad150133a827687f6b42f29b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    },
+    {
+      "acceptance_id": "initial-shell-and-dsh-direction-decided",
+      "digest": "564d5750a56e970994638dc07ae44e52f255ca6a9fdccd1df0cfb96d43aabacb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    }
+  ],
   "acceptance_ids": [
     "core-loop-direction-decided",
     "information-language-decided",
@@ -17,7 +37,7 @@
     "conversation:2026-08-20-derived-task-hierarchy-correction",
     "conversation:2026-08-20-topology-derived-task-clusters"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Across the current product review, the owner explicitly chose Task rather than Chat as the durable product unit and the VibeHub Ticket Graph as the first frame. Entering a Task enters its working Context Space; normal Chat remains the open Human-led exploration and steering surface with explicit Fork, Compare, Bring Back, scoped Context, conversion to Task, Start, human attention, Evidence review, and closeout. The owner accepted one Global Work Graph with Task nodes and lighter Chat meta nodes, Project-owned or standalone Tasks, and topology-derived visual clusters rather than inventing High-Level, Parent, Child, or Subtask ontology. The owner also corrected the earlier wholesale-shell direction: V1 should remain a non-invasive DeepSeek Harness Plugin using one or two VibeHub Graph or Task pages, additive Chat actions and official Theme composition, with a substantial coherent Codex/Linear-quality reskin but no upstream fork or executor-internal task coupling. This is explicit product and composition approval, not approval of the current low-fidelity visual design or all remaining interaction details.",
   "ticket_id": "ticket-decide-task-harness-product-direction"
 }

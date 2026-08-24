@@ -7,11 +7,15 @@
     "skills-and-tests-share-one-rule"
   ],
   "closed_at": "2026-08-20T20:35:01Z",
+  "contract_binding": {
+    "digest": "4a8ce4489a99c2d9a226545de2b5d20e9bef834c93e44864dbf85af45dcb144c",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "dependency-hygiene-contract-advice-and-parity"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout reproduced every criterion. The shared dependency-hygiene contract explicitly separates causal prerequisites from completed Context; Plan requires reading each target Ticket and Outcome plus a causal rationale for DONE edges; Validate and ticket apply expose deterministic, sorted, nonblocking completed-dependency-review advice only for newly proposed edges without rewriting candidates or invalidating existing repositories. Focused topology fixtures preserve justified fork, join, release, migration, and consumed-artifact history in All scope while context-only baselines avoid Current boundaries and stubs. The focused 16-test suite, canonical Ticket and project validation, full 114-test npm verification including loopback hosts, artifact verification, and Codex/Claude marketplace parity all passed. No human-authority criterion applies.",
   "ticket_id": "ticket-tighten-completed-dependency-hygiene",

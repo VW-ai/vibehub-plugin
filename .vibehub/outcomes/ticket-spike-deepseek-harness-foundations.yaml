@@ -9,11 +9,15 @@
     "architecture-recommendation-is-decision-ready"
   ],
   "closed_at": "2026-08-20T19:01:05Z",
+  "contract_binding": {
+    "digest": "9473326c52090b265108d1155339b572bb3ca89c043491b43b724735129b8d02",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "deepseek-harness-foundation-spikes"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all seven criteria. The Spike pins DeepSeek Harness rc.7 and its exact commit/runtime contract, installs an out-of-tree VibeHub Bundle through an official Profile, boots the real local Web application, and proves root layout, conversation slots, custom views, Session fork, no-model commands, durable event feed, and shutdown behavior. It records the replay failure discovered for unknown custom events, keeps Compare and Bring Back product-owned, and defines a replaceable executor event boundary because the shipped Codex provider is final-text-only. The feasibility report classifies seams and limits, recommends the initial monorepo composition and compatibility adapter, and provides smoke tests and stop conditions without vendoring or forking DSH.",
   "ticket_id": "ticket-spike-deepseek-harness-foundations",

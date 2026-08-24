@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "search-console-discovery-is-configured",
+      "digest": "478420935138828216fc94a189ed34ed2d1f8413af3a8f590bd54af191e3b4e7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9151feb7ffa80016b0fd8f1ef7749e4bc0fdb03e"
+    }
+  ],
   "acceptance_ids": [
     "search-console-discovery-is-configured"
   ],
@@ -12,7 +20,7 @@
     "dns-method:apex-txt-record-present",
     "verification-status:ownership-verified-2026-08-20t20-46-59z"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Google Search Console Domain Property vibehub.icu was created and ownership was verified for the sole visible Google account label w.wayne.vip@gmail.com using the Domain name provider TXT method. A read-only apex DNS preflight found no conflicting apex TXT or CNAME record; the exact Google-issued TXT proof was added at the apex, verification succeeded, and the proof remains present. No verification value, credential, cookie, or authorization token is recorded here. Sitemap submission and homepage recrawl remain pending until the canonical metadata commit is live.",
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { contractIdentity } from "../../skills/vibehub-core/scripts/vh.mjs";
 
 export function git(cwd, args) {
   return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
@@ -20,8 +21,17 @@ export function porcelain(cwd, extra = []) {
 
 export const commitCount = (cwd) => git(cwd, ["rev-list", "--count", "HEAD"]);
 
+// The fixture is a binding-aware (format 3) repository, so its proof carries
+// the native bindings every vh.mjs write produces there: without them a
+// successful Outcome is unresolved by design and the closed Task would
+// return as REPLAN work instead of staying closed.
+const CLOSED_IDENTITY = contractIdentity({
+  ticket_id: "ticket-bridge-closed",
+  acceptance: [{ acceptance_id: "closed-holds", criterion: "The closed Task holds." }],
+});
+
 export const BRIDGE_REPOSITORY_DOCUMENTS = Object.freeze({
-  ".vibehub/version.yaml": { format_version: 2, kind: "vibehub_project", schema_version: 1 },
+  ".vibehub/version.yaml": { format_version: 3, kind: "vibehub_project", schema_version: 1 },
   ".vibehub/rooms/product/room.yaml": { schema_version: 1, kind: "room", room_id: "product", description: "Product direction", boundary: "What the shell promises", anchors: ["README.md"], stale: false },
   ".vibehub/rooms/product/ux/room.yaml": { schema_version: 1, kind: "room", room_id: "ux", description: "Interaction detail", boundary: "How the shell behaves", anchors: ["README.md"], stale: false },
   ".vibehub/rooms/product/decision-bridge-direction.yaml": {
@@ -41,8 +51,8 @@ export const BRIDGE_REPOSITORY_DOCUMENTS = Object.freeze({
     schema_version: 2, kind: "ticket", ticket_id: "ticket-bridge-closed", maturity: "firm", outcome: "The closed Task is accepted.", deliveries: [],
     context: "Closed.", acceptance: [{ acceptance_id: "closed-holds", criterion: "The closed Task holds." }], constraints: [], context_refs: [], relations: [], provenance_refs: [],
   },
-  ".vibehub/evidence/ticket-bridge-closed/closed-proof.yaml": { schema_version: 1, kind: "ticket_evidence", evidence_id: "closed-proof", ticket_id: "ticket-bridge-closed", acceptance_ids: ["closed-holds"], summary: "Closed proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" },
-  ".vibehub/outcomes/ticket-bridge-closed.yaml": { schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-bridge-closed", status: "successful", accepted_acceptance_ids: ["closed-holds"], unresolved_acceptance_ids: [], evidence_ids: ["closed-proof"], summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" },
+  ".vibehub/evidence/ticket-bridge-closed/closed-proof.yaml": { schema_version: 2, kind: "ticket_evidence", evidence_id: "closed-proof", ticket_id: "ticket-bridge-closed", acceptance_ids: ["closed-holds"], acceptance_bindings: [{ acceptance_id: "closed-holds", digest: CLOSED_IDENTITY.criterion_digests["closed-holds"], binding: "native" }], summary: "Closed proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" },
+  ".vibehub/outcomes/ticket-bridge-closed.yaml": { schema_version: 2, kind: "ticket_outcome", ticket_id: "ticket-bridge-closed", status: "successful", accepted_acceptance_ids: ["closed-holds"], unresolved_acceptance_ids: [], evidence_ids: ["closed-proof"], contract_binding: { digest: CLOSED_IDENTITY.contract_digest, binding: "native" }, summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" },
 });
 
 export function createBridgeRepository({ prefix = "vibehub-bridge-guard-" } = {}) {

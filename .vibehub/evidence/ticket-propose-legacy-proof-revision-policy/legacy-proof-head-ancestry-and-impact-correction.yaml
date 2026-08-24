@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "legacy-proof-corpus-is-audited",
+      "digest": "26af8ca0148607b0fac45a707de6ab26fbd578c3ddd57223daa69c7c44fa7403",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5d4125cc5f245d7c9d360e292ce102a630cb996c"
+    },
+    {
+      "acceptance_id": "repository-truth-impact-is-quantified",
+      "digest": "b74c535cb68335f20b2e13e137ae0e15b0b8932339441007c397738b83248bed",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5d4125cc5f245d7c9d360e292ce102a630cb996c"
+    },
+    {
+      "acceptance_id": "git-reconstruction-limits-are-proven",
+      "digest": "fcd7c0ff829655c1d87f8e0d945f9e8e0c02687304b103cc9ab070ba548eda2f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5d4125cc5f245d7c9d360e292ce102a630cb996c"
+    }
+  ],
   "acceptance_ids": [
     "legacy-proof-corpus-is-audited",
     "repository-truth-impact-is-quantified",
@@ -17,7 +37,7 @@
     "commit:cdeac6b57dcab02e97f243d392f818afaad973c5",
     "rejected-non-ancestor:24b3d6d9df041a94ef3cb74468be9528b0214747"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The corrected audit follows only current HEAD ancestry and has a regression fixture proving an unrelated newer branch addition cannot be selected. At HEAD 175e83a it reconstructs 210/210 Evidence and 61/61 Outcomes, identifies 19 Evidence and one successful Outcome with later contract drift, and mechanically quantifies for all-stale, grandfather, and reconstruction policies: DONE, archive, human authority, CLOSE_OUT, Current/All graph size, successful prerequisite edges, open dependent unlock, project-format/schema changes, two installed host artifacts, migration, and rollback. The earlier non-ancestor 24b3d6d example is preserved as the exact diagnosed failure; cdeac6b is the truthful current-ancestry addition.",
   "ticket_id": "ticket-propose-legacy-proof-revision-policy"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "graph-and-overview-surface-closeout-work",
+      "digest": "618aba6c9c245e7adcccb08e344e4393e8d426e9aca9552ee1cd3c16ca39ad73",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:52eaa8a30f094bfb90018edaf85aee79e7af6b3e"
+    },
+    {
+      "acceptance_id": "inspector-explains-proof-versus-judgment",
+      "digest": "05d1b0886a519257e28d26f371aa9f986bf6fa2f9154e139cbc1c9bed1db0a58",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:52eaa8a30f094bfb90018edaf85aee79e7af6b3e"
+    },
+    {
+      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+      "digest": "c6a4c0cf7019eb0eb028e624e69b0f8b44385e8599e3213da52a6bf843ee5105",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:52eaa8a30f094bfb90018edaf85aee79e7af6b3e"
+    },
+    {
+      "acceptance_id": "interaction-regressions-pass",
+      "digest": "acb8f51ce1829b433ef1310ae77306557c09408c2bb3c90a6c2a64533b0f2f5c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:52eaa8a30f094bfb90018edaf85aee79e7af6b3e"
+    }
+  ],
   "acceptance_ids": [
     "graph-and-overview-surface-closeout-work",
     "inspector-explains-proof-versus-judgment",
@@ -21,7 +47,7 @@
     "command:visual-system-contract-8-of-8",
     "command:npm-run-verify-118-of-118"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production graph consumes host-derived CLOSE_OUT as a non-color next-action layer: cards and minimap use a neutral dashed REVIEW treatment instead of executable READY copy, the canvas summary separates READY from CLOSE OUT, and Overview exposes a repository- and scope-bounded Independent closeout count and keyboard-reachable queue that opens one Ticket's Log without any batch acceptance. Execution, Contract, and Log each show authority-satisfying coverage, Outcome pending, and the Evidence-versus-independent-judgment boundary while keeping every acceptance inspectable and NEEDS_HUMAN separate. The UI regression corpus projects zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete human Evidence, successful Outcome, and failed Outcome; focused Workbench/lifecycle/host/model tests passed 21 of 21, the visual-system contract passed 8 of 8 including narrow, keyboard-target, and reduced-motion rules, and complete verification passed 118 of 118.",
   "ticket_id": "ticket-make-closeout-first-class-handoff"
 }

@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "kind": "vibehub_proof_binding_migration_report",
+  "mode": "dry-run",
+  "from_format": 2,
+  "to_format": 3,
+  "audited_commit": "56c5ca3b80c96533a830e6987230fc5ad2742f11",
+  "corpus": {
+    "tickets": 115,
+    "evidence": 327,
+    "outcomes": 104,
+    "successful_outcomes": 104
+  },
+  "evidence": {
+    "total": 327,
+    "skipped_native": 0,
+    "reconstructed": 327,
+    "unresolved": [],
+    "drifted": [
+      {
+        "evidence_id": "canonical-discovery-artifact-preflight",
+        "ticket_id": "ticket-complete-public-domain-discovery",
+        "stale_acceptance_ids": [
+          "domain-discovery-is-production-verified"
+        ]
+      },
+      {
+        "evidence_id": "canonical-www-redirect-production-verification",
+        "ticket_id": "ticket-complete-public-domain-discovery",
+        "stale_acceptance_ids": [
+          "domain-discovery-is-production-verified"
+        ]
+      },
+      {
+        "evidence_id": "cloudflare-pages-production-cutover",
+        "ticket_id": "ticket-deploy-public-site-cloudflare",
+        "stale_acceptance_ids": [
+          "existing-pages-project-is-reused",
+          "canonical-apex-is-served-by-pages",
+          "cloudflare-migration-is-regression-proven"
+        ]
+      },
+      {
+        "evidence_id": "cloudflare-pages-release-contract",
+        "ticket_id": "ticket-deploy-public-site-cloudflare",
+        "stale_acceptance_ids": [
+          "cloudflare-migration-is-regression-proven"
+        ]
+      },
+      {
+        "evidence_id": "codex-base-low-fidelity-product-logic",
+        "ticket_id": "ticket-prototype-task-harness-experience",
+        "stale_acceptance_ids": [
+          "near-and-far-scenarios-are-explicit",
+          "clickable-core-loop-prototype",
+          "ticket-context-annotation-language",
+          "execution-is-strongly-perceptible",
+          "browser-first-app-like-shell",
+          "review-pack-is-decision-ready"
+        ]
+      },
+      {
+        "evidence_id": "decision-boundary-policy-approval",
+        "ticket_id": "ticket-encode-human-acceptance-authority",
+        "stale_acceptance_ids": [
+          "decision-boundary-policy-approved"
+        ]
+      },
+      {
+        "evidence_id": "decision-boundary-prompt-proof",
+        "ticket_id": "ticket-encode-human-acceptance-authority",
+        "stale_acceptance_ids": [
+          "plan-and-run-handle-human-decisions"
+        ]
+      },
+      {
+        "evidence_id": "graph-first-ticket-workspace-correction",
+        "ticket_id": "ticket-prototype-task-harness-experience",
+        "stale_acceptance_ids": [
+          "near-and-far-scenarios-are-explicit",
+          "clickable-core-loop-prototype",
+          "whole-application-product-identity",
+          "ticket-context-annotation-language",
+          "execution-is-strongly-perceptible",
+          "review-pack-is-decision-ready"
+        ]
+      },
+      {
+        "evidence_id": "harness-prototype-product-loop",
+        "ticket_id": "ticket-prototype-task-harness-experience",
+        "stale_acceptance_ids": [
+          "near-and-far-scenarios-are-explicit",
+          "clickable-core-loop-prototype",
+          "ticket-context-annotation-language",
+          "execution-is-strongly-perceptible",
+          "browser-first-app-like-shell",
+          "review-pack-is-decision-ready"
+        ]
+      },
+      {
+        "evidence_id": "no-root-context-proof",
+        "ticket_id": "ticket-context-always-roomed",
+        "stale_acceptance_ids": [
+          "no-root-context-loading"
+        ]
+      },
+      {
+        "evidence_id": "owner-requires-whole-application-shell",
+        "ticket_id": "ticket-decide-task-harness-product-direction",
+        "stale_acceptance_ids": [
+          "initial-shell-and-dsh-direction-decided"
+        ]
+      },
+      {
+        "evidence_id": "readme-v080-current-surface-and-verification",
+        "ticket_id": "ticket-refresh-readme-for-v080-workbench",
+        "stale_acceptance_ids": [
+          "readme-shows-current-workbench",
+          "user-scenario-is-clear-and-compact",
+          "readme-surface-stays-focused-and-verified"
+        ]
+      },
+      {
+        "evidence_id": "rooms-decision-graph-proof",
+        "ticket_id": "ticket-encode-human-acceptance-authority",
+        "stale_acceptance_ids": [
+          "rooms-flow-proves-graph-boundary"
+        ]
+      },
+      {
+        "evidence_id": "skills-docs-sweep-proof",
+        "ticket_id": "ticket-context-always-roomed",
+        "stale_acceptance_ids": [
+          "skills-teach-placement"
+        ]
+      }
+    ]
+  },
+  "outcomes": {
+    "total": 104,
+    "skipped_native": 0,
+    "reconstructed_current": 102,
+    "unresolved": [
+      {
+        "ticket_id": "ticket-deploy-public-site-cloudflare",
+        "status": "successful",
+        "reason": "contract-drifted-since-addition",
+        "acceptance_ids": [
+          "canonical-apex-is-served-by-pages",
+          "cloudflare-migration-is-regression-proven",
+          "existing-pages-project-is-reused"
+        ]
+      },
+      {
+        "ticket_id": "ticket-encode-human-acceptance-authority",
+        "status": "successful",
+        "reason": "contract-drifted-since-addition",
+        "acceptance_ids": [
+          "decision-boundary-policy-approved",
+          "plan-and-run-handle-human-decisions",
+          "rooms-flow-proves-graph-boundary"
+        ]
+      }
+    ]
+  },
+  "retention": {
+    "before": {
+      "done_tickets": 104,
+      "archived_tickets": 43,
+      "close_out_tickets": 0,
+      "replan_unresolved_tickets": [],
+      "stale_coverage_tickets": [],
+      "human_authority_criteria": 19,
+      "human_authority_criteria_satisfied": 18,
+      "current_graph_tickets": 18,
+      "all_graph_tickets": 115,
+      "successful_prerequisite_edges": 92,
+      "open_dependents_unblocked": 4
+    },
+    "after": {
+      "done_tickets": 102,
+      "archived_tickets": 42,
+      "close_out_tickets": 0,
+      "replan_unresolved_tickets": [
+        "ticket-deploy-public-site-cloudflare",
+        "ticket-encode-human-acceptance-authority"
+      ],
+      "stale_coverage_tickets": [
+        "ticket-context-always-roomed",
+        "ticket-encode-human-acceptance-authority",
+        "ticket-prototype-task-harness-experience"
+      ],
+      "human_authority_criteria": 19,
+      "human_authority_criteria_satisfied": 18,
+      "current_graph_tickets": 26,
+      "all_graph_tickets": 115,
+      "successful_prerequisite_edges": 90,
+      "open_dependents_unblocked": 6
+    }
+  },
+  "changed_projection": [
+    {
+      "ticket_id": "ticket-deploy-public-site-cloudflare",
+      "before": {
+        "action": "DONE",
+        "reason": "successful_outcome"
+      },
+      "after": {
+        "action": "REPLAN",
+        "reason": "unresolved_legacy_outcome"
+      },
+      "acceptance_ids": [
+        "canonical-apex-is-served-by-pages",
+        "cloudflare-migration-is-regression-proven",
+        "existing-pages-project-is-reused"
+      ]
+    },
+    {
+      "ticket_id": "ticket-encode-human-acceptance-authority",
+      "before": {
+        "action": "DONE",
+        "reason": "successful_outcome"
+      },
+      "after": {
+        "action": "REPLAN",
+        "reason": "unresolved_legacy_outcome"
+      },
+      "acceptance_ids": [
+        "decision-boundary-policy-approved",
+        "plan-and-run-handle-human-decisions",
+        "rooms-flow-proves-graph-boundary"
+      ]
+    }
+  ]
+}

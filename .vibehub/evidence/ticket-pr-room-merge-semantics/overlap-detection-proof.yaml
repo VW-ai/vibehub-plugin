@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "anchor-overlap-detected",
+      "digest": "95312dc2c080d7400b3a24ceab01b867ded50de69c94ee9f5f9cf55ff82d6025",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a63188503d2a8540b6b923826d1a320a8ae5c5d2"
+    }
+  ],
   "acceptance_ids": [
     "anchor-overlap-detected"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/room.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "loadRooms now fails validation when two rooms where neither contains the other claim overlapping anchors, naming both rooms and the shared territory; parent/child nesting stays legitimate. Tests cover the auth-versus-identity overlap failing and the auth with auth/oauth nesting passing; the four dogfood rooms have no overlap and validate clean.",
   "ticket_id": "ticket-pr-room-merge-semantics"
 }

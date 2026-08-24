@@ -7,13 +7,17 @@
     "project-parity-review-is-decision-ready"
   ],
   "closed_at": "2026-08-22T00:06:58Z",
+  "contract_binding": {
+    "digest": "0132ea9450a31abf5c6b0f2b1a7414e0bbb69e0cf8218d98e4fa624261aa90e1",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "codex-project-contract-and-live-lifecycle-proof",
     "codex-projects-recents-shell-and-review-proof",
     "codex-project-browser-movement-focus-correction"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent re-closeout at exact canonical commit f4147732099dbb77577bd6020a04ab42fe373018 accepts all five current criteria. Reinspection of the pinned 0.147.0 schema, source-backed inventory, executable object contract, adapter and correction diff confirms that Codex ThreadSection remains the sole Project-membership authority; Recents is the explicit unsectioned query; fork lineage, search, archive, restart recovery and failure fallback stay native or visibly bounded; and Codex Chat, cwd, VibeHub Project, Task and immutable Task origin remain separate without a second transcript or membership registry. The canonical authenticated four-path browser record is accepted for its exact claims: real pointer movement at wide Light and 390x844 Light, labeled native-select input/change at wide Dark and 390x844 Dark, deliberate opening focus, focus restoration after membership rerender, polite atomic status wording, screen-reader-named controls and no horizontal overflow. This Outcome does not claim physical OS-arrow synthesis beyond that native select semantic path. Independently reproduced checks passed the exact Codex schema probe, the 14-of-14 focused Project/shell suite with authorized local runtime access, a fresh real create-move-fork-search-archive-restart-restore-delete lifecycle with stable lineage and complete cleanup, the full 181-pass verification with two intentional skips, artifact verification at 62 files and 2832437 bytes, diff checks and canonical Ticket validation.",
   "ticket_id": "ticket-research-codex-project-and-recent-chat-parity",

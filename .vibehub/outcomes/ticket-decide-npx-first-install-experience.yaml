@@ -3,11 +3,15 @@
     "install-path-decided"
   ],
   "closed_at": "2026-08-23T02:40:00Z",
+  "contract_binding": {
+    "digest": "30da1d2762aedcbd9f91aa98961ebd560d7cf0b3cdd01d82a2d3fdcdefdaa37e",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "owner-chooses-path-a"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent adjudication at HEAD ec89ecd. Criterion install-path-decided (human authority) accepted: Evidence owner-chooses-path-a has origin: human, links the criterion, names the choice explicitly (A: self-contained vibehub-core skill folder making skills.sh a supported path; GitHub Issues mirror offered once during project setup; npm-published init deferred until a human asks), and carries readable refs to conversation:2026-08-22-tickets-as-github-issues and docs/proposals/npx-first-install-experience.md. Constraint 'do not implement anything' held: git diff 1a7c292..HEAD adds only .vibehub/ evidence and ticket YAML plus docs/proposals/npx-first-install-experience.md; no skills/, README, docs/INSTALL.md, or manifest changes.",
   "ticket_id": "ticket-decide-npx-first-install-experience",

@@ -15,7 +15,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
 import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
-import { VibeHubError, applyTickets, validateTicket } from "../skills/vibehub-core/scripts/vh.mjs";
+import { VibeHubError, applyTickets, contractIdentity, validateTicket } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -98,7 +98,7 @@ async function bridgeRepository(context) {
     await mkdir(join(folder, path, ".."), { recursive: true });
     await writeFile(join(folder, path), `${JSON.stringify(document, null, 2)}\n`);
   };
-  await write(".vibehub/version.yaml", { format_version: 2, kind: "vibehub_project", schema_version: 1 });
+  await write(".vibehub/version.yaml", { format_version: 3, kind: "vibehub_project", schema_version: 1 });
   await write(".vibehub/rooms/product/room.yaml", { schema_version: 1, kind: "room", room_id: "product", description: "Product direction", boundary: "What the shell promises", anchors: ["README.md"], stale: false });
   await write(".vibehub/rooms/product/ux/room.yaml", { schema_version: 1, kind: "room", room_id: "ux", description: "Interaction detail", boundary: "How the shell behaves", anchors: ["README.md"], stale: false });
   await write(".vibehub/rooms/product/decision-bridge-direction.yaml", {
@@ -116,8 +116,9 @@ async function bridgeRepository(context) {
     schema_version: 2, kind: "ticket", ticket_id: "ticket-bridge-closed", maturity: "firm", outcome: "The closed Task is accepted.", deliveries: [],
     context: "Closed.", acceptance: [{ acceptance_id: "closed-holds", criterion: "The closed Task holds." }], constraints: [], context_refs: [], relations: [], provenance_refs: [],
   });
-  await write(".vibehub/evidence/ticket-bridge-closed/closed-proof.yaml", { schema_version: 1, kind: "ticket_evidence", evidence_id: "closed-proof", ticket_id: "ticket-bridge-closed", acceptance_ids: ["closed-holds"], summary: "Closed proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" });
-  await write(".vibehub/outcomes/ticket-bridge-closed.yaml", { schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-bridge-closed", status: "successful", accepted_acceptance_ids: ["closed-holds"], unresolved_acceptance_ids: [], evidence_ids: ["closed-proof"], summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" });
+  const closedIdentity = contractIdentity({ ticket_id: "ticket-bridge-closed", acceptance: [{ acceptance_id: "closed-holds", criterion: "The closed Task holds." }] });
+  await write(".vibehub/evidence/ticket-bridge-closed/closed-proof.yaml", { schema_version: 2, kind: "ticket_evidence", evidence_id: "closed-proof", ticket_id: "ticket-bridge-closed", acceptance_ids: ["closed-holds"], acceptance_bindings: [{ acceptance_id: "closed-holds", digest: closedIdentity.criterion_digests["closed-holds"], binding: "native" }], summary: "Closed proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" });
+  await write(".vibehub/outcomes/ticket-bridge-closed.yaml", { schema_version: 2, kind: "ticket_outcome", ticket_id: "ticket-bridge-closed", status: "successful", accepted_acceptance_ids: ["closed-holds"], unresolved_acceptance_ids: [], evidence_ids: ["closed-proof"], contract_binding: { digest: closedIdentity.contract_digest, binding: "native" }, summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" });
   git(folder, ["add", ".vibehub"]);
   git(folder, ["commit", "-q", "-m", "vibehub bridge graph"]);
   return { folder, realFolder };

@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "drift-four-states",
+      "digest": "e8362c284f5803fca9359883b0ed5388ebdb50ee7fd79e308652443f41f62b24",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5b64f23ea8411299da94e6e61e6fa4e90a126eb9"
+    }
+  ],
   "acceptance_ids": [
     "drift-four-states"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/room-drift.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vh room drift returns cold_start:true for a repo without rooms and classifies every room FRESH, DRIFTED with exact changed/added/deleted path lists, STALE with reason, or UNKNOWN (never aligned), plus WARNING when merge-base --is-ancestor shows the checkout is older than the alignment baseline. Exercised end to end in test/room-drift.test.mjs and live on this repository where all three dogfood rooms report FRESH after alignment, including across the implementation commit itself.",
   "ticket_id": "ticket-drift-check-mechanical"
 }

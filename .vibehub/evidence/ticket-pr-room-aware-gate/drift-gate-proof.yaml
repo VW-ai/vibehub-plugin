@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "pr-drift-gate",
+      "digest": "a3dc6e9ffc41aa910a9f0f9d86d9ea9300b9190b66c69f56770d934ba9944cb4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:381e4b3eb139ff8f78de1e22aa537bedace92ce5"
+    }
+  ],
   "acceptance_ids": [
     "pr-drift-gate"
   ],
@@ -9,7 +17,7 @@
     "commit:5055155",
     "skills/vibehub-pr/SKILL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vibehub-pr step 1 now runs room drift alongside project validate and states the gate with the validator's refinement: entered rooms must be aligned (not literally FRESH, so a preserved semantic claim from another branch cannot over-block), an unexplained DRIFTED room blocks the handoff until aligned or honestly marked, drift:-prefixed marks ship as recorded debt, and rooms the branch never entered do not block.",
   "ticket_id": "ticket-pr-room-aware-gate"
 }

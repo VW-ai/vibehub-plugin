@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "digest": "d97ea3074d1db25e7a004305eac2d6bd949ce30c18da5d2d245b1c6dcf4807ca",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-product",
+      "digest": "67f13ef0ecacee764fa52c808d9a6ea5c1a00c4afc1d1a87f092a475c2bfa03b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    },
+    {
+      "acceptance_id": "readme-render-and-artifact-parity-pass",
+      "digest": "d76b733bd4c2a27de1556bd9442a4707435b7ac6fe174821b27ffbfbd18ed223",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    }
+  ],
   "acceptance_ids": [
     "readme-images-are-lossless-retina-captures",
     "readme-copy-matches-current-product",
@@ -17,7 +37,7 @@
     "artifact:fresh-codex-claude-62-files-2828307-bytes",
     ".vibehub/rooms/product/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Automated release tests parse the Retina capture manifest, verify the PNG signature, exact IHDR dimensions and SHA-256 for all three README images, require all four current phases and the progressively disclosed Recommended action copy, reject JPEG Workbench references, and preserve the at-most-60-line surface plus single canonical invocation and installation/release contracts. Plugin packaging includes the three PNGs and manifest. Installed-artifact verification parses Markdown and HTML README image references and fails if any relative target is missing. Full repository verification passes 131/131, and a fresh Codex/Claude-parity installed artifact passes its real read-only loopback checks at 62 files and 2,828,307 bytes. Product Room alignment is refreshed to the exact README/docs asset state; Ticket and project validation remain valid.",
   "ticket_id": "ticket-refresh-readme-workbench-screenshots"
 }

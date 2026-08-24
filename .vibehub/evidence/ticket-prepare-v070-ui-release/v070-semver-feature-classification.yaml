@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "v070-semver-classification",
+      "digest": "2c9067e5a1b312e274e1e57832bc0191ba2619748d72e3b8ede22708851afa51",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ec37d74ee3a64297211edd417618d918c632f222"
+    }
+  ],
   "acceptance_ids": [
     "v070-semver-classification"
   ],
@@ -18,7 +26,7 @@
     ".github/workflows/release.yml",
     "command:git diff --name-status origin/main..HEAD"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The published baseline and latest fetched tag are v0.6.0. The curated branch adds a user-visible shared Web graph and Inspector upgrade while retaining the same Start-this-with-VibeHub entry, format_version 1 canonical schemas, Git-native document model, Codex/Claude installation metadata shape, dependency-free artifact boundary, and GitHub-only release workflow. With no incompatible product boundary, data-format, installation, or release-surface change, Semantic Versioning classifies the next feature release as v0.7.0.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

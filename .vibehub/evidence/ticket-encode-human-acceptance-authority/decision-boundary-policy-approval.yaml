@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "decision-boundary-policy-approved",
+      "digest": "3a9da18df43ef92377e668a5c250db3fd0d8f70c96f9cccf592be55ef03d36d5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ffaad6d19139942e4d1e21679a3cf7b8a6d94f21"
+    }
+  ],
   "acceptance_ids": [
     "decision-boundary-policy-approved"
   ],
@@ -12,6 +20,6 @@
     "conversation:2026-08-10-owner-selected-proposal-decision-implementation-flow"
   ],
   "summary": "The owner explicitly agreed that a human decision which blocks later implementation belongs in the Ticket graph, confirmed that execution-time discovery may split out a new Ticket, and accepted the proposal → human choice → implementation flow. This supports the policy that authority names the criterion's decision owner, while terminal sign-off without downstream scheduling may remain in one delivery Ticket.",
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

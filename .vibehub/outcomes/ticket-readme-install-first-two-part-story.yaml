@@ -7,6 +7,10 @@
     "owner-judges-readme"
   ],
   "closed_at": "2026-08-23T07:30:00Z",
+  "contract_binding": {
+    "digest": "7544da15300851fae605f6c7dec7050b00e7da4bf5d0908cf96ff32d8e0d9c95",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "install-above-fold-asserted",
     "two-part-layout-62-lines",
@@ -15,7 +19,7 @@
     "owner-approves-readme"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent adjudication at dd87199: npm test 143/143 and verify:artifact ok reproduced; README is 62 lines (budget 90), the npx install command (line 16) and the entry line (23) precede the first docs/assets image (31) and How it works (33), marketplace commands remain a one-line alternative; top part is logo, tagline, install, entry, three-item What you get, one hero image; lower part carries How it works, Workbench, Work with your team on GitHub, Learn more; Upgrades text lives in docs/INSTALL.md with a README pointer. The GitHub section shows docs/assets/github-issues/issue-blocked-by-2x.png, viewed and confirmed as live Issue #35 with the native Blocked-by pill and state/maturity labels, registered in the capture manifest with sha256, source_url, and captured_at, and links docs/GITHUB_ISSUES.md. Every phrase pinned by origin/main's release test is still asserted and passes, with vibehub.icu href and entry line exactly once. Constraints hold: git diff origin/main..HEAD -- site is empty; the three Workbench captures match their manifest sha256 and manifest entries were added, not replaced. Human-authority criterion accepted through owner-approves-readme (origin: human, ref conversation:2026-08-23-readme-refresh).",
   "ticket_id": "ticket-readme-install-first-two-part-story",

@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "canvas-is-default-primary-surface",
+      "digest": "9b19c2bfa926a50969fe1ef1cb2c130bfc736aa8d1b9835908895ba6a502d3d7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    },
+    {
+      "acceptance_id": "overview-has-one-operational-purpose",
+      "digest": "268982b98861c7e47447ae09ffd967042d6846863f7dc87939e203f686088285",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    },
+    {
+      "acceptance_id": "empty-presence-does-not-occupy-shell",
+      "digest": "8eaaff125d5799421830136a444686522b4eec57bfc8e8f28628d20547c208fb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    },
+    {
+      "acceptance_id": "focused-local-link-is-complete-and-honest",
+      "digest": "ea24288b99dfeb7c81aaa72f72b6241b3caf7c38f4df78d497fd4bd93d0983fc",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    },
+    {
+      "acceptance_id": "victor-interactions-are-preserved",
+      "digest": "1b51bdf3767569c367f13080f078bd296c3272d443d32b5a6e2b0fa6abeb7c3f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    },
+    {
+      "acceptance_id": "canvas-shell-is-responsive-and-verified",
+      "digest": "c70e22a94416dcbfeb24f81ceb6d5e3c29cf8d3247390d839b7191d8b95822fd",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:26364e4c01d28471e14289420b7571b9608beb1d"
+    }
+  ],
   "acceptance_ids": [
     "canvas-is-default-primary-surface",
     "overview-has-one-operational-purpose",
@@ -22,7 +60,7 @@
     "browser:on-demand-overview-wide-and-narrow-keyboard-focus",
     "room:product-and-workbench-fresh-at-9d70122"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 9d70122 makes the causal graph the default full-width Workbench surface, removes the permanent overview rail and both empty Implementing surfaces, and adds an on-demand operational Overview limited to READY frontier, pending and upcoming human boundaries, deviations, REFINE count, and exact VibeHub source dirtiness. The retained production graph still exposes causal-cone selection, relation controls, minimap, pan/zoom, progressive Execution/Contract/Log Inspector, exact source, and READY-gated Agent handoff. Ticket selection and lens changes now replace only explicit ticket/view query state while preserving the 64-character bearer fragment; opening the resulting URL in a second tab on the same live host restored the selected Ticket and Log lens, and copy feedback says the link is valid only while that local host runs. Full verification passed 51/51 tests and the 53-file, 659222-byte installed artifact. Real-browser DOM comparison against tag v0.7.0 measured the 1440x960 canvas growing from 1208x800 (966400 px2) to 1440x854 (1229760 px2), +27.3%, and the 1180x820 canvas from 972x660 (641520 px2) to 1180x714 (842520 px2), +31.3%. At 390x844 the canvas, full-screen Inspector, and 370px on-demand Overview had no horizontal overflow; graph controls, Inspector tabs and close button, Overview items and close button, Copy, and source details were at least 44px. Keyboard Enter opened the Ticket, Escape returned focus from Overview, and the reduced-motion media rule remains mechanically verified. Product and Workbench Rooms were aligned to the implementation commit and all four Rooms report FRESH.",
   "ticket_id": "ticket-workbench-canvas-first-overview"
 }

@@ -1,23 +1,80 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket-outcome.v1.json",
+  "$id": "https://vibehub.dev/schemas/ticket-outcome.v2.json",
   "title": "VibeHub Ticket Outcome",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "kind", "ticket_id", "status", "accepted_acceptance_ids", "unresolved_acceptance_ids", "evidence_ids", "summary", "closed_at"],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "enum": [1, 2] },
     "kind": { "const": "ticket_outcome" },
     "ticket_id": { "$ref": "#/$defs/id" },
     "status": { "enum": ["successful", "partial", "failed", "deviated"] },
     "accepted_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
     "unresolved_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
     "evidence_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "contract_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["binding"],
+      "description": "The complete acceptance contract this Outcome adjudicated: the sha256 digest of the acceptance-id-sorted [ticket_id, acceptance_id, authority, criterion] arrays, its native or reconstructed origin, and an optional unresolved marker from the fixed migration vocabulary. Omission is the only legacy compatibility rule; under the binding-aware project format a successful Outcome contributes to DONE, archive, and dependent unlock only while its recorded digest still equals the current contract.",
+      "properties": {
+        "binding": { "enum": ["native", "reconstructed"] },
+        "digest": { "$ref": "#/$defs/sha256" },
+        "unresolved": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason"],
+          "properties": {
+            "reason": {
+              "enum": [
+                "no-addition-commit",
+                "ticket-unreadable-at-addition",
+                "referenced-acceptance-missing-at-addition",
+                "contract-drifted-since-addition"
+              ]
+            },
+            "acceptance_ids": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/id" },
+              "description": "The exact drifted or missing acceptance ids the reason names, so the projection can route review without recomputing history."
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "binding": { "const": "native" } } },
+          "then": { "required": ["digest"], "not": { "required": ["unresolved"] } }
+        },
+        {
+          "if": {
+            "required": ["unresolved"],
+            "properties": { "unresolved": { "properties": { "reason": { "const": "contract-drifted-since-addition" } } } }
+          },
+          "then": { "required": ["digest"] }
+        },
+        {
+          "if": {
+            "required": ["unresolved"],
+            "properties": { "unresolved": { "properties": { "reason": { "enum": ["no-addition-commit", "ticket-unreadable-at-addition", "referenced-acceptance-missing-at-addition"] } } } }
+          },
+          "then": { "not": { "required": ["digest"] } }
+        },
+        {
+          "if": { "not": { "required": ["unresolved"] } },
+          "then": { "required": ["digest"] }
+        }
+      ]
+    },
     "summary": { "$ref": "#/$defs/text" },
     "closed_at": { "type": "string", "format": "date-time" }
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
   }
 }

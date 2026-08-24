@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "canonical-discovery-metadata-is-consistent",
+      "digest": "d9d6fb9c897dd4efe5ed757d001cee5658921e3878c68491a3f4a2dea6d2add6",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    },
+    {
+      "acceptance_id": "domain-discovery-is-production-verified",
+      "digest": "21a88cc87fb54b31729fb65b4960ebd95c3430533d68eaadfc96d2ec5ef2ef18",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    }
+  ],
   "acceptance_ids": [
     "canonical-discovery-metadata-is-consistent",
     "domain-discovery-is-production-verified"
@@ -18,7 +32,7 @@
     "command:curl-googlebot-sitemap-http-200-application-xml",
     "command:xmllint-sitemap-valid"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact Cloudflare Pages deployment for commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77 is now served at https://vibehub.icu with an Active SSL-enabled custom domain. Mechanical production verification returned HTTPS 200 for the homepage, robots.txt, sitemap.xml, Open Graph image, and favicon; the page canonical points only to https://vibehub.icu/, robots.txt names the canonical sitemap, and the one-URL sitemap contains no www hostname. The www verifier separately confirmed direct 301 redirects for HTTP and HTTPS with path and query preserved.",
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

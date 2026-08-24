@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "research-corpus-is-official-and-comparative",
+      "digest": "e52cf483e83d2c666cb8911b702ef19c11fd7b7aa9d5ec3ab80b9de577fc3754",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b76bb3069f9e2bcf35b22b634740003f8d666dec"
+    },
+    {
+      "acceptance_id": "chat-task-search-semantics-are-explicit",
+      "digest": "eaaf5a6f08f652db6431d4ecaa9d9a26189340f800006cb397ac80d4b6d507e2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b76bb3069f9e2bcf35b22b634740003f8d666dec"
+    },
+    {
+      "acceptance_id": "attention-inbox-is-quiet-and-truthful",
+      "digest": "dc696b41c75aaa3598dea854e9f740b9c7023aa5d8fc55073f1469da8a6ec15a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b76bb3069f9e2bcf35b22b634740003f8d666dec"
+    }
+  ],
   "acceptance_ids": [
     "research-corpus-is-official-and-comparative",
     "chat-task-search-semantics-are-explicit",
@@ -23,7 +43,7 @@
     "command:npm-run-verify-162-pass-1-expected-skip",
     "command:verify-plugin-artifact-62-files-2832437-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in study compares five first-party interaction families across OpenAI Developers, Linear Inbox, GitHub Notifications, Cursor Background Agents, and Raycast command search, naming the reusable pattern, its failure mode, and its bounded VibeHub use. The executable interaction contract keeps Chat Thread, Task, Context, notification, and trusted live presence as separate typed objects. Search groups Chats, Tasks, and Context and routes each exact owner; current Needs You comes only from canonical NEEDS_HUMAN, completion history only from successful Outcomes, and Running remains quiet. Initial repository history is never minted as unread, replay cannot claim a new event, and color is reinforced by text, icons, and grouping.",
   "ticket_id": "ticket-research-codex-native-search-and-task-attention"
 }

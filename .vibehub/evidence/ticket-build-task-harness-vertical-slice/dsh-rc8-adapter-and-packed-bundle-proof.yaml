@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "current-dsh-baseline-and-adapter-are-pinned",
+      "digest": "9d8401aea8394ad18cc19143db490dda4f3947bdef7c01ebe5f3c20aad9e48fe",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b42782ec0329d29f02930531573605b75f3c29c9"
+    },
+    {
+      "acceptance_id": "installable-bundle-preserves-native-dsh",
+      "digest": "434b0e8942e478958cc81e56b48bcc3010e514d243152080a9a7b129bb29fc44",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b42782ec0329d29f02930531573605b75f3c29c9"
+    }
+  ],
   "acceptance_ids": [
     "current-dsh-baseline-and-adapter-are-pinned",
     "installable-bundle-preserves-native-dsh"
@@ -19,7 +33,7 @@
     "test/dsh-adapter.test.mjs",
     "test/dsh-bundle.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact official DeepSeek Harness checkout at 141eb6fef83422698aef7a981029e843e8161534 and @deepseek-ai/dsh@0.1.0-rc.8 passed the 14-seam source-contract probe for every imported VibeHub boundary. The standalone Bundle rebuilt idempotently, packed to an npm tarball, installed through the official plugin command into a fresh Web Profile after the official base/web layers, booted on loopback with the native shell intact, restarted through the same Profile, and was cleanly removed with no remaining Profile dependency. The Bundle uses additive shell.overlay and conversation.view Slots, native DSH theme tokens, commands, workspaces, Sessions, skill provider and registered Session projection; it vendors no upstream code.",
   "ticket_id": "ticket-build-task-harness-vertical-slice"
 }

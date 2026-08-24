@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-pr-merged",
+      "digest": "ec12b1f4e44590165a29b93a7994edcdfae1c19730a423a49e27342eb6191a87",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a969afed026a1e11d2e0c3e92401f42932583be1"
+    }
+  ],
   "acceptance_ids": [
     "release-pr-merged"
   ],
@@ -12,7 +20,7 @@
     "command:gh pr view 16 --json state,mergedAt,mergeCommit",
     "command:git pull --ff-only origin main"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "GitHub PR #16, release: VibeHub v0.6.0, passed both Verify VibeHub checks, was marked ready with CLEAN/MERGEABLE state, and merged to main at 2026-08-11T07:34:51Z as merge commit 20988ffa3fde04e952a0d6905268e43fb93e195e. Fast-forwarding local main from origin/main produced that exact commit and included the successful ticket-prepare-v060-release Outcome plus its four Evidence documents.",
   "ticket_id": "ticket-publish-v060-release"
 }

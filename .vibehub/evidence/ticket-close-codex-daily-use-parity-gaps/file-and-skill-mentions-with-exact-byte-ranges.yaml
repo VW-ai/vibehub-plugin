@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "file-and-skill-mentions-from-the-composer",
+      "digest": "055546f18cb2e9c057ff468bfff68a83c4f5f63212f6d04e51f151c6b8c5c96b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "file-and-skill-mentions-from-the-composer"
   ],
@@ -17,7 +25,7 @@
     "test/codex-chat-conformance.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 4ef3908, 801c536 and 33a9eaf add mentions. The host searchFiles action calls fuzzyFileSearch rooted at the bound repository with a fresh cancellation token per request and at most twenty results, listSkills calls skills/list with the repository cwd, and validInputs checks every text_elements byteRange against the UTF-8 byte span of its placeholder with Buffer.byteLength, rejecting overlap or mid-character cuts. Typing at-sign opens a keyboard-navigable picker over searchFiles and dollar opens one over listSkills; each chosen entry becomes a chip, one text_elements entry whose byteRange is computed with TextEncoder, and one mention or skill item with name and path; chips render in the composer and again in replayed user messages by parsing text_elements. Node tests assert the byte ranges equal Buffer.byteLength spans, the items and the replay parsing, and the host refusals; guard checks cover both pickers with Escape and Tab and the exact text_elements; the driver walk reads the exact input arrays from the fixture log.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

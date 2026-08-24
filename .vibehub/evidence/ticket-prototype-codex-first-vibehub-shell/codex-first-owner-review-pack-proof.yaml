@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "owner-review-pack-is-exact",
+      "digest": "f7a42b09d8cde4829cbd3f31c0242c1f2578741b4c94892bf9f1460266b46115",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8ef9463d41eb78e11c606c9df319f482f2183dde"
+    }
+  ],
   "acceptance_ids": [
     "owner-review-pack-is-exact"
   ],
@@ -14,7 +22,7 @@
     ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml",
     ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in owner review pack and the in-application review drawer name the product promise, persistent sidebar hierarchy, Codex default landing, additive Task entry, focused Task Workspace, exact Task-to-Thread handoff, Composer and ordinary audio placement, loopback local-app boundary, protected owner decisions, known gaps, smallest production path, and DSH as a later compatibility Plugin rather than the product carrier. A real browser opened the review drawer with focus moved to Close; closing restores focus to its trigger.",
   "ticket_id": "ticket-prototype-codex-first-vibehub-shell"
 }

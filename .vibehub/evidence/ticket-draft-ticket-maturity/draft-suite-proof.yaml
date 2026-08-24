@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "draft-suite-green",
+      "digest": "66c6843220e4169339e47b89a9f291e52ecfa062914421561e13084c5cd037b4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1d7d379009105bd85dbdd9c1d753c92fe52b6969"
+    }
+  ],
   "acceptance_ids": [
     "draft-suite-green"
   ],
@@ -9,7 +17,7 @@
     "commit:46d88ff",
     "test/draft-maturity.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Full node --test suite passes 36/36 including the three new draft-maturity tests, and the plugin artifact builds and verifies cleanly (47 files) with both shared references asserted present; all four rooms FRESH after align-on-use.",
   "ticket_id": "ticket-draft-ticket-maturity"
 }

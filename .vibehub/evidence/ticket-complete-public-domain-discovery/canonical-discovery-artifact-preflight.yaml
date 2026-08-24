@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "canonical-discovery-metadata-is-consistent",
+      "digest": "d9d6fb9c897dd4efe5ed757d001cee5658921e3878c68491a3f4a2dea6d2add6",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9151feb7ffa80016b0fd8f1ef7749e4bc0fdb03e"
+    },
+    {
+      "acceptance_id": "domain-discovery-is-production-verified",
+      "digest": "c82ba7b873f2b184b5c9a464448e5780d57f7d89629da443ec6ef21afaa8db41",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9151feb7ffa80016b0fd8f1ef7749e4bc0fdb03e"
+    }
+  ],
   "acceptance_ids": [
     "canonical-discovery-metadata-is-consistent",
     "domain-discovery-is-production-verified"
@@ -16,7 +30,7 @@
     "site/tests/rendered-html.test.mjs",
     "command:node-site-release-scripts-release-mjs-preflight"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Exact source commit d1c024176f4c3b26ecb5cd93be3d4964c2048caa adds the self-referential canonical link, public robots.txt, one-URL canonical sitemap.xml, release configuration guards, canonical production verification, and a deterministic www redirect verifier. The exact release preflight passed lint, static Vinext production build, and all 9 rendered artifact contracts with NEXT_PUBLIC_SITE_URL=https://vibehub.icu. Production metadata publication remains separately verifiable after the existing Sites deployment path publishes this commit.",
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

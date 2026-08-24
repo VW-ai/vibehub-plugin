@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "combined-workbench-journeys-pass",
+      "digest": "5e8994d32710992b5ed43ba0a25a5b041ba81d3910df56ae53919361e98b9f7d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2d4408136e35df069fc1e797d8c2ee53f426dd21"
+    },
+    {
+      "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+      "digest": "1d94ecfe9e346f49a043a68db1fc52f4196184c3cc1b6317664ae536b6f2846c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2d4408136e35df069fc1e797d8c2ee53f426dd21"
+    }
+  ],
   "acceptance_ids": [
     "combined-workbench-journeys-pass",
     "plugin-boundary-and-artifact-stay-clean"
@@ -16,7 +30,7 @@
     "evidence:workbench-shortened-text-tooltip-browser-proof",
     "evidence:workbench-canvas-done-count-browser-proof"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A fresh read-only host at exact HEAD ebac37c was exercised in the in-app browser. Current/All controls updated both URL scope and aria-pressed state; LTR/TTB updated explicit direction and geometry; zoom-in changed the world transform and zoom-out/Fit remained actionable. A focused integration Ticket on the Contract lens survived Workbench Room filter and Clear with ticket, lens, direction, world transform, and no-overflow state restored exactly. The canonical PR #21 delivery query rendered exactly its 10 proposed constituent Tickets; the knowledge+workbench Room union rendered 30 Tickets in TTB without document overflow. The exact-head pass complements the independently successful constituent browser Outcomes that already cover progressive archived-hop fixtures, Overview, exact source, attention coexistence, keyboard/reduced-motion behavior, and the 1440x960, 1180x820, 390x844 matrices in both directions; no production UI assets changed after those closeouts except the independently checked interaction/tooltip/count fixes already evidenced on this Ticket.",
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

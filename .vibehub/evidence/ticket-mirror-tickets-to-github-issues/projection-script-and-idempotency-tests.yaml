@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "projection-script-is-deterministic-and-idempotent",
+      "digest": "29b15890955b46a2f1fe7e9a48a3ba51f8ff007cd0ca0b84007c7674739e6eae",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:861ae0c36f55fb7b27a65dbbf4324b09f9bd176b"
+    }
+  ],
   "acceptance_ids": [
     "projection-script-is-deterministic-and-idempotent"
   ],
@@ -10,7 +18,7 @@
     "scripts/sync-github-issues.mjs",
     "test/sync-github-issues.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "scripts/sync-github-issues.mjs imports loadRepository, ticketStatus, and ticketNextAction from the plugin's own vh.mjs and computes title, body, labels, open/closed state, and Evidence comments for every Ticket; the only runtime dependencies are node and gh. test/sync-github-issues.test.mjs builds a fixture repository with a DONE and a BLOCKED Ticket, Outcome, agent and human Evidence, and asserts: rendering of checklist, human-authority mark, Blocked-by number resolution, Outcome record and markers; an empty remote plans one create per Ticket then bodies with resolved numbers; a remote that already matches yields zero operations; and drift in state, labels, or missing Evidence is repaired while foreign labels are left alone. Full suite passes 136/136 and verify:artifact passes with the script excluded from the plugin bundle.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

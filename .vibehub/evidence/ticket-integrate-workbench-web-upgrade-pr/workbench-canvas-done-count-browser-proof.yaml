@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "combined-workbench-journeys-pass",
+      "digest": "5e8994d32710992b5ed43ba0a25a5b041ba81d3910df56ae53919361e98b9f7d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:eb3f5a0491f08c1d6182f261418e2e2825a44ffc"
+    },
+    {
+      "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+      "digest": "1d94ecfe9e346f49a043a68db1fc52f4196184c3cc1b6317664ae536b6f2846c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:eb3f5a0491f08c1d6182f261418e2e2825a44ffc"
+    }
+  ],
   "acceptance_ids": [
     "combined-workbench-journeys-pass",
     "plugin-boundary-and-artifact-stay-clean"
@@ -12,7 +26,7 @@
     "test:ui-visual-system-operational-count-legend",
     "browser:iab-canvas-done-count-2026-08-13"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production canvas summary now always renders the operational DONE count with its check icon before READY, REFINE, BLOCKED, DEVIATED, and the independent NEEDS YOU attention count. The live 47-Ticket Workbench displayed 42 DONE, 1 READY, 2 REFINE, and 2 BLOCKED in the upper-left summary with no horizontal overflow. All 81 tests and the 54-file 722740-byte installed artifact passed, and all four Rooms were FRESH.",
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "codex-chat-state-inventory-is-complete",
+      "digest": "2284bdc17eb98d423f74d390aec44d26d01f9825b1ed1e4b9a245bee275d2335",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf"
+    },
+    {
+      "acceptance_id": "open-source-reuse-options-are-audited",
+      "digest": "a7512cf19e1e2ff88690d2dbfbd6f2791e4c2b1b0104e120e4bf00ef7231a5b2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf"
+    },
+    {
+      "acceptance_id": "app-server-events-map-to-one-ui-contract",
+      "digest": "6626e4b511a7b3685ea2b5b32b6ecb2e5a0582783d6238f9c53de4ff74b73117",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf"
+    }
+  ],
   "acceptance_ids": [
     "codex-chat-state-inventory-is-complete",
     "open-source-reuse-options-are-audited",
@@ -22,7 +42,7 @@
     "command:node-test-codex-first-shell-prototype-6-of-6",
     "command:npm-run-verify-163-pass-1-expected-skip"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in first-party inventory covers Thread lifecycle, Turn lifecycle, every pinned 0.147.0 ThreadItem family, streaming deltas, approvals and user input, delegated agents, attachment/audio posture, failure/retry/reconnect, keyboard and accessibility boundaries. The executable contract pins the exact Codex package, upstream commit, and generated protocol hash; defines stable Thread/Turn/item/request identity, authoritative item completion, live-versus-replay truth, animation-frame batching, a 500-event/240-item bounded carrier, sanitization and unknown-item fallback; and keeps ordinary Chat independent of VibeHub Task protocol. The source-backed audit compares seven maintained or relevant clients, records exact license/maintenance/dependency/security/reuse boundaries, recommends a bounded MIT reducer pattern from codex-gateway plus selected MIT assistant-ui headless primitives, rejects whole-product/runtime adoption, and forbids reuse from the unlicensed candidate.",
   "ticket_id": "ticket-research-codex-native-chat-parity"
 }

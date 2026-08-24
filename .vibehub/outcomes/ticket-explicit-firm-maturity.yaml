@@ -6,12 +6,16 @@
     "explicit-maturity-verifies-cleanly"
   ],
   "closed_at": "2026-08-11T01:17:05Z",
+  "contract_binding": {
+    "digest": "e1e468a8fd8dbe27e8e82f0f90ec728a6b5e74669caaf26fdf68faf396ab48fd",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "explicit-maturity-contract-proof",
     "explicit-maturity-verification-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all four criteria after reading the current Ticket, maturity decision Context, schema, validator, Plan instructions, Rooms proposal/decision/implementation Tickets, tests, full diff, and both Evidence documents. The schema and validator accept firm and draft while omission remains compatible firm; Plan writes explicit maturity and firms drafts in place; focused tests prove firm, omission, draft REFINE, and same-Ticket firming; the real Rooms chain is firm READY, firm BLOCKED, draft BLOCKED. Project and Ticket validation pass, all four Rooms are FRESH, git diff check is clean, and npm run verify passes 46/46 with the 52-file, 379489-byte Codex/Claude-compatible artifact.",
   "ticket_id": "ticket-explicit-firm-maturity",

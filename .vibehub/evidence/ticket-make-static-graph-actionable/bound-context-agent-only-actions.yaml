@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "digest": "93648ecdf0372db89be8d8ccde48680f37df887dd7c41c98658e91fce2ce687b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cb224cabfbab5f2f51d9b20b411e19262c87dc41"
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "digest": "1e717555abeccb63093b06f20d71c15ce4e28d9d8393054f75047548ed8c0e60",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cb224cabfbab5f2f51d9b20b411e19262c87dc41"
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "digest": "cbaaa6d225ec47f9acb3e7dd33ec4dc161200a04a26f07fdcdb48531a7a9d2e9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cb224cabfbab5f2f51d9b20b411e19262c87dc41"
+    }
+  ],
   "acceptance_ids": [
     "one-copy-handoff-per-object",
     "bound-context-is-inspectable",
@@ -16,7 +36,7 @@
     "file:skills/scripts/vh-ui.mjs",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood clarified that each Bound Context object should expose only one Copy for Agent action and should never show raw Source or Evidence JSON. Commit e14476f removes per-reference editor and GitHub actions from Bound Context while retaining those mechanical links in the dedicated Source Dock. Canonical Context remains human-readable through parsed Source quote/ref/time, Evidence note/ref records, directional Relations, and compact identity. A real-browser audit of the current Ticket found exactly one Copy for Agent button, no links, and no Source/Evidence JSON dump in every visible Bound Context object. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227583 bytes.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

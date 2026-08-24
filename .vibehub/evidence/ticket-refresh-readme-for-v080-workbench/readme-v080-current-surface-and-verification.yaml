@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "digest": "660c0297c01eb6ced89f6dd66df98de60fdb47c8f3ae801dd98be173af541b28",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70d09064a561ce97759ba23200dc02dad6a10e9d"
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "digest": "ebe5080ebe49a5e10368316a3e72b692dc6b161c7be8a70bfbccbf92d61eea83",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70d09064a561ce97759ba23200dc02dad6a10e9d"
+    },
+    {
+      "acceptance_id": "installation-and-upgrade-copy-is-current",
+      "digest": "a7686c2b73dde3d3eb012e6794c0850bdffec5c92035371969604238984ba31d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70d09064a561ce97759ba23200dc02dad6a10e9d"
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "digest": "bc2a828769c6bb2bb414b847edc110ef0ecb09c4d64731d5e59b4d1fae12f676",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:70d09064a561ce97759ba23200dc02dad6a10e9d"
+    }
+  ],
   "acceptance_ids": [
     "readme-shows-current-workbench",
     "user-scenario-is-clear-and-compact",
@@ -18,7 +44,7 @@
     "artifact:54-files-567833-bytes",
     "room:product-fresh"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README now presents v0.8 through an authentic 1280x720 capture from clean main in the read-only Workbench at scope=current and direction=ltr, with current controls, causal canvas, archived boundary, selected cone, minimap, and Execution Inspector visible; the browser had no console errors or document overflow. The adjacent two-paragraph scenario covers the canonical user entry, Git-native Ticket planning, current causal work, human boundaries, on-demand Rooms and history, acceptance-linked Evidence, and independent Outcome without becoming a feature inventory. Codex and Claude install/upgrade commands match the current docs and the locally verified v0.8.0 update flows, while explicitly preserving checked-in project data. README is 58 lines, retains exactly one canonical entry and the dark-safe wordmark, names no Desktop product, and all local links/assets exist. The focused release suite passed 4/4, full npm run verify passed 81/81 with a 54-file artifact, Ticket/project validation passed, git diff checks passed, and all four Rooms are FRESH after product alignment.",
   "ticket_id": "ticket-refresh-readme-for-v080-workbench"
 }

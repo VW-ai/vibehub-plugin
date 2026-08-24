@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "public-cards-match-workbench-grammar",
+      "digest": "85936b973ffbfcb2c9053fba94bb120d9b78cffdf86b75abb463ac61c36829ed",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d469127e7150d3091fae961c52141e8e9698cdc1"
+    },
+    {
+      "acceptance_id": "public-links-match-workbench-grammar",
+      "digest": "b9468ccd2de5bd8635dbd2fb63be8a24c889e0800c4779c34019b7f104b2ecb9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d469127e7150d3091fae961c52141e8e9698cdc1"
+    },
+    {
+      "acceptance_id": "public-shell-is-truthful-and-clear",
+      "digest": "d8e34d174f9cca7d0623d9cac5a652c46cf7f75ba357832be11d065ecfb67a25",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d469127e7150d3091fae961c52141e8e9698cdc1"
+    },
+    {
+      "acceptance_id": "graph-refinement-is-regression-checked",
+      "digest": "603f4b37a4dea12fd954e9f4a6f8d7a0f67f2628d140a55b6272e0f9e58a091a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d469127e7150d3091fae961c52141e8e9698cdc1"
+    }
+  ],
   "acceptance_ids": [
     "public-cards-match-workbench-grammar",
     "public-links-match-workbench-grammar",
@@ -19,7 +45,7 @@
     "command:node-site-release-verify-vibehub-icu",
     "command:live-html-workbench-label-contract"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Sites version 2 deployed the exact validated commit to the existing public VibeHub project. The immutable deployment succeeded, the vibehub.icu custom domain remained active with active provider and SSL status, and HTTPS verification returned 200 for both URLs. The live canonical HTML contains Ticket Workbench and Dark mode feature, contains no Vibe task app or GUIDED FIXTURE label, and references the new favicon path.",
   "ticket_id": "ticket-align-public-graph-with-real-workbench"
 }

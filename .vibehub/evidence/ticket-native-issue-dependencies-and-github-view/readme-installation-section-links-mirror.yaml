@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "owner-picks-github-view",
+      "digest": "dd4713137771537330a0f183e3155599fbe4ee4443e4d4dede01233137d17898",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:c7f0b05801b1718d5af0700edea79a4de4616add"
+    }
+  ],
   "acceptance_ids": [
     "owner-picks-github-view"
   ],
@@ -9,7 +17,7 @@
     "README.md",
     ".vibehub/evidence/ticket-native-issue-dependencies-and-github-view/owner-picks-issues-list-default-view.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After the partial Outcome noted the link sat in the README footer, the Installation section line 'Then start a new task and use the single entry above.' now also links the GitHub Issues list and docs/GITHUB_ISSUES.md, keeping README within its 60-line test budget (137/137 pass). The owner's choice itself is recorded in human-origin Evidence owner-picks-issues-list-default-view.",
   "ticket_id": "ticket-native-issue-dependencies-and-github-view"
 }

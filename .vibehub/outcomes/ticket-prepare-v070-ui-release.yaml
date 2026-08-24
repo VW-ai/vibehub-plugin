@@ -8,6 +8,10 @@
     "replacement-pr-ready"
   ],
   "closed_at": "2026-08-12T02:40:15Z",
+  "contract_binding": {
+    "digest": "87ec3036a970a7116bc292dca52ef377825dcbf98f23a9b5dfc97d1d425d9b84",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "v070-ui-release-owner-authorization",
     "v070-origin-main-and-pr15-alignment",
@@ -17,7 +21,7 @@
     "v070-replacement-pr-readiness"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Accepted the v0.7.0 UI release candidate after independent verification against freshly fetched origin/main 0b5585c. Human-origin Evidence authorizes shipping the curated Victor Web UI before the later redesign and releasing afterward. PR #15 authority, human-origin Evidence, maturity/REFINE, human-attention, and READY-only stateless handoff contracts remain intact; the shared Web UI is a backward-compatible feature over published v0.6.0, so v0.7.0 is the correct minor version. All five identity fields and the dated changelog agree. Full verification passed 48 of 48 tests and the 52-file artifact check; a clean-clone npm build produced 52 files and 648451 bytes; release-tag identity, project and Ticket validation, diff check, four FRESH Rooms, and independent wide/narrow Chrome rendering of the clean 36-Ticket graph all passed. The final clean pre-Outcome branch has three bounded commits beyond main: UI curation, release preparation, and its readiness Evidence; rejected Desktop/runtime paths remain absent. No v0.7.0 tag or release was created from the feature branch.",
   "ticket_id": "ticket-prepare-v070-ui-release",

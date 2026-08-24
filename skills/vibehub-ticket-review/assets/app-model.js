@@ -100,6 +100,10 @@
       blockingTicketIds: Array.isArray(slot.summary?.blockingTicketIds)
         ? slot.summary.blockingTicketIds
         : [],
+      // The host's canonical proof-binding explanation (native,
+      // reconstructed, stale, unresolved), carried verbatim: the Workbench
+      // never recomputes proof state.
+      proof: slot.summary?.proof ?? null,
     };
   }
 

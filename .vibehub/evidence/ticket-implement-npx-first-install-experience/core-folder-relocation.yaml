@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "core-folder-carries-helper-and-contracts",
+      "digest": "8894dbabb5209a94783df30723cf320e907f027de48d6fb399eb09f62b08fcba",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:fc698c1c5d7f229c23ccf92593b87c10768c5812"
+    }
+  ],
   "acceptance_ids": [
     "core-folder-carries-helper-and-contracts"
   ],
@@ -10,7 +18,7 @@
     "skills/vibehub-core/SKILL.md",
     "test/install-templates.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "git mv moved skills/scripts and skills/contracts into skills/vibehub-core/ (history preserved); skills/vibehub-core/SKILL.md declares it the shared helper, contracts, and templates that nothing invokes directly; templates/github/ holds the workflow and sync script templates; skills/scripts and skills/contracts no longer exist, asserted by test/install-templates.test.mjs.",
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

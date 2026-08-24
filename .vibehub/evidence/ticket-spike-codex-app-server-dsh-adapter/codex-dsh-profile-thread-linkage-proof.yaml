@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "app-server-lifecycle-and-auth-boundary-are-proven",
+      "digest": "e16abda4ec2995e3c4614cec1b813b48c209d1ee58fe370ec6d686e04363adbc",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1caf170519af7edc0a7484afc85dd8e908f16818"
+    },
+    {
+      "acceptance_id": "codex-thread-turn-and-event-loop-is-real",
+      "digest": "a8b47bb220d9921d5dcf1118940748e4696edcbfd535b03edc02596a5bc9de3c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1caf170519af7edc0a7484afc85dd8e908f16818"
+    },
+    {
+      "acceptance_id": "task-thread-handoff-remains-exact",
+      "digest": "fe418f6fb8033db80468b5bb7465903e3f36c75c387ece9b6757c17186f55e76",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:1caf170519af7edc0a7484afc85dd8e908f16818"
+    }
+  ],
   "acceptance_ids": [
     "app-server-lifecycle-and-auth-boundary-are-proven",
     "codex-thread-turn-and-event-loop-is-real",
@@ -21,7 +41,7 @@
     "command:loopback-get-200-post-405-redacted-auth",
     "command:focused-codex-adapter-5-of-5"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A clean temporary DSH rc.8 Web Profile installed the local Bundle, started exactly one Profile-owned Codex app-server, returned a redacted authenticated ChatGPT Pro capability from a no-store loopback health route, rejected POST with 405 read_only, stopped the child, installed the rebuilt Bundle, restarted with the same healthy capability and clean repository state, then removed the Bundle back to base+web with an empty patch. The live official app-server probe initialized, listed stable Workspace Threads, completed a real ephemeral read-only Turn with streamed start/item/delta/completion events and exact sentinel, restarted app-server, and recovered the same stable Thread ID. The versioned DSH command projection deterministically replays Workspace+Ticket+Codex Thread identity without localStorage, SQLite, Agent Team Tasks, live or observedAt fields; canonical Ticket, Evidence and Outcome semantics remain outside Codex runtime events.",
   "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
 }

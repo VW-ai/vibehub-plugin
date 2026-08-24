@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "perception-one-line",
+      "digest": "05a50c5423436ac2a5a5cf5ab439ccdabb1e0f6e61629ed4b6e221144dafbb4e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a0efc6d1f5005426033d29a4987cec607cf0e02d"
+    }
+  ],
   "acceptance_ids": [
     "perception-one-line"
   ],
@@ -9,7 +17,7 @@
     "skills/vibehub-ticket-plan/SKILL.md",
     "skills/vibehub-distill/SKILL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "On an already-distilled repository a normal ticket start costs one deterministic drift call (about 0.2s on this repo, all rooms FRESH) and the ticket-plan step instructs surfacing it as a single line such as Aligned 2 rooms (3 files drifted); the distill skill caps its own report at one line per room and totals, and only COLD_START is allowed to be perceptible. Suite passes 28/28 and the plugin artifact builds with the new skill included (45 files).",
   "ticket_id": "ticket-ambient-distill-workflow"
 }

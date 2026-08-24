@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "verified-feature-pr-is-merged",
+      "digest": "8c3a1e226331cd7dc50ab676ff68db14324af9620b64b6d249cf852c9c3ff6c1",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    },
+    {
+      "acceptance_id": "delivery-membership-is-made-authoritative",
+      "digest": "9f2e1674bed39a117a2c6b8adb8a0e61e4d5dc3b98d2ff2a10bdeb574429b9a0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:aa75912d0bf4fa06a98ab31a7cad3f48f877b016"
+    }
+  ],
   "acceptance_ids": [
     "verified-feature-pr-is-merged",
     "delivery-membership-is-made-authoritative"
@@ -17,7 +31,7 @@
     "commit:648c5f62d27b0164b631245e52ddd805e9ff5337",
     "command:git-diff-ee2cd9b-to-648c5f6-exactly-ten-ticket-delivery-files"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "GitHub reports focused Web Workbench PR #21 merged after both required Verify VibeHub checks succeeded at 2026-08-13T18:27:34Z as ee2cd9bbe7489754e513de6b2c376e63473187fe. That merged main tree contains the accepted integration Outcome, its Evidence, and the ten constituent successful Outcomes. Follow-up PR #22 also passed both required checks and merged at 2026-08-13T18:31:30Z as 648c5f62d27b0164b631245e52ddd805e9ff5337. Its bounded diff changes exactly the ten constituent PR #21 delivery entries from proposed to delivered with the authoritative PR #21 mergedAt timestamp and merge commit; no other files or historical/future Tickets changed.",
   "ticket_id": "ticket-publish-v080-workbench-release"
 }

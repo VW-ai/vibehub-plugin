@@ -9,6 +9,7 @@ import {
   renameSync,
   writeFileSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,6 +48,24 @@ const DEPENDENCY_HYGIENE = JSON.parse(readFileSync(
 ));
 const CURRENT_PROJECT_FORMAT = VERSION_CONTRACT.project_format;
 const CURRENT_TICKET_SCHEMA = VERSION_CONTRACT.document_schemas.ticket;
+const CURRENT_EVIDENCE_SCHEMA = VERSION_CONTRACT.document_schemas.evidence;
+const CURRENT_OUTCOME_SCHEMA = VERSION_CONTRACT.document_schemas.outcome;
+// Proof documents written before the binding existed stay readable at their
+// original schema_version; the optional binding arrives with version 2.
+const EVIDENCE_SCHEMA_VERSIONS = new Set([1, CURRENT_EVIDENCE_SCHEMA]);
+const OUTCOME_SCHEMA_VERSIONS = new Set([1, CURRENT_OUTCOME_SCHEMA]);
+const PROOF_BINDINGS = new Set(["native", "reconstructed"]);
+// The fixed unresolved vocabulary shared with the reconstruction migration.
+const OUTCOME_UNRESOLVED_REASONS = new Set([
+  "no-addition-commit",
+  "ticket-unreadable-at-addition",
+  "referenced-acceptance-missing-at-addition",
+  "contract-drifted-since-addition",
+]);
+// The first project format whose projection consults proof bindings. Older
+// formats keep the legacy interpretation, which is exactly what rollback
+// restores without deleting any binding.
+const BINDING_AWARE_PROJECT_FORMAT = 3;
 const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
@@ -603,6 +622,39 @@ export function validateTicket(document, path = "ticket") {
   return errors;
 }
 
+// One optional binding per referenced criterion: the digest of the exact
+// acceptance semantics the Evidence evaluated, its native/reconstructed
+// origin, and — only for reconstruction — the provenance commit reference,
+// which is provenance and never identity.
+function validateAcceptanceBindings(errors, document, path) {
+  const bindings = document.acceptance_bindings;
+  if (bindings === undefined) return;
+  if (!Array.isArray(bindings) || bindings.length === 0) {
+    add(errors, `${path}.acceptance_bindings`, "must be a non-empty array when present");
+    return;
+  }
+  const referenced = new Set(Array.isArray(document.acceptance_ids) ? document.acceptance_ids : []);
+  const seen = new Set();
+  bindings.forEach((entry, index) => {
+    const entryPath = `${path}.acceptance_bindings[${index}]`;
+    if (!strictKeys(errors, entry, new Set(["acceptance_id", "digest", "binding", "provenance_ref"]), entryPath)) return;
+    requiredString(errors, entry, "acceptance_id", entryPath, { id: true });
+    if (typeof entry.acceptance_id === "string") {
+      if (!referenced.has(entry.acceptance_id)) {
+        add(errors, `${entryPath}.acceptance_id`, "must be one of this Evidence's acceptance_ids");
+      }
+      if (seen.has(entry.acceptance_id)) add(errors, `${entryPath}.acceptance_id`, "must be unique");
+      seen.add(entry.acceptance_id);
+    }
+    if (!SHA256_HEX.test(entry.digest ?? "")) add(errors, `${entryPath}.digest`, "must be 64 lowercase hex characters");
+    if (!PROOF_BINDINGS.has(entry.binding)) add(errors, `${entryPath}.binding`, "must equal native or reconstructed");
+    if (entry.provenance_ref !== undefined) {
+      if (!COMMIT_REF.test(entry.provenance_ref ?? "")) add(errors, `${entryPath}.provenance_ref`, "must equal commit:<40-hex>");
+      if (entry.binding === "native") add(errors, `${entryPath}.provenance_ref`, "is allowed only for reconstructed bindings");
+    }
+  });
+}
+
 function validateEvidence(document, path = "evidence") {
   const errors = [];
   if (
@@ -615,6 +667,7 @@ function validateEvidence(document, path = "evidence") {
         "evidence_id",
         "ticket_id",
         "acceptance_ids",
+        "acceptance_bindings",
         "summary",
         "refs",
         "origin",
@@ -623,11 +676,14 @@ function validateEvidence(document, path = "evidence") {
       path,
     )
   ) return errors;
-  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (!EVIDENCE_SCHEMA_VERSIONS.has(document.schema_version)) {
+    add(errors, `${path}.schema_version`, `must equal 1 or ${CURRENT_EVIDENCE_SCHEMA}`);
+  }
   if (document.kind !== "ticket_evidence") add(errors, `${path}.kind`, "must equal ticket_evidence");
   requiredString(errors, document, "evidence_id", path, { id: true });
   requiredString(errors, document, "ticket_id", path, { id: true });
   stringArray(errors, document.acceptance_ids, `${path}.acceptance_ids`, { nonEmpty: true, ids: true });
+  validateAcceptanceBindings(errors, document, path);
   requiredString(errors, document, "summary", path);
   stringArray(errors, document.refs, `${path}.refs`, { nonEmpty: true });
   if (document.origin !== undefined && !EVIDENCE_ORIGINS.has(document.origin)) {
@@ -636,6 +692,43 @@ function validateEvidence(document, path = "evidence") {
   requiredString(errors, document, "recorded_at", path);
   if (Number.isNaN(Date.parse(document.recorded_at))) add(errors, `${path}.recorded_at`, "must be an ISO-compatible date-time");
   return errors;
+}
+
+// The complete-contract binding of an Outcome: the digest of the exact
+// acceptance-id-sorted contract it adjudicated, its native/reconstructed
+// origin, and — for reconstruction that could not certify the contract — an
+// unresolved marker with a reason from the fixed migration vocabulary. A
+// missing-history reason carries no digest: reconstruction never fabricates a
+// binding it could not read.
+function validateContractBinding(errors, document, path) {
+  const binding = document.contract_binding;
+  if (binding === undefined) return;
+  const bindingPath = `${path}.contract_binding`;
+  if (!strictKeys(errors, binding, new Set(["binding", "digest", "unresolved"]), bindingPath)) return;
+  if (!PROOF_BINDINGS.has(binding.binding)) add(errors, `${bindingPath}.binding`, "must equal native or reconstructed");
+  if (binding.digest !== undefined && !SHA256_HEX.test(binding.digest ?? "")) {
+    add(errors, `${bindingPath}.digest`, "must be 64 lowercase hex characters");
+  }
+  if (binding.unresolved !== undefined) {
+    const unresolvedPath = `${bindingPath}.unresolved`;
+    if (binding.binding === "native") add(errors, unresolvedPath, "is allowed only for reconstructed bindings");
+    if (strictKeys(errors, binding.unresolved, new Set(["reason", "acceptance_ids"]), unresolvedPath)) {
+      if (!OUTCOME_UNRESOLVED_REASONS.has(binding.unresolved.reason)) {
+        add(errors, `${unresolvedPath}.reason`, `must be one of ${[...OUTCOME_UNRESOLVED_REASONS].join(", ")}`);
+      }
+      if (binding.unresolved.acceptance_ids !== undefined) {
+        stringArray(errors, binding.unresolved.acceptance_ids, `${unresolvedPath}.acceptance_ids`, { nonEmpty: true, ids: true });
+      }
+    }
+  }
+  const requiresDigest = binding.unresolved === undefined
+    || binding.unresolved?.reason === "contract-drifted-since-addition";
+  if (requiresDigest && binding.digest === undefined) {
+    add(errors, `${bindingPath}.digest`, "is required unless the binding is unresolved for a missing-history reason");
+  }
+  if (!requiresDigest && binding.digest !== undefined) {
+    add(errors, `${bindingPath}.digest`, "must be omitted for a missing-history unresolved reason; reconstruction never fabricates a binding");
+  }
 }
 
 function validateOutcome(document, path = "outcome") {
@@ -652,19 +745,23 @@ function validateOutcome(document, path = "outcome") {
         "accepted_acceptance_ids",
         "unresolved_acceptance_ids",
         "evidence_ids",
+        "contract_binding",
         "summary",
         "closed_at",
       ]),
       path,
     )
   ) return errors;
-  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (!OUTCOME_SCHEMA_VERSIONS.has(document.schema_version)) {
+    add(errors, `${path}.schema_version`, `must equal 1 or ${CURRENT_OUTCOME_SCHEMA}`);
+  }
   if (document.kind !== "ticket_outcome") add(errors, `${path}.kind`, "must equal ticket_outcome");
   requiredString(errors, document, "ticket_id", path, { id: true });
   if (!OUTCOME_STATUSES.has(document.status)) add(errors, `${path}.status`, "is not supported");
   stringArray(errors, document.accepted_acceptance_ids, `${path}.accepted_acceptance_ids`, { ids: true });
   stringArray(errors, document.unresolved_acceptance_ids, `${path}.unresolved_acceptance_ids`, { ids: true });
   stringArray(errors, document.evidence_ids, `${path}.evidence_ids`, { ids: true });
+  validateContractBinding(errors, document, path);
   requiredString(errors, document, "summary", path);
   requiredString(errors, document, "closed_at", path);
   if (Number.isNaN(Date.parse(document.closed_at))) add(errors, `${path}.closed_at`, "must be an ISO-compatible date-time");
@@ -783,6 +880,20 @@ function findCycle(tickets) {
   return null;
 }
 
+// The repository's own checked-in format version, read tolerantly: it selects
+// the projection interpretation (binding-aware from format 3 on) and is the
+// exact switch a rollback flips back without touching any document.
+function repositoryFormatVersion(repo) {
+  const path = projectFormatPath(repo);
+  if (!existsSync(path)) return null;
+  try {
+    const document = readDocument(path);
+    return validateProjectFormat(document, path).length === 0 ? document.format_version : null;
+  } catch {
+    return null;
+  }
+}
+
 export function loadRepository(repo, overrides = {}) {
   const paths = dirs(repo);
   const rooms = loadRooms(paths.rooms);
@@ -888,7 +999,16 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
-  return { paths, rooms, contexts, tickets, evidence, outcomes, errors };
+  return {
+    paths,
+    rooms,
+    contexts,
+    tickets,
+    evidence,
+    outcomes,
+    errors,
+    format_version: overrides.format_version ?? repositoryFormatVersion(repo),
+  };
 }
 
 export function assertValid(errors, message = "VibeHub validation failed") {
@@ -998,12 +1118,136 @@ export function putContext({ repo, room, context }) {
   return contextOperation("put", resolve(repo), context, { room: room ?? null });
 }
 
+// Contract identity is always derived from the current document; no Ticket
+// stores a digest. The per-criterion identity is the sha256 of the UTF-8
+// canonical JSON array [ticket_id, acceptance_id, authority, criterion] with
+// the default authority made explicit, and the complete contract is the
+// sha256 of the acceptance_id-sorted array of those arrays. Nothing mutable —
+// no timestamp, commit, filename, or repository position — enters either
+// serialization, so unrelated Ticket edits leave every digest unchanged.
+export function contractIdentity(ticket) {
+  const digestOf = (value) => createHash("sha256")
+    .update(Buffer.from(JSON.stringify(value), "utf8"))
+    .digest("hex");
+  const entries = (Array.isArray(ticket?.acceptance) ? ticket.acceptance : [])
+    .map((criterion) => [
+      ticket.ticket_id,
+      criterion.acceptance_id,
+      criterion.authority ?? "agent",
+      criterion.criterion,
+    ])
+    .sort((left, right) => (left[1] < right[1] ? -1 : left[1] > right[1] ? 1 : 0));
+  return {
+    contract_digest: digestOf(entries),
+    criterion_digests: Object.fromEntries(entries.map((entry) => [entry[1], digestOf(entry)])),
+  };
+}
+
+// The projection consults proof bindings only from the binding-aware project
+// format on. Below it, bindings may exist on disk but stay inert: that is the
+// documented rollback interpretation.
+function repositoryBindingAware(repository) {
+  return (repository.format_version ?? 0) >= BINDING_AWARE_PROJECT_FORMAT;
+}
+
+function outcomeBindingResolution(repository, ticket, outcome) {
+  const allIds = ticket.acceptance.map((criterion) => criterion.acceptance_id);
+  const binding = outcome.contract_binding ?? null;
+  if (!repositoryBindingAware(repository)) {
+    return { binding: binding?.binding ?? null, state: "legacy", reason: null, drifted_acceptance_ids: [] };
+  }
+  if (!binding) {
+    return { binding: null, state: "unresolved", reason: "missing-contract-binding", drifted_acceptance_ids: allIds };
+  }
+  if (binding.unresolved) {
+    return {
+      binding: binding.binding,
+      state: "unresolved",
+      reason: binding.unresolved.reason,
+      drifted_acceptance_ids: Array.isArray(binding.unresolved.acceptance_ids) && binding.unresolved.acceptance_ids.length > 0
+        ? binding.unresolved.acceptance_ids
+        : allIds,
+    };
+  }
+  if (binding.digest !== contractIdentity(ticket).contract_digest) {
+    return { binding: binding.binding, state: "unresolved", reason: "contract-drifted-since-addition", drifted_acceptance_ids: allIds };
+  }
+  return { binding: binding.binding, state: "current", reason: null, drifted_acceptance_ids: [] };
+}
+
+// The one successful-Outcome acceptance gate: DONE, archive membership,
+// dependent unlock, and prior-accepted projections all ask this. A successful
+// Outcome whose contract binding is unresolved stops counting while its file
+// stays readable.
+export function outcomeAccepted(repository, ticketId) {
+  const outcome = repository.outcomes.documents.get(ticketId)?.document;
+  if (outcome?.status !== "successful") return null;
+  const ticket = repository.tickets?.documents.get(ticketId)?.document;
+  if (!ticket) return outcome;
+  return outcomeBindingResolution(repository, ticket, outcome).state === "unresolved" ? null : outcome;
+}
+
+// The one canonical derivation of proof-binding explanations. Every surface —
+// next_action, frontier, graph, ticket get, handoff, shell readTask, and the
+// Workbench phase labels — carries this result; none recomputes it.
+export function ticketProofState(repository, ticket) {
+  const aware = repositoryBindingAware(repository);
+  const identity = contractIdentity(ticket);
+  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  const ticketEvidence = documents(repository.evidence.documents)
+    .filter((evidence) => evidence.ticket_id === ticket.ticket_id);
+  const acceptance = ticket.acceptance.map((criterion) => {
+    const id = criterion.acceptance_id;
+    const linked = ticketEvidence.filter((evidence) => evidence.acceptance_ids.includes(id));
+    const states = linked.map((evidence) => {
+      let state = "legacy";
+      if (aware) {
+        const entry = (evidence.acceptance_bindings ?? [])
+          .find((candidate) => candidate.acceptance_id === id);
+        if (!entry) state = "unbound";
+        else if (entry.digest === identity.criterion_digests[id]) state = entry.binding;
+        else state = "stale";
+      }
+      return { evidence_id: evidence.evidence_id, origin: evidence.origin ?? "agent", state };
+    });
+    const counting = new Set(["legacy", "native", "reconstructed"]);
+    const current = states.filter((entry) => counting.has(entry.state));
+    const coverage = current.some((entry) => entry.state === "native")
+      ? "native"
+      : current.some((entry) => entry.state === "reconstructed")
+        ? "reconstructed"
+        : current.length > 0
+          ? "legacy"
+          : states.length > 0
+            ? "stale"
+            : "none";
+    return {
+      acceptance_id: id,
+      authority: criterion.authority ?? "agent",
+      coverage,
+      covered: current.length > 0,
+      human_covered: current.some((entry) => entry.origin === "human"),
+      stale_evidence_ids: states
+        .filter((entry) => !counting.has(entry.state))
+        .map((entry) => entry.evidence_id)
+        .sort(),
+    };
+  });
+  return {
+    mode: aware ? "binding" : "legacy",
+    outcome: outcome ? { status: outcome.status, ...outcomeBindingResolution(repository, ticket, outcome) } : null,
+    acceptance,
+    stale_acceptance_ids: acceptance
+      .filter((entry) => entry.coverage === "stale")
+      .map((entry) => entry.acceptance_id),
+  };
+}
+
 export function ticketStatus(repository, ticket) {
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
-  if (outcome?.status === "successful") return "DONE";
+  if (outcomeAccepted(repository, ticket.ticket_id)) return "DONE";
   const blocking = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
+    .filter((id) => !outcomeAccepted(repository, id));
   if (blocking.length > 0) return "BLOCKED";
   // A draft can never become READY: it surfaces as REFINE until planning
   // rewrites its acceptance for real and marks the Ticket firm.
@@ -1020,14 +1264,26 @@ function evidenceOrigin(evidence) {
 
 export function ticketNextAction(repository, ticket) {
   const acceptanceIds = ticket.acceptance.map((criterion) => criterion.acceptance_id);
+  const proof = ticketProofState(repository, ticket);
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
-  if (outcome?.status === "successful") {
+  if (outcome?.status === "successful" && proof.outcome.state !== "unresolved") {
     return {
       action: "DONE",
       reason: "successful_outcome",
       detail: "An independent successful Outcome accepts every current criterion.",
       acceptance_ids: acceptanceIds,
       blocking_ticket_ids: [],
+      proof,
+    };
+  }
+  if (outcome?.status === "successful") {
+    return {
+      action: "REPLAN",
+      reason: "unresolved_legacy_outcome",
+      detail: `The successful Outcome's contract binding is unresolved (${proof.outcome.reason}); it stops contributing to DONE, archive, and dependent unlock until the named criteria are independently reviewed against the current contract.`,
+      acceptance_ids: proof.outcome.drifted_acceptance_ids,
+      blocking_ticket_ids: [],
+      proof,
     };
   }
   if (outcome) {
@@ -1037,12 +1293,13 @@ export function ticketNextAction(repository, ticket) {
       detail: `The independent Outcome is ${outcome.status}; revise the Ticket before another execution cycle.`,
       acceptance_ids: outcome.unresolved_acceptance_ids,
       blocking_ticket_ids: [],
+      proof,
     };
   }
 
   const blockingTicketIds = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful")
+    .filter((id) => !outcomeAccepted(repository, id))
     .sort();
   if (blockingTicketIds.length > 0) {
     return {
@@ -1051,6 +1308,7 @@ export function ticketNextAction(repository, ticket) {
       detail: "Direct prerequisites must close successfully before this Ticket can advance.",
       acceptance_ids: [],
       blocking_ticket_ids: blockingTicketIds,
+      proof,
     };
   }
 
@@ -1061,31 +1319,31 @@ export function ticketNextAction(repository, ticket) {
       detail: "The unblocked draft needs a firm, executable acceptance contract.",
       acceptance_ids: acceptanceIds,
       blocking_ticket_ids: [],
+      proof,
     };
   }
 
-  const ticketEvidence = documents(repository.evidence.documents)
-    .filter((evidence) => evidence.ticket_id === ticket.ticket_id);
-  const evidencedIds = new Set(ticketEvidence.flatMap((evidence) => evidence.acceptance_ids));
-  const humanEvidencedIds = new Set(ticketEvidence
-    .filter((evidence) => evidenceOrigin(evidence) === "human")
-    .flatMap((evidence) => evidence.acceptance_ids));
+  const coverage = new Map(proof.acceptance.map((entry) => [entry.acceptance_id, entry]));
   const missingHumanIds = ticket.acceptance
     .filter((criterion) => acceptanceAuthority(criterion) === "human"
-      && !humanEvidencedIds.has(criterion.acceptance_id))
+      && !coverage.get(criterion.acceptance_id).human_covered)
     .map((criterion) => criterion.acceptance_id);
   if (missingHumanIds.length > 0) {
+    const stale = missingHumanIds.filter((id) => coverage.get(id).coverage === "stale");
     return {
       action: "NEEDS_HUMAN",
       reason: "missing_human_evidence",
-      detail: "Reachable human-authority criteria still need explicit human-origin Evidence.",
+      detail: stale.length > 0
+        ? `Reachable human-authority criteria still need explicit human-origin Evidence; recorded Evidence for ${stale.join(", ")} is bound to superseded criterion revisions and no longer satisfies coverage.`
+        : "Reachable human-authority criteria still need explicit human-origin Evidence.",
       acceptance_ids: missingHumanIds,
       blocking_ticket_ids: [],
+      proof,
     };
   }
 
   const missingEvidenceIds = ticket.acceptance
-    .filter((criterion) => !evidencedIds.has(criterion.acceptance_id))
+    .filter((criterion) => !coverage.get(criterion.acceptance_id).covered)
     .map((criterion) => criterion.acceptance_id);
   if (missingEvidenceIds.length === 0) {
     return {
@@ -1094,21 +1352,25 @@ export function ticketNextAction(repository, ticket) {
       detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
       acceptance_ids: acceptanceIds,
       blocking_ticket_ids: [],
+      proof,
     };
   }
+  const staleIds = missingEvidenceIds.filter((id) => coverage.get(id).coverage === "stale");
   return {
     action: "EXECUTE",
     reason: "acceptance_evidence_incomplete",
-    detail: "Executable criteria still need reproducible acceptance-linked Evidence.",
+    detail: staleIds.length > 0
+      ? `Executable criteria still need reproducible acceptance-linked Evidence; recorded Evidence for ${staleIds.join(", ")} is bound to superseded criterion revisions and no longer satisfies coverage.`
+      : "Executable criteria still need reproducible acceptance-linked Evidence.",
     acceptance_ids: missingEvidenceIds,
     blocking_ticket_ids: [],
+    proof,
   };
 }
 
 export function ticketArchived(repository, ticket) {
   if (!ticket) return false;
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
-  return outcome?.status === "successful"
+  return Boolean(outcomeAccepted(repository, ticket.ticket_id))
     && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
 }
 
@@ -1303,6 +1565,44 @@ function assertOriginImmutable(currentRepository, candidates) {
   }
 }
 
+// Closed-contract immutability, beside the origin guard. Once an independent
+// successful Outcome exists, the acceptance contract it adjudicated is
+// closed: no apply (CLI or any host path built on applyTickets) may change
+// criterion text, authority, or acceptance membership. Context, constraints,
+// context_refs, relations, deliveries, and provenance edits still apply. The
+// explicit reopen protocol that would revise a closed contract while keeping
+// the prior Outcome immutable is future work, not this guard.
+function assertContractOpen(currentRepository, candidates) {
+  const violations = [];
+  candidates.forEach((candidate, index) => {
+    const existing = currentRepository.tickets.documents.get(candidate.ticket_id);
+    if (!existing) return;
+    const outcome = currentRepository.outcomes.documents.get(candidate.ticket_id)?.document;
+    if (outcome?.status !== "successful") return;
+    const before = contractIdentity(existing.document);
+    const after = contractIdentity(candidate);
+    if (before.contract_digest === after.contract_digest) return;
+    const ids = [...new Set([
+      ...Object.keys(before.criterion_digests),
+      ...Object.keys(after.criterion_digests),
+    ])].sort();
+    violations.push({
+      code: "contract_closed",
+      message: `Ticket ${candidate.ticket_id} has a successful Outcome; its acceptance contract is closed and cannot be changed`,
+      ticket_id: candidate.ticket_id,
+      ticket_path: existing.path,
+      candidate_path: `tickets[${index}].acceptance`,
+      changed_acceptance_ids: ids.filter((id) =>
+        before.criterion_digests[id] !== after.criterion_digests[id]),
+      existing_contract_digest: before.contract_digest,
+      candidate_contract_digest: after.contract_digest,
+    });
+  });
+  if (violations.length > 0) {
+    throw new VibeHubError(violations[0].code, violations[0].message, { violations });
+  }
+}
+
 export function applyTickets({ repo, tickets }) {
   const root = resolve(repo);
   assertCurrentProjectFormat(root);
@@ -1319,6 +1619,7 @@ export function applyTickets({ repo, tickets }) {
   const currentRepository = loadRepository(root);
   assertValid(currentRepository.errors);
   assertOriginImmutable(currentRepository, tickets);
+  assertContractOpen(currentRepository, tickets);
   const repository = loadRepository(root, { tickets });
   assertValid(repository.errors);
   const advice = candidateDependencyAdvice(currentRepository, repository, tickets);
@@ -1336,6 +1637,19 @@ export function applyTickets({ repo, tickets }) {
   };
 }
 
+// New proof always carries native bindings computed from the current Ticket;
+// they are derived, so a caller may omit them or repeat the exact derivation,
+// never supply a different one.
+function assertDerivedBindingEquals(provided, derived, path) {
+  if (provided !== undefined && !sameDocument(provided, derived)) {
+    throw new VibeHubError(
+      "validation_error",
+      "Proof bindings are derived from the current Ticket contract",
+      { errors: [{ path, message: "must be omitted or equal the derived native binding" }] },
+    );
+  }
+}
+
 export function appendEvidence({ repo, evidence }) {
   const root = resolve(repo);
   assertCurrentProjectFormat(root);
@@ -1343,8 +1657,17 @@ export function appendEvidence({ repo, evidence }) {
   assertValid(errors, "Evidence document is invalid");
   const repository = loadRepository(root, { evidence: [evidence] });
   assertValid(repository.errors);
+  const ticket = repository.tickets.documents.get(evidence.ticket_id).document;
+  const identity = contractIdentity(ticket);
+  const bindings = evidence.acceptance_ids.map((acceptanceId) => ({
+    acceptance_id: acceptanceId,
+    digest: identity.criterion_digests[acceptanceId],
+    binding: "native",
+  }));
+  assertDerivedBindingEquals(evidence.acceptance_bindings, bindings, "evidence.acceptance_bindings");
+  const document = { ...evidence, schema_version: CURRENT_EVIDENCE_SCHEMA, acceptance_bindings: bindings };
   const path = join(repository.paths.evidence, evidence.ticket_id, `${evidence.evidence_id}.yaml`);
-  writeDocument(path, evidence);
+  writeDocument(path, document);
   return { status: "written", evidence_id: evidence.evidence_id, path };
 }
 
@@ -1357,8 +1680,12 @@ function ticketOperation(operation, repo, input, options = {}) {
     assertValid(errors, "Outcome document is invalid");
     const repository = loadRepository(repo, { outcomes: [input] });
     assertValid(repository.errors);
+    const ticket = repository.tickets.documents.get(input.ticket_id).document;
+    const binding = { digest: contractIdentity(ticket).contract_digest, binding: "native" };
+    assertDerivedBindingEquals(input.contract_binding, binding, "outcome.contract_binding");
+    const document = { ...input, schema_version: CURRENT_OUTCOME_SCHEMA, contract_binding: binding };
     const path = join(repository.paths.outcomes, `${input.ticket_id}.yaml`);
-    writeDocument(path, input);
+    writeDocument(path, document);
     return { status: "written", ticket_id: input.ticket_id, outcome_status: input.status, path };
   }
   const repository = loadRepository(repo);
@@ -1397,7 +1724,7 @@ function ticketOperation(operation, repo, input, options = {}) {
       archived: ticketArchived(repository, ticket),
       blocking_ticket_ids: ticket.relations
         .map((relation) => relation.target_ticket_id)
-        .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful"),
+        .filter((id) => !outcomeAccepted(repository, id)),
       outcome: repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null,
     }));
     if (operation === "frontier") {

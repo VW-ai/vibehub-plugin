@@ -6,12 +6,16 @@
     "palette-review-boundary-is-decision-ready"
   ],
   "closed_at": "2026-08-21T04:15:40Z",
+  "contract_binding": {
+    "digest": "68113aa85cc991985e640508db9f14531ee1e0da8f2c8fe91076e74626bbd271",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "monochrome-palette-contract-and-review-proof",
     "monochrome-palette-wide-narrow-browser-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts all four criteria. The exact implementation commit changes only the disposable palette explorer, review contract, tests and canonical VibeHub records; it does not alter the production DSH Bundle, Theme Runtime, Workbench or accepted persistent-shell prototype. Source inspection confirms one persistent sidebar, Graph, Chat and Task shell whose palette control changes one root data-palette token selector, while layout, copy, topology, hierarchy and interaction remain shared; the compact comparison also repeats one identical mini-shell carrier for every option. True Black, Graphite, Soft Black, Cool Mono and Warm Mono declare the same complete neutral token contract and materially differ in black level, neutral temperature and contrast without paper treatment, decorative gradients, neon, glass or a colored state rainbow. Independent contrast calculation found the lowest muted-text contrast against either background or surface to be 6.20:1, with primary text at least 14.51:1. The checked-in review note records intent, strengths, risks and recommended use for each direction, labels Graphite as Agent input only, and reserves owner preference plus later installed whole-application approval for the downstream visual-system Ticket. Focused verification passed 4/4, and full repository verification passed 150 tests with one unrelated optional exact-DSH-source probe skipped; the installed plugin artifact remained 62 files / 2,831,812 bytes. An independent loopback probe reported localOnly=true and repositoryWrites=false, returned 405 for POST, and served no-store/CSP-protected content without changing the worktree. Canonical browser Evidence records all five computed palettes, compact and full-size inspection, Graph/Chat/Task switching, zero console errors, and exact 390x844 client-width parity with only the Graph's intentional internal panning; source and focused tests independently corroborate visible keyboard focus, narrow behavior and reduced motion. This Outcome approves the comparison study as decision-ready input, not any palette as final owner-approved production styling.",
   "ticket_id": "ticket-compare-dsh-shell-palette-directions",

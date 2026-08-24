@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "follow-ups-queue-by-default-and-steer-is-explicit",
+      "digest": "7462cd4e1bb3001c1723ea86bdbde4237078e5c73d55fb42f852cc5ad8a28c99",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "follow-ups-queue-by-default-and-steer-is-explicit"
   ],
@@ -19,7 +27,7 @@
     "apps/codex-first-shell/browser-interaction-guard.mjs",
     "scripts/vh-codex-first-shell-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 801c536 and 15e9adc implement the host-owned transient follow-up queue. The host keeps one per-Thread queue in session memory with queueTurn, listQueue, updateQueued, deleteQueued, resumeQueue and steerQueued actions and queueChanged, queuedStarted and queuedFailed events; a queued message becomes its own turn/start with a new Turn id only after the prior turn/completed, an interrupted Turn pauses the queue with pausedReason interrupted until an explicit resumeQueue, and the queue is lost on host restart. In the browser, Enter or Send during a live Turn calls queueTurn with the Send label reading Queue, Alt+Enter performs the opposite of the label and steers through turn/steer with the exact expectedTurnId, the queue tray above the composer offers Edit, Delete, per-row Steer and a Resume affordance with the paused reason, and queuedStarted moves the row into the transcript as a new Turn. The conformance row running-composer-steer is rewritten to this contract with proof fields. test/codex-first-shell-parity-host.test.mjs shows three queued messages of which one is deleted and two become turn/start requests with distinct Turn ids each after the prior turn/completed in the fixture log, interrupt then paused then nothing sent then resume, edit and delete, steerQueued with the exact expectedTurnId and loss on restart; the chat-model reducer test covers queueChanged, queuedStarted and queuedFailed; six guard checks cover Queue and Stop coherence, queue by default, Alt+Enter steer, row actions, paused until Resume and the transcript move; the driver's queue walk against the fixture-backed production host passes 12 of 12, the driver skipping that walk on the real runtime because it would spend model Turns, with the call log reading start, completed, start A, completed interrupted, start B across four distinct Turn ids.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

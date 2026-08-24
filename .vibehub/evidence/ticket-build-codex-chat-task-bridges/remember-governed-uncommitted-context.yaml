@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "remember-is-a-governed-proposal",
+      "digest": "0e1fecf7d92f66fa4399a6b06b5506bffad605f6178c0f5cd9c9ba2478b46c39",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "remember-is-a-governed-proposal"
   ],
@@ -16,7 +24,7 @@
     "test/codex-first-shell-bridges.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Remember opens a sheet listing only the existing Rooms returned by listRooms, a type select pinned to the Context schema enum, summary and detail prefilled from the selection, tags, an evidence note and the exact source reference; Confirm calls remember, which derives a kebab context_id with a collision suffix and writes one Context document through putContext with state active, source.ref codex-thread:<thread_id>/turn:<turn_id>/item:<item_id>, the quote, captured_at and at least one evidence entry carrying the same reference, answers 409 room_missing with the existing rooms rather than creating one, and 409 scope_unavailable when unbound. The guard reads the written Context back from the driver-owned repository, confirms state, type, source and evidence references and tags, that the path is uncommitted and the commit count unchanged, and that the Rooms surface now projects it; the host test proves room_missing and the uncommitted git status.",
   "ticket_id": "ticket-build-codex-chat-task-bridges"
 }

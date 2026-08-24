@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "chat-conformance-floor-holds-in-production",
+      "digest": "0c7b3f5bc4837c58d253c15902f96bc17ff29f719f6811fec34aababbc0a2d47",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2456133a54c04d585814f4dd4ec207d898641d3f"
+    }
+  ],
   "acceptance_ids": [
     "chat-conformance-floor-holds-in-production"
   ],
@@ -23,7 +31,7 @@
     "test/codex-first-shell.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 88f1674 through e0c7562 close the five partial checks and the URL recovery check of docs/proposals/codex-chat-conformance/conformance-matrix.json in the promoted production shell apps/codex-first-shell: escape-first Markdown hardened for nested and malformed constructs; Composer growth converged on its CSS ceiling; Thread deep link follows the visible Thread after in-app navigation via history.replaceState; request-user-input drafts survive intentional route changes; Quote source identity serialized into durable Thread history with no browser storage; selection-preserving reconciliation never replaces a selected transcript entry while a Turn streams. The matrix now records 26 pass and 3 deferred with every proof field naming a test or guard check, and the deferred model, mode, realtime and virtualization items are bound by tests proving no contrary UI claim and a disclosed 240-item mounted bound. Node suite 216 tests, 213 pass, 0 fail, 3 skipped; real-DOM browser interaction guard 35/35 at 1280x800 and 36/36 with the narrow frame at 390x844, zero console errors, no horizontal overflow. The guard ran against the pinned-protocol fixture app-server test/fixtures/codex-app-server-fixture.mjs because the locally installed Codex is 0.144.1 and predates the 0.147.0 baseline; the earlier authenticated runtime review at fac258a was not repeated.",
   "ticket_id": "ticket-implement-codex-first-vibehub-shell"
 }

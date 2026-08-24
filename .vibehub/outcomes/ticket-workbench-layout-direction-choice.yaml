@@ -7,11 +7,15 @@
     "direction-choice-is-behavior-tested"
   ],
   "closed_at": "2026-08-12T23:28:12Z",
+  "contract_binding": {
+    "digest": "b3d7b48370a62d4570f4445a7f8346a9c248e6208c7d6a53ef99aeabb68f87f5",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "layout-direction-contract-and-browser-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all five criteria after reading the Ticket, prerequisite Outcome, commits edf4140 and b22e457, current Context/design/source, and canonical Evidence. layout-authority-is-amended: the active Workbench Context and LOCAL_GRAPH_DESIGN now define one causal layout with left-to-right as desktop default and top-to-bottom as a first-class choice over unchanged Ticket semantics. both-directions-are-real-layouts: the live current-checkout Workbench exposed accessible direction controls; at 1440x960 the canvas-first -> layout-direction -> dense-layout chain advanced in x for LTR and y for TTB, with right/left versus bottom/top orthogonal routes, matching graph labels, direction controls, minimap lines, fit/zoom, direct empty-canvas pan, and orientation-aware causal keyboard focus. direction-state-is-explicit-and-copyable: direction was explicit in the focused URL, preserved Ticket, Log lens, and the 64-character bearer fragment in a second tab, invalid diagonal normalized visibly to ltr, and source inspection plus repository search found no localStorage or sessionStorage. focus-and-attention-survive-direction-change: switching without reload preserved the selected Ticket, identical complete undimmed transitive cone, Log lens, six human-attention accents, five REFINE cards, Exact Git source affordance, and focused URL. direction-choice-is-behavior-tested: real-browser checks covered both directions at 1440x960, 1180x820, and 390x844; 1180 and 390 had no horizontal overflow, narrow controls were 44x44, Enter opened the Ticket, orientation-specific arrow keys moved causal focus, copied/current focus restored exactly, and the reduced-motion stylesheet remains enforced. Independent npm run verify passed 52/52 tests and the dependency-free 53-file, 664546-byte artifact check; canonical Ticket validation passed and all four Rooms were FRESH.",
   "ticket_id": "ticket-workbench-layout-direction-choice",

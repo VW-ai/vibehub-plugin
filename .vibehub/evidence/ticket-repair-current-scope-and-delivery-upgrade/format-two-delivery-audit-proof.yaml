@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "delivery-audit-is-a-versioned-migration",
+      "digest": "7420e2d0a544ff7ba649072993d513b5aeae5a676fe5769e6977d8d1345ad976",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "repository-history-is-audited",
+      "digest": "c568d54d03e09dfc456b13531de34a01f61724cb3bd8dd897f00f90a8f262c30",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    }
+  ],
   "acceptance_ids": [
     "delivery-audit-is-a-versioned-migration",
     "repository-history-is-audited"
@@ -17,7 +31,7 @@
     "command:vh-project-compatibility:current-format-2",
     "command:vh-project-validate:54-tickets"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Project format 2 requires every Ticket to carry an explicit deliveries array and compatibility blocks format 1 writes until the agent-driven audit completes. The repository audit added explicit arrays to 43 legacy-shaped Tickets: 33 successful Tickets received exact PR URL, merge timestamp, and 40-hex merge commit from the first main merge introducing their Outcome; ten unproven or unfinished Tickets remained explicit empty arrays. All 54 canonical Tickets now carry the field, 43 have verified archived delivery, and project compatibility plus validation report CURRENT format 2.",
   "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
 }

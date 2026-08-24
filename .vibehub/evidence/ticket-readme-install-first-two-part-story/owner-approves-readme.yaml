@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "owner-judges-readme",
+      "digest": "d55e3ea991e700162d1e4920a70fd4f0a0f551b296ab5bfc9abb6e732f44d035",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:dd87199af186ea5379e2bd6b78596671b4e7a78a"
+    }
+  ],
   "acceptance_ids": [
     "owner-judges-readme"
   ],
@@ -11,7 +19,7 @@
     "https://github.com/VW-ai/vibehub-plugin/pull/121",
     "README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner read the restructured README on the PR 121 branch and said in conversation: 很好，真的很好 — accepting the two-part layout, install above the fold, the What-you-get list, and the GitHub collaboration section.",
   "ticket_id": "ticket-readme-install-first-two-part-story"
 }

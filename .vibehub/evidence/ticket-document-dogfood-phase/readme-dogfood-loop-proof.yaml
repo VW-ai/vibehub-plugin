@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "feedback-loop-is-actionable",
+      "digest": "6e9158c2734da193ce44d4a0ce8c428847ff93903ca9eae32891007ba41179a7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b9ec671712dee8ee8e67127be18de045b072a014"
+    }
+  ],
   "acceptance_ids": [
     "feedback-loop-is-actionable"
   ],
@@ -9,7 +17,7 @@
     "README.md:13",
     ".vibehub/context/decision-dogfood-only-phase.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README gives the real-use loop from Ticket through acceptance-linked Evidence and independent Outcome, keeps durable Context explicit, and routes only observed failures or missing capabilities into focused Tickets.",
   "ticket_id": "ticket-document-dogfood-phase"
 }

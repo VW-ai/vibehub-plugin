@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "install-paths-are-compared-empirically",
+      "digest": "7516ca2973deb1b0103135ba8955eb8784a3626ce036d9fef521e394e6849a78",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:11285340bc29f23ee076150dcd9550832659d257"
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "digest": "dd48ce6b278d4e17b87500b31c8a5018363cc976450f84c5f211361e7208b1f7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:11285340bc29f23ee076150dcd9550832659d257"
+    }
+  ],
   "acceptance_ids": [
     "install-paths-are-compared-empirically",
     "recommendation-is-decision-ready"
@@ -9,7 +23,7 @@
   "refs": [
     "docs/proposals/npx-first-install-experience.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "docs/proposals/npx-first-install-experience.md compares A (self-contained vibehub-core skill folder so skills.sh copies the helper), B (npm-published package with npx wrapper rule and init), and C (marketplace-only) on commands, disk layout per host, helper reachability, version skew, network, upgrade, cost, and conformance with decision-speed-first-skill-plugin. Empirical facts: skills.sh copy behavior (run), hyperframes Skill text pattern (repo read), npm name vibehub taken by an unrelated 0.2.2 package (npm view), @vibehub/cli unpublished; untested items are marked. It recommends A now, defers B until a human needs init outside an agent, rejects C, and ends with the single question for the owner.",
   "ticket_id": "ticket-propose-npx-first-install-experience"
 }

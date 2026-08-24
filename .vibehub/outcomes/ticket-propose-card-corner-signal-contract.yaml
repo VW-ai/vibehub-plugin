@@ -8,12 +8,16 @@
     "recommendation-and-downstream-boundaries-are-decision-ready"
   ],
   "closed_at": "2026-08-20T21:41:20Z",
+  "contract_binding": {
+    "digest": "f90efda0490586f11118c6328e7dcb48647eb7556f3d66ec134e3f297500527d",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "card-signal-semantic-contract-proof",
     "card-signal-wide-narrow-review-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout reproduced all six proposal criteria from the canonical artifacts rather than the executor summary. The contract separates eight durable or trusted truth sources from the four-phase Human model, implements exact precedence and one-slot eligibility across 22 adversarial fixtures, keeps CLOSE_OUT inside RUNNING while withholding live claims without trusted fresh presence, and preserves raw v0.8 machine values plus the executor/independent-closeout authority boundary. Focused tests passed 8/8 and the full elevated verification passed 126/126 with the installed artifact at 57 files and 607662 bytes. Independent visual inspection of the 1440x1000 wide capture and the explicit 390x844 narrow production frame confirmed the four-entry legend, compact card anatomy, single icon-plus-text corner signal, separate live affordance, readable long copy, selected and causal-dimmed states, quiet empty slots, and the lower Inspector treatment. The proposal is therefore decision-ready without changing production projection, routing, vocabulary, or Workbench assets.",
   "ticket_id": "ticket-propose-card-corner-signal-contract",

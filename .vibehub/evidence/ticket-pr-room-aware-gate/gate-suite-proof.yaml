@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "gate-suite-green",
+      "digest": "6b5e2e37099442c227790ab5e9d40323f64a6b702db868ca62bdd0cc0ea0f557",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:381e4b3eb139ff8f78de1e22aa537bedace92ce5"
+    }
+  ],
   "acceptance_ids": [
     "gate-suite-green"
   ],
@@ -9,7 +17,7 @@
     "commit:5055155",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Full node --test suite passes 38/38 over the new prose — the skill-contracts command-surface test welds the newly cited full room drift invocation automatically — and the plugin artifact builds and verifies cleanly (47 files).",
   "ticket_id": "ticket-pr-room-aware-gate"
 }

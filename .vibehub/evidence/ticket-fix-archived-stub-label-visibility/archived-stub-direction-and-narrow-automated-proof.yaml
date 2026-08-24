@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "directions-and-narrow-layout-regressions-pass",
+      "digest": "f7d3198b272400c3181d920a9e46b8ccb731a2a8ce00f36b89d6d6e19d958cd8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:efc725acc557f955b50fe5b53a837aaa0b1756a8"
+    },
+    {
+      "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+      "digest": "61845ab51e00a936b49e5f1620a620313085c76a7b96a19836853e6f52531e6e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:efc725acc557f955b50fe5b53a837aaa0b1756a8"
+    }
+  ],
   "acceptance_ids": [
     "directions-and-narrow-layout-regressions-pass",
     "quiet-accessible-visual-contract-is-preserved"
@@ -17,7 +31,7 @@
     "host:read-only-loopback-test-passed",
     "context:constraint-ui-quiet-intelligence-standard"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The automated matrix includes the reported left-to-right shape with a downstream stub competing with the archived card to visible dependent route, and a top-to-bottom shape whose preferred side is occupied. Both deterministically select a card- and route-clear position and retain an anchored orthogonal leader. Production contracts also assert the opaque label hierarchy, exact next-hop accessible name, visible keyboard focus, narrow Inspector and graph controls, nested-control pan exclusion, and the existing reduced-motion rule. The complete suite exercises the real read-only loopback host and exact current/all archived projection. A controllable browser instance was unavailable in this executor task, so this Evidence records the automated LTR, TTB, responsive, keyboard-contract, reduced-motion, host, and source-truth proof only and does not claim a separate manual visual browser pass.",
   "ticket_id": "ticket-fix-archived-stub-label-visibility"
 }

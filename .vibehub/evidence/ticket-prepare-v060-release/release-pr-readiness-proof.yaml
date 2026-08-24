@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-pr-ready",
+      "digest": "0b7e5cff78bb72feb689d773f4e76a3d77dfbb3dd628b3381ba39676aeebd251",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ae5560db7ef6ac52f9ca438cfd21ab157427fe16"
+    }
+  ],
   "acceptance_ids": [
     "release-pr-ready"
   ],
@@ -13,7 +21,7 @@
     "command:git status --short --branch",
     "docs/RELEASE.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Branch codex/release-v0.6.0 was created directly from main at cbd41a10cbd2caa4d008ac1ad495154ee9f4140a, the PR #15 merge commit. The reviewed working-tree scope is limited to five release identity fields, CHANGELOG.md, the release identity test, the product Room alignment stamp for the changed changelog anchor, and the two v0.6.0 Ticket contracts. It adds no updater, runtime, daemon, MCP, database, hook, or self-modifying machinery. Successful independent closeout will add only this Ticket's Evidence and Outcome before the PR is opened to main.",
   "ticket_id": "ticket-prepare-v060-release"
 }

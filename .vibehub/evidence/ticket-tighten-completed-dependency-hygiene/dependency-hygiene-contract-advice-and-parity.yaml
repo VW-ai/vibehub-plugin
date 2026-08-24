@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "dependency-versus-context-rule-is-explicit",
+      "digest": "08635d15e2db48b689e2e7c9b8600b47caa651482d7cc71d90d467e6d2bc98c1",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5784ed722b9331a5588afa2346b98e561c00245b"
+    },
+    {
+      "acceptance_id": "planner-checks-current-prerequisite-state",
+      "digest": "8ff7d528d0538b6ce17f16517d8fcb28a78014d526506fca0adf9a0d1376c469",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5784ed722b9331a5588afa2346b98e561c00245b"
+    },
+    {
+      "acceptance_id": "validation-emits-nonblocking-structured-advice",
+      "digest": "37d1bef6912a49f16326e8e221d01d83f6e4cddbdc1c5113778564c05b732a0d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5784ed722b9331a5588afa2346b98e561c00245b"
+    },
+    {
+      "acceptance_id": "graph-hygiene-improves-without-history-loss",
+      "digest": "642d960154aa570cc2176d1ce207e184218a93e0e02cb9d0b759e77c1e885a07",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5784ed722b9331a5588afa2346b98e561c00245b"
+    },
+    {
+      "acceptance_id": "skills-and-tests-share-one-rule",
+      "digest": "61500ea98ec5211dcb4358f8d59a7995cecb66e42f737416012e2b546d6a7e95",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5784ed722b9331a5588afa2346b98e561c00245b"
+    }
+  ],
   "acceptance_ids": [
     "dependency-versus-context-rule-is-explicit",
     "planner-checks-current-prerequisite-state",
@@ -23,7 +55,7 @@
     "scripts/verify-plugin-artifact.mjs",
     "command:npm-run-verify-108-of-108-2026-08-20"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A single checked-in dependency-hygiene contract now defines depends_on versus context_refs and historical preservation. Ticket Plan reads each proposed target and resolves DONE edges semantically; Ticket Validate reports the same advisory boundary without treating DONE dependencies as invalid. The dependency-free helper emits sorted completed-dependency-review advice only for newly proposed edges to successful targets, leaves writes and existing edges untouched, and suggests exact Ticket and Outcome context refs. Fixtures prove context-only baselines create no boundary, repeated historical edges are not re-warned, active dependencies retain normal blocking, and legitimate fork, join, release, migration, and consumed-artifact edges remain exact. Fresh full verification passed 108/108 tests, the 56-file installed artifact, read-only loopback UI, and identical Codex and Claude Code marketplace behavior; project and Ticket validation passed and all Rooms are FRESH.",
   "ticket_id": "ticket-tighten-completed-dependency-hygiene"
 }

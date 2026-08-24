@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "owner": "vibehub-migrate",
-  "current_format": 2,
+  "current_format": 3,
   "migrations": [
     {
       "from": "0.4",
@@ -39,8 +39,30 @@
         "Preview every canonical Ticket and classify its delivery membership from exact reviewable history; do not infer delivery from Ticket status, branch name, filename, prose, or whichever pull request is currently open.",
         "Upgrade every Ticket document from schema_version 1 to schema_version 2 and add an explicit deliveries array. For a delivered pull request, record its canonical GitHub pull request URL, state delivered, exact mergedAt timestamp, and 40-hex merge commit. For an exact delivered cherry-pick, record the commit ref, timestamp, and delivered commit. Leave an empty array when no authoritative delivery can be established.",
         "After the reviewed Ticket audit, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 2.",
-        "Prove project compatibility returns CURRENT, project validate passes, the current Ticket graph is action-focused, and room drift remains honest."
+        "Continue with the format-2-to-format-3 step; format 2 is no longer current."
       ]
+    },
+    {
+      "from": "format-2",
+      "to": "format-3",
+      "document_schema_versions": {
+        "evidence": {
+          "from": 1,
+          "to": 2
+        },
+        "outcome": {
+          "from": 1,
+          "to": 2
+        }
+      },
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 2 and target_format 3 after Evidence and Outcomes gained their optional acceptance-contract binding.",
+      "steps": [
+        "Run the deterministic dry run and review its impact report before writing anything: node scripts/migrate-proof-bindings.mjs --repo <root> (from this Skill's folder). Every count in the report is recomputed at the migration HEAD; nothing is hard-coded.",
+        "After the explicit migration boundary, run the same migrator with --apply. It upgrades every Evidence document from schema_version 1 to schema_version 2 with a reconstructed acceptance_bindings array, and every Outcome document from schema_version 1 to schema_version 2 with a reconstructed contract_binding, reading each document's owning Ticket at its first Git addition on the current HEAD ancestry only. The addition commit is recorded as provenance_ref — provenance, never identity. Missing, ambiguous, or since-drifted history becomes an unresolved marker (no-addition-commit, ticket-unreadable-at-addition, referenced-acceptance-missing-at-addition, contract-drifted-since-addition) rather than a fabricated binding, and every other byte of the historical document is preserved.",
+        "The apply finishes by writing .vibehub/version.yaml with integer format_version 3 and verifying that the on-disk retention counts equal the dry-run report; a second apply at the same HEAD is byte-identical and reproduces the same unresolved set.",
+        "Prove project compatibility returns CURRENT, project validate and ticket validate pass, and review the diff as ordinary Git changes: an unresolved successful Outcome now projects REPLAN with reason unresolved_legacy_outcome and stale Evidence stops satisfying acceptance coverage."
+      ],
+      "rollback": "Restore the format 2 interpretation by reverting .vibehub/version.yaml to format_version 2 together with the matching plugin version. Bindings stay in place and are inert under format 2; no historical document is deleted or rewritten, and reapplying the migration at the same HEAD reproduces byte-identical bindings and the same unresolved set."
     }
   ]
 }

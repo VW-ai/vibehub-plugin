@@ -7,11 +7,15 @@
     "research-board-is-usable"
   ],
   "closed_at": "2026-08-20T19:01:05Z",
+  "contract_binding": {
+    "digest": "cc87c147fa540fa71932a3786d5ffb8efa771fee7760ac34df924de3755d18ec",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "task-workbench-interaction-research"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all five criteria. The checked-in study extracts concrete interaction patterns and failure modes from eight official product sources, maps them across the complete Task-first first-frame-to-return loop, and compares exactly three coherent spatial architectures against the same representative lifecycle. The responsive local board makes those directions reviewable rather than presenting a style picker, and the report recommends Focus Route with explicit tradeoffs, rejected alternatives, remaining owner choices, and a source-backed DSH Slot and Theme composition boundary. Existing focused tests and browser Evidence support the board without claiming final visual design or production integration.",
   "ticket_id": "ticket-research-task-workbench-interaction-directions",

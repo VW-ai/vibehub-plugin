@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "static-build-is-isolated-and-verifiable",
+      "digest": "c32d4843bdda4b37e8b7d56b248874d3fc0aa187a0f019b23367b36c59a9506c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "static-build-is-isolated-and-verifiable"
   ],
@@ -12,7 +20,7 @@
     "command:site/npm-test 3-pass",
     "command:root/npm-run-verify 43-pass and artifact verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public website produces a documented Cloudflare-compatible static export with no persistence bindings, while all site assertions and the complete Plugin verification suite pass.",
   "ticket_id": "ticket-launch-public-causal-canvas-site"
 }

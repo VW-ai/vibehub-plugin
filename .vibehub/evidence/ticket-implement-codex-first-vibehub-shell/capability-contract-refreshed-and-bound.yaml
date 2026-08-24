@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "capability-contract-is-refreshed-and-consistent",
+      "digest": "ac8555389df381d81818195fd00c46aa402ca7fbc00bb5b52fead2a667dcda5e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2456133a54c04d585814f4dd4ec207d898641d3f"
+    }
+  ],
   "acceptance_ids": [
     "capability-contract-is-refreshed-and-consistent"
   ],
@@ -14,7 +22,7 @@
     "packages/codex-adapter/upstream-lock.json",
     ".vibehub/outcomes/ticket-research-codex-project-and-recent-chat-parity.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 6218885 corrects docs/proposals/harness-neutral-core/capabilities.v1.json so the Codex projects capability is available and native on ThreadSection authority, with the fork placement race named as fallback, and names the pinned realtime probe result protocol-present-current-ephemeral-thread-unsupported in the ordinary audio fallback; realtime stays absent from the twelve-capability map while unsupported. test/harness-core-contract.test.mjs gains the test 'refreshed Codex declarations bind native ThreadSection Projects, hidden realtime, and ordinary audio', which fails against the stale file and passes against the refreshed one. The shared-ui isolation root in package-boundaries.json now points at apps/codex-first-shell so the package isolation probe scans the production shell. Full suite after the change: 206 tests, 203 pass, 0 fail, 3 skipped.",
   "ticket_id": "ticket-implement-codex-first-vibehub-shell"
 }

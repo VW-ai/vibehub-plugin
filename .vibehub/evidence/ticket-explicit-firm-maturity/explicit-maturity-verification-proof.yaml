@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rolling-wave-behavior-is-preserved",
+      "digest": "77e6e3471733dc179c927d09998ea10404f70aea76850872cfc9fe9f02ad56d2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:80091d8bb2a45c62655e438ab8460f294475c8c0"
+    },
+    {
+      "acceptance_id": "explicit-maturity-verifies-cleanly",
+      "digest": "c772dc3b6883cace3e58416de492a27d6f0d50e7fe6a65238f6d883c48a60256",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:80091d8bb2a45c62655e438ab8460f294475c8c0"
+    }
+  ],
   "acceptance_ids": [
     "rolling-wave-behavior-is-preserved",
     "explicit-maturity-verifies-cleanly"
@@ -17,7 +31,7 @@
     "command:room-drift-all-four-fresh",
     "command:git-diff-check-pass"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The Rooms chain now states maturity firm, firm, and draft. The human-blocker draft test proves a successful human decision moves downstream work only to REFINE and that rewriting the same Ticket to firm makes it READY. Full npm run verify passes 46/46 tests, including Codex and Claude Code marketplace parity, and verifies the 52-file dependency-free artifact; project and Ticket validation pass, all four Rooms are FRESH, and git diff check is clean.",
   "ticket_id": "ticket-explicit-firm-maturity"
 }

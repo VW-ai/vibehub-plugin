@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rooms-projection-is-canonical-and-shared",
+      "digest": "b065a5b8f8d8f77c93c708bbd0f4bb148ec23225cde5552e9e3e660e9b09af31",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:359a415eed245e98cb72b865ef5fd3fb819ba1a1"
+    },
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "digest": "fde63249d9ff66ca3e8a6bff95d2ce0ebaf057f333652add53afc2577662c2bf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:359a415eed245e98cb72b865ef5fd3fb819ba1a1"
+    },
+    {
+      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+      "digest": "8e613fba06665a41ef1f1b85ec8072764c2d20ed02176137d27a37a1dc17538a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:359a415eed245e98cb72b865ef5fd3fb819ba1a1"
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "digest": "a0d71a2944e58b67de4c71fc60cbe8597d2ee147c8abe3ec309564c10a78276b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:359a415eed245e98cb72b865ef5fd3fb819ba1a1"
+    }
+  ],
   "acceptance_ids": [
     "rooms-projection-is-canonical-and-shared",
     "rooms-surface-is-on-demand-and-responsive",
@@ -14,7 +40,7 @@
     "docs/proposals/rooms-workbench/contract.json",
     "test/ui-rooms.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Contract audit found that production used one generic drift icon and raw WARNING/COLD_START labels. A shared ROOM_STATE_PRESENTATION map now renders the exact approved FRESH/check, DRIFTED/diff, OLD CHECKOUT/history, STALE/alert-circle, and ROOMS NOT INITIALIZED/snowflake language in tree, detail header, Drift rows, and true zero-Room empty state. Flat DOM treeitems expose canonical directory depth through aria-level. Focused host tests pass 13/13, fresh full verify passes 78/78, the artifact verifies at 54 files / 718834 bytes, and Workbench Room is FRESH. Independent closeout must exercise the state fixture and hierarchy semantics before acceptance.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

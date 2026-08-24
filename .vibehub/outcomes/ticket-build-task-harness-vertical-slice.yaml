@@ -8,6 +8,10 @@
     "production-and-installed-regressions-pass"
   ],
   "closed_at": "2026-08-21T01:28:10Z",
+  "contract_binding": {
+    "digest": "27032371b66e2b8dd759c02079fb951632111f43a091d822ac4797863993f298",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "dsh-rc8-adapter-and-packed-bundle-proof",
     "canonical-graph-native-chat-and-recovery-proof",
@@ -16,7 +20,7 @@
     "dsh-adapter-boundary-and-exact-seam-probe-correction"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent re-closeout accepts all six criteria. The prior adapter-boundary gap is corrected at exact commit f519300da84646da382e9449f45d2c86e17db760: packages/dsh-bundle/index.js is exactly one re-export, all actual rc.8 Host and Client translations are contained by packages/dsh-adapter, and the expanded source-contract probe binds 17 real Adapter uses to exact official signatures while three additional checks pin the release/runtime and unsupported custom-event boundary. All 20 checks independently passed against clean official commit 141eb6fef83422698aef7a981029e843e8161534. Focused verification passed 30/30 and full verification passed 141/141 with the exact source probe enabled and a 62-file production Plugin artifact. A freshly built 68-file npm tarball installed after official rc.8 base and Web bundles into a new isolated Profile, booted the native DSH shell with its complete native module roster plus the additive VibeHub client, served canonical read-only bootstrap identity at HTTP 200, rejected POST with 405 read_only, restarted with the same source identity and graph digest, stopped cleanly, and uninstalled to a base/web-only Profile with no VibeHub package or patch residue. The earlier independently reproduced canonical Graph, exact native-Chat handoff, durable Task-to-Session linkage, native Skill/tool execution, acceptance-linked Evidence write, restart recovery, honest unsupported waiting-tool/failure boundary, and independent closeout facts remain accepted and are not weakened by the isolated compatibility correction.",
   "ticket_id": "ticket-build-task-harness-vertical-slice",

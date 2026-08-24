@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "main-and-pr15-contracts-are-reconciled",
+      "digest": "314206ec3724e549e8d91f9df54f7aa04a00797670f5a2d1c6efdd4aab054a26",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2d4408136e35df069fc1e797d8c2ee53f426dd21"
+    },
+    {
+      "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+      "digest": "1d94ecfe9e346f49a043a68db1fc52f4196184c3cc1b6317664ae536b6f2846c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2d4408136e35df069fc1e797d8c2ee53f426dd21"
+    },
+    {
+      "acceptance_id": "v080-release-candidate-identity-is-in-pr",
+      "digest": "d80cdeb4d14f4bc174bd362caddf5620fddcbdc2153423f08e9114fd80cba768",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2d4408136e35df069fc1e797d8c2ee53f426dd21"
+    }
+  ],
   "acceptance_ids": [
     "main-and-pr15-contracts-are-reconciled",
     "plugin-boundary-and-artifact-stay-clean",
@@ -15,7 +35,7 @@
     "artifact:54-files-724304-bytes",
     "release:v0.8.0-candidate"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fetched origin/main at 92802fa54739ed8051a8c0704fb0eae873ab60e8 is an ancestor of the release branch. Full local verification passed 81/81 and the dependency-free installed artifact verified at 54 files / 724304 bytes; a separate clean output directory built the same 54-file / 724304-byte artifact. Project and Ticket validation passed with 48 Tickets, 145 Evidence, and 42 Outcomes before this Evidence; knowledge, product, ticket-lifecycle, and workbench Rooms were FRESH. Version identity is exactly 0.8.0 across package, Codex, Claude, marketplace, release test, and top Changelog entry dated 2026-08-13; data format remains 1 and the GitHub-only tag workflow is unchanged except for fetching full history required by the committed dense-layout baseline test. Source/diff audit found no Desktop app, repository switcher, launcher runtime, session watcher, deep-link app packaging, database, daemon, persistent browser store, or writable Workbench route. The passing suite explicitly retains human authority/origin Evidence, human attention, READY-only handoff, REFINE non-execution, causal focus, exact source, and archive/query contracts.",
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

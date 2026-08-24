@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "phase-is-explicit",
+      "digest": "7db78cce5ce9aefa702b582286305e177ea3140f699bc9e814792f0138250244",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b9ec671712dee8ee8e67127be18de045b072a014"
+    }
+  ],
   "acceptance_ids": [
     "phase-is-explicit"
   ],
@@ -9,7 +17,7 @@
     "README.md:6",
     "git-diff:README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README now states immediately after the introduction that the architecture pivot is complete, this version is in dogfood-only validation, and pre-emptive runtime parity work is out of scope.",
   "ticket_id": "ticket-document-dogfood-phase"
 }

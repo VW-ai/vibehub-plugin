@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "same-shell-comparison-is-controlled",
+      "digest": "35d9f67a56f190894fdf445bf819aec934eda7003dbc136accc221001531e2e0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ddc8557c758796ba55a5da6189bd1934cd8b616"
+    },
+    {
+      "acceptance_id": "palette-directions-are-distinct-and-coherent",
+      "digest": "cda95ff5e1ee65331a26d204867b541a78913a2648814738767658764b6e3d1c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ddc8557c758796ba55a5da6189bd1934cd8b616"
+    },
+    {
+      "acceptance_id": "palette-review-boundary-is-decision-ready",
+      "digest": "67bd3a0100d6d2ac0752ec91fbc896e7a743f63d5205d21c43ed9f4442efa506",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ddc8557c758796ba55a5da6189bd1934cd8b616"
+    }
+  ],
   "acceptance_ids": [
     "same-shell-comparison-is-controlled",
     "palette-directions-are-distinct-and-coherent",
@@ -15,7 +35,7 @@
     "docs/DSH_MONOCHROME_PALETTE_REVIEW.md",
     "test/dsh-palette-explorer.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in rough-HTML explorer renders one fixed persistent Shell, native-shaped Chat, Task Graph and Task Workspace while switching only a shared token contract. True Black, Graphite, Soft Black, Cool Mono and Warm Mono each declare the same complete background, surface, border, text, muted, monochrome accent, selection and four-phase token set, with materially different black level, white level, temperature and contrast but no colored state rainbow, paper treatment or decorative gradient. The review note records intent, strengths, risks and best use for all five; recommends Graphite only as Agent input; and keeps explicit owner preference and later installed whole-application approval separate.",
   "ticket_id": "ticket-compare-dsh-shell-palette-directions"
 }

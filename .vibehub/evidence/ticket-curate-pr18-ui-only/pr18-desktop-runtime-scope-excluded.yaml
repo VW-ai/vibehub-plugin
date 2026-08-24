@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "desktop-and-runtime-scope-excluded",
+      "digest": "d10a4cad22f478900334403a7886a7ddbbc8d73db67b37033f309a1880c209cb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ad21554e334cc88b434feb6f7e7145aad002af2a"
+    }
+  ],
   "acceptance_ids": [
     "desktop-and-runtime-scope-excluded"
   ],
@@ -12,7 +20,7 @@
     "docs/LOCAL_GRAPH_DESIGN.md",
     "test:desktop-runtime-path-absence-audit"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The curated tree contains no apps/workbench Desktop product, desktop tests, vh-workbench launcher, session-watch behavior, deep-link or repository-switch runtime, packaging, or documentation claim that those rejected capabilities ship.",
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

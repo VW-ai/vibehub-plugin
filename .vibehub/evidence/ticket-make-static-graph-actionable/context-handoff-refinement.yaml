@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "digest": "93648ecdf0372db89be8d8ccde48680f37df887dd7c41c98658e91fce2ce687b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    },
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "digest": "f572425a74e5a63da5517a077f7be927078c5b37f0c16aba1bfccb2316c513b7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "digest": "1e717555abeccb63093b06f20d71c15ce4e28d9d8393054f75047548ed8c0e60",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    },
+    {
+      "acceptance_id": "source-actions-are-mechanical-and-honest",
+      "digest": "d1c5467da472a789229de9eae06d32c8c194ab4e1a6fcc82b6a34c288cb365ab",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "digest": "8af04c2d24bb469e32a3a76ab64875f5319b966d09595d5cea909b19f87f4fff",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "digest": "cbaaa6d225ec47f9acb3e7dd33ec4dc161200a04a26f07fdcdb48531a7a9d2e9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ff83f45c060409abb9da0219975cde826605823"
+    }
+  ],
   "acceptance_ids": [
     "one-copy-handoff-per-object",
     "evidence-references-are-typed-and-compact",
@@ -19,7 +57,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After owner dogfood rejected redundant per-reference copy controls and raw JSON-shaped Bound Context facts, commit 720a961 narrowed every visible object to one labeled Copy for Agent action while retaining honest editor and commit-pinned GitHub links. Canonical Context now projects Source as the exact captured quote, typed ref, and timestamp; Evidence as individual note-and-ref records; Relations as directional Context connections; and identity as a compact footer. Evidence and provenance refs remain typed and readable but no longer expose per-ref copy buttons. Real-browser review on the current Ticket covered desktop and 390x720 expanded Context views with no overflow or runtime warnings. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227691 bytes.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

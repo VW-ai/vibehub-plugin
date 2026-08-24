@@ -8,13 +8,17 @@
     "hosted-service-deferred-cleanly"
   ],
   "closed_at": "2026-08-12T21:03:15Z",
+  "contract_binding": {
+    "digest": "079ae5aaee118db299c900191df82a16af57314a47628c02e126ae54c9a35955",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "v070-plugin-loop-refresh",
     "v070-open-graph-reconciliation",
     "v070-candidate-ranking"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout at executor commit 45180b0 accepted all six criteria. current-plugin-loop-inventoried: README, docs/CONCEPT.md, Setup/Plan/Run/Closeout/Review Skills, and the lifecycle contract reproduce the installed one-line entry through setup/compatibility, Room-aware planning, READY-only execution, acceptance-linked Evidence, separate-Agent Outcome, and Log/graph review; an independent escalated npm test run passed 49/49. Current index.html and app.js directly confirm the observed highest-impact Workbench friction: a permanently reserved left rail, two empty Implementing surfaces despite no trusted presence, one top-to-bottom layout, all 44 Tickets rendered, and copied location.href not updated by Ticket/lens selection. open-graph-reconciled: an independent graph read reproduced 44 total, 31 DONE, 4 READY, 3 REFINE, and 6 BLOCKED; all 13 non-DONE Tickets appear exactly once in v070-open-graph-reconciliation with current audit work classified DO NOW, canvas-first as DO NEXT, eight dependency-ordered directions DO LATER, archive/query as REFINE FROM EVIDENCE, and cross-repository plus CLI directions DEFERRED. The DO NOW label honestly distinguishes the audit already being closed from the future roadmap and creates no omission or duplicate. observed-and-speculative-gaps-separated: code, active product Context, current Tickets, and owner-provenance references support canvas density, orientation, routing, visual proposal, archive overload, and Rooms visibility, while project playbooks, cross-repository work, CLI packaging, hosted coordination, accounts, synchronization, storage, deployment, and connectors remain explicitly unimplemented or evidence-gated. candidates-ranked: v070-candidate-ranking gives five bounded candidates explicit 1-5 scores for immediate value, repeated-use leverage, strategic fit, tractability, and evidence strength, with dependency chains grouped coherently rather than duplicated as parallel roadmap work. next-slice-recommended: ticket-workbench-canvas-first-overview is the smallest firm READY implementation slice; its existing six criteria define dominant canvas, a single-purpose overview, conditional presence, honest focused local URL state, preserved Victor interactions, and measured wide/narrow browser behavior, while its constraints preserve the read-only dependency-free Web boundary. The ranking explains why layout/dense geometry, production visual styling, archive semantics, and Rooms should not precede that shell/focus foundation. hosted-service-deferred-cleanly: the refreshed report preserves only local Plugin seams and explicitly excludes hosted storage, accounts, synchronization, Cloud architecture, deployment, connectors, and a private-service Ticket. Repository validation passed with 44 Tickets, 129 Evidence records, and 31 pre-closeout Outcomes; git diff --check passed and the executor diff contains only the three refreshed Evidence files. The three older Evidence records were read as historical snapshots and deliberately are not used as current closeout proof.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements",
