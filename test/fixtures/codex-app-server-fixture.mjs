@@ -73,6 +73,10 @@
 //   signal (the deprecated thread/compacted notification is not sent by the
 //   0.149.0 v2 path, so the fixture does not send it either);
 //   thread/name/set answers first and then sends thread/name/updated;
+//   thread/fork replays the source's terminal Turns into the fork with their
+//   ids; lastTurnId is the stable inclusive boundary (later Turns omitted,
+//   an in-progress Turn refused), exactly the ThreadForkParams seam pinned in
+//   docs/proposals/fork-chat/fork-interaction-contract.json;
 //   model/list lists the fixture's hidden model too, unlike the real server
 //   (which omits hidden presets unless includeHidden), so the host-side
 //   hidden filter is exercised by the proof;
@@ -577,7 +581,20 @@ const handlers = {
   },
   "thread/fork": (params) => {
     const source = requireThread(params);
-    const thread = { ...source, id: nextId("fixture-thread"), forkedFromId: source.id, turns: [], name: null };
+    // Mirrors pinned 0.149.0 thread_fork_inner: the fork replays the source's
+    // terminal Turns with their ids (thread_fork_at_last_turn_id_keeps_only_
+    // terminal_prefix); lastTurnId is an inclusive boundary — Turns after it
+    // are omitted — and may not name an in-progress Turn, which the real
+    // server refuses as an invalid request.
+    const terminal = source.turns.filter((turn) => turn.status !== "inProgress");
+    let replayed = terminal;
+    if (params?.lastTurnId !== undefined && params?.lastTurnId !== null) {
+      const named = source.turns.find((turn) => turn.id === params.lastTurnId);
+      if (!named) throw Object.assign(new Error(`Unknown turn ${params.lastTurnId}`), { code: -32602 });
+      if (named.status === "inProgress") throw Object.assign(new Error(`turn ${params.lastTurnId} is in progress and cannot be a fork boundary`), { code: -32600 });
+      replayed = terminal.slice(0, terminal.indexOf(named) + 1);
+    }
+    const thread = { ...source, id: nextId("fixture-thread"), forkedFromId: source.id, turns: structuredClone(replayed), name: null, status: { type: "idle" } };
     threads.set(thread.id, thread);
     return { thread: threadRecord(thread) };
   },
