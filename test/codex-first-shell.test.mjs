@@ -316,6 +316,9 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.deepEqual(lockAudio.acceptedDataUrlMimeTypes, [RECORDING_MIME_TYPE]);
   assert.match(lockAudio.acceptedDataUrlMimeTypesProvenance, /probe:codex:live[^]*status completed/);
   assert.equal(lockAudio.currentProbeResult, "protocol-present-current-ephemeral-thread-unsupported");
+  // Submission is the existing ordinary path, no second loop: a Turn whose
+  // content carries audio routes through validateInputs and sendChatAudio.
+  assert.match(server, /if \(types\.has\("audio"\)\) return harness\.sendChatAudio\(input\);/);
   // The microphone is capability-gated: enabled only on runtime.audioInput
   // true with getUserMedia present, otherwise visibly disabled and explained
   // with the capability contract's own fallback text; DSH stays unsupported.
