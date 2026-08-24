@@ -1054,7 +1054,8 @@ test("Graph and Task Workspace routes serve the canonical projection, and the Wo
   assert.deepEqual(workspace.body.data.evidence, handoff.evidence);
   assert.deepEqual(workspace.body.data.evidence.map((item) => [item.evidenceId, item.acceptanceIds, item.origin, item.refs]), [["workspace-proof", ["workspace-renders"], "agent", ["apps/codex-first-shell/app.js"]]]);
   assert.equal(workspace.body.data.outcome, null, "no Outcome is recorded for the open Ticket");
-  assert.deepEqual(workspace.body.data.nextAction, { action: "EXECUTE", reason: "acceptance_evidence_incomplete", detail: "Executable criteria still need reproducible acceptance-linked Evidence.", acceptanceIds: ["packet-is-exact"], blockingTicketIds: [] });
+  assert.deepEqual(workspace.body.data.nextAction, { action: "EXECUTE", reason: "acceptance_evidence_incomplete", detail: "Executable criteria still need reproducible acceptance-linked Evidence.", acceptanceIds: ["packet-is-exact"], blockingTicketIds: [], proof: handoff.nextAction.proof }, "readTask carries the canonical next action with its proof explanation, not a re-derivation");
+  assert.ok(workspace.body.data.nextAction.proof, "the Workspace surface carries the proof-binding explanation");
   assert.equal(workspace.body.data.packet.context.items[0].contextId, "decision-proof-direction");
   assert.deepEqual(workspace.body.data.source, { handoff: "vh-ui.buildTicketHandoff", packet: "codex-adapter/task-context.buildTaskContextPacket", contexts: "canonical_room_projection", snapshotId: snapshot.state.graph.snapshotId });
   const closed = (await action({ action: "readTask", ticketId: "ticket-proof-prerequisite" })).body.data;

@@ -9,6 +9,7 @@ import {
   assertValid,
   documents,
   loadRepository,
+  outcomeAccepted,
   projectRoomDrift,
   projectTicketQuery,
   ticketArchived,
@@ -255,13 +256,18 @@ function chatAssociations(ticket) {
   return associations;
 }
 
-function outcomeState(outcome) {
+// A successful Outcome presents as DONE only while it is accepted by the
+// canonical binding gate; an unresolved one presents like a deviation: its
+// file stays readable, but it no longer certifies the current contract.
+function outcomeState(repository, ticket, outcome) {
   if (!outcome) return null;
-  return outcome.status === "successful" ? "DONE" : "DEVIATED";
+  return outcome.status === "successful" && outcomeAccepted(repository, ticket.ticket_id)
+    ? "DONE"
+    : "DEVIATED";
 }
 
 function operationalState(repository, ticket, outcome) {
-  const label = outcomeState(outcome) ?? ticketStatus(repository, ticket);
+  const label = outcomeState(repository, ticket, outcome) ?? ticketStatus(repository, ticket);
   if (label === "DONE") {
     return {
       label,
@@ -272,13 +278,15 @@ function operationalState(repository, ticket, outcome) {
   if (label === "DEVIATED") {
     return {
       label,
-      detail: `The independent Outcome is ${outcome.status}; this Ticket does not unlock dependents.`,
+      detail: outcome.status === "successful"
+        ? "The successful Outcome's contract binding is unresolved against the current acceptance contract; this Ticket does not unlock dependents until it is independently reviewed."
+        : `The independent Outcome is ${outcome.status}; this Ticket does not unlock dependents.`,
       references: [{ ref: `.vibehub/outcomes/${ticket.ticket_id}.yaml`, label: outcome.status }],
     };
   }
   const blockers = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
+    .filter((id) => !outcomeAccepted(repository, id));
   if (label === "BLOCKED") {
     return {
       label,
@@ -308,6 +316,9 @@ function projectedNextAction(repository, ticket) {
     detail: derived.detail,
     acceptanceIds: derived.acceptance_ids,
     blockingTicketIds: derived.blocking_ticket_ids,
+    // The canonical proof-binding explanation, verbatim from the one
+    // derivation in vh.mjs: native, reconstructed, stale, or unresolved.
+    proof: derived.proof,
   };
 }
 
@@ -359,22 +370,19 @@ function handoffInstruction(ticketId, nextAction) {
   };
 }
 
-function humanAttentionState(repository, ticket, outcome) {
+// Human-authority attention follows the canonical proof derivation: a
+// human-origin record satisfies a criterion only while its binding still
+// matches the current criterion, so stale sign-off returns to pending.
+function humanAttentionState(repository, ticket, outcome, proof) {
   const humanCriteria = ticket.acceptance.filter(
     (criterion) => acceptanceAuthority(criterion) === "human",
   );
-  const humanEvidence = documents(repository.evidence.documents).filter(
-    (evidence) => evidence.ticket_id === ticket.ticket_id
-      && evidenceOrigin(evidence) === "human",
-  );
-  const recordedIds = new Set(humanEvidence.flatMap(
-    (evidence) => evidence.acceptance_ids,
-  ));
+  const coverage = new Map(proof.acceptance.map((entry) => [entry.acceptance_id, entry]));
   const criteria = humanCriteria.map((criterion) => ({
     acceptanceId: criterion.acceptance_id,
     criterion: criterion.criterion,
     authority: "human",
-    evidenceState: recordedIds.has(criterion.acceptance_id)
+    evidenceState: coverage.get(criterion.acceptance_id)?.human_covered
       ? "recorded"
       : "pending",
   }));
@@ -389,7 +397,8 @@ function humanAttentionState(repository, ticket, outcome) {
   const operational = ticketStatus(repository, ticket);
   let label = "NONE";
   let detail = "No acceptance criterion reserves human authority.";
-  if (humanAcceptanceCount > 0 && outcome?.status === "successful") {
+  if (humanAcceptanceCount > 0 && outcome?.status === "successful"
+    && outcomeAccepted(repository, ticket.ticket_id)) {
     label = "COMPLETE";
     detail = "Human-authority acceptance was independently accepted.";
   } else if (humanAcceptanceCount > 0
@@ -440,8 +449,8 @@ function projectGraph(repository, queryOptions = {}) {
   }
   const tickets = ticketDocuments.map((ticket) => {
     const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
-    const attention = humanAttentionState(repository, ticket, outcome);
     const nextAction = projectedNextAction(repository, ticket);
+    const attention = humanAttentionState(repository, ticket, outcome, nextAction.proof);
     return {
       ticketId: ticket.ticket_id,
       ticketRevision: digest(ticket),
@@ -575,10 +584,10 @@ function ticketContextPackage(ticket, relations, repository, source) {
       refs: item.refs,
       recordedAt: item.recorded_at,
     }));
-  const attention = humanAttentionState(repository, ticket, outcome);
   const maturity = ticket.maturity ?? "firm";
-  const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
+  const operational = outcomeState(repository, ticket, outcome) ?? ticketStatus(repository, ticket);
   const nextAction = projectedNextAction(repository, ticket);
+  const attention = humanAttentionState(repository, ticket, outcome, nextAction.proof);
   const acceptance = ticket.acceptance.map((item) => ({
     acceptanceId: item.acceptance_id,
     criterion: item.criterion,

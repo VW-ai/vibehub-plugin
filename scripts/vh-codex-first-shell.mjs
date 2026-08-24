@@ -29,7 +29,7 @@ import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
-import { VibeHubError, applyTickets, documents, initProject, projectCompatibility, putContext, readDocument, validateTicket, writeDocument } from "../skills/vibehub-core/scripts/vh.mjs";
+import { VibeHubError, applyTickets, documents, initProject, outcomeAccepted, projectCompatibility, putContext, readDocument, validateTicket, writeDocument } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const SHELL_ID = "codex-first-shell";
@@ -877,7 +877,9 @@ function priorAcceptedProjection(handoff, repository) {
     .map((relation) => {
       const outcomeEntry = repository.outcomes.documents.get(relation.target_ticket_id);
       const outcome = outcomeEntry?.document;
-      if (outcome?.status !== "successful") return null;
+      // The canonical acceptance gate: an unresolved successful Outcome is
+      // not prior accepted context, exactly as it no longer unlocks anything.
+      if (outcome?.status !== "successful" || !outcomeAccepted(repository, relation.target_ticket_id)) return null;
       return {
         ticketId: relation.target_ticket_id,
         rationale: relation.rationale,
@@ -1199,7 +1201,9 @@ function bridgeFailure(error) {
 
 function listTaskTargets(snapshot = buildUiSnapshot(repoRoot)) {
   return snapshot.state.graph.tickets
-    .filter((row) => snapshot.repository.outcomes.documents.get(row.ticketId)?.document.status !== "successful")
+    // A Ticket is a Task target until its successful Outcome is accepted by
+    // the canonical binding gate; an unresolved one returns as REPLAN work.
+    .filter((row) => !outcomeAccepted(snapshot.repository, row.ticketId))
     .map((row) => {
       const ticket = snapshot.repository.tickets.documents.get(row.ticketId).document;
       return {
