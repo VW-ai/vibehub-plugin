@@ -1,0 +1,34 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "closed-contract-mutation-is-refused",
+      "binding": "native",
+      "digest": "0e7794f0ad56222bfddbcee765965bba710db99fb4da4a866ad82980ea0286d2"
+    },
+    {
+      "acceptance_id": "projection-explains-proof-without-a-new-status",
+      "binding": "native",
+      "digest": "98dcfb4a6735fff02e843d3cb98fbd51c4f2402ce1592d74acd95d28844794fe"
+    }
+  ],
+  "acceptance_ids": [
+    "closed-contract-mutation-is-refused",
+    "projection-explains-proof-without-a-new-status"
+  ],
+  "evidence_id": "closed-contract-guard-and-projection-explanation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:30:01Z",
+  "refs": [
+    "commit:251e7db",
+    "commit:459b3f0",
+    "commit:b544d9e",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "scripts/vh-codex-first-shell.mjs",
+    "skills/vibehub-core/contracts/ticket-next-action.md"
+  ],
+  "schema_version": 2,
+  "summary": "Commit 251e7db adds the contract_closed refusal beside origin_immutable in applyTickets: any change to criterion text, authority or acceptance membership of a Ticket holding a successful Outcome is rejected through the CLI and the shell host path while context, constraints, context_refs, relations, deliveries and provenance edits still apply, and the reopen protocol is recorded as future work. ticketNextAction keeps exactly the seven actions: a successful Outcome with an unresolved contract binding projects REPLAN with the stable reason unresolved_legacy_outcome naming the drifted acceptance ids, Evidence whose binding digest no longer matches the current criterion stops satisfying coverage so affected Tickets project EXECUTE or NEEDS_HUMAN with reasons naming the stale ids, and commit 459b3f0 carries the native, reconstructed, stale or unresolved explanation through frontier, ticket get, graph, buildTicketHandoff, the shell readTask surface and the Workbench phase-label slot from the one canonical derivation with no second computation; commit b544d9e documents the binding-aware rows in ticket-next-action.md. Unresolved successful Outcomes present operationally under the existing DEVIATED label with explaining detail rather than a new status.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

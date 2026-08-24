@@ -1,0 +1,33 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "legacy-migration-is-mechanical-and-replayable",
+      "binding": "native",
+      "digest": "2d3b833235e35a2ef63f5a8ec6a405ea792084ae8cd6c4ea11f0a876cef076de"
+    },
+    {
+      "acceptance_id": "unresolved-fallback-preserves-retention-semantics",
+      "binding": "native",
+      "digest": "e9dca1e200051c0975fc070f417e02a1a3476c3280d48ac9a2dd861768079c44"
+    }
+  ],
+  "acceptance_ids": [
+    "legacy-migration-is-mechanical-and-replayable",
+    "unresolved-fallback-preserves-retention-semantics"
+  ],
+  "evidence_id": "migration-ran-replayable-with-unresolved-fallback",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:30:01Z",
+  "refs": [
+    "commit:56c5ca3",
+    "commit:1ab39f7",
+    "skills/vibehub-migrate/references/migrations.json",
+    "docs/proof-binding-migration-report.json",
+    "scripts/audit-legacy-proof.mjs",
+    "test/legacy-proof-audit.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Commit 56c5ca3 adds the format 2 to 3 entry and the migrator, and commit 1ab39f7 is the deliberate run on this repository: a 432-file diff adding bindings to 431 documents plus version.yaml, with the committed dry-run report docs/proof-binding-migration-report.json recomputing every count at the migration HEAD. All 431 documents were reconstructable through firstCurrentAddition on HEAD ancestry with git log follow chaining re-added files to their original addition; zero documents fell to missing-history reasons; the two drifted successful Outcomes, ticket-deploy-public-site-cloudflare and ticket-encode-human-acceptance-authority, received contract-drifted-since-addition markers naming their drifted acceptance ids, moving DONE from 104 to 102, archive membership from 43 to 42, prerequisite edges from 92 to 90 and the current graph from 18 to 26 while human-authority satisfactions stayed 18 because the drifted human sign-off was re-recorded after the drift; 14 evidence documents carry stale bindings and three tickets have stale-only coverage. Each rewritten document preserved key order with only the schema_version value and the inserted field changed, stripped-restore byte identity is proven by test, and replaying the migrator on the migrated repository rewrote zero documents. ticket validate, project validate and compatibility CURRENT pass on the migrated repository.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

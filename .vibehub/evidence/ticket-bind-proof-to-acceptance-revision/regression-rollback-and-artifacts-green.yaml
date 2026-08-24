@@ -1,0 +1,28 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "regression-rollback-and-artifacts-hold",
+      "binding": "native",
+      "digest": "8e8bb4aef0685263541d749f70ac2e74474f577162fef6ce0689cc88ea269a56"
+    }
+  ],
+  "acceptance_ids": [
+    "regression-rollback-and-artifacts-hold"
+  ],
+  "evidence_id": "regression-rollback-and-artifacts-green",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:30:01Z",
+  "refs": [
+    "commit:251e7db",
+    "commit:56c5ca3",
+    "commit:1ab39f7",
+    "test/ticket-origin.test.mjs",
+    "test/legacy-proof-audit.test.mjs",
+    "scripts/build-claude-marketplace.mjs",
+    "scripts/build-codex-marketplace.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "The suite at branch head reports 323 tests, 321 pass, 0 fail and the two pre-existing DSH skips, up 16 passing tests from the 307 baseline; npm run verify passes and both marketplace builds succeed on the migrated repository; npm run guard:codex passes. Tests cover wording, authority and membership drift each changing the digest, unchanged-criterion survival across unrelated edits, the reconstruction fixture spanning HEAD ancestry, re-added files and missing history falling to unresolved without a fabricated digest, contract_closed refusal via CLI and host, human-authority criteria still requiring human-origin Evidence after migration, and rollback restoring the format 2 interpretation without deleting bindings with reapply reproducing identical results and zero rewrites on replay.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

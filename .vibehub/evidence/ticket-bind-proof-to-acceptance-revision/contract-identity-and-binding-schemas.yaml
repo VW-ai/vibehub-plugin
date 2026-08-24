@@ -1,0 +1,32 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "contract-identity-is-deterministic",
+      "binding": "native",
+      "digest": "a73eed2d9a01a972aaa4c4b40ec10261dca51b5351215fb4dfcd2f77e2fabc08"
+    },
+    {
+      "acceptance_id": "proof-schemas-gain-one-optional-binding",
+      "binding": "native",
+      "digest": "fd24f25b7141ddbd34d5c978c37d0dc96cd52d2cc4849a822a40689d7aa7e8f3"
+    }
+  ],
+  "acceptance_ids": [
+    "contract-identity-is-deterministic",
+    "proof-schemas-gain-one-optional-binding"
+  ],
+  "evidence_id": "contract-identity-and-binding-schemas",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:30:01Z",
+  "refs": [
+    "commit:251e7db",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/evidence.schema.json",
+    "skills/vibehub-core/contracts/outcome.schema.json",
+    "test/ticket-origin.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Commit 251e7db adds one exported contractIdentity function to skills/vibehub-core/scripts/vh.mjs computing the per-criterion sha256 over the UTF-8 canonical JSON array of ticket_id, acceptance_id, explicitly defaulted authority and criterion text, and the complete-contract digest over the acceptance-id-sorted set; tests prove identical digests from the source tree and both installed artifacts, that no timestamp, commit, filename or repository position enters the serialization, and that unrelated context, constraint, relation, delivery or copy edits leave every digest unchanged while wording, authority and membership drift each change it. evidence.schema.json gains exactly one optional acceptance_bindings array with acceptance_id bound to the document's own ids, 64-hex digest, binding native or reconstructed and a reconstructed-only provenance commit reference; outcome.schema.json gains exactly one optional contract_binding whose allOf rules require a digest for native and drifted bindings and forbid a fabricated digest for missing-history reasons from the fixed four-reason set; both schema versions accept 1 and 2, additionalProperties stays false, legacy documents stay valid, new Evidence and Outcomes written by vh.mjs always carry native bindings, and a ticket-origin-style test pins exactly one optional addition per schema.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}
