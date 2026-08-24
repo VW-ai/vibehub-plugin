@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "codexVersion": "0.149.0",
+    "codexReleaseTag": "rust-v0.149.0",
+    "codexCommit": "758ef40f50c1a458425c7cfbf1eb12cbc07af0b0",
+    "protocolSchemaSha256": "9b3de71a5a2ffc980b792a18aa8f8dec3f85f48829560222a0264fe494b679a9",
+    "verification": "codex app-server generate-json-schema run read-only on the installed 0.149.0 binary for this proposal; the emitted v2 schema file is byte-identical to the pin in packages/codex-adapter/upstream-lock.json"
+  },
+  "protocolFacts": {
+    "forkFromPoint": {
+      "claim": "thread/fork supports forking from a chosen Turn, stable in 0.149.0, via lastTurnId (inclusive boundary); turns after it are omitted and the referenced turn cannot be in progress. Boundaries are Turns: no item-level fork exists anywhere in the params.",
+      "stableParams": ["threadId (required)", "lastTurnId", "model", "modelProvider", "serviceTier", "cwd", "approvalPolicy", "approvalsReviewer", "sandbox", "config", "baseInstructions", "developerInstructions", "ephemeral", "threadSource"],
+      "experimentalParams": ["beforeTurnId (exclusive boundary; cannot combine with lastTurnId)", "path (fork by rollout path)", "permissions", "runtimeWorkspaceRoots", "excludeTurns", "deferGoalContinuation"],
+      "sources": [
+        "generated v2 schema definition ThreadForkParams (only stable fields are emitted; lastTurnId is present, beforeTurnId is not)",
+        "codex-rs/app-server-protocol/src/protocol/v2/thread.rs at rust-v0.149.0 (ThreadForkParams: lastTurnId has no #[experimental]; beforeTurnId, path, permissions, runtimeWorkspaceRoots, excludeTurns, deferGoalContinuation do)",
+        "codex-rs/app-server/src/request_processors/thread_processor.rs thread_fork_inner (truncate_rollout_after_turn_id / truncate_rollout_before_turn_id on the legacy path; thread_store.prepare_fork ForkBoundary::ThroughTurn/BeforeTurn/Latest on the paginated path; invalid_request when both boundaries are named)",
+        "codex-rs/app-server/tests/suite/v2/thread_fork.rs (thread_fork_at_last_turn_id_keeps_only_terminal_prefix; thread_fork_can_cut_before_unfinished_stored_turn; freeze-active-turn cases)"
+      ]
+    },
+    "lineage": {
+      "claim": "The fork response is ThreadForkResponse { thread, model, modelProvider, serviceTier, cwd, instructionSources, approvalPolicy, approvalsReviewer, sandbox, ... } with thread.forkedFromId naming the source, and a thread/started notification announces the fork. forkedFromId is persisted in the rollout's SessionMeta, so thread/read and thread/list rebuild it after any restart; chains nest (a fork of a fork names the middle Thread). An explicitly set source name is inherited; an unnamed source's fork stays name null.",
+      "notPersisted": "The fork point is not recorded anywhere: SessionMeta carries forked_from_id only. 'Cut at Turn N' can be derived from the shared Turn-id prefix of the two transcripts (thread/fork replays source Turns with their ids), which needs both transcripts read.",
+      "distinctConcept": "Thread.parentThreadId is set only for AgentControl subagents and is never fork lineage.",
+      "sources": [
+        "generated v2 schema definitions Thread (forkedFromId: 'Source thread id when this thread was created by forking another thread'), ThreadForkResponse, ThreadListResponse (data: Thread[])",
+        "codex-rs/protocol/src/protocol.rs SessionMeta.forked_from_id (persisted rollout meta) and SessionConfiguredEvent.forked_from_id",
+        "codex-rs/app-server/src/request_processors/thread_processor.rs (thread_from_stored_thread maps stored forked_from_id back onto Thread; thread_started_notification after fork; update_thread_metadata inherits an explicit source name)",
+        "codex-rs/app-server/tests/suite/v2/thread_fork.rs (thread_fork_creates_new_thread_and_emits_started asserts forked_from_id and name:null; thread_fork_inherits_explicit_source_name_from_session_index; nested fork asserts forked_from_id of the middle Thread)",
+        "packages/codex-adapter/probe-projects-live.mjs (live probe: fork lineage recovered after app-server restart)"
+      ]
+    },
+    "sectionPlacement": {
+      "claim": "thread/fork copies no Thread.section: nothing in thread_fork_inner touches sections. In 0.149.0 the fork inherits the server-owned projectId (staged before the fork thread is created), but no ClientRequest assigns projectId, so Thread.section stays the membership authority this adapter consumes. The shipped adapter therefore moves the fork into the source's section after creation; when the section disappears in that race the fork remains a valid unsectioned Chat in Recents and the response reports placement.applied=false. The placement outcome is transient response data; the durable truth is the two Thread.section values.",
+      "sources": [
+        "codex-rs/app-server/src/request_processors/thread_processor.rs thread_fork_inner (inherited_project_id = source_thread.project_id; stage_pending_project_metadata(..., \"thread/fork\"); no section handling)",
+        "packages/codex-adapter/upstream-lock.json baselineDiff.addedToPinnedShapes (Thread.projectId owned by app-server; Thread.section stays the membership authority)",
+        "packages/codex-adapter/projects.mjs forkThread (post-fork thread/section/move; placement fallback record)",
+        "docs/proposals/codex-projects/project-object-contract.json migrationAndFailure.forkPlacementRace"
+      ]
+    },
+    "codexDesktop": {
+      "claim": "The Codex surface of the installed ChatGPT macOS app exposes fork as 'Continue in new chat': a hover button on each assistant message (tooltip 'Continue in new chat') and an app-scope command/shortcut forkThread titled 'Continue in new chat' / 'Create a new chat from the current chat'. That build implements fork-from-a-point as a head thread/fork followed by thread/rollback { threadId, numTurns } cutting the trailing Turns, uses thread/rollback numTurns:1 for edit-most-recent-message, names forks by walking the forkedFromId chain to the root and deduping as 'Title (N)', and reuses the source's git worktree through forkedFromId on cross-host handoff. No lineage-navigation UI (source chip, fork list, tree) was found in the bundle's strings; the observed forkedFromId consumers are title dedup and worktree reuse.",
+      "honesty": [
+        "Evidence is strings extracted from /Applications/ChatGPT.app/Contents/Resources/app.asar (bundle dated 2026-07-17); the bundled codex version is not stated in the strings and its protocol surface differs from pinned 0.149.0 (it also carries thread/turns/list and thread/metadata/update), so desktop claims are marked bundle-observed, not 0.149.0 claims.",
+        "Absence of lineage-UI strings is not proof the UI lacks one; it is reported as not found, unverified beyond strings.",
+        "In pinned 0.149.0 ThreadRollbackParams is documented 'DEPRECATED: thread/rollback will be removed soon', so lastTurnId — not fork+rollback — is the go-forward point-fork seam."
+      ]
+    }
+  },
+  "directions": {
+    "A-source-chip": {
+      "state": "reviewable in the real shell (?forkFixture=chip | chip-source | chip-missing)",
+      "replaces": "the raw ' · Fork of <uuid>' heading line",
+      "surface": "A navigable chip under the Chat heading: '⑂ Forked from <source title>' opens the source; the source side shows '⑂ N forks of this chat' listing each fork with its title, preview and group, each row opening that fork; a placement note appears when fork and source live in different groups.",
+      "canonicalData": [
+        "Thread.forkedFromId of the open Chat (thread/read)",
+        "listed Thread records of this folder for the title lookup and the fork listing (thread/list already carries forkedFromId on every row)",
+        "Thread.section of fork and source for the placement note",
+        "shared Turn-id prefix of the open pair for the divergence sub-line (derived; needs both transcripts)"
+      ],
+      "hostProjection": "None new: publicCodexThread already projects forkedFromId and project into bootstrap. Production would add one lazy thread/read of the source when the divergence sub-line is wanted; the chip itself needs nothing.",
+      "emptyStates": "A source no list carries renders as a non-navigable dashed chip naming the truncated source id and why nothing opens (archived, deleted, or another folder). A root Chat with no forks renders nothing.",
+      "keyboard": "Chip and fork rows are ordinary buttons in heading order; opening moves focus to the opened Chat's title (existing afterRenderFocus path)."
+    },
+    "B-sidebar-fork-tree": {
+      "state": "reviewable in the real shell (?forkFixture=sidebar)",
+      "surface": "Within each Sidebar list (a group's threads, Recents, Pinned) a fork indents one step under its source row with a branch glyph and an sr-only 'Fork ·' prefix; chains nest to a capped depth of 3; a fork whose source is not in the same list stays flat — no placeholder parent is invented.",
+      "canonicalData": ["forkedFromId on every listed row (already in bootstrap lists)"],
+      "hostProjection": "None: ordering and nesting are a pure browser projection over the rows one list already holds. The host keeps returning recency-ordered lists.",
+      "emptyStates": "Orphan forks (source archived, other folder, other list) render flat exactly as today; an empty group keeps its existing copy.",
+      "keyboard": "DOM order equals tree reading order, so Tab order is unchanged; rows stay the same buttons with the same rename affordance.",
+      "tradeoffNamed": "Nesting reorders a recency-sorted list: a fork touched yesterday renders under a source touched last week. The proposal names this as the direction's real cost; the capture shows it."
+    },
+    "C-bring-back": {
+      "state": "reviewable in the real shell (?forkFixture=bringback)",
+      "surface": "Selecting a finalized passage in a fork whose source is listed adds 'Bring back to source' to the selection sheet. It opens the source Chat and places the passage in its composer as a quote whose identity names the FORK's Thread, Turn and item; the tray labels it 'Brought back from fork <id> · Turn <id>'. The explicit send stays with the human; the review fixture refuses sends.",
+      "canonicalData": [
+        "the selection and its finalized item identity (existing selection sheet machinery)",
+        "Thread.forkedFromId of the open fork (target resolution)",
+        "quote-source.mjs: composeQuotedMessage serializes the fork identity into the Turn input; parseQuotedMessage renders it back on replay in any client; buildOrigin already carries forked_from_id for the explicit VibeHub bridge"
+      ],
+      "hostProjection": "None: the composer quote already supports cross-Thread identity and the send path already serializes it. Production cost is the selection-sheet button, the target-open step, and the tray label.",
+      "emptyStates": "No source listed (orphan fork) or no finalized selection: the action is simply absent — never a dead button.",
+      "keyboard": "The selection sheet is the existing toolbar; after the action, focus lands in the source composer."
+    },
+    "D-fork-from-here": {
+      "state": "defined, not built (no review surface; named for the decision list)",
+      "surface": "A per-assistant-message 'Fork from here' that calls thread/fork with lastTurnId = that Turn — the desktop's own affordance shape ('Continue in new chat' on each assistant message), on the stable 0.149.0 seam instead of the deprecated fork+rollback.",
+      "alreadyPlumbed": "scripts/vh-codex-first-shell.mjs forkThread action already accepts payload.lastTurnId and packages/codex-adapter/projects.mjs forkThread already forwards lastTurnId; only the browser affordance is missing.",
+      "openCost": "One control per finalized Turn (visual-weight decision), plus the same placement and lineage behavior the whole-Thread fork already has."
+    }
+  },
+  "compare": {
+    "definition": "Side-by-side reading of a fork against its source from their shared prefix: two thread/read transcripts, the derived shared Turn prefix as the alignment point, and a two-pane render of the divergent tails.",
+    "requires": ["two-pane transcript layout in the shell (new rendering surface)", "scroll coordination and a narrow-viewport story (stacked panes or a switcher)", "divergence alignment from the shared Turn prefix", "no protocol gap: both transcripts replay from thread/read"],
+    "cost": "A real layout surface with its own wide/narrow/Light/Dark/keyboard matrix — the largest single cost in this proposal — for a reading act two browser windows already approximate at zero cost.",
+    "recommendation": "Wait. Bring Back enters the next implementation; Compare returns only if daily use shows two-window reading failing."
+  },
+  "invariants": [
+    "A Chat fork is a Thread lineage edge, never a Subtask, Task or dependency.",
+    "Review surfaces mount only under the ?forkFixture gate; production fork behavior is unchanged by this proposal.",
+    "Fixtures answer every review interaction; sends are refused and no model is spent.",
+    "Nothing here invents durable records: lineage, placement and divergence render from what the pinned protocol already persists or what two transcripts derive.",
+    "Final visual identity remains owned by the visual-system Ticket."
+  ],
+  "reviewCommand": {
+    "serve": "npm run review:fork-chat",
+    "captures": "npm run review:fork-chat -- --captures"
+  }
+}
