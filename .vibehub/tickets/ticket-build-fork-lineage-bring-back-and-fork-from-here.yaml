@@ -1,0 +1,79 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "source-chip-and-fork-listing-are-production",
+      "criterion": "Every Thread whose forkedFromId names a listed Thread renders a navigable source chip in its heading showing the source title and opening the source on the chat route, with the derived shared-Turn note computed from the two transcripts' common Turn-id prefix and never invented; a source Thread's heading offers a fork listing naming each fork with its title and opening it; a fork whose source is missing from the current list renders the dashed non-navigable state naming the id; the raw Fork-of UUID line is gone; all states are covered by guard checks at 1280x800 and 390x844 in Light and Dark with keyboard paths and by node tests over the lineage projection."
+    },
+    {
+      "acceptance_id": "bring-back-is-an-explicit-labeled-send",
+      "criterion": "Inside a fork, selecting assistant text or acting on a finalized assistant message offers Bring back to source; confirming places a quote labeled with the exact fork Thread and Turn identity into the source Thread's composer draft using the existing quote-source serialization, navigates to the source with the draft visible, and sends nothing until the human sends; the sent message renders the quote with its fork identity on replay; the action is absent when the source is missing or archived and never mutates either transcript by itself; fixture-log guard checks prove the draft content, the single explicit turn/start and the replay rendering."
+    },
+    {
+      "acceptance_id": "fork-from-here-uses-the-stable-seam",
+      "criterion": "Every finalized assistant message of a settled Turn offers Fork from here, which calls the existing host fork action with lastTurnId set to that message's Turn so later Turns are omitted, never uses thread/rollback, is absent on live or user messages and while the runtime is halted, opens the created fork with its source chip present, and respects the placement handling already shipped; the fixture app-server honors lastTurnId truncation so guard checks prove the created fork's transcript ends at the chosen Turn, and one live check against the installed 0.149.0 proves a point fork's transcript truncation on the real runtime."
+    },
+    {
+      "acceptance_id": "fork-surfaces-hold-the-baseline-and-scope",
+      "criterion": "The new chip, listing, bring-back surface and per-message action trap focus where they open surfaces, close on Escape, restore focus, expose keyboard paths, meet the existing contrast floors in both themes and add no horizontal overflow at 390; a fork is never presented as a Task, Subtask or dependency and the sidebar gains no fork tree; the review-only forkReview surfaces stay gated and their fixtures keep passing; npm test, npm run verify, npm run probe:codex and npm run guard:codex pass by exit code, and the conformance matrix gains rows for the three shipped behaviors with proof fields naming the tests."
+    }
+  ],
+  "constraints": [
+    "Direction B, the sidebar fork tree, and Compare stay out; proposing them again requires a new owner decision.",
+    "The fork point is always derived from the transcripts, never persisted or inferred from names.",
+    "Bring Back sends nothing without an explicit human send and performs no transcription or summarization of the brought-back text.",
+    "Fork from here uses lastTurnId only; thread/rollback stays unused.",
+    "At most two live model Turns may be spent proving the point-fork truncation, and any Thread created live is deleted afterwards.",
+    "Final visual identity remains owned by the visual-system Ticket."
+  ],
+  "context": "The owner adopted the fork proposal's recommended composition over the reviewed pack: direction A first, C next, D after, B held for its recency-reorder cost and Compare deferred to a future two-pane surface. The proposal proved the seams: ThreadForkParams carries the stable lastTurnId for Turn-granularity point forks with later Turns omitted and in-progress Turns refused, the host action and adapter already accept lastTurnId with only the UI missing, forkedFromId persists in the rollout and survives restart, the fork point is not persisted and must be derived from the shared Turn-id prefix, a fork inherits no Thread.section so the shipped placement handling stands, and the review-only surfaces under state.forkReview demonstrate the chip, the missing-source state and the bring-back flow against fixtures. This Ticket promotes those directions into production behavior on the merged line, replacing the review gating for A and C with real data paths, adding the per-message fork entry, and keeping the pack's honest notes: the bring-back quote lands in the source composer while focus stays on the thread title unless implementation moves focus deliberately and proves it. The fork review fixtures and driver remain for regression. Sidebar tree and Compare are explicitly out.",
+  "context_refs": [
+    {
+      "purpose": "The owner's adopted composition this Ticket implements.",
+      "ref": ".vibehub/outcomes/ticket-decide-fork-chat-direction.yaml"
+    },
+    {
+      "purpose": "Human-origin record of the selection and exclusions.",
+      "ref": ".vibehub/evidence/ticket-decide-fork-chat-direction/owner-adopts-chip-bringback-then-fork-from-here.yaml"
+    },
+    {
+      "purpose": "The reviewed pack with directions, costs and honest notes.",
+      "ref": "docs/proposals/fork-chat/README.md"
+    },
+    {
+      "purpose": "Exact seams and corrected interaction notes the implementation consumes.",
+      "ref": "docs/proposals/fork-chat/fork-interaction-contract.json"
+    },
+    {
+      "purpose": "Review-only projections to promote or reuse.",
+      "ref": "apps/codex-first-shell/fork-review.mjs"
+    },
+    {
+      "purpose": "Quote serialization Bring Back extends with fork identity.",
+      "ref": "apps/codex-first-shell/quote-source.mjs"
+    },
+    {
+      "purpose": "Pinned thread/fork seam with stable lastTurnId.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "A fork is never a Task or dependency.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Fork chat ships the owner-adopted composition: a navigable source chip with the source-side fork listing replaces the raw lineage line, a selection in a fork can be brought back to its source composer as an explicitly sent labeled quote, and every finalized assistant message offers Fork from here on the stable lastTurnId seam, with the sidebar tree held and Compare deferred.",
+  "provenance_refs": [
+    "conversation:2026-08-23-owner-adopts-fork-proposal-recommendation"
+  ],
+  "relations": [
+    {
+      "rationale": "Implementation is authorized by the owner's recorded fork direction decision.",
+      "target_ticket_id": "ticket-decide-fork-chat-direction",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-fork-lineage-bring-back-and-fork-from-here"
+}
