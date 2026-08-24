@@ -8,6 +8,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
+import { formatRecordingClock, MAX_RECORDING_MS, RECORDING_MIME_TYPE } from "../apps/codex-first-shell/composer-recording.mjs";
 import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
 import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
 import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
@@ -291,9 +292,10 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
 });
 
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
-  const [html, script, server, eventWindow, registry, lock] = await Promise.all([
+  const [html, script, recording, server, eventWindow, registry, lock] = await Promise.all([
     source("apps/codex-first-shell/index.html"),
     source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/composer-recording.mjs"),
     source("scripts/vh-codex-first-shell.mjs"),
     source("apps/codex-first-shell/event-window.mjs"),
     source("apps/codex-first-shell/server-request-registry.mjs"),
@@ -307,6 +309,51 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.equal(capabilitySnapshot("codex").capabilities.audio.available, true);
   assert.match(server, /realtimeConversation: false/);
   assert.match(lock, /"stableTurnInputs": \["audio", "localAudio"\]/);
+  // The accepted data-URL mime the one ephemeral live probe Turn proved is
+  // recorded in the lock's audio block and is exactly the mimeType the
+  // shell's MediaRecorder produces.
+  const lockAudio = JSON.parse(lock).audio;
+  assert.deepEqual(lockAudio.acceptedDataUrlMimeTypes, [RECORDING_MIME_TYPE]);
+  assert.match(lockAudio.acceptedDataUrlMimeTypesProvenance, /probe:codex:live[^]*status completed/);
+  assert.equal(lockAudio.currentProbeResult, "protocol-present-current-ephemeral-thread-unsupported");
+  // Submission is the existing ordinary path, no second loop: a Turn whose
+  // content carries audio routes through validateInputs and sendChatAudio.
+  assert.match(server, /if \(types\.has\("audio"\)\) return harness\.sendChatAudio\(input\);/);
+  // The microphone is capability-gated: enabled only on runtime.audioInput
+  // true with getUserMedia present, otherwise visibly disabled and explained
+  // with the capability contract's own fallback text; DSH stays unsupported.
+  assert.match(script, /runtime\?\.audioInput === true && Boolean\(navigator\.mediaDevices\?\.getUserMedia\)/);
+  assert.match(server, /audioInputFallback: harness\.capabilities\.capabilities\.audio\.fallback/);
+  assert.match(capabilitySnapshot("codex").capabilities.audio.fallback, /hide microphone-live/);
+  assert.equal(capabilitySnapshot("dsh").capabilities.audio.available, false);
+  assert.match(capabilitySnapshot("dsh").capabilities.audio.fallback, /do not display a working microphone/);
+  assert.match(html, /id="voiceFallback"/);
+  assert.match(html, /id="recordingTray"/);
+  // Recording state: a persistent tray with a live timer counting toward the
+  // 90 second cap, the pulsing control, and the accessible-name swap.
+  assert.equal(MAX_RECORDING_MS, 90_000);
+  assert.equal(formatRecordingClock(0), "0:00 / 1:30");
+  assert.equal(formatRecordingClock(89_000), "1:29 / 1:30");
+  assert.match(script, /formatRecordingClock\(view\.elapsedMs, view\.capMs\)/);
+  assert.match(script, /recordingLive \? "Stop recording" : "Record voice input"/);
+  assert.match(script, /dataset\.recordingState = view\.status/);
+  // Cancel and Escape discard without attaching; a plain stop attaches the
+  // removable chip; send finishes the live recording inside the same Turn;
+  // every teardown path releases the MediaStream tracks.
+  assert.match(script, /data-cancel-recording/);
+  assert.match(script, /recording\.status\(\) === "recording"\) \{ recording\.cancel\(\); return; \}/);
+  assert.match(script, /await recording\.finishForSend\(\);/);
+  assert.match(script, /recording\.ensureReleased\(\)/);
+  // Permission denial: a persistent inline state naming the cause, never
+  // only a transient toast; retry re-prompts through the same control.
+  assert.match(recording, /NotAllowedError/);
+  assert.match(recording, /NotFoundError/);
+  assert.match(script, /recordingDeniedCause/);
+  assert.match(script, /data-dismiss-recording/);
+  // No claim anywhere that the audio becomes text, and no persistence seam:
+  // no storage API, no object or blob URL over the whole recording path.
+  assert.doesNotMatch(recording, /transcri|dictat|listening|speech/i);
+  assert.doesNotMatch(script + recording, /localStorage|sessionStorage|indexedDB|caches\.open|createObjectURL|revokeObjectURL/i);
   for (const decision of ["accept", "acceptForSession", "decline", "cancel"]) assert.match(registry, new RegExp(`"${decision}"`));
   assert.match(server, /item\/tool\/requestUserInput/);
   assert.match(server, /unsupportedServerRequestResult/);

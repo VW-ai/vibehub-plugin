@@ -567,6 +567,7 @@ const assets = new Map([
   ["/composer-queue.mjs", script("composer-queue.mjs")],
   ["/composer-settings.mjs", script("composer-settings.mjs")],
   ["/composer-attachments.mjs", script("composer-attachments.mjs")],
+  ["/composer-recording.mjs", script("composer-recording.mjs")],
   ["/composer-mentions.mjs", script("composer-mentions.mjs")],
   ["/context-usage.mjs", script("context-usage.mjs")],
   ["/thread-name.mjs", script("thread-name.mjs")],
@@ -1005,6 +1006,10 @@ function runtimeProjection() {
     baselineMatch: runtime.version === baselineVersion,
     local: true,
     audioInput: harness.capabilities.capabilities.audio.available,
+    // The truthful no-claim explanation the browser shows on the disabled
+    // microphone whenever audioInput is not granted: the capability
+    // contract's own fallback text, never a working-microphone claim.
+    audioInputFallback: harness.capabilities.capabilities.audio.fallback,
     realtimeConversation: false,
     generation: runtime.generation,
     alive: runtime.alive,

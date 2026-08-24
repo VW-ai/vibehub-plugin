@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "ordinary-audio-turn-submission-proven-live"
+  ],
+  "evidence_id": "ordinary-audio-turn-proven-live-with-locked-mime",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:25:05Z",
+  "refs": [
+    "commit:2a5c076",
+    "commit:b54621b",
+    "commit:3e6242e",
+    "packages/codex-adapter/probe-live.mjs",
+    "packages/codex-adapter/upstream-lock.json",
+    "scripts/vh-codex-first-shell.mjs",
+    "packages/harness-core/shell.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Send finishes a live recording into the same ordinary submission path, host validateInputs then harness sendChatAudio into one turn/start with no second Agent loop, asserted by the host routing test in b54621b and by a guard check proving one turn/start carrying a data audio webm opus URL and the sent message rendering its audio chip. Commit 2a5c076 extends packages/codex-adapter/probe-live.mjs with one ephemeral read-only Turn carrying a real Opus WebM sample as a data URL with the exact MediaRecorder mimeType the shell produces; run once against the authenticated installed 0.149.0 it reached turn/completed with status completed, the restarted process's listing verifiably omitted the ephemeral thread so nothing durable existed to delete, realtime was re-confirmed unavailable, and the lock's audio block records acceptedDataUrlMimeTypes audio webm codecs opus with provenance; npm run probe:codex stays green. One earlier probe launch threw before any Turn on a fresh worktree cwd and the probe now stops clients on every path and names the skipped stable-thread recovery clause, which is orthogonal to this criterion.",
+  "ticket_id": "ticket-build-codex-audio-input"
+}

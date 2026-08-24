@@ -558,6 +558,22 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .quote-tray strong { font-size: 10px; }
 .quote-tray small { color: var(--muted); font-size: 9px; }
 .quote-tray button { align-self: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; }
+/* Honest voice input: the persistent recording state with its elapsed clock
+   counting toward the cap and a distinct Cancel, and the persistent inline
+   permission-denied state naming the cause. The dot's pulse stops under
+   prefers-reduced-motion with every other animation. */
+.recording-tray { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 4px 7px; padding: 7px 9px; border: 1px solid var(--line-strong); border-radius: 10px; color: var(--text); background: var(--raised); font-size: 11px; }
+.recording-tray strong { font-size: 11px; }
+.recording-tray small { color: var(--muted); font-size: 10px; }
+.recording-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--danger); animation: pulse 1s ease-in-out infinite; }
+.recording-clock { color: var(--text); font: 11px/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+.recording-cancel { min-height: 26px; margin-left: auto; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--panel); font-size: 10px; }
+.recording-cancel:hover { border-color: var(--line-strong); }
+.recording-tray[data-recording-state="denied"] { border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
+.recording-tray[data-recording-state="denied"] strong { color: var(--danger); }
+.recording-denied-cause { flex: 1 1 200px; min-width: 0; color: var(--text); }
+.composer-icon[disabled] { opacity: .45; cursor: not-allowed; }
+.composer-icon[disabled]:hover { background: transparent; }
 .selection-sheet { position: fixed; z-index: 90; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; max-width: min(360px, calc(100vw - 16px)); padding: 4px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel); box-shadow: var(--shadow); }
 .selection-sheet .bridge-hint { margin: 2px 4px 3px; }
 .quote-selection { height: 29px; padding: 0 10px; border: 0; border-radius: 7px; color: var(--text); background: transparent; font-size: 10px; }

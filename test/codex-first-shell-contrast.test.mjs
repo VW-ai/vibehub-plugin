@@ -161,6 +161,15 @@ const MODELLED_RULES = [
   [".completion-badge", /\.thread-button em\.completion-badge \{[^}]*color: var\(--ok\); background: var\(--panel\); \}/],
   [".notification-setting", /\.notification-setting \{[^}]*color: var\(--text\);/],
   [".notification-setting select", /\.notification-setting select \{[^}]*border: 1px solid var\(--line\); border-radius: 7px; color: var\(--text\); background: var\(--panel\);/],
+  // Honest voice input: the recording tray with its live clock and Cancel,
+  // the persistent permission-denied state, and the disabled microphone.
+  [".recording-tray", /\.recording-tray \{[^}]*color: var\(--text\); background: var\(--raised\);/],
+  [".recording-tray small", /\.recording-tray small \{ color: var\(--muted\); font-size: 10px; \}/],
+  [".recording-dot", /\.recording-dot \{[^}]*background: var\(--danger\); animation: pulse/],
+  [".recording-clock", /\.recording-clock \{ color: var\(--text\); font: 11px\/1\.4 var\(--mono\); font-variant-numeric: tabular-nums; \}/],
+  [".recording-cancel", /\.recording-cancel \{[^}]*border: 1px solid var\(--line\); border-radius: 7px; color: var\(--text\); background: var\(--panel\);/],
+  [".recording-tray denied heading", /\.recording-tray\[data-recording-state="denied"\] strong \{ color: var\(--danger\); \}/],
+  [".composer-icon[disabled]", /\.composer-icon\[disabled\] \{ opacity: \.45; cursor: not-allowed; \}/],
 ];
 
 test("the contrast pair table models rules that still exist in app.css", () => {
@@ -308,6 +317,16 @@ function pairsFor(t) {
     text("completion badge (ok) on its panel fill", c("ok"), c("panel")),
     text("notification setting label on sidebar", c("text"), c("sidebar")),
     text("notification setting value on panel", c("text"), c("panel")),
+    // Honest voice input: the recording tray sits on raised, its Cancel on
+    // panel; the pulsing dot is a state indicator; the denied state names its
+    // cause in danger; the disabled microphone is exempt (SC 1.4.3), reported.
+    text("recording label and clock on recording tray (raised)", c("text"), c("raised")),
+    text("recording hint (muted) on recording tray (raised)", c("muted"), c("raised")),
+    text("recording Cancel label on panel", c("text"), c("panel")),
+    text("recording denied heading (danger) on raised", c("danger"), c("raised")),
+    text("recording denied cause on raised", c("text"), c("raised")),
+    ui("recording state dot (danger) on raised", c("danger"), c("raised")),
+    info("disabled microphone glyph (opacity .45)", blend(c("text"), 0.45, c("panel")), c("panel")),
     ui("queue edit boundary (field-line) on panel", c("field-line"), c("panel")),
     ui("rename input boundary (field-line) on panel", c("field-line"), c("panel")),
     ui("mention chip border (accent 70% over line) on accent 6% fill", blend(c("accent"), 0.7, c("line")), blend(c("accent"), 0.06, c("panel"))),

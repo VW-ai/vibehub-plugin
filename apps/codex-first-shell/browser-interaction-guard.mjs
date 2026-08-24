@@ -26,7 +26,7 @@ const focusableByTabindex = (node) => node.hasAttribute("tabindex") && Number(no
 const keyboardOperable = (node) => node.matches(NATIVE_OPERABLE) || focusableByTabindex(node);
 // Every selector the delegated click handler in app.js dispatches on. A match
 // that is neither a native control nor focusable has no keyboard path.
-const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]", "[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]"].join(", ");
+const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]", "[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]", "[data-cancel-recording]", "[data-dismiss-recording]"].join(", ");
 
 // Pointer-only gaps in the mounted document: click targets without a keyboard
 // path, and scroll regions (wheel or touch) that neither take focus nor hold a
@@ -1574,6 +1574,254 @@ export async function runBrowserInteractionGuard(hooks) {
     check(results, "bridge write checks need the seeded source Thread on a bound repository", !bridgeWrites, `seeded ${Boolean(seedThread)} · scope ${bridgeBootstrap?.project?.scope}`);
   }
   window.__VIBEHUB_BRIDGE_GUARD__ = bridgeSummary;
+
+  // --- Honest voice input ----------------------------------------------------
+  // The recording checks run on stubbed capture devices: navigator.mediaDevices
+  // and MediaRecorder are replaced in this page for the duration of this
+  // section, and window.__VIBEHUB_RECORDING_SEAM__ may shorten the cap so the
+  // auto-stop causes are observable. That stub is the documented test seam —
+  // the one ephemeral live probe in packages/codex-adapter/probe-live.mjs is
+  // the real-device, real-runtime proof — so no real microphone or permission
+  // prompt takes part here, and every state below is driven deterministically.
+  {
+    const capture = { calls: 0, mode: "grant", streams: [], recorders: [], gate: null };
+    class GuardTrack { constructor() { this.stopped = 0; } stop() { this.stopped += 1; } }
+    class GuardStream { constructor() { this.tracks = [new GuardTrack(), new GuardTrack()]; } getTracks() { return this.tracks; } }
+    class GuardRecorder {
+      static isTypeSupported() { return true; }
+      constructor(stream, options = {}) { this.stream = stream; this.mimeType = options.mimeType ?? "audio/webm;codecs=opus"; this.state = "inactive"; capture.recorders.push(this); }
+      start() { this.state = "recording"; }
+      stop() { if (this.state !== "recording") return; this.state = "inactive"; this.onstop?.(); }
+      emit(bytes) { this.ondataavailable?.({ data: new Blob([new Uint8Array(bytes)], { type: this.mimeType }) }); }
+    }
+    const stubDevices = {
+      getUserMedia: () => {
+        capture.calls += 1;
+        if (capture.mode === "deny") return Promise.reject(Object.assign(new Error("Permission denied by the guard stub"), { name: "NotAllowedError" }));
+        if (capture.mode === "manual") return new Promise((resolve) => { capture.gate = () => { const stream = new GuardStream(); capture.streams.push(stream); resolve(stream); }; });
+        const stream = new GuardStream();
+        capture.streams.push(stream);
+        return Promise.resolve(stream);
+      },
+    };
+    const realRecorder = window.MediaRecorder;
+    const installDevices = (value) => Object.defineProperty(navigator, "mediaDevices", { configurable: true, value });
+    installDevices(stubDevices);
+    window.MediaRecorder = GuardRecorder;
+    const voice = document.querySelector("#voiceButton");
+    const recordingTray = document.querySelector("#recordingTray");
+    const attachmentTray = document.querySelector("#attachmentTray");
+    const note = document.querySelector("#composerNote");
+    const clockText = () => document.querySelector("#recordingClock")?.textContent ?? "";
+    const lastTracksStopped = () => (capture.streams.at(-1)?.getTracks() ?? []).every((track) => track.stopped > 0);
+    const audioFailure = (name, error) => check(results, name, false, `threw: ${error?.message ?? error}`);
+    // Each area is negatively controlled on its own: a shell without the
+    // recording UI (or its hooks) fails that area's named check instead of
+    // silently skipping it or stalling the run.
+    const area = async (name, run) => { try { await run(); } catch (error) { audioFailure(name, error); } };
+    const record = async () => {
+      voice.click();
+      if (!(await waitFor(() => recordingTray.dataset.recordingState === "recording"))) throw new Error("recording state never rendered");
+    };
+    try {
+      // Capability gating: the disabled microphone explains itself with the
+      // capability contract's own fallback text and claims nothing.
+      await area("an unavailable audio capability disables the microphone visibly, explained by the capability fallback text", async () => {
+        await hooks.setRuntimeAudioInput(false);
+        const audioFallback = hooks.currentBootstrap()?.runtime?.audioInputFallback ?? "";
+        const callsBefore = capture.calls;
+        voice.click();
+        await frame();
+        checkAll(results, "an unavailable audio capability disables the microphone visibly, explained by the capability fallback text", {
+          disabled: voice.disabled,
+          visiblyDisabled: Number(getComputedStyle(voice).opacity) < 0.6 && getComputedStyle(voice).cursor === "not-allowed",
+          fallbackIsTheExplanation: audioFallback.length > 0 && voice.title === audioFallback && document.querySelector("#voiceFallback")?.textContent === audioFallback && voice.getAttribute("aria-describedby") === "voiceFallback",
+          fallbackIsTheContractText: /hide microphone-live/.test(audioFallback),
+          noWorkingMicrophoneClaim: voice.getAttribute("aria-label") === "Record voice input" && !voice.classList.contains("recording") && recordingTray.hidden,
+          clickPromptsNothing: capture.calls === callsBefore,
+        }, audioFallback.slice(0, 60));
+        await hooks.setRuntimeAudioInput(true);
+        installDevices(undefined);
+        await hooks.setRuntimeAudioInput(true);
+        check(results, "a browser without getUserMedia keeps the microphone disabled with the same explanation", voice.disabled && voice.title === audioFallback);
+        installDevices(stubDevices);
+        await hooks.setRuntimeAudioInput(true);
+        check(results, "audioInput true with getUserMedia present enables the microphone", !voice.disabled && voice.getAttribute("aria-describedby") === null && voice.title === "Record voice input");
+      });
+
+      // Recording state and timer: the UI appears only once a MediaStream is
+      // live, pulses, swaps the accessible name, announces the start, ticks
+      // toward the 90 second cap, and a plain stop attaches the removable chip.
+      await area("recording renders its persistent state with a live timer toward the 90 second cap", async () => {
+        capture.mode = "manual";
+        voice.click();
+        await frame();
+        const beforeStream = { trayHidden: recordingTray.hidden, recordingClass: voice.classList.contains("recording"), aria: voice.getAttribute("aria-label") };
+        capture.gate?.();
+        capture.mode = "grant";
+        await waitFor(() => recordingTray.dataset.recordingState === "recording" && !recordingTray.hidden);
+        const startClock = clockText();
+        checkAll(results, "recording renders its persistent state with a live timer toward the 90 second cap, pulses the control and swaps its accessible name — only once a MediaStream is live", {
+          noUiBeforeTheStream: beforeStream.trayHidden && !beforeStream.recordingClass && beforeStream.aria === "Record voice input",
+          persistentState: !recordingTray.hidden && recordingTray.dataset.recordingState === "recording",
+          clockCountsTowardTheCap: /^0:0\d \/ 1:30$/.test(startClock),
+          pulses: voice.classList.contains("recording") && getComputedStyle(voice).animationName === "pulse",
+          accessibleNameSwapped: voice.getAttribute("aria-label") === "Stop recording",
+          startAnnouncedPolitely: note.getAttribute("aria-live") === "polite" && note.textContent.includes("Recording locally toward the 90 second cap"),
+          distinctCancel: Boolean(recordingTray.querySelector("[data-cancel-recording]")),
+        }, `clock ${startClock}`);
+        const ticked = await waitFor(() => clockText() !== startClock && clockText() !== "", 240);
+        check(results, "the elapsed timer ticks while recording", ticked && /^0:\d\d \/ 1:30$/.test(clockText()), `${startClock} → ${clockText()}`);
+        capture.recorders.at(-1).emit(2_048);
+        voice.click();
+        await waitFor(() => recordingTray.hidden && !attachmentTray.hidden);
+        const chip = attachmentTray.querySelector('[data-attachment-type="audio"]');
+        checkAll(results, "plain Stop attaches a removable audio chip, stops the MediaStream tracks and announces the ordinary audio input", {
+          removableChip: Boolean(chip?.querySelector("[data-remove-attachment]")) && (chip?.textContent ?? "").includes("Voice recording.webm"),
+          idleAgain: recordingTray.hidden && voice.getAttribute("aria-label") === "Record voice input" && !voice.classList.contains("recording"),
+          tracksStopped: lastTracksStopped(),
+          announced: note.textContent.includes("attached as ordinary Codex audio input"),
+        });
+        chip?.querySelector("[data-remove-attachment]")?.click();
+        await frame();
+        voice.click();
+        const rerecordAfterRemoval = await waitFor(() => recordingTray.dataset.recordingState === "recording");
+        check(results, "recording again immediately after removing the chip succeeds", rerecordAfterRemoval && attachmentTray.hidden);
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        await waitFor(() => recordingTray.hidden);
+      });
+
+      // Cancel and Escape end the recording without attaching.
+      await area("Cancel ends the recording without attaching: tracks stop, buffered chunks drop, no chip appears", async () => {
+        await record();
+        capture.recorders.at(-1).emit(1_024);
+        recordingTray.querySelector("[data-cancel-recording]").click();
+        await waitFor(() => recordingTray.hidden);
+        checkAll(results, "Cancel ends the recording without attaching: tracks stop, buffered chunks drop, no chip appears", {
+          noChip: attachmentTray.hidden,
+          tracksStopped: lastTracksStopped(),
+          discardAnnounced: note.textContent.includes("Recording discarded. Nothing was attached."),
+          idle: voice.getAttribute("aria-label") === "Record voice input",
+        });
+        await record();
+        capture.recorders.at(-1).emit(1_024);
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        await waitFor(() => recordingTray.hidden);
+        checkAll(results, "Escape ends the recording without attaching, and recording again right away succeeds", {
+          noChip: attachmentTray.hidden,
+          tracksStopped: lastTracksStopped(),
+          discardAnnounced: note.textContent.includes("Recording discarded. Nothing was attached."),
+        });
+      });
+
+      // The auto-stop causes, each announced through the polite composer note:
+      // the duration cap (shortened through the documented seam) and the size
+      // bound (the real 8 MiB bound, crossed with one oversized chunk).
+      await area("the duration cap and the size bound auto-stop the recording with their causes announced", async () => {
+        window.__VIBEHUB_RECORDING_SEAM__ = { capMs: 900 };
+        await record();
+        capture.recorders.at(-1).emit(512);
+        await waitFor(() => recordingTray.hidden, 240);
+        checkAll(results, "the duration cap auto-stops the recording with its cause announced and the bounded chip attached", {
+          capAnnounced: /auto-stopped at the 1 second cap/.test(note.textContent),
+          chipAttached: Boolean(attachmentTray.querySelector('[data-attachment-type="audio"]')),
+          tracksStopped: lastTracksStopped(),
+        }, note.textContent.slice(0, 80));
+        delete window.__VIBEHUB_RECORDING_SEAM__;
+        attachmentTray.querySelector("[data-remove-attachment]")?.click();
+        await frame();
+        await record();
+        capture.recorders.at(-1).emit(8 * 1024 * 1024 + 1);
+        await waitFor(() => recordingTray.hidden);
+        checkAll(results, "the size bound auto-stops the recording with its cause announced and attaches nothing", {
+          sizeAnnounced: /8 MiB attachment bound and was not attached/.test(note.textContent),
+          noChip: attachmentTray.hidden,
+          tracksStopped: lastTracksStopped(),
+        }, note.textContent.slice(0, 80));
+      });
+
+      // Permission denial: a persistent inline state naming the cause (not
+      // only a transient toast), the control back to idle, retry re-prompting.
+      await area("a denied prompt renders a persistent inline state naming the cause, with the control back to idle and no recording UI without a stream", async () => {
+        capture.mode = "deny";
+        const streamsBeforeDenial = capture.streams.length;
+        const callsBeforeDenial = capture.calls;
+        voice.click();
+        await waitFor(() => recordingTray.dataset.recordingState === "denied");
+        await hooks.reconcile();
+        checkAll(results, "a denied prompt renders a persistent inline state naming the cause, with the control back to idle and no recording UI without a stream", {
+          persistentInlineState: !recordingTray.hidden && recordingTray.dataset.recordingState === "denied",
+          namesTheCause: Boolean(document.querySelector("#recordingDeniedCause")) && recordingTray.textContent.includes("Microphone access was denied"),
+          notOnlyTheToast: recordingTray.textContent.includes("try again") && !recordingTray.hidden,
+          idleControl: voice.getAttribute("aria-label") === "Record voice input" && !voice.classList.contains("recording") && !voice.disabled,
+          noStreamNoRecordingUi: capture.streams.length === streamsBeforeDenial,
+        }, recordingTray.textContent.slice(0, 80));
+        capture.mode = "grant";
+        await record();
+        check(results, "retry after a denial re-prompts the browser and records", capture.calls === callsBeforeDenial + 2 && recordingTray.dataset.recordingState === "recording");
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        await waitFor(() => recordingTray.hidden);
+      });
+
+      // Send while recording: one ordinary turn/start carries the audio data
+      // URL with the shell's exact MediaRecorder mimeType, the sent message
+      // renders its audio chip, attachments clear, tracks stop.
+      await area("send finishes the live recording into the same ordinary Turn: one turn/start carries the audio data URL with the shell's MediaRecorder mimeType, the sent message renders its audio chip, attachments clear, tracks stop", async () => {
+        await hooks.switchFixtureThread(fixture.secondaryThread);
+        const sendActions = [];
+        let sentInput = null;
+        const audioThread = structuredClone(fixture.secondaryThread);
+        await hooks.withFixtureTransport(async (payload) => {
+          sendActions.push(payload);
+          if (payload.action === "startTurn") {
+            sentInput = payload.input;
+            audioThread.turns = [...(audioThread.turns ?? []), { id: "guard-audio-turn", status: "completed", items: [{ type: "userMessage", id: "guard-audio-user", content: structuredClone(payload.input) }] }];
+            audioThread.status = { type: "idle" };
+            return { turn: { id: "guard-audio-turn", status: "inProgress" } };
+          }
+          if (payload.action === "readThread") return { thread: structuredClone(audioThread) };
+          if (payload.action === "listQueue") return { queue: { threadId: audioThread.id, items: [], paused: false, pausedReason: null } };
+          return {};
+        }, async () => {
+          await record();
+          capture.recorders.at(-1).emit(2_048);
+          const input = document.querySelector("#composerInput");
+          input.value = "voice note for the guard";
+          input.dispatchEvent(new InputEvent("input", { bubbles: true }));
+          document.querySelector("#composer").requestSubmit();
+          await waitFor(() => sendActions.some((entry) => entry.action === "startTurn"), 240);
+          await waitFor(() => document.querySelector(".turn.user .message-attachment"), 240);
+          const audioItem = (sentInput ?? []).find((item) => item.type === "audio");
+          checkAll(results, "send finishes the live recording into the same ordinary Turn: one turn/start carries the audio data URL with the shell's MediaRecorder mimeType, the sent message renders its audio chip, attachments clear, tracks stop", {
+            oneTurnStart: sendActions.filter((entry) => entry.action === "startTurn").length === 1,
+            audioDataUrlWithShellMime: Boolean(audioItem) && audioItem.url.startsWith("data:audio/webm;codecs=opus;base64,"),
+            textTravelsBeside: (sentInput ?? []).some((item) => item.type === "text" && item.text === "voice note for the guard"),
+            sentMessageRendersAudioChip: (document.querySelector(".turn.user .message-attachment")?.textContent ?? "").includes("Audio attachment"),
+            attachmentsClearAfterSend: attachmentTray.hidden,
+            tracksStopped: lastTracksStopped(),
+            recordingIdle: recordingTray.hidden,
+          }, `${(sentInput ?? []).map((item) => item.type).join(",")}`);
+        });
+      });
+
+      // View teardown: switching Threads discards the live recording.
+      await area("switching Threads is view teardown: the live recording is discarded with its tracks stopped and no chip", async () => {
+        await record();
+        capture.recorders.at(-1).emit(256);
+        await hooks.switchFixtureThread(fixture.thread);
+        checkAll(results, "switching Threads is view teardown: the live recording is discarded with its tracks stopped and no chip", {
+          trayGone: recordingTray.hidden,
+          tracksStopped: lastTracksStopped(),
+          noChip: attachmentTray.hidden,
+        });
+      });
+    } finally {
+      delete window.__VIBEHUB_RECORDING_SEAM__;
+      window.MediaRecorder = realRecorder;
+      delete navigator.mediaDevices;
+      await hooks.setRuntimeAudioInput?.(true);
+    }
+  }
 
   // The two remaining overlays: the Task inbox and the product boundary notes
   // open as contained modals, take focus, and Escape returns it to the trigger.

@@ -1,6 +1,7 @@
 import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "./chat-model.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "./composer-settings.mjs";
 import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES, renderAttachmentChips } from "./composer-attachments.mjs";
+import { createRecordingController, formatRecordingClock, MAX_RECORDING_MS, recordingMimeType } from "./composer-recording.mjs";
 import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, placeholderFor, removePlaceholder } from "./composer-mentions.mjs";
 import { compactDisabledReason, contextUsage } from "./context-usage.mjs";
 import { renameThreadRecord } from "./thread-name.mjs";
@@ -50,8 +51,6 @@ const state = {
   running: false,
   currentTurnId: null,
   attachments: [],
-  recorder: null,
-  recordingStream: null,
   themeIndex: 0,
   searchResults: [],
   searchIndex: 0,
@@ -153,8 +152,6 @@ let mentionSearchSequence = 0;
 // while a Turn is live, Send otherwise); Alt+Enter takes the opposite
 // (steer the live Turn). The flag is read once by submitTurn.
 let composerSubmitMode = "default";
-
-const MAX_RECORDING_MS = 90_000;
 
 const token = location.hash.slice(1);
 const reviewFrame = new URLSearchParams(location.search).get("reviewFrame");
@@ -736,6 +733,9 @@ function syncThreadLocation() {
 
 function setRoute(route) {
   captureRequestDrafts(surface);
+  // View teardown ends a live recording without attaching: navigating to a
+  // different route discards it and stops the MediaStream tracks.
+  if (route !== state.route) recording.ensureReleased();
   // Leaving a Task Workspace that has no Codex Thread yet: its pending Quote
   // into Task stays keyed to the Task, and never leaks into ordinary Chat.
   if (state.route === "task" && route !== "task" && !state.activeThreadId) {
@@ -780,8 +780,11 @@ function syncComposerMode() {
   if (!state.creatingThread) $("#newThread").disabled = halted;
   for (const fork of $$("[data-fork-thread]")) fork.disabled = state.fixtureMode || state.running || halted;
   renderContextIndicator();
+  syncVoiceCapability();
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : queueing ? "Queue a follow-up for after this Turn" : "Ask Codex to do something";
-  $("#composerNote").textContent = taskMode
+  // A live recording owns the composer note (its start announcement stays up);
+  // every other posture writes the note as before.
+  if (recording.status() !== "recording") $("#composerNote").textContent = taskMode
     ? (linked
       ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.`
       : state.composerQuote
@@ -2068,6 +2071,9 @@ function restoreTaskQuoteDraft(ticketId) {
 }
 
 function captureComposerDraft(threadId = state.activeThreadId) {
+  // Leaving the Thread that owns the Composer is view teardown for a live
+  // recording: tracks stop and nothing is attached to the next Thread.
+  recording.ensureReleased();
   if (!threadId) { captureTaskQuoteDraft(); return; }
   saveThreadDraft(state.composerDrafts, threadId, {
     text: $("#composerInput").value,
@@ -2141,46 +2147,88 @@ function fileToDataUrl(file) {
   });
 }
 
-async function toggleRecording() {
-  if (state.recorder?.state === "recording") {
-    state.recorder.stop();
-    return;
+// --- Honest voice input -----------------------------------------------------
+// Capability-gated recording through composer-recording.mjs: record locally,
+// review as a removable chip, send as the stable ordinary Codex audio input.
+// The audio is never turned into text and no live-conversation control
+// exists. The recording seam below exists for the browser guard only: it stubs
+// navigator.mediaDevices and MediaRecorder in this page and may shorten the
+// cap through window.__VIBEHUB_RECORDING_SEAM__ so the auto-stop causes are
+// observable in a test run; the ephemeral live probe in
+// packages/codex-adapter/probe-live.mjs is the real-device proof. Outside the
+// guard the seam is absent and the production cap holds.
+
+const recording = createRecordingController({
+  getUserMedia: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+  createRecorder: (stream) => {
+    const mimeType = recordingMimeType(globalThis.MediaRecorder);
+    return new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  },
+  capMs: () => window.__VIBEHUB_RECORDING_SEAM__?.capMs ?? MAX_RECORDING_MS,
+  maxBytes: MAX_ATTACHMENT_BYTES,
+  attach: async ({ chunks, mimeType }) => {
+    const blob = new Blob(chunks, { type: mimeType || "audio/webm" });
+    const extension = (mimeType || "audio/webm").split("/")[1]?.split(";")[0] ?? "webm";
+    const file = new File([blob], `Voice recording.${extension}`, { type: blob.type });
+    return addAttachment(file, await fileToDataUrl(file));
+  },
+  render: renderRecording,
+  announce: (text) => { $("#composerNote").textContent = text; },
+});
+
+// The persistent recording surface: the live state with its elapsed timer
+// counting toward the cap and a distinct Cancel, or the persistent inline
+// permission-denied state naming the cause. Neither is a live region — the
+// polite announcements travel through the composer note — and the recording
+// state renders only while the controller holds an active MediaStream.
+function renderRecording(view) {
+  const tray = $("#recordingTray");
+  const button = $("#voiceButton");
+  tray.dataset.recordingState = view.status;
+  tray.hidden = view.status === "idle";
+  if (view.status === "recording") {
+    if (!$("#recordingClock", tray)) {
+      tray.innerHTML = `<span class="recording-dot" aria-hidden="true"></span><strong>Recording</strong><span class="recording-clock" id="recordingClock">${escapeHtml(formatRecordingClock(0, view.capMs))}</span><small>Stop attaches a reviewable chip · Escape discards</small><button type="button" class="recording-cancel" data-cancel-recording aria-label="Cancel recording and discard it">Cancel</button>`;
+    }
+    $("#recordingClock", tray).textContent = formatRecordingClock(view.elapsedMs, view.capMs);
+  } else if (view.status === "denied") {
+    tray.innerHTML = `<strong>Voice input unavailable</strong><span class="recording-denied-cause" id="recordingDeniedCause">${escapeHtml(view.deniedCause ?? "")}</span><button type="button" class="recording-cancel" data-dismiss-recording aria-label="Dismiss the microphone error">Dismiss</button>`;
+  } else {
+    tray.innerHTML = "";
   }
-  if (!state.bootstrap.runtime.audioInput || !navigator.mediaDevices?.getUserMedia) return notify("Voice input is unavailable in this browser.");
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const chunks = [];
-    let recordedBytes = 0;
-    const recorder = new MediaRecorder(stream);
-    state.recorder = recorder;
-    state.recordingStream = stream;
-    const stopTimer = setTimeout(() => {
-      if (recorder.state === "recording") recorder.stop();
-    }, MAX_RECORDING_MS);
-    recorder.ondataavailable = (event) => {
-      if (!event.data.size) return;
-      recordedBytes += event.data.size;
-      if (recordedBytes <= MAX_ATTACHMENT_BYTES) chunks.push(event.data);
-      if (recordedBytes > MAX_ATTACHMENT_BYTES && recorder.state === "recording") recorder.stop();
-    };
-    recorder.onstop = async () => {
-      clearTimeout(stopTimer);
-      if (recordedBytes > MAX_ATTACHMENT_BYTES) notify("Voice recording exceeded the 8 MiB local attachment limit and was not attached.");
-      const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
-      const file = new File([blob], "Voice recording.webm", { type: blob.type });
-      if (recordedBytes <= MAX_ATTACHMENT_BYTES) addAttachment(file, await fileToDataUrl(file));
-      stream.getTracks().forEach((track) => track.stop());
-      state.recorder = null;
-      state.recordingStream = null;
-      $("#voiceButton").classList.remove("recording");
-      $("#voiceButton").setAttribute("aria-label", "Record voice input");
-      $("#composerNote").textContent = "Voice recording is attached as ordinary Codex audio input.";
-    };
-    recorder.start(1_000);
-    $("#voiceButton").classList.add("recording");
-    $("#voiceButton").setAttribute("aria-label", "Stop recording");
-    $("#composerNote").textContent = "Recording locally… Select the microphone again to stop.";
-  } catch (error) { notify(`Microphone unavailable: ${error.message}`); }
+  const recordingLive = view.status === "recording";
+  button.classList.toggle("recording", recordingLive);
+  button.setAttribute("aria-label", recordingLive ? "Stop recording" : "Record voice input");
+  if (!button.disabled) button.title = recordingLive ? "Stop recording" : "Record voice input";
+}
+
+// The Composer microphone is enabled only when the bootstrap runtime reports
+// audioInput true from the harness capability contract and
+// navigator.mediaDevices.getUserMedia exists; otherwise it is a visibly
+// disabled control whose explanation is the capability fallback text, never a
+// working-microphone claim.
+function syncVoiceCapability() {
+  const button = $("#voiceButton");
+  const runtime = state.bootstrap?.runtime;
+  const available = runtime?.audioInput === true && Boolean(navigator.mediaDevices?.getUserMedia);
+  const fallback = runtime?.audioInputFallback ?? "Keep text input; this runtime does not accept audio input.";
+  button.disabled = !available;
+  if (available) {
+    button.removeAttribute("aria-describedby");
+    $("#voiceFallback").textContent = "";
+    button.title = recording.status() === "recording" ? "Stop recording" : "Record voice input";
+  } else {
+    recording.ensureReleased();
+    button.setAttribute("aria-describedby", "voiceFallback");
+    $("#voiceFallback").textContent = fallback;
+    button.title = fallback;
+  }
+}
+
+async function toggleRecording() {
+  if (recording.status() === "recording") { recording.stop(); return; }
+  if ($("#voiceButton").disabled) return;
+  await recording.start();
 }
 
 function clearComposerAfterSend(textarea) {
@@ -2200,6 +2248,10 @@ async function submitTurn(event) {
   event.preventDefault();
   const mode = composerSubmitMode;
   composerSubmitMode = "default";
+  // Send while recording is a plain stop the send awaits: the MediaStream
+  // tracks stop and the bounded chip joins state.attachments before the
+  // input array is built, so the audio travels inside this same ordinary Turn.
+  if (recording.status() === "recording") await recording.finishForSend();
   const textarea = $("#composerInput");
   const text = textarea.value.trim();
   if (!text && !state.attachments.length && !state.composerQuote) return;
@@ -3662,7 +3714,15 @@ document.addEventListener("click", async (event) => {
     return;
   }
   const remove = event.target.closest("[data-remove-attachment]");
-  if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
+  if (remove) {
+    const index = Number(remove.dataset.removeAttachment);
+    // Removing an audio chip never leaves live capture behind: any recording
+    // still running is discarded, so recording again right away succeeds.
+    if (state.attachments[index]?.type === "audio") recording.ensureReleased();
+    state.attachments.splice(index, 1);
+    renderAttachments();
+    return;
+  }
   const removeMentionButton = event.target.closest("[data-remove-mention]");
   if (removeMentionButton) { removeMention(Number(removeMentionButton.dataset.removeMention)); return; }
   if (event.target.closest("[data-remove-quote]")) { state.composerQuote = null; renderComposerQuote(); return; }
@@ -3847,6 +3907,12 @@ composerForm.addEventListener("drop", async (event) => {
   $("#composerInput").focus();
 });
 $("#voiceButton").addEventListener("click", toggleRecording);
+$("#recordingTray").addEventListener("click", (event) => {
+  // The distinct Cancel ends the recording without attaching; Dismiss clears
+  // the persistent permission-denied state (the microphone re-prompts anyway).
+  if (event.target.closest("[data-cancel-recording]")) recording.cancel();
+  else if (event.target.closest("[data-dismiss-recording]")) recording.dismissDenied();
+});
 $("#composer").addEventListener("submit", submitTurn);
 $("#composerInput").addEventListener("keydown", (event) => {
   // The open mention picker takes the navigation keys: ↑↓ move, ↵ or Tab
@@ -3966,6 +4032,9 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   if (event.key === "Escape") {
+    // Escape ends a live recording without attaching: tracks stop, buffered
+    // chunks drop, no chip appears.
+    if (recording.status() === "recording") { recording.cancel(); return; }
     if (!$("#searchDialog").hidden) closeSearch();
     else if (openBridgeDialog()) closeOpenBridgeDialog();
     else if (!$("#fullAccessDialog").hidden) closeFullAccessDialog();
@@ -4217,6 +4286,14 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     },
     currentProject: () => state.bootstrap?.project ?? null,
     currentBootstrap: () => state.bootstrap ?? null,
+    // Swap only the host-reported audio capability so the guard can observe
+    // the truthfully disabled microphone; the fallback text stays the host's.
+    setRuntimeAudioInput: async (audioInput) => {
+      state.bootstrap = { ...state.bootstrap, runtime: { ...state.bootstrap?.runtime, audioInput } };
+      syncComposerMode();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+    recordingStatus: () => recording.status(),
     // The process generation the browser currently holds, so a synthetic
     // event window can name it and never trigger a generation-change re-read.
     currentRuntimeGeneration: () => state.runtimeGeneration,
