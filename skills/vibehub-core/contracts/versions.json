@@ -2,6 +2,8 @@
   "schema_version": 1,
   "project_format": 2,
   "document_schemas": {
-    "ticket": 2
+    "ticket": 2,
+    "evidence": 2,
+    "outcome": 2
   }
 }
