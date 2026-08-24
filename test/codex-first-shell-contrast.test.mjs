@@ -114,6 +114,14 @@ const MODELLED_RULES = [
   ["selected attach row", /\.attach-row\[aria-pressed="true"\] \{ border-color: var\(--accent\); background: color-mix\(in srgb, var\(--accent\) 8%, transparent\);/],
   [".attach-row .attach-provenance", /\.attach-row \.attach-provenance \{ color: var\(--accent\);/],
   [".attach-row > em", /\.attach-row > em \{ color: var\(--faint\);/],
+  // Fork lineage surfaces: the source chip, the derived note, the missing
+  // state and the fork listing rows in the Chat heading.
+  [".lineage-chip", /\.lineage-chip \{[^}]*border: 1px solid var\(--line-strong\);[^}]*color: var\(--muted\); background: var\(--panel\);/],
+  [".lineage-chip strong", /\.lineage-chip strong \{[^}]*color: var\(--text\);/],
+  [".lineage-chip.is-missing", /\.lineage-chip\.is-missing \{ border-style: dashed; color: var\(--faint\); background: transparent; \}/],
+  [".lineage-note", /\.lineage-note \{ color: var\(--faint\);/],
+  [".lineage-placement", /\.lineage-note\.lineage-placement \{ color: var\(--warn\); \}/],
+  [".fork-row small", /\.fork-row small \{[^}]*color: var\(--muted\);/],
   [".selection-sheet", /\.selection-sheet \{[^}]*background: var\(--panel\);/],
   [".quote-selection[disabled]", /\.quote-selection\[disabled\] \{ opacity: \.4;/],
   ["provenance edge", /\.graph-edges path\[data-edge-kind="provenance"\] \{ stroke: color-mix\(in srgb, var\(--accent\) 75%, transparent\); stroke-dasharray: 5 4; \}/],
@@ -270,6 +278,17 @@ function pairsFor(t) {
     text("body text on selected attach row", c("text"), blend(c("accent"), 0.08, c("panel"))),
     text("selection sheet action label on panel", c("text"), c("panel")),
     text("bridge confirm label on accent", c("on-accent"), c("accent")),
+    // Fork lineage: the chip sits on the heading canvas with a panel fill;
+    // the derived note and the missing state are faint text on the canvas;
+    // the placement note is warn on the canvas; listing rows sit on canvas.
+    text("fork lineage chip label (muted) on panel", c("muted"), c("panel")),
+    text("fork lineage chip source title on panel", c("text"), c("panel")),
+    text("fork lineage missing state (faint) on canvas", c("faint"), c("bg")),
+    text("fork lineage derived note (faint) on canvas", c("faint"), c("bg")),
+    text("fork placement note (warn) on canvas", c("warn"), c("bg")),
+    text("fork listing row title on canvas", c("text"), c("bg")),
+    text("fork listing row detail (muted) on canvas", c("muted"), c("bg")),
+    info("fork lineage chip boundary (line-strong) on panel (exempt: the chip carries its own text label)", c("line-strong"), c("panel")),
     ui("bridge field boundary on panel", c("field-line"), c("panel")),
     ui("selected attach row border on panel", c("accent"), c("panel")),
     ui("association link, provenance node and origin chip border (accent 70% over line) on panel", blend(c("accent"), 0.7, c("line")), c("panel")),

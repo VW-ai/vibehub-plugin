@@ -898,7 +898,7 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
       }
     }
   }
-  for (const id of ["selection-during-stream", "quote-add-to-chat", "markdown-rich-content", "request-user-input", "composer-inputs", "current-thread-url-recovery", "running-composer-steer", "model-mode-pickers"]) {
+  for (const id of ["selection-during-stream", "quote-add-to-chat", "markdown-rich-content", "request-user-input", "composer-inputs", "current-thread-url-recovery", "running-composer-steer", "model-mode-pickers", "fork-source-chip-and-listing", "fork-bring-back-to-source", "fork-from-here"]) {
     const check = matrix.checks.find((entry) => entry.id === id);
     assert.equal(check.after, "pass", `${id} is upgraded`);
     assert.ok(check.proof.some((entry) => entry.startsWith("test/") && entry.includes("::")), `${id} names an exact node test`);
@@ -909,7 +909,7 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
     assert.equal(check.after, "deferred", `${id} stays deferred`);
     assert.ok(check.proof.some((entry) => entry.includes("::")), `${id} pins that the UI makes no contrary claim`);
   }
-  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 29, partial: 0, deferred: 2, fail: 0 });
+  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 32, partial: 0, deferred: 2, fail: 0 });
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {
