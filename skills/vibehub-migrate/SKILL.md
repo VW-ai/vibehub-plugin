@@ -30,7 +30,10 @@ mechanically before a migration is complete; this Skill supplies the judgment.
    marketplace refresh, validation, query, and UI launch never grant it.
 3. Apply the selected steps as ordinary Git changes. Placement judgment follows
    `../vibehub-ingest/references/knowledge-governance.json`; a missing Room
-   tree is built with `$vibehub-distill` first.
+   tree is built with `$vibehub-distill` first. A step that names a migrator
+   script (such as `scripts/migrate-proof-bindings.mjs` for format 2 to 3) is
+   performed by running that script — dry run first, then `--apply` — never by
+   hand-editing proof documents.
 4. Prove `project compatibility` is `CURRENT`, `project validate` passes, and
    `room drift` is honest
    about anything the migration could not settle. Leave the diff to normal
