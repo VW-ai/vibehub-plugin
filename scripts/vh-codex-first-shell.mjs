@@ -573,6 +573,7 @@ const assets = new Map([
   ["/thread-name.mjs", script("thread-name.mjs")],
   ["/completion-notifier.mjs", script("completion-notifier.mjs")],
   ["/sidebar-freshness.mjs", script("sidebar-freshness.mjs")],
+  ["/fork-lineage.mjs", script("fork-lineage.mjs")],
   ["/fork-review.mjs", script("fork-review.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/fork-fixtures.json", fixture("fork-fixtures.json")],
