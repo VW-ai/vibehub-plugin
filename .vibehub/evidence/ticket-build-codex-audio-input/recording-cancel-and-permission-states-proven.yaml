@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "recording-state-timer-and-accessibility",
+      "digest": "22789c3c5894cbf9f28ec2dc9b0dc143c45ac1a2ab7a5ef3082014037e749550",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:46b87c76924bc061a146b49358b57e7a260896d5"
+    },
+    {
+      "acceptance_id": "cancel-discards-and-retry-works",
+      "digest": "cfcf3bcda5cf420cd55bde522e6fc91d9168728ae3442f741f3075d309dd6e2f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:46b87c76924bc061a146b49358b57e7a260896d5"
+    },
+    {
+      "acceptance_id": "permission-denial-is-truthful-and-recoverable",
+      "digest": "47642e2045e6cd498d28b98b108cb5926e40bfecfbcf36bc462fcce1d1c000f9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:46b87c76924bc061a146b49358b57e7a260896d5"
+    }
+  ],
   "acceptance_ids": [
     "recording-state-timer-and-accessibility",
     "cancel-discards-and-retry-works",
@@ -19,7 +39,7 @@
     "test/codex-first-shell-contrast.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 5dea574, ee5c709 and 3e6242e implement and prove the recording surface: a persistent recording tray with a live elapsed clock counting toward the 90 second cap, a pulsing voice control whose accessible name swaps to Stop recording, and polite composer-note announcements for start and each auto-stop cause including the cap and the size bound; a distinct Cancel control and document-level Escape end recording with tracks stopped and chunks discarded and no chip, plain Stop attaches a removable chip, and recording again immediately after a cancel, a removal or a denied prompt succeeds; a getUserMedia rejection produces a persistent inline state naming the DOMException-derived cause rather than only a toast, the control returns to idle, retry re-prompts with getUserMedia called again, and recording UI never renders without an active MediaStream. test/codex-first-shell-recording.test.mjs covers the state machine, the guard drives all of it in-browser on documented stubbed capture devices with the seam-shortened cap named as the test seam, the contrast test models every new rule in both themes, and the keyboard audit reports zero gaps.",
   "ticket_id": "ticket-build-codex-audio-input"
 }

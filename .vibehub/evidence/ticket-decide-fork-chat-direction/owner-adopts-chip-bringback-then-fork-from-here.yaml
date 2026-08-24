@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "fork-chat-direction-decided",
+      "digest": "f5a0719edd068f98b0c317cfbccf12648bffed5ea8b0af81ec0df9245a105571",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:f2330f1188b656e7f91d1cd881919fb78b61a1aa"
+    }
+  ],
   "acceptance_ids": [
     "fork-chat-direction-decided"
   ],
@@ -12,7 +20,7 @@
     "docs/proposals/fork-chat/fork-interaction-contract.json",
     ".vibehub/evidence/ticket-propose-fork-chat-interaction-directions/pack-decision-ready-and-gates-green.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "With the fork review surfaces open in the browser through npm run review:fork-chat and the proposal pack's directions, captures and eight decision points presented, the owner explicitly adopted the pack's recommended composition, saying to follow the recommendation with no issues: direction A, the navigable source chip with the source-side fork listing and honest missing-source state, ships first as the lineage presentation; direction C, Bring Back built on the existing quote and origin machinery with an explicit human send, enters the next implementation; direction D, per-message Fork from here on the stable lastTurnId seam, follows; direction B, the sidebar fork tree, is explicitly held for its recency-reorder cost; and Compare explicitly waits because a two-pane transcript surface is the largest cost for what two windows do free today. The stated costs in the pack are accepted as written.",
   "ticket_id": "ticket-decide-fork-chat-direction"
 }

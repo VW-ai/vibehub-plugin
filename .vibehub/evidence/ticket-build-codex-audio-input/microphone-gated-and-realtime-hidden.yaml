@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "audio-capability-gates-the-microphone",
+      "digest": "9edc777f1ead66f7b4d5716b0c852589d2cd4b89c830cda674bf54ca492c8e7f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:46b87c76924bc061a146b49358b57e7a260896d5"
+    },
+    {
+      "acceptance_id": "realtime-stays-hidden-behind-capability-truth",
+      "digest": "808d44c30220f513ca819c8cc448be3ff8b1559d43bfc65235334c3b5ed47915",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:46b87c76924bc061a146b49358b57e7a260896d5"
+    }
+  ],
   "acceptance_ids": [
     "audio-capability-gates-the-microphone",
     "realtime-stays-hidden-behind-capability-truth"
@@ -18,7 +32,7 @@
     "test/codex-first-shell.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 5dea574 gates the Composer microphone on runtime audioInput true from the harness capability contract and the presence of getUserMedia, rendering otherwise a visibly disabled control that carries the capability fallback text as title and aria-describedby without claiming a working microphone, with the DSH audio declaration untouched at unsupported. runtime realtimeConversation stays false, no realtime, transcript, dictation or listening UI or wording exists, the shell host test bans those words from the recording code, the schema probe's audio input checks and the audio-input-removed stop condition stay green, and the exposes-ordinary-audio-honestly host test is extended with timer, cancel, permission and no-transcription-claim assertions in commits ee5c709 and b54621b.",
   "ticket_id": "ticket-build-codex-audio-input"
 }

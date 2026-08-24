@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "fork-protocol-and-desktop-facts-are-established",
+      "digest": "064645221cdb05b6998930b62daf495a0c7f45137c406bbdfaa06c7c2df09f18",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7279df1a543f4ef45b05db01ab8f466b9dffad42"
+    }
+  ],
   "acceptance_ids": [
     "fork-protocol-and-desktop-facts-are-established"
   ],
@@ -13,7 +21,7 @@
     "packages/codex-adapter/upstream-lock.json",
     "docs/proposals/codex-projects/project-object-contract.json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The pack records from the regenerated 0.149.0 schema, hash-matched to the pin, and the upstream source that ThreadForkParams carries the stable lastTurnId for Turn-granularity point forks, fork through and inclusive with later Turns omitted and in-progress Turns refused, while beforeTurnId, path, excludeTurns, deferGoalContinuation and permissions are experimental and stripped; no item-level fork exists; the shell host action and adapter already accept lastTurnId end to end with only the UI missing. Lineage forkedFromId persists in the rollout session meta and survives restart as re-proven by the live probe record, chains nest, and the fork point itself is not persisted but derivable from the shared Turn-id prefix, which the review surfaces derive rather than invent; a fork inherits the server-owned projectId but no Thread.section, so the shipped adapter placement and its race handling stand. Codex desktop, read as strings from the installed bundle and marked unverified as to version, offers a per-assistant-message Continue in new chat implemented as head fork plus thread/rollback, which 0.149.0 documents as deprecated, making lastTurnId the go-forward seam; no lineage-navigation UI was found in strings, reported as not found rather than absent.",
   "ticket_id": "ticket-propose-fork-chat-interaction-directions"
 }
