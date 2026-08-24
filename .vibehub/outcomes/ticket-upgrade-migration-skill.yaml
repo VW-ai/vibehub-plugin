@@ -6,6 +6,10 @@
     "migration-suite-green"
   ],
   "closed_at": "2026-08-04T03:53:24.000Z",
+  "contract_binding": {
+    "digest": "f1bbddad38f51653c82459dfa5d14b507248403f67f54b58d02954877a662bc9",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "migrations-reference-proof",
     "migrate-skill-proof",
@@ -13,7 +17,7 @@
     "migration-suite-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independently adjudicated against commit b7abb52 and decision-agent-driven-upgrade-migration. skills/vibehub-migrate/references/migrations.json states the 0.4-to-0.5 step exactly once (distill-built room tree, placement-rule moves, context_ref rewrites, validate-and-drift proof) with detect text matching the real legacy validation error, and test/skill-contracts.test.mjs asserts owner, the 0.4/0.5 version pair, step count, and the skill's pointer to the reference. SKILL.md is 28 lines, judgment-first, triggers only on the legacy validation error or an explicit upgrade request, forbids background conversion and shims, and points at (never restates) the knowledge-governance placement rule and architecture boundary; every cited command and reference resolves. The closeout agent rebuilt the rehearsal from scratch with independent fixtures: a flat .vibehub/context/ entry plus a referencing ticket failed project validate with the legacy message, and after performing the reference's steps mechanically (room created, git mv, directory removed, ref rewritten) the same repo validated clean with the entry queryable from its room and the diff an ordinary reviewable Git change; test/migration.test.mjs covers the same path under node --test. Independent runs: npm test 39/39 pass, verify:artifact ok with 50 files and the vibehub-migrate skill (SKILL.md, references/migrations.json, agents/openai.yaml) confirmed bundled. Minor non-blocking gap: verify-plugin-artifact.mjs's required-file list does not name a vibehub-migrate path explicitly; bundling rests on the generic skills copy.",
   "ticket_id": "ticket-upgrade-migration-skill",

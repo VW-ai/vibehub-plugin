@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "legacy-runtime-absent",
+      "digest": "4d73413a99b82876103168408497cda7c6c9f17c807e359f8eba5ee4fdcc5918",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:74ab68f473eb27281ac82494d03a88a6d8a1d8d8"
+    }
+  ],
   "acceptance_ids": [
     "legacy-runtime-absent"
   ],
@@ -12,7 +20,7 @@
     ".github/workflows/verify.yml",
     "docs/SPEED_FIRST_CLEANUP.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The worktree and manifests have no packages, runtime, hooks, Codex MCP config, root MCP config, pnpm workspace/lock, native dependency, CLI bin, or writable local host; CI now runs dependency-free Node verification.",
   "ticket_id": "ticket-speed-first-cleanup"
 }

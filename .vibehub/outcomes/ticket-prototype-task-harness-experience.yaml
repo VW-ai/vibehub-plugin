@@ -9,13 +9,17 @@
     "review-pack-is-decision-ready"
   ],
   "closed_at": "2026-08-20T19:01:05Z",
+  "contract_binding": {
+    "digest": "c4661d224f56b763dd935235b0a6f928f67dcfda605cebc3a452000b2b152f07",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "graph-first-ticket-workspace-correction",
     "codex-base-low-fidelity-product-logic",
     "harness-prototype-product-loop"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts the replanned low-fidelity carrier, not its visual design. The checked-in prototypes and product-logic contract make think-first, act-first, normal Chat, Fork, branch graph, Compare, Bring Back, scoped Context, Task craft, Start, execution attention, Evidence review, closeout, and return traversable. They establish the Ticket Graph as home and the focused Ticket Workspace as the execution Context Space, distinguish Branch, Context, Reference, Ticket, Run, attention, and Evidence, and expose queued, running, waiting, failed, evidence-producing, and completed Run projections without inferring presence from Ticket state. The static loopback artifacts are responsive, keyboard-aware, reduced-motion-safe, disposable, and carry no production backend or durable browser-state claim. Deferred scope and the lack of high-fidelity visual authority remain explicit rather than being misreported as delivered product UI.",
   "ticket_id": "ticket-prototype-task-harness-experience",

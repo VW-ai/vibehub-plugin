@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "dry-run-prints-full-plan-without-writes",
+      "digest": "9f35c0d5c85da4d8119937d163e33e99a9483e2b618995596d5433051244119e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:861ae0c36f55fb7b27a65dbbf4324b09f9bd176b"
+    }
+  ],
   "acceptance_ids": [
     "dry-run-prints-full-plan-without-writes"
   ],
@@ -9,7 +17,7 @@
     "commit:dd64bef3b9b30727cbfdbd0c23756b04fb36466c",
     ".vibehub/evidence/ticket-mirror-tickets-to-github-issues/dry-run-2026-08-22.txt"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Running node scripts/sync-github-issues.mjs --repo . --dry-run against this checkout printed 87 creates and 402 follow-up operations (updates, Evidence comments, closes) for VW-ai/vibehub-plugin, which had 0 Issues, and performed no GitHub write: gh issue list confirmed 0 Issues afterwards. The transcript is checked in next to this Evidence.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

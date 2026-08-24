@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "graph-and-task-surfaces-use-canonical-vibehub-projection",
+      "digest": "9f303640159fef4e14fe51802a57196b8547cd0e460eb27acf5969ad6112e843",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b42782ec0329d29f02930531573605b75f3c29c9"
+    },
+    {
+      "acceptance_id": "task-handoff-enters-native-chat-exactly",
+      "digest": "330681fe01ee50ebc70e3ba7599800375da205ed4e02383ded48eecdf73322e0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b42782ec0329d29f02930531573605b75f3c29c9"
+    }
+  ],
   "acceptance_ids": [
     "graph-and-task-surfaces-use-canonical-vibehub-projection",
     "task-handoff-enters-native-chat-exactly"
@@ -17,7 +31,7 @@
     "test/ui-embed.test.mjs",
     "docs/DEEPSEEK_HARNESS_V1.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The real rc.8 Web application displayed the canonical current Git Task Graph as its first VibeHub surface before any Session existed, while closing the additive overlay restored untouched native DSH and the Tasks launcher. Selecting this Ticket exposed the host-owned Recommended action; Start in Chat created and opened one native Workspace/Session, recorded the registered /vibehub-task lifecycle, and queued the exact contextPackage.agentPayload JSON into native Chat without browser reconstruction. A fresh Session catalog contained the vendored vibehub-ticket-run Skill. Browser refresh and DSH restart recovered the Workspace/Ticket/Session association from the registered projection, restored the focused Tasks view, retained canonical Evidence, and showed no false live RUNNING state.",
   "ticket_id": "ticket-build-task-harness-vertical-slice"
 }

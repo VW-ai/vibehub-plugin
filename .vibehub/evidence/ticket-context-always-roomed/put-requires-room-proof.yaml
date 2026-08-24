@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "put-requires-room",
+      "digest": "9677830c89b432b566441f42fe32a6dbff3ba4802d8aae58d6b7c4c41a3580ad",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:25358f3ac9ee8fc1234429e32174486dd6af8d9c"
+    }
+  ],
   "acceptance_ids": [
     "put-requires-room"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/room.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "context put without --room now fails with guidance naming the placement rule (every Context lives in a room; pass --room with the lowest room that owns this claim) while roomed puts, in-place updates, and the duplicate-location refusal keep working; covered by updated node --test cases in room.test.mjs and context.test.mjs.",
   "ticket_id": "ticket-context-always-roomed"
 }

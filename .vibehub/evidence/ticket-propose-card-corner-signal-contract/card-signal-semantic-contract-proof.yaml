@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "canonical-facts-and-human-model-are-separated",
+      "digest": "9be6bd7a7ccfea417975b2c55f5bb5a600bbec80f5ef283e92e30dc5af1b5d0a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "primary-phase-derivation-and-precedence-are-exact",
+      "digest": "3db34641f9a5d9cd88db3eec1b86aa029297c297c50d3610b16befe71e3b7da4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "one-cross-cutting-substate-slot-is-defined",
+      "digest": "79277355f9527f303daa71b4baed31c0ba1a107f38edb3747f3a3600a8594dcf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "running-substages-and-live-presence-are-distinct",
+      "digest": "d48db2cb75c757fe83cd53ece083ea998abafd8afedc6d911d6dd9067a9a85ad",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    },
+    {
+      "acceptance_id": "recommendation-and-downstream-boundaries-are-decision-ready",
+      "digest": "c5498941076f3ca0ec7b51bd47ef426fae356ecc819515df2e56fc0cb5629f9c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b3aae55cb974e7d40aacb49734ed34c8e8d58486"
+    }
+  ],
   "acceptance_ids": [
     "canonical-facts-and-human-model-are-separated",
     "primary-phase-derivation-and-precedence-are-exact",
@@ -20,7 +52,7 @@
     "command:npm-run-verify-126-of-126",
     "command:installed-artifact-57-files-607662-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The decision-ready contract audits eight distinct truth sources and proposes exactly four Human phases derived by strict precedence. Its executable model and 22-case adversarial fixture matrix prove successful/non-success Outcomes, unresolved/resolved dependencies, draft/firm maturity, NEEDS_HUMAN before and during trusted work, CLOSE_OUT with and without presence, Run start/end, stale/untrusted presence, failed closeout, archive, and reopened history. The one-slot eligibility matrix rejects contradictory Cartesian pairs and implements DEVIATED > BLOCKED > actionable NEEDS YOU > VERIFYING > WAITING > empty. It defines all current no-schema v0.8 mappings, treats every non-success Outcome as material, records the DRAFT+NEEDS YOU hard gap and recommended explicit trusted runtime/current-human-boundary source, preserves independent closeout inside RUNNING, and separates seven downstream decision/implementation boundaries without changing production truth.",
   "ticket_id": "ticket-propose-card-corner-signal-contract"
 }

@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "skill-and-artifact-work-cleanly",
+      "digest": "b82193f955bf77cd52dfc91eb9f99cf430169833c9af50d785b65440661f8cea",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:99c95d220b034595d6d556e70515aca82fa78461"
+    }
+  ],
   "acceptance_ids": [
     "skill-and-artifact-work-cleanly"
   ],
@@ -12,7 +20,7 @@
     "/private/tmp/vibehub-ui-claude-20260802",
     "/private/tmp/vibehub-ui-codex-20260802"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The review Skill now launches the local UI or presents the same graph in conversation. `npm run verify` passed 7/7 tests and built a 32-file, 168,012-byte clean plugin whose installed helper completed Context validation and whose installed UI host passed health and graph projection. Fresh Claude and Codex marketplace builders both completed without dependency installation or native build.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "digest": "fde63249d9ff66ca3e8a6bff95d2ce0ebaf057f333652add53afc2577662c2bf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d8247a29044501d37085f076f9faedea3e60ba69"
+    },
+    {
+      "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
+      "digest": "20830ddba87abe2a30f4bd36020e48b20fbecf020fd8a0de966939f208f31756",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d8247a29044501d37085f076f9faedea3e60ba69"
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "digest": "a0d71a2944e58b67de4c71fc60cbe8597d2ee147c8abe3ec309564c10a78276b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d8247a29044501d37085f076f9faedea3e60ba69"
+    }
+  ],
   "acceptance_ids": [
     "rooms-surface-is-on-demand-and-responsive",
     "room-detail-and-filter-preserve-causal-layout",
@@ -12,7 +32,7 @@
     "commit:fc88e01",
     "test/ui-rooms.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent browser closeout correctly rejected the first implementation because Clear deleted the prior Room union, its click bubbled to the canvas and closed the selected Ticket/Inspector, a scheduled frame fit overwrote saved pan, and the narrow Rooms button lost its accessible name. The repair restores the exact pre-filter URL when a snapshot exists, stops filter-status click propagation, preserves pan on preserveLayout refreshes, and gives the icon/count button aria-label Rooms. Focused tests and fresh npm run verify pass 77/77; artifact verifies at 54 files / 717012 bytes and Workbench Room alignment is FRESH. Independent browser closeout must re-run the failed journeys before acceptance.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

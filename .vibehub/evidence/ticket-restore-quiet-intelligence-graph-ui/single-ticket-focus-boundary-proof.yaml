@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "interaction-is-deliberate-and-accessible",
+      "digest": "830a2ca5d7fc915f65e263602c3024e34748bf842a292b8606f536538b66bd5e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cfb68cf52e9ad158a38a614f7681a3ab81dd04cc"
+    }
+  ],
   "acceptance_ids": [
     "interaction-is-deliberate-and-accessible"
   ],
@@ -13,7 +21,7 @@
     "command:npm-test-8-of-8",
     "command:npm-run-verify-8-of-8"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Dogfood isolated the transient second selection frame to the browser focus outline on the focusable SVG Ticket group immediately before selection re-render replaced that group. Commit d9c6a65 removes the outer SVG-group outline while retaining keyboard focus on the Ticket's own boundary and relation geometry. In the real loopback browser, closing the Inspector restored focus to the Ticket with :focus-visible true, outer outline none, and the Ticket boundary visibly stroked; pointer selection retained a single selected boundary. All 8 tests and the clean plugin verification passed.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

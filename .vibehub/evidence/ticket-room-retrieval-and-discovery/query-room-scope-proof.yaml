@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "query-room-scope",
+      "digest": "cb833e138a7ad3dcd3d3511fb3646dc939d39ac77b12c21873b1301719e59af9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:0f889d8e5ef410a58df97f882f6147190e16e845"
+    }
+  ],
   "acceptance_ids": [
     "query-room-scope"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/room.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vh context query --room <path> filters results to the room's subtree including sub-rooms (auth returns auth plus auth/oauth entries, billing returns only its own) and errors not_found on a missing room; covered by the new subtree-scope test in room.test.mjs.",
   "ticket_id": "ticket-room-retrieval-and-discovery"
 }

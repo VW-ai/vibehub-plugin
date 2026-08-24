@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "canonical-website-entry-is-visible-and-exact",
+      "digest": "52d98f8fb8bd3b419a53d66736d503f5bba674ff4b92096264d278509017750e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a648e4a55363d56cf4f8b40e8a1fceda2f63373c"
+    },
+    {
+      "acceptance_id": "readme-and-site-share-one-major-narrative",
+      "digest": "5d1ef2558eeba222d81c4a2b01aa1888585a1feddce8305c160c71617046d18e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a648e4a55363d56cf4f8b40e8a1fceda2f63373c"
+    },
+    {
+      "acceptance_id": "existing-readme-contract-and-artifact-parity-remain-intact",
+      "digest": "1bb791aa6685a7342acd44f51cad8cfad1a4a962217bd5d11b437f9de9bd2d25",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a648e4a55363d56cf4f8b40e8a1fceda2f63373c"
+    }
+  ],
   "acceptance_ids": [
     "canonical-website-entry-is-visible-and-exact",
     "readme-and-site-share-one-major-narrative",
@@ -18,7 +38,7 @@
     "artifact:fresh-codex-claude-62-files-2828446-bytes",
     ".vibehub/rooms/product/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README-focused plus fresh Codex/Claude marketplace tests pass 6/6. Both independently built installed plugin roots contain byte-identical README content with the exact apex link, work-over-chat thesis, Ticket/Evidence/Outcome/Context narrative, and no www or Pages URL. The fresh installed-artifact verifier passes at 62 files and 2,828,446 bytes after asserting the same narrative, exact single apex link, and all relative README image targets. Full repository verification passes 131/131. The root README remains 59 physical lines and within its 60-element guard, preserves exactly one `Start this with VibeHub.`, all three accepted Retina Workbench PNGs, DRAFT/READY/RUNNING/DONE, current Codex and Claude installation/upgrades, and dark-mode brand assets. Product Room alignment is refreshed; all four Rooms are FRESH, Ticket/project validation passes, and the implementation diff contains no site path.",
   "ticket_id": "ticket-align-readme-with-public-site-narrative"
 }

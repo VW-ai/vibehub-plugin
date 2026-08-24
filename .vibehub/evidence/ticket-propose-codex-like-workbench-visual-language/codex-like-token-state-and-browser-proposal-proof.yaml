@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "proposal-defines-one-coherent-token-system",
+      "digest": "5854dcba8377b7f1bdcf70829cec264cc56ba14677c0261411d81ae0a0a52323",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d0b3d2744d2e90b5117c9c7537c1c21578dbe836"
+    },
+    {
+      "acceptance_id": "proposal-separates-state-from-human-attention",
+      "digest": "43b065775e11e6aae22c65ac5911eafcd48ac11fedc7aeeee703a5c07bbaaeea",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d0b3d2744d2e90b5117c9c7537c1c21578dbe836"
+    },
+    {
+      "acceptance_id": "proposal-preserves-victor-product-value",
+      "digest": "30482a9966d502609c1da9e4d5b224f4846e88c44bc49e059697a10a9765f9e5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d0b3d2744d2e90b5117c9c7537c1c21578dbe836"
+    },
+    {
+      "acceptance_id": "proposal-is-reviewable-at-real-sizes",
+      "digest": "cf4e8d6899d21d95149b4b585508cc1a432827f5a7df82ae1cfb1f34f9a3f99e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d0b3d2744d2e90b5117c9c7537c1c21578dbe836"
+    },
+    {
+      "acceptance_id": "proposal-does-not-ship-production-style",
+      "digest": "1d770d085c4f7ee96d874a8057ea78fa36428f79f5758e66df3f039c8529af8e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d0b3d2744d2e90b5117c9c7537c1c21578dbe836"
+    }
+  ],
   "acceptance_ids": [
     "proposal-defines-one-coherent-token-system",
     "proposal-separates-state-from-human-attention",
@@ -22,7 +54,7 @@
     "browser:narrow-44px-controls-44.8px-history-stub-no-overflow-or-console-errors",
     "room:all-four-rooms-fresh-at-e79ca19"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit f5daedb adds only a dependency-free checked-in proposal under docs/proposals/codex-like-workbench plus proposal validation. The concrete token contract covers system and monospace typography, spacing, radii, borders, elevation, neutral surfaces, six semantic including ARCHIVED, four human-attention treatments, icons, hover, focus, neutral selection, reduced motion, and narrow targets. The independent state matrix defines DONE, READY, BLOCKED, REFINE, and DEVIATED as restrained whole-card surfaces with redundant uppercase labels and icons, while UPCOMING, PENDING, RECORDED, and COMPLETE remain a separate badge/notch axis; four coexistence rows explicitly prevent a human boundary from becoming a false operational blocker. The standalone responsive prototype uses current repository Ticket names and retains the complete causal canvas, selected upstream/downstream cone, archived stub, relation selection, canvas-first default with hidden compact Overview, Execution/Contract/Log Inspector lenses, exact source, focused-link control, honest no-Active-Run empty state, and Agent-owned READY handoff. Real in-app-browser review at 1440x960, 1180x820, and 390x844 shows the proposal in left-to-right and top-to-bottom forms, with a right-side Inspector becoming a narrow bottom sheet, no document overflow, no console warnings/errors, 44px visible narrow controls, and a 44.8px scaled history target. Automated contrast checks prove at least 12:1 ink-to-state-surface and 4.5:1 semantic-accent contrast, while labels and icons remain mandatory. Full verification passes 66/66 and the installed Plugin artifact remains exactly 54 files and 698815 bytes, proving no production Workbench asset, release identity, runtime behavior, or canonical Ticket semantic changed. Product Room alignment at f5daedb leaves all four Rooms FRESH.",
   "ticket_id": "ticket-propose-codex-like-workbench-visual-language"
 }

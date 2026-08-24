@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "first-view-explains-and-installs",
+      "digest": "ed245efaa7960ed0e230287d1016f8a1c10440f8aaf2700187a0c0074941ee6b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "ticket-shelf-is-the-site-navigation",
+      "digest": "269d09255e2ac7a32410b9caf1f6eb183a937f8b8a6c96485f5a1121511b7adb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "opened-ticket-is-physical-and-readable",
+      "digest": "4f06bc934b5d9b639d7b726223942d561e1606b772f19886a55495f3072a034f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
+      "digest": "6e9089a397abdc5d49b6eb7c075294ac12cac3c375a986d24eabd3e311af406f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "first-view-explains-and-installs",
     "ticket-shelf-is-the-site-navigation",
@@ -15,7 +41,7 @@
     "context:.vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml",
     "context:.vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public page now renders one physical two-page Ticket over a persistent five-module Ticket Shelf. Product opens by default with the exact promise, one-Ticket explanation, canonical entry, truthful Codex and Claude Code actions, Copy for Agent, and GitHub. The shelf preserves the selected Ticket as a dashed OPEN origin with a connector to the expanded dossier. Product, Workflow, Documentation, and Founder render distinct linearly readable page structures. The Product page keeps Request and Context semantically separate from the single Ticket, then shows Evidence and independent Outcome. Pointer switching uses an origin-measured, cancellable WAAPI transform/opacity animation; keyboard and narrow layouts switch immediately; hover is fine-pointer-gated and reduced motion is honored.",
   "ticket_id": "ticket-restore-public-hero-ticket-graph"
 }

@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "skills-teach-placement",
+      "digest": "64841f3d05a8bccd7e6108219af2f832ea023380b85bd13abdb2cc44039c0834",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:25358f3ac9ee8fc1234429e32174486dd6af8d9c"
+    }
+  ],
   "acceptance_ids": [
     "skills-teach-placement"
   ],
@@ -11,7 +19,7 @@
     "skills/vibehub-query/SKILL.md",
     "CLAUDE.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The ingest skill states the placement judgment in three sentences (lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge) and shows the --room form; the query skill names the Room tree as the source of truth; CLAUDE.md, AGENTS.md, and docs/INSTALL.md no longer point at .vibehub/context/ as a live location.",
   "ticket_id": "ticket-context-always-roomed"
 }

@@ -5,11 +5,15 @@
     "initial-shell-and-dsh-direction-decided"
   ],
   "closed_at": "2026-08-20T19:01:05Z",
+  "contract_binding": {
+    "digest": "d84a3204bd808e4cb4ae910b4e0c6135f86324147b44494aae8ac61fa1e38e94",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "owner-records-current-task-workbench-direction"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts the owner's current V1 product and composition decision from human-origin Evidence. Task is the durable unit and the Ticket Graph is the first frame; entering a Task enters its working Context Space, while normal Chat remains a Human-led exploration and steering surface around the Agent-led Task loop. One Global Work Graph carries Task nodes and lighter Chat meta nodes, with Project scope, topology-derived clusters, semantic zoom, and Context-anchored intervention rather than invented parent-task ontology. V1 is a non-invasive DeepSeek Harness Plugin with one or two first-class Graph or Task surfaces, additive Chat actions, Theme integration, and a substantial coherent reskin—not an upstream fork, executor-coupled task adapter, or wholesale replacement shell. This decision does not approve the current low-fidelity visual design or claim that the remaining interaction details are complete.",
   "ticket_id": "ticket-decide-task-harness-product-direction",

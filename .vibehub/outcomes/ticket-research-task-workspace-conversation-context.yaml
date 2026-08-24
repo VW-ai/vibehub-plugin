@@ -7,12 +7,16 @@
     "task-workspace-prototype-is-decision-ready"
   ],
   "closed_at": "2026-08-21T08:54:42Z",
+  "contract_binding": {
+    "digest": "c904f254bcb08d85523f48bf71c13897bf23df73241eb1aad74805f764a6a163",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "codex-task-workspace-context-contract-and-runtime-proof",
     "codex-task-workspace-real-graph-and-browser-matrix"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout in a fresh isolated worktree at exact implementation commit 9cf4a1e6a2010026f468928d7de6d29637004be0 accepts all five current criteria. The checked-in contract and production-shaped prototype keep VibeHub Task, Codex Thread and Turn, Project, Room, Context, Reference, Evidence and independently adjudicated Outcome as separate product objects; lifecycle disclosure covers DRAFT, READY, trusted RUNNING, NEEDS YOU, VERIFYING, DEVIATED and DONE while Recommended action and the shared native conversation remain primary. The local host, not browser code, deterministically assembles direct Task Context before bounded lexical one-Turn selections, expands only eligible current-Project Context with Room/source/inclusion reason, exposes unavailable references, truncation, citations, explicit conflict posture and no writeback authority, supports standalone Tasks, and includes relevant successful direct-prerequisite Outcomes plus their cited Evidence. Source inspection confirms browser actions submit only canonical Task/Thread IDs, message, bounded attachments and selected Context IDs; the host validates Task-to-Thread linkage, resumes before continuing, steers only with the exact active Turn ID, routes exact approval or input requests, interrupts through app-server, and never equates a completed Run with a VibeHub Outcome. An independently rerun authenticated Codex lifecycle probe created a persistent named standalone Task Thread, persisted the exact host packet, interrupted its authoritative Turn, stopped and restarted app-server, recovered and resumed the same Thread, replayed interrupted history, preserved completedRunIsOutcome=false and deleted the probe Thread; packet SHA-256 was 82e9e79df45311b0ffcc7c78c1ecaeb7c4435d5b0096ca4417b3b181fd10cf04. Focused verification passed 11 of 11; full verification passed 168 tests with zero failures and one expected opt-in DSH-source skip; the installed artifact verified at 62 files and 2832437 bytes; the pinned Codex 0.147.0 schema probe, diff check, Ticket, Project and Context validation passed, and all four Rooms were fresh. Initial sandbox-only socket runs failed for environmental loopback permissions and were rerun successfully with authorized local runtime access. No fresh browser drive is claimed because this closeout had no browser-control binding; the canonical Light/Dark, wide, 390x844, Graph-focus/return, eight-state, governed-Context and approval browser Evidence was inspected and corroborated against the exact fixture, renderer, host actions, CSS and tests without extending its recorded claims.",
   "ticket_id": "ticket-research-task-workspace-conversation-context",

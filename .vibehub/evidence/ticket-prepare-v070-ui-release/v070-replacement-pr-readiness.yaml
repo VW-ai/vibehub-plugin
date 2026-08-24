@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "replacement-pr-ready",
+      "digest": "bc90a18aaec249f537bd1c03776779351cc9b92ce66389a686576dea8c859909",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:c5b8021b61c0b14abc81a58ca3f4eafeaf09e1c7"
+    }
+  ],
   "acceptance_ids": [
     "replacement-pr-ready"
   ],
@@ -16,7 +24,7 @@
     "test:rejected-runtime-path-absence-audit",
     "github-pr:VW-ai/vibehub-plugin#18"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The clean codex/pr18-ui-curation branch contains exactly two commits beyond latest origin/main: independently accepted UI-only curation ad21554 and bounded v0.7.0 preparation ec37d74. The tracked diff carries the curated Web UI, exact non-canonical PR history snapshot, synchronized release identity/changelog, and VibeHub release records; apps/workbench, vh-workbench, watcher, Desktop deep-link/switch code and tests remain absent. It is ready for a replacement PR whose body explicitly supersedes original PR #18 and carries the successful preparation Outcome after independent closeout.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

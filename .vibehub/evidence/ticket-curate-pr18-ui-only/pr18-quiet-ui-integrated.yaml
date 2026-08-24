@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "quiet-ui-integrated",
+      "digest": "5b5261a77326433890fa5212508059cafb19b72285eb69011de271a91b574b29",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ad21554e334cc88b434feb6f7e7145aad002af2a"
+    }
+  ],
   "acceptance_ids": [
     "quiet-ui-integrated"
   ],
@@ -13,7 +21,7 @@
     "skills/vibehub-ticket-review/assets/app.css",
     "test:ui-host-read-only-loopback"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The shared review assets now implement the approved A · Quiet Workbench surface with top-to-bottom causal layout, honest empty Active-Run presence, responsive progressive inspection, persistent source truth, and no style selector.",
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

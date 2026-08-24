@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-candidate-verified",
+      "digest": "dd73d16dc7b53a486ed19406e252ab613a193d33f3d660510351863c6cd79bfa",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ec37d74ee3a64297211edd417618d918c632f222"
+    }
+  ],
   "acceptance_ids": [
     "release-candidate-verified"
   ],
@@ -16,7 +24,7 @@
     "test:vibehub-room-drift-all-fresh",
     "browser:headless-chrome-v070-current-branch-wide-and-narrow"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The v0.7.0 identity guard passed; npm run verify passed 48 of 48 tests and a clean 52-file, 648451-byte artifact check; npm run build produced the same 52-file, 648451-byte plugin; project and raw Ticket graph validation passed; git diff --check passed; all four Rooms are FRESH after product alignment; and headless Chrome rendered the current 36-Ticket release candidate successfully at 1440x900 and 390x844.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "dense-causal-position-remains-readable",
+      "digest": "cf5986cb5a4af9baa51c55ea9d364549179ae89bc26c804e22db2305960a1623",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    }
+  ],
   "acceptance_ids": [
     "dense-causal-position-remains-readable"
   ],
@@ -13,7 +21,7 @@
     "file:skills/vibehub-ticket-review/assets/app.js",
     "file:skills/vibehub-ticket-review/assets/app.css"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A disposable real-browser fixture projected eleven Tickets and ten direct unlocks around one selected center with five prerequisites and five dependents. The prerequisite set contained DONE, DEVIATED, and READY paths; the center showed BLOCKED with 1/5 completed, four blockers, and five unlocks. The causal lens prioritized the deviated and executable paths, showed three compact state-coded objects per side, communicated five-item totals, and expanded each View all 5 control without overflow at desktop width. The fixture and its loopback host were deleted after verification; an automated fixture preserves the same topology and operational-state coverage.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

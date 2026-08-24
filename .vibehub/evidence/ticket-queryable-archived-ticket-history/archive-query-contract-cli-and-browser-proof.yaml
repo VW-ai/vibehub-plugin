@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "archive-and-delivery-membership-are-canonical",
+      "digest": "78ccafad22843a667b4ccf5e315648ba8ba6315fbcadf5dc41cc196a824291cb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    },
+    {
+      "acceptance_id": "history-edge-cases-stay-truthful",
+      "digest": "23cfe205d408be738dbe2bdcc792965602accd2132341fbf0946f24d5cccf2e4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    },
+    {
+      "acceptance_id": "one-query-model-serves-cli-json-and-web",
+      "digest": "e4f67c1d473088147cb546655a014665a4e2909a27d01a114efe0c7cb30a3bbc",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    },
+    {
+      "acceptance_id": "filtered-graphs-preserve-causal-truth",
+      "digest": "896e4c47d1eb8dbf37bf66f0aca66dd2012d1d03091764c969868dff508d5cc1",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    },
+    {
+      "acceptance_id": "query-focus-is-explicit-accessible-and-copyable",
+      "digest": "35b6b2ae8f18c6a73c7f60558f59c4e2bd49f0f802231c67aad1b85ae7797367",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    },
+    {
+      "acceptance_id": "archive-query-is-regression-verified",
+      "digest": "314eb43df33ecd47acb214ca478e2411296c10e4c926141c136255e19d46b77f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:2f71036f1b510a9c4b0367a997d289b821021954"
+    }
+  ],
   "acceptance_ids": [
     "archive-and-delivery-membership-are-canonical",
     "history-edge-cases-stay-truthful",
@@ -23,7 +61,7 @@
     "browser:one-hop-expansion-preserves-card-coordinates-ticket-log-lens-direction-and-copyable-url",
     "room:all-four-rooms-fresh-at-a8331ac"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits f59a1b2 and 73a6385 add the optional discriminated Ticket deliveries array, the derived successful-plus-delivered archive predicate, one exported current/all/delivery/repeated-Room query projection shared by CLI JSON and Web, deterministic endpoint-visible relations, progressive archived boundary cards and one-hop stubs, explicit URL filters, and aligned Product, Ticket Lifecycle, and Workbench Room contracts. State-table and schema tests cover omitted legacy deliveries, proposed/abandoned/unmerged pull requests, delivered pull requests and cherry-picks, failed/partial/deviated Outcomes, multiple memberships, revert preservation, and reopen provenance. Full verification passes 62/62 plus the dependency-free 54-file, 698815-byte artifact. A real Codex in-app-browser fixture proves the default current view contains three current Tickets plus one textual/dashed ARCHIVED boundary and one keyboard-focusable upstream stub; Enter reveals old-foundation, removes the exhausted stub, records history=old-foundation, and preserves every prior card coordinate, selected current-web-work Ticket, Log lens, and direction. All history contains five Tickets and no stubs; exact pull request delivery returns the two archived members; product/web returns four, knowledge returns two, and repeated normalized Rooms return their five-Ticket union. Invalid scope, delivery, Room, and history values render Ticket graph unavailable with zero Ticket cards rather than broadening. Copy focused link reports success and the live URL preserves scope, sorted repeated filters, history, selected Ticket, Log lens, direction, and the 64-character bearer fragment without persistent browser state. At 1440x960, 1180x820, and 390x844, both left-to-right and top-to-bottom views retain four current nodes, one archived boundary, and one stub without document overflow or console warnings/errors; the narrow history target is 44.8px high after the browser-found c2bf1a4 fix and all graph controls are 44x44. The complete plugin remains Git-native and read-only, with all four Rooms FRESH at a8331ac.",
   "ticket_id": "ticket-queryable-archived-ticket-history"
 }

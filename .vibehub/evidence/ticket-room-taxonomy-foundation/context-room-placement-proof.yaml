@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "context-placement",
+      "digest": "0256912f14da36e14cc48811f3f858d1da8e8173fcebdb2c59007cb3fd79c342",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4edd097ed776ff9a104cdaa3ede662ab61302d4c"
+    }
+  ],
   "acceptance_ids": [
     "context-placement"
   ],
@@ -10,7 +18,7 @@
     "skills/scripts/vh.mjs",
     "test/room.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "context put gained an optional --room <path> flag writing the entry inside the named room directory after verifying the room exists; flat root-level puts keep working, updates in place succeed, and a put that would duplicate an existing context_id at another location is refused with an explicit git-move instruction.",
   "ticket_id": "ticket-room-taxonomy-foundation"
 }

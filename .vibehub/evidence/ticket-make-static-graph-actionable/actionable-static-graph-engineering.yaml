@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "digest": "93648ecdf0372db89be8d8ccde48680f37df887dd7c41c98658e91fce2ce687b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    },
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "digest": "f572425a74e5a63da5517a077f7be927078c5b37f0c16aba1bfccb2316c513b7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "digest": "1e717555abeccb63093b06f20d71c15ce4e28d9d8393054f75047548ed8c0e60",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    },
+    {
+      "acceptance_id": "source-actions-are-mechanical-and-honest",
+      "digest": "d1c5467da472a789229de9eae06d32c8c194ab4e1a6fcc82b6a34c288cb365ab",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "digest": "8af04c2d24bb469e32a3a76ab64875f5319b966d09595d5cea909b19f87f4fff",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "digest": "cbaaa6d225ec47f9acb3e7dd33ec4dc161200a04a26f07fdcdb48531a7a9d2e9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:07820a528e1d4cdb65acbb27cfad1a4146b82fc0"
+    }
+  ],
   "acceptance_ids": [
     "one-copy-handoff-per-object",
     "evidence-references-are-typed-and-compact",
@@ -22,7 +60,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "At commits 54e0592 and 55bf753, the freshly validated projection exposes one typed Agent payload per Git source, Ticket, canonical Context, source ref, Evidence, and Outcome; compact common copy icons; typed/countable Evidence references; expandable exact canonical Context; commit-pinned GitHub and local VS Code links; directional dependency objects; typed provenance; and a compact source dock. Real-browser review exercised the actual repository at desktop and 390x720, including Source Dock, Context expansion, long-proof progressive disclosure, copy confirmation, and narrow full-screen Inspector. npm test passed 9 of 9, full artifact verification passed 9 of 9 at 32 files and 223662 bytes, runtime logs were empty, and the host remains GET/HEAD-only, schema-validating, dependency-free, database/cache/daemon-free, and without opener or write endpoints.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "archived-stub-is-legible-in-real-graph",
+      "digest": "544f0f7a47dddd9fdcbe755bda80e23ee96cdc7eccf234669ef4cf4978a81d5e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:307c90e16f04baa0414c314e301fa50ea2692fa7"
+    },
+    {
+      "acceptance_id": "archive-expansion-remains-exact-and-operable",
+      "digest": "3e9bbe876a7c5af5e9c6d21abbf3d0d8fe72c1a7dc85b846635d1cab1cb8b1fd",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:307c90e16f04baa0414c314e301fa50ea2692fa7"
+    },
+    {
+      "acceptance_id": "directions-and-narrow-layout-regressions-pass",
+      "digest": "f7d3198b272400c3181d920a9e46b8ccb731a2a8ce00f36b89d6d6e19d958cd8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:307c90e16f04baa0414c314e301fa50ea2692fa7"
+    },
+    {
+      "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+      "digest": "61845ab51e00a936b49e5f1620a620313085c76a7b96a19836853e6f52531e6e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:307c90e16f04baa0414c314e301fa50ea2692fa7"
+    }
+  ],
   "acceptance_ids": [
     "archived-stub-is-legible-in-real-graph",
     "archive-expansion-remains-exact-and-operable",
@@ -16,7 +42,7 @@
     "test/ui-visual-system.test.mjs",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Direct integrated-main browser inspection on the authorized read-only loopback Workbench confirmed all three real archived boundaries render as opaque two-line controls with complete counts and upstream/downstream labels outside the primary causal lane in both LTR and TTB. At an explicit 760x900 viewport the document measured clientWidth=scrollWidth=760 and clientHeight=scrollHeight=900. Keyboard Enter on the 18-Ticket upstream stub added exactly history=ticket-rooms-into-workbench, revealed that canonical Ticket, replaced the boundary with the next 17-Ticket stub, and moved focus to the revealed archived Ticket. Normal viewport was restored after the check; no browser or repository state became authoritative.",
   "ticket_id": "ticket-fix-archived-stub-label-visibility"
 }

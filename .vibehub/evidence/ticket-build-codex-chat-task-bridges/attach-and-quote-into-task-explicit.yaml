@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "attach-and-quote-into-task-are-explicit",
+      "digest": "92511b8d3baf74d230b0c596ffcaf51ba1e7e19b172991177c350361cdc2a1ce",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "attach-and-quote-into-task-are-explicit"
   ],
@@ -16,7 +24,7 @@
     "test/codex-first-shell-bridges.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Attach to Task lists every open Task the host returns from listTaskTargets, which excludes Tickets with a successful Outcome, and appends exactly one provenance reference of the form codex-thread:<thread_id>/turn:<turn_id> through applyTickets, idempotently, leaving origin, deliveries, acceptance and relations untouched so the origin guard never fires and the depends_on relation counts are unchanged; the host answers 409 task_closed and 404 task_not_found. Quote into Task places the selected text into a task-scoped draft keyed by ticketId held only in memory, or into the linked Thread's Composer draft when the Task already has one, and it reaches the Agent only as startTask or startTaskTurn humanMessage inside the host-built packet; the guard proves the packet humanMessage equals the quoted block plus source line, that no turn/start or turn/steer carried the passage as plain text, and that the only turn/start with the passage is the Task packet, while the source Chat is unchanged and no Thread is created by either action.",
   "ticket_id": "ticket-build-codex-chat-task-bridges"
 }

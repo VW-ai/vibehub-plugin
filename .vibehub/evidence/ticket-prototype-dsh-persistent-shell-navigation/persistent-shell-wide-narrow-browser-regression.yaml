@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "prototype-is-accessible-and-native-behavior-survives",
+      "digest": "ac72efdb35b0d6193810251ab2d284fa0ea88e760f5824edd01e5d7a13317afa",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    }
+  ],
   "acceptance_ids": [
     "prototype-is-accessible-and-native-behavior-survives"
   ],
@@ -14,7 +22,7 @@
     "test/dsh-persistent-shell-prototype.test.mjs",
     "package.json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The exact local review server was exercised in a fresh real browser at the default desktop frame and the built-in 390x844 narrow frame. Keyboard-visible controls, persistent navigation, Chat composer, model/workspace affordances, Task Graph, focused Task Workspace, Recommended action, Needs You, Evidence posture, sidebar opening and exact Graph return remained operable. The narrow application has clientWidth equal to scrollWidth at 390px; only the intentional graph viewport pans horizontally. Reduced-motion and accessibility contracts pass, the server is loopback-only/read-only, the repository is not mutated by browser use, and the fresh browser console contains zero errors. Full repository verification passes 146 tests with one exact-source optional skip and the installed plugin artifact verifies at 62 files / 2,831,812 bytes.",
   "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation"
 }

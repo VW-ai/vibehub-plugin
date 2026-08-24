@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "existing-contract-remains-consistent",
+      "digest": "4de3043e737b284e574c18bcd8ad499f8df68b68d7d60dccf0ed78ae9542ebba",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b9ec671712dee8ee8e67127be18de045b072a014"
+    }
+  ],
   "acceptance_ids": [
     "existing-contract-remains-consistent"
   ],
@@ -11,7 +19,7 @@
     "command:node skills/scripts/vh.mjs ticket validate --repo .",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The existing Skill-first, Git-YAML, no-required-CLI/MCP/runtime, and no-persistent-cache contract remains intact; project and Ticket validation passed and npm run verify passed all four tests plus the 28-file artifact check.",
   "ticket_id": "ticket-document-dogfood-phase"
 }

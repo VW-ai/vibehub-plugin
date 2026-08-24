@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "real-runtime-chat-prototype-is-production-shaped",
+      "digest": "d5122ec043a39f87b6f410b0e4bd9e5e7eabeb7ba0deaa77da81e3dd7d9ae6db",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf"
+    },
+    {
+      "acceptance_id": "chat-parity-review-is-decision-ready",
+      "digest": "b38b5ffc53ee02985e63acf524dcab7e9398f900c74ca9cf48adfa5cd02d90a0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf"
+    }
+  ],
   "acceptance_ids": [
     "real-runtime-chat-prototype-is-production-shaped",
     "chat-parity-review-is-decision-ready"
@@ -23,7 +37,7 @@
     "command:npm-run-verify-163-pass-1-expected-skip",
     "command:verify-plugin-artifact-62-files-2832437-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The authenticated Codex-first shell now renders sanitized Markdown and code, stable replay plus live deltas, reasoning and plan disclosures, grouped command/tool/file/diff/delegated-agent activity, inline approvals, retry/error and context boundaries, image/audio attachments, a familiar bottom Composer, Send/Stop, Enter/Shift+Enter, automatic follow with manual-scroll preservation, and explicit disabled future VibeHub bridge actions. Real browser dogfood exposed and fixed the official unmaterialized-Thread boundary: New Chat now uses thread/start output directly and waits until the first Turn before thread/read. A live first Turn completed with the exact response 'Chat renderer runtime connected.' and replayed from the real app-server. A long real Thread with 180 activity items rendered as 54 Turn-level groups instead of 180 peer cards. The visibly labelled deterministic fixture covered mixed plan, reasoning, command, diff, tool, delegated-agent, retry, compaction, attachment and disabled approval states. Wide 1280x720 and explicit 390x844 review had zero surface overflow and zero new console warnings/errors; the narrow surface and Composer measured 390 and 374 pixels respectively. Light/Dark tokens, reduced-motion, focus, bounded 240-item tail, unknown fallback, real host auth/read-only behavior and the 62-file installed artifact are regression-protected.",
   "ticket_id": "ticket-research-codex-native-chat-parity"
 }

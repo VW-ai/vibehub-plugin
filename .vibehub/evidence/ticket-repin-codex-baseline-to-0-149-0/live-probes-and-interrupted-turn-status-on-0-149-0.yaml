@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "live-lifecycle-proofs-rerun-on-0-149-0",
+      "digest": "df880cc6954d24b90e4b00cb86e8ab57d98545bd4481bf92dbdb2c2fe1ba5b39",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "live-lifecycle-proofs-rerun-on-0-149-0"
   ],
@@ -16,7 +24,7 @@
     "test/fixtures/codex-app-server-fixture.mjs",
     "test/codex-first-shell.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Against the authenticated installed 0.149.0 app-server, npm run probe:codex:live passed with a streamed Turn completed to its sentinel, the same Thread identity recovered after restart, the exact host handoff started and interrupted, and realtime still unsupported on the ephemeral Thread; npm run probe:codex:projects passed create, move, fork, search, archive, restore, restart recovery and delete; probe-task-context-live passed with the packet Turn interrupted, recovered by Thread name and resumed before reuse. A new packages/codex-adapter/probe-interrupted-turn-live.mjs observed three times, including a direct SIGKILL of the native app-server, that a Turn in progress with a running commandExecution replays as interrupted with the Thread notLoaded before thread/resume and idle after, and the in-flight command item not persisted; commit 89e1482 makes the fixture repair persisted inProgress to interrupted on reload and the two restart proofs expect that. The fixture default version and test expectations moved to 0.149.0; npm test and npm run verify pass at 248 tests, 246 pass, 0 fail, 2 skipped, both remaining skips being DSH source-checkout environment skips, and the real-runtime host test now asserts baselineMatch, alive and a passing hash condition instead of passing silently on a halted shell. Every probe Thread and Section was deleted afterwards.",
   "ticket_id": "ticket-repin-codex-baseline-to-0-149-0"
 }

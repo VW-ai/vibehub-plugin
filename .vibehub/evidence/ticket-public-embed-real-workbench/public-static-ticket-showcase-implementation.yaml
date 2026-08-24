@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+      "digest": "62c394c69b81e1678fe1a94a8b76c671aeed31d9e3568d6b174e868a4aa3ce9d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "digest": "bf193a7bd9ddc167109ea7ba2dda7c468adeb6f8250699c2699c42d0491a46d6",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "digest": "19e9cef05edaddd4f8dca2d2a7b933a1fa10561a13cb1803c1ab16984d85c8a8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "ticket-view-is-a-faithful-workbench-scene",
     "public-fixture-is-honest-and-lightweight",
@@ -14,7 +34,7 @@
     "file:site/tests/rendered-html.test.mjs",
     "preview:http://localhost:3000"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public site now uses a concise product-showcase hierarchy instead of a walkthrough. The first composition pairs one plain-language product statement, neutral and truthful Codex and Claude Code installation, GitHub, Copy for Agent, and the concrete request Add dark mode to this task app with the existing high-fidelity Ticket Graph and open Inspector. The request card is an honest three-part reference—Request, the human request, and the exact Start this with VibeHub phrase—with no fake attached state or send affordance. The page directly reuses the typed five-Ticket fixture, causal cone, Rooms, Execution, Contract, Log, acceptance, Evidence, Outcome, human-attention, and returned-Context surfaces. One compact static diagram explains Request plus Context to one Ticket, work to Evidence, independent Outcome, and durable Context; a second real Workbench scene shows the completed Log. All Phase, stage-rail, Back and Next, palette, App, Activity, timer, autoplay, arbitrary-prompt, and fake-agent code paths were removed. The site adds no backend, model call, persistence, iframe, new dependency, runtime, or second lifecycle.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

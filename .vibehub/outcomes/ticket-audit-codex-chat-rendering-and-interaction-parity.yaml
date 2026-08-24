@@ -7,6 +7,10 @@
     "chat-production-gap-plan-is-decision-ready"
   ],
   "closed_at": "2026-08-22T00:36:41Z",
+  "contract_binding": {
+    "digest": "5b4053a195fcd27732aca585b4f713b8b1ab60f7aa53bd86641aae7844afb7ad",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "codex-chat-conformance-matrix-and-audits",
     "codex-chat-executable-regression-proof",
@@ -14,7 +18,7 @@
     "codex-chat-production-gap-plan-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout in a fresh isolated worktree at exact integrated canonical HEAD 76102da3e21bcc607a5147f03c7b88774b2de763 accepts all five current criteria. The checked-in matrix incrementally measures the accepted native-Chat contract across Thread, Turn, rich content, streaming, execution, Composer, navigation, recovery, accessibility and responsive behavior; three separately attributable source-backed audits preserve their FAIL verdicts against stable interim commits and converge on the corrected highest-severity backlog without copying proprietary Codex Desktop implementation or assets. Executable reducer, renderer, event-window, request-registry, Composer-draft, browser-guard and host tests bind compound identity, authoritative completion, ordering, sanitization, unknown-item truth, live/replay separation, interruption and bounded state. The final Evidence records a 25/25 real-DOM guard, Light/Dark wide and 390x844 review, and an authenticated Codex steer, interrupt, fork and archive lifecycle while ordinary Chat remains independent of VibeHub Task protocol. Inspection of the integrated union confirms that Projects/Recents conflict resolution preserves Chat behavior: Fork and Archive now route through the native Codex Projects adapter while exact turn/steer and request semantics remain host-owned. Independently rerun focused verification passed 26 of 26 with a real loopback Codex app-server; full verification passed 199 of 201 tests with zero failures and two documented DSH source-availability skips; the artifact verified at 62 files and 2,832,437 bytes. The pinned Codex probe passed version 0.147.0 and protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2, including fork, archive, unarchive, steer, rich notifications, approval/input requests, ordinary audio and capability-item seams. Remaining CommonMark, virtualization, durable Quote serialization, prolonged selection policy, route-persistent request drafts, Composer-height convergence, current-Thread URL recovery, model/mode/realtime breadth, theme persistence and final visual polish are explicitly bounded medium or low production work and do not leave a current highest-severity criterion unresolved.",
   "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity",

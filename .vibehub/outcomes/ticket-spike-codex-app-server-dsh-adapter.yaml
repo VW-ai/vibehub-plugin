@@ -8,6 +8,10 @@
     "adapter-recommendation-is-decision-ready"
   ],
   "closed_at": "2026-08-21T05:55:52Z",
+  "contract_binding": {
+    "digest": "3c2b2aa238fbb4860d029b7409c71f3a937c0f1a02ad859e3dbd250d5b631742",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "codex-dsh-contract-and-recommendation-proof",
     "codex-dsh-profile-thread-linkage-proof",
@@ -15,7 +19,7 @@
     "codex-audio-and-realtime-capability-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout at commit 475823fe1dd5f9eda77b6169345c68f833d0f75d reproduced the pinned Codex 0.147.0 schema identity and required protocol seams, the exact DSH rc.8 source seams, a real authenticated ephemeral Codex Turn, stable Thread recovery after app-server restart, byte-exact host-owned synthetic Task handoff with interruption, truthful realtime-unavailable capability handling, and the isolated DSH Profile install, read-only redacted health, stop, restart and removal lifecycle. Focused tests, the full 157-pass repository verification, artifact verification, canonical graph validation and fresh Room drift all passed. The checked-in recommendation keeps Codex as the sole Agent runtime, VibeHub as Task truth, realtime voice capability-gated, and DSH as a bounded later compatibility carrier.",
   "ticket_id": "ticket-spike-codex-app-server-dsh-adapter",

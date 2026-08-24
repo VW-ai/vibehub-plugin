@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "open-graph-reconciled",
+      "digest": "e7f7b6098a291124eb1eba964536d7ecea5df0330523739fe5ed2385ae8ad9fe",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:45180b014bca3c8885336d590b3ced1d2b733986"
+    },
+    {
+      "acceptance_id": "observed-and-speculative-gaps-separated",
+      "digest": "644c62f978a8ef3d36390a3f5453635ba856b08f7560470cf13a7936c8879613",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:45180b014bca3c8885336d590b3ced1d2b733986"
+    }
+  ],
   "acceptance_ids": [
     "open-graph-reconciled",
     "observed-and-speculative-gaps-separated"
@@ -22,7 +36,7 @@
     ".vibehub/tickets/ticket-invisible-git-cross-repo-actions.yaml",
     ".vibehub/tickets/ticket-vibehub-cli.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "All 13 non-DONE Tickets were reconciled against the solo/small-team Plugin wedge. DO NOW: ticket-prioritize-near-term-plugin-improvements is this refresh and should close without product implementation. DO NEXT: ticket-workbench-canvas-first-overview is the smallest user-visible slice and unlocks the established UI chain. DO LATER in dependency order: ticket-workbench-layout-direction-choice after canvas focus state; ticket-workbench-dense-graph-layout after both orientations; ticket-propose-codex-like-workbench-visual-language once the shell baseline is stable; ticket-decide-codex-like-workbench-visual-language as the protected owner choice; ticket-apply-codex-like-workbench-visual-language only after owner choice and dense geometry; ticket-prepare-rooms-workbench-proposal after the core shell direction is clearer; ticket-decide-rooms-workbench-direction as its owner boundary; ticket-rooms-into-workbench after that draft is refined. REFINE FROM EVIDENCE: ticket-queryable-archived-ticket-history now has strong current evidence (31 of 44 Tickets are DONE and the Workbench renders all 44), but its archive/PR/query schema and filtered causal interaction still require an explicit refinement pass before implementation. DEFER: ticket-invisible-git-cross-repo-actions lacks one real target workflow and authority/recovery evidence; ticket-vibehub-cli has maintainability signals but no measured user outcome or command failure justifying a new public surface. No duplicate Ticket is needed: every current direction maps to one existing canonical Ticket or dependency chain.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

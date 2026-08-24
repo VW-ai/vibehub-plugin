@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "task-workspace-information-and-conversation-model-is-explicit",
+      "digest": "186c4c1d39af04b41c873ea9cacdde6b4e58ebdaf21846faaccf9bc82f74b15a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "task-thread-run-and-prompt-boundaries-are-proven",
+      "digest": "373c9c51364cef70affaf82e1ebea2fee934d2a5b6323e06804728ab9d6ed231",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "rooms-and-context-are-readable-without-a-second-graph",
+      "digest": "44819722499ede42d98e9004451f634ed91f537e7c2624acaddc417e76f710db",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "task-workspace-prototype-is-decision-ready",
+      "digest": "215e0af6b2e265ef5ebab2c690c942edfdd1042797e0d50aa501d388296b2e56",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    }
+  ],
   "acceptance_ids": [
     "task-workspace-information-and-conversation-model-is-explicit",
     "task-thread-run-and-prompt-boundaries-are-proven",
@@ -21,7 +47,7 @@
     "browser:codex-in-app:task-needs-you-390-frame-no-overflow-composer-374-approval-context:2026-08-21",
     "command:npm-run-verify-installed-artifact-62-files-2832437-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The real loopback Codex-first shell opened the current canonical Ticket from the 21-card Task Graph into a focused READY Workspace with Start in Codex, 12 readable Context choices, the shared native conversation renderer and Composer, and a host packet containing the accepted Chat prerequisite proof and browserMayReconstructPrompt=false; Back to Tasks restored focus to the exact originating Ticket card. The same DOM exercised DRAFT/Continue, READY/Start in Codex, RUNNING/Continue, READY plus NEEDS YOU, RUNNING plus VERIFYING, DRAFT plus DEVIATED, DONE, and Standalone fixtures without conflating Chat and Task. The 390px app frame had clientWidth=scrollWidth=390 and a 374px Composer, with Task timeline, exact approval card and governed Context selector present; direct Task Context stayed checked and locked while an optional Context could be explicitly enabled for the next Turn, changing the visible count to two. Wide Light and Dark reused the same hierarchy, Dark rendered white foreground, and no false live or Outcome claim was introduced. Automated contracts cover keyboard, focus, reduced motion, fixture parity, local-only host and read-only boundaries; the full installed artifact verification produced 62 files / 2,832,437 bytes.",
   "ticket_id": "ticket-research-task-workspace-conversation-context"
 }

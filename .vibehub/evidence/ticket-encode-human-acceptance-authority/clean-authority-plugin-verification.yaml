@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "authority-feature-remains-lightweight",
+      "digest": "90f9bfa7de115c739e4b1a28a7c9125492d06334333db7b1ba5ecf39abd79b03",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7267b43b96da68d123f7ca84df5b35cbdd4bd021"
+    }
+  ],
   "acceptance_ids": [
     "authority-feature-remains-lightweight"
   ],
@@ -12,7 +20,7 @@
     "package.json",
     "docs/CONCEPT.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "`npm run verify` passes 45/45 tests and builds a dependency-free 52-file Plugin artifact. Fresh artifact verification executes a Human-authority Ticket through READY, human-origin Evidence, successful Outcome, and read-only UI COMPLETE projection. Project validation and diff checks pass. The implementation adds only optional Git-document fields, shared Skill guidance, mechanical validation/projection, and read-only UI treatment; it adds no dependency, service, account, permission engine, database, writable endpoint, hidden state, lease, or attestation mechanism.",
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

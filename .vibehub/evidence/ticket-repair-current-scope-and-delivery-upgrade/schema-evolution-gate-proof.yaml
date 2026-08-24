@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "schema-evolution-gate-is-mechanical",
+      "digest": "dc25a15b1ad7d716b44ff6068ed21b2f26a23c1cc0346175e74de722111c7a46",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    }
+  ],
   "acceptance_ids": [
     "schema-evolution-gate-is-mechanical"
   ],
@@ -16,7 +24,7 @@
     "command:npm-run-verify:101-of-101-tests-pass",
     "command:plugin-artifact:55-files-570918-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The runtime now reads one compact version contract: project format 2 and Ticket schema 2. The Ticket schema ID and validator require v2 plus explicit deliveries; the format-1-to-format-2 registry declares ticket 1-to-2 in machine-readable form; all 54 canonical Tickets are v2. Regression proves a premature format-2 marker over a v1 Ticket fails validation, the complete migration heals it, a v1 Ticket is rejected by current writes, the registry targets equal the runtime contract, and the full 101-test plus installed-artifact verification passes.",
   "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
 }

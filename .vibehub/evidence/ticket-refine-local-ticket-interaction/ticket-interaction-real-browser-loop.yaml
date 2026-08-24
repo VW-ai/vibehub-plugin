@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "default-view-orients-immediately",
+      "digest": "090861446c03d6c53b56b7b20ef2c860cd6333b272f60a687e248eae8572c491",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:963ce1003d5ae0275ebeae6efac1283415b6a27b"
+    },
+    {
+      "acceptance_id": "selection-is-one-execution-lens",
+      "digest": "889101c6b4f24d924d93275702e6f6149f9d587d354a01478ee25bd74f3cece9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:963ce1003d5ae0275ebeae6efac1283415b6a27b"
+    },
+    {
+      "acceptance_id": "detail-is-progressive-and-task-ordered",
+      "digest": "388c51bbc08d034428fa36c02110027585a603f38174191a026e456b5e18e573",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:963ce1003d5ae0275ebeae6efac1283415b6a27b"
+    },
+    {
+      "acceptance_id": "navigation-feels-fluid-and-predictable",
+      "digest": "420997fd13a772617c19f9e2f915abe391c5813a17c505f25c15f9bd40fad22e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:963ce1003d5ae0275ebeae6efac1283415b6a27b"
+    }
+  ],
   "acceptance_ids": [
     "default-view-orients-immediately",
     "selection-is-one-execution-lens",
@@ -15,7 +41,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "browser:actual-repository-desktop-1280x900-and-narrow-390x720"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit fbdf901 was exercised against the actual six-Ticket repository at 1280x900, the normal Codex browser width, and 390x720. The settled default view exposed the exact vibehub-plugin worktree, branch and commit, one READY frontier, causal direction, direct relations, DONE state, minimap and controls without a legend. Selecting the READY Ticket kept its SVG node inside the resized desktop canvas and opened one Execution lens with state, completed prerequisites, zero blockers, direct unlocks and proof coverage. Contract exposed acceptance, guardrails, bounded Context and audit disclosures; Proof mechanically reflected structured Evidence and Outcome arrays, including seven Accepted criteria on a completed Ticket. Arrow-key tab navigation, full-screen narrow Inspector, close/back focus restoration and semantic state color were observed. Dogfood also found and fixed the prior false DONE blocker count and the programmatic heading focus frame.",
   "ticket_id": "ticket-refine-local-ticket-interaction"
 }

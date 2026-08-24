@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "near-and-far-scenarios-are-explicit",
+      "digest": "7e36b8e8b21c3efbf2f257934603fe9feb543b895f7d0135111dbf9b9203a685",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "clickable-core-loop-prototype",
+      "digest": "b18f579665e3f09aee1d7a85618e2bf2116f5ee53ed4eae20a647d7824c23062",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "whole-application-product-identity",
+      "digest": "b07d68a57aea0a542672d525d18dafa6225d9190e73d13f5e67ffd19224e5383",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "ticket-context-annotation-language",
+      "digest": "fa25f736040f605cfee894ea5a9ad19595a99be91b7b26dee5ed007e64d3641f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "execution-is-strongly-perceptible",
+      "digest": "85b82d0057e3f94e27e81de828f760946d317522c84b9a2c755e0d8b30b051ae",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "review-pack-is-decision-ready",
+      "digest": "b50ef31d6d10f628a66ab621af9b97fde09034b47a1aba89dc2fc39b36668e98",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    }
+  ],
   "acceptance_ids": [
     "near-and-far-scenarios-are-explicit",
     "clickable-core-loop-prototype",
@@ -22,7 +60,7 @@
     "test:npm-test-99-of-99",
     "http:127.0.0.1:55724-health-ok"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner corrected the application hierarchy: the previous build was acceptable only as the internal execution state of one Ticket, while the primary application surface must present Tickets through the existing VibeHub causal graph grammar. The low-fidelity prototype now opens on a Ticket Graph that shows direct dependencies, fork and join geometry, blockers, unlocks, operational state, orthogonal Needs-you signals, and trusted Active-Run presence. Clicking a graph Ticket enters its phase-specific Ticket Workspace, preserving the earlier Explore, Ready, Running, Needs you, Review, and Done surfaces; a persistent back action returns to the graph. The sidebar now contains stable Tickets, Chats, and Rooms destinations plus recent uncommitted Chats rather than replacing committed Ticket causality with flat attention queues. Product logic and review guidance explicitly define the two-level Graph-to-Ticket-Workspace application. The full repository suite passed 99/99 and the local-only preview served the corrected graph-first prototype.",
   "ticket_id": "ticket-prototype-task-harness-experience"
 }

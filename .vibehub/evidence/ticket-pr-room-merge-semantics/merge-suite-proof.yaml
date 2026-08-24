@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "merge-suite-green",
+      "digest": "34e33f48694909f5b6c461372affd2825627d7f4d8da4ed6cf569ce35e92b9bd",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a63188503d2a8540b6b923826d1a320a8ae5c5d2"
+    }
+  ],
   "acceptance_ids": [
     "merge-suite-green"
   ],
@@ -9,7 +17,7 @@
     "commit:43fae5d",
     "test/room-drift.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Full node --test suite passes 38/38 and the plugin artifact builds and verifies cleanly (47 files) with the extended governance reference bundled; all four rooms FRESH after align-on-use.",
   "ticket_id": "ticket-pr-room-merge-semantics"
 }

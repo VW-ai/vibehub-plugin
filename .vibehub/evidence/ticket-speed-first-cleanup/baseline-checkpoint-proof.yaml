@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "baseline-checkpoint",
+      "digest": "6772fc024f6d8ec52d929599559836461216e69024db37beedfdc29492d89c5d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:74ab68f473eb27281ac82494d03a88a6d8a1d8d8"
+    }
+  ],
   "acceptance_ids": [
     "baseline-checkpoint"
   ],
@@ -9,7 +17,7 @@
     "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91",
     ".vibehub/tickets/ticket-speed-first-cleanup.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 9dee0f095374211d8d7cbeeacac653ebb87bed91 captures the independently closed ticket-first pivot and the cleanup Ticket before hard deletion.",
   "ticket_id": "ticket-speed-first-cleanup"
 }

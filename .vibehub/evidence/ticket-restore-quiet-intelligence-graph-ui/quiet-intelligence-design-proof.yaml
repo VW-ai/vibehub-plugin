@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "design-authority-is-explicit",
+      "digest": "0023f2e190051c2dfa02a8a64e46e9cc874451b7c1e0b713c1d5f0a54eaf4237",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7f60b3bdb529a28def533f09d4040fc0df4369b4"
+    },
+    {
+      "acceptance_id": "spatial-language-matches-authority",
+      "digest": "0bccefc677d3869598f54d667a2523c547709cf3f22d5f0c143d7488f6cc4da2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7f60b3bdb529a28def533f09d4040fc0df4369b4"
+    }
+  ],
   "acceptance_ids": [
     "design-authority-is-explicit",
     "spatial-language-matches-authority"
@@ -14,7 +28,7 @@
     "docs/assets/local-graph/quiet-workbench-narrow.jpg",
     "sha256:3841d734e111b2024420032e77527712a9140f0d205bd517bf74d8d60201d1a1"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit c2126eb compiles the approved quiet-intelligence, v8 spatial-workbench, and causal-graph authority into a checked-in local design brief and removes the rejected warm editorial, serif, decorative-green, persistent-legend, card-dashboard direction. Real-browser review used a disposable eight-Ticket fork-and-join fixture with DONE, READY, BLOCKED, and DEVIATED states. The retained 1280-class desktop and 390px narrow captures show cool-neutral matte surfaces, compact system typography, restrained state color, bounded execution objects, direct relation handles, a quiet default graph, and a full-screen narrow Inspector.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

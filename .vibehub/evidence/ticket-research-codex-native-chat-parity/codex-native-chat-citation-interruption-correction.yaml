@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "codex-chat-state-inventory-is-complete",
+      "digest": "2284bdc17eb98d423f74d390aec44d26d01f9825b1ed1e4b9a245bee275d2335",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:f0144d5d81d0099853d050d65e34699b753195b8"
+    },
+    {
+      "acceptance_id": "app-server-events-map-to-one-ui-contract",
+      "digest": "6626e4b511a7b3685ea2b5b32b6ecb2e5a0582783d6238f9c53de4ff74b73117",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:f0144d5d81d0099853d050d65e34699b753195b8"
+    },
+    {
+      "acceptance_id": "chat-parity-review-is-decision-ready",
+      "digest": "b38b5ffc53ee02985e63acf524dcab7e9398f900c74ca9cf48adfa5cd02d90a0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:f0144d5d81d0099853d050d65e34699b753195b8"
+    }
+  ],
   "acceptance_ids": [
     "codex-chat-state-inventory-is-complete",
     "app-server-events-map-to-one-ui-contract",
@@ -21,7 +41,7 @@
     "browser:codex-in-app:real-thread-turn-interrupt-stop-boundary-running-cleared:2026-08-21",
     "command:node-test-codex-first-shell-prototype-6-of-6"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The correction closes the three exact independent-closeout gaps without broadening the prototype. The pinned interaction inventory now explicitly covers agentMessage.memoryCitation, model and collaboration-mode posture, ordinary microphone/audio input, discoverable keyboard shortcuts, focus return, accessibility, retry, completion, failure and interruption. The executable contract, deterministic fixture and renderer retain citation entries plus source Thread identity instead of silently dropping memoryCitation. Authoritative TurnStatus interrupted/failed adds a visible terminal boundary while preserving every already-recorded Turn item. Real Codex browser exercise created a durable Thread, started a long Turn, interrupted it through the production Stop control, reconciled the same Thread from app-server, rendered exactly one Turn interrupted boundary, cleared running state and retained history. The mixed wide carrier rendered one citation and one interruption boundary at 1280 px with no overflow; the explicit 390x844 carrier rendered both with a 390 px body and 374 px Composer. Focused runtime tests passed 6/6 under the normal host-owned Codex configuration.",
   "ticket_id": "ticket-research-codex-native-chat-parity"
 }

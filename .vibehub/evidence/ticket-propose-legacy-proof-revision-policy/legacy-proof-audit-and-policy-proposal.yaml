@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "legacy-proof-corpus-is-audited",
+      "digest": "26af8ca0148607b0fac45a707de6ab26fbd578c3ddd57223daa69c7c44fa7403",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    },
+    {
+      "acceptance_id": "three-transition-policies-are-compared",
+      "digest": "acce856e546c6b2464901773181b2a46fbc94258ac74a7ac836e20d3f0a15444",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    },
+    {
+      "acceptance_id": "repository-truth-impact-is-quantified",
+      "digest": "b74c535cb68335f20b2e13e137ae0e15b0b8932339441007c397738b83248bed",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    },
+    {
+      "acceptance_id": "git-reconstruction-limits-are-proven",
+      "digest": "fcd7c0ff829655c1d87f8e0d945f9e8e0c02687304b103cc9ab070ba548eda2f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "digest": "de3f724efaa05a3756c165a8242ed3d41a7bda6ba21012854e9ff095db25290d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    },
+    {
+      "acceptance_id": "downstream-boundary-is-explicit",
+      "digest": "b36b56087b14be8e35625e6f27c88b8c7746dfded0305b09593d879736abfa6c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:b93aa5dd6471e13dbf8af9c505ef05529d20eeb7"
+    }
+  ],
   "acceptance_ids": [
     "legacy-proof-corpus-is-audited",
     "three-transition-policies-are-compared",
@@ -18,7 +56,7 @@
     "commit:24b3d6d9df041a94ef3cb74468be9528b0214747",
     "commit:ffaad6d19139942e4d1e21679a3cf7b8a6d94f21"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A reproducible Git-history audit at b558f35 inventories 79 Tickets, 202 Evidence, 59 successful Outcomes, 43 archived Tickets, and human-authority proof; it reconstructs every proof document at first Git appearance, identifies 19 Evidence and one successful Outcome with later contract drift, quantifies all-stale, grandfather, and reconstruction impacts, and supports a decision-ready bounded-reconstruction hybrid with explicit migration, rollback, schema, projection, host-parity, and regression boundaries without mutating repository truth.",
   "ticket_id": "ticket-propose-legacy-proof-revision-policy"
 }

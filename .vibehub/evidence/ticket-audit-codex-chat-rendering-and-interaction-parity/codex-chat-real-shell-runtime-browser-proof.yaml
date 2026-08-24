@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "highest-severity-chat-gaps-are-closed-in-real-shell",
+      "digest": "5b7783933e1cd7f5879e04d09c3613da7b134b79c6a015f6a80d4980d55332d2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:da8ee812d8d1b10474b8059500f1eb8c825f7298"
+    }
+  ],
   "acceptance_ids": [
     "highest-severity-chat-gaps-are-closed-in-real-shell"
   ],
@@ -16,7 +24,7 @@
     "browser:2026-08-21-final-fac258a-guard-25-of-25",
     "runtime:2026-08-21-codex-steer-interrupt-fork-archive"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The authenticated carrier closes every highest-severity finding from all three audits with behavior and hierarchy changes rather than styling alone. The exact fac258a application passed the visible 25/25 real-DOM guard. A disposable real Codex Turn preserved one active Turn through exact Steer, then Stop produced one interrupted boundary with partial history; real Fork opened a new Thread with exact source lineage. Both disposable Threads were recoverably archived and absent from a fresh active Thread list. Ordinary Chat remained independent of VibeHub Task protocol.",
   "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
 }

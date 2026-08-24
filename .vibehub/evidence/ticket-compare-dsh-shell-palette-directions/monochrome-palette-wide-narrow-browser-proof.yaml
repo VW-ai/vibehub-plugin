@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "wide-narrow-and-keyboard-review-is-usable",
+      "digest": "4545de9b2806e53ba6d7c988a23c608750df16790ac86de4242019dbc077259d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3ddc8557c758796ba55a5da6189bd1934cd8b616"
+    }
+  ],
   "acceptance_ids": [
     "wide-narrow-and-keyboard-review-is-usable"
   ],
@@ -14,7 +22,7 @@
     "test/dsh-palette-explorer.test.mjs",
     "package.json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A real browser exercised all five palette radios and observed five distinct computed background tokens, opened the compact Compare all grid, returned to full-size inspection, and switched Graph, Chat and Task surfaces successfully. The built-in exact 390x844 frame reports body clientWidth=scrollWidth=390 and clientHeight=scrollHeight=844, while the Task Graph alone keeps intentional internal horizontal panning. Both wide and narrow frames retain visible controls and the fresh browser logs contain zero errors. Focused tests pass 4/4; full verification passes 150 tests with one optional exact-source skip; and the existing installed plugin artifact remains 62 files / 2,831,812 bytes. The loopback server accepts GET/HEAD only and exposes repositoryWrites=false.",
   "ticket_id": "ticket-compare-dsh-shell-palette-directions"
 }

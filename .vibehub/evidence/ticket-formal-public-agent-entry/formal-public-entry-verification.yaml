@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "product-entry-remains-reachable",
+      "digest": "752dfee91eab87673c54a1e2b42be57b47c875153cbfea8c29ed2f78100c4276",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "shell-feels-formal-not-prototypical",
+      "digest": "b04533163a2ec08c01a8d1503e044a1fa8051e58eddb2b9a21ab3311d7bbaaa3",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "agent-first-cycle-remains-intact",
+      "digest": "ecc7a74c6173e7c28c3c62556cdbe6923db6740b1a50336d6e9d983657cd4b79",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "formal-entry-is-responsive-and-verifiable",
+      "digest": "75b121f23c6f534e367c99464ef7c7734fd3d9b1a5e9d5d2964e7be21d619fdf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "product-entry-remains-reachable",
     "shell-feels-formal-not-prototypical",
@@ -20,7 +46,7 @@
     "browser:http://localhost:3000/@390x844",
     "conversation:2026-08-09-formal-entry-browser-verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh verification passes: ESLint, Vinext static production export, six rendered product-contract tests, canonical project and Ticket validation, and Plugin artifact verification at 51 files and 361397 bytes. Desktop browser inspection confirmed the formal masthead and brand entry remain visible in initial and active states, Send reaches the explicit palette boundary, Exit demo restores the initial conversation immediately, Overview is marked current after reset, the input is re-enabled, and the page has no horizontal overflow (1159px body and viewport). At a 390x844 mobile override the masthead occupies 58px, the initial product surface fills the remaining viewport, the active state stacks 375px-wide Chat and View with three palette choices and no body overflow, and the scoped Overview action returns from the active demo to the initial state. Browser console errors were empty. Reduced-motion and fine-pointer hover contracts remain explicit, and the viewport override was reset after inspection.",
   "ticket_id": "ticket-formal-public-agent-entry"
 }

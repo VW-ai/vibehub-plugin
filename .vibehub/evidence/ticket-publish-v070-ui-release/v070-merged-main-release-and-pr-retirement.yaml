@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-pr-merged",
+      "digest": "6b2cf43394fd4adc964d249b861d0f50d2a4e6241b3ee33f34b4040758ba2e32",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9fad9fefc706702e2647e1323d1a46f56a95ddfb"
+    },
+    {
+      "acceptance_id": "tagged-merged-main",
+      "digest": "6f1267eb8dd29adadda70212e7ac28c5860b7f897c05accdba6b92e26863f669",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9fad9fefc706702e2647e1323d1a46f56a95ddfb"
+    },
+    {
+      "acceptance_id": "github-release-verified",
+      "digest": "7c0a78f43bb1c123b6ba4bc36d1601ccca382e49e82a9888245aafce5d205596",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9fad9fefc706702e2647e1323d1a46f56a95ddfb"
+    },
+    {
+      "acceptance_id": "superseded-pr-retired",
+      "digest": "f214c2dede528b34e70450145d2ae337c17728fae3c721d1e90e3db125f7dc22",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9fad9fefc706702e2647e1323d1a46f56a95ddfb"
+    }
+  ],
   "acceptance_ids": [
     "release-pr-merged",
     "tagged-merged-main",
@@ -23,7 +49,7 @@
     "test:sha256sum-check-vibehub-plugin-0.7.0-ok",
     "github-pr:VW-ai/vibehub-plugin#18-closed-unmerged"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Replacement PR #19 merged the curated shared Web UI, release preparation, and REFINE compatibility repair into main at merge commit 3860f3a. Local main fast-forwarded exactly to that commit and passed npm run verify (49/49 plus the 53-file artifact), project/Ticket validation, and four-room FRESH drift checks before lightweight tag v0.7.0 was created and pushed on that exact merged-main commit. The tag-triggered Release VibeHub run 31562864171 succeeded, publishing both the 343503-byte archive and checksum; downloading both and running sha256sum --check returned OK, and the archive digest is e8ab544db738936aa0cc0e98f7a40aa69c2d84d5a7ede4e25254d3e09f10a05b. Original PR #18 was then closed without merge with a comment pointing to merged replacement #19 and v0.7.0.",
   "ticket_id": "ticket-publish-v070-ui-release"
 }

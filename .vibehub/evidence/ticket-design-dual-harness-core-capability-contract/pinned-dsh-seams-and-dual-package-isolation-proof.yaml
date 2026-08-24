@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "dsh-independent-adapter-boundary-is-source-proven",
+      "digest": "f6fc305b626b1fce99eea0e1fb3fdb4e79829dc0fbb1f69436aa94741ea538dc",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8792e954ffedfedde707c4ec9ceff785a06be520"
+    },
+    {
+      "acceptance_id": "dual-harness-package-boundaries-are-decision-ready",
+      "digest": "87b8531e87b7247876f4d45aac616e6a945fd2684474f6b1c25ebd67f6202eaf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8792e954ffedfedde707c4ec9ceff785a06be520"
+    }
+  ],
   "acceptance_ids": [
     "dsh-independent-adapter-boundary-is-source-proven",
     "dual-harness-package-boundaries-are-decision-ready"
@@ -20,7 +34,7 @@
     "command:probe-harness-package-isolation-5-of-5",
     "command:npm-run-verify-174-pass-0-fail-1-expected-skip"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A read-only 30-check probe passed against the clean official DSH rc.8 source at exact commit 141eb6fef83422698aef7a981029e843e8161534. It binds Session prompt/search/fork/cancel/replay, Workspace, command, projection, tool, approval, permission, delegated work, Slot, Theme and package seams, proves rc.8 prompt input is text or image with audio unsupported, and proves selected DSH base, Web and VibeHub adapter manifests contain no Codex runtime dependency. Five static import domains also prove shared Task/UI/core import neither harness and each adapter excludes the other. The full repository verification passed 174 tests with zero failures and one unrelated expected source-check skip; no DSH package was installed, booted or executed, leaving real DSH carrier proof to the later Plugin Ticket.",
   "ticket_id": "ticket-design-dual-harness-core-capability-contract"
 }

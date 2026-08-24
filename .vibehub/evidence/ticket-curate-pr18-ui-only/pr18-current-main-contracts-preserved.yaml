@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "current-main-ui-contracts-preserved",
+      "digest": "07a16bf8813050d85d767da871ab062580113aa2306806cd93df9d4777195db2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ad21554e334cc88b434feb6f7e7145aad002af2a"
+    }
+  ],
   "acceptance_ids": [
     "current-main-ui-contracts-preserved"
   ],
@@ -13,7 +21,7 @@
     "test:ui-host-human-attention-projection",
     "test:ui-host-read-only-loopback"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The semantic conflict resolution preserves main's human attention states and authority badges, READY-only Agent handoff, canonical Room context cards, direct Git-YAML projection, and read-only host boundary within the rebuilt UI.",
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

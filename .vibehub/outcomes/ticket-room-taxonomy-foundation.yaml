@@ -6,6 +6,10 @@
     "dogfood-rooms"
   ],
   "closed_at": "2026-08-03T23:04:00.000Z",
+  "contract_binding": {
+    "digest": "66e71874c46389a5621fdf4fb71450a76ed4d56f6809b50dae4b7b047e676ad4",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "room-schema-contract-proof",
     "vh-room-tree-validation-proof",
@@ -13,7 +17,7 @@
     "dogfood-rooms-migration-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independently verified at commit 069d4d8. room-schema: skills/contracts/room.schema.json defines description, boundary, unique anchor globs, an alignment block (last_aligned_commit, checked_at, per-file anchor_hashes path+blob) and a stale flag with optional stale_reason; vh.mjs validateRoom mirrors it field-for-field and all three checked-in room.yaml files validate (vh.mjs is stricter on anchor_hashes path uniqueness than the schema declares, a harmless tightening). vh-room-validation: loadRooms walks nested rooms/ enforcing room.yaml presence per directory, kebab-case slugs, room_id equal to directory name, and no stray documents directly under rooms/; room-held Context entries load into the shared map and a live context query resolved a room-held entry; node --test passes 22/22 including five room tests. context-placement: context put --room writes inside the named room after an existence check; a put to a missing room was exercised in a scratch repo and failed with not_found exit 1, and a room directory lacking room.yaml made project validate fail with an explicit error; flat root-level puts and duplicate-location refusal remain intact. dogfood-rooms: .vibehub/rooms/ holds knowledge, workbench, and ticket-lifecycle rooms with six Context entries moved in (three each to knowledge and workbench) and three genuinely cross-room entries left at the root; grep found no stale flat-path context_refs and eleven ticket files were updated in the commit; project validate reports rooms 3, contexts 9, valid. The evidence claim that the plugin artifact verifies also holds (verify:artifact ok; npm run build alone errors only on a pre-existing dist/plugin directory, unrelated to this ticket).",
   "ticket_id": "ticket-room-taxonomy-foundation",

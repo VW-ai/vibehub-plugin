@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "light-and-dark-baseline-is-reviewable",
+      "digest": "19a71dd939db5f9ba6412def3183a103ba3c01b2b4aeffd398f17b1cec069395",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8ef9463d41eb78e11c606c9df319f482f2183dde"
+    },
+    {
+      "acceptance_id": "wide-narrow-and-accessible-loop-is-real",
+      "digest": "b7faad22dbe1b0308a2b40c1a6812aadc5c2c36924c1b44bd0b12371f278ab22",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8ef9463d41eb78e11c606c9df319f482f2183dde"
+    }
+  ],
   "acceptance_ids": [
     "light-and-dark-baseline-is-reviewable",
     "wide-narrow-and-accessible-loop-is-real"
@@ -17,7 +31,7 @@
     "test:focused-codex-shell-and-host:21-pass",
     "test:npm-run-verify:161-pass-1-expected-skip"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Real Codex in-app browser review proved the identical shell at the default 1280px-wide viewport and an explicit 390x844 narrow viewport. Light computed to accent #0169cc, background rgb(255,255,255), foreground rgb(13,13,13); Dark computed to accent #339cff, background rgb(24,24,24), foreground rgb(255,255,255). Chat, exact canonical Task Graph, focused Task Workspace and back-to-card focus were traversed; the narrow document measured clientWidth=scrollWidth=390, placed Recommended action before Context, hid graph edges rather than drawing misleading compressed topology, and showed no false live or recording state. Reduced-motion, focus-visible and responsive contracts are checked in, the console review returned zero warnings/errors, and the focused/full regression suites passed.",
   "ticket_id": "ticket-prototype-codex-first-vibehub-shell"
 }

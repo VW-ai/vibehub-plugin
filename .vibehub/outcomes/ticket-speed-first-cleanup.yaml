@@ -8,6 +8,10 @@
     "ticket-vertical-slice-works"
   ],
   "closed_at": "2026-07-31T22:29:53.000Z",
+  "contract_binding": {
+    "digest": "5a8a498940c14a8bfd9e10a7b2de58515f9e9c090dcb14635b5f9532bff63b2f",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "baseline-checkpoint-proof",
     "context-minimum-proof",
@@ -17,7 +21,7 @@
     "ticket-vertical-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all six criteria. Commit 9dee0f095374211d8d7cbeeacac653ebb87bed91 is the exact rollback baseline and 74ab68f473eb27281ac82494d03a88a6d8a1d8d8 removes the legacy runtime surfaces. Project and Ticket validation passed; npm run verify passed 4/4 tests and the 28-file, 65,042-byte artifact check. Independent footprint reconstruction matched 110 to 5 production files, 40,211 to 1,086 production lines, and 74 to 28 artifact files with 2,495,913 to 65,042 bytes. Claude and Codex marketplace builders succeeded under /private/tmp, exposed all nine Skills without MCP/hooks/runtime/packages, and their installed helpers completed fresh-process Context capture, query, and validation roundtrips.",
   "ticket_id": "ticket-speed-first-cleanup",

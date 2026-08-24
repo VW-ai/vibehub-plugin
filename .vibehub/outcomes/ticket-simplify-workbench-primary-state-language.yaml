@@ -7,12 +7,16 @@
     "production-and-installed-regressions-pass"
   ],
   "closed_at": "2026-08-20T22:28:50Z",
+  "contract_binding": {
+    "digest": "3833b84c95318db3cdfbd66bfeebfd0345b4726de04333090b00f188a3d3acc1",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "workbench-four-phase-and-action-contract-proof",
     "workbench-state-browser-and-installed-regression-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepts all five implementation criteria at exact commit 3b2d4ae. Source and focused tests confirm one shared additive model derives only DRAFT, READY, RUNNING, and DONE from unchanged host next_action, then selects at most one deterministic DEVIATED/BLOCKED/NEEDS YOU/VERIFYING/WAITING corner substate while keeping trusted live presence separate. Production cards retain their dimensions, copy, aperture, relation metadata, selection, and topology; the rendered top phase accent is removed, READY and RUNNING use distinct text/icon and restrained visual treatments, and reduced-motion-safe live styling is reachable only through a trusted, Ticket-scoped, active execute/closeout runtime with valid observation and expiry. The host currently exposes runtime as unavailable, so CLOSE_OUT is RUNNING+VERIFYING without a fabricated live claim. The focused Execution panel begins with the strongest Recommended action surface and copies the exact host-owned context payload for every canonical action, including an independent, read-only closeout handoff, while causal, Context, Contract, Log, Evidence, source, and Inspector content remain available. Independent focused verification passed 34/34; full repository verification passed 129/129; and the freshly verified Codex/Claude artifact passed at 58 files and 603720 bytes. Canonical browser Evidence records clean default and 390x844 real-Workbench review with no console errors.",
   "ticket_id": "ticket-simplify-workbench-primary-state-language",

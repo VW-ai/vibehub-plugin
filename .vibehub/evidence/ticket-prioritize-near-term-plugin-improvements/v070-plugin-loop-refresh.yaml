@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "current-plugin-loop-inventoried",
+      "digest": "d7fb6b3d7c15b3ea746ea5c8d27e2ecc430f58977cc44284806c07d4f53fdad9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:45180b014bca3c8885336d590b3ced1d2b733986"
+    },
+    {
+      "acceptance_id": "observed-and-speculative-gaps-separated",
+      "digest": "644c62f978a8ef3d36390a3f5453635ba856b08f7560470cf13a7936c8879613",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:45180b014bca3c8885336d590b3ced1d2b733986"
+    },
+    {
+      "acceptance_id": "hosted-service-deferred-cleanly",
+      "digest": "2f27780139c62add7662fe6bf0d70872b0d746f28fac8dc3bdb5fd2c95a22a62",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:45180b014bca3c8885336d590b3ced1d2b733986"
+    }
+  ],
   "acceptance_ids": [
     "current-plugin-loop-inventoried",
     "observed-and-speculative-gaps-separated",
@@ -22,7 +42,7 @@
     ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml",
     ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Post-v0.7.0 audit confirms the installed loop is healthy and complete: README's single entry routes through Ticket Plan and setup/compatibility; Plan checks Room drift and writes the smallest canonical Ticket graph; Ticket Run selects only READY work and appends acceptance-linked Evidence; a separate Agent owns Outcome closeout; Ticket Review presents Execution, protected Contract boundaries, Log, and PR/explicit graph review. The current 49-test suite passes. The strongest observed gaps are now Workbench interaction and information density rather than lifecycle correctness: index.html permanently reserves a left rail and a second full-width empty Implementing strip despite no trusted presence input; app.js has only top-to-bottom layout and projects all 44 canonical Tickets, of which 31 are DONE; the owner has directly identified canvas space, direction choice, dense routing, visual quality, and historical-ticket filtering as friction. Rooms visibility is a real but larger proposal/decision surface. Codex-like styling, project playbooks, cross-repository actions, CLI packaging, and hosted coordination are separated from observed gaps: visual language has explicit owner demand but still needs proposal/decision; playbooks, cross-repository action, CLI, accounts, synchronization, storage, deployment, and connectors remain speculative or deferred until dogfood supplies narrower evidence. The recommendation preserves the Skill-first, Git-native, dependency-free plugin and read-only loopback UI; no hosted-service architecture is proposed.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

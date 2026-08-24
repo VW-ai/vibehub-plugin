@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "tagged-merged-main",
+      "digest": "804a5ec06dac25fc5ab916456db5271f2e390d1c9c5dc78268cd2aaa68dfd89a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a969afed026a1e11d2e0c3e92401f42932583be1"
+    }
+  ],
   "acceptance_ids": [
     "tagged-merged-main"
   ],
@@ -12,7 +20,7 @@
     "command:git push origin v0.6.0",
     "https://api.github.com/repos/VW-ai/vibehub-plugin/git/refs/tags/v0.6.0"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After PR #16 merged, local main was fast-forwarded and main HEAD, origin/main, and the newly created lightweight tag v0.6.0 all resolved exactly to merge commit 20988ffa3fde04e952a0d6905268e43fb93e195e. The tag was pushed as a new origin tag from main; the release feature-branch head was ae5560db7ef6ac52f9ca438cfd21ab157427fe16 and was not tagged. GitHub's tag ref API independently reports v0.6.0 object sha 20988ffa3fde04e952a0d6905268e43fb93e195e.",
   "ticket_id": "ticket-publish-v060-release"
 }

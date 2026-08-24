@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "knowledge-governance-reference",
+      "digest": "54c595102d417ef739ee447e3e62c55cfe23a13be571421bca330100dfcd23ab",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67ef8ad5780acc0c0853d7ba7f34bb55c75692ee"
+    }
+  ],
   "acceptance_ids": [
     "knowledge-governance-reference"
   ],
@@ -10,7 +18,7 @@
     "skills/vibehub-ingest/references/knowledge-governance.json",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "skills/vibehub-ingest/references/knowledge-governance.json states placement (lowest-owning-room, lowest-common-ancestor, create-it), both trust layers with the distill: source-ref prefix and single winning layer, and the git-pr-review activation gate exactly once; ingest, distill, and query each carry a single pointer line with no restated rule, and the skill-contracts test asserts pointer presence and the reference's structural invariants.",
   "ticket_id": "ticket-contractize-skill-system"
 }

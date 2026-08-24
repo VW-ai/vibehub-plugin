@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "digest": "f5773cf85b34907b4c94c5920a9c24e6706fc2621952ffe5fdf80a07a057fb28",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "graph-projects-progressive-causality",
+      "digest": "b75af35c9e9ae9e59372019d3c310b1f3acfd82f073f668bb10502d5fe7919bb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "motion-explains-without-obstructing",
+      "digest": "892aa5399e1d065765a4284774a93dccfaccf7c12261080bb5afe38261e66725",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "reduced-motion-preserves-the-sequence",
+      "digest": "83ee1d9a11bf3f8430169632a6857c8733b8487f130326c770ee8e1161f84172",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "cycle-evolution-is-verified",
+      "digest": "28b66c1647cde6b9930fc029d2e1df7687291a789d2bd6f0bc4a82d37fddff91",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "post-decision-cycle-evolves-in-order",
     "graph-projects-progressive-causality",
@@ -19,7 +51,7 @@
     "command:npm test",
     "command:npm run verify:artifact"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh non-browser verification passes after the lifecycle refinement: ESLint, Vinext static production export, seven rendered product-contract tests, canonical project validation at 4 rooms / 26 Context / 33 Tickets / 104 prior Evidence / 28 Outcomes, canonical Ticket validation, the full repository suite at 43/43, and Plugin artifact verification at 51 files and 361397 bytes. The rendered contracts assert the two-step Evidence-before-Outcome schedule, mechanical connector and node states, the four lifecycle labels, horizontal and mobile-vertical connector projection, reduced-motion state preservation, both approved easing tokens, and the absence of transition-all, scale(0), ease-in, or 300ms-plus opacity/transform transitions. No motion dependency was added and the production site remains a static export.",
   "ticket_id": "ticket-public-cycle-evolution"
 }

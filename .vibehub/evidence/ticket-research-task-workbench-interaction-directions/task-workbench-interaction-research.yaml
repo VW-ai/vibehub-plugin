@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "research-corpus-is-source-backed",
+      "digest": "c4a1a3970561dacf8d3d854ccdbab26d5bd9bcbe04165c007faf1dc56991b16f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:059d716c06b36304eeefc5c534da93cac2c938d3"
+    },
+    {
+      "acceptance_id": "scenario-pattern-map-is-complete",
+      "digest": "ab19152a37256e21560504ca43114ded73f986db00182e9e15d3072f8e64c944",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:059d716c06b36304eeefc5c534da93cac2c938d3"
+    },
+    {
+      "acceptance_id": "directions-are-interaction-architectures",
+      "digest": "db5dff7fecaf4278d33691870ee44272f3ff4031a8170ca49b8de91b43a316fc",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:059d716c06b36304eeefc5c534da93cac2c938d3"
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "digest": "269ae3be7d372f88e640c45f43e31a1c364fab743e5e04bbe349b62e405958b2",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:059d716c06b36304eeefc5c534da93cac2c938d3"
+    },
+    {
+      "acceptance_id": "research-board-is-usable",
+      "digest": "484431ecc20e3cc7a67f480076e8f756a77a834692e05b0e1cfa899ffe74f0c9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:059d716c06b36304eeefc5c534da93cac2c938d3"
+    }
+  ],
   "acceptance_ids": [
     "research-corpus-is-source-backed",
     "scenario-pattern-map-is-complete",
@@ -23,7 +55,7 @@
     "source-probe:9-of-9-at-deepseek-harness-rc8",
     "source:packages-client-ui-theme-theme-runtime-register-and-override-tokens"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in study extracts interaction decisions and failure modes from eight official product sources, maps them to the complete Task-first VibeHub loop, and compares Focus Route, Spatial Lens, and Live Split against the same graph, Task, Run, attention, Chat, and review states. The local research board was exercised in the Codex in-app browser across all three spatial models and all four lifecycle phases with no browser warnings or errors. It recommends Focus Route while retaining exact graph restoration and a spatial transition. A fresh source probe against DeepSeek Harness rc.8 commit 141eb6fef83422698aef7a981029e843e8161534 passed the existing nine extension seams and additionally confirmed official composable Theme Runtime token overrides; the report explicitly keeps rc.8 runtime boot unverified and relies on the prior rc.7 live-profile proof for runtime feasibility.",
   "ticket_id": "ticket-research-task-workbench-interaction-directions"
 }

@@ -10,6 +10,10 @@
     "read-only-boundary-remains-light"
   ],
   "closed_at": "2026-08-02T22:44:20Z",
+  "contract_binding": {
+    "digest": "fb34fb6ec8d784927bfc23569640ce239dd32f0fb78e7099eeadea012cbc0aa6",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "actionable-static-graph-engineering",
     "bound-context-agent-only-actions",
@@ -22,7 +26,7 @@
     "owner-authorizes-main-release-direction"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all eight criteria. Current source and recorded browser proofs show one coherent Agent handoff per Ticket, Context, Evidence, Outcome, and Git source; compact typed references; exact expandable canonical Context; honest commit-pinned editor and GitHub links; directional dependencies and typed provenance; and a bounded five-in/five-out causal lens with prioritized state and complete-set disclosure. The quiet responsive visual and interaction direction remains consistent with the checked-in authority, and the exact conversation-backed owner release Evidence explicitly authorizes this UI as the v0.4.0 release candidate; no unrelated approval was inferred. Fresh project and Ticket validation, diff checks, and the full 13 of 13 test suite passed, with a dependency-free 33-file 244335-byte clean artifact and unchanged schema-valid GET/HEAD-only ephemeral-bearer boundary without database, cache, daemon, write route, opener endpoint, or hidden durable state.",
   "ticket_id": "ticket-make-static-graph-actionable",

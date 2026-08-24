@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "task-workspace-information-and-conversation-model-is-explicit",
+      "digest": "186c4c1d39af04b41c873ea9cacdde6b4e58ebdaf21846faaccf9bc82f74b15a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "initial-task-context-packet-is-deterministic",
+      "digest": "4005644df8c64bf26d1f107337066cc32c4d7d3a1aacd4e6cbe1102e2729a696",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "task-thread-run-and-prompt-boundaries-are-proven",
+      "digest": "373c9c51364cef70affaf82e1ebea2fee934d2a5b6323e06804728ab9d6ed231",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    },
+    {
+      "acceptance_id": "rooms-and-context-are-readable-without-a-second-graph",
+      "digest": "44819722499ede42d98e9004451f634ed91f537e7c2624acaddc417e76f710db",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9cf4a1e6a2010026f468928d7de6d29637004be0"
+    }
+  ],
   "acceptance_ids": [
     "task-workspace-information-and-conversation-model-is-explicit",
     "initial-task-context-packet-is-deterministic",
@@ -21,7 +47,7 @@
     "command:codex-task-context-live-probe-interrupted-recovered-resumed-cleaned",
     "command:npm-run-verify-168-pass-0-fail-1-expected-skip"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in research and executable contract define Task, Thread, Turn, Project, Room, Context, Reference, Evidence and Outcome as separate objects and make the focused hierarchy and lifecycle disclosure exact. The local host deterministically expands direct Ticket Context first, then bounded one-Turn Human selections, with Room/source/inclusion reason, unavailable and external refs, truncation, citations, zero-or-one Project scope, no writeback authority, and explicit successful direct-prerequisite Outcomes plus their acceptance-linked Evidence. Browser code submits only IDs/message/attachments and cannot rebuild the packet. The synthetic real Codex app-server probe stored the exact packet in a persistent named Task Thread, interrupted its authoritative Turn after the user message became durable, stopped and restarted app-server, recovered the same Thread by cwd plus exact ID/name, resumed before reuse, read back interrupted history, preserved completedRunIsOutcome=false, and deleted its temporary Thread. Focused tests passed 11/11 and the full repository verification passed 168 tests with zero failures and one expected opt-in source skip.",
   "ticket_id": "ticket-research-task-workspace-conversation-context"
 }

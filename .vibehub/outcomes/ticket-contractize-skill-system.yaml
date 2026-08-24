@@ -6,6 +6,10 @@
     "taxonomy-reflected"
   ],
   "closed_at": "2026-08-04T00:58:39.000Z",
+  "contract_binding": {
+    "digest": "29e4503df4531216216d77b12db5252092e4866b331e0015f9e5530dc0c21a71",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "governance-reference-proof",
     "command-surface-proof",
@@ -13,7 +17,7 @@
     "taxonomy-visible-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independently adjudicated against commit 6d16979. knowledge-governance-reference: skills/vibehub-ingest/references/knowledge-governance.json states placement (lowest-owning-room, lowest-common-ancestor, create-it), both trust layers with the distill: source_ref_prefix and a single winning human layer, and the git-pr-review activation gate; grep confirms ingest, distill, and query each carry only a pointer line with no restated rule, and the pointer-presence test plus structural assertions live in test/skill-contracts.test.mjs. command-surface-welded: the contract test extracts both citation forms from every SKILL.md and resolves each against a scratch repo; closeout sabotage in both forms (backticked `context frobnicate` and prose vh.mjs context frobnicate) made the test fail with the exact command named, the --room flag case passes, and the lifecycle ownership tests were unaffected during sabotage. boundary-stated-once: the product-wide enumeration exists only in skills/vibehub-setup/references/architecture-boundary.md; the diff shows setup, ingest, query, and run lost their variant wordings for pointers, plan and distill gained the pointer while keeping only skill-specific temptations, and both presentation-is-not-an-approval restatements (plan, closeout) are gone; all six boundary pointers verified by grep and test. taxonomy-reflected: contract-layer tests are grouped in test/skill-contracts.test.mjs whose header names the three-layer convention; npm test passes 33/33 and verify:artifact passes with both new references bundled in the 47-file artifact (bundling confirmed directly against buildPluginArtifact output). Constraints held: skill line counts moved at most +3 (net shrinkage), no mechanical step inflation, no e2e harness added, ownership test unweakened. Minor non-blocking wart: the vibehub-query pointer sentence reads awkwardly (nothing exists outside ... to refresh), and verify-plugin-artifact.mjs's required-file list does not yet assert the two new references, though they are bundled.",
   "ticket_id": "ticket-contractize-skill-system",

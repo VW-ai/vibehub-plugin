@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "migrations-reference-owned",
+      "digest": "7331731dc63048a185bfa00d7ec70cf6260f8beb7431b64eedfe802cd8b28763",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:33b4098ad922d2ca4544134ae0ee459b032286db"
+    }
+  ],
   "acceptance_ids": [
     "migrations-reference-owned"
   ],
@@ -10,7 +18,7 @@
     "skills/vibehub-migrate/references/migrations.json",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "skills/vibehub-migrate/references/migrations.json states the 0.4-to-0.5 step once — distill-built room tree, placement-rule moves via git mv, context_ref rewrites, validation and drift proof — with detect text matching the real legacy error; the skill-contracts test asserts owner, version pair, step count, and the skill's pointer to the reference.",
   "ticket_id": "ticket-upgrade-migration-skill"
 }

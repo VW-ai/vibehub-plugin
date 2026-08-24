@@ -7,13 +7,17 @@
     "chat-parity-review-is-decision-ready"
   ],
   "closed_at": "2026-08-21T08:24:04Z",
+  "contract_binding": {
+    "digest": "b1a1cecbc9bf84f0aef25ab21a712d1587e725712b912f04f602852283eb1578",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "codex-native-chat-inventory-reuse-and-event-contract",
     "codex-native-chat-real-runtime-and-browser-proof",
     "codex-native-chat-citation-interruption-correction"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent re-closeout in a fresh isolated worktree at exact correction commit f0144d5d81d0099853d050d65e34699b753195b8 accepts all five current criteria. The correction genuinely resolves the previous three gaps: the first-party inventory now explicitly records pinned agentMessage.memoryCitation, model and collaboration-mode posture, ordinary microphone/audio input, shortcuts, focus return and accessibility; the contract and renderer preserve and display each citation entry's exact path, line range and note together with its source Thread identity; and authoritative replayed TurnStatus interrupted or failed appends one explicit terminal boundary after the Turn's already-recorded items rather than replacing or synthesizing its history. The deterministic mixed fixture contains both memoryCitation entries with source threadIds and an interrupted Turn, while the canonical correction Evidence records wide and 390x844 browser review plus a real durable Codex Thread interrupted through the production Stop control, reconciled from app-server with running cleared, history retained and exactly one interruption boundary. The source-backed reuse audit and production-shaped real-runtime shell remain accepted from the prior adjudication. Independently rerun focused verification passed 6 of 6; full verification passed 163 tests with zero failures and one expected opt-in DSH-source skip; the pinned Codex seam probe passed at @openai/codex 0.147.0 with protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2 and proved turn/interrupt plus audio/localAudio; diff check, Ticket validation, Project validation and Context validation passed, and all four Rooms were fresh. No fresh browser drive is claimed because this closeout had no browser-control binding; the canonical browser Evidence was inspected and corroborated against the corrected contract, fixture, renderer and tests without extending its claims.",
   "ticket_id": "ticket-research-codex-native-chat-parity",

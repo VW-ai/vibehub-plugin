@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "digest": "d97ea3074d1db25e7a004305eac2d6bd949ce30c18da5d2d245b1c6dcf4807ca",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-product",
+      "digest": "67f13ef0ecacee764fa52c808d9a6ea5c1a00c4afc1d1a87f092a475c2bfa03b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    },
+    {
+      "acceptance_id": "readme-render-and-artifact-parity-pass",
+      "digest": "d76b733bd4c2a27de1556bd9442a4707435b7ac6fe174821b27ffbfbd18ed223",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:797b46fce2fd80f0e62ef67780e64b4b14d6ef0c"
+    }
+  ],
   "acceptance_ids": [
     "readme-images-are-lossless-retina-captures",
     "readme-copy-matches-current-product",
@@ -18,7 +38,7 @@
     "browser:http-127-0-0-1-61079-narrow-readme-review",
     "browser:readme-preview-console-zero-errors"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The root README now embeds three lossless PNG captures from the exact clean production Workbench commit 55c52b49b9d7caffe0ce5c048529269dbfdb9261. The controlled DPR=2 capture path produced 2560x1440 pixels from a 1280x720 desktop graph, 2360x1640 from a 1180x820 focused Ticket action view, and 780x1688 from a real 390x844 narrow Rooms view; no 1x result was resized. The checked-in manifest records source commit, CSS viewport, DPR, output dimensions, paths, SHA-256 hashes, and the lossless/no-resize contract. Original-detail inspection confirmed crisp text and graph lines, useful crops, no browser chrome or transient tooltip, and no sensitive token; the narrow image was assembled only from native 2x slices without resizing. A GitHub-like README preview loaded every image at desktop and 390px article widths without broken assets, overflow, or console errors. Surrounding copy now names DRAFT, READY, RUNNING, and DONE and presents Recommended action as primary with explanation on demand, while preserving Evidence/Outcome inspection and making no native DSH invocation claim.",
   "ticket_id": "ticket-refresh-readme-workbench-screenshots"
 }

@@ -8,11 +8,15 @@
     "archive-query-is-regression-verified"
   ],
   "closed_at": "2026-08-13T00:38:24Z",
+  "contract_binding": {
+    "digest": "7b17816acce40e6cd4b1143a21f7c958a64e7a6f4863bc90432c0c6d9cdcc9c5",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "archive-query-contract-cli-and-browser-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all six criteria after reading the exact Ticket, prerequisite successful Outcome, canonical Evidence, implementation and Room-alignment commits, current contracts, shared query code, Workbench assets, regression tests, and Room Context. archive-and-delivery-membership-are-canonical: schema and validation define only the optional discriminated deliveries array, enforce exact canonical pull-request and commit references, conditional delivered metadata, unique per-Ticket refs, and derive archive only from a successful Outcome plus an explicit delivered entry while omission remains current without migration. history-edge-cases-stay-truthful: the checked-in state table freshly passed proposed, abandoned, partial, failed, deviated, delivered pull-request, delivered cherry-pick, multiple-membership, revert-preserving, and new-Ticket reopen provenance cases without inferring external PR state. one-query-model-serves-cli-json-and-web: one exported projection is consumed by CLI JSON and Web; fresh tests and a live fixture proved current/all, exact PR77 delivery, product/web, knowledge, repeated-Room union, deterministic visible endpoints, and visible invalid-filter failures with zero broadened cards. filtered-graphs-preserve-causal-truth: the in-app browser showed three current Tickets plus one subdued dashed textual ARCHIVED boundary and one count-labelled keyboard stub; Enter in left-to-right and Space in top-to-bottom revealed exactly old-foundation, removed the exhausted stub, recorded history=old-foundation, preserved every previous card x/y, and kept routes out of unrelated card interiors; All restored five Tickets with no stubs. query-focus-is-explicit-accessible-and-copyable: ARCHIVED cards and the upstream count stub had explicit accessible names and tabindex; expanded and composite URLs normalized repeated Rooms and retained scope, exact delivery, history, selected archived-boundary or current-web-work, Log lens, direction, and the 64-character bearer fragment; Copy focused link reported success and reopening that exact live URL restored the same state without a storage-backed contract. archive-query-is-regression-verified: fresh npm run verify passed 62/62 plus the dependency-free 54-file, 698815-byte artifact; project and Ticket validation passed, all four Rooms were FRESH, and the worktree was clean at 2f71036. Real in-app-browser review covered both directions at 1440x960, 1180x820, and 390x844 with four current nodes, one archived boundary, one stub, document width equal to viewport, no route/card violations or console warnings/errors, a 44.8px narrow stub, and 44x44 narrow controls. No historical record, database, hosted index, cache, writable Web route, or parallel source of truth was introduced.",
   "ticket_id": "ticket-queryable-archived-ticket-history",

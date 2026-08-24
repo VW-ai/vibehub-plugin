@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "founder-correction-is-verified",
+      "digest": "7c799064d497d800a91c750781f99df12447d280a88f899271f228a6d2e417c9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:d75daec829bc98ccc5a9c7ccdd5f574ad13c3b32"
+    }
+  ],
   "acceptance_ids": [
     "founder-correction-is-verified"
   ],
@@ -12,7 +20,7 @@
     "command:pnpm verify (81 passed; artifact verified)",
     "command:node skills/scripts/vh.mjs project validate --repo . (valid)"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh verification passes for the founder correction: site ESLint, Vinext static production export, all 8 rendered-content contracts, the full repository suite at 81 of 81, unchanged Plugin artifact verification at 54 files and 568449 bytes, and canonical VibeHub project validation at 4 Rooms, 34 Context documents, 60 Tickets, 173 prior Evidence records, and 52 prior Outcomes.",
   "ticket_id": "ticket-correct-public-founder-identity"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "four-phase-presentation-is-derived-once",
+      "digest": "f125e62ab9cc1fdf58573d0109e5fe6b5c7db66e55853eff42255b536163b391",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3b2d4ae42a4bcf0eb0d1db5c55a991ff5656c476"
+    },
+    {
+      "acceptance_id": "one-upper-right-substate-is-truthful",
+      "digest": "dd7fd714a9e53a3fb36a74aa2ed5984ba0a926a54bbd3154ff96374a3f4c028e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3b2d4ae42a4bcf0eb0d1db5c55a991ff5656c476"
+    },
+    {
+      "acceptance_id": "card-visual-change-is-minimal-and-live-is-honest",
+      "digest": "407cab79798294a96680315a6ecce7fb7ed12ba9f34d81e72c25758e8850ddd5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3b2d4ae42a4bcf0eb0d1db5c55a991ff5656c476"
+    },
+    {
+      "acceptance_id": "recommended-action-dominates-the-focused-panel",
+      "digest": "800f159b50572466e94a45e9b2442f678f505b675864e0f068cc73978c6dab62",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3b2d4ae42a4bcf0eb0d1db5c55a991ff5656c476"
+    }
+  ],
   "acceptance_ids": [
     "four-phase-presentation-is-derived-once",
     "one-upper-right-substate-is-truthful",
@@ -21,7 +47,7 @@
     "browser:http://127.0.0.1:56224-wide-current-graph-and-focused-ticket",
     "browser:http://127.0.0.1:56224-390x844-focused-ticket"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "One shared browser model now derives only DRAFT, READY, RUNNING, and DONE from the unchanged host next_action, with exactly one upper-right DEVIATED/BLOCKED/NEEDS YOU/VERIFYING/WAITING slot and canonical precedence that forbids READY or RUNNING from appearing blocked or deviated. The production host explicitly exposes runtime unavailable; the optional model path accepts only trusted, ticket-scoped execute/closeout runtime with a run id, active state, observation time, and unexpired deadline, so CLOSE_OUT is RUNNING+VERIFYING without a false live claim. Real cards keep their anatomy and topology while omitting the former rendered top accent; READY is restrained neutral, RUNNING is active blue, and only verified live presence gets the reduced-motion-safe pulse. The focused Execution panel now leads with Recommended action, a short title and explanation, and the strongest Copy prompt CTA; when a host payload exists the browser returns that exact object rather than adding phase/substate metadata, preserving read-only independent closeout. Real-browser review at the source host confirmed global phase/substate cards and the action-first panel at the default viewport and 390x844 narrow viewport.",
   "ticket_id": "ticket-simplify-workbench-primary-state-language"
 }

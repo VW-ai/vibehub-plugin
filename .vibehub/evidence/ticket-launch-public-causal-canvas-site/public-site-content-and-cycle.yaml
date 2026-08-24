@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "causal-canvas-is-the-site-grammar",
+      "digest": "050a77d7a1317d204eee97c1b8a64acf863222d66b82bddc794395d751ae4456",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "first-viewport-communicates-and-invites",
+      "digest": "80da31db836b49465f8aa06553467f91e952eba884b9e8b1d6cafdfc4e25eecb",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "canonical-cycle-is-visually-proven",
+      "digest": "6ca8ae974566c0bea204183384227eadd94975cb11d978c6326826f3683a9a99",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "causal-canvas-is-the-site-grammar",
     "first-viewport-communicates-and-invites",
@@ -14,7 +34,7 @@
     "context:decision-ticket-mediates-intent-context-loop",
     "command:site/npm-test static export assertions"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The static public page explains VibeHub before showing one central Ticket mediating a normal-scroll loop: human Request and long-term Context shape the Ticket, the Ticket produces Evidence, independent Outcome returns durable learning to Context, and every non-Ticket object uses a distinct visual form.",
   "ticket_id": "ticket-launch-public-causal-canvas-site"
 }

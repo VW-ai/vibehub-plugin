@@ -111,7 +111,9 @@ test("the complete 0.4-to-current migration takes a flat-context repo from faili
 
 test("the repository format-2 audit makes delivery structure explicit and evidence-backed", () => {
   const version = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
-  assert.equal(version.format_version, 2);
+  // The repository has since taken the format-2-to-format-3 proof-binding
+  // migration; the delivery audit below stays checked-in truth.
+  assert.equal(version.format_version, 3);
   const ticketRoot = join(root, ".vibehub", "tickets");
   const tickets = readdirSync(ticketRoot)
     .filter((name) => name.endsWith(".yaml"))

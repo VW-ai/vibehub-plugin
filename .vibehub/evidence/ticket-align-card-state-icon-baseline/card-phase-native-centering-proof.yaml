@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "card-phase-icon-baseline-is-corrected",
+      "digest": "f90c0800070ef5eddc3dc69066928272911d02d8cd37c35c81ffbf4528d6746a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:bcc9f505aafbb4cccc15fe797632fc760e10a51f"
+    },
+    {
+      "acceptance_id": "alignment-regression-is-verified",
+      "digest": "ed744335122132427cdd6e1ad3c71dfaaee158c35e10cd485f8a43a735332517",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:bcc9f505aafbb4cccc15fe797632fc760e10a51f"
+    }
+  ],
   "acceptance_ids": [
     "card-phase-icon-baseline-is-corrected",
     "alignment-regression-is-verified"
@@ -17,7 +31,7 @@
     "command:npm-run-verify-126-of-126",
     "command:verify-plugin-artifact-58-files-608379-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After the owner rejected the 1px optical offset as visibly too low, the proposal card phase row now retains its native inline-flex `align-items:center` geometry and the 14px lower-right phase SVG has no independent transform. Focused assertions require native centering and explicitly forbid phase, corner-signal, or contract-strip icon offsets. The proposal test passes 8/8. Fresh in-app browser review passed both the wide production-shaped board and the explicit 390x844 narrow frame: DRAFT and READY icon/label pairs remain balanced, while upper-right BLOCKED and NEEDS YOU signals, the four-phase legend, live presence, card dimensions, and responsive behavior are unchanged. Full repository verification passes 126/126 and the installed artifact remains 58 files / 608379 bytes.",
   "ticket_id": "ticket-align-card-state-icon-baseline"
 }

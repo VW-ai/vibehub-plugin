@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rooms-workbench-direction-chosen",
+      "digest": "992ba3c767460e96fa1ba83aaad40a9b679cf83993821ef25a3eaff5209ecb86",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:21d1c0528643ffb7b5837b596e49d0e58e4dca4b"
+    }
+  ],
   "acceptance_ids": [
     "rooms-workbench-direction-chosen"
   ],
@@ -13,7 +21,7 @@
     "commit:bbbac957da11e712b8d688237054359eabc65ec7",
     "commit:cb7cd112996cb99737cee49b344723481355e221"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After reviewing the live Rooms Workbench proposal and its successive owner-requested refinements, the repository owner explicitly approved the current direction with '非常好，gogo'. The selected production direction is an on-demand Rooms browser over the unchanged causal Ticket graph, with canonical Room containment, in-situ drift state, Room Context/Ticket detail, query-backed related-Ticket filtering that preserves graph coordinates, desktop floating panel and narrow bottom sheet, and no permanent left navigation. The approved refinements make hierarchy and interaction carry meaning instead of explanatory copy; remove labels such as Knowledge spaces, Selected Room, Execution flow, slogans, and proposal-only controls; use one global system-monospace font stack and consistent compact stroke-SVG icons without emoji; replace the oversized blue related-Tickets banner with a neutral 44px row action; and make the colored icon-bearing READY, REFINE, and NEEDS YOU counts serve as the compact local legend. This is the owner's decision, not an Agent recommendation.",
   "ticket_id": "ticket-decide-rooms-workbench-direction"
 }

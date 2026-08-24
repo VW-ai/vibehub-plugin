@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "migration-rehearsed",
+      "digest": "3832d8c060a292a323c89c6542b97dfe95e3b8c7e3afa15cc1401536ac3de0aa",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:33b4098ad922d2ca4544134ae0ee459b032286db"
+    }
+  ],
   "acceptance_ids": [
     "migration-rehearsed"
   ],
@@ -9,7 +17,7 @@
     "commit:b7abb52",
     "test/migration.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "test/migration.test.mjs builds a 0.4-style repo (flat context entry plus a ticket referencing it), proves project validate fails with the legacy message, performs the migration steps mechanically (room created, entry moved, directory removed, ref rewritten), and proves the same repo then validates clean with the entry queryable from its room.",
   "ticket_id": "ticket-upgrade-migration-skill"
 }

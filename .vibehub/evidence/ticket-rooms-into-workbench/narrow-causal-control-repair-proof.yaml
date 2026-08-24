@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "digest": "fde63249d9ff66ca3e8a6bff95d2ce0ebaf057f333652add53afc2577662c2bf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5799cca3f49a4bb50d779b7cffc1471a6b28c756"
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "digest": "a0d71a2944e58b67de4c71fc60cbe8597d2ee147c8abe3ec309564c10a78276b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5799cca3f49a4bb50d779b7cffc1471a6b28c756"
+    }
+  ],
   "acceptance_ids": [
     "rooms-surface-is-on-demand-and-responsive",
     "rooms-production-journeys-and-boundary-pass"
@@ -11,7 +25,7 @@
     "commit:2e4bb63",
     "test/ui-rooms.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent 390x844 audit found four pre-existing Inspector causal-ticket buttons at roughly 80x20px even though all Rooms-sheet controls and the repaired Rooms accessible name passed. The narrow production stylesheet now gives every causal-ticket control a 44px minimum height; focused Rooms and visual-system tests pass 7/7 and Workbench Room alignment is FRESH. Independent browser closeout must remeasure every visible narrow control before acceptance.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

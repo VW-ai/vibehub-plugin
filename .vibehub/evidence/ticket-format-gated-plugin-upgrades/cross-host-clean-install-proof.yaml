@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "cross-host-clean-install-proof",
+      "digest": "9fc33489e2566d603d6a431ec1525e5214d6a8384c99759f113d027352234fd5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:51d81b0723f5005ddae3b8b977cd4b4468d36de5"
+    }
+  ],
   "acceptance_ids": [
     "cross-host-clean-install-proof"
   ],
@@ -14,7 +22,7 @@
     "git diff --check: passed",
     "node skills/scripts/vh.mjs project validate --repo .: valid format_version=1"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh Codex and Claude marketplace artifacts execute their installed helpers identically for current, migration-required, and newer-format fixtures and clean all test-owned temporary paths after success or failure; the complete suite, artifact verifier, diff check, project validation, and both standalone builders pass.",
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

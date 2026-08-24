@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "firm-and-draft-are-canonical",
+      "digest": "2a18192544534d034fafa9a703a0b16acf789b7c24519e1b52995b31509a498e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:80091d8bb2a45c62655e438ab8460f294475c8c0"
+    },
+    {
+      "acceptance_id": "planning-writes-maturity-explicitly",
+      "digest": "f066bb91f35329c0bef18cf019502b9a61f4e811c55d83355e125048cb1b15f3",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:80091d8bb2a45c62655e438ab8460f294475c8c0"
+    }
+  ],
   "acceptance_ids": [
     "firm-and-draft-are-canonical",
     "planning-writes-maturity-explicitly"
@@ -15,7 +29,7 @@
     "test/draft-maturity.test.mjs",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The schema now canonically enumerates firm and draft with a documented firm default, while the validator accepts both and rejects fuzzy. Ticket Plan requires new and rewritten Tickets to state maturity explicitly and changes refinement from removing draft to setting firm. Behavioral and contract tests verify explicit firm, explicit draft, legacy omission, invalid input, schema parity, and prompt wording.",
   "ticket_id": "ticket-explicit-firm-maturity"
 }

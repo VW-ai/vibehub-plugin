@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "digest": "6e78f40cb1d5d33856129ee905f4b617a0ba1c66f0ac6b0b6eca9f4d18ab7ea8",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:dcecd18c1d94042ebb5245fc143651a8694c8b30"
+    }
+  ],
   "acceptance_ids": [
     "visual-polish-strengthens-not-obscures"
   ],
@@ -11,7 +19,7 @@
     "browser:current-actionable-graph-dogfood-and-workflow-log",
     "test:npm-run-verify-13-of-13-33-files-244335-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After iterative dogfood of the actionable graph, Contract hierarchy, Log naming, Context projection, evidence presentation, and lifecycle-driven focused review, the repository owner explicitly moved the current product into final main-merge and formal release preparation and asked that the README present the product philosophy with the approved visual language. This is owner-origin authorization to treat the current UI and interaction direction as the v0.4.0 release candidate. It does not approve speculative follow-up features or alter the canonical acceptance criteria.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

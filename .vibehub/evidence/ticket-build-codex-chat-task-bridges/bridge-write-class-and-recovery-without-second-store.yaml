@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "bridge-writes-are-explicit-recoverable-and-uncommitted",
+      "digest": "81a8cc27ad059d4dcbf83dbb339b0d190d57273636df9b95a61840c7be4f3b9f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:8fc7e6b51c30d7c2635e0a8749b29601991a05c2"
+    }
+  ],
   "acceptance_ids": [
     "bridge-writes-are-explicit-recoverable-and-uncommitted"
   ],
@@ -16,7 +24,7 @@
     "test/codex-first-shell-bridges.test.mjs",
     "scripts/vh-codex-first-shell-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit fc4c1fd adds explicitChatBridge with the exact templates .vibehub/tickets/<ticket_id>.yaml and .vibehub/rooms/<room_id>/<context_id>.yaml beside explicitImportOnly with commits false, advertised in /health and bootstrap, and the static no-second-store test and write-surface pins in test/codex-first-shell.test.mjs assert exactly those two classes. No bridge action runs git add, commit or push: the host test and the guard both show only untracked or modified paths under .vibehub and an unchanged rev-list count, and written paths surface in project.uncommitted.paths after commit 3ddbabf fixed the porcelain read that dropped the leading dot of a tracked dirty path. test/codex-first-shell-bridges.test.mjs proves that a Start whose thread/name/set is dropped by the fixture leaves the Ticket valid with readTask still returning a derived nextAction, and that a created Task's origin and an attached reference survive a host restart over the same persisted fixture state with no extra persistence; the guard's lifecycle walk proves reload recovery of ?thread= and ?task= and the repository read after restart. All six bridge actions are adapter-free so they remain usable while the runtime restarts or halts.",
   "ticket_id": "ticket-build-codex-chat-task-bridges"
 }

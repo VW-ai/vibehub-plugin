@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "digest": "a319af13f7804728696d33c0afe232b1ec19bc1c92182befcb265eb40c06df42",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+      "digest": "6f246fe8ad3e7015a56ec975056f7b5503aed197becdd1a06c6a2c8d4ccbb6c9",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+      "digest": "3a478eb7abd86bb878a08bcf702ad319a0f1497606bc4f470857a64c03b9044d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    },
+    {
+      "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+      "digest": "0754ec43a9601b5bb66f4108e29320ab08daa89d94e927169423d9c408d82179",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:67d89e2539c63ba5a21b0489456a3180eca597cd"
+    }
+  ],
   "acceptance_ids": [
     "next-action-table-is-complete-and-authority-aware",
     "frontier-distinguishes-execution-from-adjudication",
@@ -17,7 +43,7 @@
     "test/ui-model.test.mjs",
     "command:node-test-ticket-next-action-ticket-draft-ui-model-17-of-17"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "One documented host-side derivation now maps successful and non-success Outcomes, unresolved direct dependencies, draft maturity, missing human-origin Evidence, complete authority-satisfying Evidence, and incomplete Agent work to DONE, REPLAN, WAIT, REFINE, NEEDS_HUMAN, CLOSE_OUT, and EXECUTE with stable reasons and relevant IDs. Frontier preserves ready as an alias of ready_to_execute while separately grouping closeout, human, replan, refinement, wait, and done. Regression proves Agent Evidence cannot satisfy human authority, a mixed Ticket routes deterministically, runtime presence does not rewrite routing, and complete Evidence neither creates an Outcome nor unlocks a dependent.",
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

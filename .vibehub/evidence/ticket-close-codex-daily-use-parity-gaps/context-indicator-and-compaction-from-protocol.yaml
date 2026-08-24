@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "context-usage-and-compaction-are-visible",
+      "digest": "b58546a402cd57f5f608115a8d5cae239620f944c13f6a0dd9cf3234e09ec631",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "context-usage-and-compaction-are-visible"
   ],
@@ -18,7 +26,7 @@
     "test/codex-chat-conformance.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 4ef3908, 801c536 and 9603ade add the context indicator and compaction. The indicator is computed only from thread/tokenUsage/updated total tokens against modelContextWindow, shows no value before the first notification and no percentage while modelContextWindow is null, and updates as the notification lands inside each Turn and on resume replay; the Compact action calls the host compactThread, which issues thread/compact/start and answers 409 turn_live while a Turn is live, and the contextCompaction ThreadItem renders as a boundary row because 0.149.0 never emits thread/compacted on the v2 path. The chat-model test drives the notification and the null-window variant and the boundary item, the host test proves the 409 and the boundary item after compaction, guard checks cover the indicator states, the boundary row, the Compact dispatch and disabled state and the 409 message, and the driver walk shows real usage numbers and the thread/compact/start request.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

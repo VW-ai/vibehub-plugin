@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "normal-browser-entry-is-obvious",
+      "digest": "2fe568960541587d867d7e4462f77cd88fa5ae68a1f6250a7a7dc4a12c1de330",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7308b6a57be9ccc0ba8a530b3e652141fa8f97f9"
+    }
+  ],
   "acceptance_ids": [
     "normal-browser-entry-is-obvious"
   ],
@@ -14,7 +22,7 @@
     "command:node skills/scripts/vh-ui.mjs --repo . --json",
     "launch-envelope:opened-true-port-61573"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Running the launcher without `--no-open` returned an `opened:true` envelope containing the complete authorized fragment URL and invoked the operating-system browser opener. Flag tests prove open is the default and no-open remains explicit. README, install guidance, and the review Skill now state that the default target is the user's normal system browser, explain Copy link, and reserve no-open for Agent/testing use.",
   "ticket_id": "ticket-rebuild-local-graph-workbench"
 }

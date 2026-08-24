@@ -1,4 +1,18 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "current-overlay-failure-is-reproduced-and-bounded",
+      "digest": "47004c265673164a1de687ed13e92571ae2b30528582ea404cadfed9d9679e12",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    },
+    {
+      "acceptance_id": "real-dsh-composition-seams-are-proven",
+      "digest": "1accd93b37573153958004f27dbdeb8b171f9e8e564adc3d4d013d94d9478669",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9e75b6c55ed482a2e0fb7d4d9445340a540fb64d"
+    }
+  ],
   "acceptance_ids": [
     "current-overlay-failure-is-reproduced-and-bounded",
     "real-dsh-composition-seams-are-proven"
@@ -16,7 +30,7 @@
     ".vibehub/rooms/workbench/note-dsh-embedded-graph-host-can-outlive-its-loopback-child.yaml",
     "test/dsh-persistent-shell-prototype.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The packed rc.8 dogfood baseline was reproduced with the native DSH shell still available while the shell.overlay child had become a refused loopback frame, confirming that the defect is application composition rather than the canonical Graph. The exact 141eb6f rc.8 source probe passes 8/8 supported seams and the checked-in contract maps every prototype surface to the real Root, single-owner Sidebar, Sidebar child seats, Conversation, Session, Theme and additive action boundaries. The recommendation keeps DSH Root and native services, shadows only Sidebar while recreating all five stock child seats, rejects shell.overlay as an ordinary page carrier, and names stop conditions that forbid DOM injection, upstream forks, synthetic Sessions and a second Task store.",
   "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation"
 }

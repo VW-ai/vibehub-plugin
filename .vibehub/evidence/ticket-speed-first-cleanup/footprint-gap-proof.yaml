@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "footprint-and-gap-report",
+      "digest": "6d9eb8a429473076589a5a37ff4dddcf4f01b4deb766480e71625cf2495dbe04",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:74ab68f473eb27281ac82494d03a88a6d8a1d8d8"
+    }
+  ],
   "acceptance_ids": [
     "footprint-and-gap-report"
   ],
@@ -9,7 +17,7 @@
     "docs/SPEED_FIRST_CLEANUP.md",
     "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in report records before/after files, lines, dependencies, artifact bytes, deleted surfaces, preserved invariants, verification, and every observed gap without a parity checklist.",
   "ticket_id": "ticket-speed-first-cleanup"
 }

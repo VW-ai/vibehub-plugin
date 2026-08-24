@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "codex-project-and-thread-capabilities-are-source-audited",
+      "digest": "112e18c3167bb01627260d13528dec5323a8106dc7425d594854541b9226e04d",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4be210440b77f1c3c29435da5d5f0b738054056e"
+    },
+    {
+      "acceptance_id": "project-chat-task-object-mapping-is-explicit",
+      "digest": "b03267596425f8273ac934c3b9a98cbd8718fee1a4c0a7de37af93b98b451eed",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4be210440b77f1c3c29435da5d5f0b738054056e"
+    },
+    {
+      "acceptance_id": "unsupported-native-membership-has-truthful-adapter-boundary",
+      "digest": "fdd7ff42437e01890536839e45b2345e8d18cbfd5e972b9ffd1e252786a1033a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4be210440b77f1c3c29435da5d5f0b738054056e"
+    }
+  ],
   "acceptance_ids": [
     "codex-project-and-thread-capabilities-are-source-audited",
     "project-chat-task-object-mapping-is-explicit",
@@ -22,7 +42,7 @@
     "command:node packages/codex-adapter/probe-schema.mjs (ok; pinned schema f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2)",
     "commit:c517dcc"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Pinned official Codex 0.147.0 source and generated schema prove server-owned ThreadSection CRUD, nullable Thread.section membership, explicit-null Recents, native move, fork lineage, title search, archive/restore and restart recovery. The executable contract keeps Codex Project, Pinned, Chat/Thread, cwd, VibeHub Project, Task, Task origin and Run distinct; one continuing Chat may birth many independent Tasks whose immutable origin never moves with the Chat. The adapter uses no shadow membership registry. Its only required composition is native fork followed by native move; if the source section disappears, the fork stays visibly unsectioned in Recents with forkedFromId and placement.applied=false. A real authenticated lifecycle probe created, moved, forked, searched, archived, restarted, restored, deleted and fully cleaned temporary native records.",
   "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
 }

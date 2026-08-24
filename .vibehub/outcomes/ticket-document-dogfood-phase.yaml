@@ -5,13 +5,17 @@
     "existing-contract-remains-consistent"
   ],
   "closed_at": "2026-07-31T22:43:21.000Z",
+  "contract_binding": {
+    "digest": "cc18b4f620ec63f5884d24d842c17ea9f47f2c53c4e9e5a75f672bc60b718c7a",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "readme-dogfood-phase-proof",
     "readme-dogfood-loop-proof",
     "readme-contract-verification-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all three criteria. Against baseline 03648c88abe5e14e6b9ae15b6d1073c6ae30d09e, README adds one concise 15-line dogfood section near the introduction that states the architecture pivot is complete, limits the current phase to real-use validation rather than speculative parity, and defines the Ticket, acceptance-linked Evidence, independent Outcome, explicit durable Context, and observed-gap-to-focused-Ticket loop. The remaining README preserves the Skill-first Git-YAML, no-required-CLI/MCP/runtime, and no-persistent-cache contracts. npm run verify passed 4/4 tests and the 28-file artifact verification; project and Ticket validation both returned valid.",
   "ticket_id": "ticket-document-dogfood-phase",

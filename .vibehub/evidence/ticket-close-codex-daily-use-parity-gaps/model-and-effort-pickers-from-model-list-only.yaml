@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "model-and-effort-pickers-are-truthful",
+      "digest": "0cafaa84c79d22014adc94bd3e07cb36aa26c96c85c5ab79e4e01e1e8f5ba5c6",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:5198fe968afb69631632c69788d59fd07f399c9a"
+    }
+  ],
   "acceptance_ids": [
     "model-and-effort-pickers-are-truthful"
   ],
@@ -18,7 +26,7 @@
     "test/codex-first-shell-parity-ui.test.mjs",
     "apps/codex-first-shell/browser-interaction-guard.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits 4ef3908, 801c536 and 0beda38 add truthful pickers. The host listModels action returns the model/list records with hidden models dropped, attaches a settings record with model, effort, approvalPolicy, sandboxPolicy, source and observedAt to every Thread, null until thread/start, thread/resume or thread/settings/updated reported it, and startTurn and queueTurn accept settings whose model slug and effort become the turn/start keys. The pickers beneath the composer stay disabled with a not-loaded label until listModels returns, draw their options only from the response with isDefault marked and effort options from the selected model's supportedReasoningEfforts with defaultReasoningEffort preselected, show the settings record as the current value without claiming a default is set, send the selection as settings on startTurn and queueTurn, label each Turn with the model and effort it used from the startTurn response, and refuse image attachments on a model whose inputModalities lacks image with a refusal naming the displayName and its inputModalities. A static test proves no option string exists in source, the deferred assertion in test/codex-chat-conformance.test.mjs is narrowed to mode and realtime which stay absent, the matrix row model-mode-pickers moves from deferred to pass with proofs, and four guard checks cover the not-loaded state, exact options and defaults, the text-only refusal and the settings keys on turn/start with the Turn label.",
   "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
 }

@@ -1,4 +1,30 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "existing-pages-project-is-reused",
+      "digest": "8320be1d1efc77f3e157afe9133a27cb051a7a1bdf81cb6c1752505da26f4677",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:00c0b4ecba59958b980509721b2d729b7c561631"
+    },
+    {
+      "acceptance_id": "canonical-apex-is-served-by-pages",
+      "digest": "f743f14aa52d61db05d03b67f71def60ae28a5a38d6d226f3f6ec80ffeb28c4b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:00c0b4ecba59958b980509721b2d729b7c561631"
+    },
+    {
+      "acceptance_id": "repository-release-path-is-cloudflare-only",
+      "digest": "f75f7536d8daf3a188aee85c3c70ab0a7ec2c608c03e90241dcf778fb843f8f7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:00c0b4ecba59958b980509721b2d729b7c561631"
+    },
+    {
+      "acceptance_id": "cloudflare-migration-is-regression-proven",
+      "digest": "0782c94f45b62880056f1aa5fe57ea15f3511f5e687b2bf0580da96335357de5",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:00c0b4ecba59958b980509721b2d729b7c561631"
+    }
+  ],
   "acceptance_ids": [
     "existing-pages-project-is-reused",
     "canonical-apex-is-served-by-pages",
@@ -24,7 +50,7 @@
     "command:node-site-release-scripts-release-mjs-verify-www",
     "command:dig-redacted-google-site-verification-txt-count-1"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh closeout verification on 2026-08-20 confirmed that the selected Cloudflare account still contains the pre-existing vibehub-website-v1 Pages project and lists both vibehub-website-v1.pages.dev and vibehub.icu as its domains. Its current Production deployment c07ad72e-df89-429e-9903-29c9c94c411d is on branch main, identifies source 4d628ba, and resolves to the immutable URL c07ad72e.vibehub-website-v1.pages.dev; the repository release record pins the complete source commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77. A fresh release preflight passed lint, deterministic static build, and 9/9 rendered contracts. Fresh immutable and apex verifiers returned 200 for the homepage, robots.txt, sitemap.xml, Open Graph image, and favicon. Fresh HTTP and HTTPS www probes returned direct 301 responses preserving the exact path and query. A value-redacted DNS check counted one retained google-site-verification TXT proof. No credential, token, cookie, verification value, or transient authorization state is recorded.",
   "ticket_id": "ticket-deploy-public-site-cloudflare"
 }

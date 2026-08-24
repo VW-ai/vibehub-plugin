@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "plan-and-run-handle-human-decisions",
+      "digest": "1bff34fceea38c1b3db353067b83f001ace62a2e7363635febe2b687643abd38",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ffaad6d19139942e4d1e21679a3cf7b8a6d94f21"
+    }
+  ],
   "acceptance_ids": [
     "plan-and-run-handle-human-decisions"
   ],
@@ -15,6 +23,6 @@
     "test:npm-test-46-of-46"
   ],
   "summary": "The shared authority contract defines decision ownership, graph splitting for independently schedulable downstream work, terminal sign-off, and execution-triggered replanning without an Event package. Plan encodes known boundaries, Run returns newly discovered decisions to Plan for revise-or-split, Validate rejects hidden gating boundaries, and the contract-layer assertions plus the complete 46-test suite pass.",
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

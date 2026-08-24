@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "ticket-vertical-slice-works",
+      "digest": "b53f77a2d0682548c2d883d0ab9deeac1a43638be229a32865b6e71af68886ff",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:74ab68f473eb27281ac82494d03a88a6d8a1d8d8"
+    }
+  ],
   "acceptance_ids": [
     "ticket-vertical-slice-works"
   ],
@@ -12,7 +20,7 @@
     "skills/contracts/outcome.schema.json",
     "skills/scripts/vh.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh repositories created and read a direct Ticket graph; validation rejected missing endpoints and cycles; acceptance-linked Evidence plus independent-style Outcome unlocked only the successful direct dependency path.",
   "ticket_id": "ticket-speed-first-cleanup"
 }

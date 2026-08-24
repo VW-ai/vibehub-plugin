@@ -6,6 +6,10 @@
     "merge-suite-green"
   ],
   "closed_at": "2026-08-04T02:30:08.000Z",
+  "contract_binding": {
+    "digest": "757820af7f0718e589002182ba573199e0f1b17e6b595915c9f940bf4950950a",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "overlap-detection-proof",
     "stale-origins-proof",
@@ -13,7 +17,7 @@
     "merge-suite-proof"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independently adjudicated against commit 43fae5d. anchor-overlap-detected: rebuilt in a scratch repo — rooms auth [src/auth] and identity [src/auth/oauth] fail project validate with an error naming both rooms and the shared territory, while auth with sub-room auth/oauth validates clean; test/room.test.mjs covers both cases (overlap-detection-proof). stale-origin-in-contract: knowledge-governance.json states the two origins exactly once (drift: prefix, resolution recompute; unprefixed, resolution address-the-reason), ticket-plan's deferred write-back adopts the prefix without restating the rule, and room drift was exercised in a scratch git repo — hashes_match true for an aligned untouched stale room, false after editing an anchored file, null for a never-aligned stale room; test/room-drift.test.mjs covers the three states and skill-contracts asserts the contract structure (stale-origins-proof). pr-merge-judgment: vibehub-pr step 3 is judgment-first — recompute drift against the merged tree and never hand-pick a side's stamps, same-slug room.yaml conflicts are boundary decisions, stale marks follow their origin via the governance pointer with only the single adoption line the criterion itself mandates — and the step-2 guardrail against a second semantic merge protocol is unchanged; grep confirms no restatement of the origin rules outside the governance reference (pr-judgment-proof). merge-suite-green: node --test passes 38/38 and verify:artifact packages 47 files cleanly, both rerun by this closeout; project validate is clean over the four dogfood rooms (merge-suite-proof). All constraints hold: detection only with no fusion machinery, recompute-not-pick for derived state, single-statement convention, deterministic checks living in vh.mjs.",
   "ticket_id": "ticket-pr-room-merge-semantics",

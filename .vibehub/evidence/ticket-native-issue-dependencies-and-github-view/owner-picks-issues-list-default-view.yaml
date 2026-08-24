@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "owner-picks-github-view",
+      "digest": "dd4713137771537330a0f183e3155599fbe4ee4443e4d4dede01233137d17898",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a246b4d6556e7a9fa2726d6ad46b08a38d2f9b5b"
+    }
+  ],
   "acceptance_ids": [
     "owner-picks-github-view"
   ],
@@ -11,7 +19,7 @@
     "docs/GITHUB_ISSUES.md",
     "README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner read the three-way comparison in docs/GITHUB_ISSUES.md and said in conversation: 我觉得可以吧，我认可你的推荐 — accepting the recommendation that the Issues list with label filters is the README default, the per-Issue sidebar is the way to walk the graph, and a Projects board is created only when a team wants one. The README installation section now links the Issues list and the guide.",
   "ticket_id": "ticket-native-issue-dependencies-and-github-view"
 }

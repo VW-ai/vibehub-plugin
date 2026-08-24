@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "release-identity-and-changelog",
+      "digest": "ddcaf7b2bca9fb6f807bd8d29a6590e65a0c491eb47b7d1de09cf3d2a8bd926e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:ae5560db7ef6ac52f9ca438cfd21ab157427fe16"
+    }
+  ],
   "acceptance_ids": [
     "release-identity-and-changelog"
   ],
@@ -15,7 +23,7 @@
     "CHANGELOG.md",
     "test/release.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "node scripts/verify-release-version.mjs --tag v0.6.0 returned ok with package, Codex, Claude, marketplace, and marketplace plugin versions all exactly 0.6.0. CHANGELOG.md has the dated 0.6.0 entry covering per-acceptance Agent/human authority, human-origin Evidence enforcement, Workbench attention states, explicit firm/draft plus REFINE, stateless repository-level Agent handoff, and the proposal to human-decision to downstream-refinement graph boundary. test/release.test.mjs now mechanically guards the 0.6.0 identity and dated entry.",
   "ticket_id": "ticket-prepare-v060-release"
 }

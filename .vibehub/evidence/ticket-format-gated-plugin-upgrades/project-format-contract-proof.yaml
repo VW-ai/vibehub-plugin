@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "project-format-contract",
+      "digest": "0562163b292f7446c960331610b3b10388f191ceb53e5322dbb2793410ebba6e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:51d81b0723f5005ddae3b8b977cd4b4468d36de5"
+    }
+  ],
   "acceptance_ids": [
     "project-format-contract"
   ],
@@ -12,7 +20,7 @@
     "test/project-format.test.mjs",
     "npm run verify: 43/43 tests passed and artifact verification passed on 2026-08-05"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The repository now owns and dogfoods integer project format 1; init writes the canonical marker and validation rejects malformed or newer markers without mutation.",
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "arrival-is-one-coding-agent-conversation",
+      "digest": "b4ac0976913d1f33f834222d353b3c83c63a0ac5b792f6951eb55c288009616b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "development-request-opens-contextual-view",
+      "digest": "868a145f0471f56875c5d8a8db702b67d056012f6ba68931b938ad1e3510a1e4",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "human-choice-drives-live-app",
+      "digest": "111add8817d73f5289eb4532d06c46caa7521cdee09abb8b1119ac7bf47bb16c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "app-and-ticket-views-share-one-cycle",
+      "digest": "f0d135eda20c4ab481c1ef68f83525dd9192d468c2275fc86be616f2707cc344",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    },
+    {
+      "acceptance_id": "agent-first-site-is-accessible-and-verifiable",
+      "digest": "e1dcdd6ab7ee003c70e0505e1c9774a52ff6e1d1d134d01508146eac095f8a62",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:9553afb6019d043bd4238adb5e752bb3d9cf3419"
+    }
+  ],
   "acceptance_ids": [
     "arrival-is-one-coding-agent-conversation",
     "development-request-opens-contextual-view",
@@ -21,7 +53,7 @@
     "browser:http://localhost:3000/@390x844",
     "conversation:2026-08-09-agent-first-browser-verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Rendered assertions pass 5/5, ESLint passes, and the Vinext static export completes. Browser verification at 1440x900 confirmed arrival has no Workspace, the complete first message and composer are above the fold, pointer Send opens Ticket, the human boundary automatically switches to App, Ink immediately changes the localhost preview while Outcome remains absent, and completion automatically returns to Ticket with Ink still selected, all four acceptance rows checked, Evidence attached, Successful Outcome, and returned Context. Manual App/Ticket switching, Copy for Agent feedback, task interaction, and keyboard-native form submission are present. At 390x844 the first view fits exactly within the viewport (body 390x844, composer bottom 843, no Workspace); the development state stacks Chat and View without horizontal overflow (content width 375 in a 390 viewport), exposes all three human choices, applies Ink, and renders the full Ticket graph linearly. The browser reported no page-level horizontal overflow. Reduced-motion, fine-pointer hover, forced-colors, focus, labels, roles, and live-status contracts are explicit in source. Canonical project validation reports 4 rooms, 26 Context documents, 30 Tickets, 98 Evidence documents, and 25 Outcomes; Ticket validation passes; Plugin artifact verification passes at 51 files and 361397 bytes.",
   "ticket_id": "ticket-coding-agent-first-public-site"
 }

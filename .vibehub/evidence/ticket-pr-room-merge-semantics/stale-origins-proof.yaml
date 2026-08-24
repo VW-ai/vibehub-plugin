@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "stale-origin-in-contract",
+      "digest": "08e90f15b7ebe8a417cb3058ee9a367f50dac246bd6d7799501023305b105593",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:a63188503d2a8540b6b923826d1a320a8ae5c5d2"
+    }
+  ],
   "acceptance_ids": [
     "stale-origin-in-contract"
   ],
@@ -10,7 +18,7 @@
     "skills/vibehub-ingest/references/knowledge-governance.json",
     "test/room-drift.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "knowledge-governance.json states the two stale origins once (drift: prefix mechanical with resolution recompute; unprefixed semantic with resolution address-the-reason); ticket-plan's deferred write-back instruction adopts the drift: prefix; vh room drift reports hashes_match true/false for aligned stale rooms and null for never-aligned ones, covered by the three-state drift test; the contract structure is asserted by the skill-contracts test.",
   "ticket_id": "ticket-pr-room-merge-semantics"
 }

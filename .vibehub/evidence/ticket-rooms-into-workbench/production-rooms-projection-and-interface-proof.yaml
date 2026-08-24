@@ -1,4 +1,36 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "rooms-projection-is-canonical-and-shared",
+      "digest": "b065a5b8f8d8f77c93c708bbd0f4bb148ec23225cde5552e9e3e660e9b09af31",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3baff7ca7af9d26b90f70661d73fc3eb1bcdd97a"
+    },
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "digest": "fde63249d9ff66ca3e8a6bff95d2ce0ebaf057f333652add53afc2577662c2bf",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3baff7ca7af9d26b90f70661d73fc3eb1bcdd97a"
+    },
+    {
+      "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
+      "digest": "20830ddba87abe2a30f4bd36020e48b20fbecf020fd8a0de966939f208f31756",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3baff7ca7af9d26b90f70661d73fc3eb1bcdd97a"
+    },
+    {
+      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+      "digest": "8e613fba06665a41ef1f1b85ec8072764c2d20ed02176137d27a37a1dc17538a",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3baff7ca7af9d26b90f70661d73fc3eb1bcdd97a"
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "digest": "a0d71a2944e58b67de4c71fc60cbe8597d2ee147c8abe3ec309564c10a78276b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:3baff7ca7af9d26b90f70661d73fc3eb1bcdd97a"
+    }
+  ],
   "acceptance_ids": [
     "rooms-projection-is-canonical-and-shared",
     "rooms-surface-is-on-demand-and-responsive",
@@ -19,7 +51,7 @@
     "skills/scripts/vh-ui.mjs",
     "skills/vibehub-ticket-review/assets/app.js"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The read-only production host now projects the canonical directory-containment Room tree, Room boundaries/anchors, subtree Context, context_ref-consuming Tickets, and shared Git snapshot drift semantics; the browser owns no parallel index or inference. The closed-by-default Rooms control opens a floating panel or narrow bottom sheet with ARIA-synchronized tree selection, no-selection toggle, progressive Context/Tickets/Drift detail, minimal owner-selected copy, and a neutral Show related Tickets action. The action composes the canonical repeated room URL query and preserves the pre-filter positions, selected subject, direction, pan, and zoom for clear restoration. Fresh npm run verify passes 77/77 and the installed artifact verifies at 54 files / 716853 bytes; focused Room drift/UI host tests pass, project/Ticket validation remains required at closeout, and all four Rooms are FRESH after aligning the implementation commit. Independent closeout must reproduce the complete specified browser viewport/direction/filter-intersection matrix before accepting the journey criterion.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

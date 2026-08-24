@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "existing-pages-project-is-reused",
+      "digest": "764c95e668805e9fd0b5b758328d0cf56e0a92a7e32932fac89aa217e36b4946",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    },
+    {
+      "acceptance_id": "canonical-apex-is-served-by-pages",
+      "digest": "74f0e1f67c6c4a4553f40720ff8cafb1f417e49bcdf4346fd81cb7be298593ba",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    },
+    {
+      "acceptance_id": "cloudflare-migration-is-regression-proven",
+      "digest": "96295fb76d48949bf8e396e15e70e41e043ec37b682f17ffd94b167b1c27731b",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:915587aa074988dda1d236dec464bdf9e8981f0d"
+    }
+  ],
   "acceptance_ids": [
     "existing-pages-project-is-reused",
     "canonical-apex-is-served-by-pages",
@@ -22,7 +42,7 @@
     "command:node-site-release-scripts-release-mjs-verify-apex",
     "command:node-site-release-scripts-release-mjs-verify-www"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Read-only account inventory confirmed the pre-existing vibehub-website-v1 Pages project in the authorized Cloudflare account. Its main production branch received the exact clean commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77 at immutable deployment c07ad72e.vibehub-website-v1.pages.dev, which returned HTTPS 200 for the canonical page, robots.txt, sitemap.xml, Open Graph image, and favicon before DNS changed. The existing inactive vibehub.icu Pages domain was reactivated. After exact read-only DNS inspection, only the two temporary apex A origin records were removed and one proxied apex CNAME to vibehub-website-v1.pages.dev was added; the redirect-only www record and every TXT record, including the Search Console ownership proof, remained. Cloudflare then reported vibehub.icu Active with SSL enabled. The canonical production verifier passed all content checks and both HTTP and HTTPS www probes returned direct 301 responses preserving the test path and query.",
   "ticket_id": "ticket-deploy-public-site-cloudflare"
 }

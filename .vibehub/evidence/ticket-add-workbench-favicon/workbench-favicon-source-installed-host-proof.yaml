@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "workbench-declares-canonical-favicon",
+      "digest": "5e47144d542bb430ff9adac5e8c6b10015448fe2dc3ed7e2e52ea81ac71577c7",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4a85b86c6cb82edbe7ef3f2cd9ea72e098544c3e"
+    },
+    {
+      "acceptance_id": "loopback-host-serves-favicon-exactly",
+      "digest": "56851b729c32b083551e1c0bbadca9a0ad41f1eb87e78aed3924ad75f6138c04",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4a85b86c6cb82edbe7ef3f2cd9ea72e098544c3e"
+    },
+    {
+      "acceptance_id": "installed-artifacts-and-regressions-pass",
+      "digest": "36cf69cbf2e7a02dbba2957a87c63888c72698a3fd08db341c89e1585681a5c0",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:4a85b86c6cb82edbe7ef3f2cd9ea72e098544c3e"
+    }
+  ],
   "acceptance_ids": [
     "workbench-declares-canonical-favicon",
     "loopback-host-serves-favicon-exactly",
@@ -21,7 +41,7 @@
     "command:npm-run-verify-118-of-118",
     "command:verify-plugin-artifact-58-files-608379-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Workbench now declares `<link rel=\"icon\" type=\"image/svg+xml\" href=\"/vibehub-mark.svg\">` and ships a byte-for-byte copy of assets/brand/vibehub-mark.svg in its local asset directory. The loopback allowlist serves that absolute path with HTTP 200 and exact image/svg+xml bytes for GET and HEAD while POST remains read-only 405, preserving the bearer-fragment model and adding no redirect or external dependency. Focused source-host plus fresh Codex and Claude marketplace-host verification passed 11/11 and proved identical canonical bytes and content type across both installed hosts. Complete repository verification passed 118/118; installed artifact verification fetched the icon from the built host and reported 58 files and 608379 bytes. Ticket and project validation pass, all four Rooms are FRESH after aligning Workbench, and no public-site file changed.",
   "ticket_id": "ticket-add-workbench-favicon"
 }

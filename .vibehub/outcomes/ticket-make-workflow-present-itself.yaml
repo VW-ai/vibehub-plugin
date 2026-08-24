@@ -8,11 +8,15 @@
     "plugin-remains-lightweight"
   ],
   "closed_at": "2026-08-02T22:36:39Z",
+  "contract_binding": {
+    "digest": "13045f3f96054adc403b6246dd092df4e0ebc8b47913d36874bde410971f99d0",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "lifecycle-driven-focused-review"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all six criteria. The compact lifecycle reference defines seven uniquely owned events with consistent presentation, surface, continuation, human-boundary, fallback, and current-task resource-reuse semantics. Manual Skill and implementation review confirmed narrow transition ownership, Ticket Review-only launch mechanics, validated Ticket and Execution/Contract/Log focus, fragment bearer preservation, complete read-only canonical projection, and no cross-task or durable coordination state. Automated lifecycle and host coverage passed in the full 13 of 13 test suite; all six modified Skills passed quick validation; project and Ticket validation passed; and the clean dependency-free artifact verified at 33 files and 244335 bytes.",
   "ticket_id": "ticket-make-workflow-present-itself",

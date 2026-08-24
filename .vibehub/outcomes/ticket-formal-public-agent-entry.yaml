@@ -6,12 +6,16 @@
     "formal-entry-is-responsive-and-verifiable"
   ],
   "closed_at": "2026-08-09T22:00:17Z",
+  "contract_binding": {
+    "digest": "a2fda42b6cb692d8cd4e94d5a64e18de6d387c0340983c07a4f5994f239f0bc1",
+    "binding": "reconstructed"
+  },
   "evidence_ids": [
     "formal-public-entry-implementation",
     "formal-public-entry-verification"
   ],
   "kind": "ticket_outcome",
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "successful",
   "summary": "Independent closeout accepted all four criteria. Source inspection confirms a persistent keyboard- and pointer-reachable VibeHub masthead, Overview and brand reset paths, an explicit Exit demo action, complete pending-timer and state reset, removal of faux window controls, a restrained coherent product shell, and preservation of the truthful deterministic Coding-Agent-first human-decision, App/Ticket, Evidence, Outcome, and returned-Context cycle. Fresh ESLint, static production build, six rendered-contract tests, canonical project and Ticket validation, and 51-file Plugin artifact verification passed. Acceptance-linked browser Evidence covers desktop and 390x844 interaction, reset, viewport, overflow, and console observations; no browser backend was available in this independent closeout task, so those visual interactions could not be rerun here.",
   "ticket_id": "ticket-formal-public-agent-entry",

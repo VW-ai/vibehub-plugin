@@ -1,4 +1,24 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "v040-identity-is-consistent",
+      "digest": "40b6055845c26a28fde5abdf743cb9d0555ed144d831e496e78f94c21f19234c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7993a7f16244743144057269337d4627fa915985"
+    },
+    {
+      "acceptance_id": "github-release-is-small-and-reproducible",
+      "digest": "15740cd6dd727f1a871247f9d0c0946d1969f66479beda0c21b1bbbe8b76372e",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7993a7f16244743144057269337d4627fa915985"
+    },
+    {
+      "acceptance_id": "release-procedure-is-explicit",
+      "digest": "33cae8489e761bbf6fd174b3a27da4f9203f5e93d398251e003bacffa2929880",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:7993a7f16244743144057269337d4627fa915985"
+    }
+  ],
   "acceptance_ids": [
     "v040-identity-is-consistent",
     "github-release-is-small-and-reproducible",
@@ -16,7 +36,7 @@
     "test:verify-release-tag-v0.4.0",
     "test:npm-run-verify-16-of-16-40-files-324497-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit ecb811a aligns package, Codex, Claude, and marketplace identity at 0.4.0; cuts the dated v0.4.0 Changelog with the runtime break; adds a tag/version guard; and documents the merge-main→tag-exact-commit→GitHub-Release procedure. The 37-line tag workflow runs the complete verification gate, builds the dependency-free plugin, creates a tar archive and SHA-256 checksum, and publishes only through GitHub Releases. Tests mechanically reject npm publication/auth, matrices, native builds, and marketplace release machinery.",
   "ticket_id": "ticket-prepare-v040-release"
 }

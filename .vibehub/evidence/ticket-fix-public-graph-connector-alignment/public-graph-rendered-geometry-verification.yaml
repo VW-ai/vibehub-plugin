@@ -1,4 +1,12 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "connector-fix-is-production-verified",
+      "digest": "d90671edbecd4d6d802e808bc16f37a529f83de00c4d3f10f251404345e1af6f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:17a8967e42146c361afe3cf35b5c94b8031f4cd6"
+    }
+  ],
   "acceptance_ids": [
     "connector-fix-is-production-verified"
   ],
@@ -13,7 +21,7 @@
     "command:browser-visual-connector-regression-check",
     "site/tests/rendered-html.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh lint passed. The Vinext production export and all 8 rendered contracts passed, including guards for DOM-bound geometry, ResizeObserver, card and edge identifiers, source-right and target-left attachment, and removal of the fixed 1000 by 650 path fixture. The repository release preflight passed for vibehub.icu. Visual browser inspection confirmed attached routed connectors with the Inspector both open and closed, and direct DOM measurements covered four Workbench instances spanning approximately 435px to 733px graph widths with subpixel endpoint error.",
   "ticket_id": "ticket-fix-public-graph-connector-alignment"
 }

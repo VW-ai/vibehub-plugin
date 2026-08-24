@@ -1,4 +1,42 @@
 {
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "near-and-far-scenarios-are-explicit",
+      "digest": "7e36b8e8b21c3efbf2f257934603fe9feb543b895f7d0135111dbf9b9203a685",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "clickable-core-loop-prototype",
+      "digest": "b18f579665e3f09aee1d7a85618e2bf2116f5ee53ed4eae20a647d7824c23062",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "ticket-context-annotation-language",
+      "digest": "fa25f736040f605cfee894ea5a9ad19595a99be91b7b26dee5ed007e64d3641f",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "execution-is-strongly-perceptible",
+      "digest": "85b82d0057e3f94e27e81de828f760946d317522c84b9a2c755e0d8b30b051ae",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "browser-first-app-like-shell",
+      "digest": "6c86afc12dd67e9b2e6de966d2870f0ea39784bae74fe31190d6715103693e9c",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    },
+    {
+      "acceptance_id": "review-pack-is-decision-ready",
+      "digest": "b50ef31d6d10f628a66ab621af9b97fde09034b47a1aba89dc2fc39b36668e98",
+      "binding": "reconstructed",
+      "provenance_ref": "commit:cdeac6b57dcab02e97f243d392f818afaad973c5"
+    }
+  ],
   "acceptance_ids": [
     "near-and-far-scenarios-are-explicit",
     "clickable-core-loop-prototype",
@@ -25,7 +63,7 @@
     "browser:safari-local-loopback-prototype-launched",
     "room:product-aligned-2026-08-17"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in product contract defines the think-first and act-first paths, the complete single-Workspace loop, the longer-term Workspace catalog and federation direction, and explicit V1 exclusions including cross-repository coordination and a native wrapper. The dependency-free mocked browser prototype implements normal Chat, explicit forks, a conversation graph, sibling Compare, Bring Back to Main, visible scoped Context activation, reversible Ticket craft, Ready and Start, a persistent execution dock, and a detailed Run surface with distinct queued, running, waiting-for-human, failed, evidence-producing, and completed projections. Ticket, Context, Reference, Branch, Run, and Evidence use separate compact annotations, while Run state is sourced independently from Ticket state. The review guide supplies an exact walkthrough and eight owner decision questions. The prototype serves only static checked-in assets from 127.0.0.1, writes no durable state, loads no network resources, has narrow-layout and reduced-motion rules, and was launched successfully in Safari at a local ephemeral port. The focused prototype tests passed, the complete repository suite passed 84/84 including both local loopback hosts, the plugin artifact verifier remained green at 54 files and 568449 bytes, project validation passed at 53 Tickets, and the entered Product Room was explicitly realigned.",
   "ticket_id": "ticket-prototype-task-harness-experience"
 }
