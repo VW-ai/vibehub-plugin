@@ -1,0 +1,15 @@
+{
+  "accepted_acceptance_ids": [
+    "legacy-proof-transition-policy-decided"
+  ],
+  "closed_at": "2026-08-24T01:16:50Z",
+  "evidence_ids": [
+    "owner-selects-git-reconstruction-with-unresolved-fallback"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Adjudication accepts the single human-authority criterion from the human-origin Evidence recording the owner's explicit selection of Git reconstruction with unresolved fallback, made after reviewing the accepted proposal's audited corpus and policy comparison in plain language with the stated effects. The proposal Ticket's successful Outcome remains the analytical basis; implementation moves to ticket-bind-proof-to-acceptance-revision, which this decision unlocks for refinement, and no legacy document changes until that Ticket runs its mechanical migration.",
+  "ticket_id": "ticket-decide-legacy-proof-revision-policy",
+  "unresolved_acceptance_ids": []
+}

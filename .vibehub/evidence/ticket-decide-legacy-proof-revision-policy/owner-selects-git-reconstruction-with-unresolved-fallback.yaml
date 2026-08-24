@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "legacy-proof-transition-policy-decided"
+  ],
+  "evidence_id": "owner-selects-git-reconstruction-with-unresolved-fallback",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-24T01:16:50Z",
+  "refs": [
+    "conversation:2026-08-23-owner-selects-git-reconstruction-for-legacy-proof",
+    ".vibehub/outcomes/ticket-propose-legacy-proof-revision-policy.yaml",
+    "docs/LEGACY_PROOF_REVISION_POLICY.md"
+  ],
+  "schema_version": 1,
+  "summary": "The owner reviewed the completed proposal's comparison in plain language, including the audited corpus of 79 legacy Tickets with 210 Evidence records and 61 Outcomes of which 19 Evidence records and one successful Outcome had drifted from their current acceptance text, and explicitly selected Git reconstruction with unresolved fallback over grandfathering and mark-all-stale, answering with option one after the choices and their stated effects on current DONE, archive membership, dependent unlock, human-authority satisfaction, migration, rollback and unresolved cases were laid out: reconstructable proof keeps its DONE, proof that cannot be reconstructed against its contemporaneous acceptance text is marked unresolved rather than silently trusted or discarded, and the reconstruction runs mechanically from Git history as a one-time migration.",
+  "ticket_id": "ticket-decide-legacy-proof-revision-policy"
+}
