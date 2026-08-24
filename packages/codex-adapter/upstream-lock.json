@@ -173,6 +173,8 @@
   },
   "audio": {
     "stableTurnInputs": ["audio", "localAudio"],
+    "acceptedDataUrlMimeTypes": ["audio/webm;codecs=opus"],
+    "acceptedDataUrlMimeTypesProvenance": "probe:codex:live 2026-08-23 on codex-cli 0.149.0 (authenticated chatgpt pro): one ephemeral read-only Turn carrying a data:audio/webm;codecs=opus;base64 UserInput of type audio reached turn/completed with status completed; the ephemeral Thread left no listing after restart",
     "experimentalRequests": [
       "thread/realtime/start",
       "thread/realtime/appendAudio",

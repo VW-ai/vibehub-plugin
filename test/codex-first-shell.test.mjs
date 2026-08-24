@@ -8,7 +8,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
-import { formatRecordingClock, MAX_RECORDING_MS } from "../apps/codex-first-shell/composer-recording.mjs";
+import { formatRecordingClock, MAX_RECORDING_MS, RECORDING_MIME_TYPE } from "../apps/codex-first-shell/composer-recording.mjs";
 import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
 import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
 import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
@@ -309,6 +309,13 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.equal(capabilitySnapshot("codex").capabilities.audio.available, true);
   assert.match(server, /realtimeConversation: false/);
   assert.match(lock, /"stableTurnInputs": \["audio", "localAudio"\]/);
+  // The accepted data-URL mime the one ephemeral live probe Turn proved is
+  // recorded in the lock's audio block and is exactly the mimeType the
+  // shell's MediaRecorder produces.
+  const lockAudio = JSON.parse(lock).audio;
+  assert.deepEqual(lockAudio.acceptedDataUrlMimeTypes, [RECORDING_MIME_TYPE]);
+  assert.match(lockAudio.acceptedDataUrlMimeTypesProvenance, /probe:codex:live[^]*status completed/);
+  assert.equal(lockAudio.currentProbeResult, "protocol-present-current-ephemeral-thread-unsupported");
   // The microphone is capability-gated: enabled only on runtime.audioInput
   // true with getUserMedia present, otherwise visibly disabled and explained
   // with the capability contract's own fallback text; DSH stays unsupported.
