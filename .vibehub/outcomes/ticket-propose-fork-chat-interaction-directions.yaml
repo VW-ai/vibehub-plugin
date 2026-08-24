@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "fork-protocol-and-desktop-facts-are-established",
+    "daily-scenarios-ground-the-directions",
+    "lineage-visibility-directions-are-reviewable",
+    "compare-and-bring-back-are-scoped-honestly",
+    "proposal-pack-is-decision-ready"
+  ],
+  "closed_at": "2026-08-24T03:04:36Z",
+  "evidence_ids": [
+    "fork-protocol-and-desktop-facts",
+    "scenarios-directions-and-bring-back-reviewable",
+    "pack-decision-ready-and-gates-green"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent adjudication at 7279df1 reproduced every load-bearing claim rather than trusting the executor's record. Protocol facts: codex app-server generate-json-schema on the installed 0.149.0 binary emitted a v2 schema hashing exactly to the pinned 9b3de71a…, with ThreadForkParams carrying stable lastTurnId under the documented inclusive-boundary semantics verbatim and beforeTurnId, path, excludeTurns, deferGoalContinuation, permissions and runtimeWorkspaceRoots absent; the upstream source fetched at the pinned commit 758ef40f confirms lastTurnId alone lacks #[experimental], SessionMeta.forked_from_id persists lineage, and every named upstream test exists, while ThreadRollbackParams carries the quoted deprecation; the shell host action (vh-codex-first-shell.mjs:1767) and adapter (projects.mjs:250) already forward lastTurnId; desktop claims are marked bundle-observed and unverified as required. Gates: npm test 317/315 pass/0 fail/2 skipped, npm run verify green with the 67-file artifact, guard 109/109 wide and 110/110 narrow in Light and Dark with motion, bridge 7/7, lifecycle 6/6 and queue 12/12 green. Surfaces: npm run review:fork-chat serve mode was driven headlessly — the chip names and opens its source with the derived shares-1-of-2 divergence note and keyboard focus-visible, the source side lists both forks, the missing-source state renders the dashed non-navigable chip naming the truncated id, the sidebar indents forks under listed sources with sr-only Fork prefixes while the orphan stays flat, and Bring Back lands the selected fork passage in the source composer as a quote labeled with the fork's exact Thread, Turn and item; a send attempt was refused with the honest fixture notice and produced zero /api/action requests, so no turn/start and no model spend is reachable. Production posture: state.forkReview is assigned only inside applyForkFixture behind the ?forkFixture URL parameter; the 3824c27..HEAD diff to non-review paths reduces to no-ops when forkReview is null (raw Fork-of line, flat sidebar, unchanged quote label, one permanently hidden selection-sheet button), corroborated by the unchanged guard baseline. All five constraints hold: review-only, fork never presented as Task or dependency in any surface, fixtures-only with sends refused, claims source-referenced, visual identity explicitly left to the visual-system Ticket. Three named inaccuracies, none acceptance-material: the contract JSON's Direction C keyboard note says focus lands in the source composer but the opened Chat's title focus wins after the handler (probed at +0/300/900ms); the pack's app.js +137 is the git stat line (127 insertions, 10 deletions) though the 158-insertion total is exact; and the checked-in sidebar captures can only show depth-1 indentation because no single fixture list carries a three-deep chain — the depth cap is proven by unit test, not by capture.",
+  "ticket_id": "ticket-propose-fork-chat-interaction-directions",
+  "unresolved_acceptance_ids": []
+}

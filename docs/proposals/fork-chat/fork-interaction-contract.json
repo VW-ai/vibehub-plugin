@@ -10,8 +10,30 @@
   "protocolFacts": {
     "forkFromPoint": {
       "claim": "thread/fork supports forking from a chosen Turn, stable in 0.149.0, via lastTurnId (inclusive boundary); turns after it are omitted and the referenced turn cannot be in progress. Boundaries are Turns: no item-level fork exists anywhere in the params.",
-      "stableParams": ["threadId (required)", "lastTurnId", "model", "modelProvider", "serviceTier", "cwd", "approvalPolicy", "approvalsReviewer", "sandbox", "config", "baseInstructions", "developerInstructions", "ephemeral", "threadSource"],
-      "experimentalParams": ["beforeTurnId (exclusive boundary; cannot combine with lastTurnId)", "path (fork by rollout path)", "permissions", "runtimeWorkspaceRoots", "excludeTurns", "deferGoalContinuation"],
+      "stableParams": [
+        "threadId (required)",
+        "lastTurnId",
+        "model",
+        "modelProvider",
+        "serviceTier",
+        "cwd",
+        "approvalPolicy",
+        "approvalsReviewer",
+        "sandbox",
+        "config",
+        "baseInstructions",
+        "developerInstructions",
+        "ephemeral",
+        "threadSource"
+      ],
+      "experimentalParams": [
+        "beforeTurnId (exclusive boundary; cannot combine with lastTurnId)",
+        "path (fork by rollout path)",
+        "permissions",
+        "runtimeWorkspaceRoots",
+        "excludeTurns",
+        "deferGoalContinuation"
+      ],
       "sources": [
         "generated v2 schema definition ThreadForkParams (only stable fields are emitted; lastTurnId is present, beforeTurnId is not)",
         "codex-rs/app-server-protocol/src/protocol/v2/thread.rs at rust-v0.149.0 (ThreadForkParams: lastTurnId has no #[experimental]; beforeTurnId, path, permissions, runtimeWorkspaceRoots, excludeTurns, deferGoalContinuation do)",
@@ -45,15 +67,15 @@
       "honesty": [
         "Evidence is strings extracted from /Applications/ChatGPT.app/Contents/Resources/app.asar (bundle dated 2026-07-17); the bundled codex version is not stated in the strings and its protocol surface differs from pinned 0.149.0 (it also carries thread/turns/list and thread/metadata/update), so desktop claims are marked bundle-observed, not 0.149.0 claims.",
         "Absence of lineage-UI strings is not proof the UI lacks one; it is reported as not found, unverified beyond strings.",
-        "In pinned 0.149.0 ThreadRollbackParams is documented 'DEPRECATED: thread/rollback will be removed soon', so lastTurnId — not fork+rollback — is the go-forward point-fork seam."
+        "In pinned 0.149.0 ThreadRollbackParams is documented 'DEPRECATED: thread/rollback will be removed soon', so lastTurnId \u2014 not fork+rollback \u2014 is the go-forward point-fork seam."
       ]
     }
   },
   "directions": {
     "A-source-chip": {
       "state": "reviewable in the real shell (?forkFixture=chip | chip-source | chip-missing)",
-      "replaces": "the raw ' · Fork of <uuid>' heading line",
-      "surface": "A navigable chip under the Chat heading: '⑂ Forked from <source title>' opens the source; the source side shows '⑂ N forks of this chat' listing each fork with its title, preview and group, each row opening that fork; a placement note appears when fork and source live in different groups.",
+      "replaces": "the raw ' \u00b7 Fork of <uuid>' heading line",
+      "surface": "A navigable chip under the Chat heading: '\u2442 Forked from <source title>' opens the source; the source side shows '\u2442 N forks of this chat' listing each fork with its title, preview and group, each row opening that fork; a placement note appears when fork and source live in different groups.",
       "canonicalData": [
         "Thread.forkedFromId of the open Chat (thread/read)",
         "listed Thread records of this folder for the title lookup and the fork listing (thread/list already carries forkedFromId on every row)",
@@ -66,8 +88,10 @@
     },
     "B-sidebar-fork-tree": {
       "state": "reviewable in the real shell (?forkFixture=sidebar)",
-      "surface": "Within each Sidebar list (a group's threads, Recents, Pinned) a fork indents one step under its source row with a branch glyph and an sr-only 'Fork ·' prefix; chains nest to a capped depth of 3; a fork whose source is not in the same list stays flat — no placeholder parent is invented.",
-      "canonicalData": ["forkedFromId on every listed row (already in bootstrap lists)"],
+      "surface": "Within each Sidebar list (a group's threads, Recents, Pinned) a fork indents one step under its source row with a branch glyph and an sr-only 'Fork \u00b7' prefix; chains nest to a capped depth of 3; a fork whose source is not in the same list stays flat \u2014 no placeholder parent is invented.",
+      "canonicalData": [
+        "forkedFromId on every listed row (already in bootstrap lists)"
+      ],
       "hostProjection": "None: ordering and nesting are a pure browser projection over the rows one list already holds. The host keeps returning recency-ordered lists.",
       "emptyStates": "Orphan forks (source archived, other folder, other list) render flat exactly as today; an empty group keeps its existing copy.",
       "keyboard": "DOM order equals tree reading order, so Tab order is unchanged; rows stay the same buttons with the same rename affordance.",
@@ -75,27 +99,32 @@
     },
     "C-bring-back": {
       "state": "reviewable in the real shell (?forkFixture=bringback)",
-      "surface": "Selecting a finalized passage in a fork whose source is listed adds 'Bring back to source' to the selection sheet. It opens the source Chat and places the passage in its composer as a quote whose identity names the FORK's Thread, Turn and item; the tray labels it 'Brought back from fork <id> · Turn <id>'. The explicit send stays with the human; the review fixture refuses sends.",
+      "surface": "Selecting a finalized passage in a fork whose source is listed adds 'Bring back to source' to the selection sheet. It opens the source Chat and places the passage in its composer as a quote whose identity names the FORK's Thread, Turn and item; the tray labels it 'Brought back from fork <id> \u00b7 Turn <id>'. The explicit send stays with the human; the review fixture refuses sends.",
       "canonicalData": [
         "the selection and its finalized item identity (existing selection sheet machinery)",
         "Thread.forkedFromId of the open fork (target resolution)",
         "quote-source.mjs: composeQuotedMessage serializes the fork identity into the Turn input; parseQuotedMessage renders it back on replay in any client; buildOrigin already carries forked_from_id for the explicit VibeHub bridge"
       ],
       "hostProjection": "None: the composer quote already supports cross-Thread identity and the send path already serializes it. Production cost is the selection-sheet button, the target-open step, and the tray label.",
-      "emptyStates": "No source listed (orphan fork) or no finalized selection: the action is simply absent — never a dead button.",
-      "keyboard": "The selection sheet is the existing toolbar; after the action, focus lands in the source composer."
+      "emptyStates": "No source listed (orphan fork) or no finalized selection: the action is simply absent \u2014 never a dead button.",
+      "keyboard": "The selection sheet is the existing toolbar; after the action, the quote lands in the source composer while focus remains on the thread title."
     },
     "D-fork-from-here": {
       "state": "defined, not built (no review surface; named for the decision list)",
-      "surface": "A per-assistant-message 'Fork from here' that calls thread/fork with lastTurnId = that Turn — the desktop's own affordance shape ('Continue in new chat' on each assistant message), on the stable 0.149.0 seam instead of the deprecated fork+rollback.",
+      "surface": "A per-assistant-message 'Fork from here' that calls thread/fork with lastTurnId = that Turn \u2014 the desktop's own affordance shape ('Continue in new chat' on each assistant message), on the stable 0.149.0 seam instead of the deprecated fork+rollback.",
       "alreadyPlumbed": "scripts/vh-codex-first-shell.mjs forkThread action already accepts payload.lastTurnId and packages/codex-adapter/projects.mjs forkThread already forwards lastTurnId; only the browser affordance is missing.",
       "openCost": "One control per finalized Turn (visual-weight decision), plus the same placement and lineage behavior the whole-Thread fork already has."
     }
   },
   "compare": {
     "definition": "Side-by-side reading of a fork against its source from their shared prefix: two thread/read transcripts, the derived shared Turn prefix as the alignment point, and a two-pane render of the divergent tails.",
-    "requires": ["two-pane transcript layout in the shell (new rendering surface)", "scroll coordination and a narrow-viewport story (stacked panes or a switcher)", "divergence alignment from the shared Turn prefix", "no protocol gap: both transcripts replay from thread/read"],
-    "cost": "A real layout surface with its own wide/narrow/Light/Dark/keyboard matrix — the largest single cost in this proposal — for a reading act two browser windows already approximate at zero cost.",
+    "requires": [
+      "two-pane transcript layout in the shell (new rendering surface)",
+      "scroll coordination and a narrow-viewport story (stacked panes or a switcher)",
+      "divergence alignment from the shared Turn prefix",
+      "no protocol gap: both transcripts replay from thread/read"
+    ],
+    "cost": "A real layout surface with its own wide/narrow/Light/Dark/keyboard matrix \u2014 the largest single cost in this proposal \u2014 for a reading act two browser windows already approximate at zero cost.",
     "recommendation": "Wait. Bring Back enters the next implementation; Compare returns only if daily use shows two-window reading failing."
   },
   "invariants": [
