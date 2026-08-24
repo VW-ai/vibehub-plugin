@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "no-recording-persistence-by-default"
+  ],
+  "evidence_id": "no-recording-persistence-and-suites-green",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:25:05Z",
+  "refs": [
+    "commit:5dea574",
+    "commit:ee5c709",
+    "commit:3e6242e",
+    "commit:b54621b",
+    "apps/codex-first-shell/composer-recording.mjs",
+    "scripts/vh-codex-first-shell.mjs",
+    "test/codex-first-shell-recording.test.mjs",
+    "test/codex-first-shell-parity-host.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Recording bytes never persist: no object or blob URLs and no storage APIs, with the static regex extended over composer-recording.mjs and app.js in both a host test and a node test; audio bytes stay elided from the host event feed; attachments clear after send, proven in the guard; MediaStream tracks stop on all nine enumerated exit paths, plain stop, cancel, Escape, the 90 second cap, the size bound, permission denial, send, audio-chip removal and view teardown; and nothing is written into any .vibehub document. At branch head b54621b the suite reports 318 tests, 316 pass, 0 fail, 2 DSH skips, npm run verify passes with the 67-file artifact, and the guard passes 124 of 124 wide and 125 of 125 narrow in Light and Dark with the motion audit, bridge writes, lifecycle walk and queue walk green; the negative-control overlay of the new guard on the pre-change shell fails every configuration with all seven audio areas failing by name.",
+  "ticket_id": "ticket-build-codex-audio-input"
+}
