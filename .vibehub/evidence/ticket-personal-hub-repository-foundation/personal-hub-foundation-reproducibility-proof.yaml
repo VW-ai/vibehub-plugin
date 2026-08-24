@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "node-foundation-is-reproducible",
+    "personal-contracts-are-adopted-unchanged"
+  ],
+  "evidence_id": "personal-hub-foundation-reproducibility-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:29:07Z",
+  "refs": [
+    "private-repo-file:package.json",
+    "private-repo-file:package-lock.json",
+    "private-repo-file:.node-version",
+    "private-repo-file:.github/workflows/verify.yml",
+    "private-repo-file:contracts/provenance.json",
+    "private-repo-file:test/contracts.test.mjs",
+    "private-repo-receipt:foundation-clean-clone",
+    "command:npm ci",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "The sibling repo pins Node 20 and lockfile v3 with no dependencies or provider credentials. npm ci followed by npm run verify passes from a no-hardlinks clean clone: deterministic format check and 12/12 tests. The accepted schemas and 18 fixtures are adopted unchanged; contracts/provenance.json binds 23 accepted files to SHA-256 receipts and the successful source Ticket Outcome, and tests reject byte drift.",
+  "ticket_id": "ticket-personal-hub-repository-foundation"
+}

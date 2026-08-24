@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/personal-ticket.v1.json",
+  "title": "VibeHub Personal Ticket",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "personal_ticket_id",
+    "title",
+    "state",
+    "project_refs",
+    "source_refs",
+    "acceptance",
+    "external_keys",
+    "external_delivery_refs",
+    "generation_host",
+    "created_at",
+    "updated_at",
+    "revision"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "personal_ticket" },
+    "personal_ticket_id": { "$ref": "#/$defs/id" },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "\\S"
+    },
+    "desired_outcome": { "$ref": "#/$defs/text" },
+    "state": {
+      "type": "string",
+      "enum": ["inbox", "draft", "ready", "archived"]
+    },
+    "project_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reference" }
+    },
+    "source_excerpt": { "$ref": "#/$defs/text" },
+    "acceptance": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/acceptance" }
+    },
+    "next_gate": { "$ref": "#/$defs/text" },
+    "external_keys": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/external_key" }
+    },
+    "external_delivery_refs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/external_delivery_ref" }
+    },
+    "generation_host": {
+      "type": "string",
+      "enum": ["claude-code", "codex", "user", "import"]
+    },
+    "last_archive": { "$ref": "#/$defs/archive_record" },
+    "created_at": { "$ref": "#/$defs/date_time" },
+    "updated_at": { "$ref": "#/$defs/date_time" },
+    "revision": { "type": "integer", "minimum": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": { "enum": ["draft", "ready"] }
+        },
+        "required": ["state"]
+      },
+      "then": { "required": ["desired_outcome"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": { "const": "ready" }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "properties": {
+          "acceptance": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": { "const": "archived" }
+        },
+        "required": ["state"]
+      },
+      "then": { "required": ["last_archive"] }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["local_file", "url", "host_task", "git_commit"]
+        },
+        "ref": { "$ref": "#/$defs/text" },
+        "label": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "criterion"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "criterion": { "$ref": "#/$defs/text" }
+      }
+    },
+    "external_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "key"],
+      "properties": {
+        "system": { "$ref": "#/$defs/id" },
+        "key": { "$ref": "#/$defs/text" }
+      }
+    },
+    "external_delivery_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref", "observed_at"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["pull_request", "commit", "external_status"]
+        },
+        "ref": { "$ref": "#/$defs/text" },
+        "state": { "$ref": "#/$defs/text" },
+        "observed_at": { "$ref": "#/$defs/date_time" }
+      }
+    },
+    "archive_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "archived_at", "from_state"],
+      "properties": {
+        "reason": { "$ref": "#/$defs/text" },
+        "archived_at": { "$ref": "#/$defs/date_time" },
+        "from_state": {
+          "type": "string",
+          "enum": ["inbox", "draft", "ready"]
+        }
+      }
+    }
+  }
+}

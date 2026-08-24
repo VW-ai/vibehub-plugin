@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "structural_valid": [
+    { "path": "valid/sample-app.yaml", "schema": "personal-project.schema.json" },
+    { "path": "valid/pt-inbox-request.yaml", "schema": "personal-ticket.schema.json" },
+    { "path": "valid/pt-draft-export.yaml", "schema": "personal-ticket.schema.json" },
+    { "path": "valid/pt-ready-contract.yaml", "schema": "personal-ticket.schema.json" },
+    { "path": "valid/pt-archived-old-idea.yaml", "schema": "personal-ticket.schema.json" },
+    { "path": "valid/user-config.yaml", "schema": "personal-hub-config.schema.json" },
+    { "path": "valid/store.yaml", "schema": "personal-ticket-store.schema.json" }
+  ],
+  "structural_invalid": [
+    {
+      "path": "invalid/pt-unknown-field.yaml",
+      "schema": "personal-ticket.schema.json",
+      "expected_code": "additional-properties"
+    },
+    {
+      "path": "invalid/pt-ready-without-acceptance.yaml",
+      "schema": "personal-ticket.schema.json",
+      "expected_code": "min-items"
+    }
+  ],
+  "semantic_invalid": [
+    {
+      "paths": ["invalid/wrong-name.yaml"],
+      "expected_code": "filename-id-mismatch"
+    },
+    {
+      "paths": [
+        "sets/duplicate-id/a/pt-duplicate.yaml",
+        "sets/duplicate-id/b/pt-duplicate.yaml"
+      ],
+      "expected_code": "duplicate-record-id"
+    },
+    {
+      "paths": ["sets/broken-project/pt-broken-project.yaml"],
+      "expected_code": "missing-project-ref"
+    },
+    {
+      "paths": [
+        "sets/duplicate-external-key/pt-key-one.yaml",
+        "sets/duplicate-external-key/pt-key-two.yaml"
+      ],
+      "expected_code": "duplicate-external-key"
+    },
+    {
+      "paths": [
+        "sets/duplicate-alias/project-one.yaml",
+        "sets/duplicate-alias/project-two.yaml"
+      ],
+      "expected_code": "duplicate-project-alias"
+    }
+  ]
+}

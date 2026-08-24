@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "personal_ticket",
+  "personal_ticket_id": "pt-draft-export",
+  "title": "Define the export boundary",
+  "desired_outcome": "The export has a bounded source, format, and privacy rule.",
+  "state": "draft",
+  "project_refs": ["sample-app"],
+  "source_refs": [
+    {
+      "kind": "url",
+      "ref": "https://example.com/synthetic-export-request"
+    }
+  ],
+  "source_excerpt": "Export only the selected synthetic records.",
+  "acceptance": [],
+  "next_gate": "Choose the permitted fields.",
+  "external_keys": [
+    {
+      "system": "sample-tracker",
+      "key": "EXPORT-001"
+    }
+  ],
+  "external_delivery_refs": [],
+  "generation_host": "claude-code",
+  "created_at": "2026-08-20T00:00:00Z",
+  "updated_at": "2026-08-20T00:05:00Z",
+  "revision": 2
+}

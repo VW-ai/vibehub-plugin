@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/personal-hub-config.v1.json",
+  "title": "VibeHub Personal Hub user configuration pointer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "data_root"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "personal_hub_config" },
+    "data_root": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^/"
+    }
+  }
+}

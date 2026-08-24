@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "personal-structural-schemas-are-strict",
+    "semantic-contracts-are-normative",
+    "config-and-store-authority-is-unambiguous",
+    "fixtures-cover-valid-and-invalid-boundaries"
+  ],
+  "evidence_id": "personal-hub-contract-content-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:19:42Z",
+  "refs": [
+    "docs/proposals/personal-ticket-hub/contracts/personal-project.schema.json",
+    "docs/proposals/personal-ticket-hub/contracts/personal-ticket.schema.json",
+    "docs/proposals/personal-ticket-hub/contracts/personal-hub-config.schema.json",
+    "docs/proposals/personal-ticket-hub/contracts/personal-ticket-store.schema.json",
+    "docs/proposals/personal-ticket-hub/contracts/semantic-contract.json",
+    "docs/proposals/personal-ticket-hub/fixtures/manifest.json"
+  ],
+  "schema_version": 1,
+  "summary": "The proposal now contains strict draft-2020-12 Project, Ticket, config-pointer, and store-marker schemas; a separate versioned semantic authority for lifecycle, identity, global invariants, projections, and source capture; and synthetic positive and targeted negative fixtures covering every acceptance boundary.",
+  "ticket_id": "ticket-personal-hub-contract-and-fixtures"
+}

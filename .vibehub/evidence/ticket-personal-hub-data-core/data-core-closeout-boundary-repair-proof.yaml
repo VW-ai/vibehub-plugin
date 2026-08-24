@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "project-and-ticket-cli-is-complete",
+    "manual-file-failures-are-honest",
+    "core-is-regression-proven"
+  ],
+  "evidence_id": "data-core-closeout-boundary-repair-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T16:50:49Z",
+  "refs": [
+    "private-repo-receipt:data-core-boundary-repair",
+    "test:cli-mode-000-canonical-catalog-path-unavailable-exit-5",
+    "test:nested-yaml-noncanonical-path-and-duplicate-id-diagnostics",
+    "test:npm-run-verify-29-of-29-authoritative-checkout",
+    "test:git-clone-no-local-npm-ci-and-verify-29-of-29",
+    "private-repo-file:src/store.mjs",
+    "private-repo-file:test/data-core-cli.test.mjs",
+    "private-repo-file:test/data-core-lifecycle.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Private verification receipt data-core-boundary-repair resolves both concrete blockers found by the first independent PARTIAL Closeout. Canonical catalog resolution, enumeration, and permission-denied record reads now raise stable path-unavailable errors, which the CLI maps to documented exit 5; a real child process against a mode-000 tickets directory proves the envelope and exit. Catalog scanning now walks ordinary nested directories without following symlinks, reports both noncanonical directory and nested-record paths, parses nested JSON-compatible YAML for Diagnostics only, and includes it in full-data-root semantic validation, so a nested duplicate ID reports duplicate-record-id and blocks supported reads/mutations rather than being ignored. The authoritative and git clone --no-local checkouts both pass 29/29 tests under the same private verification receipt, and the source checkout is clean.",
+  "ticket_id": "ticket-personal-hub-data-core"
+}

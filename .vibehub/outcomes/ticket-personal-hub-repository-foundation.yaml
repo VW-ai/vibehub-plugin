@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "sibling-repository-is-isolated",
+    "node-foundation-is-reproducible",
+    "personal-contracts-are-adopted-unchanged",
+    "configuration-boundary-is-proven",
+    "remote-state-is-honest"
+  ],
+  "closed_at": "2026-08-20T08:31:59Z",
+  "evidence_ids": [
+    "personal-hub-foundation-repository-proof",
+    "personal-hub-foundation-reproducibility-proof",
+    "personal-hub-foundation-configuration-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout confirmed that vibehub-personal is a clean local sibling Git repository with explicit private-data and undecided-distribution policy, no network remote or private pilot records, a dependency-free Node 20 and lockfile foundation that installs and passes all 12 tests from a clean clone, byte-identical accepted contracts and fixtures bound to successful upstream provenance, and an external config-pointer/store-marker boundary whose setup, diagnosis, rejection paths, and structured errors were reproduced without dirtying the checkout.",
+  "ticket_id": "ticket-personal-hub-repository-foundation",
+  "unresolved_acceptance_ids": []
+}

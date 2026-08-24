@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/personal-ticket-store.v1.json",
+  "title": "VibeHub Personal Ticket data-store marker",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "format_version"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "personal_ticket_store" },
+    "format_version": { "const": 1 }
+  }
+}

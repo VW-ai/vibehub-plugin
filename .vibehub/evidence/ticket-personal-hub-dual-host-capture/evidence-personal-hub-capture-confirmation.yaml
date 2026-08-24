@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "capture-confirmation-is-deterministic"
+  ],
+  "evidence_id": "evidence-personal-hub-capture-confirmation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T17:10:40Z",
+  "refs": [
+    "private-repo-receipt:dual-host-capture:test/capture-preview.test.mjs",
+    "test:similar-titles-bind-confirmation-to-exact-proposal-and-current-store",
+    "test:ready-gaps-and-duplicate-external-keys-remain-blocking-preview-reasons",
+    "test:unknown-and-ambiguous-projects-are-not-guessed"
+  ],
+  "schema_version": 1,
+  "summary": "Capture contract tests prove one-action creation for an unambiguous new Inbox Ticket, exact Project name and alias resolution, non-confirmable unknown or ambiguous Projects, blocking Ready and external-key conflicts, preview-required similar titles and existing updates, mutually exclusive preview/confirm modes, and exact SHA-256 confirmation invalidation after proposal or store change.",
+  "ticket_id": "ticket-personal-hub-dual-host-capture"
+}

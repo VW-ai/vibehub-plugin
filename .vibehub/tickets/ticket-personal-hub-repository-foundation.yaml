@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "sibling-repository-is-isolated",
+      "criterion": "A local Git repository named vibehub-personal exists as a sibling of the current Plugin checkout, contains an explicit private-data policy, ignores configured personal data roots, leaves licensing and public distribution explicitly undecided, and does not contain Private pilot records or modify vibehub-plugin tracked runtime files."
+    },
+    {
+      "acceptance_id": "node-foundation-is-reproducible",
+      "criterion": "The repository pins a Node 20+ toolchain and lockfile, exposes deterministic format, test, and verify commands, and a clean checkout installs and verifies without global packages or provider credentials."
+    },
+    {
+      "acceptance_id": "personal-contracts-are-adopted-unchanged",
+      "criterion": "The accepted Personal schemas and fixtures are present with explicit upstream provenance and byte or semantic-equivalence checks preventing unreviewed drift from their accepted source."
+    },
+    {
+      "acceptance_id": "configuration-boundary-is-proven",
+      "criterion": "Setup and tests prove the OS config pointer selects an external data root, the root-local store marker is format authority, application source never becomes the default personal-data store, and invalid or missing paths fail with structured diagnostics."
+    },
+    {
+      "acceptance_id": "remote-state-is-honest",
+      "criterion": "If a Git remote is configured, its exact owner and private visibility are explicitly recorded and verified; otherwise the repository documents remote creation as deferred without claiming publication or CI execution."
+    }
+  ],
+  "constraints": [
+    "Do not create or expose a public repository containing Personal Hub code or private Ticket data.",
+    "Do not select or imply an open-source or proprietary license until the owner makes that separate distribution decision.",
+    "Do not guess a GitHub owner, organization, billing account, or remote URL.",
+    "Do not implement the data core, Claude/Codex Skills, Web server, handoff, Private pilot importer, cloud service, database, or Agent runtime.",
+    "Keep personal data outside application source even during tests; use temporary synthetic roots."
+  ],
+  "context": "The Personal Hub application has a different lifecycle from the repository-local Plugin and therefore starts in a sibling repository only after its Personal contracts are accepted. This Ticket creates a minimal implementation seat and adopts the accepted contracts; it does not implement Ticket mutations, Web UI, handoff, or migration. A remote is useful but must not block local progress when its exact GitHub owner or organization has not been named.",
+  "context_refs": [
+    {
+      "purpose": "Approved repository, distribution, and configuration boundary.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Product authority for a separate sibling application.",
+      "ref": ".vibehub/rooms/product/decision-personal-ticket-hub-separate-application.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A private-data-safe local sibling repository named vibehub-personal provides the reproducible Node 20+ foundation, CI contract, and configuration boundary for Personal Ticket Hub without changing vibehub-plugin runtime behavior.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "The new repository adopts accepted Personal contracts rather than inventing them during scaffolding.",
+      "target_ticket_id": "ticket-personal-hub-contract-and-fixtures",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-repository-foundation"
+}

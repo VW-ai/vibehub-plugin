@@ -1,0 +1,1564 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A personal and agent Ticket dashboard with optional VibeHub project integration">
+  <title>Personal Ticket Hub · Agent work dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #16201e;
+      --muted: #697270;
+      --subtle: #919a98;
+      --line: #dde2e0;
+      --line-strong: #cbd2cf;
+      --surface: #ffffff;
+      --canvas: #f4f6f5;
+      --panel: #f8faf9;
+      --wash: #edf1ef;
+      --brand: #163f37;
+      --brand-2: #285b50;
+      --blue: #4169e8;
+      --blue-wash: #edf1ff;
+      --green: #23836a;
+      --green-wash: #e9f5f0;
+      --amber: #b86425;
+      --amber-wash: #fbf1e7;
+      --blocked: #9aa3a0;
+      --danger: #b74d4d;
+      --branch-main: #4774c9;
+      --branch-agent: #2e8a66;
+      --sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+      --topbar: 62px;
+      --goal-panel: 282px;
+      --inspector: 372px;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--canvas); color: var(--ink); scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; overflow: hidden; font-family: var(--sans); background: var(--canvas); }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:active { transform: translateY(1px) scale(.99); }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .skip-link { position: fixed; left: 12px; top: -60px; z-index: 50; padding: 10px 14px; color: white; background: var(--brand); border-radius: 8px; }
+    .skip-link:focus { top: 12px; }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 20;
+      height: var(--topbar);
+      display: grid;
+      grid-template-columns: var(--goal-panel) minmax(0, 1fr) var(--inspector);
+      align-items: center;
+      background: rgb(255 255 255 / .92);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 18px;
+      border-right: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--brand);
+      color: white;
+      font: 700 11px var(--mono);
+      letter-spacing: -.03em;
+    }
+
+    .brand-copy { line-height: 1.05; }
+    .brand-copy strong { display: block; font-size: 14px; letter-spacing: -.025em; }
+    .brand-copy span { color: var(--muted); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+
+    .top-context {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 18px;
+    }
+
+    .project-select {
+      min-width: 0;
+      height: 36px;
+      padding: 0 30px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .source-pill {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font: 10px var(--mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px var(--green-wash); }
+    .source-dot.off { background: var(--blocked); box-shadow: 0 0 0 4px var(--wash); }
+    .source-dot.setup { background: var(--amber); box-shadow: 0 0 0 4px var(--amber-wash); }
+
+    .view-switch {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      border-radius: 9px;
+      background: var(--wash);
+    }
+    .view-switch button {
+      min-height: 29px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+      transition: background 180ms var(--ease), color 180ms var(--ease);
+    }
+    .view-switch button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(18 40 34 / .08); }
+    .view-switch button:disabled { cursor: not-allowed; opacity: .42; }
+
+    .top-actions {
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 0 15px;
+      border-left: 1px solid var(--line);
+    }
+
+    .top-button {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 650;
+      transition: border-color 180ms var(--ease), background 180ms var(--ease), transform 180ms var(--ease);
+    }
+
+    .top-button:hover { border-color: var(--line-strong); background: var(--panel); }
+    .top-button.primary { border-color: var(--brand); background: var(--brand); color: white; }
+    .action-count { min-width: 18px; height: 18px; display: grid; place-items: center; border-radius: 5px; background: var(--amber-wash); color: var(--amber); font: 700 9px var(--mono); }
+
+    .shell {
+      height: 100dvh;
+      display: grid;
+      grid-template-columns: var(--goal-panel) minmax(540px, 1fr) var(--inspector);
+      padding-top: var(--topbar);
+    }
+
+    .workspace { min-width: 0; min-height: 0; position: relative; overflow: hidden; }
+    .is-hidden { display: none !important; }
+
+    .tickets-view { height: 100%; min-width: 0; display: flex; flex-direction: column; background: var(--canvas); }
+    .tickets-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px 28px 21px;
+      border-bottom: 1px solid var(--line);
+      background: rgb(248 250 249 / .9);
+      backdrop-filter: blur(12px);
+    }
+    .eyebrow { color: var(--muted); font: 9px var(--mono); letter-spacing: .05em; }
+    .tickets-head h1 { margin: 7px 0 7px; font-size: clamp(25px, 2.6vw, 38px); line-height: .98; letter-spacing: -.055em; text-wrap: balance; }
+    .tickets-head p { max-width: 58ch; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .new-ticket { min-height: 38px; padding: 0 14px; border: 1px solid var(--brand); border-radius: 9px; background: var(--brand); color: white; font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+    .queue-tabs {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 28px;
+      min-height: 52px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .queue-tab { position: relative; height: 52px; padding: 0; border: 0; background: transparent; color: var(--muted); font-size: 10px; font-weight: 650; }
+    .queue-tab[aria-pressed="true"] { color: var(--ink); }
+    .queue-tab[aria-pressed="true"]::after { content: ""; position: absolute; inset: auto 0 -1px; height: 2px; background: var(--brand); }
+    .queue-tab .count { margin-left: 5px; color: var(--subtle); font: 9px var(--mono); }
+
+    .ticket-list-wrap { min-height: 0; flex: 1; overflow: auto; padding: 12px 28px 34px; }
+    .ticket-list-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 38px; color: var(--muted); font: 9px var(--mono); }
+    .ticket-list-caption a { color: var(--brand-2); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+    .ticket-list-caption a:hover { border-color: var(--brand-2); }
+    .ticket-table { min-width: 690px; }
+    .ticket-branch-group { position: relative; }
+    .ticket-branch-group + .ticket-branch-group { margin-top: 24px; }
+    .branch-group-head {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line);
+    }
+    .group-branch-symbol { width: 78px; height: 58px; overflow: visible; }
+    .group-branch-symbol .main { fill: none; stroke: var(--branch-main); stroke-width: 2.5; stroke-linecap: round; }
+    .group-branch-symbol .agent { fill: none; stroke: var(--branch-agent); stroke-width: 2.5; stroke-linecap: round; }
+    .group-branch-symbol circle { fill: var(--surface); stroke-width: 2.5; }
+    .branch-group-title strong { display: block; font-size: 11px; line-height: 1.35; letter-spacing: -.015em; }
+    .branch-group-title span { display: block; margin-top: 3px; color: var(--muted); font: 8px var(--mono); }
+    .branch-group-stats { display: flex; align-items: center; gap: 10px; color: var(--muted); font: 8px var(--mono); white-space: nowrap; }
+    .branch-key { display: inline-flex; align-items: center; gap: 5px; }
+    .branch-key::before { content: ""; width: 12px; height: 2px; border-radius: 99px; background: var(--branch-main); }
+    .branch-key.agent::before { background: var(--branch-agent); }
+    .ticket-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 78px minmax(230px, 1.5fr) minmax(145px, .75fr) 92px 96px;
+      align-items: center;
+      gap: 12px;
+      min-height: 84px;
+      padding: 0 8px 0 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      text-align: left;
+      transition: background 180ms var(--ease);
+    }
+    .ticket-list-item { display: block; }
+    .ticket-row:hover { background: var(--surface); }
+    .ticket-row[aria-selected="true"] { background: var(--blue-wash); }
+    .row-main { min-width: 0; transition: transform 180ms var(--ease); }
+    .ticket-row:hover .row-main { transform: translateX(3px); }
+    .branch-cell { width: 78px; height: 84px; align-self: stretch; }
+    .branch-cell svg { display: block; width: 78px; height: 84px; overflow: visible; }
+    .ticket-row .branch-main { fill: none; stroke: var(--branch-main); stroke-width: 2.5; stroke-linecap: round; }
+    .ticket-row .branch-agent { fill: none; stroke: var(--branch-agent); stroke-width: 2.5; stroke-linecap: round; }
+    .ticket-row .branch-node { stroke-width: 2.5; transition: r 180ms var(--ease), fill 180ms var(--ease); }
+    .ticket-row .branch-node.main { fill: var(--canvas); stroke: var(--branch-main); }
+    .ticket-row .branch-node.agent { fill: var(--canvas); stroke: var(--branch-agent); }
+    .ticket-row:hover .branch-node { r: 10; }
+    .ticket-row[aria-selected="true"] .branch-node { fill: var(--blue-wash); }
+    .ticket-row .state-core { stroke: none; }
+    .ticket-row .state-core.ready { fill: var(--blue); }
+    .ticket-row .state-core.running { fill: var(--blue); animation: branchPulse 1.7s var(--ease) infinite; transform-origin: center; transform-box: fill-box; }
+    .ticket-row .state-core.needs-you { fill: var(--amber); }
+    .ticket-row .state-core.done { fill: var(--green); }
+    .ticket-row .state-core.blocked { fill: var(--blocked); }
+    @keyframes branchPulse { 50% { transform: scale(1.75); opacity: .45; } }
+    .row-ticket-id { color: var(--muted); font: 8px var(--mono); letter-spacing: .02em; }
+    .row-title { display: block; margin-top: 5px; font-size: 12px; line-height: 1.35; letter-spacing: -.018em; text-wrap: pretty; }
+    .row-meta { color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .row-meta strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 10px; font-weight: 650; }
+    .owner { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-size: 10px; font-weight: 650; }
+    .owner::before { content: ""; width: 8px; height: 8px; border-radius: 3px; background: var(--ink); opacity: .72; }
+    .owner.you::before { border-radius: 50%; background: var(--amber); }
+    .source-badge { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font: 8px var(--mono); }
+    .source-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--subtle); }
+    .source-badge.vibehub::before { background: var(--green); }
+    .source-badge.personal::before { border-radius: 2px; background: var(--blue); }
+
+    .integration-popover {
+      position: fixed;
+      z-index: 31;
+      top: calc(var(--topbar) + 8px);
+      right: 176px;
+      width: min(370px, calc(100vw - 24px));
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgb(22 32 30 / .18);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 180ms var(--ease), transform 180ms var(--ease), visibility 180ms;
+    }
+    .integration-popover.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .integration-popover h2 { margin: 0; font-size: 15px; letter-spacing: -.03em; }
+    .integration-status { margin: 9px 0 14px; padding: 10px 11px; border-left: 3px solid var(--green); background: var(--green-wash); color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .integration-status.off { border-color: var(--blocked); background: var(--wash); }
+    .integration-status.setup { border-color: var(--amber); background: var(--amber-wash); }
+    .integration-status strong { display: block; color: var(--ink); }
+    .mode-list { display: grid; border-top: 1px solid var(--line); }
+    .mode-option { display: grid; grid-template-columns: 18px 1fr; gap: 8px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; }
+    .mode-option:hover { background: var(--panel); }
+    .mode-option:disabled { cursor: not-allowed; opacity: .5; }
+    .mode-radio { width: 14px; height: 14px; margin-top: 2px; border: 1px solid var(--line-strong); border-radius: 50%; background: white; }
+    .mode-option[aria-checked="true"] .mode-radio { border: 4px solid var(--brand); }
+    .mode-option strong { display: block; font-size: 10px; }
+    .mode-option small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+    .detect-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 13px; color: var(--muted); font: 8px var(--mono); }
+    .detect-row button { min-height: 30px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 9px; font-weight: 650; }
+
+    .integration-empty { height: 100%; display: grid; place-items: center; padding: 28px; text-align: center; }
+    .integration-empty > div { max-width: 440px; }
+    .integration-empty .empty-glyph { width: 62px; height: 82px; margin: 0 auto 20px; color: var(--line-strong); }
+    .integration-empty h2 { margin: 0; font-size: 23px; letter-spacing: -.045em; }
+    .integration-empty p { margin: 10px auto 18px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+
+    .goal-panel {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+    }
+
+    .panel-head { padding: 20px 18px 14px; }
+    .panel-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .panel-head h1 { margin: 0; font-size: 18px; line-height: 1.1; letter-spacing: -.035em; }
+    .panel-head p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      transition: background 180ms var(--ease), border-color 180ms var(--ease);
+    }
+    .icon-button:hover { background: var(--wash); border-color: var(--line-strong); }
+
+    .goal-filter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin: 0 18px 9px;
+      padding: 3px;
+      border-radius: 9px;
+      background: var(--wash);
+    }
+    .goal-filter button { min-height: 29px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 10px; font-weight: 650; }
+    .goal-filter button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(18 40 34 / .08); }
+
+    .goal-list { min-height: 0; flex: 1; overflow-y: auto; padding: 0 10px 24px; }
+    .goal-item {
+      position: relative;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+      padding: 14px 10px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      text-align: left;
+      transition: background 180ms var(--ease);
+    }
+    .goal-item::before { content: ""; position: absolute; left: 0; top: 11px; bottom: 11px; width: 3px; border-radius: 99px; background: transparent; }
+    .goal-item:hover { background: var(--wash); }
+    .goal-item[aria-selected="true"] { background: var(--blue-wash); }
+    .goal-item[aria-selected="true"]::before { background: var(--blue); }
+    .goal-glyph { width: 34px; height: 54px; color: var(--subtle); }
+    .goal-item[aria-selected="true"] .goal-glyph { color: var(--blue); }
+    .goal-code { color: var(--muted); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .goal-item h2 { margin: 5px 0 7px; font-size: 13px; line-height: 1.28; letter-spacing: -.02em; text-wrap: balance; }
+    .goal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; color: var(--muted); font-size: 9px; }
+    .goal-meta strong { color: var(--ink); font-weight: 650; }
+    .creator { display: inline-flex; align-items: center; gap: 5px; }
+    .creator::before { content: ""; width: 6px; height: 6px; border-radius: 2px; background: currentColor; opacity: .6; }
+
+    .composer {
+      display: none;
+      margin: 0 10px 12px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .composer.open { display: grid; gap: 9px; }
+    .composer label { color: var(--muted); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .composer input, .composer textarea { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 8px 0; font-size: 12px; }
+    .composer textarea { min-height: 58px; resize: vertical; }
+    .composer-actions { display: flex; justify-content: flex-end; gap: 7px; }
+
+    .graph-panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--canvas); }
+    .graph-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 18px 24px 15px;
+      background: rgb(248 250 249 / .88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .breadcrumbs { margin-bottom: 7px; color: var(--muted); font: 9px var(--mono); letter-spacing: .035em; }
+    .graph-head h2 { margin: 0; max-width: 680px; font-size: clamp(20px, 2vw, 28px); line-height: 1.07; letter-spacing: -.045em; text-wrap: balance; }
+    .graph-summary { display: flex; align-items: center; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 10px; }
+    .summary-item { display: inline-flex; align-items: center; gap: 5px; }
+    .summary-item i { width: 7px; height: 7px; border-radius: 50%; background: var(--blocked); }
+    .summary-item.done i { background: var(--green); }
+    .summary-item.ready i { background: var(--blue); }
+    .summary-item.live i { background: var(--ink); box-shadow: 0 0 0 4px rgb(22 32 30 / .08); }
+
+    .graph-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+    .control-group { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
+    .control-group button { min-width: 31px; height: 29px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: 10px var(--mono); }
+    .control-group button[aria-pressed="true"] { background: var(--ink); color: white; }
+
+    .integration-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .integration-strip strong { color: var(--ink); font-weight: 650; }
+    .lens-line, .truth-line { width: 30px; height: 0; border-top: 2px dashed var(--blue); }
+    .truth-line { border-top-style: solid; border-color: var(--brand-2); }
+    .strip-spacer { flex: 1; }
+    .data-source { font: 9px var(--mono); white-space: nowrap; }
+
+    .graph-scroll { min-height: 0; flex: 1; overflow: auto; }
+    .graph-stage {
+      position: relative;
+      width: 860px;
+      height: 790px;
+      margin: 0 auto;
+      background-image: radial-gradient(circle, #cbd2cf 1px, transparent 1px);
+      background-size: 22px 22px;
+      background-position: -1px -1px;
+      overflow: hidden;
+    }
+    .graph-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 42%, transparent 0 35%, rgb(244 246 245 / .58) 70%);
+    }
+
+    .graph-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .edge { fill: none; stroke: var(--brand-2); stroke-width: 2.2; stroke-linecap: round; opacity: .62; }
+    .edge.lens { stroke: var(--blue); stroke-dasharray: 4 8; opacity: .7; }
+    .edge.active { stroke: var(--blue); stroke-width: 3; stroke-dasharray: 5 9; animation: flow 1.2s linear infinite; opacity: 1; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+
+    .goal-root {
+      position: absolute;
+      width: 390px;
+      min-height: 96px;
+      padding: 18px 20px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--brand);
+      color: white;
+      text-align: left;
+      box-shadow: 0 18px 38px rgb(15 50 43 / .15);
+      transition: transform 200ms var(--ease);
+    }
+    .goal-root:hover { transform: translateY(-2px); }
+    .goal-root .root-kicker { color: rgb(255 255 255 / .62); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .goal-root h3 { margin: 8px 0 7px; font-size: 18px; line-height: 1.15; letter-spacing: -.035em; text-wrap: balance; }
+    .goal-root p { margin: 0; color: rgb(255 255 255 / .7); font-size: 10px; line-height: 1.45; }
+    .root-anchor { position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; border: 3px solid var(--canvas); border-radius: 50%; background: var(--blue); transform: translateX(-50%); }
+
+    .ticket-node {
+      position: absolute;
+      width: 300px;
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 11px;
+      align-items: start;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+    .node-dot {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--blocked);
+      border-radius: 50%;
+      background: var(--canvas);
+      transition: border-color 180ms var(--ease), background 180ms var(--ease), transform 180ms var(--ease);
+    }
+    .ticket-node:hover .node-dot { transform: scale(1.08); }
+    .ticket-node.state-done .node-dot { border-color: var(--green); background: var(--green); box-shadow: inset 0 0 0 5px var(--canvas); }
+    .ticket-node.state-ready .node-dot { border-color: var(--blue); background: var(--canvas); }
+    .ticket-node.state-running .node-dot { border-color: var(--blue); background: var(--blue); box-shadow: 0 0 0 6px rgb(65 105 232 / .12), inset 0 0 0 5px white; animation: breathe 1.8s var(--ease) infinite; }
+    .ticket-node.state-needs-you .node-dot { border-color: var(--amber); background: var(--amber-wash); }
+    @keyframes breathe { 50% { box-shadow: 0 0 0 10px rgb(65 105 232 / .04), inset 0 0 0 5px white; } }
+
+    .node-copy {
+      min-width: 0;
+      padding: 0 4px 11px 0;
+      border-bottom: 1px solid var(--line-strong);
+      transition: background 180ms var(--ease), border-color 180ms var(--ease), padding 180ms var(--ease);
+    }
+    .ticket-node:hover .node-copy { border-color: var(--subtle); }
+    .ticket-node[aria-selected="true"] .node-copy { margin-top: -10px; margin-left: -8px; padding: 10px 12px 12px; border: 1px solid #cbd5ff; border-radius: 11px; background: var(--blue-wash); }
+    .node-topline { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .ticket-id { min-width: 0; overflow: hidden; color: var(--muted); font: 8px var(--mono); text-overflow: ellipsis; white-space: nowrap; }
+    .state-label { margin-left: auto; color: var(--muted); font: 700 8px var(--mono); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    .state-done .state-label { color: var(--green); }
+    .state-ready .state-label, .state-running .state-label { color: var(--blue); }
+    .state-needs-you .state-label { color: var(--amber); }
+    .node-copy h4 { margin: 0; font-size: 12px; line-height: 1.32; letter-spacing: -.018em; text-wrap: pretty; }
+    .node-meta { display: flex; align-items: center; gap: 7px; margin-top: 7px; color: var(--muted); font: 8px var(--mono); }
+    .run-label { display: inline-flex; align-items: center; gap: 5px; color: var(--blue); }
+    .run-label::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    .graph-foot {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 18px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      font: 9px var(--mono);
+    }
+    .foot-item { display: inline-flex; align-items: center; gap: 7px; }
+    .foot-item::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .foot-item.live::before { background: var(--blue); }
+    .foot-spacer { flex: 1; }
+
+    .inspector {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+    }
+    .inspector-head { padding: 19px 20px 16px; border-bottom: 1px solid var(--line); }
+    .inspector-kicker { display: flex; align-items: center; gap: 7px; color: var(--muted); font: 9px var(--mono); }
+    .inspector-kicker span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .inspector h2 { margin: 10px 0 0; font-size: 20px; line-height: 1.12; letter-spacing: -.04em; text-wrap: balance; }
+    .state-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .state-chip { display: inline-flex; align-items: center; gap: 7px; font: 700 9px var(--mono); text-transform: uppercase; }
+    .state-chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--blocked); }
+    .state-chip.done { color: var(--green); }
+    .state-chip.done::before { background: var(--green); }
+    .state-chip.ready, .state-chip.running { color: var(--blue); }
+    .state-chip.ready::before, .state-chip.running::before { background: var(--blue); }
+    .state-chip.needs-you { color: var(--amber); }
+    .state-chip.needs-you::before { background: var(--amber); }
+    .source-kind { color: var(--muted); font: 8px var(--mono); }
+
+    .inspector-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 12px 14px 0; padding: 4px; border-radius: 10px; background: var(--wash); }
+    .inspector-tabs button { height: 31px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 10px; font-weight: 650; }
+    .inspector-tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(22 32 30 / .08); }
+
+    .inspector-body { min-height: 0; flex: 1; overflow-y: auto; padding: 4px 20px 36px; }
+    .detail-section { padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .detail-label { color: var(--muted); font: 8px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .detail-section p { margin: 9px 0 0; font-size: 11px; line-height: 1.55; }
+    .run-block { margin-top: 10px; padding: 12px; border-left: 3px solid var(--blue); background: var(--blue-wash); }
+    .run-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 650; }
+    .heartbeat { color: var(--muted); font: 8px var(--mono); }
+    .run-block p { color: var(--muted); font-size: 10px; }
+    .causal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .causal-cell { min-height: 74px; padding: 10px; border: 1px solid var(--line); border-radius: 9px; }
+    .causal-cell strong { display: block; margin-top: 7px; font-size: 11px; line-height: 1.3; }
+    .causal-cell small { display: block; margin-top: 3px; color: var(--muted); font: 8px var(--mono); }
+    .acceptance { list-style: none; margin: 11px 0 0; padding: 0; display: grid; gap: 10px; }
+    .acceptance li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; font-size: 10px; line-height: 1.45; }
+    .check { width: 14px; height: 14px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 4px; color: white; font: 9px var(--mono); }
+    .check.done { border-color: var(--green); background: var(--green); }
+    .evidence { margin-top: 3px; color: var(--muted); font: 8px var(--mono); }
+    .trace { list-style: none; margin: 11px 0 0; padding: 0; }
+    .trace li { position: relative; padding: 0 0 15px 18px; font-size: 10px; line-height: 1.4; }
+    .trace li::before { content: ""; position: absolute; left: 2px; top: 4px; width: 6px; height: 6px; border: 2px solid var(--line-strong); border-radius: 50%; background: white; }
+    .trace li:not(:last-child)::after { content: ""; position: absolute; left: 5px; top: 12px; bottom: 0; border-left: 1px solid var(--line); }
+    .trace time { display: block; margin-top: 3px; color: var(--muted); font: 8px var(--mono); }
+    .inspector-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 16px; }
+    .inspector-actions button { min-height: 37px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-size: 10px; font-weight: 650; }
+    .inspector-actions .primary { border-color: var(--brand); background: var(--brand); color: white; }
+
+    .inbox-drawer {
+      position: fixed;
+      z-index: 30;
+      top: calc(var(--topbar) + 8px);
+      right: 12px;
+      width: min(390px, calc(100vw - 24px));
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgb(22 32 30 / .18);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 180ms var(--ease), transform 180ms var(--ease), visibility 180ms;
+    }
+    .inbox-drawer.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .inbox-head { display: flex; align-items: center; justify-content: space-between; padding: 5px 6px 10px; }
+    .inbox-head h2 { margin: 0; font-size: 14px; letter-spacing: -.025em; }
+    .inbox-item { width: 100%; display: grid; grid-template-columns: 8px 1fr auto; gap: 10px; padding: 12px 7px; border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; }
+    .inbox-item:hover { background: var(--panel); }
+    .attention-dot { width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; background: var(--amber); }
+    .inbox-item strong { display: block; font-size: 11px; line-height: 1.35; }
+    .inbox-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .inbox-age { color: var(--muted); font: 8px var(--mono); white-space: nowrap; }
+
+    .mobile-goal-select, .mobile-inspector-button { display: none; }
+
+    @media (max-width: 1180px) {
+      :root { --goal-panel: 244px; --inspector: 340px; }
+      .source-pill { display: none; }
+      .view-switch .view-label { display: none; }
+      .graph-head { padding-inline: 18px; }
+      .integration-strip { padding-inline: 18px; }
+      .tickets-head, .queue-tabs { padding-inline: 20px; }
+      .ticket-list-wrap { padding-inline: 20px; }
+    }
+
+    @media (max-width: 980px) {
+      :root { --inspector: 0px; }
+      .topbar { grid-template-columns: var(--goal-panel) minmax(0, 1fr) auto; }
+      .shell { grid-template-columns: var(--goal-panel) minmax(540px, 1fr); }
+      .inspector {
+        position: fixed;
+        z-index: 25;
+        right: 0;
+        top: var(--topbar);
+        bottom: 0;
+        width: min(390px, 100vw);
+        border-left: 1px solid var(--line);
+        transform: translateX(102%);
+        transition: transform 220ms var(--ease);
+      }
+      .inspector.open { transform: translateX(0); }
+      .mobile-inspector-button { display: inline-flex; }
+    }
+
+    @media (max-width: 720px) {
+      :root { --goal-panel: 0px; --topbar: 58px; }
+      .topbar { grid-template-columns: 52px minmax(0, 1fr) auto; }
+      .brand { justify-content: center; padding: 0; }
+      .brand-copy { display: none; }
+      .brand-mark { width: 32px; height: 32px; }
+      .top-context { padding: 0 9px; }
+      .project-select { width: 100%; }
+      .view-switch { display: none; }
+      .top-button .button-label { display: none; }
+      .top-button { width: 44px; min-height: 44px; padding: 0; }
+      .top-button.primary { display: none; }
+      #integration-mode-label { display: none; }
+      #integration-button::before { content: "VH"; font: 700 8px var(--mono); }
+      .shell { display: block; }
+      .goal-panel { display: none; }
+      .workspace { height: calc(100dvh - var(--topbar)); }
+      .tickets-head { padding: 18px 14px 16px; }
+      .tickets-head h1 { font-size: 27px; }
+      .tickets-head p { font-size: 10px; }
+      .new-ticket { width: 44px; min-height: 44px; padding: 0; font-size: 0; }
+      .new-ticket::after { content: "+"; font-size: 16px; }
+      .queue-tabs { gap: 16px; padding: 0 14px; overflow-x: auto; }
+      .ticket-list-wrap { padding: 9px 14px 24px; }
+      .ticket-table { min-width: 0; }
+      .branch-group-head { grid-template-columns: 62px minmax(0, 1fr); }
+      .group-branch-symbol { width: 62px; }
+      .branch-group-stats { display: none; }
+      .ticket-row { grid-template-columns: 62px minmax(0, 1fr) 74px; min-height: 84px; gap: 8px; }
+      .branch-cell { width: 62px; overflow: hidden; }
+      .branch-cell svg { margin-left: -5px; }
+      .ticket-row .row-project, .ticket-row .source-badge { display: none; }
+      .integration-popover { right: 12px; }
+      .graph-head { display: block; padding: 13px 14px 12px; }
+      .graph-head h2 { font-size: 21px; }
+      .graph-controls { justify-content: flex-start; margin-top: 12px; }
+      .integration-strip { gap: 7px; padding: 9px 14px; overflow-x: auto; }
+      .strip-spacer, .data-source { display: none; }
+      .mobile-goal-select { display: block; width: 100%; height: 38px; margin-bottom: 10px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: white; font-size: 11px; font-weight: 650; }
+      .graph-stage { margin: 0; }
+      .graph-foot { overflow-x: auto; }
+      .inspector { width: 100vw; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#ticket-main">跳到 Ticket dashboard</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">VH</span>
+      <span class="brand-copy"><strong>Personal Tickets</strong><span>you + your agents</span></span>
+    </div>
+    <div class="top-context">
+      <select class="project-select" id="project-select" aria-label="Project">
+        <option value="all">All projects</option>
+        <option value="personal">VibeHub Personal</option>
+        <option value="commerce">Sample Commerce</option>
+        <option value="sample">Sample App</option>
+      </select>
+      <div class="view-switch" aria-label="Workspace view">
+        <button type="button" data-workspace-view="tickets" aria-pressed="true">☷ <span class="view-label">Tickets</span></button>
+        <button type="button" data-workspace-view="graph" aria-pressed="false">⑂ <span class="view-label">VibeHub graph</span></button>
+      </div>
+      <span class="source-pill"><span class="source-dot" id="integration-dot"></span><span id="top-source">VibeHub · detecting</span></span>
+    </div>
+    <div class="top-actions">
+      <button class="top-button" id="integration-button" type="button" aria-label="VibeHub integration settings" aria-expanded="false"><span class="button-label">VibeHub</span><span id="integration-mode-label">Auto</span></button>
+      <button class="top-button" id="inbox-button" type="button" aria-label="Open attention inbox" aria-expanded="false"><span class="button-label">Inbox</span><span class="action-count">2</span></button>
+      <button class="top-button mobile-inspector-button" id="mobile-inspector-button" type="button" aria-label="Open Ticket details" aria-expanded="false"><span class="button-label">Details</span>↗</button>
+      <button class="top-button primary" id="top-new-ticket-button" type="button">＋ <span class="button-label">New ticket</span></button>
+    </div>
+  </header>
+
+  <aside class="integration-popover" id="integration-popover" aria-label="VibeHub project integration">
+    <h2>VibeHub for this project</h2>
+    <div class="integration-status" id="integration-status"></div>
+    <div class="mode-list" role="radiogroup" aria-label="Integration mode">
+      <button class="mode-option" type="button" data-integration-mode="auto" role="radio" aria-checked="true"><span class="mode-radio"></span><span><strong>Auto detect</strong><small>Use VibeHub when the project format is current and project validation passes.</small></span></button>
+      <button class="mode-option" type="button" data-integration-mode="on" role="radio" aria-checked="false"><span class="mode-radio"></span><span><strong>On</strong><small>Mark this project for VibeHub. If setup is missing, show the setup action instead of inventing Tickets.</small></span></button>
+      <button class="mode-option" type="button" data-integration-mode="off" role="radio" aria-checked="false"><span class="mode-radio"></span><span><strong>Off</strong><small>Keep using Personal Tickets only. Existing repository files are left untouched.</small></span></button>
+    </div>
+    <div class="detect-row"><span id="detection-path">checking local repository…</span><button id="detect-again" type="button">Detect again</button></div>
+  </aside>
+
+  <aside class="inbox-drawer" id="inbox-drawer" aria-label="Needs your attention">
+    <div class="inbox-head"><h2>Needs your attention</h2><button class="icon-button" id="close-inbox" type="button" aria-label="Close inbox">×</button></div>
+    <button class="inbox-item" type="button" data-goal="personal" data-ticket="review-model">
+      <span class="attention-dot"></span><span><strong>Confirm Personal Hub ↔ VibeHub handoff model</strong><span>Goal G-04 · human acceptance</span></span><span class="inbox-age">12m</span>
+    </button>
+    <button class="inbox-item" type="button" data-goal="commerce" data-ticket="approve-permissions">
+      <span class="attention-dot"></span><span><strong>Choose catalog rollout authority</strong><span>Goal G-07 · protected decision</span></span><span class="inbox-age">31m</span>
+    </button>
+  </aside>
+
+  <div class="shell">
+    <aside class="goal-panel" aria-label="Goals">
+      <div class="panel-head">
+        <div class="panel-title-row"><h1>Goals</h1><button class="icon-button" id="panel-new-goal" type="button" aria-label="Create goal">＋</button></div>
+        <p>Goal 是可选的归类方式。Ticket 可以由你或 Agent 建立，也可以来自启用了 VibeHub 的项目。</p>
+      </div>
+      <div class="goal-filter"><button type="button" aria-pressed="true">Active · 3</button><button type="button" aria-pressed="false">Archive · 8</button></div>
+      <form class="composer" id="goal-composer">
+        <label for="goal-title-input">Goal outcome</label>
+        <input id="goal-title-input" placeholder="What should become true?">
+        <textarea aria-label="Success condition" placeholder="Success condition"></textarea>
+        <div class="composer-actions"><button class="top-button" id="cancel-goal" type="button">Cancel</button><button class="top-button primary" type="submit">Save goal</button></div>
+      </form>
+      <div class="goal-list" id="goal-list"></div>
+    </aside>
+
+    <main class="workspace" id="ticket-main">
+      <section class="tickets-view" id="tickets-view" aria-label="Personal Ticket dashboard">
+        <header class="tickets-head">
+          <div>
+            <span class="eyebrow" id="ticket-scope">ALL PROJECTS · PERSONAL QUEUE</span>
+            <h1>Your work, in one queue.</h1>
+            <p>给你和 Agents 使用的 Ticket 管理面板。Personal Tickets 永远可用；VibeHub 只为已连接的项目补充依赖图、Run、Evidence 和 Closeout。</p>
+          </div>
+          <button class="new-ticket" id="new-ticket-button" type="button">＋ New ticket</button>
+        </header>
+        <nav class="queue-tabs" aria-label="Ticket filters">
+          <button class="queue-tab" type="button" data-queue-filter="open" aria-pressed="true">Open <span class="count" id="count-open">0</span></button>
+          <button class="queue-tab" type="button" data-queue-filter="implementing" aria-pressed="false">Implementing <span class="count" id="count-running">0</span></button>
+          <button class="queue-tab" type="button" data-queue-filter="needs-you" aria-pressed="false">Needs you <span class="count" id="count-attention">0</span></button>
+          <button class="queue-tab" type="button" data-queue-filter="done" aria-pressed="false">Done</button>
+        </nav>
+        <div class="ticket-list-wrap">
+          <div class="ticket-list-caption"><span id="queue-caption">Sorted by attention, then recent activity</span><span>owner · source · branch lane · <a href="../PERSONAL_TICKET_HUB_SOLUTION.zh-CN.md">solution v0.3</a></span></div>
+          <div class="ticket-table" id="ticket-table" role="list"></div>
+        </div>
+      </section>
+
+      <section class="graph-panel is-hidden" id="graph-main" aria-label="VibeHub Ticket graph">
+      <header class="graph-head">
+        <div>
+          <select class="mobile-goal-select" id="mobile-goal-select" aria-label="Goal"></select>
+          <div class="breadcrumbs mono" id="breadcrumbs"></div>
+          <h2 id="goal-title"></h2>
+          <div class="graph-summary" id="graph-summary"></div>
+        </div>
+        <div class="graph-controls">
+          <div class="control-group" aria-label="Graph scope">
+            <button type="button" aria-pressed="true">Now</button><button type="button" aria-pressed="false">All</button>
+          </div>
+          <div class="control-group" aria-label="Graph direction">
+            <button type="button" aria-pressed="true" title="Top to bottom">↓</button><button type="button" aria-pressed="false" title="Left to right">→</button>
+          </div>
+          <div class="control-group" aria-label="Zoom">
+            <button type="button" id="zoom-out">−</button><button type="button" id="zoom-fit">Fit</button><button type="button" id="zoom-in">＋</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="integration-strip">
+        <span class="lens-line"></span><span><strong>Goal lens</strong> · Personal Hub grouping</span>
+        <span class="truth-line"></span><span><strong>depends_on</strong> · VibeHub canonical relation</span>
+        <span class="strip-spacer"></span><span class="data-source">Git truth + live Run overlay</span>
+      </div>
+
+      <div class="graph-scroll" id="graph-scroll">
+        <div class="graph-stage" id="graph-stage">
+          <svg class="graph-svg" id="graph-svg" viewBox="0 0 860 790" aria-hidden="true"></svg>
+          <div id="graph-nodes"></div>
+        </div>
+      </div>
+
+      <footer class="graph-foot">
+        <span class="foot-item">Ticket truth · .vibehub/tickets</span>
+        <span class="foot-item live">Run presence · live projection</span>
+        <span class="foot-spacer"></span>
+        <span id="repo-foot">repo · main · clean</span>
+      </footer>
+      </section>
+    </main>
+
+    <aside class="inspector" id="inspector" aria-label="Ticket inspector">
+      <div class="inspector-head">
+        <div class="inspector-kicker"><span id="detail-kicker"></span></div>
+        <h2 id="detail-title"></h2>
+        <div class="state-row"><span class="state-chip" id="detail-state"></span><span class="source-kind" id="detail-source"></span></div>
+      </div>
+      <div class="inspector-tabs" role="tablist" aria-label="Ticket details">
+        <button id="inspector-tab-execution" type="button" role="tab" data-tab="execution" aria-controls="inspector-body" aria-selected="true" tabindex="0">Execution</button>
+        <button id="inspector-tab-contract" type="button" role="tab" data-tab="contract" aria-controls="inspector-body" aria-selected="false" tabindex="-1">Contract</button>
+        <button id="inspector-tab-log" type="button" role="tab" data-tab="log" aria-controls="inspector-body" aria-selected="false" tabindex="-1">Log</button>
+      </div>
+      <div class="inspector-body" id="inspector-body" role="tabpanel" aria-labelledby="inspector-tab-execution" tabindex="0"></div>
+    </aside>
+  </div>
+
+  <script>
+    const branchGlyph = `
+      <svg class="goal-glyph" viewBox="0 0 34 54" fill="none" aria-hidden="true">
+        <path d="M10 7v39M10 25c0 0 0 8 8 8h6c0 0 4 0 4-5v-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="10" cy="7" r="4" fill="white" stroke="currentColor" stroke-width="2"/>
+        <circle cx="10" cy="46" r="4" fill="white" stroke="currentColor" stroke-width="2"/>
+        <circle cx="28" cy="19" r="4" fill="white" stroke="currentColor" stroke-width="2"/>
+      </svg>`;
+
+    const dashboardTickets = [
+      {
+        id: "PT-028", goalKey: "personal", vibeTicketId: "review-model", state: "NEEDS YOU", priority: "P0",
+        title: "Confirm the Personal Hub ↔ VibeHub handoff model", project: "VibeHub Personal", goal: "G-04 · Personal Ticket Hub",
+        owner: "You", creator: "Codex", source: "VibeHub", updated: "12m", outcome: "Confirm that Personal Tickets remain the default product surface while VibeHub stays an optional repository integration.",
+        next: "Review one product-boundary decision", acceptance: [["Personal Tickets work without VibeHub", true], ["VibeHub never becomes the Personal Ticket authority", false]],
+        log: [["Agent requested product decision", "12m ago"], ["Integration boundary drafted", "26m ago"]]
+      },
+      {
+        id: "VH-P-002", goalKey: "personal", vibeTicketId: "data-core", state: "RUNNING", priority: "P1",
+        title: "Implement revision-safe Goal and intake commands", project: "VibeHub Personal", goal: "G-04 · Personal Ticket Hub",
+        owner: "Codex", creator: "You", source: "VibeHub", updated: "8s", outcome: "Concurrent user and Agent updates apply to the exact revision or fail without lost work.",
+        next: "Codex is running conflict-matrix tests", acceptance: [["Atomic writes preserve valid YAML", true], ["Stale revisions fail predictably", false]],
+        log: [["Conflict matrix 11/16", "8s ago"], ["Run claimed by Codex", "18m ago"]]
+      },
+      {
+        id: "PT-031", goalKey: "personal", state: "READY", priority: "P1",
+        title: "Write the first pilot onboarding checklist", project: "VibeHub Personal", goal: "G-04 · Personal Ticket Hub",
+        owner: "Claude", creator: "You", source: "Personal", updated: "18m", outcome: "A first-time user can capture a Ticket, assign it to an Agent, and find the result without learning VibeHub.",
+        next: "Claude can start from the attached notes", acceptance: [["Checklist stays tool-neutral", true], ["First result is reachable in three actions", false]],
+        log: [["Assigned to Claude", "18m ago"], ["Created by you", "31m ago"]]
+      },
+      {
+        id: "PT-017", goalKey: "commerce", vibeTicketId: "approve-permissions", state: "NEEDS YOU", priority: "P0",
+        title: "Choose catalog rollout authority", project: "Sample Commerce", goal: "G-07 · Safe catalog rollout",
+        owner: "You", creator: "Claude", source: "VibeHub", updated: "31m", outcome: "Choose automatic catalog release or final human confirmation for the sample store.",
+        next: "Select one protected authority mode", acceptance: [["Sample store is named", false], ["Authority mode is explicit", false]],
+        log: [["Protected decision requested", "31m ago"]]
+      },
+      {
+        id: "PT-022", goalKey: "commerce", vibeTicketId: "retry", state: "RUNNING", priority: "P1",
+        title: "Prevent duplicate catalog release during retry", project: "Sample Commerce", goal: "G-07 · Safe catalog rollout",
+        owner: "Codex", creator: "You", source: "VibeHub", updated: "14s", outcome: "Failed catalog uploads retry once and cannot create a duplicate release.",
+        next: "Codex is running regression 7/9", acceptance: [["Failed catalog upload retries once", true], ["Duplicate catalog release is impossible", false]],
+        log: [["Regression test 7/9", "14s ago"]]
+      },
+      {
+        id: "PT-034", goalKey: "sample", state: "READY", priority: "P2",
+        title: "Collect five examples of confusing first sessions", project: "Sample App", goal: "G-11 · First session",
+        owner: "Claude", creator: "You", source: "Personal", updated: "46m", outcome: "Five concrete first-session failures are ranked before implementation begins.",
+        next: "Claude can research the saved session notes", acceptance: [["Five distinct sessions are represented", false]],
+        log: [["Added to Claude queue", "46m ago"]]
+      },
+      {
+        id: "PT-009", goalKey: "sample", state: "DONE", priority: "P2",
+        title: "Choose one primary action for the empty state", project: "Sample App", goal: "G-11 · First session",
+        owner: "You", creator: "You", source: "Personal", updated: "3h", outcome: "The empty state presents one useful, reversible next action.",
+        next: "No action needed", acceptance: [["Exactly one primary action remains", true]],
+        log: [["Marked done by you", "3h ago"]]
+      }
+    ];
+
+    const goals = {
+      personal: {
+        id: "G-04",
+        title: "Launch a personal Ticket Hub for all projects",
+        creator: "You",
+        created: "Human",
+        project: "VibeHub Personal",
+        repo: "vibehub-personal",
+        branch: "main",
+        vibehubDetected: true,
+        summary: "Capture intent once, then follow the exact VibeHub implementation graph without reconstructing agent conversations.",
+        root: { x: 235, y: 30 },
+        tickets: [
+          {
+            id: "repository-foundation", x: 115, y: 190, state: "DONE",
+            title: "Establish the external-data repository foundation",
+            outcome: "A clean personal repository and external data root exist with deterministic setup and validation.",
+            depends: [], unlocks: ["data-core", "plugin-bridge"],
+            run: null, source: "Git Ticket v2", revision: "04",
+            acceptance: [["External data root is explicit", true, "setup test"], ["Repository stays free of private records", true, "fixture scan"], ["Fresh clone verifies", true, "npm verify"]],
+            log: [["Outcome accepted independently", "1h ago"], ["12 foundation tests passed", "1h ago"]]
+          },
+          {
+            id: "data-core", x: 115, y: 335, state: "RUNNING",
+            title: "Implement revision-safe Goal and intake commands",
+            outcome: "Concurrent user and Agent updates either apply to the exact revision or fail without lost work.",
+            depends: ["repository-foundation"], unlocks: ["webview-integration"],
+            run: { agent: "Codex", id: "run-7f3a", heartbeat: "8s ago", progress: "Conflict matrix · 11/16" },
+            source: "Git + live Run", revision: "07",
+            acceptance: [["Atomic writes preserve valid YAML", true, "test: atomic-write"], ["Stale revisions fail predictably", false, "test running"], ["Manual malformed files remain visible", true, "diagnostic fixture"]],
+            log: [["Content-hash conflict test added", "2m ago"], ["Run claimed by Codex", "18m ago"]]
+          },
+          {
+            id: "plugin-bridge", x: 505, y: 335, state: "READY",
+            title: "Compile Goal handoff into VibeHub Ticket Plan input",
+            outcome: "A Goal can hand off bounded outcome, acceptance, project refs, and provenance without inventing dependencies.",
+            depends: ["repository-foundation"], unlocks: ["webview-integration", "review-model"],
+            run: null, source: "Git Ticket v2", revision: "03",
+            acceptance: [["Target project format is checked", true, "compatibility fixture"], ["Missing acceptance blocks handoff", true, "contract fixture"], ["Dependencies are never guessed", true, "semantic contract"]],
+            log: [["Ticket became READY", "6m ago"], ["Foundation Outcome linked", "6m ago"]]
+          },
+          {
+            id: "webview-integration", x: 250, y: 505, state: "BLOCKED",
+            title: "Render the selected Goal's real VibeHub Ticket graph",
+            outcome: "The webview groups one Goal lens around a fresh, read-only projection of its target repository Ticket graph.",
+            depends: ["data-core", "plugin-bridge"], unlocks: ["pilot"],
+            run: null, source: "Git Ticket v2", revision: "02",
+            acceptance: [["Solid edges come only from depends_on", false, "pending"], ["RUNNING stays a live overlay", false, "pending"], ["Goal lens never mutates Ticket schema", true, "design contract"]],
+            log: [["Blocked by 2 direct prerequisites", "now"]]
+          },
+          {
+            id: "review-model", x: 540, y: 505, state: "NEEDS YOU",
+            title: "Confirm Personal Hub ↔ VibeHub handoff model",
+            outcome: "One human decision confirms whether a Goal may span multiple repositories while each VibeHub graph stays repository-local.",
+            depends: ["plugin-bridge"], unlocks: ["pilot"],
+            run: null, source: "Human acceptance", revision: "01",
+            acceptance: [["Cross-repo Goal policy is explicit", false, "human input required"], ["Repository graphs remain authoritative", true, "schema v2"]],
+            log: [["Human boundary reached", "12m ago"], ["Two valid models documented", "19m ago"]]
+          },
+          {
+            id: "pilot", x: 320, y: 675, state: "BLOCKED",
+            title: "Dogfood one Goal from intake through independent closeout",
+            outcome: "A real project proves capture, handoff, execution, Evidence, Outcome, and return-to-Inbox as one flow.",
+            depends: ["webview-integration", "review-model"], unlocks: [],
+            run: null, source: "Git Ticket v2", revision: "01",
+            acceptance: [["One real Goal completes end to end", false, "pending"], ["Evidence remains acceptance-linked", false, "pending"]],
+            log: [["Waiting on graph UI and owner decision", "now"]]
+          }
+        ]
+      },
+      commerce: {
+        id: "G-07",
+        title: "Roll out catalog updates safely",
+        creator: "Claude",
+        created: "AI proposed · you accepted",
+        project: "Sample Commerce",
+        repo: "sample-commerce",
+        branch: "feature/catalog-rollout",
+        vibehubDetected: true,
+        summary: "Reliable catalog updates with explicit release authority, no duplicate changes, and reviewable proof.",
+        root: { x: 235, y: 30 },
+        tickets: [
+          { id: "contract", x: 115, y: 190, state: "DONE", title: "Define the catalog release boundary", outcome: "Store, credential, and final-confirm boundaries are explicit.", depends: [], unlocks: ["retry", "approve-permissions"], run: null, source: "Git Ticket v2", revision: "05", acceptance: [["Boundary contract is checked in", true, "commit proof"]], log: [["Outcome accepted", "2h ago"]] },
+          { id: "retry", x: 115, y: 345, state: "RUNNING", title: "Prevent duplicate catalog release during retry", outcome: "Failed catalog uploads retry once and cannot create a duplicate release.", depends: ["contract"], unlocks: ["scheduler"], run: { agent: "Codex", id: "run-c13d", heartbeat: "14s ago", progress: "Regression tests · 7/9" }, source: "Git + live Run", revision: "06", acceptance: [["Failed catalog upload retries once", true, "test"], ["Duplicate catalog release is impossible", false, "test running"]], log: [["Renewal regression running", "now"]] },
+          { id: "approve-permissions", x: 510, y: 345, state: "NEEDS YOU", title: "Choose catalog rollout authority", outcome: "The owner chooses automatic release or final human confirmation.", depends: ["contract"], unlocks: ["scheduler"], run: null, source: "Protected decision", revision: "02", acceptance: [["Sample store is named", false, "human input"], ["Authority mode is selected", false, "human input"]], log: [["Decision requested", "31m ago"]] },
+          { id: "scheduler", x: 315, y: 535, state: "BLOCKED", title: "Ship the catalog rollout scheduler", outcome: "Catalog updates release once under the chosen authority model.", depends: ["retry", "approve-permissions"], unlocks: [], run: null, source: "Git Ticket v2", revision: "03", acceptance: [["End-to-end catalog rollout passes", false, "pending"]], log: [["Blocked by run and decision", "now"]] }
+        ]
+      },
+      sample: {
+        id: "G-11",
+        title: "Make the sample app's first session self-evident",
+        creator: "You",
+        created: "Human",
+        project: "Sample App",
+        repo: "sample-app",
+        branch: "main",
+        vibehubDetected: false,
+        summary: "A new user understands the first useful action without a tour or setup wall.",
+        root: { x: 235, y: 30 },
+        tickets: [
+          { id: "research", x: 125, y: 190, state: "DONE", title: "Observe five first-session failures", outcome: "The first-session failure modes are concrete and ranked.", depends: [], unlocks: ["copy", "empty-state"], run: null, source: "Git Ticket v2", revision: "02", acceptance: [["Five sessions are represented", true, "research notes"]], log: [["Outcome accepted", "3h ago"]] },
+          { id: "copy", x: 125, y: 350, state: "RUNNING", title: "Rewrite the first-session sequence", outcome: "The first useful action is obvious in under thirty seconds.", depends: ["research"], unlocks: ["qa"], run: { agent: "Claude", id: "run-19aa", heartbeat: "5s ago", progress: "Narrow copy · 4/6" }, source: "Git + live Run", revision: "03", acceptance: [["First action is self-evident", false, "prototype review"]], log: [["Narrow copy rendered", "1m ago"]] },
+          { id: "empty-state", x: 500, y: 350, state: "READY", title: "Make the empty state point to one action", outcome: "The empty state presents one useful, reversible next action.", depends: ["research"], unlocks: ["qa"], run: null, source: "Git Ticket v2", revision: "01", acceptance: [["Exactly one primary action remains", true, "contract"]], log: [["Ticket became READY", "46m ago"]] },
+          { id: "qa", x: 315, y: 545, state: "BLOCKED", title: "Validate mobile and desktop first-session paths", outcome: "Both layouts complete the same first useful action without explanation.", depends: ["copy", "empty-state"], unlocks: [], run: null, source: "Git Ticket v2", revision: "01", acceptance: [["375px path passes", false, "pending"], ["Desktop path passes", false, "pending"]], log: [["Blocked by two direct prerequisites", "now"]] }
+        ]
+      }
+    };
+
+    let activeGoalKey = "personal";
+    let projectScope = "all";
+    let selectedTicketId = "data-core";
+    let selectedDashboardTicketId = "PT-028";
+    let activeTab = "execution";
+    let workspaceMode = "tickets";
+    let queueFilter = "open";
+    const integrationModes = { personal: "auto", commerce: "auto", sample: "auto" };
+    let zoom = 1;
+
+    const goalList = document.getElementById("goal-list");
+    const mobileGoalSelect = document.getElementById("mobile-goal-select");
+    const graphSvg = document.getElementById("graph-svg");
+    const graphNodes = document.getElementById("graph-nodes");
+    const graphStage = document.getElementById("graph-stage");
+    const graphScroll = document.getElementById("graph-scroll");
+    const inspector = document.getElementById("inspector");
+    const ticketsView = document.getElementById("tickets-view");
+    const graphView = document.getElementById("graph-main");
+    const ticketTable = document.getElementById("ticket-table");
+    const integrationPopover = document.getElementById("integration-popover");
+
+    function currentIntegrationMode() {
+      return integrationModes[activeGoalKey];
+    }
+
+    function activeIntegration() {
+      if (projectScope === "all") return { available: false, kind: "off", label: "2 detected", detail: "Choose one project before opening or changing its VibeHub integration." };
+      const integrationMode = currentIntegrationMode();
+      const detected = goals[activeGoalKey].vibehubDetected;
+      if (integrationMode === "off") return { available: false, kind: "off", label: "Off", detail: "Personal Tickets only. Repository files stay untouched." };
+      if (integrationMode === "on" && !detected) return { available: false, kind: "setup", label: "Setup required", detail: "This project is marked for VibeHub, but no current validated project format was detected." };
+      if (detected) return { available: true, kind: "detected", label: integrationMode === "auto" ? "Auto · Detected" : "On · Connected", detail: "Project compatibility is CURRENT and project validation passed." };
+      return { available: false, kind: "off", label: "Auto · Not detected", detail: "No current validated VibeHub project was found. Personal Ticket management remains fully available." };
+    }
+
+    function renderIntegration() {
+      const goal = goals[activeGoalKey];
+      const status = activeIntegration();
+      const integrationMode = currentIntegrationMode();
+      const dot = document.getElementById("integration-dot");
+      dot.className = `source-dot ${status.kind === "detected" ? "" : status.kind}`;
+      document.getElementById("top-source").textContent = `VibeHub · ${status.label}`;
+      document.getElementById("integration-mode-label").textContent = integrationMode[0].toUpperCase() + integrationMode.slice(1);
+      const statusBox = document.getElementById("integration-status");
+      statusBox.className = `integration-status ${status.kind === "detected" ? "" : status.kind}`;
+      statusBox.innerHTML = `<strong>${projectScope === "all" ? "All projects" : goal.project} · ${status.label}</strong>${status.detail}`;
+      document.getElementById("detection-path").textContent = projectScope === "all" ? "Select a project to inspect its repository" : `${goal.repo}/.vibehub/version.yaml · compatibility CURRENT`;
+      document.querySelectorAll("[data-integration-mode]").forEach((button) => button.setAttribute("aria-checked", String(button.dataset.integrationMode === integrationMode)));
+      document.querySelectorAll("[data-integration-mode]").forEach((button) => { button.disabled = projectScope === "all"; });
+      const graphButton = document.querySelector('[data-workspace-view="graph"]');
+      graphButton.disabled = !status.available;
+      graphButton.title = status.available ? "Open the VibeHub Ticket graph" : status.detail;
+      if (!status.available && workspaceMode === "graph") setWorkspaceMode("tickets");
+    }
+
+    function filteredDashboardTickets() {
+      let items = projectScope === "all" ? [...dashboardTickets] : dashboardTickets.filter((ticket) => ticket.goalKey === activeGoalKey);
+      if (queueFilter === "implementing") items = items.filter((ticket) => ticket.state === "RUNNING");
+      else if (queueFilter === "needs-you") items = items.filter((ticket) => ticket.state === "NEEDS YOU");
+      else if (queueFilter === "done") items = items.filter((ticket) => ticket.state === "DONE");
+      else items = items.filter((ticket) => ticket.state !== "DONE");
+      return items;
+    }
+
+    function ticketBranchSvg(ticket, index, groupItems) {
+      const agentLane = ticket.owner !== "You";
+      const previousAgentLane = index > 0 && groupItems[index - 1].owner !== "You";
+      const last = index === groupItems.length - 1;
+      const end = last ? 42 : 84;
+      const paths = [`<path class="branch-main" d="M20 0 V${end}"></path>`];
+
+      if (agentLane) {
+        if (previousAgentLane) paths.push(`<path class="branch-agent" d="M54 0 V${end}"></path>`);
+        else paths.push(`<path class="branch-agent" d="M20 8 V17 C20 32 34 42 48 42 H54"></path>`);
+        if (!last && !previousAgentLane) paths.push(`<path class="branch-agent" d="M54 42 V84"></path>`);
+      } else if (previousAgentLane) {
+        paths.push(`<path class="branch-agent" d="M54 0 V16 C54 32 39 42 20 42"></path>`);
+      }
+
+      const nodeX = agentLane ? 54 : 20;
+      return `<svg viewBox="0 0 78 84" aria-hidden="true" preserveAspectRatio="none">
+        ${paths.join("")}
+        <circle class="branch-node ${agentLane ? "agent" : "main"}" cx="${nodeX}" cy="42" r="8"></circle>
+        <circle class="state-core ${stateClass(ticket.state)}" cx="${nodeX}" cy="42" r="3"></circle>
+      </svg>`;
+    }
+
+    function renderBranchGroup(key, items) {
+      const goal = goals[key];
+      const live = items.filter((ticket) => ticket.state === "RUNNING").length;
+      const pluginLabel = goal.vibehubDetected ? "VibeHub detected" : "Personal only";
+      const rows = items.map((ticket, index) => `
+        <div class="ticket-list-item" role="listitem">
+        <button class="ticket-row" type="button" data-dashboard-ticket="${ticket.id}" aria-selected="${ticket.id === selectedDashboardTicketId}">
+          <span class="branch-cell">${ticketBranchSvg(ticket, index, items)}</span>
+          <span class="row-main"><span class="row-ticket-id">${ticket.priority} · ${ticket.id} · ${ticket.state}</span><strong class="row-title">${ticket.title}</strong></span>
+          <span class="row-meta row-project"><strong>${ticket.owner === "You" ? "Owner lane" : "Agent branch"}</strong>Created by ${ticket.creator}</span>
+          <span class="owner ${ticket.owner === "You" ? "you" : ""}">${ticket.owner}</span>
+          <span class="source-badge ${ticket.source.toLowerCase()}">${ticket.source} · ${ticket.updated}</span>
+        </button>
+        </div>`).join("");
+
+      return `<section class="ticket-branch-group" aria-label="${goal.project} Ticket branch">
+        <header class="branch-group-head">
+          <svg class="group-branch-symbol" viewBox="0 0 78 58" aria-hidden="true">
+            <path class="main" d="M20 0 V58"></path>
+            <circle cx="20" cy="18" r="7" stroke="var(--branch-main)"></circle>
+            <path class="agent" d="M20 30 C20 41 33 45 47 45 H56"></path>
+            <circle cx="56" cy="45" r="7" stroke="var(--branch-agent)"></circle>
+          </svg>
+          <span class="branch-group-title"><strong>${goal.title}</strong><span>${goal.id} · ${goal.project} · ${pluginLabel}</span></span>
+          <span class="branch-group-stats"><span class="branch-key">You</span><span class="branch-key agent">Agent</span><span>${items.length} tickets · ${live} live</span></span>
+        </header>
+        ${rows}
+      </section>`;
+    }
+
+    function renderTicketDashboard() {
+      const goal = goals[activeGoalKey];
+      const scoped = projectScope === "all" ? dashboardTickets : dashboardTickets.filter((ticket) => ticket.goalKey === activeGoalKey);
+      const items = filteredDashboardTickets();
+      document.getElementById("ticket-scope").textContent = projectScope === "all" ? "ALL PROJECTS · PERSONAL QUEUE" : `${goal.project.toUpperCase()} · ${goal.id} · PERSONAL QUEUE`;
+      document.getElementById("count-open").textContent = scoped.filter((ticket) => ticket.state !== "DONE").length;
+      document.getElementById("count-running").textContent = scoped.filter((ticket) => ticket.state === "RUNNING").length;
+      document.getElementById("count-attention").textContent = scoped.filter((ticket) => ticket.state === "NEEDS YOU").length;
+      document.getElementById("queue-caption").textContent = `${items.length} Ticket${items.length === 1 ? "" : "s"} · sorted by attention, then recent activity`;
+      if (!items.some((ticket) => ticket.id === selectedDashboardTicketId)) selectedDashboardTicketId = items[0]?.id || scoped[0]?.id;
+      const groupedItems = Object.keys(goals).map((key) => [key, items.filter((ticket) => ticket.goalKey === key)]).filter(([, groupItems]) => groupItems.length);
+      ticketTable.innerHTML = items.length ? groupedItems.map(([key, groupItems]) => renderBranchGroup(key, groupItems)).join("") : `<div class="integration-empty"><div><h2>No Tickets in this view</h2><p>Change the filter or create a Personal Ticket. VibeHub is never required for capture and assignment.</p></div></div>`;
+      document.querySelectorAll("[data-dashboard-ticket]").forEach((row) => row.addEventListener("click", () => {
+        selectedDashboardTicketId = row.dataset.dashboardTicket;
+        renderTicketDashboard();
+        renderInspector();
+        if (window.innerWidth <= 980) {
+          inspector.classList.add("open");
+          document.getElementById("mobile-inspector-button").setAttribute("aria-expanded", "true");
+        }
+      }));
+    }
+
+    function selectedDashboardTicket() {
+      return dashboardTickets.find((ticket) => ticket.id === selectedDashboardTicketId);
+    }
+
+    function syncInspectorTabs() {
+      document.querySelectorAll("[data-tab]").forEach((tab) => {
+        const selected = tab.dataset.tab === activeTab;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      const body = document.getElementById("inspector-body");
+      body.setAttribute("aria-labelledby", `inspector-tab-${activeTab}`);
+    }
+
+    function renderDashboardInspector() {
+      const ticket = selectedDashboardTicket();
+      if (!ticket) return;
+      document.getElementById("detail-kicker").textContent = `${ticket.project} · ${ticket.source} Ticket · ${ticket.id}`;
+      document.getElementById("detail-title").textContent = ticket.title;
+      const state = document.getElementById("detail-state");
+      state.textContent = ticket.state;
+      state.className = `state-chip ${stateClass(ticket.state)}`;
+      document.getElementById("detail-source").textContent = ticket.source === "VibeHub" ? "VibeHub projection" : "Personal Hub truth";
+      syncInspectorTabs();
+      const body = document.getElementById("inspector-body");
+      if (activeTab === "execution") {
+        body.innerHTML = `
+          <section class="detail-section"><span class="detail-label">Desired outcome</span><p>${ticket.outcome}</p></section>
+          <section class="detail-section"><span class="detail-label">Responsibility</span><div class="causal-grid"><div class="causal-cell"><span class="detail-label">Assigned to</span><strong>${ticket.owner}</strong><small>Created by ${ticket.creator}</small></div><div class="causal-cell"><span class="detail-label">Next</span><strong>${ticket.next}</strong><small>${ticket.updated} ago</small></div></div></section>
+          <section class="detail-section"><span class="detail-label">Source behavior</span><p>${ticket.source === "VibeHub" ? "This row is a read-only projection of the repository Ticket plus live Run state. Open the graph for dependency and Evidence context." : "This is a Personal Ticket. It can be assigned to you, Codex, or Claude without setting up VibeHub."}</p></section>
+          <div class="inspector-actions"><button class="primary" id="primary-ticket-action" type="button">${ticket.source === "VibeHub" ? "Open VibeHub graph" : "Update assignment"}</button><button type="button">Copy link</button></div>`;
+        const primary = document.getElementById("primary-ticket-action");
+        if (ticket.source === "VibeHub") primary.addEventListener("click", () => {
+          activeGoalKey = ticket.goalKey;
+          projectScope = ticket.goalKey;
+          document.getElementById("project-select").value = ticket.goalKey;
+          selectedTicketId = ticket.vibeTicketId;
+          renderGoalList();
+          renderIntegration();
+          setWorkspaceMode("graph");
+        });
+      } else if (activeTab === "contract") {
+        body.innerHTML = `<section class="detail-section"><span class="detail-label">Acceptance · ${ticket.acceptance.filter((item) => item[1]).length}/${ticket.acceptance.length}</span><ul class="acceptance">${ticket.acceptance.map(([criterion, done]) => `<li><span class="check ${done ? "done" : ""}">${done ? "✓" : ""}</span><span>${criterion}</span></li>`).join("")}</ul></section><section class="detail-section"><span class="detail-label">Goal</span><p>${ticket.goal}. Goal grouping does not imply a VibeHub dependency.</p></section>`;
+      } else {
+        body.innerHTML = `<section class="detail-section"><span class="detail-label">Activity</span><ol class="trace">${ticket.log.map(([event, time]) => `<li>${event}<time>${time}</time></li>`).join("")}</ol></section>`;
+      }
+    }
+
+    function setWorkspaceMode(mode) {
+      if (mode === "graph" && !activeIntegration().available) mode = "tickets";
+      workspaceMode = mode;
+      ticketsView.classList.toggle("is-hidden", mode !== "tickets");
+      graphView.classList.toggle("is-hidden", mode !== "graph");
+      document.querySelectorAll("[data-workspace-view]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.workspaceView === mode)));
+      if (mode === "tickets") renderTicketDashboard();
+      else {
+        renderGraph();
+        requestAnimationFrame(() => document.getElementById("zoom-fit").click());
+      }
+      renderInspector();
+    }
+
+    function stateClass(state) {
+      return state.toLowerCase().replaceAll(" ", "-");
+    }
+
+    function renderGoalList() {
+      goalList.innerHTML = Object.entries(goals).map(([key, goal]) => {
+        const live = goal.tickets.filter((ticket) => ticket.run).length;
+        return `
+          <button class="goal-item" type="button" data-goal-key="${key}" aria-selected="${projectScope !== "all" && key === activeGoalKey}">
+            ${branchGlyph}
+            <span>
+              <span class="goal-code">${goal.id} · ${goal.project}</span>
+              <h2>${goal.title}</h2>
+              <span class="goal-meta"><strong>${goal.tickets.length} tickets</strong><span>${live} live</span><span class="creator">${goal.created}</span></span>
+            </span>
+          </button>`;
+      }).join("");
+
+      mobileGoalSelect.innerHTML = Object.entries(goals).map(([key, goal]) => `<option value="${key}">${goal.id} · ${goal.title}</option>`).join("");
+      mobileGoalSelect.value = activeGoalKey;
+
+      document.querySelectorAll("[data-goal-key]").forEach((button) => {
+        button.addEventListener("click", () => selectGoal(button.dataset.goalKey));
+      });
+    }
+
+    function selectGoal(key, ticketId = null) {
+      activeGoalKey = key;
+      projectScope = key;
+      document.getElementById("project-select").value = key;
+      const goal = goals[key];
+      selectedTicketId = ticketId && goal.tickets.some((ticket) => ticket.id === ticketId)
+        ? ticketId
+        : (goal.tickets.find((ticket) => ticket.run)?.id || goal.tickets[0].id);
+      const dashboardMatch = dashboardTickets.find((ticket) => ticket.goalKey === key && ticket.vibeTicketId === ticketId)
+        || dashboardTickets.find((ticket) => ticket.goalKey === key && ticket.state === "NEEDS YOU")
+        || dashboardTickets.find((ticket) => ticket.goalKey === key);
+      if (dashboardMatch) selectedDashboardTicketId = dashboardMatch.id;
+      renderGoalList();
+      renderIntegration();
+      renderTicketDashboard();
+      if (workspaceMode === "graph" && activeIntegration().available) renderGraph();
+      renderInspector();
+      document.getElementById("inbox-drawer").classList.remove("open");
+    }
+
+    function edgePath(source, target) {
+      const mid = source.y + (target.y - source.y) * .52;
+      return `M ${source.x} ${source.y} C ${source.x} ${mid}, ${target.x} ${mid}, ${target.x} ${target.y}`;
+    }
+
+    function renderGraph() {
+      const goal = goals[activeGoalKey];
+      document.getElementById("breadcrumbs").textContent = `Personal Hub / ${goal.id} / ${goal.repo} · ${goal.branch}`;
+      document.getElementById("goal-title").textContent = goal.title;
+      document.getElementById("repo-foot").textContent = `${goal.repo} · ${goal.branch} · exact source`;
+
+      const done = goal.tickets.filter((ticket) => ticket.state === "DONE").length;
+      const ready = goal.tickets.filter((ticket) => ticket.state === "READY").length;
+      const live = goal.tickets.filter((ticket) => ticket.run).length;
+      const attention = goal.tickets.filter((ticket) => ticket.state === "NEEDS YOU").length;
+      document.getElementById("graph-summary").innerHTML = `
+        <span class="summary-item done"><i></i>${done} done</span>
+        <span class="summary-item ready"><i></i>${ready} ready</span>
+        <span class="summary-item live"><i></i>${live} live run</span>
+        ${attention ? `<span class="summary-item"><i style="background:var(--amber)"></i>${attention} needs you</span>` : ""}
+      `;
+
+      const byId = Object.fromEntries(goal.tickets.map((ticket) => [ticket.id, ticket]));
+      const rootAnchor = { x: goal.root.x + 195, y: goal.root.y + 103 };
+      const entryTickets = goal.tickets.filter((ticket) => ticket.depends.length === 0);
+      const lensPaths = entryTickets.map((ticket) => `<path class="edge lens" d="${edgePath(rootAnchor, { x: ticket.x, y: ticket.y })}"></path>`);
+      const truthPaths = [];
+      for (const target of goal.tickets) {
+        for (const dependencyId of target.depends) {
+          const source = byId[dependencyId];
+          if (!source) continue;
+          const active = target.run || source.run;
+          truthPaths.push(`<path class="edge ${active ? "active" : ""}" d="${edgePath({ x: source.x, y: source.y }, { x: target.x, y: target.y })}"></path>`);
+        }
+      }
+      graphSvg.innerHTML = [...lensPaths, ...truthPaths].join("");
+
+      const root = `
+        <button class="goal-root" type="button" style="left:${goal.root.x}px;top:${goal.root.y}px" aria-label="Goal ${goal.id}">
+          <span class="root-kicker">Personal Goal · ${goal.id} · created by ${goal.creator}</span>
+          <h3>${goal.title}</h3>
+          <p>${goal.summary}</p>
+          <span class="root-anchor"></span>
+        </button>`;
+
+      const nodes = goal.tickets.map((ticket) => `
+        <button class="ticket-node state-${stateClass(ticket.state)}" type="button"
+          data-ticket-id="${ticket.id}" aria-selected="${ticket.id === selectedTicketId}"
+          style="left:${ticket.x - 12}px;top:${ticket.y - 12}px">
+          <span class="node-dot"></span>
+          <span class="node-copy">
+            <span class="node-topline"><span class="ticket-id">${ticket.id}</span><span class="state-label">${ticket.state}</span></span>
+            <h4>${ticket.title}</h4>
+            <span class="node-meta">${ticket.depends.length} in · ${ticket.unlocks.length} out ${ticket.run ? `<span class="run-label">${ticket.run.agent} · ${ticket.run.heartbeat}</span>` : ""}</span>
+          </span>
+        </button>`).join("");
+
+      graphNodes.innerHTML = root + nodes;
+      document.querySelectorAll("[data-ticket-id]").forEach((node) => {
+        node.addEventListener("click", () => {
+          selectedTicketId = node.dataset.ticketId;
+          renderGraph();
+          renderInspector();
+          if (window.innerWidth <= 980) {
+            inspector.classList.add("open");
+            document.getElementById("mobile-inspector-button").setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+      applyZoom();
+    }
+
+    function selectedTicket() {
+      return goals[activeGoalKey].tickets.find((ticket) => ticket.id === selectedTicketId);
+    }
+
+    function renderInspector() {
+      if (workspaceMode === "tickets") {
+        renderDashboardInspector();
+        return;
+      }
+      const goal = goals[activeGoalKey];
+      const ticket = selectedTicket();
+      if (!ticket) return;
+      document.getElementById("detail-kicker").textContent = `${goal.repo} · Ticket · ${ticket.id}`;
+      document.getElementById("detail-title").textContent = ticket.title;
+      const state = document.getElementById("detail-state");
+      state.textContent = ticket.state;
+      state.className = `state-chip ${stateClass(ticket.state)}`;
+      document.getElementById("detail-source").textContent = ticket.source;
+
+      syncInspectorTabs();
+      const body = document.getElementById("inspector-body");
+
+      if (activeTab === "execution") {
+        body.innerHTML = `
+          <section class="detail-section">
+            <span class="detail-label">Desired outcome</span>
+            <p>${ticket.outcome}</p>
+            ${ticket.run ? `
+              <div class="run-block">
+                <div class="run-head"><span>${ticket.run.agent} · ${ticket.run.id}</span><span class="heartbeat">${ticket.run.heartbeat}</span></div>
+                <p>${ticket.run.progress}. Active Run presence is live and does not rewrite the Ticket's Git state.</p>
+              </div>` : ""}
+          </section>
+          <section class="detail-section">
+            <span class="detail-label">Causal position</span>
+            <div class="causal-grid">
+              <div class="causal-cell"><span class="detail-label">Requires</span><strong>${ticket.depends.length ? ticket.depends.join("<br>") : "Entry Ticket"}</strong><small>${ticket.depends.length} direct prerequisite${ticket.depends.length === 1 ? "" : "s"}</small></div>
+              <div class="causal-cell"><span class="detail-label">Unlocks</span><strong>${ticket.unlocks.length ? ticket.unlocks.join("<br>") : "No direct unlock"}</strong><small>${ticket.unlocks.length} dependent${ticket.unlocks.length === 1 ? "" : "s"}</small></div>
+            </div>
+          </section>
+          <section class="detail-section">
+            <span class="detail-label">Source truth</span>
+            <p><span class="mono">Ticket revision ${ticket.revision}</span><br>Goal ${goal.id} is a Personal Hub lens. Solid graph edges come from VibeHub <span class="mono">relations: depends_on</span>.</p>
+          </section>
+          <div class="inspector-actions"><button class="primary" type="button">${ticket.state === "READY" ? "Copy run instruction" : "Open in VibeHub"}</button><button type="button">Focus link</button></div>`;
+      } else if (activeTab === "contract") {
+        body.innerHTML = `
+          <section class="detail-section">
+            <span class="detail-label">Acceptance · ${ticket.acceptance.filter((item) => item[1]).length}/${ticket.acceptance.length}</span>
+            <ul class="acceptance">${ticket.acceptance.map(([criterion, done, evidence]) => `<li><span class="check ${done ? "done" : ""}">${done ? "✓" : ""}</span><span>${criterion}<span class="evidence">${evidence}</span></span></li>`).join("")}</ul>
+          </section>
+          <section class="detail-section"><span class="detail-label">Constraints</span><p>No inferred dependencies. No Agent may accept a human-authority criterion. The browser remains read-only.</p></section>
+          <section class="detail-section"><span class="detail-label">Context</span><p>Bound repository files and exact upstream Outcomes are loaded from the canonical Git snapshot when the Ticket executes.</p></section>`;
+      } else {
+        body.innerHTML = `
+          <section class="detail-section">
+            <span class="detail-label">Evidence & Outcome trace</span>
+            <ol class="trace">${ticket.log.map(([event, time]) => `<li>${event}<time>${time}</time></li>`).join("")}</ol>
+          </section>
+          <section class="detail-section"><span class="detail-label">Authority</span><p>Execution writes Evidence. A separate Agent writes the Outcome. Completion is not inferred from Run progress.</p></section>`;
+      }
+    }
+
+    function applyZoom() {
+      graphStage.style.transform = `scale(${zoom})`;
+      graphStage.style.transformOrigin = "top center";
+      graphScroll.style.setProperty("--scaled-height", `${790 * zoom}px`);
+    }
+
+    const inspectorTabs = [...document.querySelectorAll("[data-tab]")];
+    inspectorTabs.forEach((tab) => {
+      tab.addEventListener("click", () => { activeTab = tab.dataset.tab; renderInspector(); });
+    });
+    document.querySelector(".inspector-tabs").addEventListener("keydown", (event) => {
+      const currentIndex = inspectorTabs.indexOf(event.target);
+      if (currentIndex < 0) return;
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % inspectorTabs.length;
+      else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + inspectorTabs.length) % inspectorTabs.length;
+      else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = inspectorTabs.length - 1;
+      else return;
+      event.preventDefault();
+      inspectorTabs[nextIndex].focus();
+      inspectorTabs[nextIndex].click();
+    });
+
+    document.querySelectorAll("[data-workspace-view]").forEach((button) => {
+      button.addEventListener("click", () => setWorkspaceMode(button.dataset.workspaceView));
+    });
+
+    document.querySelectorAll("[data-queue-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        queueFilter = button.dataset.queueFilter;
+        document.querySelectorAll("[data-queue-filter]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        renderTicketDashboard();
+        renderInspector();
+      });
+    });
+
+    document.querySelectorAll(".control-group").forEach((group) => {
+      group.querySelectorAll("button[aria-pressed]").forEach((button) => {
+        button.addEventListener("click", () => {
+          group.querySelectorAll("button[aria-pressed]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        });
+      });
+    });
+
+    document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(.72, zoom - .1); applyZoom(); });
+    document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(1.25, zoom + .1); applyZoom(); });
+    document.getElementById("zoom-fit").addEventListener("click", () => {
+      zoom = Math.min(1, Math.max(.72, (graphScroll.clientWidth - 24) / 860));
+      applyZoom();
+      graphScroll.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+    });
+
+    mobileGoalSelect.addEventListener("change", () => selectGoal(mobileGoalSelect.value));
+
+    document.getElementById("project-select").addEventListener("change", (event) => {
+      if (event.target.value === "all") {
+        projectScope = "all";
+        setWorkspaceMode("tickets");
+        renderGoalList();
+        renderIntegration();
+      } else {
+        selectGoal(event.target.value);
+      }
+    });
+
+    const integrationButton = document.getElementById("integration-button");
+    integrationButton.addEventListener("click", () => {
+      const open = integrationPopover.classList.toggle("open");
+      integrationButton.setAttribute("aria-expanded", String(open));
+      document.getElementById("inbox-drawer").classList.remove("open");
+      document.getElementById("inbox-button").setAttribute("aria-expanded", "false");
+    });
+    document.querySelectorAll("[data-integration-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (projectScope === "all") return;
+        integrationModes[activeGoalKey] = button.dataset.integrationMode;
+        renderIntegration();
+      });
+    });
+    document.getElementById("detect-again").addEventListener("click", () => {
+      if (projectScope === "all") return;
+      const status = document.getElementById("integration-status");
+      status.className = "integration-status setup";
+      status.innerHTML = `<strong>Checking ${goals[activeGoalKey].project}</strong>Reading version.yaml, compatibility, validation, and Ticket directory…`;
+      setTimeout(renderIntegration, 520);
+    });
+
+    const inboxDrawer = document.getElementById("inbox-drawer");
+    const inboxButton = document.getElementById("inbox-button");
+    inboxButton.addEventListener("click", () => {
+      const open = inboxDrawer.classList.toggle("open");
+      inboxButton.setAttribute("aria-expanded", String(open));
+      integrationPopover.classList.remove("open");
+      integrationButton.setAttribute("aria-expanded", "false");
+    });
+    document.getElementById("close-inbox").addEventListener("click", () => {
+      inboxDrawer.classList.remove("open");
+      inboxButton.setAttribute("aria-expanded", "false");
+    });
+    document.querySelectorAll(".inbox-item").forEach((item) => item.addEventListener("click", () => {
+      setWorkspaceMode("tickets");
+      selectGoal(item.dataset.goal, item.dataset.ticket);
+    }));
+
+    const composer = document.getElementById("goal-composer");
+    function toggleComposer(force) {
+      composer.classList.toggle("open", force ?? !composer.classList.contains("open"));
+      if (composer.classList.contains("open")) document.getElementById("goal-title-input").focus();
+    }
+    document.getElementById("panel-new-goal").addEventListener("click", () => toggleComposer());
+    document.getElementById("cancel-goal").addEventListener("click", () => toggleComposer(false));
+    composer.addEventListener("submit", (event) => {
+      event.preventDefault();
+      toggleComposer(false);
+    });
+    const mobileInspectorButton = document.getElementById("mobile-inspector-button");
+    mobileInspectorButton.addEventListener("click", () => {
+      const open = inspector.classList.toggle("open");
+      mobileInspectorButton.setAttribute("aria-expanded", String(open));
+    });
+    document.getElementById("new-ticket-button").addEventListener("click", () => {
+      document.getElementById("detail-kicker").textContent = "Personal Hub · new Ticket";
+      document.getElementById("detail-title").textContent = "Capture work for you or an Agent";
+      document.getElementById("detail-state").textContent = "DRAFT";
+      document.getElementById("detail-state").className = "state-chip";
+      document.getElementById("detail-source").textContent = "Personal Hub truth";
+      document.getElementById("inspector-body").innerHTML = `<form class="composer open" style="margin:14px 0;display:grid" id="ticket-composer"><label for="ticket-outcome">Ticket outcome</label><input id="ticket-outcome" required placeholder="What should become true?"><label for="ticket-owner">Assign to</label><select id="ticket-owner" class="project-select"><option>You</option><option>Codex</option><option>Claude</option></select><label for="ticket-goal">Goal (optional)</label><select id="ticket-goal" class="project-select"><option>No goal</option><option>G-04 · Personal Ticket Hub</option><option>G-07 · Safe catalog rollout</option><option>G-11 · First session</option></select><p style="color:var(--muted);font-size:10px;line-height:1.5">This creates a Personal Ticket. VibeHub is not required. You can hand it off later if the project is connected.</p><div class="composer-actions"><button class="top-button" type="button" id="cancel-ticket">Cancel</button><button class="top-button primary" type="submit">Save draft</button></div></form>`;
+      document.getElementById("cancel-ticket").addEventListener("click", renderInspector);
+      document.getElementById("ticket-composer").addEventListener("submit", (event) => { event.preventDefault(); renderInspector(); });
+      if (window.innerWidth <= 980) {
+        inspector.classList.add("open");
+        mobileInspectorButton.setAttribute("aria-expanded", "true");
+      }
+      document.getElementById("ticket-outcome").focus();
+    });
+    document.getElementById("top-new-ticket-button").addEventListener("click", () => document.getElementById("new-ticket-button").click());
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        inboxDrawer.classList.remove("open");
+        integrationPopover.classList.remove("open");
+        inspector.classList.remove("open");
+        inboxButton.setAttribute("aria-expanded", "false");
+        integrationButton.setAttribute("aria-expanded", "false");
+        mobileInspectorButton.setAttribute("aria-expanded", "false");
+        toggleComposer(false);
+      }
+    });
+
+    renderGoalList();
+    renderIntegration();
+    setWorkspaceMode("tickets");
+  </script>
+</body>
+</html>

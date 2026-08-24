@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Five Goal navigation directions for Personal Ticket Hub">
+  <title>Personal Ticket Hub · 5 Goal directions</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --board-ink: #17201e;
+      --board-muted: #6d7774;
+      --board-line: #dce2df;
+      --board-bg: #eef1ef;
+      --board-surface: #fff;
+      --board-accent: #184d40;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--board-bg); scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; color: var(--board-ink); background: var(--board-bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    button:active { transform: translateY(1px) scale(.99); }
+    :focus-visible { outline: 2px solid #4774c9; outline-offset: 3px; }
+    .mono { font-family: "SFMono-Regular", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+    .skip { position: fixed; top: -50px; left: 12px; z-index: 100; padding: 9px 12px; background: #143f35; color: #fff; }
+    .skip:focus { top: 12px; }
+
+    .board-top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      min-height: 68px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+      align-items: center;
+      gap: 20px;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--board-line);
+      background: rgb(255 255 255 / .94);
+      backdrop-filter: blur(18px);
+    }
+    .board-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .board-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--board-accent); color: white; font: 700 10px "SFMono-Regular", monospace; }
+    .board-brand strong { display: block; font-size: 13px; letter-spacing: -.02em; }
+    .board-brand span { display: block; margin-top: 2px; color: var(--board-muted); font: 8px "SFMono-Regular", monospace; letter-spacing: .05em; }
+    .variant-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 11px; background: #edf1ef; overflow-x: auto; }
+    .variant-tab { min-width: 78px; min-height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--board-muted); font-size: 10px; font-weight: 700; white-space: nowrap; transition: 180ms var(--ease); }
+    .variant-tab[aria-pressed="true"] { background: #fff; color: var(--board-ink); box-shadow: 0 2px 8px rgb(21 48 40 / .08); }
+    .board-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
+    .selection { color: var(--board-muted); font: 9px "SFMono-Regular", monospace; }
+    .choose-current { min-height: 36px; padding: 0 13px; border: 1px solid var(--board-accent); border-radius: 9px; background: var(--board-accent); color: #fff; font-size: 10px; font-weight: 700; }
+
+    .board-main { max-width: 1480px; margin: 0 auto; padding: 28px 24px 54px; }
+    .board-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 520px); gap: 32px; align-items: end; margin-bottom: 24px; }
+    .board-intro .eyebrow { color: var(--board-muted); font: 9px "SFMono-Regular", monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .board-intro h1 { max-width: 760px; margin: 9px 0 0; font-size: clamp(28px, 4vw, 54px); line-height: .96; letter-spacing: -.055em; text-wrap: balance; }
+    .board-intro p { margin: 0; color: var(--board-muted); font-size: 12px; line-height: 1.6; }
+    .board-intro strong { color: var(--board-ink); }
+
+    .variant { display: none; animation: enter 280ms var(--ease) both; }
+    .variant.active { display: block; }
+    @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+    .variant-meta { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; margin-bottom: 12px; }
+    .variant-letter { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: #17201e; color: #fff; font: 700 18px "SFMono-Regular", monospace; }
+    .variant-meta h2 { margin: 0; font-size: 19px; letter-spacing: -.035em; }
+    .variant-meta p { margin: 4px 0 0; color: var(--board-muted); font-size: 10px; line-height: 1.45; }
+    .fit-label { padding: 7px 9px; border: 1px solid var(--board-line); border-radius: 7px; background: #fff; color: var(--board-muted); font: 8px "SFMono-Regular", monospace; }
+    .app-frame { min-height: 660px; display: grid; grid-template-columns: minmax(330px, 430px) minmax(0, 1fr); overflow: hidden; border: 1px solid #d8ddda; border-radius: 20px; background: #fff; box-shadow: 0 24px 70px rgb(24 45 39 / .12); }
+    .goal-surface { min-width: 0; border-right: 1px solid rgba(100,110,106,.18); }
+    .context { min-width: 0; padding: 30px; }
+    .context-kicker { color: #7d8784; font: 8px "SFMono-Regular", monospace; text-transform: uppercase; letter-spacing: .08em; }
+    .context h3 { max-width: 700px; margin: 12px 0 10px; font-size: clamp(26px, 3vw, 42px); line-height: 1; letter-spacing: -.05em; }
+    .context > p { max-width: 64ch; color: #697370; font-size: 11px; line-height: 1.6; }
+    .context-stats { display: flex; gap: 8px; margin: 22px 0 26px; }
+    .context-stat { min-width: 98px; padding: 12px; border-top: 1px solid #dfe4e2; }
+    .context-stat strong { display: block; font: 700 20px "SFMono-Regular", monospace; }
+    .context-stat span { display: block; margin-top: 5px; color: #7a8581; font-size: 9px; }
+    .mini-ticket-list { border-top: 1px solid #dfe4e2; }
+    .mini-ticket { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; min-height: 72px; border-bottom: 1px solid #e4e8e6; }
+    .mini-ticket svg { width: 56px; height: 72px; }
+    .mini-ticket strong { display: block; font-size: 11px; }
+    .mini-ticket small { display: block; margin-top: 5px; color: #7a8581; font: 8px "SFMono-Regular", monospace; }
+    .mini-owner { color: #55605d; font-size: 9px; font-weight: 700; }
+
+    /* A — Linear branch rail */
+    .variant-a .app-frame { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .variant-a .goal-surface { background: #f7f8f8; }
+    .a-head { padding: 24px 22px 15px; }
+    .a-head-row { display: flex; align-items: center; justify-content: space-between; }
+    .a-head h3 { margin: 0; font-size: 20px; letter-spacing: -.04em; }
+    .a-add { width: 44px; height: 44px; border: 1px solid #dce1df; border-radius: 8px; background: #fff; }
+    .a-search { margin-top: 15px; padding: 10px 12px; border: 1px solid #dfe4e2; border-radius: 8px; background: #fff; color: #8a9491; font-size: 10px; }
+    .a-section { padding: 9px 12px 20px; }
+    .a-section-label { padding: 0 10px 8px; color: #87918e; font: 8px "SFMono-Regular", monospace; text-transform: uppercase; letter-spacing: .08em; }
+    .a-goal { width: 100%; min-height: 108px; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 5px; align-items: stretch; padding: 0 10px 0 0; border: 0; border-bottom: 1px solid #e1e5e3; background: transparent; text-align: left; }
+    .a-goal:hover, .a-goal.active { background: #eef1ff; }
+    .a-lane { width: 58px; height: 108px; }
+    .a-main { fill: none; stroke: #5b6fc7; stroke-width: 2.4; stroke-linecap: round; }
+    .a-agent { fill: none; stroke: #3b946e; stroke-width: 2.4; stroke-linecap: round; }
+    .a-node { fill: #f7f8f8; stroke-width: 2.4; }
+    .a-goal.active .a-node { fill: #eef1ff; }
+    .a-copy { padding: 18px 0 14px; }
+    .a-id { color: #78827f; font: 8px "SFMono-Regular", monospace; }
+    .a-copy strong { display: block; margin-top: 7px; font-size: 12px; line-height: 1.3; letter-spacing: -.02em; }
+    .a-meta { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: #7b8582; font-size: 8px; }
+    .a-progress { width: 72px; height: 3px; overflow: hidden; border-radius: 9px; background: #dfe4e2; }
+    .a-progress i { display: block; height: 100%; background: #5b6fc7; }
+    .variant-a .context { background: #fff; }
+
+    /* B — Jira hierarchy */
+    .variant-b .app-frame { border-radius: 8px; font-family: Arial, Helvetica, sans-serif; }
+    .variant-b .goal-surface { background: #f4f5f7; }
+    .b-top { padding: 20px 18px; border-bottom: 1px solid #d8dce3; background: #fff; }
+    .b-crumb { color: #667085; font-size: 10px; }
+    .b-top h3 { margin: 9px 0 0; font-size: 20px; }
+    .b-tools { display: flex; gap: 7px; margin-top: 14px; }
+    .b-tools button { min-height: 30px; padding: 0 10px; border: 1px solid #c9ced8; border-radius: 3px; background: #fff; color: #42526e; font-size: 9px; font-weight: 700; }
+    .b-program { padding: 15px 12px 22px; }
+    .b-program-head { display: grid; grid-template-columns: 20px 1fr auto; gap: 7px; align-items: center; padding: 9px 6px; color: #42526e; font-size: 10px; font-weight: 700; }
+    .b-caret { color: #6b778c; }
+    .b-goal { width: 100%; display: grid; grid-template-columns: 32px minmax(0, 1fr) 72px; gap: 8px; align-items: center; min-height: 78px; padding: 8px 7px; border: 0; border-top: 1px solid #dfe1e6; background: transparent; text-align: left; }
+    .b-goal:hover, .b-goal.active { background: #deebff; }
+    .b-epic { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 3px; background: #6554c0; color: white; font-size: 11px; font-weight: 700; }
+    .b-goal:nth-of-type(3) .b-epic { background: #00875a; }
+    .b-goal:nth-of-type(4) .b-epic { background: #0052cc; }
+    .b-goal strong { display: block; color: #172b4d; font-size: 11px; line-height: 1.3; }
+    .b-goal small { display: block; margin-top: 5px; color: #6b778c; font-size: 8px; }
+    .b-progress { color: #42526e; font-size: 8px; text-align: right; }
+    .b-progress span { display: block; height: 5px; margin-top: 6px; overflow: hidden; border-radius: 2px; background: #dfe1e6; }
+    .b-progress i { display: block; height: 100%; background: #0052cc; }
+    .b-child { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; min-height: 42px; margin-left: 32px; padding: 0 8px; border-left: 2px solid #b3bac5; color: #42526e; font-size: 9px; }
+    .b-child::before { content: ""; width: 12px; border-top: 2px solid #b3bac5; }
+    .b-status { padding: 3px 5px; border-radius: 3px; background: #e3fcef; color: #006644; font-size: 7px; font-weight: 700; }
+    .variant-b .context { background: #fff; color: #172b4d; }
+
+    /* C — Focus goal */
+    .variant-c .app-frame { grid-template-columns: minmax(360px, 480px) minmax(0, 1fr); border-radius: 28px; font-family: "Avenir Next", Avenir, sans-serif; }
+    .variant-c .goal-surface { padding: 24px; background: #eeeae2; }
+    .c-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .c-head span { color: #756f66; font: 8px "SFMono-Regular", monospace; }
+    .c-head h3 { margin: 5px 0 0; font: 700 27px Georgia, serif; letter-spacing: -.04em; }
+    .c-focus { position: relative; min-height: 310px; overflow: hidden; padding: 24px; border: 0; border-radius: 22px; background: #173f36; color: #fff; text-align: left; }
+    .c-focus::after { content: ""; position: absolute; right: -60px; bottom: -80px; width: 240px; height: 240px; border: 1px solid rgb(255 255 255 / .16); border-radius: 50%; }
+    .c-focus-label { color: rgb(255 255 255 / .58); font: 8px "SFMono-Regular", monospace; text-transform: uppercase; }
+    .c-focus h4 { max-width: 300px; margin: 14px 0 10px; font: 700 25px/1.05 Georgia, serif; letter-spacing: -.035em; }
+    .c-focus p { max-width: 34ch; margin: 0; color: rgb(255 255 255 / .64); font-size: 10px; line-height: 1.5; }
+    .c-branch { width: 250px; height: 132px; margin-top: 20px; }
+    .c-branch path { fill: none; stroke: #82adff; stroke-width: 3; stroke-linecap: round; }
+    .c-branch path.agent { stroke: #79d6ad; }
+    .c-branch circle { fill: #173f36; stroke-width: 3; }
+    .c-other { display: grid; gap: 8px; margin-top: 10px; }
+    .c-other button { min-height: 74px; display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 0 12px; border: 0; border-bottom: 1px solid #d6d0c7; background: transparent; text-align: left; }
+    .c-other button:hover { background: rgb(255 255 255 / .38); }
+    .c-mini-node { width: 23px; height: 45px; border-left: 2px solid #5d7f75; position: relative; }
+    .c-mini-node::before, .c-mini-node::after { content: ""; position: absolute; left: -5px; width: 8px; height: 8px; border: 2px solid #5d7f75; border-radius: 50%; background: #eeeae2; }
+    .c-mini-node::before { top: 0; }.c-mini-node::after { bottom: 0; }
+    .c-other strong { font-size: 11px; line-height: 1.3; }
+    .c-other small { display: block; margin-top: 4px; color: #7a736a; font-size: 8px; }
+    .c-percent { font: 700 12px "SFMono-Regular", monospace; }
+    .variant-c .context { background: #fbfaf7; }
+    .variant-c .context h3 { font-family: Georgia, serif; }
+
+    /* D — Command queue */
+    .variant-d .app-frame { border-color: #2d3537; border-radius: 12px; background: #111618; color: #e8eeee; font-family: "SFMono-Regular", Menlo, Consolas, monospace; box-shadow: 0 24px 70px rgb(0 0 0 / .26); }
+    .variant-d .goal-surface { background: #121719; border-color: #30383a; }
+    .d-head { padding: 18px; border-bottom: 1px solid #30383a; }
+    .d-headline { display: flex; align-items: center; justify-content: space-between; }
+    .d-head h3 { margin: 0; font-size: 15px; letter-spacing: -.03em; }
+    .d-shortcut { color: #7d898b; font-size: 8px; }
+    .d-command { margin-top: 14px; padding: 10px; border: 1px solid #394244; border-radius: 6px; background: #0c1011; color: #7f8d8f; font-size: 9px; }
+    .d-queue-label { padding: 14px 18px 7px; color: #6e7a7c; font-size: 8px; text-transform: uppercase; letter-spacing: .08em; }
+    .d-goal { width: 100%; min-height: 104px; display: grid; grid-template-columns: 68px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 0 16px 0 6px; border: 0; border-top: 1px solid #293134; background: transparent; color: #dce5e4; text-align: left; }
+    .d-goal:hover, .d-goal.active { background: #192124; }
+    .d-svg { width: 68px; height: 104px; }
+    .d-svg path { fill: none; stroke: #6aa5ff; stroke-width: 2; stroke-linecap: round; }
+    .d-svg path.agent { stroke: #55d29f; }
+    .d-svg circle { fill: #121719; stroke-width: 2; }
+    .d-id { color: #6e7c7e; font-size: 8px; }
+    .d-goal strong { display: block; margin-top: 7px; font-size: 10px; line-height: 1.4; }
+    .d-row-meta { display: flex; gap: 10px; margin-top: 8px; color: #7c8a8c; font-size: 7px; }
+    .d-attn { color: #efac62; font-size: 8px; }
+    .variant-d .context { background: #151b1d; color: #e8eeee; }
+    .variant-d .context-kicker, .variant-d .context > p, .variant-d .context-stat span, .variant-d .mini-ticket small { color: #7f8d8f; }
+    .variant-d .context-stat, .variant-d .mini-ticket-list, .variant-d .mini-ticket { border-color: #30383a; }
+    .variant-d .mini-ticket svg path { stroke: #6aa5ff; }
+    .variant-d .mini-owner { color: #9eabaa; }
+
+    /* E — Roadmap strips */
+    .variant-e .app-frame { grid-template-columns: minmax(390px, 510px) minmax(0, 1fr); border-radius: 16px; font-family: "Trebuchet MS", "Avenir Next", sans-serif; }
+    .variant-e .goal-surface { padding: 20px; background: #f3f5fa; }
+    .e-head { display: flex; align-items: end; justify-content: space-between; margin-bottom: 15px; }
+    .e-head h3 { margin: 0; font-size: 22px; letter-spacing: -.04em; }
+    .e-head span { color: #728096; font-size: 9px; }
+    .e-weeks { display: grid; grid-template-columns: 92px repeat(4, 1fr); padding: 8px 7px; color: #8290a3; font: 7px "SFMono-Regular", monospace; text-align: center; }
+    .e-weeks span:first-child { text-align: left; }
+    .e-goal { width: 100%; min-height: 142px; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; padding: 12px 8px; border: 0; border-top: 1px solid #d7ddea; background: transparent; text-align: left; }
+    .e-goal:hover, .e-goal.active { background: #e8edfb; }
+    .e-label strong { display: block; font-size: 10px; line-height: 1.3; }
+    .e-label small { display: block; margin-top: 7px; color: #768397; font-size: 8px; }
+    .e-road { position: relative; height: 118px; background-image: linear-gradient(to right, #dfe4ef 1px, transparent 1px); background-size: 25% 100%; }
+    .e-road svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .e-road path { fill: none; stroke: #5a75ce; stroke-width: 3; stroke-linecap: round; }
+    .e-road path.agent { stroke: #38a277; }
+    .e-road circle { fill: #f3f5fa; stroke-width: 3; }
+    .e-goal.active .e-road circle { fill: #e8edfb; }
+    .e-now { position: absolute; top: 0; bottom: 0; left: 57%; border-left: 1px dashed #d07a4d; }
+    .e-now::before { content: "NOW"; position: absolute; top: -11px; left: 3px; color: #b26540; font: 6px "SFMono-Regular", monospace; }
+    .variant-e .context { background: #fff; }
+
+    .board-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 16px; padding: 13px 4px; color: var(--board-muted); font-size: 10px; }
+    .board-foot strong { color: var(--board-ink); }
+    .next-variant { min-height: 34px; padding: 0 11px; border: 1px solid var(--board-line); border-radius: 8px; background: #fff; font-size: 9px; font-weight: 700; }
+
+    @media (max-width: 980px) {
+      .board-top { grid-template-columns: 1fr auto; }
+      .variant-tabs { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+      .selection { display: none; }
+      .board-intro { grid-template-columns: 1fr; }
+      .app-frame, .variant-c .app-frame, .variant-e .app-frame { grid-template-columns: minmax(0, 1fr); }
+      .goal-surface { border-right: 0; border-bottom: 1px solid rgba(100,110,106,.18); }
+      .context { min-height: 520px; }
+    }
+    @media (max-width: 620px) {
+      .board-top { padding: 9px 10px; }
+      .board-brand > span:last-child { display: none; }
+      .choose-current { width: 38px; padding: 0; font-size: 0; }
+      .choose-current::after { content: "✓"; font-size: 13px; }
+      .board-main { padding: 20px 12px 38px; }
+      .board-intro h1 { font-size: 34px; }
+      .variant-meta { grid-template-columns: auto 1fr; }
+      .fit-label { display: none; }
+      .app-frame { min-height: 0; border-radius: 12px; }
+      .goal-surface { min-height: 610px; }
+      .context { display: none; }
+      .variant-c .goal-surface, .variant-e .goal-surface { padding: 15px; }
+      .c-focus { min-height: 288px; }
+      .e-goal { grid-template-columns: 76px minmax(0,1fr); }
+      .e-weeks { grid-template-columns: 76px repeat(4,1fr); }
+      .board-foot { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#variants">跳到设计方案</a>
+  <header class="board-top">
+    <div class="board-brand"><span class="board-mark">VH</span><span><strong>Goal directions</strong><span>PERSONAL TICKET HUB · DESIGN EXPLORATION</span></span></div>
+    <nav class="variant-tabs" aria-label="Design directions">
+      <button class="variant-tab" type="button" data-variant="a" aria-pressed="true">A · Rail</button>
+      <button class="variant-tab" type="button" data-variant="b" aria-pressed="false">B · Hierarchy</button>
+      <button class="variant-tab" type="button" data-variant="c" aria-pressed="false">C · Focus</button>
+      <button class="variant-tab" type="button" data-variant="d" aria-pressed="false">D · Command</button>
+      <button class="variant-tab" type="button" data-variant="e" aria-pressed="false">E · Roadmap</button>
+    </nav>
+    <div class="board-actions"><span class="selection" id="selection">No direction selected</span><button class="choose-current" id="choose-current" type="button">Choose A</button></div>
+  </header>
+
+  <main class="board-main" id="variants">
+    <section class="board-intro">
+      <div><span class="eyebrow">Jira hierarchy × Linear speed × VibeHub branch language</span><h1>Goals should feel like living work, not folders.</h1></div>
+      <p>五个方向使用相同数据。比较重点是：<strong>多快找到正在推进的 Goal、Agent 在哪条分支、哪里需要你处理</strong>。键盘 1–5 可切换方案。</p>
+    </section>
+
+    <article class="variant variant-a active" data-panel="a">
+      <header class="variant-meta"><span class="variant-letter">A</span><div><h2>Linear Branch Rail</h2><p>最接近当前 Ticket branch。紧凑、安静、切换成本最低。</p></div><span class="fit-label">BEST FIT · DAILY USE</span></header>
+      <div class="app-frame">
+        <aside class="goal-surface">
+          <div class="a-head"><div class="a-head-row"><h3>Goals</h3><button class="a-add" type="button" aria-label="Create goal">＋</button></div><div class="a-search">⌕ Search goals · ⌘ K</div></div>
+          <div class="a-section"><div class="a-section-label">Active · 3</div>
+            <button class="a-goal active" type="button">
+              <svg class="a-lane" viewBox="0 0 58 108" aria-hidden="true"><path class="a-main" d="M20 0V108"/><path class="a-agent" d="M20 36C20 51 34 57 49 57"/><circle class="a-node" cx="20" cy="25" r="7" stroke="#5b6fc7"/><circle class="a-node" cx="49" cy="57" r="7" stroke="#3b946e"/><circle class="a-node" cx="20" cy="88" r="7" stroke="#5b6fc7"/></svg>
+              <span class="a-copy"><span class="a-id">G-04 · VIBEHub PERSONAL</span><strong>Launch a personal Ticket Hub for all projects</strong><span class="a-meta"><span class="a-progress"><i style="width:48%"></i></span><span>6 tickets</span><span>1 live</span></span></span>
+            </button>
+            <button class="a-goal" type="button">
+              <svg class="a-lane" viewBox="0 0 58 108" aria-hidden="true"><path class="a-main" d="M20 0V108"/><path class="a-agent" d="M20 43C20 55 32 60 46 60"/><circle class="a-node" cx="20" cy="25" r="7" stroke="#5b6fc7"/><circle class="a-node" cx="46" cy="60" r="7" stroke="#3b946e"/></svg>
+              <span class="a-copy"><span class="a-id">G-07 · SAMPLE COMMERCE</span><strong>Roll out catalog updates safely</strong><span class="a-meta"><span class="a-progress"><i style="width:63%"></i></span><span>4 tickets</span><span>1 review</span></span></span>
+            </button>
+            <button class="a-goal" type="button">
+              <svg class="a-lane" viewBox="0 0 58 108" aria-hidden="true"><path class="a-main" d="M20 0V108"/><circle class="a-node" cx="20" cy="28" r="7" stroke="#5b6fc7"/><circle class="a-node" cx="20" cy="78" r="7" stroke="#5b6fc7"/></svg>
+              <span class="a-copy"><span class="a-id">G-11 · SAMPLE</span><strong>Make the sample app's first session self-evident</strong><span class="a-meta"><span class="a-progress"><i style="width:36%"></i></span><span>4 tickets</span><span>personal</span></span></span>
+            </button>
+          </div>
+        </aside>
+        <section class="context"><span class="context-kicker">Selected Goal · G-04 · Human created</span><h3>Launch a personal Ticket Hub for all projects</h3><p>Goal rail and Ticket rail use the same branch grammar. Blue is your owner lane; green is parallel Agent work. Source stays independent.</p><div class="context-stats"><div class="context-stat"><strong>6</strong><span>tickets</span></div><div class="context-stat"><strong>1</strong><span>live Agent</span></div><div class="context-stat"><strong>2</strong><span>need review</span></div></div><div class="mini-ticket-list" data-mini></div></section>
+      </div>
+      <footer class="board-foot"><span><strong>Choose A when:</strong> Goals should behave exactly like a compact parent branch above Tickets.</span><button class="next-variant" type="button" data-next="b">Next · Jira hierarchy →</button></footer>
+    </article>
+
+    <article class="variant variant-b" data-panel="b">
+      <header class="variant-meta"><span class="variant-letter">B</span><div><h2>Jira Goal Hierarchy</h2><p>Goal、sub-goal、milestone 和状态列最明确，适合规模变大以后。</p></div><span class="fit-label">BEST SCALE · STRUCTURE</span></header>
+      <div class="app-frame">
+        <aside class="goal-surface">
+          <div class="b-top"><span class="b-crumb">Projects / Personal Hub / Goals</span><h3>Goals and outcomes</h3><div class="b-tools"><button type="button">＋ Create goal</button><button type="button">Filter</button><button type="button">•••</button></div></div>
+          <div class="b-program"><div class="b-program-head"><span class="b-caret">▾</span><span>2026 Product outcomes</span><span>3 active</span></div>
+            <button class="b-goal active" type="button"><span class="b-epic">G</span><span><strong>Launch a personal Ticket Hub for all projects</strong><small>G-04 · Human created · 6 issues</small></span><span class="b-progress">48%<span><i style="width:48%"></i></span></span></button>
+            <div class="b-child"><span></span><span>Personal Ticket foundation</span><span class="b-status">IN PROGRESS</span></div>
+            <div class="b-child"><span></span><span>VibeHub handoff</span><span class="b-status">REVIEW</span></div>
+            <button class="b-goal" type="button"><span class="b-epic">G</span><span><strong>Roll out catalog updates safely</strong><small>G-07 · AI proposed · 4 issues</small></span><span class="b-progress">63%<span><i style="width:63%"></i></span></span></button>
+            <button class="b-goal" type="button"><span class="b-epic">G</span><span><strong>Make the sample app's first session self-evident</strong><small>G-11 · Human created · 4 issues</small></span><span class="b-progress">36%<span><i style="width:36%"></i></span></span></button>
+          </div>
+        </aside>
+        <section class="context"><span class="context-kicker">Goal G-04 · expanded hierarchy</span><h3>Outcome, milestones, and Ticket sources in one tree.</h3><p>Jira-inspired hierarchy makes larger plans legible. Linear-style density keeps the tree from becoming a configuration screen.</p><div class="context-stats"><div class="context-stat"><strong>2</strong><span>milestones</span></div><div class="context-stat"><strong>6</strong><span>tickets</span></div><div class="context-stat"><strong>48%</strong><span>accepted</span></div></div><div class="mini-ticket-list" data-mini></div></section>
+      </div>
+      <footer class="board-foot"><span><strong>Choose B when:</strong> Goals may gain sub-goals, milestones, owners and cross-project reporting.</span><button class="next-variant" type="button" data-next="c">Next · Focus goal →</button></footer>
+    </article>
+
+    <article class="variant variant-c" data-panel="c">
+      <header class="variant-meta"><span class="variant-letter">C</span><div><h2>Focus Goal</h2><p>把当前 Goal 变成工作台，而不是导航项；其他 Goal 退到安静队列。</p></div><span class="fit-label">BEST FOCUS · FEWER GOALS</span></header>
+      <div class="app-frame">
+        <aside class="goal-surface">
+          <div class="c-head"><div><span>YOUR OUTCOMES</span><h3>Goals</h3></div><button class="a-add" type="button" aria-label="Create goal">＋</button></div>
+          <button class="c-focus" type="button"><span class="c-focus-label">In focus · G-04 · 48% accepted</span><h4>Launch a personal Ticket Hub for all projects</h4><p>One queue for you, Codex, and Claude. VibeHub stays optional per project.</p><svg class="c-branch" viewBox="0 0 250 132" aria-hidden="true"><path d="M28 8V124"/><path class="agent" d="M28 45C28 62 53 68 82 68H132"/><circle cx="28" cy="18" r="8" stroke="#82adff"/><circle cx="132" cy="68" r="8" stroke="#79d6ad"/><circle cx="28" cy="112" r="8" stroke="#82adff"/></svg></button>
+          <div class="c-other"><button type="button"><span class="c-mini-node"></span><span><strong>Roll out catalog updates safely</strong><small>4 tickets · 1 needs you</small></span><span class="c-percent">63%</span></button><button type="button"><span class="c-mini-node"></span><span><strong>Make the sample app's first session self-evident</strong><small>4 tickets · Claude running</small></span><span class="c-percent">36%</span></button></div>
+        </aside>
+        <section class="context"><span class="context-kicker">Focus mode · one outcome at a time</span><h3>The Goal is the workspace.</h3><p>Best when you keep only a few active Goals and want the selected outcome to carry more narrative, branch context, and next action.</p><div class="context-stats"><div class="context-stat"><strong>Next</strong><span>review handoff</span></div><div class="context-stat"><strong>1</strong><span>Agent live</span></div><div class="context-stat"><strong>12m</strong><span>last change</span></div></div><div class="mini-ticket-list" data-mini></div></section>
+      </div>
+      <footer class="board-foot"><span><strong>Choose C when:</strong> You want one primary Goal in focus and rarely scan more than five at once.</span><button class="next-variant" type="button" data-next="d">Next · Command queue →</button></footer>
+    </article>
+
+    <article class="variant variant-d" data-panel="d">
+      <header class="variant-meta"><span class="variant-letter">D</span><div><h2>Command Branch Queue</h2><p>键盘优先、信息密度最高，Goal 像可执行队列。</p></div><span class="fit-label">BEST POWER USER · SPEED</span></header>
+      <div class="app-frame">
+        <aside class="goal-surface">
+          <div class="d-head"><div class="d-headline"><h3>goal.queue</h3><span class="d-shortcut">[1–9] focus · [g] graph</span></div><div class="d-command">› filter:active owner:any source:any_</div></div>
+          <div class="d-queue-label">3 active / sorted by intervention</div>
+          <button class="d-goal active" type="button"><svg class="d-svg" viewBox="0 0 68 104" aria-hidden="true"><path d="M21 0V104"/><path class="agent" d="M21 39C21 55 36 60 56 60"/><circle cx="21" cy="22" r="7" stroke="#6aa5ff"/><circle cx="56" cy="60" r="7" stroke="#55d29f"/><circle cx="21" cy="86" r="7" stroke="#6aa5ff"/></svg><span><span class="d-id">01 / G-04 / P0</span><strong>Launch a personal Ticket Hub for all projects</strong><span class="d-row-meta"><span>6 tickets</span><span>codex:running</span><span>vh:on</span></span></span><span class="d-attn">2 review</span></button>
+          <button class="d-goal" type="button"><svg class="d-svg" viewBox="0 0 68 104" aria-hidden="true"><path d="M21 0V104"/><path class="agent" d="M21 39C21 55 36 60 56 60"/><circle cx="21" cy="22" r="7" stroke="#6aa5ff"/><circle cx="56" cy="60" r="7" stroke="#55d29f"/></svg><span><span class="d-id">02 / G-07 / P0</span><strong>Roll out catalog updates safely</strong><span class="d-row-meta"><span>4 tickets</span><span>codex:running</span><span>vh:on</span></span></span><span class="d-attn">1 decision</span></button>
+          <button class="d-goal" type="button"><svg class="d-svg" viewBox="0 0 68 104" aria-hidden="true"><path d="M21 0V104"/><circle cx="21" cy="24" r="7" stroke="#6aa5ff"/><circle cx="21" cy="79" r="7" stroke="#6aa5ff"/></svg><span><span class="d-id">03 / G-11 / P2</span><strong>Make the sample app's first session self-evident</strong><span class="d-row-meta"><span>4 tickets</span><span>claude:running</span><span>vh:off</span></span></span><span class="d-attn">quiet</span></button>
+        </aside>
+        <section class="context"><span class="context-kicker">goal://G-04 · active branch</span><h3>Ship the queue without touching the mouse.</h3><p>Everything is optimized for rapid scanning and commands. It is the strongest operational tool, but the least friendly first-run experience.</p><div class="context-stats"><div class="context-stat"><strong>⌘1</strong><span>focus Goal</span></div><div class="context-stat"><strong>g</strong><span>open graph</span></div><div class="context-stat"><strong>r</strong><span>review next</span></div></div><div class="mini-ticket-list" data-mini></div></section>
+      </div>
+      <footer class="board-foot"><span><strong>Choose D when:</strong> You live in Codex all day and value intervention speed over onboarding softness.</span><button class="next-variant" type="button" data-next="e">Next · Roadmap strips →</button></footer>
+    </article>
+
+    <article class="variant variant-e" data-panel="e">
+      <header class="variant-meta"><span class="variant-letter">E</span><div><h2>Roadmap Branch Strips</h2><p>每个 Goal 是一个时间条，分支同时表达进度和 Agent 并行工作。</p></div><span class="fit-label">BEST PLANNING · TIME</span></header>
+      <div class="app-frame">
+        <aside class="goal-surface">
+          <div class="e-head"><div><h3>Goal roadmap</h3><span>Aug 24 → Sep 20</span></div><button class="a-add" type="button" aria-label="Create goal">＋</button></div>
+          <div class="e-weeks"><span>Outcome</span><span>W1</span><span>W2</span><span>W3</span><span>W4</span></div>
+          <button class="e-goal active" type="button"><span class="e-label"><strong>Personal Ticket Hub</strong><small>G-04 · 48%</small></span><span class="e-road"><i class="e-now"></i><svg viewBox="0 0 280 118" aria-hidden="true"><path d="M18 22H250"/><path class="agent" d="M92 22C104 22 108 47 108 64H224"/><circle cx="18" cy="22" r="7" stroke="#5a75ce"/><circle cx="92" cy="22" r="7" stroke="#5a75ce"/><circle cx="224" cy="64" r="7" stroke="#38a277"/><circle cx="250" cy="22" r="7" stroke="#5a75ce"/></svg></span></button>
+          <button class="e-goal" type="button"><span class="e-label"><strong>Catalog rollout</strong><small>G-07 · 63%</small></span><span class="e-road"><i class="e-now"></i><svg viewBox="0 0 280 118" aria-hidden="true"><path d="M18 22H250"/><path class="agent" d="M72 22C86 22 90 47 90 64H200"/><circle cx="18" cy="22" r="7" stroke="#5a75ce"/><circle cx="72" cy="22" r="7" stroke="#5a75ce"/><circle cx="200" cy="64" r="7" stroke="#38a277"/></svg></span></button>
+          <button class="e-goal" type="button"><span class="e-label"><strong>Sample app first session</strong><small>G-11 · 36%</small></span><span class="e-road"><i class="e-now"></i><svg viewBox="0 0 280 118" aria-hidden="true"><path d="M18 22H230"/><circle cx="18" cy="22" r="7" stroke="#5a75ce"/><circle cx="146" cy="22" r="7" stroke="#5a75ce"/></svg></span></button>
+        </aside>
+        <section class="context"><span class="context-kicker">Roadmap · branch timing · owner handoffs</span><h3>See when parallel work should rejoin.</h3><p>This direction treats Goal navigation as a compact roadmap. It adds useful time context but asks for trustworthy target dates.</p><div class="context-stats"><div class="context-stat"><strong>W2</strong><span>current week</span></div><div class="context-stat"><strong>3</strong><span>parallel lanes</span></div><div class="context-stat"><strong>Sep 12</strong><span>target</span></div></div><div class="mini-ticket-list" data-mini></div></section>
+      </div>
+      <footer class="board-foot"><span><strong>Choose E when:</strong> Goals have real target windows and schedule risk matters as much as current state.</span><button class="next-variant" type="button" data-next="a">Back to A · Branch rail ↺</button></footer>
+    </article>
+  </main>
+
+  <script>
+    const miniTickets = `
+      <div class="mini-ticket"><svg viewBox="0 0 56 72" aria-hidden="true"><path d="M20 0V72" fill="none" stroke="#4774c9" stroke-width="2.4"/><circle cx="20" cy="36" r="7" fill="white" stroke="#4774c9" stroke-width="2.4"/><circle cx="20" cy="36" r="2.5" fill="#c4773f"/></svg><span><strong>Confirm Personal Hub ↔ VibeHub handoff</strong><small>P0 · NEEDS YOU · 12m</small></span><span class="mini-owner">You</span></div>
+      <div class="mini-ticket"><svg viewBox="0 0 56 72" aria-hidden="true"><path d="M20 0V20C20 33 31 36 48 36V72" fill="none" stroke="#2e8a66" stroke-width="2.4"/><circle cx="48" cy="36" r="7" fill="white" stroke="#2e8a66" stroke-width="2.4"/><circle cx="48" cy="36" r="2.5" fill="#4774c9"/></svg><span><strong>Implement revision-safe Goal commands</strong><small>P1 · RUNNING · 8s</small></span><span class="mini-owner">Codex</span></div>
+      <div class="mini-ticket"><svg viewBox="0 0 56 72" aria-hidden="true"><path d="M48 0V72" fill="none" stroke="#2e8a66" stroke-width="2.4"/><circle cx="48" cy="36" r="7" fill="white" stroke="#2e8a66" stroke-width="2.4"/><circle cx="48" cy="36" r="2.5" fill="#4774c9"/></svg><span><strong>Write the first pilot onboarding checklist</strong><small>P1 · READY · 18m</small></span><span class="mini-owner">Claude</span></div>`;
+    document.querySelectorAll("[data-mini]").forEach((node) => { node.innerHTML = miniTickets; });
+
+    let current = "a";
+    const names = { a: "A", b: "B", c: "C", d: "D", e: "E" };
+    function showVariant(key) {
+      current = key;
+      document.querySelectorAll("[data-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === key));
+      document.querySelectorAll("[data-variant]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.variant === key)));
+      document.getElementById("choose-current").textContent = `Choose ${names[key]}`;
+      window.location.hash = `variant-${key}`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    document.querySelectorAll("[data-variant]").forEach((button) => button.addEventListener("click", () => showVariant(button.dataset.variant)));
+    document.querySelectorAll("[data-next]").forEach((button) => button.addEventListener("click", () => showVariant(button.dataset.next)));
+    document.getElementById("choose-current").addEventListener("click", () => {
+      localStorage.setItem("personal-ticket-goal-direction", current.toUpperCase());
+      document.getElementById("selection").textContent = `Selected ${current.toUpperCase()} · tell Codex to apply it`;
+      document.getElementById("choose-current").textContent = `Selected ${current.toUpperCase()}`;
+    });
+    document.addEventListener("keydown", (event) => {
+      if (["1","2","3","4","5"].includes(event.key)) showVariant(["a","b","c","d","e"][Number(event.key) - 1]);
+    });
+    window.addEventListener("hashchange", () => {
+      const next = window.location.hash.match(/variant-([a-e])/i)?.[1]?.toLowerCase();
+      if (next && next !== current) showVariant(next);
+    });
+    const saved = localStorage.getItem("personal-ticket-goal-direction");
+    if (saved && names[saved.toLowerCase()]) document.getElementById("selection").textContent = `Previously selected ${saved}`;
+    const hash = window.location.hash.match(/variant-([a-e])/i)?.[1];
+    if (hash) showVariant(hash.toLowerCase());
+  </script>
+</body>
+</html>

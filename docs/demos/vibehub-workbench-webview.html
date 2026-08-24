@@ -1,0 +1,4516 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="quiet">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>VibeHub Workbench — Interactive Demo</title>
+  <style>
+    :root {
+      --canvas: #eef0ef;
+      --surface: #f8f9f8;
+      --surface-raised: #ffffff;
+      --surface-muted: #f1f3f2;
+      --line: #d9ddda;
+      --line-strong: #bcc4bf;
+      --ink: #17201c;
+      --ink-soft: #53605a;
+      --ink-faint: #7b8680;
+      --active: #315f9c;
+      --active-soft: #e7eef8;
+      --ready: #087f8c;
+      --ready-soft: #e2f4f5;
+      --done: #3f7d5d;
+      --done-soft: #e6f1ea;
+      --blocked: #a56b13;
+      --blocked-soft: #f7eddc;
+      --deviated: #b24a4a;
+      --deviated-soft: #f8e7e7;
+      --selection: #283a32;
+      --shadow: 0 18px 44px rgba(29, 42, 35, 0.12), 0 2px 8px rgba(29, 42, 35, 0.07);
+      --shadow-soft: 0 8px 20px rgba(29, 42, 35, 0.08);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --rail: 236px;
+      --inspector: 336px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 2px solid var(--ready);
+      outline-offset: 2px;
+    }
+
+    .demo-shell {
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .demo-note {
+      width: min(1510px, 100%);
+      margin: 0 auto 10px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .style-lab {
+      width: min(1510px, 100%);
+      display: grid;
+      grid-template-columns: minmax(210px, 0.62fr) minmax(640px, 1.38fr);
+      align-items: stretch;
+      gap: 10px;
+      margin: 0 auto 10px;
+    }
+
+    .style-lab-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-md);
+      background: var(--surface-raised);
+    }
+
+    .style-lab-kicker {
+      color: var(--ink-faint);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .style-lab-title {
+      margin-top: 2px;
+      font-size: 14px;
+      font-weight: 760;
+      letter-spacing: -0.02em;
+    }
+
+    .style-lab-description {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .style-options {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      padding: 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+    }
+
+    .style-option {
+      min-width: 0;
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .style-option:hover {
+      border-color: var(--line-strong);
+      background: var(--surface-raised);
+    }
+
+    .style-option[aria-pressed="true"] {
+      border-color: var(--selection);
+      background: var(--surface-raised);
+      box-shadow: 0 0 0 1px var(--selection);
+    }
+
+    .style-index {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--surface-muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .style-option-copy {
+      min-width: 0;
+    }
+
+    .style-option-name,
+    .style-option-note {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .style-option-name {
+      font-size: 11px;
+      font-weight: 740;
+    }
+
+    .style-option-note {
+      margin-top: 2px;
+      color: var(--ink-faint);
+      font-size: 9px;
+    }
+
+    .style-swatch {
+      width: 30px;
+      height: 18px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+    }
+
+    .style-swatch i {
+      display: block;
+    }
+
+    .style-swatch.quiet i:nth-child(1) { background: #eef0ef; }
+    .style-swatch.quiet i:nth-child(2) { background: #20332b; }
+    .style-swatch.quiet i:nth-child(3) { background: #315f9c; }
+    .style-swatch.signal i:nth-child(1) { background: #c6c2be; }
+    .style-swatch.signal i:nth-child(2) { background: #f4f1ea; }
+    .style-swatch.signal i:nth-child(3) { background: #d7654d; }
+    .style-swatch.grid i:nth-child(1) { background: #f0eee7; }
+    .style-swatch.grid i:nth-child(2) { background: #242421; }
+    .style-swatch.grid i:nth-child(3) { background: #c95b43; }
+
+    .window {
+      width: min(1510px, 100%);
+      min-height: calc(100vh - 62px);
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid rgba(90, 105, 96, 0.35);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .titlebar {
+      min-height: 56px;
+      display: grid;
+      grid-template-columns: auto minmax(260px, 1fr) auto auto;
+      align-items: center;
+      gap: 18px;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(248, 249, 248, 0.96);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .window-control {
+      width: 11px;
+      height: 11px;
+      border: 1px solid rgba(24, 32, 28, 0.12);
+      border-radius: 50%;
+      background: #c8ceca;
+    }
+
+    .window-control:first-child {
+      background: #d67a70;
+    }
+
+    .window-control:nth-child(2) {
+      background: #d5ad59;
+    }
+
+    .window-control:nth-child(3) {
+      background: #67a173;
+    }
+
+    .repo-identity {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: #20332b;
+      color: white;
+      font-weight: 760;
+      font-size: 13px;
+      letter-spacing: -0.04em;
+    }
+
+    .repo-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--ink-faint);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .repo-title {
+      margin-top: 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 680;
+      letter-spacing: -0.01em;
+    }
+
+    .title-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .app-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface-muted);
+    }
+
+    .app-nav-button {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 7px;
+      padding: 6px 11px;
+      background: transparent;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 690;
+    }
+
+    .app-nav-button:hover {
+      color: var(--ink);
+    }
+
+    .app-nav-button[aria-selected="true"] {
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(28, 40, 33, 0.1);
+    }
+
+    .nav-count {
+      min-width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--deviated);
+      color: white;
+      font-size: 9px;
+      font-weight: 780;
+    }
+
+    .nav-count:empty,
+    .nav-count[data-count="0"] {
+      display: none;
+    }
+
+    .status-pill,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 26px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-raised);
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .watch-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--done);
+      box-shadow: 0 0 0 3px var(--done-soft);
+    }
+
+    .button {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+      background: var(--surface-raised);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 650;
+      box-shadow: 0 1px 1px rgba(20, 30, 25, 0.04);
+    }
+
+    .button:hover {
+      border-color: #89958e;
+      background: #fbfcfb;
+    }
+
+    .button.primary {
+      border-color: #20332b;
+      background: #20332b;
+      color: #ffffff;
+    }
+
+    .button.primary:hover {
+      background: #2b4339;
+    }
+
+    .button.icon-only {
+      width: 32px;
+      padding: 0;
+    }
+
+    .button svg,
+    .icon-button svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: var(--rail) minmax(460px, 1fr) var(--inspector);
+      min-height: calc(100vh - 104px);
+    }
+
+    .inbox-workspace {
+      display: grid;
+      grid-template-columns: 220px minmax(420px, 1fr) 360px;
+      min-height: calc(100vh - 104px);
+      background: var(--surface);
+    }
+
+    .inbox-rail {
+      padding: 22px 14px;
+      border-right: 1px solid var(--line);
+      background: #f5f7f5;
+    }
+
+    .inbox-rail-kicker,
+    .inbox-queue-kicker {
+      color: var(--ink-faint);
+      font-size: 9px;
+      font-weight: 780;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .inbox-rail-title {
+      margin: 4px 0 2px;
+      font-size: 24px;
+      font-weight: 730;
+      letter-spacing: -0.045em;
+    }
+
+    .inbox-rail-copy {
+      margin: 0 0 18px;
+      color: var(--ink-soft);
+      font-size: 11px;
+    }
+
+    .inbox-attention {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 11px;
+      border: 1px solid #cfd7d2;
+      border-radius: 10px;
+      background: var(--surface-raised);
+    }
+
+    .inbox-attention-number {
+      min-width: 38px;
+      color: var(--active);
+      font-size: 28px;
+      font-weight: 720;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .inbox-attention-label {
+      color: var(--ink-soft);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .inbox-filters {
+      display: grid;
+      gap: 4px;
+    }
+
+    .inbox-filter {
+      width: 100%;
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 9px;
+      background: transparent;
+      color: var(--ink-soft);
+      text-align: left;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 640;
+    }
+
+    .inbox-filter:hover {
+      background: var(--surface-raised);
+      color: var(--ink);
+    }
+
+    .inbox-filter[aria-pressed="true"] {
+      border-color: var(--line);
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(30, 42, 35, 0.06);
+    }
+
+    .inbox-filter-count {
+      min-width: 20px;
+      height: 20px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--ink-faint);
+      font-size: 9px;
+    }
+
+    .inbox-queue {
+      min-width: 0;
+      background: var(--surface-raised);
+    }
+
+    .inbox-queue-head {
+      min-height: 88px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inbox-queue-title {
+      margin: 3px 0 0;
+      font-size: 20px;
+      font-weight: 720;
+      letter-spacing: -0.035em;
+    }
+
+    .inbox-queue-caption {
+      max-width: 220px;
+      margin: 0;
+      color: var(--ink-faint);
+      font-size: 10px;
+      text-align: right;
+    }
+
+    .inbox-list {
+      display: grid;
+    }
+
+    .inbox-item {
+      width: 100%;
+      min-height: 94px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 11px;
+      padding: 14px 18px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-raised);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .inbox-item:hover {
+      background: #f7f9f7;
+    }
+
+    .inbox-item[aria-current="true"] {
+      background: var(--active-soft);
+      box-shadow: inset 3px 0 0 var(--active);
+    }
+
+    .inbox-kind-mark {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--surface-muted);
+      color: var(--ink-soft);
+      font-size: 10px;
+      font-weight: 820;
+    }
+
+    .inbox-item.review .inbox-kind-mark {
+      border-color: #a9bbd2;
+      background: var(--active-soft);
+      color: var(--active);
+    }
+
+    .inbox-item.decision .inbox-kind-mark {
+      border-color: #d9bf94;
+      background: var(--blocked-soft);
+      color: var(--blocked);
+    }
+
+    .inbox-item.blocked .inbox-kind-mark {
+      border-color: #ddb4b4;
+      background: var(--deviated-soft);
+      color: var(--deviated);
+    }
+
+    .inbox-item-copy {
+      min-width: 0;
+    }
+
+    .inbox-item-topline {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 9px;
+    }
+
+    .inbox-unread-dot {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--active);
+    }
+
+    .inbox-item:not(.unread) .inbox-unread-dot {
+      visibility: hidden;
+    }
+
+    .inbox-item-title {
+      display: block;
+      margin-top: 5px;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 690;
+      letter-spacing: -0.012em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .inbox-item-summary {
+      display: -webkit-box;
+      margin-top: 4px;
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 10px;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .inbox-item-time {
+      color: var(--ink-faint);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .inbox-empty {
+      padding: 40px 20px;
+      color: var(--ink-faint);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .inbox-detail {
+      min-width: 0;
+      border-left: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .inbox-detail-head {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inbox-detail-kind {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: var(--ink-soft);
+      font-size: 9px;
+      font-weight: 760;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .inbox-detail-title {
+      margin: 11px 0 5px;
+      font-size: 20px;
+      font-weight: 730;
+      letter-spacing: -0.035em;
+      line-height: 1.25;
+    }
+
+    .inbox-detail-subtitle {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 9px;
+    }
+
+    .inbox-detail-body {
+      padding: 18px;
+    }
+
+    .inbox-detail-section + .inbox-detail-section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .inbox-evidence-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .inbox-evidence-item {
+      display: grid;
+      grid-template-columns: 7px minmax(0, 1fr);
+      gap: 8px;
+      color: #35423c;
+      font-size: 11px;
+    }
+
+    .inbox-evidence-item::before {
+      width: 6px;
+      height: 6px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--done);
+      content: "";
+    }
+
+    .inbox-detail-actions {
+      display: grid;
+      gap: 7px;
+      margin-top: 20px;
+    }
+
+    .inbox-detail-actions .button.primary {
+      min-height: 38px;
+    }
+
+    .inbox-detail-actions .button {
+      min-height: 40px;
+    }
+
+    .sidebar {
+      padding: 16px 12px;
+      border-right: 1px solid var(--line);
+      background: #f5f7f5;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 4px 8px;
+      color: var(--ink-faint);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .repo-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .repo-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .repo-button:hover {
+      background: var(--surface-raised);
+    }
+
+    .repo-button[aria-current="true"] {
+      border-color: #c7cfca;
+      background: var(--surface-raised);
+      box-shadow: 0 1px 2px rgba(30, 42, 35, 0.06);
+    }
+
+    .repo-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: #e6eae7;
+      color: #3d4c45;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .repo-button[aria-current="true"] .repo-icon {
+      background: #253930;
+      color: white;
+    }
+
+    .repo-button-copy {
+      min-width: 0;
+    }
+
+    .repo-name {
+      display: block;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 680;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .repo-branch {
+      display: block;
+      margin-top: 1px;
+      overflow: hidden;
+      color: var(--ink-faint);
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .divider {
+      height: 1px;
+      margin: 16px 4px;
+      background: var(--line);
+    }
+
+    .frontier-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .active-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .frontier-item {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 7px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .frontier-item:hover {
+      background: var(--surface-raised);
+    }
+
+    .frontier-item[aria-current="true"] {
+      background: var(--active-soft);
+      color: #244d83;
+    }
+
+    .frontier-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ready);
+    }
+
+    .frontier-dot.active {
+      background: var(--active);
+      box-shadow: 0 0 0 3px var(--active-soft);
+    }
+
+    .frontier-name {
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 620;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .frontier-key {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 9px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .summary-cell {
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .summary-value {
+      display: block;
+      font-size: 17px;
+      font-weight: 720;
+      letter-spacing: -0.04em;
+    }
+
+    .summary-label {
+      color: var(--ink-faint);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .canvas-pane {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--canvas);
+    }
+
+    .canvas-toolbar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(245, 247, 245, 0.9);
+    }
+
+    .view-tabs,
+    .toolbar-actions,
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .view-tab,
+    .inspector-tab {
+      border: 0;
+      border-radius: 6px;
+      padding: 6px 9px;
+      background: transparent;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 680;
+    }
+
+    .view-tab[aria-pressed="true"],
+    .inspector-tab[aria-selected="true"] {
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(28, 40, 33, 0.09);
+    }
+
+    .implementation-strip {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      min-height: 68px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #f5f7f6;
+    }
+
+    .implementation-heading {
+      min-width: 104px;
+    }
+
+    .implementation-heading-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #274a78;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .implementation-count {
+      min-width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--active);
+      color: white;
+      font-size: 9px;
+    }
+
+    .implementation-caption {
+      margin-top: 3px;
+      color: var(--ink-faint);
+      font-size: 9px;
+    }
+
+    .active-switcher {
+      min-width: 0;
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px;
+      scrollbar-width: thin;
+    }
+
+    .active-ticket {
+      min-width: 210px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface-raised);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .active-ticket:hover {
+      border-color: #8298b6;
+    }
+
+    .active-ticket[aria-current="true"] {
+      border-color: var(--active);
+      box-shadow: 0 0 0 1px var(--active);
+    }
+
+    .active-ticket-signal {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--active);
+      box-shadow: 0 0 0 4px var(--active-soft);
+    }
+
+    .active-ticket-copy {
+      min-width: 0;
+    }
+
+    .active-ticket-title {
+      display: block;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .active-ticket-meta {
+      display: block;
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--ink-faint);
+      font-size: 9px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .active-ticket-progress {
+      color: var(--active);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .empty-active {
+      padding: 7px 9px;
+      color: var(--ink-faint);
+      font-size: 10px;
+    }
+
+    .graph-viewport {
+      position: relative;
+      min-height: 650px;
+      flex: 1;
+      overflow: auto;
+      background-color: var(--canvas);
+      background-image: radial-gradient(circle, rgba(74, 92, 82, 0.18) 0.75px, transparent 0.8px);
+      background-size: 18px 18px;
+    }
+
+    .graph-world {
+      position: relative;
+      width: 880px;
+      height: 1220px;
+      transform-origin: 0 0;
+      transition: transform 150ms ease;
+    }
+
+    .edges {
+      position: absolute;
+      inset: 0;
+      width: 880px;
+      height: 1220px;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .edge {
+      fill: none;
+      stroke: #9aa59f;
+      stroke-width: 1.4;
+    }
+
+    .edge.satisfied {
+      stroke: #799183;
+    }
+
+    .edge-label {
+      fill: #78847d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 9px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+
+    .ticket-node {
+      position: absolute;
+      width: 190px;
+      min-height: 108px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.98);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+    }
+
+    .ticket-node:hover {
+      transform: translateY(-1px);
+      border-color: #89958e;
+      box-shadow: 0 11px 26px rgba(29, 42, 35, 0.12);
+    }
+
+    .ticket-node[aria-pressed="true"] {
+      border-color: var(--selection);
+      box-shadow: 0 0 0 2px var(--selection), 0 12px 28px rgba(29, 42, 35, 0.13);
+    }
+
+    .node-accent {
+      height: 4px;
+      border-radius: 10px 10px 0 0;
+      background: var(--line-strong);
+    }
+
+    .ticket-node.ready .node-accent {
+      background: var(--ready);
+    }
+
+    .ticket-node.active {
+      border-color: #8da6c5;
+      box-shadow: 0 9px 26px rgba(49, 95, 156, 0.16);
+    }
+
+    .ticket-node.active .node-accent {
+      background: var(--active);
+    }
+
+    .ticket-node.done .node-accent {
+      background: var(--done);
+    }
+
+    .ticket-node.blocked .node-accent {
+      background: var(--blocked);
+    }
+
+    .ticket-node.deviated .node-accent {
+      background: var(--deviated);
+    }
+
+    .node-body {
+      padding: 10px 11px 11px;
+    }
+
+    .node-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .node-id {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 9px;
+    }
+
+    .state-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 18px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .state-label.ready {
+      background: var(--ready-soft);
+      color: var(--ready);
+    }
+
+    .state-label.active {
+      background: var(--active-soft);
+      color: var(--active);
+    }
+
+    .state-label.active::before {
+      width: 5px;
+      height: 5px;
+      margin-right: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .state-label.done {
+      background: var(--done-soft);
+      color: var(--done);
+    }
+
+    .state-label.blocked {
+      background: var(--blocked-soft);
+      color: var(--blocked);
+    }
+
+    .state-label.deviated {
+      background: var(--deviated-soft);
+      color: var(--deviated);
+    }
+
+    .node-title {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 720;
+      letter-spacing: -0.01em;
+    }
+
+    .node-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--ink-faint);
+      font-size: 9px;
+    }
+
+    .node-progress {
+      height: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+      border-radius: 3px;
+      background: #e6e9e7;
+    }
+
+    .node-progress > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--line-strong);
+    }
+
+    .ticket-node.ready .node-progress > span {
+      background: var(--ready);
+    }
+
+    .ticket-node.active .node-progress > span {
+      background: var(--active);
+    }
+
+    .ticket-node.done .node-progress > span {
+      background: var(--done);
+    }
+
+    .ticket-node.blocked .node-progress > span {
+      background: var(--blocked);
+    }
+
+    .minimap {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: 150px;
+      height: 112px;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: rgba(249, 250, 249, 0.92);
+      box-shadow: 0 5px 16px rgba(29, 42, 35, 0.09);
+      pointer-events: none;
+    }
+
+    .minimap-label {
+      position: absolute;
+      top: 6px;
+      left: 7px;
+      color: var(--ink-faint);
+      font-size: 8px;
+      font-weight: 750;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .mini-node {
+      position: absolute;
+      width: 24px;
+      height: 12px;
+      border: 1px solid var(--line-strong);
+      border-top-width: 3px;
+      border-radius: 3px;
+      background: #fff;
+    }
+
+    .mini-node.ready {
+      border-top-color: var(--ready);
+    }
+
+    .mini-node.active {
+      border-top-color: var(--active);
+    }
+
+    .mini-node.done {
+      border-top-color: var(--done);
+    }
+
+    .mini-node.blocked {
+      border-top-color: var(--blocked);
+    }
+
+    .mini-node.deviated {
+      border-top-color: var(--deviated);
+    }
+
+    .inspector {
+      min-width: 0;
+      border-left: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .inspector-head {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inspector-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .inspector-title {
+      margin: 9px 0 4px;
+      font-size: 18px;
+      font-weight: 720;
+      letter-spacing: -0.025em;
+      line-height: 1.25;
+    }
+
+    .inspector-id {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+    }
+
+    .inspector-tabs {
+      display: flex;
+      gap: 3px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .inspector-content {
+      padding: 15px 16px 22px;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .detail-section + .detail-section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .detail-label {
+      margin: 0 0 7px;
+      color: var(--ink-faint);
+      font-size: 9px;
+      font-weight: 780;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .detail-copy {
+      margin: 0;
+      color: #33413a;
+      font-size: 12px;
+    }
+
+    .kv-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+    }
+
+    .kv-row {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr);
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .kv-row dt {
+      color: var(--ink-faint);
+    }
+
+    .kv-row dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      color: #2b3832;
+      font-weight: 590;
+    }
+
+    .check-list,
+    .log-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 16px minmax(0, 1fr);
+      gap: 7px;
+      color: #35423c;
+      font-size: 11px;
+    }
+
+    .check-box {
+      width: 14px;
+      height: 14px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      color: white;
+      font-size: 9px;
+    }
+
+    .check-item.complete .check-box {
+      border-color: var(--done);
+      background: var(--done);
+    }
+
+    .log-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 9px;
+      font-size: 10px;
+    }
+
+    .log-time {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .log-copy {
+      color: #35423c;
+    }
+
+    .code-block {
+      overflow: auto;
+      margin: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #edf0ee;
+      color: #2d3b34;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .inspector-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 18px;
+    }
+
+    .source-dock {
+      min-height: 70px;
+      display: grid;
+      grid-template-columns: minmax(280px, 1.4fr) repeat(4, minmax(112px, auto));
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      background: #f5f7f5;
+    }
+
+    .source-path {
+      min-width: 0;
+    }
+
+    .source-path-value {
+      margin-top: 3px;
+      overflow: hidden;
+      color: #2d3b34;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .source-item {
+      min-width: 0;
+    }
+
+    .source-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+      color: #2d3b34;
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .source-state-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--done);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 20;
+      max-width: min(440px, calc(100vw - 32px));
+      padding: 10px 13px;
+      border: 1px solid #385046;
+      border-radius: 9px;
+      background: #20332b;
+      color: white;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .toast.visible {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    .mobile-repos {
+      display: none;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mobile-repos select {
+      width: 100%;
+      min-height: 32px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 5px 30px 5px 9px;
+      background: var(--surface-raised);
+      color: var(--ink);
+      font-size: 11px;
+    }
+
+    @media (max-width: 1320px) {
+      :root {
+        --rail: 210px;
+        --inspector: 310px;
+      }
+
+      .demo-shell {
+        padding: 10px;
+      }
+
+      .window {
+        min-height: calc(100vh - 42px);
+      }
+
+      .workspace {
+        grid-template-columns: var(--rail) minmax(430px, 1fr);
+      }
+
+      .inbox-workspace {
+        grid-template-columns: var(--rail) minmax(430px, 1fr);
+      }
+
+      .inbox-detail {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      .inbox-detail-head {
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .inspector {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      .inspector-head {
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .inspector-body {
+        min-width: 0;
+      }
+
+      .inspector-content {
+        min-height: 240px;
+      }
+
+      .source-dock {
+        grid-template-columns: minmax(250px, 1.4fr) repeat(4, minmax(90px, auto));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .demo-shell {
+        padding: 0;
+      }
+
+      .demo-note {
+        padding: 8px 10px;
+        margin: 0;
+      }
+
+      .window {
+        min-height: calc(100vh - 36px);
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+      }
+
+      .titlebar {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .app-nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .app-nav-button {
+        min-height: 38px;
+      }
+
+      .window-controls {
+        display: none;
+      }
+
+      .title-actions .status-pill,
+      .title-actions .button span {
+        display: none;
+      }
+
+      .title-actions .button {
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .repo-copy {
+        display: none;
+      }
+
+      .repo-identity {
+        width: 100%;
+      }
+
+      .workspace {
+        display: block;
+      }
+
+      .inbox-workspace {
+        display: block;
+      }
+
+      .inbox-rail {
+        padding: 14px 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .inbox-rail-title,
+      .inbox-rail-copy {
+        display: none;
+      }
+
+      .inbox-attention {
+        grid-template-columns: auto minmax(0, 1fr);
+        margin-bottom: 10px;
+        padding: 9px 10px;
+      }
+
+      .inbox-attention-number {
+        font-size: 22px;
+      }
+
+      .inbox-filters {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .inbox-filter {
+        width: auto;
+        min-width: max-content;
+        min-height: 44px;
+        grid-template-columns: auto auto;
+      }
+
+      .inbox-detail-actions .button,
+      .inbox-detail-actions .button.primary {
+        min-height: 44px;
+      }
+
+      .inbox-queue-head {
+        min-height: 72px;
+        align-items: center;
+        padding: 13px 14px;
+      }
+
+      .inbox-queue-caption {
+        display: none;
+      }
+
+      .inbox-detail {
+        display: block;
+        border-top: 1px solid var(--line);
+      }
+
+      .inbox-detail-head {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .mobile-repos {
+        display: block;
+      }
+
+      .canvas-toolbar {
+        flex-wrap: wrap;
+      }
+
+      .implementation-strip {
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+
+      .graph-viewport {
+        min-height: 590px;
+      }
+
+      .inspector {
+        display: block;
+      }
+
+      .inspector-head {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .source-dock {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .source-path {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .repo-identity .mark {
+        display: none;
+      }
+
+      .titlebar {
+        padding: 8px 9px;
+      }
+
+      .app-nav-button {
+        min-height: 44px;
+      }
+
+      .inbox-item {
+        min-height: 100px;
+        padding: 13px 12px;
+      }
+
+      .inbox-item-title {
+        white-space: normal;
+      }
+
+      .toolbar-actions .button:not(.primary) {
+        display: none;
+      }
+
+      .view-tabs .view-tab:nth-child(n+3) {
+        display: none;
+      }
+
+      .active-ticket {
+        min-width: 196px;
+      }
+
+      .minimap {
+        display: none;
+      }
+
+      .inspector-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .source-dock {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Direction B: oversized Swiss signal system inspired by reference image 1. */
+    html[data-theme="signal"] {
+      --canvas: #c6c2be;
+      --surface: #efede8;
+      --surface-raised: #fbfaf6;
+      --surface-muted: #d6d2cf;
+      --line: #9e9995;
+      --line-strong: #3b3733;
+      --ink: #272522;
+      --ink-soft: #353331;
+      --ink-faint: #686460;
+      --active: #d7654d;
+      --active-soft: #f3ddd6;
+      --ready: #126d73;
+      --ready-soft: #ddf1f0;
+      --done: #2f6b49;
+      --done-soft: #e0eee4;
+      --blocked: #9a5a00;
+      --blocked-soft: #f3e4ca;
+      --selection: #272522;
+      --shadow: 0 24px 56px rgba(39, 37, 34, 0.10);
+      --shadow-soft: 0 7px 0 rgba(39, 37, 34, 0.07);
+      --radius-sm: 14px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --rail: 244px;
+      --inspector: 350px;
+    }
+
+    html[data-theme="signal"] body {
+      font-family: Arial, Helvetica, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    html[data-theme="signal"] .demo-note {
+      color: #262422;
+      font-size: 10px;
+      font-weight: 760;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="signal"] .style-lab-copy,
+    html[data-theme="signal"] .style-options {
+      border: 2px solid #272522;
+      border-radius: 999px;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .style-lab-copy {
+      padding-inline: 22px;
+    }
+
+    html[data-theme="signal"] .style-lab-title {
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .style-option {
+      border-radius: 999px;
+    }
+
+    html[data-theme="signal"] .style-option[aria-pressed="true"] {
+      border-color: #272522;
+      background: #d7654d;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .style-index,
+    html[data-theme="signal"] .style-swatch {
+      border: 2px solid #272522;
+      border-radius: 999px;
+    }
+
+    html[data-theme="signal"] .style-index {
+      background: #f4f1ea;
+      font-size: 13px;
+    }
+
+    html[data-theme="signal"] .window {
+      border: 2px solid #272522;
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    html[data-theme="signal"] .titlebar {
+      min-height: 82px;
+      padding: 13px 20px;
+      border-bottom: 2px solid #272522;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .window-control {
+      width: 13px;
+      height: 13px;
+      border: 2px solid #272522;
+      background: transparent;
+    }
+
+    html[data-theme="signal"] .window-control:first-child,
+    html[data-theme="signal"] .window-control:nth-child(2),
+    html[data-theme="signal"] .window-control:nth-child(3) {
+      background: transparent;
+    }
+
+    html[data-theme="signal"] .mark {
+      width: 46px;
+      height: 46px;
+      border: 2px solid #272522;
+      border-radius: 50%;
+      background: #272522;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .repo-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    html[data-theme="signal"] .eyebrow,
+    html[data-theme="signal"] .section-heading,
+    html[data-theme="signal"] .detail-label {
+      color: #3b3835;
+      font-weight: 850;
+    }
+
+    html[data-theme="signal"] .status-pill,
+    html[data-theme="signal"] .chip,
+    html[data-theme="signal"] .button,
+    html[data-theme="signal"] .view-tab,
+    html[data-theme="signal"] .inspector-tab {
+      border-width: 2px;
+      border-color: #272522;
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .button.primary {
+      border-color: #272522;
+      background: #d7654d;
+      color: #272522;
+    }
+
+    html[data-theme="signal"] .button.primary:hover {
+      background: #df765f;
+    }
+
+    html[data-theme="signal"] .sidebar {
+      border-right: 2px solid #272522;
+      background: #ddd8d3;
+    }
+
+    html[data-theme="signal"] .repo-button,
+    html[data-theme="signal"] .frontier-item {
+      border-radius: 999px;
+    }
+
+    html[data-theme="signal"] .repo-button[aria-current="true"] {
+      border: 2px solid #272522;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .repo-icon {
+      border: 1px solid #272522;
+      border-radius: 50%;
+      background: #f4f1ea;
+      color: #272522;
+    }
+
+    html[data-theme="signal"] .repo-button[aria-current="true"] .repo-icon {
+      background: #272522;
+      color: #ffffff;
+    }
+
+    html[data-theme="signal"] .summary-cell {
+      border: 1px solid #272522;
+      border-radius: 50%;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      background: rgba(244, 241, 234, 0.64);
+      text-align: center;
+    }
+
+    html[data-theme="signal"] .summary-value {
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .canvas-toolbar {
+      min-height: 56px;
+      border-bottom: 2px solid #272522;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .view-tab[aria-pressed="true"],
+    html[data-theme="signal"] .inspector-tab[aria-selected="true"] {
+      background: #272522;
+      color: #ffffff;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .implementation-strip {
+      min-height: 82px;
+      border-bottom: 2px solid #272522;
+      background: #b7b1ad;
+    }
+
+    html[data-theme="signal"] .implementation-heading-row {
+      color: #272522;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="signal"] .implementation-count {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #272522;
+      background: #f4f1ea;
+      color: #272522;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .active-ticket {
+      min-width: 238px;
+      border: 2px solid #272522;
+      border-radius: 999px;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .active-ticket[aria-current="true"] {
+      background: #d7654d;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .active-ticket-signal {
+      width: 13px;
+      height: 13px;
+      border: 2px solid #272522;
+      background: #d7654d;
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .active-ticket[aria-current="true"] .active-ticket-signal {
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .active-ticket-title {
+      font-weight: 850;
+    }
+
+    html[data-theme="signal"] .active-ticket-progress {
+      color: #272522;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .graph-viewport {
+      background-color: #c6c2be;
+      background-image: radial-gradient(circle, rgba(39, 37, 34, 0.18) 0.8px, transparent 0.9px);
+      background-size: 14px 14px;
+    }
+
+    html[data-theme="signal"] .graph-viewport::before {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      width: 430px;
+      height: 430px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(39, 37, 34, 0.16);
+      border-radius: 50%;
+      color: rgba(39, 37, 34, 0.045);
+      content: "03";
+      font-size: 170px;
+      font-weight: 950;
+      letter-spacing: -0.08em;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    html[data-theme="signal"] .graph-world {
+      z-index: 1;
+    }
+
+    html[data-theme="signal"] .edge,
+    html[data-theme="signal"] .edge.satisfied {
+      stroke: #625c56;
+      stroke-width: 1.8;
+    }
+
+    html[data-theme="signal"] .edge-label {
+      fill: #4e4944;
+      font-weight: 850;
+    }
+
+    html[data-theme="signal"] #arrow path,
+    html[data-theme="signal"] #arrowSatisfied path {
+      fill: #625c56;
+    }
+
+    html[data-theme="signal"] .ticket-node {
+      border: 2px solid #272522;
+      border-radius: 24px;
+      background: #f4f1ea;
+      box-shadow: 0 7px 0 rgba(39, 37, 34, 0.08);
+    }
+
+    html[data-theme="signal"] .ticket-node:hover {
+      border-color: #272522;
+      box-shadow: 0 9px 0 rgba(39, 37, 34, 0.11);
+    }
+
+    html[data-theme="signal"] .ticket-node[aria-pressed="true"] {
+      border-color: #272522;
+      box-shadow: 0 0 0 3px #272522, 0 10px 0 rgba(39, 37, 34, 0.08);
+    }
+
+    html[data-theme="signal"] .ticket-node.active {
+      border-color: #272522;
+      background: #d7654d;
+    }
+
+    html[data-theme="signal"] .node-accent {
+      height: 8px;
+      border-radius: 22px 22px 0 0;
+      background: #272522 !important;
+    }
+
+    html[data-theme="signal"] .state-label {
+      border: 1px solid currentColor;
+      font-weight: 900;
+    }
+
+    html[data-theme="signal"] .ticket-node.active .state-label.active {
+      border-color: #272522;
+      background: #f4f1ea;
+      color: #272522;
+    }
+
+    html[data-theme="signal"] .node-title {
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    html[data-theme="signal"] .node-progress {
+      height: 5px;
+      border: 1px solid #272522;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .ticket-node.active .node-progress > span {
+      background: #272522;
+    }
+
+    html[data-theme="signal"] .minimap {
+      border: 2px solid #272522;
+      border-radius: 22px;
+      background: rgba(244, 241, 234, 0.94);
+      box-shadow: none;
+    }
+
+    html[data-theme="signal"] .inspector {
+      border-left: 2px solid #272522;
+      background: #f4f1ea;
+    }
+
+    html[data-theme="signal"] .inspector-head,
+    html[data-theme="signal"] .inspector-tabs,
+    html[data-theme="signal"] .detail-section + .detail-section {
+      border-color: #272522;
+    }
+
+    html[data-theme="signal"] .inspector-title {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+      line-height: 1.04;
+    }
+
+    html[data-theme="signal"] .check-box,
+    html[data-theme="signal"] .code-block {
+      border-color: #272522;
+      border-radius: 12px;
+    }
+
+    html[data-theme="signal"] .source-dock {
+      border-top: 2px solid #272522;
+      background: #f4f1ea;
+    }
+
+    /* Direction C: strict creative-engineering grid inspired by reference image 2. */
+    html[data-theme="grid"] {
+      --canvas: #dedbd3;
+      --surface: #f0eee7;
+      --surface-raised: #f8f6ee;
+      --surface-muted: #d9d6cc;
+      --line: #4b4943;
+      --line-strong: #242421;
+      --ink: #242421;
+      --ink-soft: #32322f;
+      --ink-faint: #66625b;
+      --active: #c95b43;
+      --active-soft: #ecd9d3;
+      --ready: #006d73;
+      --ready-soft: #d7efed;
+      --done: #2f6847;
+      --done-soft: #dcebe0;
+      --blocked: #a85d00;
+      --blocked-soft: #f1dfbe;
+      --selection: #242421;
+      --shadow: 9px 9px 0 #242421;
+      --shadow-soft: 4px 4px 0 rgba(36, 36, 33, 0.14);
+      --radius-sm: 0px;
+      --radius-md: 0px;
+      --radius-lg: 8px;
+      --rail: 244px;
+      --inspector: 350px;
+    }
+
+    html[data-theme="grid"] body {
+      font-family: "Arial Narrow", "Helvetica Neue Condensed", Arial, sans-serif;
+      letter-spacing: 0.005em;
+    }
+
+    html[data-theme="grid"] .demo-note {
+      color: #242421;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .style-lab {
+      gap: 0;
+    }
+
+    html[data-theme="grid"] .style-lab-copy,
+    html[data-theme="grid"] .style-options {
+      border: 2px solid #242421;
+      border-radius: 0;
+      background: #f0eee7;
+    }
+
+    html[data-theme="grid"] .style-options {
+      margin-left: -2px;
+      gap: 0;
+      padding: 0;
+    }
+
+    html[data-theme="grid"] .style-lab-title {
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .style-option {
+      min-height: 64px;
+      border: 0;
+      border-left: 1px solid #242421;
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .style-option:first-child {
+      border-left: 0;
+    }
+
+    html[data-theme="grid"] .style-option:hover {
+      background: #ddd9cf;
+    }
+
+    html[data-theme="grid"] .style-option[aria-pressed="true"] {
+      border-color: #242421;
+      background: #c95b43;
+      box-shadow: inset 0 -5px 0 #242421;
+    }
+
+    html[data-theme="grid"] .style-index,
+    html[data-theme="grid"] .style-swatch {
+      border: 1px solid #242421;
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .style-index {
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .window {
+      border: 3px solid #c97755;
+      border-radius: 8px;
+      background: #f0eee7;
+      box-shadow: 0 0 0 2px #242421, 9px 9px 0 rgba(36, 36, 33, 0.12);
+    }
+
+    html[data-theme="grid"] .titlebar {
+      min-height: 72px;
+      padding: 10px 15px;
+      border-bottom: 3px solid #c95b43;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .window-control {
+      width: 12px;
+      height: 12px;
+      border: 1px solid #f0eee7;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    html[data-theme="grid"] .window-control:first-child {
+      background: #c95b43;
+    }
+
+    html[data-theme="grid"] .window-control:nth-child(2),
+    html[data-theme="grid"] .window-control:nth-child(3) {
+      background: transparent;
+    }
+
+    html[data-theme="grid"] .mark {
+      width: 42px;
+      height: 42px;
+      border: 1px solid #f0eee7;
+      border-radius: 0;
+      background: #c95b43;
+      color: #242421;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    html[data-theme="grid"] .titlebar .eyebrow,
+    html[data-theme="grid"] .titlebar .repo-title {
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .repo-title {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .status-pill,
+    html[data-theme="grid"] .titlebar .button {
+      border-color: #f0eee7;
+      border-radius: 0;
+      background: #242421;
+      color: #f0eee7;
+      box-shadow: none;
+    }
+
+    html[data-theme="grid"] .titlebar .button.primary {
+      border-color: #c95b43;
+      background: #c95b43;
+      color: #242421;
+    }
+
+    html[data-theme="grid"] .button,
+    html[data-theme="grid"] .chip,
+    html[data-theme="grid"] .view-tab,
+    html[data-theme="grid"] .inspector-tab {
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    html[data-theme="grid"] .sidebar {
+      border-right: 2px solid #242421;
+      background: #f0eee7;
+      background-image: linear-gradient(rgba(36, 36, 33, 0.045) 1px, transparent 1px);
+      background-size: 100% 72px;
+    }
+
+    html[data-theme="grid"] .section-heading,
+    html[data-theme="grid"] .detail-label,
+    html[data-theme="grid"] .eyebrow {
+      color: #373632;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 900;
+    }
+
+    html[data-theme="grid"] .repo-button,
+    html[data-theme="grid"] .frontier-item,
+    html[data-theme="grid"] .repo-icon,
+    html[data-theme="grid"] .summary-cell {
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .repo-button[aria-current="true"] {
+      border: 2px solid #242421;
+      background: #c95b43;
+      box-shadow: none;
+    }
+
+    html[data-theme="grid"] .repo-icon,
+    html[data-theme="grid"] .repo-button[aria-current="true"] .repo-icon {
+      border: 1px solid #242421;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .frontier-item[aria-current="true"] {
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .summary-grid {
+      gap: 0;
+      border-top: 1px solid #242421;
+      border-left: 1px solid #242421;
+    }
+
+    html[data-theme="grid"] .summary-cell {
+      border: 0;
+      border-right: 1px solid #242421;
+      border-bottom: 1px solid #242421;
+      background: #f0eee7;
+    }
+
+    html[data-theme="grid"] .summary-value {
+      font-size: 23px;
+      font-weight: 950;
+    }
+
+    html[data-theme="grid"] .canvas-toolbar {
+      min-height: 54px;
+      border-bottom: 2px solid #242421;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .canvas-toolbar .chip,
+    html[data-theme="grid"] .canvas-toolbar .button {
+      border-color: #f0eee7;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .view-tab {
+      color: #f0eee7;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .view-tab[aria-pressed="true"] {
+      background: #c95b43;
+      color: #242421;
+    }
+
+    html[data-theme="grid"] .implementation-strip {
+      min-height: 82px;
+      border-bottom: 2px solid #242421;
+      background: #c95b43;
+    }
+
+    html[data-theme="grid"] .implementation-heading-row {
+      color: #242421;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .implementation-caption {
+      color: #5f3026;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    html[data-theme="grid"] .implementation-count {
+      border: 1px solid #242421;
+      border-radius: 0;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .active-ticket {
+      min-width: 238px;
+      border: 2px solid #242421;
+      border-radius: 0;
+      background: #f0eee7;
+    }
+
+    html[data-theme="grid"] .active-ticket[aria-current="true"] {
+      background: #242421;
+      color: #f0eee7;
+      box-shadow: inset 0 -5px 0 #f0eee7;
+    }
+
+    html[data-theme="grid"] .active-ticket-signal {
+      width: 11px;
+      height: 11px;
+      border: 1px solid #242421;
+      border-radius: 0;
+      background: #c95b43;
+      box-shadow: none;
+    }
+
+    html[data-theme="grid"] .active-ticket[aria-current="true"] .active-ticket-meta,
+    html[data-theme="grid"] .active-ticket[aria-current="true"] .active-ticket-progress {
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .graph-viewport {
+      background-color: #dedbd3;
+      background-image:
+        linear-gradient(rgba(36, 36, 33, 0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36, 36, 33, 0.10) 1px, transparent 1px);
+      background-size: 72px 72px;
+    }
+
+    html[data-theme="grid"] .ticket-node {
+      border: 2px solid #242421;
+      border-radius: 0;
+      background: #f0eee7;
+      box-shadow: 5px 5px 0 rgba(36, 36, 33, 0.14);
+    }
+
+    html[data-theme="grid"] .edge,
+    html[data-theme="grid"] .edge.satisfied {
+      stroke: #242421;
+      stroke-width: 1.8;
+    }
+
+    html[data-theme="grid"] .edge-label {
+      fill: #242421;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] #arrow path,
+    html[data-theme="grid"] #arrowSatisfied path {
+      fill: #242421;
+    }
+
+    html[data-theme="grid"] .ticket-node:hover {
+      border-color: #242421;
+      box-shadow: 7px 7px 0 rgba(36, 36, 33, 0.20);
+    }
+
+    html[data-theme="grid"] .ticket-node[aria-pressed="true"] {
+      border-color: #242421;
+      box-shadow: 0 0 0 3px #242421, 8px 8px 0 #c95b43;
+    }
+
+    html[data-theme="grid"] .ticket-node.active {
+      border-color: #242421;
+      background: #c95b43;
+      box-shadow: 6px 6px 0 #242421;
+    }
+
+    html[data-theme="grid"] .node-accent {
+      height: 8px;
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .ticket-node.active .node-accent {
+      background: #242421;
+    }
+
+    html[data-theme="grid"] .state-label {
+      border: 1px solid currentColor;
+      border-radius: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    html[data-theme="grid"] .ticket-node.active .state-label.active {
+      border-color: #242421;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .node-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+    }
+
+    html[data-theme="grid"] .node-progress {
+      height: 6px;
+      border: 1px solid #242421;
+      border-radius: 0;
+      background: #f0eee7;
+    }
+
+    html[data-theme="grid"] .ticket-node.active .node-progress > span {
+      background: #242421;
+    }
+
+    html[data-theme="grid"] .minimap {
+      border: 2px solid #242421;
+      border-radius: 0;
+      background: #f0eee7;
+      box-shadow: 5px 5px 0 #242421;
+    }
+
+    html[data-theme="grid"] .mini-node {
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .inspector {
+      border-left: 2px solid #242421;
+      background: #f0eee7;
+    }
+
+    html[data-theme="grid"] .inspector-head {
+      border-bottom: 2px solid #c95b43;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .inspector-head .inspector-id {
+      color: #bdb9ad;
+    }
+
+    html[data-theme="grid"] .inspector-title {
+      font-size: 23px;
+      font-weight: 950;
+      letter-spacing: -0.055em;
+      line-height: 1.02;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .inspector-tabs {
+      gap: 0;
+      padding: 0;
+      border-bottom: 2px solid #242421;
+    }
+
+    html[data-theme="grid"] .inspector-tab {
+      flex: 1;
+      padding: 10px 8px;
+      border-right: 1px solid #242421;
+      color: #242421;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="grid"] .inspector-tab[aria-selected="true"] {
+      background: #c95b43;
+      color: #242421;
+    }
+
+    html[data-theme="grid"] .detail-section + .detail-section,
+    html[data-theme="grid"] .code-block,
+    html[data-theme="grid"] .check-box {
+      border-color: #242421;
+      border-radius: 0;
+    }
+
+    html[data-theme="grid"] .source-dock {
+      border-top: 3px solid #c95b43;
+      background: #242421;
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .source-dock .eyebrow,
+    html[data-theme="grid"] .source-path-value,
+    html[data-theme="grid"] .source-value {
+      color: #f0eee7;
+    }
+
+    html[data-theme="grid"] .toast {
+      border: 2px solid #242421;
+      border-radius: 0;
+      background: #c95b43;
+      color: #242421;
+      box-shadow: 6px 6px 0 #242421;
+      font-weight: 800;
+    }
+
+    @media (max-width: 920px) {
+      .style-lab {
+        grid-template-columns: 1fr;
+      }
+
+      html[data-theme="grid"] .style-options {
+        margin-top: -2px;
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .style-lab {
+        padding: 0 10px;
+      }
+
+      html[data-theme="signal"] .window,
+      html[data-theme="grid"] .window {
+        border-right-width: 0;
+        border-left-width: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      html[data-theme="signal"] .inspector,
+      html[data-theme="grid"] .inspector {
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .style-lab-copy {
+        display: none;
+      }
+
+      .style-options {
+        grid-template-columns: repeat(3, minmax(152px, 1fr));
+        overflow-x: auto;
+        padding: 6px;
+      }
+
+      html[data-theme="grid"] .style-options {
+        padding: 0;
+      }
+
+      html[data-theme="signal"] .style-options {
+        border-radius: 24px;
+      }
+
+      html[data-theme="signal"] .titlebar,
+      html[data-theme="grid"] .titlebar {
+        min-height: 60px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+    <p class="demo-note">VibeHub Workbench · 交互原型 · 模拟数据 · 只读，不会修改任何 Ticket 或本地文件</p>
+
+    <main class="window" aria-label="VibeHub Workbench interactive demo">
+      <header class="titlebar">
+        <div class="window-controls" aria-hidden="true">
+          <span class="window-control"></span>
+          <span class="window-control"></span>
+          <span class="window-control"></span>
+        </div>
+
+        <div class="repo-identity">
+          <div class="mark" aria-hidden="true">VH</div>
+          <div class="repo-copy">
+            <div class="eyebrow">VibeHub Workbench</div>
+            <div class="repo-title" id="repoTitle">vibehub-plugin · codex/workbench-webview</div>
+          </div>
+          <div class="mobile-repos">
+            <label class="eyebrow" for="mobileRepoSelect">Repository</label>
+            <select id="mobileRepoSelect" aria-label="选择模拟仓库"></select>
+          </div>
+        </div>
+
+        <nav class="app-nav" role="tablist" aria-label="Workbench sections">
+          <button class="app-nav-button" id="app-tab-tickets" type="button" role="tab" data-workspace-view="tickets" aria-controls="ticketWorkspace" aria-selected="true" tabindex="0">
+            Tickets
+          </button>
+          <button class="app-nav-button" id="app-tab-inbox" type="button" role="tab" data-workspace-view="inbox" aria-controls="inboxWorkspace" aria-selected="false" tabindex="-1">
+            Inbox
+            <span class="nav-count" id="inboxUnreadCount" data-count="3">3</span>
+          </button>
+        </nav>
+
+        <div class="title-actions">
+          <span class="status-pill">
+            <span class="watch-dot" aria-hidden="true"></span>
+            <span id="watchLabel">Watching .vibehub</span>
+          </span>
+          <button class="button icon-only" id="refreshButton" type="button" aria-label="刷新投影" title="刷新投影">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 7v5h-5"></path>
+              <path d="M19 12a7 7 0 1 0-2 5"></path>
+            </svg>
+          </button>
+          <button class="button primary" id="simulateButton" type="button" aria-label="模拟 Git 更新" title="模拟 Git 更新">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v18M3 12h18"></path>
+            </svg>
+            <span>模拟 Git 更新</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="workspace" id="ticketWorkspace" role="tabpanel" aria-labelledby="app-tab-tickets">
+        <aside class="sidebar" aria-label="Repository navigation">
+          <div class="section-heading">
+            <span>Recent repositories</span>
+            <button class="button icon-only" id="addRepoButton" type="button" aria-label="选择仓库" title="选择仓库（Demo）">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="repo-list" id="repoList"></div>
+
+          <div class="divider"></div>
+
+          <div class="section-heading">
+            <span>Implementing now</span>
+            <span id="activeSidebarCount">2</span>
+          </div>
+          <div class="active-list" id="activeSidebarList"></div>
+
+          <div class="divider"></div>
+
+          <div class="section-heading">
+            <span>Ready frontier</span>
+            <span id="frontierCount">2</span>
+          </div>
+          <div class="frontier-list" id="frontierList"></div>
+
+          <div class="divider"></div>
+
+          <div class="section-heading">
+            <span>Graph summary</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-cell">
+              <span class="summary-value" id="activeCount">2</span>
+              <span class="summary-label">Implementing</span>
+            </div>
+            <div class="summary-cell">
+              <span class="summary-value" id="readyCount">1</span>
+              <span class="summary-label">Ready</span>
+            </div>
+            <div class="summary-cell">
+              <span class="summary-value" id="blockedCount">1</span>
+              <span class="summary-label">Blocked</span>
+            </div>
+            <div class="summary-cell">
+              <span class="summary-value" id="doneCount">3</span>
+              <span class="summary-label">Done</span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="canvas-pane" aria-label="Ticket causal graph">
+          <div class="canvas-toolbar">
+            <div class="view-tabs" role="group" aria-label="Graph views">
+              <button class="view-tab" type="button" aria-pressed="true">Execution flow</button>
+              <button class="view-tab" type="button" aria-pressed="false">Implementing</button>
+              <button class="view-tab" type="button" aria-pressed="false">Ready frontier</button>
+            </div>
+            <div class="toolbar-actions">
+              <span class="chip" id="graphScope">Exact worktree · 7 Tickets</span>
+              <div class="zoom-controls" aria-label="Graph zoom controls">
+                <button class="button icon-only" id="zoomOutButton" type="button" aria-label="缩小">−</button>
+                <button class="button icon-only" id="fitButton" type="button" aria-label="适合视图">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"></path>
+                  </svg>
+                </button>
+                <button class="button icon-only" id="zoomInButton" type="button" aria-label="放大">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="implementation-strip" aria-label="Tickets currently being implemented">
+            <div class="implementation-heading">
+              <div class="implementation-heading-row">
+                <span>Implementing now</span>
+                <span class="implementation-count" id="activeSwitcherCount">2</span>
+              </div>
+              <div class="implementation-caption">Live Run projection · click to switch</div>
+            </div>
+            <div class="active-switcher" id="activeTicketSwitcher" role="group" aria-label="切换正在实现的 Ticket"></div>
+          </div>
+
+          <div class="graph-viewport" id="graphViewport" tabindex="0" aria-label="可滚动的 Ticket 因果图">
+            <div class="graph-world" id="graphWorld">
+              <svg class="edges" id="edgeLayer" viewBox="0 0 880 1220" aria-hidden="true">
+                <defs>
+                  <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L8,4 L0,8 z" fill="#9aa59f"></path>
+                  </marker>
+                  <marker id="arrowSatisfied" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L8,4 L0,8 z" fill="#799183"></path>
+                  </marker>
+                </defs>
+              </svg>
+              <div id="nodeLayer"></div>
+            </div>
+
+            <div class="minimap" id="minimap" aria-hidden="true">
+              <span class="minimap-label">Overview</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="inspector" aria-label="Ticket inspector">
+          <div class="inspector-head">
+            <div class="inspector-kicker">
+              <span class="state-label active" id="inspectorState">IMPLEMENTING</span>
+              <span class="inspector-id" id="inspectorId">T-104</span>
+            </div>
+            <h1 class="inspector-title" id="inspectorTitle">Build user-owned Workbench shell</h1>
+            <div class="inspector-id" id="inspectorSource">tickets/workbench-shell.yaml</div>
+          </div>
+
+          <div class="inspector-body">
+            <div class="inspector-tabs" role="tablist" aria-label="Ticket details">
+              <button class="inspector-tab" id="detail-tab-execution" type="button" role="tab" data-panel="execution" aria-controls="panel-execution" aria-selected="true" tabindex="0">Execution</button>
+              <button class="inspector-tab" id="detail-tab-contract" type="button" role="tab" data-panel="contract" aria-controls="panel-contract" aria-selected="false" tabindex="-1">Contract</button>
+              <button class="inspector-tab" id="detail-tab-log" type="button" role="tab" data-panel="log" aria-controls="panel-log" aria-selected="false" tabindex="-1">Log</button>
+            </div>
+
+            <div class="inspector-content">
+              <section class="panel active" id="panel-execution" role="tabpanel" aria-labelledby="detail-tab-execution" tabindex="0">
+                <div class="detail-section">
+                  <h2 class="detail-label">Outcome</h2>
+                  <p class="detail-copy" id="outcomeText"></p>
+                </div>
+                <div class="detail-section">
+                  <h2 class="detail-label">Execution context</h2>
+                  <dl class="kv-list" id="executionDetails"></dl>
+                </div>
+                <div class="detail-section">
+                  <h2 class="detail-label">Acceptance</h2>
+                  <ul class="check-list" id="acceptanceList"></ul>
+                </div>
+                <div class="inspector-actions">
+                  <button class="button" id="copyPromptButton" type="button">Copy for Agent</button>
+                  <button class="button" id="copyLinkButton" type="button">Copy deep link</button>
+                </div>
+              </section>
+
+              <section class="panel" id="panel-contract" role="tabpanel" aria-labelledby="detail-tab-contract" tabindex="0" hidden>
+                <div class="detail-section">
+                  <h2 class="detail-label">Constraints</h2>
+                  <ul class="check-list" id="constraintList"></ul>
+                </div>
+                <div class="detail-section">
+                  <h2 class="detail-label">Depends on</h2>
+                  <dl class="kv-list" id="dependencyList"></dl>
+                </div>
+                <div class="detail-section">
+                  <h2 class="detail-label">Source</h2>
+                  <pre class="code-block" id="sourceBlock"></pre>
+                </div>
+              </section>
+
+              <section class="panel" id="panel-log" role="tabpanel" aria-labelledby="detail-tab-log" tabindex="0" hidden>
+                <div class="detail-section">
+                  <h2 class="detail-label">Evidence timeline</h2>
+                  <ol class="log-list" id="logList"></ol>
+                </div>
+              </section>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="inbox-workspace" id="inboxWorkspace" role="tabpanel" aria-labelledby="app-tab-inbox" hidden>
+        <aside class="inbox-rail" aria-label="Inbox filters">
+          <div class="inbox-rail-kicker">Across recent repositories</div>
+          <h1 class="inbox-rail-title">Inbox</h1>
+          <p class="inbox-rail-copy">只收集需要你判断或介入的工作。</p>
+
+          <div class="inbox-attention">
+            <strong class="inbox-attention-number" id="inboxActionCount">3</strong>
+            <span class="inbox-attention-label">items need you now<br>普通进度不会占红点</span>
+          </div>
+
+          <div class="inbox-filters" role="group" aria-label="筛选 Inbox">
+            <button class="inbox-filter" type="button" data-inbox-filter="needs" aria-pressed="true">
+              <span>Needs you</span><span class="inbox-filter-count" id="inboxNeedsCount">3</span>
+            </button>
+            <button class="inbox-filter" type="button" data-inbox-filter="review" aria-pressed="false">
+              <span>Review requested</span><span class="inbox-filter-count" id="inboxReviewCount">2</span>
+            </button>
+            <button class="inbox-filter" type="button" data-inbox-filter="decision" aria-pressed="false">
+              <span>Decision required</span><span class="inbox-filter-count" id="inboxDecisionCount">1</span>
+            </button>
+            <button class="inbox-filter" type="button" data-inbox-filter="blocked" aria-pressed="false">
+              <span>Blocked</span><span class="inbox-filter-count" id="inboxBlockedCount">1</span>
+            </button>
+            <button class="inbox-filter" type="button" data-inbox-filter="all" aria-pressed="false">
+              <span>All activity</span><span class="inbox-filter-count" id="inboxAllCount">5</span>
+            </button>
+          </div>
+        </aside>
+
+        <section class="inbox-queue" aria-label="Inbox items">
+          <header class="inbox-queue-head">
+            <div>
+              <div class="inbox-queue-kicker">Attention queue</div>
+              <h2 class="inbox-queue-title" id="inboxQueueTitle">Needs you</h2>
+            </div>
+            <p class="inbox-queue-caption">按需要行动的紧迫度排列，不按消息时间制造焦虑。</p>
+          </header>
+          <div class="inbox-list" id="inboxList"></div>
+        </section>
+
+        <aside class="inbox-detail" aria-label="Selected inbox item">
+          <div class="inbox-detail-head">
+            <span class="inbox-detail-kind" id="inboxDetailKind">Review requested</span>
+            <h2 class="inbox-detail-title" id="inboxDetailTitle"></h2>
+            <div class="inbox-detail-subtitle" id="inboxDetailSubtitle"></div>
+          </div>
+          <div class="inbox-detail-body">
+            <section class="inbox-detail-section">
+              <h3 class="detail-label">Why it needs you</h3>
+              <p class="detail-copy" id="inboxDetailReason"></p>
+            </section>
+            <section class="inbox-detail-section">
+              <h3 class="detail-label">Context prepared by the Agent</h3>
+              <p class="detail-copy" id="inboxDetailSummary"></p>
+            </section>
+            <section class="inbox-detail-section">
+              <h3 class="detail-label">Evidence ready</h3>
+              <ul class="inbox-evidence-list" id="inboxEvidenceList"></ul>
+            </section>
+            <div class="inbox-detail-actions">
+              <button class="button primary" id="openInboxTicketButton" type="button">Open exact Ticket</button>
+              <button class="button" id="copyInboxPromptButton" type="button">Copy review prompt</button>
+              <button class="button" id="markInboxSeenButton" type="button">Mark as seen</button>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="source-dock" id="sourceDock" aria-label="Exact repository source">
+        <div class="source-path">
+          <div class="eyebrow">Exact worktree</div>
+          <div class="source-path-value" id="sourcePath"></div>
+        </div>
+        <div class="source-item">
+          <div class="eyebrow">Branch</div>
+          <div class="source-value" id="sourceBranch"></div>
+        </div>
+        <div class="source-item">
+          <div class="eyebrow">Commit</div>
+          <div class="source-value" id="sourceCommit"></div>
+        </div>
+        <div class="source-item">
+          <div class="eyebrow">Working tree</div>
+          <div class="source-value"><span class="source-state-dot"></span><span id="sourceDirty"></span></div>
+        </div>
+        <div class="source-item">
+          <div class="eyebrow">Last projection</div>
+          <div class="source-value" id="sourceSynced"></div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var repos = {
+        vibehub: {
+          name: 'vibehub-plugin',
+          short: 'VH',
+          path: '/workspaces/vibehub-plugin',
+          branch: 'codex/workbench-webview',
+          commit: '05b9aa2',
+          dirty: '2 files changed',
+          evidence: 8,
+          simulated: false,
+          selected: 'workbench-shell',
+          nodes: [
+            {
+              id: 'git-native',
+              key: 'T-101',
+              title: 'Establish Git-native control plane',
+              status: 'done',
+              x: 345,
+              y: 40,
+              progress: 100,
+              owner: 'Platform',
+              outcome: 'Ticket, Context, Evidence and Outcome are read directly from governed Git YAML.',
+              source: 'tickets/git-native-control-plane.yaml',
+              scope: 'packages/core, skills',
+              run: 'closed · R-221',
+              acceptance: [
+                [true, 'Git YAML remains the only durable truth'],
+                [true, 'No SQLite or hidden runtime is required'],
+                [true, 'Invalid documents fail before projection']
+              ],
+              constraints: [
+                'Do not create a second truth source',
+                'Projection must be deterministic',
+                'All durable changes remain reviewable in Git'
+              ],
+              depends: [],
+              logs: [
+                ['09:12', 'Outcome accepted by independent closeout'],
+                ['08:44', 'Projection tests passed'],
+                ['08:07', 'Run claimed from exact worktree']
+              ]
+            },
+            {
+              id: 'ui-contract',
+              key: 'T-102',
+              title: 'Ship read-only causal graph UI',
+              status: 'done',
+              x: 520,
+              y: 280,
+              progress: 100,
+              owner: 'Product UI',
+              outcome: 'A quiet, spatial Ticket graph exposes causal flow while keeping Git YAML unchanged.',
+              source: 'tickets/local-graph-ui.yaml',
+              scope: 'packages/ui, assets',
+              run: 'closed · R-228',
+              acceptance: [
+                [true, 'Graph stays visible during inspection'],
+                [true, 'Execution, Contract and Log are progressively disclosed'],
+                [true, 'Host exposes GET and HEAD only']
+              ],
+              constraints: [
+                'Graph is the primary surface',
+                'Semantic color only',
+                'No Ticket write route'
+              ],
+              depends: ['git-native'],
+              logs: [
+                ['11:26', 'UI host read-only test passed'],
+                ['10:58', 'Responsive graph inspection verified'],
+                ['10:14', 'Ticket projection loaded']
+              ]
+            },
+            {
+              id: 'lifecycle-design',
+              key: 'T-103',
+              title: 'Define user-owned UI lifecycle',
+              status: 'done',
+              x: 170,
+              y: 280,
+              progress: 100,
+              owner: 'Architecture',
+              outcome: 'Separate Agent-owned presentation from a user-owned persistent Workbench.',
+              source: 'tickets/workbench-lifecycle.yaml',
+              scope: 'docs, lifecycle policy',
+              run: 'closed · R-231',
+              acceptance: [
+                [true, 'Workbench survives Agent task completion'],
+                [true, 'Existing task-scoped review stays available'],
+                [true, 'No hidden daemon registry is introduced']
+              ],
+              constraints: [
+                'User explicitly owns start and stop',
+                'Agent task policy stays narrow',
+                'Workbench may only observe exact worktree'
+              ],
+              depends: ['git-native'],
+              logs: [
+                ['14:03', 'Architecture decision recorded'],
+                ['13:38', 'Current 30 minute host lifecycle traced'],
+                ['13:12', 'Dogfood friction reproduced']
+              ]
+            },
+            {
+              id: 'workbench-shell',
+              key: 'T-104',
+              title: 'Build user-owned Workbench shell',
+              status: 'active',
+              x: 170,
+              y: 520,
+              progress: 64,
+              owner: 'Desktop',
+              agent: 'Codex task #84',
+              heartbeat: '12s ago',
+              outcome: 'A desktop WebView owns the local read-only host, recent repositories and window lifecycle.',
+              source: 'tickets/workbench-shell.yaml',
+              scope: 'apps/workbench',
+              run: 'claimed · R-236',
+              acceptance: [
+                [false, 'Select an exact Git worktree'],
+                [false, 'App session owns host and in-memory token'],
+                [false, 'Closing the app cleans up every local resource']
+              ],
+              constraints: [
+                'Reuse the existing projector and frontend',
+                'Persist UI preferences only',
+                'Bearer token must never be written to disk'
+              ],
+              depends: ['lifecycle-design', 'ui-contract'],
+              logs: [
+                ['17:04', 'Run heartbeat received from Codex task #84'],
+                ['16:48', 'Run R-236 claimed from exact worktree'],
+                ['16:42', 'Ticket became READY'],
+                ['16:40', 'Dependency outcome T-103 accepted'],
+                ['15:18', 'Worktree boundary reviewed']
+              ]
+            },
+            {
+              id: 'git-watch',
+              key: 'T-105',
+              title: 'Refresh from governed Git updates',
+              status: 'active',
+              x: 520,
+              y: 520,
+              progress: 31,
+              owner: 'Runtime',
+              agent: 'Codex task #91',
+              heartbeat: '27s ago',
+              outcome: 'A debounced watcher validates and reprojects the graph after governed YAML changes.',
+              source: 'tickets/workbench-git-watch.yaml',
+              scope: 'apps/workbench/repository-session',
+              run: 'claimed · R-239',
+              acceptance: [
+                [false, 'Watch .vibehub YAML and Git metadata'],
+                [false, 'Keep last valid snapshot during invalid writes'],
+                [false, 'Coalesce a burst of file events']
+              ],
+              constraints: [
+                'Never write watcher state into the repository',
+                'Validate before swapping the snapshot',
+                'Observe only the selected worktree'
+              ],
+              depends: ['ui-contract'],
+              logs: [
+                ['17:03', 'Run heartbeat received from Codex task #91'],
+                ['16:51', 'Run R-239 claimed from exact worktree'],
+                ['16:44', 'Ticket entered READY frontier'],
+                ['16:39', 'Read-only projection contract attached'],
+                ['15:47', 'Debounce scenario defined']
+              ]
+            },
+            {
+              id: 'deep-link',
+              key: 'T-106',
+              title: 'Focus Ticket through deep link',
+              status: 'blocked',
+              x: 170,
+              y: 780,
+              progress: 0,
+              owner: 'Integration',
+              outcome: 'Agents can focus a repository, Ticket and inspector tab without owning the Workbench.',
+              source: 'tickets/workbench-deep-link.yaml',
+              scope: 'apps/workbench/deep-link',
+              run: 'blocked',
+              acceptance: [
+                [false, 'Support vibehub://open navigation'],
+                [false, 'Confirm switching to a different repository'],
+                [false, 'Deep links never carry mutations']
+              ],
+              constraints: [
+                'Navigation only; no semantic write authority',
+                'Unknown Ticket opens the repo with an error',
+                'First use of a repo requires user confirmation'
+              ],
+              depends: ['workbench-shell'],
+              logs: [
+                ['16:43', 'Blocked on T-104'],
+                ['15:52', 'URI contract drafted'],
+                ['15:31', 'Host integration boundary reviewed']
+              ]
+            },
+            {
+              id: 'desktop-release',
+              key: 'T-107',
+              title: 'Package dogfood desktop release',
+              status: 'blocked',
+              x: 345,
+              y: 1020,
+              progress: 0,
+              owner: 'Release',
+              outcome: 'A signed dogfood build opens recent repositories without Agent involvement.',
+              source: 'tickets/workbench-dogfood-release.yaml',
+              scope: 'apps/workbench, release',
+              run: 'blocked',
+              acceptance: [
+                [false, 'Signed macOS dogfood artifact'],
+                [false, 'Recent repository restoration'],
+                [false, 'No resources remain after app exit']
+              ],
+              constraints: [
+                'No automatic background startup',
+                'No cross-repository scanning',
+                'Preserve the browser review fallback'
+              ],
+              depends: ['workbench-shell', 'git-watch', 'deep-link'],
+              logs: [
+                ['16:45', 'Blocked on three upstream Tickets'],
+                ['16:06', 'Release acceptance drafted'],
+                ['15:50', 'Dogfood-only scope confirmed']
+              ]
+            }
+          ],
+          edges: [
+            ['git-native', 'lifecycle-design', 'enables'],
+            ['git-native', 'ui-contract', 'governs'],
+            ['lifecycle-design', 'workbench-shell', 'unlocks'],
+            ['ui-contract', 'workbench-shell', 'renders'],
+            ['ui-contract', 'git-watch', 'projects'],
+            ['workbench-shell', 'deep-link', 'hosts'],
+            ['workbench-shell', 'desktop-release', 'packages'],
+            ['git-watch', 'desktop-release', 'refreshes'],
+            ['deep-link', 'desktop-release', 'integrates']
+          ]
+        },
+        commerce: {
+          name: 'sample-commerce',
+          short: 'SC',
+          path: '/workspaces/sample-commerce',
+          branch: 'main',
+          commit: '7f3c2d1',
+          dirty: 'Clean',
+          evidence: 5,
+          simulated: false,
+          selected: 'catalog-flow',
+          nodes: [
+            {
+              id: 'content-model',
+              key: 'T-201',
+              title: 'Define governed content model',
+              status: 'done',
+              x: 170,
+              y: 60,
+              progress: 100,
+              owner: 'Product',
+              outcome: 'A stable content schema supports draft, review and catalog release states.',
+              source: 'tickets/content-model.yaml',
+              scope: 'src/content',
+              run: 'closed · R-401',
+              acceptance: [[true, 'Schema is versioned'], [true, 'Draft metadata is explicit']],
+              constraints: ['No platform-specific fields in the core model'],
+              depends: [],
+              logs: [['10:18', 'Outcome accepted'], ['09:42', 'Schema tests passed']]
+            },
+            {
+              id: 'adapter-auth',
+              key: 'T-202',
+              title: 'Connect sample commerce adapter',
+              status: 'done',
+              x: 520,
+              y: 60,
+              progress: 100,
+              owner: 'Integrations',
+              outcome: 'Sample adapter tokens are isolated behind a narrow adapter contract.',
+              source: 'tickets/adapter-auth.yaml',
+              scope: 'src/adapters',
+              run: 'closed · R-405',
+              acceptance: [[true, 'Tokens stay outside content records'], [true, 'Adapter errors are typed']],
+              constraints: ['Never log adapter secrets'],
+              depends: [],
+              logs: [['13:22', 'Security review passed'], ['12:57', 'Adapters verified']]
+            },
+            {
+              id: 'catalog-flow',
+              key: 'T-203',
+              title: 'Implement catalog approval flow',
+              status: 'active',
+              x: 345,
+              y: 340,
+              progress: 32,
+              owner: 'Workflow',
+              agent: 'Codex task #51',
+              heartbeat: '8s ago',
+              outcome: 'Approved catalog changes can be scheduled and released through bounded adapters.',
+              source: 'tickets/catalog-flow.yaml',
+              scope: 'src/workflows',
+              run: 'claimed · R-412',
+              acceptance: [[false, 'Approval is required'], [false, 'Idempotent catalog release'], [false, 'Catalog receipt is stored']],
+              constraints: ['Never release an unapproved catalog change', 'Retry must be idempotent'],
+              depends: ['content-model', 'adapter-auth'],
+              logs: [['15:24', 'Run heartbeat received from Codex task #51'], ['15:12', 'Run R-412 claimed'], ['15:10', 'Ticket became READY'], ['14:54', 'Dependencies accepted']]
+            },
+            {
+              id: 'analytics',
+              key: 'T-204',
+              title: 'Ingest catalog quality metrics',
+              status: 'blocked',
+              x: 170,
+              y: 650,
+              progress: 0,
+              owner: 'Data',
+              outcome: 'Released catalog changes receive normalized quality snapshots.',
+              source: 'tickets/catalog-quality.yaml',
+              scope: 'src/analytics',
+              run: 'blocked',
+              acceptance: [[false, 'Normalize catalog quality metrics'], [false, 'Keep source timestamp']],
+              constraints: ['Metrics are append-only snapshots'],
+              depends: ['catalog-flow'],
+              logs: [['15:12', 'Blocked on T-203']]
+            },
+            {
+              id: 'calendar',
+              key: 'T-205',
+              title: 'Render catalog rollout calendar',
+              status: 'blocked',
+              x: 520,
+              y: 650,
+              progress: 0,
+              owner: 'Frontend',
+              outcome: 'The team can inspect scheduled and completed catalog changes in one calendar.',
+              source: 'tickets/catalog-calendar.yaml',
+              scope: 'src/ui',
+              run: 'blocked',
+              acceptance: [[false, 'Display scheduled catalog changes'], [false, 'Show catalog receipt state']],
+              constraints: ['Calendar is read-only in MVP'],
+              depends: ['catalog-flow'],
+              logs: [['15:13', 'Blocked on T-203']]
+            }
+          ],
+          edges: [
+            ['content-model', 'catalog-flow', 'shapes'],
+            ['adapter-auth', 'catalog-flow', 'connects'],
+            ['catalog-flow', 'analytics', 'produces'],
+            ['catalog-flow', 'calendar', 'schedules']
+          ]
+        }
+      };
+
+      var inboxItems = [
+        {
+          id: 'review-workbench-shell',
+          kind: 'review',
+          repo: 'vibehub',
+          ticket: 'workbench-shell',
+          requiresAction: true,
+          unread: true,
+          time: '2m ago',
+          actor: 'Codex task #84',
+          title: 'Review the Workbench shell checkpoint',
+          reason: 'The Agent has reached a product checkpoint and needs your judgment before polishing the remaining shell behavior.',
+          summary: 'The read-only host, recent repository state and WebView lifecycle are wired. The Agent wants confirmation that the navigation and Ticket focus model match how you work.',
+          evidence: ['Desktop and 375px responsive checks passed', 'No Ticket or local project file is written by the UI', '3 acceptance items are prepared for targeted review']
+        },
+        {
+          id: 'review-catalog-safety',
+          kind: 'review',
+          repo: 'commerce',
+          ticket: 'catalog-flow',
+          requiresAction: true,
+          unread: true,
+          time: '6m ago',
+          actor: 'Codex task #51',
+          title: 'Review catalog release safety contract',
+          reason: 'Catalog release changes an external sample store, so the Agent is asking you to inspect the approval boundary before implementation continues.',
+          summary: 'The proposed flow blocks unapproved changes, uses an idempotent catalog release and stores the catalog receipt after a successful external action.',
+          evidence: ['Approval gate is represented as an explicit acceptance item', 'Retry behavior has an idempotency constraint', 'Sample adapter tokens remain behind the existing adapter']
+        },
+        {
+          id: 'decision-dirty-refresh',
+          kind: 'decision',
+          repo: 'vibehub',
+          ticket: 'git-watch',
+          requiresAction: true,
+          unread: true,
+          time: '11m ago',
+          actor: 'Codex task #91',
+          title: 'Choose refresh behavior for a dirty worktree',
+          reason: 'Both behaviors are technically valid, but choosing silently would change what the user believes the graph represents.',
+          summary: 'Option A keeps the last valid projection and shows a dirty warning. Option B projects valid uncommitted YAML immediately and labels it as working-tree state.',
+          evidence: ['Exact branch and commit remain visible in both options', 'Invalid YAML always keeps the last valid graph', 'The choice affects only projection semantics, never Git files']
+        },
+        {
+          id: 'blocked-deep-link',
+          kind: 'blocked',
+          repo: 'vibehub',
+          ticket: 'deep-link',
+          requiresAction: false,
+          unread: false,
+          time: '18m ago',
+          actor: 'VibeHub projection',
+          title: 'Deep-link work is waiting on the shell lifecycle',
+          reason: 'No human action is required yet. This item is visible so the downstream effect of the active shell work is easy to inspect.',
+          summary: 'T-106 remains blocked until the Workbench shell has an accepted lifecycle contract. It will move to READY only after governed closeout evidence is current.',
+          evidence: ['Dependency T-104 is still implementing', 'No duplicate Run has been claimed', 'The blocked state comes from the Ticket graph']
+        },
+        {
+          id: 'update-lifecycle-closeout',
+          kind: 'update',
+          repo: 'vibehub',
+          ticket: 'lifecycle-design',
+          requiresAction: false,
+          unread: false,
+          time: '34m ago',
+          actor: 'Independent closeout',
+          title: 'User-owned lifecycle contract was accepted',
+          reason: 'This is a completed lifecycle event. It stays in All activity but never consumes an attention badge.',
+          summary: 'The accepted outcome says the UI lifecycle belongs to the user-owned Workbench, while Agent tasks may only deep-link into it.',
+          evidence: ['Independent closeout accepted all current acceptance items', 'The Ticket is DONE in governed Git', 'Downstream shell work is now unblocked']
+        }
+      ];
+
+      var activeRepoKey = 'vibehub';
+      var zoom = 1;
+      var selectedPanel = 'execution';
+      var activeWorkspaceView = 'tickets';
+      var activeInboxFilter = 'needs';
+      var selectedInboxId = 'review-workbench-shell';
+      var toastTimer = null;
+
+      var nodeLayer = document.getElementById('nodeLayer');
+      var edgeLayer = document.getElementById('edgeLayer');
+      var graphWorld = document.getElementById('graphWorld');
+      var graphViewport = document.getElementById('graphViewport');
+      var minimap = document.getElementById('minimap');
+      var repoList = document.getElementById('repoList');
+      var mobileRepoSelect = document.getElementById('mobileRepoSelect');
+      var activeSidebarList = document.getElementById('activeSidebarList');
+      var activeTicketSwitcher = document.getElementById('activeTicketSwitcher');
+      var frontierList = document.getElementById('frontierList');
+      var ticketWorkspace = document.getElementById('ticketWorkspace');
+      var inboxWorkspace = document.getElementById('inboxWorkspace');
+      var inboxList = document.getElementById('inboxList');
+      var sourceDock = document.getElementById('sourceDock');
+      var toast = document.getElementById('toast');
+
+      function currentRepo() {
+        return repos[activeRepoKey];
+      }
+
+      function nodeById(id) {
+        return currentRepo().nodes.find(function (node) {
+          return node.id === id;
+        });
+      }
+
+      function stateName(status) {
+        if (status === 'active') return 'IMPLEMENTING';
+        return status.toUpperCase();
+      }
+
+      function showToast(message) {
+        window.clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add('visible');
+        toastTimer = window.setTimeout(function () {
+          toast.classList.remove('visible');
+        }, 2200);
+      }
+
+      function formatTime() {
+        return new Intl.DateTimeFormat('zh-CN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(new Date());
+      }
+
+      function inboxItemById(id) {
+        return inboxItems.find(function (item) {
+          return item.id === id;
+        });
+      }
+
+      function inboxKindLabel(kind) {
+        if (kind === 'review') return 'Review requested';
+        if (kind === 'decision') return 'Decision required';
+        if (kind === 'blocked') return 'Blocked';
+        return 'Activity update';
+      }
+
+      function inboxKindMark(kind) {
+        if (kind === 'review') return 'R';
+        if (kind === 'decision') return 'D';
+        if (kind === 'blocked') return '!';
+        return 'i';
+      }
+
+      function visibleInboxItems() {
+        if (activeInboxFilter === 'needs') {
+          return inboxItems.filter(function (item) {
+            return item.requiresAction;
+          });
+        }
+        if (activeInboxFilter === 'all') return inboxItems.slice();
+        return inboxItems.filter(function (item) {
+          return item.kind === activeInboxFilter;
+        });
+      }
+
+      function updateInboxCounts() {
+        var needs = inboxItems.filter(function (item) { return item.requiresAction; }).length;
+        var unread = inboxItems.filter(function (item) { return item.requiresAction && item.unread; }).length;
+        var review = inboxItems.filter(function (item) { return item.kind === 'review'; }).length;
+        var decision = inboxItems.filter(function (item) { return item.kind === 'decision'; }).length;
+        var blocked = inboxItems.filter(function (item) { return item.kind === 'blocked'; }).length;
+        var navCount = document.getElementById('inboxUnreadCount');
+
+        navCount.textContent = unread ? String(unread) : '';
+        navCount.dataset.count = String(unread);
+        document.getElementById('inboxActionCount').textContent = needs;
+        document.getElementById('inboxNeedsCount').textContent = needs;
+        document.getElementById('inboxReviewCount').textContent = review;
+        document.getElementById('inboxDecisionCount').textContent = decision;
+        document.getElementById('inboxBlockedCount').textContent = blocked;
+        document.getElementById('inboxAllCount').textContent = inboxItems.length;
+      }
+
+      function renderInboxList() {
+        var items = visibleInboxItems();
+        var titles = {
+          needs: 'Needs you',
+          review: 'Review requested',
+          decision: 'Decision required',
+          blocked: 'Blocked work',
+          all: 'All activity'
+        };
+
+        if (!items.some(function (item) { return item.id === selectedInboxId; })) {
+          selectedInboxId = items.length ? items[0].id : null;
+        }
+
+        document.getElementById('inboxQueueTitle').textContent = titles[activeInboxFilter];
+        document.querySelectorAll('[data-inbox-filter]').forEach(function (button) {
+          button.setAttribute('aria-pressed', String(button.dataset.inboxFilter === activeInboxFilter));
+        });
+        inboxList.replaceChildren();
+
+        items.forEach(function (item) {
+          var repo = repos[item.repo];
+          var node = repo.nodes.find(function (candidate) { return candidate.id === item.ticket; });
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'inbox-item ' + item.kind + (item.unread ? ' unread' : '');
+          button.setAttribute('aria-current', String(item.id === selectedInboxId));
+
+          var mark = document.createElement('span');
+          mark.className = 'inbox-kind-mark';
+          mark.textContent = inboxKindMark(item.kind);
+
+          var copy = document.createElement('span');
+          copy.className = 'inbox-item-copy';
+          var topline = document.createElement('span');
+          topline.className = 'inbox-item-topline';
+          var unread = document.createElement('span');
+          unread.className = 'inbox-unread-dot';
+          unread.setAttribute('aria-hidden', 'true');
+          var context = document.createElement('span');
+          context.textContent = repo.name + ' · ' + (node ? node.key : item.ticket) + ' · ' + inboxKindLabel(item.kind);
+          topline.append(unread, context);
+          var title = document.createElement('strong');
+          title.className = 'inbox-item-title';
+          title.textContent = item.title;
+          var summary = document.createElement('span');
+          summary.className = 'inbox-item-summary';
+          summary.textContent = item.summary;
+          copy.append(topline, title, summary);
+
+          var time = document.createElement('span');
+          time.className = 'inbox-item-time';
+          time.textContent = item.time;
+
+          button.append(mark, copy, time);
+          button.addEventListener('click', function () {
+            selectedInboxId = item.id;
+            renderInboxList();
+            renderInboxDetail();
+          });
+          inboxList.appendChild(button);
+        });
+
+        if (!items.length) {
+          var empty = document.createElement('div');
+          empty.className = 'inbox-empty';
+          empty.textContent = '这个筛选下暂时没有需要处理的事项。';
+          inboxList.appendChild(empty);
+        }
+      }
+
+      function renderInboxDetail() {
+        var item = inboxItemById(selectedInboxId);
+        var detail = document.querySelector('.inbox-detail');
+        if (!item) {
+          detail.hidden = true;
+          return;
+        }
+
+        detail.hidden = false;
+        var repo = repos[item.repo];
+        var node = repo.nodes.find(function (candidate) { return candidate.id === item.ticket; });
+        document.getElementById('inboxDetailKind').textContent = inboxKindLabel(item.kind);
+        document.getElementById('inboxDetailTitle').textContent = item.title;
+        document.getElementById('inboxDetailSubtitle').textContent = repo.name + ' · ' + (node ? node.key : item.ticket) + ' · ' + item.actor + ' · ' + item.time;
+        document.getElementById('inboxDetailReason').textContent = item.reason;
+        document.getElementById('inboxDetailSummary').textContent = item.summary;
+
+        var evidence = document.getElementById('inboxEvidenceList');
+        evidence.replaceChildren();
+        item.evidence.forEach(function (entry) {
+          var li = document.createElement('li');
+          li.className = 'inbox-evidence-item';
+          li.textContent = entry;
+          evidence.appendChild(li);
+        });
+
+        var seenButton = document.getElementById('markInboxSeenButton');
+        seenButton.textContent = item.unread ? 'Mark as seen' : 'Seen';
+        seenButton.disabled = !item.unread;
+      }
+
+      function renderInbox() {
+        updateInboxCounts();
+        renderInboxList();
+        renderInboxDetail();
+      }
+
+      function applyWorkspaceView(view, announce) {
+        if (view !== 'tickets' && view !== 'inbox') return;
+        activeWorkspaceView = view;
+        ticketWorkspace.hidden = view !== 'tickets';
+        inboxWorkspace.hidden = view !== 'inbox';
+        sourceDock.hidden = view !== 'tickets';
+        document.querySelectorAll('[data-workspace-view]').forEach(function (button) {
+          var selected = button.dataset.workspaceView === view;
+          button.setAttribute('aria-selected', String(selected));
+          button.tabIndex = selected ? 0 : -1;
+        });
+        if (view === 'inbox') renderInbox();
+        if (announce) showToast(view === 'inbox' ? 'Inbox 只显示需要判断或介入的事项' : '已回到 Ticket execution flow');
+      }
+
+      function createRepoNavigation() {
+        repoList.replaceChildren();
+        mobileRepoSelect.replaceChildren();
+
+        Object.keys(repos).forEach(function (key) {
+          var repo = repos[key];
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'repo-button';
+          button.setAttribute('aria-current', String(key === activeRepoKey));
+          button.dataset.repo = key;
+
+          var icon = document.createElement('span');
+          icon.className = 'repo-icon';
+          icon.textContent = repo.short;
+
+          var copy = document.createElement('span');
+          copy.className = 'repo-button-copy';
+          var name = document.createElement('span');
+          name.className = 'repo-name';
+          name.textContent = repo.name;
+          var branch = document.createElement('span');
+          branch.className = 'repo-branch';
+          branch.textContent = repo.branch;
+          copy.append(name, branch);
+          button.append(icon, copy);
+          button.addEventListener('click', function () {
+            switchRepo(key);
+          });
+          repoList.appendChild(button);
+
+          var option = document.createElement('option');
+          option.value = key;
+          option.textContent = repo.name + ' · ' + repo.branch;
+          option.selected = key === activeRepoKey;
+          mobileRepoSelect.appendChild(option);
+        });
+      }
+
+      function createEdges() {
+        edgeLayer.querySelectorAll('.dynamic-edge').forEach(function (element) {
+          element.remove();
+        });
+
+        currentRepo().edges.forEach(function (edge) {
+          var from = nodeById(edge[0]);
+          var to = nodeById(edge[1]);
+          if (!from || !to) return;
+
+          var x1 = from.x + 95;
+          var y1 = from.y + 108;
+          var x2 = to.x + 95;
+          var y2 = to.y;
+          var bend = Math.max(58, (y2 - y1) * 0.46);
+          var satisfied = from.status === 'done';
+          var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('class', 'dynamic-edge edge' + (satisfied ? ' satisfied' : ''));
+          path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + (y1 + bend) + ', ' + x2 + ' ' + (y2 - bend) + ', ' + x2 + ' ' + y2);
+          path.setAttribute('marker-end', satisfied ? 'url(#arrowSatisfied)' : 'url(#arrow)');
+          edgeLayer.appendChild(path);
+
+          var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          label.setAttribute('class', 'dynamic-edge edge-label');
+          label.setAttribute('x', String((x1 + x2) / 2 + 10));
+          label.setAttribute('y', String((y1 + y2) / 2 - 5));
+          label.setAttribute('text-anchor', 'middle');
+          label.textContent = edge[2];
+          edgeLayer.appendChild(label);
+        });
+      }
+
+      function createNodes() {
+        nodeLayer.replaceChildren();
+        currentRepo().nodes.forEach(function (node) {
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'ticket-node ' + node.status;
+          button.style.left = node.x + 'px';
+          button.style.top = node.y + 'px';
+          button.setAttribute('aria-pressed', String(node.id === currentRepo().selected));
+          button.setAttribute('aria-label', node.key + ' ' + node.title + ', ' + stateName(node.status));
+
+          var accent = document.createElement('div');
+          accent.className = 'node-accent';
+
+          var body = document.createElement('div');
+          body.className = 'node-body';
+
+          var topline = document.createElement('div');
+          topline.className = 'node-topline';
+          var id = document.createElement('span');
+          id.className = 'node-id';
+          id.textContent = node.key;
+          var state = document.createElement('span');
+          state.className = 'state-label ' + node.status;
+          state.textContent = stateName(node.status);
+          topline.append(id, state);
+
+          var title = document.createElement('div');
+          title.className = 'node-title';
+          title.textContent = node.title;
+
+          var meta = document.createElement('div');
+          meta.className = 'node-meta';
+          var owner = document.createElement('span');
+          owner.textContent = node.owner;
+          var progressText = document.createElement('span');
+          progressText.textContent = node.progress + '%';
+          meta.append(owner, progressText);
+
+          var progress = document.createElement('div');
+          progress.className = 'node-progress';
+          var fill = document.createElement('span');
+          fill.style.width = node.progress + '%';
+          progress.appendChild(fill);
+
+          body.append(topline, title, meta, progress);
+          button.append(accent, body);
+          button.addEventListener('click', function () {
+            selectNode(node.id, true);
+          });
+          nodeLayer.appendChild(button);
+        });
+      }
+
+      function createMinimap() {
+        minimap.querySelectorAll('.mini-node').forEach(function (element) {
+          element.remove();
+        });
+
+        currentRepo().nodes.forEach(function (node) {
+          var mini = document.createElement('span');
+          mini.className = 'mini-node ' + node.status;
+          mini.style.left = 7 + (node.x / 880) * 118 + 'px';
+          mini.style.top = 22 + (node.y / 1220) * 80 + 'px';
+          minimap.appendChild(mini);
+        });
+      }
+
+      function activeNodes() {
+        return currentRepo().nodes.filter(function (node) {
+          return node.status === 'active';
+        });
+      }
+
+      function createActiveSwitchers() {
+        var active = activeNodes();
+        activeSidebarList.replaceChildren();
+        activeTicketSwitcher.replaceChildren();
+        document.getElementById('activeSidebarCount').textContent = active.length;
+        document.getElementById('activeSwitcherCount').textContent = active.length;
+
+        active.forEach(function (node) {
+          var sidebarButton = document.createElement('button');
+          sidebarButton.type = 'button';
+          sidebarButton.className = 'frontier-item';
+          sidebarButton.setAttribute('aria-current', String(node.id === currentRepo().selected));
+
+          var sidebarDot = document.createElement('span');
+          sidebarDot.className = 'frontier-dot active';
+          var sidebarName = document.createElement('span');
+          sidebarName.className = 'frontier-name';
+          sidebarName.textContent = node.title;
+          var sidebarKey = document.createElement('span');
+          sidebarKey.className = 'frontier-key';
+          sidebarKey.textContent = node.key;
+          sidebarButton.append(sidebarDot, sidebarName, sidebarKey);
+          sidebarButton.addEventListener('click', function () {
+            selectNode(node.id, true);
+          });
+          activeSidebarList.appendChild(sidebarButton);
+
+          var switchButton = document.createElement('button');
+          switchButton.type = 'button';
+          switchButton.className = 'active-ticket';
+          switchButton.setAttribute('aria-pressed', String(node.id === currentRepo().selected));
+          switchButton.setAttribute('aria-current', String(node.id === currentRepo().selected));
+
+          var signal = document.createElement('span');
+          signal.className = 'active-ticket-signal';
+          signal.setAttribute('aria-hidden', 'true');
+          var copy = document.createElement('span');
+          copy.className = 'active-ticket-copy';
+          var title = document.createElement('span');
+          title.className = 'active-ticket-title';
+          title.textContent = node.key + ' · ' + node.title;
+          var meta = document.createElement('span');
+          meta.className = 'active-ticket-meta';
+          meta.textContent = (node.agent || 'Active Agent') + ' · heartbeat ' + (node.heartbeat || 'now');
+          copy.append(title, meta);
+          var progress = document.createElement('span');
+          progress.className = 'active-ticket-progress';
+          progress.textContent = node.progress + '%';
+          switchButton.append(signal, copy, progress);
+          switchButton.addEventListener('click', function () {
+            selectNode(node.id, true);
+          });
+          activeTicketSwitcher.appendChild(switchButton);
+        });
+
+        if (!active.length) {
+          var sidebarEmpty = document.createElement('p');
+          sidebarEmpty.className = 'detail-copy';
+          sidebarEmpty.textContent = 'No active Runs';
+          activeSidebarList.appendChild(sidebarEmpty);
+
+          var switcherEmpty = document.createElement('div');
+          switcherEmpty.className = 'empty-active';
+          switcherEmpty.textContent = '当前没有正在实现的 Ticket。READY frontier 仍可用于选择下一项工作。';
+          activeTicketSwitcher.appendChild(switcherEmpty);
+        }
+      }
+
+      function createFrontier() {
+        var ready = currentRepo().nodes.filter(function (node) {
+          return node.status === 'ready';
+        });
+        frontierList.replaceChildren();
+        document.getElementById('frontierCount').textContent = ready.length;
+
+        ready.forEach(function (node) {
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'frontier-item';
+          var dot = document.createElement('span');
+          dot.className = 'frontier-dot';
+          var name = document.createElement('span');
+          name.className = 'frontier-name';
+          name.textContent = node.title;
+          var key = document.createElement('span');
+          key.className = 'frontier-key';
+          key.textContent = node.key;
+          button.append(dot, name, key);
+          button.addEventListener('click', function () {
+            selectNode(node.id, true);
+          });
+          frontierList.appendChild(button);
+        });
+
+        if (!ready.length) {
+          var empty = document.createElement('p');
+          empty.className = 'detail-copy';
+          empty.textContent = 'No READY Tickets';
+          frontierList.appendChild(empty);
+        }
+      }
+
+      function updateCounts() {
+        var counts = { active: 0, done: 0, ready: 0, blocked: 0 };
+        currentRepo().nodes.forEach(function (node) {
+          if (Object.prototype.hasOwnProperty.call(counts, node.status)) {
+            counts[node.status] += 1;
+          }
+        });
+        document.getElementById('doneCount').textContent = counts.done;
+        document.getElementById('activeCount').textContent = counts.active;
+        document.getElementById('readyCount').textContent = counts.ready;
+        document.getElementById('blockedCount').textContent = counts.blocked;
+      }
+
+      function appendKV(container, key, value) {
+        var row = document.createElement('div');
+        row.className = 'kv-row';
+        var dt = document.createElement('dt');
+        dt.textContent = key;
+        var dd = document.createElement('dd');
+        dd.textContent = value;
+        row.append(dt, dd);
+        container.appendChild(row);
+      }
+
+      function renderInspector() {
+        var node = nodeById(currentRepo().selected) || currentRepo().nodes[0];
+        currentRepo().selected = node.id;
+
+        var state = document.getElementById('inspectorState');
+        state.className = 'state-label ' + node.status;
+        state.textContent = stateName(node.status);
+        document.getElementById('inspectorId').textContent = node.key;
+        document.getElementById('inspectorTitle').textContent = node.title;
+        document.getElementById('inspectorSource').textContent = node.source;
+        document.getElementById('outcomeText').textContent = node.outcome;
+
+        var details = document.getElementById('executionDetails');
+        details.replaceChildren();
+        appendKV(details, 'Owner', node.owner);
+        appendKV(details, 'Run', node.run);
+        if (node.status === 'active') {
+          appendKV(details, 'Implementing', node.agent || 'Active Agent');
+          appendKV(details, 'Heartbeat', node.heartbeat || 'now');
+        }
+        appendKV(details, 'Scope', node.scope);
+        appendKV(details, 'Progress', node.progress + '%');
+
+        var acceptance = document.getElementById('acceptanceList');
+        acceptance.replaceChildren();
+        node.acceptance.forEach(function (item) {
+          var li = document.createElement('li');
+          li.className = 'check-item' + (item[0] ? ' complete' : '');
+          var box = document.createElement('span');
+          box.className = 'check-box';
+          box.textContent = item[0] ? '✓' : '';
+          var copy = document.createElement('span');
+          copy.textContent = item[1];
+          li.append(box, copy);
+          acceptance.appendChild(li);
+        });
+
+        var constraints = document.getElementById('constraintList');
+        constraints.replaceChildren();
+        node.constraints.forEach(function (constraint) {
+          var li = document.createElement('li');
+          li.className = 'check-item';
+          var box = document.createElement('span');
+          box.className = 'check-box';
+          var copy = document.createElement('span');
+          copy.textContent = constraint;
+          li.append(box, copy);
+          constraints.appendChild(li);
+        });
+
+        var dependencies = document.getElementById('dependencyList');
+        dependencies.replaceChildren();
+        if (node.depends.length) {
+          node.depends.forEach(function (dependencyId, index) {
+            var dependency = nodeById(dependencyId);
+            appendKV(dependencies, 'Dependency ' + (index + 1), dependency ? dependency.key + ' · ' + dependency.title : dependencyId);
+          });
+        } else {
+          appendKV(dependencies, 'Dependencies', 'None');
+        }
+
+        document.getElementById('sourceBlock').textContent =
+          'id: ' + node.id + '\\n' +
+          'git_status: ' + (node.status === 'active' ? 'READY' : node.status.toUpperCase()) + '\\n' +
+          'implementation_overlay: ' + (node.status === 'active' ? 'IMPLEMENTING' : 'none') + '\\n' +
+          'outcome: >\\n  ' + node.outcome + '\\n' +
+          'source: .vibehub/' + node.source;
+
+        var logs = document.getElementById('logList');
+        logs.replaceChildren();
+        node.logs.forEach(function (entry) {
+          var li = document.createElement('li');
+          li.className = 'log-item';
+          var time = document.createElement('span');
+          time.className = 'log-time';
+          time.textContent = entry[0];
+          var copy = document.createElement('span');
+          copy.className = 'log-copy';
+          copy.textContent = entry[1];
+          li.append(time, copy);
+          logs.appendChild(li);
+        });
+      }
+
+      function updateRepositoryChrome() {
+        var repo = currentRepo();
+        document.getElementById('repoTitle').textContent = repo.name + ' · ' + repo.branch;
+        document.getElementById('sourcePath').textContent = repo.path;
+        document.getElementById('sourceBranch').textContent = repo.branch;
+        document.getElementById('sourceCommit').textContent = repo.commit;
+        document.getElementById('sourceDirty').textContent = repo.dirty;
+        document.getElementById('sourceSynced').textContent = formatTime();
+        document.getElementById('graphScope').textContent = 'Exact worktree · ' + repo.nodes.length + ' Tickets';
+      }
+
+      function renderAll() {
+        createRepoNavigation();
+        createEdges();
+        createNodes();
+        createMinimap();
+        createActiveSwitchers();
+        createFrontier();
+        updateCounts();
+        updateRepositoryChrome();
+        renderInspector();
+        updateInboxCounts();
+        if (activeWorkspaceView === 'inbox') renderInbox();
+      }
+
+      function selectNode(id, scrollIntoView) {
+        currentRepo().selected = id;
+        createNodes();
+        createActiveSwitchers();
+        renderInspector();
+        if (scrollIntoView) {
+          var node = nodeById(id);
+          graphViewport.scrollTo({
+            left: Math.max(0, node.x * zoom - graphViewport.clientWidth / 2 + 95),
+            top: Math.max(0, node.y * zoom - graphViewport.clientHeight / 2 + 54),
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+          });
+        }
+      }
+
+      function switchRepo(key) {
+        if (!repos[key]) return;
+        activeRepoKey = key;
+        updateZoom(1);
+        renderAll();
+        graphViewport.scrollTo({ left: 0, top: 0 });
+        showToast('已切换到 exact worktree：' + currentRepo().name);
+      }
+
+      function updateZoom(nextZoom) {
+        zoom = Math.min(1.25, Math.max(0.72, nextZoom));
+        graphWorld.style.transform = 'scale(' + zoom + ')';
+        graphWorld.style.width = 880 * zoom + 'px';
+        graphWorld.style.height = 1220 * zoom + 'px';
+      }
+
+      function simulateGitUpdate() {
+        var repo = currentRepo();
+        if (activeRepoKey !== 'vibehub') {
+          var catalog = nodeById('catalog-flow');
+          if (!repo.simulated) {
+            catalog.status = 'done';
+            catalog.progress = 100;
+            catalog.run = 'closed · R-412';
+            catalog.acceptance = catalog.acceptance.map(function (item) {
+              return [true, item[1]];
+            });
+            catalog.logs.unshift([formatTime().slice(0, 5), 'Outcome accepted from governed Git update']);
+            ['analytics', 'calendar'].forEach(function (id) {
+              var node = nodeById(id);
+              node.status = 'ready';
+              node.run = 'unclaimed';
+              node.logs.unshift([formatTime().slice(0, 5), 'Dependency T-203 accepted; Ticket became READY']);
+            });
+            repo.evidence += 3;
+            repo.commit = '8a19e44';
+            repo.dirty = 'Clean';
+            repo.selected = 'analytics';
+            repo.simulated = true;
+            showToast('检测到 3 个 YAML 变更：T-204 与 T-205 已进入 READY frontier');
+          } else {
+            showToast('Demo 更新已经应用；切换仓库可以体验另一条状态变化');
+          }
+        } else if (!repo.simulated) {
+          var shell = nodeById('workbench-shell');
+          shell.status = 'done';
+          shell.progress = 100;
+          shell.run = 'closed · R-236';
+          shell.acceptance = shell.acceptance.map(function (item) {
+            return [true, item[1]];
+          });
+          shell.logs.unshift([formatTime().slice(0, 5), 'Outcome accepted from governed Git update']);
+
+          var deepLink = nodeById('deep-link');
+          deepLink.status = 'ready';
+          deepLink.run = 'unclaimed';
+          deepLink.logs.unshift([formatTime().slice(0, 5), 'Dependency T-104 accepted; Ticket became READY']);
+          repo.evidence += 4;
+          repo.commit = '19c42be';
+          repo.dirty = '1 file changed';
+          repo.selected = 'git-watch';
+          repo.simulated = true;
+          showToast('T-104 已完成；当前切换到仍在实现的 T-105，T-106 进入 READY frontier');
+        } else {
+          showToast('Demo 更新已经应用；切换仓库可以体验另一条状态变化');
+        }
+
+        document.getElementById('watchLabel').textContent = 'Validating updates';
+        window.setTimeout(function () {
+          renderAll();
+          document.getElementById('watchLabel').textContent = 'Watching .vibehub';
+        }, 420);
+      }
+
+      function copyText(text, successMessage) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            showToast(successMessage);
+          }).catch(function () {
+            showToast('浏览器未允许剪贴板；内容已在 Demo 中准备');
+          });
+        } else {
+          showToast('浏览器未允许剪贴板；内容已在 Demo 中准备');
+        }
+      }
+
+      document.querySelectorAll('[data-workspace-view]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          applyWorkspaceView(button.dataset.workspaceView, true);
+        });
+      });
+
+      document.querySelectorAll('[data-inbox-filter]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          activeInboxFilter = button.dataset.inboxFilter;
+          renderInbox();
+        });
+      });
+
+      document.getElementById('openInboxTicketButton').addEventListener('click', function () {
+        var item = inboxItemById(selectedInboxId);
+        if (!item || !repos[item.repo]) return;
+        activeRepoKey = item.repo;
+        renderAll();
+        applyWorkspaceView('tickets', false);
+        selectNode(item.ticket, true);
+        showToast('已定位到 ' + repos[item.repo].name + ' 的 exact Ticket；没有改变 Ticket 状态');
+      });
+
+      document.getElementById('copyInboxPromptButton').addEventListener('click', function () {
+        var item = inboxItemById(selectedInboxId);
+        if (!item || !repos[item.repo]) return;
+        var repo = repos[item.repo];
+        var node = repo.nodes.find(function (candidate) { return candidate.id === item.ticket; });
+        var ticketLabel = node ? node.key + ' (' + node.id + ')' : item.ticket;
+        var prompt;
+        if (item.kind === 'review') {
+          prompt = 'Use $vibehub-ticket-review to inspect Ticket ' + ticketLabel + ' in the exact repository at ' + repo.path + '. Focus on this review request: ' + item.reason + ' Do not modify or approve the Ticket.';
+        } else if (item.kind === 'decision') {
+          prompt = 'Inspect Ticket ' + ticketLabel + ' in the exact repository at ' + repo.path + ' and prepare a bounded decision brief for this question: ' + item.title + '. Do not continue implementation until the human decides.';
+        } else {
+          prompt = 'Inspect Ticket ' + ticketLabel + ' in the exact repository at ' + repo.path + ' and explain why this Inbox item exists: ' + item.reason;
+        }
+        copyText(prompt, '已复制包含 exact repo 与 Ticket 的处理指令');
+      });
+
+      document.getElementById('markInboxSeenButton').addEventListener('click', function () {
+        var item = inboxItemById(selectedInboxId);
+        if (!item || !item.unread) return;
+        item.unread = false;
+        renderInbox();
+        showToast('已标为看过；这不会批准 Review、记录 Decision 或改变 Ticket');
+      });
+
+      document.getElementById('simulateButton').addEventListener('click', simulateGitUpdate);
+
+      document.getElementById('refreshButton').addEventListener('click', function () {
+        var button = this;
+        button.disabled = true;
+        document.getElementById('watchLabel').textContent = 'Projecting snapshot';
+        window.setTimeout(function () {
+          updateRepositoryChrome();
+          document.getElementById('watchLabel').textContent = 'Watching .vibehub';
+          button.disabled = false;
+          showToast('已从当前 exact worktree 重新投影（模拟）');
+        }, 520);
+      });
+
+      document.getElementById('addRepoButton').addEventListener('click', function () {
+        showToast('正式版会在这里调用原生目录选择器；Demo 不读取本地文件');
+      });
+
+      mobileRepoSelect.addEventListener('change', function () {
+        switchRepo(this.value);
+      });
+
+      document.getElementById('zoomInButton').addEventListener('click', function () {
+        updateZoom(zoom + 0.1);
+      });
+
+      document.getElementById('zoomOutButton').addEventListener('click', function () {
+        updateZoom(zoom - 0.1);
+      });
+
+      document.getElementById('fitButton').addEventListener('click', function () {
+        var available = graphViewport.clientWidth - 28;
+        updateZoom(Math.min(1, available / 880));
+        graphViewport.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+      });
+
+      document.querySelectorAll('.inspector-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          selectedPanel = tab.dataset.panel;
+          document.querySelectorAll('.inspector-tab').forEach(function (item) {
+            var selected = item === tab;
+            item.setAttribute('aria-selected', String(selected));
+            item.tabIndex = selected ? 0 : -1;
+          });
+          document.querySelectorAll('.panel').forEach(function (panel) {
+            var selected = panel.id === 'panel-' + selectedPanel;
+            panel.classList.toggle('active', selected);
+            panel.hidden = !selected;
+          });
+        });
+      });
+
+      document.querySelectorAll('.view-tab').forEach(function (tab, index) {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.view-tab').forEach(function (item) {
+            item.setAttribute('aria-pressed', String(item === tab));
+          });
+          if (index === 1) {
+            var firstActive = activeNodes()[0];
+            if (firstActive) selectNode(firstActive.id, true);
+            showToast(firstActive ? '已聚焦正在实现的 Ticket；使用上方切换条可在 Active Runs 之间切换' : '当前没有正在实现的 Ticket');
+          } else if (index === 2) {
+            var firstReady = currentRepo().nodes.find(function (node) {
+              return node.status === 'ready';
+            });
+            if (firstReady) selectNode(firstReady.id, true);
+            showToast(firstReady ? '已聚焦 READY frontier；完整纵向因果图仍保持可见' : '当前 READY frontier 为空');
+          }
+        });
+      });
+
+      function wireRovingTablist(tablist) {
+        tablist.addEventListener('keydown', function (event) {
+          if (!event.target.matches('[role="tab"]')) return;
+          var tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+          var currentIndex = tabs.indexOf(event.target);
+          var nextIndex = currentIndex;
+          if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+          else if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+          else if (event.key === 'Home') nextIndex = 0;
+          else if (event.key === 'End') nextIndex = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          tabs[nextIndex].focus();
+          tabs[nextIndex].click();
+        });
+      }
+
+      document.querySelectorAll('.app-nav, .inspector-tabs').forEach(wireRovingTablist);
+
+      document.getElementById('copyPromptButton').addEventListener('click', function () {
+        var node = nodeById(currentRepo().selected);
+        var prompt;
+        if (node.status === 'active') {
+          prompt = 'Focus the existing active VibeHub Ticket Run for ' + node.key + ' (' + node.id + ') in the exact repository at ' + currentRepo().path + '. Do not claim a second Run.';
+        } else if (node.status === 'ready') {
+          prompt = 'Use $vibehub-ticket-run to execute READY Ticket ' + node.key + ' (' + node.id + ') in the exact repository at ' + currentRepo().path;
+        } else {
+          prompt = 'Inspect VibeHub Ticket ' + node.key + ' (' + node.id + ') in the exact repository at ' + currentRepo().path + ' and explain its current state.';
+        }
+        copyText(prompt, '已复制给 Agent 的精确 Ticket 指令');
+      });
+
+      document.getElementById('copyLinkButton').addEventListener('click', function () {
+        var node = nodeById(currentRepo().selected);
+        var link = 'vibehub://open?repo=' + encodeURIComponent(currentRepo().path) + '&ticket=' + encodeURIComponent(node.id) + '&view=' + selectedPanel;
+        copyText(link, '已复制 Workbench deep link');
+      });
+
+      graphViewport.addEventListener('keydown', function (event) {
+        var delta = 44;
+        if (event.key === 'ArrowRight') graphViewport.scrollLeft += delta;
+        if (event.key === 'ArrowLeft') graphViewport.scrollLeft -= delta;
+        if (event.key === 'ArrowDown') graphViewport.scrollTop += delta;
+        if (event.key === 'ArrowUp') graphViewport.scrollTop -= delta;
+      });
+
+      document.documentElement.dataset.theme = 'quiet';
+      renderAll();
+      applyWorkspaceView('tickets', false);
+    }());
+  </script>
+</body>
+</html>

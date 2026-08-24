@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "source-capture-is-bounded",
+    "inbox-skill-uses-derived-views"
+  ],
+  "evidence_id": "evidence-personal-hub-bounded-capture-views",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T17:10:40Z",
+  "refs": [
+    "private-repo-receipt:dual-host-capture:skills/vibehub-personal-capture/SKILL.md",
+    "private-repo-receipt:dual-host-capture:skills/vibehub-personal-inbox/SKILL.md",
+    "test:capture-input-rejects-transcript-shaped-fields",
+    "forward-test:fresh-agent-isolated-skill-local-capture-list-get",
+    "smoke:live-config-read-only-valid-zero-diagnostics"
+  ],
+  "schema_version": 1,
+  "summary": "The shared capture Skill authorizes only the current request and explicit references, rejects transcript-shaped proposal fields, and stores an excerpt only after preview or explicit authorization. The shared Inbox Skill reads canonical CLI JSON/text projections for Inbox, Active, Drafts, Ready, Project, Unassigned, Archive, and detail without a second index. A fresh Agent forward test used only the isolated request and Skill-local executables to create, list, and inspect one Sample Project Inbox Ticket with no path ambiguity or live-data access.",
+  "ticket_id": "ticket-personal-hub-dual-host-capture"
+}

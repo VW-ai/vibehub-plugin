@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "capture-skill-is-equivalent-across-hosts",
+    "capture-confirmation-is-deterministic",
+    "source-capture-is-bounded",
+    "inbox-skill-uses-derived-views",
+    "dual-host-artifacts-are-proven"
+  ],
+  "closed_at": "2026-08-20T17:15:22Z",
+  "evidence_ids": [
+    "evidence-personal-hub-bounded-capture-views",
+    "evidence-personal-hub-capture-confirmation",
+    "evidence-personal-hub-dual-host-artifacts"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria under private verification receipt dual-host-closeout. The authoritative checkout and a git clone --no-local checkout each passed npm run verify with formatting clean and 39/39 tests; Claude marketplace, Codex plugin, and both Skill validators passed. Separate isolated Claude and Codex artifacts contained the same capture and Inbox Skills plus Skill-local executable wrappers, created and queried the same normalized canonical Ticket, and returned exit 3 revision-conflict for a stale update without credentials or a Web service. An independent CLI smoke proved unambiguous Inbox capture requires no confirmation, unknown and ambiguous Projects, duplicate external keys, and Ready requests missing acceptance are non-confirmable, similar active titles and existing updates require preview, and changed input invalidates the exact SHA-256 confirmation with exit 3 preview-conflict. The shared capture Skill limits collection to the current request and explicit references; transcript/tool-output-shaped fields were rejected, an unapproved excerpt failed closed until exact preview confirmation, and an explicitly authorized excerpt stored successfully. Canonical JSON and text reads reproduced Inbox, Active, Ready, Unassigned, Archive, Project, and detail projections directly from one valid store with zero Diagnostics. Source inspection confirmed no host-specific writer, separate index, Web UI/service, provider credential, repository handoff, execution, Evidence, Outcome, or completion-state implementation was introduced.",
+  "ticket_id": "ticket-personal-hub-dual-host-capture",
+  "unresolved_acceptance_ids": []
+}

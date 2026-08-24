@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "manual-file-failures-are-honest",
+    "core-is-regression-proven"
+  ],
+  "evidence_id": "data-core-diagnostics-and-clean-clone-regression-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T16:45:00Z",
+  "refs": [
+    "private-repo-receipt:data-core-regression",
+    "test:npm-run-verify-27-of-27-authoritative-checkout",
+    "test:git-clone-no-local-npm-ci-and-verify-27-of-27",
+    "test:clean-clone-external-setup-and-validate-zero-diagnostics",
+    "test:user-configured-store-read-only-smoke-valid-zero-diagnostics",
+    "private-repo-file:test/data-core-lifecycle.test.mjs",
+    "private-repo-file:test/data-core-cli.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The committed Data Core passes npm run verify with 27/27 tests in both the authoritative checkout and a git clone --no-local checkout under private verification receipt data-core-regression; the clean clone also completed setup into an external temporary store and validated it with zero Diagnostics while leaving its checkout clean. Coverage includes accepted positive and negative schemas, contract provenance identity, lifecycle and projections, global ID/alias/external-key/reference invariants, malformed JSON-compatible YAML, unknown fields, filename/ID mismatch, duplicate IDs, valid manual hash drift, symlink containment, concurrent writers, interrupted writes, explicit stale-lock repair, and Unicode-scalar title limits. Ordering uses an explicit lexical comparator over schema-constrained ASCII IDs rather than platform locale behavior. The source repository is clean, has no remote, and therefore has no Linux CI claim; the macOS run is proven and the ordering implementation is platform-independent by construction. A read-only smoke test against the user's configured external store reported valid:true, zero Diagnostics, zero Projects, and zero Tickets.",
+  "ticket_id": "ticket-personal-hub-data-core"
+}

@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "personal-structural-schemas-are-strict",
+      "criterion": "Checked-in JSON Schemas encode every approved MVP record field and subobject shape, required and conditional fields, enums, identifier grammar, cardinality, timestamp formats, and strict unknown-field rejection."
+    },
+    {
+      "acceptance_id": "semantic-contracts-are-normative",
+      "criterion": "Checked-in versioned semantic-contract data defines immutable filename/ID identity, lifecycle transitions, ready invalidation fields, global external-key and Project-alias uniqueness, reference integrity, and exact Active, Inbox, Draft, Ready, Project, Unassigned, and Archive projection predicates separately from structural JSON Schema."
+    },
+    {
+      "acceptance_id": "config-and-store-authority-is-unambiguous",
+      "criterion": "The contracts distinguish one OS user-config pointer containing the absolute data root from one root-local format marker, define their version fields and override semantics, and contain no provider token, repository Context, or private Ticket content."
+    },
+    {
+      "acceptance_id": "fixtures-cover-valid-and-invalid-boundaries",
+      "criterion": "Synthetic or redacted fixtures include valid Project, Inbox, Draft, Ready, and Archived records plus invalid cases for duplicate identifiers, filename mismatch, missing ready acceptance, broken Project references, unknown fields, and globally duplicated external keys."
+    },
+    {
+      "acceptance_id": "contracts-are-mechanically-verified",
+      "criterion": "A dependency-light test command validates every positive structural and semantic fixture, rejects every negative fixture for the intended structural or semantic reason, scans fixture and contract bytes for private Private pilot content, and passes in the current repository verification flow."
+    }
+  ],
+  "constraints": [
+    "Do not create the vibehub-personal repository in this Ticket.",
+    "Do not define Web, handoff journal, executable VibeHub Ticket, Evidence, Outcome, Agent runtime, provider API, or multi-user contracts.",
+    "Do not copy private Private pilot Ticket text, absolute private source paths, credentials, or proprietary attachments into public repository fixtures.",
+    "Treat docs/designs/personal-ticket-hub.md as the approved semantic authority; surface any contradiction instead of silently inventing a second model."
+  ],
+  "context": "The approved Personal Hub architecture depends on one stable intake contract before a new repository or runtime exists. This Ticket turns the approved design into normative JSON Schemas and fixtures inside the current VibeHub repository so the later repository foundation can adopt them unchanged. It owns only Personal Project, Personal Ticket, config-pointer, and store-marker contracts; executable VibeHub handoff and Web contracts remain later boundaries.",
+  "context_refs": [
+    {
+      "purpose": "Approved field, lifecycle, projection, privacy, and staged-delivery authority.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Approved product and repository boundary.",
+      "ref": ".vibehub/rooms/product/decision-personal-ticket-hub-separate-application.yaml"
+    },
+    {
+      "purpose": "Existing strict-schema style and identifier grammar to reuse where semantics match.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The approved Personal Ticket Hub MVP has strict, implementation-ready Personal Project, Personal Ticket, user-config pointer, and data-store marker contracts with privacy-safe canonical fixtures.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-contract-and-fixtures"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "personal_ticket",
+  "personal_ticket_id": "pt-ready-without-acceptance",
+  "title": "Invalid ready Ticket",
+  "desired_outcome": "This fixture must fail because ready work needs acceptance.",
+  "state": "ready",
+  "project_refs": [],
+  "source_refs": [],
+  "acceptance": [],
+  "external_keys": [],
+  "external_delivery_refs": [],
+  "generation_host": "user",
+  "created_at": "2026-08-20T00:00:00Z",
+  "updated_at": "2026-08-20T00:00:00Z",
+  "revision": 1
+}

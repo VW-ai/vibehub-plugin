@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "sibling-repository-is-isolated",
+    "remote-state-is-honest"
+  ],
+  "evidence_id": "personal-hub-foundation-repository-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:29:07Z",
+  "refs": [
+    "private-repo-file:.git",
+    "private-repo-file:PRIVATE_DATA_POLICY.md",
+    "private-repo-file:DISTRIBUTION.md",
+    "private-repo-file:repository-state.json",
+    "private-repo-receipt:foundation-isolation",
+    "private-repo-receipt:foundation-policy",
+    "command:git remote -v"
+  ],
+  "schema_version": 1,
+  "summary": "A separate local Git repository exists in a private sibling checkout on main with a private repository commit. PRIVATE_DATA_POLICY.md, ignore rules, DISTRIBUTION.md, and repository-state.json keep personal data external, record licensing as undecided, public distribution as false, and network remote/CI execution as deferred. git remote -v is empty in the authoritative repo and no Plugin runtime file was changed for the foundation.",
+  "ticket_id": "ticket-personal-hub-repository-foundation"
+}

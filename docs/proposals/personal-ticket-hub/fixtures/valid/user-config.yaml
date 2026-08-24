@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "kind": "personal_hub_config",
+  "data_root": "/workspace/personal-ticket-data"
+}

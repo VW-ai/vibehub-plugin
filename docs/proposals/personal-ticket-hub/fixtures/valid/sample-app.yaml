@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "kind": "personal_project",
+  "project_id": "sample-app",
+  "name": "Sample App",
+  "aliases": ["sample", "demo workspace"],
+  "repo_path": "/workspace/sample-app",
+  "adapter": "vibehub",
+  "playbook_refs": [
+    {
+      "kind": "local_file",
+      "ref": "/workspace/sample-app/AGENTS.md",
+      "label": "Agent instructions"
+    }
+  ],
+  "created_at": "2026-08-20T00:00:00Z",
+  "updated_at": "2026-08-20T00:00:00Z",
+  "revision": 1
+}

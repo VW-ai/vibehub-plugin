@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "kind": "personal_ticket",
+  "personal_ticket_id": "pt-archived-old-idea",
+  "title": "Try the old navigation idea",
+  "state": "archived",
+  "project_refs": ["sample-app"],
+  "source_refs": [],
+  "acceptance": [],
+  "external_keys": [],
+  "external_delivery_refs": [],
+  "generation_host": "user",
+  "last_archive": {
+    "reason": "Superseded by the simpler synthetic flow.",
+    "archived_at": "2026-08-20T00:15:00Z",
+    "from_state": "inbox"
+  },
+  "created_at": "2026-08-20T00:00:00Z",
+  "updated_at": "2026-08-20T00:15:00Z",
+  "revision": 2
+}

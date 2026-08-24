@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "personal-structural-schemas-are-strict",
+    "semantic-contracts-are-normative",
+    "config-and-store-authority-is-unambiguous",
+    "fixtures-cover-valid-and-invalid-boundaries",
+    "contracts-are-mechanically-verified"
+  ],
+  "closed_at": "2026-08-20T08:22:17Z",
+  "evidence_ids": [
+    "personal-hub-contract-content-proof",
+    "personal-hub-contract-verification-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout confirmed that the checked-in strict structural schemas and separate versioned semantic contract match the approved Personal Hub MVP boundary; config and store authority are distinct; synthetic fixtures cover every required valid and invalid case; every semantic negative is structurally valid and fails for its intended invariant; the focused harness, canonical Ticket validation, full 107-test repository verification, artifact verification, privacy scan, and whitespace check all pass.",
+  "ticket_id": "ticket-personal-hub-contract-and-fixtures",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "capture-skill-is-equivalent-across-hosts",
+    "dual-host-artifacts-are-proven"
+  ],
+  "evidence_id": "evidence-personal-hub-dual-host-artifacts",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T17:10:40Z",
+  "refs": [
+    "private-repo-receipt:dual-host-artifact",
+    "test:npm-run-verify-39-of-39-authoritative-and-no-local-clone",
+    "test:isolated-claude-and-codex-artifacts-create-same-canonical-fixture",
+    "validation:skill-creator-quick-validate-both-skills",
+    "validation:plugin-creator-validate-plugin"
+  ],
+  "schema_version": 1,
+  "summary": "Private verification receipt dual-host-artifact packages one shared capture Skill, one shared Inbox Skill, Claude Code and Codex manifests, and Skill-local wrappers over the same vh-personal CLI. The authoritative checkout and a no-local clean clone each passed npm ci and 39/39 tests; both Skill validators and the plugin validator passed. Isolated Claude and Codex artifact smokes created and queried the same canonical fixture and preserved revision conflicts without credentials or a Web service.",
+  "ticket_id": "ticket-personal-hub-dual-host-capture"
+}

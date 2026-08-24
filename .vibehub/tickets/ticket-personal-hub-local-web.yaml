@@ -1,0 +1,42 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-web-after-mvp-dogfood",
+      "criterion": "After the dual-host MVP Outcome and concrete dogfood findings exist, this same Ticket is replanned to maturity firm with exact read-only routes, UI states, accessibility and responsive acceptance, authenticated capability lifecycle, dependency choice, and projection-parity tests before Web implementation starts."
+    }
+  ],
+  "constraints": [
+    "Do not execute while maturity remains draft.",
+    "Do not add browser write routes, Agent launch, execution state, causal repository graph semantics, cloud hosting, accounts, or a second cache/database authority.",
+    "Every read route must require a short-lived capability, strict Host and Origin validation, no permissive CORS, and DNS-rebinding coverage.",
+    "Filesystem watching may request a full validated rescan but never becomes correctness authority."
+  ],
+  "context": "Web is intentionally deferred until the CLI-and-dual-host MVP earns daily use and stabilizes its projection contract. The approved direction is a list/detail Personal Hub, not another execution graph, with every route authenticated and every view derived from validated rescans. Exact frontend dependency and visual-component choices must be refined from MVP dogfood before implementation begins.",
+  "context_refs": [
+    {
+      "purpose": "Approved Milestone 2 scope, trust boundary, and open visual implementation choice.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Existing VibeHub visual restraint and honest state standard to consider during refinement.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Stable Personal Hub CLI projections gain a quiet read-only local browser surface for Inbox, Projects, filters, and Ticket detail without creating a second data authority.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "Web is refined only after the CLI-and-dual-host MVP is accepted and dogfooded.",
+      "target_ticket_id": "ticket-personal-hub-dual-host-capture",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-local-web"
+}

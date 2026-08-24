@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "pilot-selection-covers-five-states",
+      "criterion": "The pilot records exactly one source item from each of INTAKE, GATED, OPEN, DEVELOPED-LOCAL, and MERGED-VERIFY, records the selected recognized IDs in a private-data-safe manifest, and does not authorize full import."
+    },
+    {
+      "acceptance_id": "import-is-dry-run-first-and-idempotent",
+      "criterion": "The Private pilot importer supports structured dry-run and explicit apply, uses source identity plus external key as its idempotency key, reports collisions without overwrite, resumes after interruption, and produces the same canonical records on safe retry."
+    },
+    {
+      "acceptance_id": "operational-meaning-is-preserved",
+      "criterion": "Each imported Personal Ticket preserves its recognized external ID, source references, desired outcome or intake text boundary, next gate, Project assignment, and non-authoritative delivery/status references without translating merge or production proof into Personal ready/archive state, Evidence, or Outcome."
+    },
+    {
+      "acceptance_id": "derived-views-match-pilot-expectations",
+      "criterion": "CLI projections place all five records in the expected Active, Inbox/Draft/Ready/Archive, Project, Unassigned, and external-key query views from their canonical files, with no separately maintained Markdown indexes."
+    },
+    {
+      "acceptance_id": "private-data-boundary-is-proven",
+      "criterion": "Application-source scans contain no private Private pilot prose, absolute private paths, credentials, or attachments; only redacted/synthetic fixtures and aggregate mapping evidence are checked in, while the real pilot remains in the configured private data root."
+    },
+    {
+      "acceptance_id": "bulk-migration-remains-a-new-decision",
+      "criterion": "The closeout reports mapping gaps and dogfood findings but does not modify or freeze the remaining Private pilot registry; importing all records requires a separately approved Ticket after pilot review."
+    }
+  ],
+  "constraints": [
+    "Do not copy the full Private pilot registry or proprietary source documents into vibehub-plugin or vibehub-personal.",
+    "Do not dual-write the old registry and Personal Hub indefinitely or declare either source retired in this pilot.",
+    "Do not infer production proof, PR delivery, ownership, or closure beyond the exact source record.",
+    "Do not require Web or repository handoff; this pilot depends only on the accepted data core."
+  ],
+  "context": "The existing Private pilot registry is evidence for durable Ticket capture across branches, worktrees, PRs, source channels, Agent tasks, and production gates. This pilot selects one INTAKE, GATED, OPEN, DEVELOPED-LOCAL, and MERGED-VERIFY record and maps each to the accepted Personal model without importing the remaining registry or collapsing delivery proof into Personal lifecycle. Private source content stays in the configured local data root; only synthetic/redacted fixtures and aggregate proof may enter application source.",
+  "context_refs": [
+    {
+      "purpose": "Approved five-record pilot, mapping, privacy, and no-bulk-import boundary.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Product authority for a personal data root and project-oriented capture layer.",
+      "ref": ".vibehub/rooms/product/decision-personal-ticket-hub-separate-application.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Five representative Private pilot registry records are losslessly and idempotently represented as privacy-safe Personal Tickets, proving the new data model and derived views before any full-registry migration decision.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "The pilot imports into the accepted canonical files and projections but does not depend on Web or handoff.",
+      "target_ticket_id": "ticket-personal-hub-data-core",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-private-pilot"
+}

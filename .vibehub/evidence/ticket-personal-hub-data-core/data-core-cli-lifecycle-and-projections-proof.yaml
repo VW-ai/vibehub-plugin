@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "project-and-ticket-cli-is-complete",
+    "state-and-projections-are-exact"
+  ],
+  "evidence_id": "data-core-cli-lifecycle-and-projections-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T16:45:00Z",
+  "refs": [
+    "private-repo-receipt:data-core-lifecycle-and-projections",
+    "private-repo-file:bin/vh-personal.mjs",
+    "private-repo-file:src/store.mjs",
+    "private-repo-file:docs/CLI.md",
+    "test:test/data-core-cli.test.mjs",
+    "test:test/data-core-lifecycle.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Private verification receipt data-core-lifecycle-and-projections completes the dependency-free vh-personal Project add/get/list/update/remove and Ticket capture/get/list/update/archive/reopen surfaces, validate, and explicit lock repair with one structured JSON stdout envelope and documented exit codes 0 through 7. New capture is intentionally restricted to ID, title, current source fields, and generation host and always enters Inbox; Project assignment and later lifecycle fields use guarded updates. Tests exercise every accepted positive lifecycle edge, rejected jumps, ready validation and all six readiness-invalidating fields; Project and external bookkeeping remain orthogonal. Active, Inbox, Drafts, Ready, Project, Unassigned, and Archive are deterministic projections over the same canonical Ticket files, and referenced Project removal is refused. Reopen retains last_archive and never restores Ready automatically.",
+  "ticket_id": "ticket-personal-hub-data-core"
+}

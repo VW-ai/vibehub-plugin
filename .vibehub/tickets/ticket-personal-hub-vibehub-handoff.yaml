@@ -1,0 +1,66 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "one-vibehub-contract-is-pinned",
+      "criterion": "The implementation pins one exact released VibeHub project format 2 and Ticket schema 2 contract bundle by tag and checksum, reads target .vibehub/version.yaml during preview, and returns an actionable compatibility error for missing or different formats without multi-version negotiation."
+    },
+    {
+      "acceptance_id": "handoff-journal-is-exact",
+      "criterion": "A strict journal schema stores immutable source Ticket revision/hash, Project and target repository identity, deterministic target ID/path, approved UTF-8 LF-only no-BOM compiled YAML bytes and SHA-256, idempotency key, actor, lifecycle, structured errors, revision, timestamps, and validation receipt."
+    },
+    {
+      "acceptance_id": "materialization-is-explicit-and-idempotent",
+      "criterion": "The host Skill shows the exact target checkout, path, and compiled payload, requires confirmation bound to handoff ID and payload hash, revalidates repository identity and symlink-safe path immediately before write, and never overwrites different existing content or creates a duplicate on retry."
+    },
+    {
+      "acceptance_id": "repository-validation-remains-authoritative",
+      "criterion": "Claude Code and Codex handoff Skills invoke the target repository's installed VibeHub Ticket Plan/Validate workflow, and materialized status requires a receipt matching target path and payload hash; the Personal CLI and Web never launch or impersonate the repository validator."
+    },
+    {
+      "acceptance_id": "partial-failure-is-reconcilable",
+      "criterion": "Previewed, failed, and materialized journal transitions plus reconcile handle target-write/personal-record split failure using the stable handoff ID and deterministic target path; reconcile requires a fresh host-supplied validation receipt and derives Handed-off projection from journals without a duplicated Ticket index."
+    },
+    {
+      "acceptance_id": "handoff-does-not-claim-execution",
+      "criterion": "Successful handoff records only target materialization and validation; it never marks the Personal Ticket or repository Ticket running, done, merged, production-proven, evidenced, or closed."
+    }
+  ],
+  "constraints": [
+    "Do not make handoff automatic, background, cross-project-atomic, or available through an arbitrary target path.",
+    "Do not add a daemon, Agent runtime, database, silent compatibility shim, or direct browser filesystem write API.",
+    "One handoff targets one registered repository; several handoffs remain separate journals without pretending to be cross-repository execution coordination.",
+    "Do not start repository execution as part of materialization."
+  ],
+  "context": "Repository handoff is a later bridge between personal intake and repository-local execution truth. The Personal CLI owns immutable preview snapshots and journals; the host Skill owns entering the target checkout and invoking its installed VibeHub Ticket Plan/Validate workflow. The flow must survive partial failure across the personal store and target repository without duplicate or silent overwrite.",
+  "context_refs": [
+    {
+      "purpose": "Approved Milestone 3 journal, snapshot, compatibility, and trust semantics.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Authority separating personal intake from repository-local execution truth.",
+      "ref": ".vibehub/rooms/product/decision-personal-ticket-hub-separate-application.yaml"
+    },
+    {
+      "purpose": "Current repository-local executable Ticket schema target.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A ready Personal Ticket can be explicitly and idempotently materialized by Claude Code or Codex into one registered compatible VibeHub repository with an exact preview, validation receipt, and recoverable handoff journal, without claiming execution.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "Handoff extends the accepted shared CLI and both host Skill packages after MVP capture works.",
+      "target_ticket_id": "ticket-personal-hub-dual-host-capture",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-vibehub-handoff"
+}

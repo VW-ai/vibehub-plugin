@@ -1,0 +1,58 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "capture-skill-is-equivalent-across-hosts",
+      "criterion": "Claude Code and Codex plugin packages expose semantically equivalent vibehub-personal-capture Skills that construct structured CLI input, never hand-edit YAML, and create the same canonical result for shared fixtures."
+    },
+    {
+      "acceptance_id": "capture-confirmation-is-deterministic",
+      "criterion": "Both Skills force preview for unknown or ambiguous Projects, duplicate external keys or similar active titles, ready requests missing acceptance, and updates to existing data; preview hashes bind confirmation to exact input, while unambiguous new Inbox capture remains one explicit action."
+    },
+    {
+      "acceptance_id": "source-capture-is-bounded",
+      "criterion": "Host integration captures only the current user request and explicit references, stores an excerpt only when previewed or explicitly requested, and does not harvest prior conversation turns, tool output, repository contents, or background transcripts."
+    },
+    {
+      "acceptance_id": "inbox-skill-uses-derived-views",
+      "criterion": "Both hosts expose equivalent Inbox and Project inspection Skills backed by CLI text/JSON projections, including Active, Unassigned, Ready, and Archive filters, without maintaining separate indexes."
+    },
+    {
+      "acceptance_id": "dual-host-artifacts-are-proven",
+      "criterion": "Contract tests and isolated install or artifact smokes prove both plugin manifests contain the required Skills and executable entry, clean temporary data roots support capture/list/get, conflict/error envelopes are preserved, and no provider credential or Web service is required."
+    }
+  ],
+  "constraints": [
+    "Do not add Web UI, in-app Agent launch, repository handoff, automatic execution, Evidence, Outcome, or completion state.",
+    "Do not create separate Claude and Codex data semantics or host-specific YAML writers.",
+    "Do not require users to know internal schema fields for ordinary capture; previews remain inspectable.",
+    "Keep non-interactive mode fail-closed whenever confirmation is required."
+  ],
+  "context": "The first usable product boundary is Agent-assisted capture and retrieval, not Web or execution. Both hosts package the same semantic Skills and invoke one deterministic CLI. A Skill captures only the current request and explicit source references, previews ambiguous or mutating operations, and never turns generated prose into execution or completion claims.",
+  "context_refs": [
+    {
+      "purpose": "Approved MVP boundary, confirmation triggers, source policy, and dual-host contract.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Authority that Claude and Codex are replaceable producers/executors around stable Tickets.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Claude Code and Codex provide equivalent Personal Ticket capture and Inbox/Project inspection through the same vh-personal CLI, making the local Personal Hub MVP usable without provider APIs or hand-edited YAML.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "Both host packages must call the single accepted CLI and data authority.",
+      "target_ticket_id": "ticket-personal-hub-data-core",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-dual-host-capture"
+}

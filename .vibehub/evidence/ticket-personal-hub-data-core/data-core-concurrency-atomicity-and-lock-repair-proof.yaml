@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "cross-record-writes-are-lossless",
+    "lock-repair-is-safe"
+  ],
+  "evidence_id": "data-core-concurrency-atomicity-and-lock-repair-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T16:45:00Z",
+  "refs": [
+    "private-repo-receipt:data-core-atomicity",
+    "private-repo-file:src/store.mjs",
+    "test:two-real-cli-writers-one-success-one-conflict",
+    "test:stale-content-hash-and-interrupted-before-rename-preserve-current-bytes",
+    "test:active-aged-lock-refused-and-verified-absent-owner-explicitly-repaired"
+  ],
+  "schema_version": 1,
+  "summary": "Private verification receipt data-core-atomicity serializes supported mutations with one data-root directory lock, rescans the complete store after acquiring it, validates cross-record invariants, and requires matching revision plus raw-file SHA-256 for updates, removals, archives, and reopens. Record writes use exclusive temporary siblings, fsync, atomic rename, parent-directory fsync, and cleanup on an injected pre-rename interruption. Two real concurrent CLI processes using one prior snapshot deterministically produce one success and one exit-3 conflict with a valid final store. Lock metadata records schema, host, PID, ps process-start identity when available, a random token, operation, and creation time. Explicit repair requires confirm:true and the exact token, refuses active or unverifiable owners regardless of lock age, and removes only a single verified stale owner record.",
+  "ticket_id": "ticket-personal-hub-data-core"
+}

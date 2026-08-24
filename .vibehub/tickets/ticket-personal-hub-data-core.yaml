@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "project-and-ticket-cli-is-complete",
+      "criterion": "The vh-personal CLI implements the approved MVP project add/get/list/update/remove and ticket capture/get/list/update/archive/reopen commands plus validate and explicit lock repair, using structured JSON input/output and the documented stable exit codes."
+    },
+    {
+      "acceptance_id": "state-and-projections-are-exact",
+      "criterion": "Lifecycle transitions, ready invalidation, and Active, Inbox, Draft, Ready, Project, Unassigned, and Archive projections match the accepted contracts from the same canonical Ticket files, including refusal to remove referenced Projects."
+    },
+    {
+      "acceptance_id": "cross-record-writes-are-lossless",
+      "criterion": "Every mutation holds one data-root interprocess write lock, rescans cross-record invariants, rechecks expected revision and content hash, writes and fsyncs temporary siblings, atomically renames them, and deterministically rejects concurrent stale updates without data loss."
+    },
+    {
+      "acceptance_id": "lock-repair-is-safe",
+      "criterion": "Lock metadata records host, PID, process-start identity when available, random owner token, and operation; repair never breaks a lock by age alone and requires verified owner-process absence plus an explicit action."
+    },
+    {
+      "acceptance_id": "manual-file-failures-are-honest",
+      "criterion": "Startup and reads rescan and validate canonical files, report malformed, duplicate, filename-mismatched, or reference-invalid records through Diagnostics, and never silently repair or overwrite invalid manual edits."
+    },
+    {
+      "acceptance_id": "core-is-regression-proven",
+      "criterion": "Tests cover positive and negative schemas, every state edge, global alias/external-key/ID invariants, concurrent writers, stale revision and hash conflicts, interrupted writes, stale-lock repair, path containment, malformed manual edits, and deterministic query ordering on macOS and Linux CI where available."
+    }
+  ],
+  "constraints": [
+    "Do not add SQLite, a daemon, cloud sync, accounts, provider API keys, transcript harvesting, implicit repository scans, or background Agent calls.",
+    "Do not implement Web routes, executable VibeHub handoff, or Private pilot-specific import in this Ticket.",
+    "Do not optimize to per-record locks before real write-throughput evidence justifies weakening the simpler data-root lock.",
+    "Plain files are inspectable and offline-editable, but supported concurrent mutations go through the CLI."
+  ],
+  "context": "MVP correctness lives in one local mutation and query contract shared by all future surfaces. The core reads strict one-record-per-file YAML, validates global invariants, serializes all mutations under one data-root interprocess lock, and emits stable JSON envelopes. It provides no Web server, Agent runtime, repository handoff, or Private pilot-specific importer.",
+  "context_refs": [
+    {
+      "purpose": "Approved CLI, state, concurrency, Diagnostics, and trust contract.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "purpose": "Authority that Project is a view and routing reference rather than mandatory Ticket parent.",
+      "ref": ".vibehub/rooms/product/decision-ticket-project-independent.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Personal Ticket Hub has a deterministic local CLI and plain-file data core that safely manages Projects and Personal Tickets, derives exact views, and prevents lost updates across Claude, Codex, user, and import writers.",
+  "provenance_refs": [
+    "conversation:2026-08-20-personal-ticket-hub-architecture-approval",
+    "design:docs/designs/personal-ticket-hub.md"
+  ],
+  "relations": [
+    {
+      "rationale": "The data core is implemented only in the accepted isolated repository and configuration boundary.",
+      "target_ticket_id": "ticket-personal-hub-repository-foundation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-personal-hub-data-core"
+}

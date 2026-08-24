@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "project-and-ticket-cli-is-complete",
+    "state-and-projections-are-exact",
+    "cross-record-writes-are-lossless",
+    "lock-repair-is-safe",
+    "manual-file-failures-are-honest",
+    "core-is-regression-proven"
+  ],
+  "closed_at": "2026-08-20T16:53:11Z",
+  "evidence_ids": [
+    "data-core-cli-lifecycle-and-projections-proof",
+    "data-core-concurrency-atomicity-and-lock-repair-proof",
+    "data-core-diagnostics-and-clean-clone-regression-proof",
+    "data-core-closeout-boundary-repair-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Second independent closeout under private verification receipt data-core-closeout accepted all six criteria. The complete structured CLI, exact lifecycle/projections, revision-and-hash guarded atomic writes, and explicit process-identity lock repair remain proven by source inspection and the original acceptance-linked Evidence. The two former blockers were independently reproduced after the corrective commit: a mode-000 canonical tickets directory returned a structured path-unavailable envelope with exit 5, while a nested tickets/nested/*.yaml duplicate produced noncanonical-record-directory, noncanonical-record-path, and duplicate-record-id Diagnostics, made validate return valid:false with exit 2, and remained outside canonical query results. The clean authoritative checkout and a git clone --no-local checkout both passed npm run verify with 29/29 tests during the adjudicated private closeout, and the authoritative implementation worktree remained clean.",
+  "ticket_id": "ticket-personal-hub-data-core",
+  "unresolved_acceptance_ids": []
+}

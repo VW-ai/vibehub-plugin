@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "configuration-boundary-is-proven"
+  ],
+  "evidence_id": "personal-hub-foundation-configuration-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:29:07Z",
+  "refs": [
+    "private-repo-file:src/config.mjs",
+    "private-repo-file:bin/vh-personal.mjs",
+    "private-repo-file:test/config.test.mjs",
+    "command:node bin/vh-personal.mjs setup --data-root /private/tmp/vh-personal-clean.FQ2RFC/personal-data --config /private/tmp/vh-personal-clean.FQ2RFC/config/config.yaml",
+    "command:node bin/vh-personal.mjs diagnose --config /private/tmp/vh-personal-clean.FQ2RFC/config/config.yaml",
+    "command:git status --short"
+  ],
+  "schema_version": 1,
+  "summary": "The dependency-free setup command requires an absolute explicit external data root, writes exactly one OS config pointer plus a root-local version marker, and rejects application-local data, relative config paths, missing roots, malformed markers, and config conflicts with stable codes. A clean-clone setup/diagnose smoke test created only the named temporary external store with projects, tickets, and store.yaml; the application checkout remained clean.",
+  "ticket_id": "ticket-personal-hub-repository-foundation"
+}

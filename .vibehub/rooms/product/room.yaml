@@ -10,6 +10,10 @@
         "path": "README.md"
       },
       {
+        "blob": "e91ec2bb1d7a5b223dbb94f28d763db175734530",
+        "path": "docs/CODEBASE_GUIDE.zh-CN.md"
+      },
+      {
         "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
         "path": "docs/CONCEPT.md"
       },
@@ -20,6 +24,10 @@
       {
         "blob": "e813eebb932d23a0a7e23c9cb9296b8c2744d80f",
         "path": "docs/GITHUB_ISSUES.md"
+      },
+      {
+        "blob": "ec596531347d7aa6b3f198e7c6d63a2c9bf8ac50",
+        "path": "docs/GOAL_UI_VARIANTS.zh-CN.md"
       },
       {
         "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
@@ -62,12 +70,28 @@
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
+        "blob": "d294e1b4f6d2ea92def93456c8536394c8da84b2",
+        "path": "docs/PERSONAL_TICKET_HUB_DESIGN_NOTES.zh-CN.md"
+      },
+      {
+        "blob": "5b13cea46d196a647cca29d9c955ac444844047c",
+        "path": "docs/PERSONAL_TICKET_HUB_SOLUTION.zh-CN.md"
+      },
+      {
         "blob": "bba25862b59850c49e883185e4aaee76b3ec692d",
         "path": "docs/RELEASE.md"
       },
       {
         "blob": "b5d11fecb58d9e15c672264523a6e4cdda0bb0e0",
         "path": "docs/SPEED_FIRST_CLEANUP.md"
+      },
+      {
+        "blob": "1a4a2fabb55ebf2505e99368cd14a5503d7512be",
+        "path": "docs/TICKET_FIRST_RUNTIME_DRIFT.zh-CN.md"
+      },
+      {
+        "blob": "a1cd51ff0d25c78e872f72a1f3baf838e3f16394",
+        "path": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
       },
       {
         "blob": "579612a343167c8240b7e690e5ce2eb462cba429",
@@ -108,6 +132,22 @@
       {
         "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
         "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
+      },
+      {
+        "blob": "a9d801279b9c3d9ddfc07ab08da39fbb62ee7384",
+        "path": "docs/demos/personal-ticket-branch-workbench.html"
+      },
+      {
+        "blob": "94f34b4043e7f79c67a9d6a3dba22768df197d6f",
+        "path": "docs/demos/personal-ticket-goal-directions.html"
+      },
+      {
+        "blob": "8f7de5115f44025772a76dc478ef3a164cb10d7f",
+        "path": "docs/demos/vibehub-workbench-webview.html"
+      },
+      {
+        "blob": "df365d7f2986684fa68c756704c569c6697f90b8",
+        "path": "docs/designs/personal-ticket-hub.md"
       },
       {
         "blob": "85fafdaebc2668fb4e4f456d23b715c3bf858633",
@@ -166,6 +206,106 @@
         "path": "docs/proposals/npx-first-install-experience.md"
       },
       {
+        "blob": "286f2ef7d08c46ab78d3b7978662704a7cc7408d",
+        "path": "docs/proposals/personal-ticket-hub/README.md"
+      },
+      {
+        "blob": "bb87a4d2ca8e3fedf0dc759c751f561cbee5a4e9",
+        "path": "docs/proposals/personal-ticket-hub/contracts/personal-hub-config.schema.json"
+      },
+      {
+        "blob": "a039c8caee3e2b86e0a7a289ae5c68ddfcbab43f",
+        "path": "docs/proposals/personal-ticket-hub/contracts/personal-project.schema.json"
+      },
+      {
+        "blob": "8a86803a523b14d17562f1b6fcc8a9cdb109ef78",
+        "path": "docs/proposals/personal-ticket-hub/contracts/personal-ticket-store.schema.json"
+      },
+      {
+        "blob": "7093a3e6f0cb2e5060589328d0ac61ccfaa20290",
+        "path": "docs/proposals/personal-ticket-hub/contracts/personal-ticket.schema.json"
+      },
+      {
+        "blob": "fb043226ebac906844f34ad2793a984e3897907c",
+        "path": "docs/proposals/personal-ticket-hub/contracts/semantic-contract.json"
+      },
+      {
+        "blob": "ff8c88fd8addd6a9f739a521bc4f390bdb6ef7be",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/invalid/pt-ready-without-acceptance.yaml"
+      },
+      {
+        "blob": "975966c5375147f5208692f57aae824ca1d7a1b3",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/invalid/pt-unknown-field.yaml"
+      },
+      {
+        "blob": "21c93e771f7187430e9a8af547702541aa411915",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/invalid/wrong-name.yaml"
+      },
+      {
+        "blob": "ad0a716997b4644bfebb7c45e08efaf0f769a2ec",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/manifest.json"
+      },
+      {
+        "blob": "d2c3101e71e0f00508f1ab2708e22032006c54f9",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/broken-project/pt-broken-project.yaml"
+      },
+      {
+        "blob": "67b1fa994ff8b59517059495481c0beb7bc2fa65",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-alias/project-one.yaml"
+      },
+      {
+        "blob": "6d037cebb8ae9e6104af30fdedb897d3beb23f8b",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-alias/project-two.yaml"
+      },
+      {
+        "blob": "86db8b107a30c4b6f7a2b821998dee6843db8218",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-external-key/pt-key-one.yaml"
+      },
+      {
+        "blob": "bad27d789e4f6bf38fd161f6c79f4ae5d1e7a080",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-external-key/pt-key-two.yaml"
+      },
+      {
+        "blob": "2c3f9d7f3bbe83ae3d42fc486029c9bd248cd1b5",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-id/a/pt-duplicate.yaml"
+      },
+      {
+        "blob": "67f90cd7be1172e28a3b0c7b0c02fed457145a05",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/sets/duplicate-id/b/pt-duplicate.yaml"
+      },
+      {
+        "blob": "f36d6ce25e9346ba42821b4a7c7550ee700f1203",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/pt-archived-old-idea.yaml"
+      },
+      {
+        "blob": "a5a9ae8584ed750f996edc1ef349ba1ae257bd47",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/pt-draft-export.yaml"
+      },
+      {
+        "blob": "009a0b26a32fa011a713108ef452087cbd4092da",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/pt-inbox-request.yaml"
+      },
+      {
+        "blob": "73acce5414c15733d896f8e2721de1ffb7de1fa1",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/pt-ready-contract.yaml"
+      },
+      {
+        "blob": "a886ce53f1aff6e93413910ea2303a6d67edbc96",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/sample-app.yaml"
+      },
+      {
+        "blob": "d8551e1d80209db37291dd19c856d5dd64000855",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/store.yaml"
+      },
+      {
+        "blob": "da4ef9fcf8b29a5cb6588284365320d8e3d52ea3",
+        "path": "docs/proposals/personal-ticket-hub/fixtures/valid/user-config.yaml"
+      },
+      {
+        "blob": "fe51eef66b3301b84288ccd8b9200451ff6809cf",
+        "path": "docs/proposals/personal-ticket-hub/scripts/contract-validator.mjs"
+      },
+      {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
@@ -186,8 +326,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T21:29:34.508Z",
-    "last_aligned_commit": "a584cdf34d7643067d5b8d5bad6e50e9958e6e1d"
+    "checked_at": "2026-08-24T17:52:46.426Z",
+    "last_aligned_commit": "27f72a54d47d4e32004d7e048a63f368d2f912c3"
   },
   "anchors": [
     "CHANGELOG.md",

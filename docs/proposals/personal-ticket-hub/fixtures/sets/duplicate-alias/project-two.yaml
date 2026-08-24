@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "personal_project",
+  "project_id": "project-two",
+  "name": "Project Two",
+  "aliases": ["shared alias"],
+  "adapter": "none",
+  "playbook_refs": [],
+  "created_at": "2026-08-20T00:00:00Z",
+  "updated_at": "2026-08-20T00:00:00Z",
+  "revision": 1
+}

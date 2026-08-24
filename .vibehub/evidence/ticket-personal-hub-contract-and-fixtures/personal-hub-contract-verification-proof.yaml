@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "contracts-are-mechanically-verified"
+  ],
+  "evidence_id": "personal-hub-contract-verification-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:19:42Z",
+  "refs": [
+    "docs/proposals/personal-ticket-hub/scripts/contract-validator.mjs",
+    "test/personal-ticket-hub-contract.test.mjs",
+    "command:node docs/proposals/personal-ticket-hub/scripts/contract-validator.mjs",
+    "command:node --test test/personal-ticket-hub-contract.test.mjs",
+    "command:npm run verify",
+    "command:git diff --check"
+  ],
+  "schema_version": 1,
+  "summary": "The dependency-free validator reports ok with no failures; the focused Node test passes five contract, semantic, authority, fixture, and private-content checks; the complete repository verification passes 107 tests and artifact verification with 55 files and 570919 bytes; git diff --check passes.",
+  "ticket_id": "ticket-personal-hub-contract-and-fixtures"
+}

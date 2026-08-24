@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "personal_ticket_semantics",
+  "record_files": {
+    "project_directory": "projects",
+    "project_id_field": "project_id",
+    "ticket_directory": "tickets",
+    "ticket_id_field": "personal_ticket_id",
+    "filename_template": "<immutable-id>.yaml",
+    "duplicate_ids": "error",
+    "basename_id_mismatch": "error"
+  },
+  "configuration": {
+    "pointer_override_environment_variable": "VIBEHUB_PERSONAL_CONFIG",
+    "pointer_kind": "personal_hub_config",
+    "pointer_owns": ["data_root"],
+    "store_marker_filename": "store.yaml",
+    "store_marker_kind": "personal_ticket_store",
+    "provider_secrets_allowed": false,
+    "project_context_allowed": false
+  },
+  "lifecycle": {
+    "states": ["inbox", "draft", "ready", "archived"],
+    "transitions": [
+      { "from": "new", "to": "inbox" },
+      { "from": "inbox", "to": "draft", "requires": ["desired_outcome"] },
+      { "from": "draft", "to": "ready", "requires": ["desired_outcome", "acceptance_non_empty"] },
+      { "from": "ready", "to": "draft", "when": "readiness_affecting_field_changes" },
+      { "from": "inbox", "to": "archived", "requires": ["last_archive"] },
+      { "from": "draft", "to": "archived", "requires": ["last_archive"] },
+      { "from": "ready", "to": "archived", "requires": ["last_archive"] },
+      { "from": "archived", "to": "inbox", "when": "desired_outcome_absent" },
+      { "from": "archived", "to": "draft", "when": "desired_outcome_present" }
+    ],
+    "reopen_never_restores": "ready",
+    "readiness_affecting_fields": [
+      "title",
+      "desired_outcome",
+      "source_refs",
+      "source_excerpt",
+      "acceptance",
+      "next_gate"
+    ],
+    "project_assignment_changes_state": false,
+    "external_bookkeeping_changes_state": false
+  },
+  "global_invariants": {
+    "project_alias_case_insensitive_unique": true,
+    "external_key_pair_unique_across_all_tickets": true,
+    "project_refs_must_resolve": true
+  },
+  "projections": {
+    "active": { "state_in": ["inbox", "draft", "ready"] },
+    "inbox": { "state_equals": "inbox" },
+    "drafts": { "state_equals": "draft" },
+    "ready": { "state_equals": "ready" },
+    "project": { "project_refs_contains": "<selected-project-id>" },
+    "unassigned": { "project_refs_length": 0 },
+    "archive": { "state_equals": "archived" }
+  },
+  "source_policy": {
+    "default_scope": "current_user_request_and_explicit_references",
+    "source_excerpt_requires_preview_or_explicit_request": true,
+    "prior_transcript_harvest": false,
+    "tool_output_harvest": false,
+    "implicit_repository_scan": false
+  }
+}

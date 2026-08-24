@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/personal-project.v1.json",
+  "title": "VibeHub Personal Project Reference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "project_id",
+    "name",
+    "aliases",
+    "adapter",
+    "playbook_refs",
+    "created_at",
+    "updated_at",
+    "revision"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "personal_project" },
+    "project_id": { "$ref": "#/$defs/id" },
+    "name": { "$ref": "#/$defs/text" },
+    "aliases": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "repo_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^/"
+    },
+    "adapter": {
+      "type": "string",
+      "enum": ["vibehub", "none"]
+    },
+    "playbook_refs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reference" }
+    },
+    "created_at": { "$ref": "#/$defs/date_time" },
+    "updated_at": { "$ref": "#/$defs/date_time" },
+    "revision": { "type": "integer", "minimum": 1 }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["local_file", "url", "host_task", "git_commit"]
+        },
+        "ref": { "$ref": "#/$defs/text" },
+        "label": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

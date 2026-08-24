@@ -1,0 +1,51 @@
+{
+  "context_id": "decision-personal-ticket-hub-separate-application",
+  "detail": "VibeHub Personal Ticket Hub is approved as a separate sibling application repository within the same VibeHub product and Ticket language. The existing vibehub-plugin remains the repository-local protocol, Skills, execution, Evidence, Outcome, and Workbench surface. The new private vibehub-personal repository owns personal cross-project capture, Inbox and Project projections, and Claude Code/Codex capture Skills over a deterministic local CLI. Personal data lives outside application source in a configurable private data root. MVP ends when the schemas, data core, derived views, and equivalent Claude Code/Codex capture paths work; a local Web view, explicit repository handoff, and the five-record Private pilot remain later dependent milestones. Project is an optional view and routing reference rather than a mandatory Ticket parent, and Personal Ticket state never claims repository execution, merge, production proof, Evidence, or Outcome.",
+  "evidence": [
+    {
+      "note": "The approved design records the repository boundary, Personal Ticket and Project contracts, MVP scope, later handoff boundary, trust model, and causal implementation graph after three independent review rounds.",
+      "ref": "docs/designs/personal-ticket-hub.md"
+    },
+    {
+      "note": "The owner explicitly selected the separate Personal Hub approach and then authorized the approved plan to start.",
+      "ref": "conversation:2026-08-20-personal-ticket-hub-architecture-approval"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-project-playbook-context-guides-tickets",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-plugin-wedge-solo-small-team-coordination",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T07:48:35Z",
+    "quote": "B. 同产品、独立 Personal Ticket Hub（推荐）……开始",
+    "ref": "conversation:2026-08-20-personal-ticket-hub-architecture-approval"
+  },
+  "state": "active",
+  "summary": "Personal Ticket Hub is a separate sibling application in the VibeHub product, with a CLI-and-dual-host-capture MVP and later Web, repository handoff, and Private pilot milestones",
+  "tags": [
+    "claude-code",
+    "codex",
+    "cross-project",
+    "personal-tickets",
+    "product-boundary",
+    "projects",
+    "repository-boundary"
+  ],
+  "type": "decision"
+}
