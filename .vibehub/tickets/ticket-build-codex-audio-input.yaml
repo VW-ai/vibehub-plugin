@@ -1,17 +1,44 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-audio-input-after-adapter-and-composer",
-      "criterion": "Placeholder: after both prerequisites succeed, replan this Ticket to firm with microphone permission, record interaction, audio handling, cancel and retry, accessible states, ordinary audio/localAudio Turn submission, privacy, retention, unsupported fallback, optional realtime feature flag and regression acceptance."
+      "acceptance_id": "audio-capability-gates-the-microphone",
+      "criterion": "The Composer microphone is enabled only when the bootstrap runtime reports audioInput true from the harness capability contract and navigator.mediaDevices.getUserMedia exists; otherwise it renders a visibly disabled control whose explanation matches the capability fallback text without claiming a working microphone; the DSH carrier's audio declaration stays unsupported and untouched."
+    },
+    {
+      "acceptance_id": "recording-state-timer-and-accessibility",
+      "criterion": "Starting a recording shows a persistent recording state with a live elapsed timer counting toward the 90 second cap, pulses the voice control, swaps its accessible name to Stop recording, and announces start and every auto-stop cause, cap or size bound, through the polite live-region composer note; the guard keyboard audit stays at zero gaps and the new states meet the existing contrast floors in both themes."
+    },
+    {
+      "acceptance_id": "cancel-discards-and-retry-works",
+      "criterion": "A distinct Cancel control and Escape end recording without attaching: MediaStream tracks stop, buffered chunks are discarded and no chip appears, while plain Stop attaches a removable chip; recording again immediately after a cancel, a removal or a denied prompt succeeds, proven by node tests and guard checks."
+    },
+    {
+      "acceptance_id": "permission-denial-is-truthful-and-recoverable",
+      "criterion": "A getUserMedia rejection produces a persistent inline state naming the cause rather than only a transient toast, the control returns to idle, retry re-prompts, and recording UI never renders without an active MediaStream."
+    },
+    {
+      "acceptance_id": "ordinary-audio-turn-submission-proven-live",
+      "criterion": "Send transmits the recording as the stable audio data URL UserInput inside one ordinary turn/start through the existing startTurn or queueTurn path, host input validation and harness sendChatAudio with no second Agent loop; the sent message renders its audio chip; and packages/codex-adapter/probe-live.mjs gains one ephemeral read-only Turn carrying an audio data URL whose mime equals the exact MediaRecorder mimeType the shell produces that reaches turn/completed with status completed, with the accepted mime types recorded in the lock's audio block."
+    },
+    {
+      "acceptance_id": "no-recording-persistence-by-default",
+      "criterion": "Recording bytes never persist: no object or blob URLs, no storage APIs with the existing static regex extended over the recording code, audio bytes stay elided from the host event feed, attachments clear after send, MediaStream tracks stop on every exit path, namely plain stop, cancel, Escape, the 90 second cap, the size bound, permission denial, send, chip removal and view teardown, and no recording is written into any .vibehub document."
+    },
+    {
+      "acceptance_id": "realtime-stays-hidden-behind-capability-truth",
+      "criterion": "runtime realtimeConversation stays false and no realtime, transcript or listening UI exists while the lock's audio probe result reads protocol-present-current-ephemeral-thread-unsupported; any future reveal requires a rerun probe reporting the experimental realtime seam supported; the schema probe's audio input checks and the audio-input-removed stop condition stay green, and the existing exposes-ordinary-audio-honestly host test is extended to assert the timer, cancel, permission state and the absence of any transcription claim."
     }
   ],
   "constraints": [
     "Do not claim microphone, transcript, listening or realtime output without current trusted capability and active state.",
     "Do not make experimental realtime a prerequisite for ordinary audio input.",
     "Do not persist recordings by default or copy them into Context.",
-    "Do not route audio through a second Agent loop."
+    "Do not route audio through a second Agent loop.",
+    "Voice input is audio attachment; the shell performs no transcription and mimics no dictation flow.",
+    "The live probe spends at most one ephemeral read-only Turn and deletes what it creates.",
+    "Final visual identity remains owned by the visual-system Ticket."
   ],
-  "context": "Voice input is part of the required Codex parity floor. Keep stable audio/localAudio Turn input and experimental realtime as separate acceptance boundaries after the adapter and production Composer exist. DSH audio integration is a later compatibility concern.",
+  "context": "Both prerequisites hold successful Outcomes. The pinned 0.149.0 protocol carries ordinary audio and localAudio Turn inputs with no format constraint and no transcription notification: an ordinary audio input reaches the model as an input_audio content part, while transcript events exist only on the experimental realtime sideband whose live probe still reports protocol-present-current-ephemeral-thread-unsupported. Codex desktop's voice affordance is dictation into text, which would require a transcription loop this product forbids, so the shell's voice input is honest audio attachment: record, review as a removable chip, send as the stable audio data URL input inside one ordinary Turn. The prototype microphone survived into the production Composer with getUserMedia, MediaRecorder, a 90 second cap and an 8 MiB bound, but has no visible timer, no true cancel, and only a transient toast on permission denial. One seam is unverified: whether the backend accepts MediaRecorder mime types through the audio data URL, settled by one ephemeral live probe recorded in the lock. DSH audio stays unsupported and realtime stays hidden behind the capability truth.",
   "context_refs": [
     {
       "purpose": "Codex-first product and privacy boundary.",
@@ -20,14 +47,47 @@
     {
       "purpose": "Voice is part of the ordinary parity floor.",
       "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Pinned audio inputs, experimental realtime seams, probe result and the audio-input-removed stop condition.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "Proven audio and realtime capability boundary.",
+      "ref": ".vibehub/evidence/ticket-spike-codex-app-server-dsh-adapter/codex-audio-and-realtime-capability-proof.yaml"
+    },
+    {
+      "purpose": "Living audio capability declarations for both carriers.",
+      "ref": "docs/proposals/harness-neutral-core/capabilities.v1.json"
+    },
+    {
+      "purpose": "Existing recording implementation to harden: toggleRecording, caps, attachment flow.",
+      "ref": "apps/codex-first-shell/app.js"
+    },
+    {
+      "purpose": "Host validation and event-feed audio elision the submission path reuses.",
+      "ref": "scripts/vh-codex-first-shell.mjs"
+    },
+    {
+      "purpose": "Live probe gaining the one ephemeral audio Turn.",
+      "ref": "packages/codex-adapter/probe-live.mjs"
+    },
+    {
+      "purpose": "Major-not-niche rule governing which voice affordances ship.",
+      "ref": ".vibehub/rooms/product/decision-codex-daily-use-parity-major-features-not-niche.yaml"
+    },
+    {
+      "purpose": "No second Agent loop for one user action; ordinary audio Turn input as the baseline.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The Codex-backed Composer exposes trustworthy microphone and audio input with clear recording, cancel, permission, submission and capability states, while experimental realtime remains optional.",
+  "maturity": "firm",
+  "outcome": "The production Composer records voice honestly: capability-gated microphone, visible recording state with a timer, true cancel, truthful permission states, submission as one ordinary audio Turn input proven live against the pinned runtime, no recording persistence, and no transcription or realtime claim while the capability is unsupported.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-requires-codex-voice-input"
+    "conversation:2026-08-20-owner-requires-codex-voice-input",
+    "conversation:2026-08-23-owner-starts-audio-and-proof-binding"
   ],
   "relations": [
     {

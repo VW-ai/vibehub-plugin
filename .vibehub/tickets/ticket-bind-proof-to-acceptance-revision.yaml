@@ -1,18 +1,44 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-after-proof-policy-and-next-action",
-      "criterion": "After both direct prerequisites have successful Outcomes, replan this same Ticket to firm with exact acceptance for contract identity, Evidence and Outcome binding, selected legacy migration and unresolved fallback, closed-contract mutation, stale-proof projection, CLOSE_OUT and DONE behavior, Workbench explanation, host parity, rollback, and complete regression coverage derived from the chosen policy and shared next_action contract."
+      "acceptance_id": "contract-identity-is-deterministic",
+      "criterion": "One shared exported function in skills/vibehub-core/scripts/vh.mjs computes a per-criterion sha256 digest over the UTF-8 canonical JSON array of ticket_id, acceptance_id, authority with agent defaulted explicitly, and criterion text, and a complete-contract digest over the acceptance-id-sorted set of those triples; identical inputs produce identical digests from the source tree and from both installed Plugin artifacts, no timestamp, Git commit, filename or repository position enters the serialization, and unrelated Ticket context, constraints, relations, deliveries or copy changes leave every digest unchanged, proven by tests."
+    },
+    {
+      "acceptance_id": "proof-schemas-gain-one-optional-binding",
+      "criterion": "Following the deliveries and origin precedent, evidence.schema.json gains exactly one optional acceptance_bindings array whose entries carry acceptance_id, the per-criterion digest, binding native or reconstructed, and an optional provenance commit reference that is never identity, and outcome.schema.json gains exactly one optional contract binding carrying the complete-contract digest, binding native or reconstructed, and an optional unresolved marker with a reason from the fixed set no-addition-commit, ticket-unreadable-at-addition, referenced-acceptance-missing-at-addition or contract-drifted-since-addition, pinned by test; both schema versions bump once, additionalProperties stays false, every legacy document without the field remains readable and valid, new Evidence and Outcomes written by vh.mjs always carry native bindings, and a ticket-origin-style test pins exactly one optional addition per schema."
+    },
+    {
+      "acceptance_id": "legacy-migration-is-mechanical-and-replayable",
+      "criterion": "A format 2 to 3 entry in skills/vibehub-migrate/references/migrations.json and a deterministic migrator provide a dry run that emits an impact report recomputing the audit matrix at the migration HEAD with no hard-coded corpus counts, and an apply that writes reconstructed bindings using firstCurrentAddition semantics on HEAD ancestry only, marks drifted, missing or ambiguous cases unresolved with a reason from the same fixed set rather than fabricating a binding, preserves every historical document byte-for-byte except the added optional field, and is replayable: a second apply produces byte-identical bindings and the same unresolved set."
+    },
+    {
+      "acceptance_id": "unresolved-fallback-preserves-retention-semantics",
+      "criterion": "After migration, Evidence counts toward acceptance coverage only when its binding is native or reconstructed with its referenced criteria unchanged, a successful Outcome keeps DONE, archive membership and dependent unlock only when its complete contract is unchanged, and an unresolved Outcome stops contributing to DONE, archive, dependent unlock and CLOSE_OUT while its file stays readable and its Ticket projects REPLAN with the stable reason unresolved-legacy-outcome naming the drifted acceptance ids; the migrated repository passes ticket validate and the retention counts equal the dry-run report."
+    },
+    {
+      "acceptance_id": "closed-contract-mutation-is-refused",
+      "criterion": "applyTickets and every host path built on it refuse, with a stable error code beside origin_immutable, any change to criterion text, authority or acceptance membership of a Ticket that has a successful Outcome, while context, constraints, context_refs, relations, deliveries and provenance edits still apply; the refusal is proven through the CLI path and the shell host path, and the explicit reopen protocol is recorded as future work rather than implemented."
+    },
+    {
+      "acceptance_id": "projection-explains-proof-without-a-new-status",
+      "criterion": "ticket-next-action.md and ticketNextAction keep exactly the existing seven actions; Evidence whose binding is stale no longer satisfies the coverage row so affected Tickets project EXECUTE or NEEDS_HUMAN with a stable reason naming the stale acceptance ids, unresolved Outcomes project REPLAN as specified, and frontier, ticket get, graph, buildTicketHandoff, the shell readTask surface and the Workbench phase labels all carry the native, reconstructed, stale or unresolved explanation from the one canonical derivation with no second computation, proven by projection tests and one host test."
+    },
+    {
+      "acceptance_id": "regression-rollback-and-artifacts-hold",
+      "criterion": "Tests prove wording, authority and membership drift each change the digest while unrelated edits do not, the reconstruction fixture covers HEAD ancestry, re-added files and missing history falling to unresolved, human-authority criteria still require human-origin Evidence after migration, and rollback restores the format 2 interpretation without deleting bindings while reapply reproduces identical results; npm test, npm run verify and both marketplace artifact builds pass on the migrated repository."
     }
   ],
   "constraints": [
-    "Do not execute this Ticket while draft or infer the protected legacy policy before human Evidence exists.",
-    "Do not delete or rewrite historical Evidence or Outcome to make it match a newer contract.",
+    "Only the documented migration may touch historical Evidence and Outcome files, and it may only add the optional binding field; it never rewrites their existing content to match a newer contract.",
     "Do not use timestamps, Git commit identity, filenames, or mutable repository position as acceptance semantic identity.",
     "Do not invalidate unchanged criteria because unrelated Ticket context, constraints, relations, deliveries, or copy changed.",
-    "Do not add a database, ledger service, hidden cache, signature authority, or compatibility shim outside an explicit project migration."
+    "Do not add a database, ledger service, hidden cache, signature authority, or compatibility shim outside an explicit project migration.",
+    "The Ticket document stores no digest; contract identity is always derived from the current document.",
+    "Review of legacy-unresolved cases follows existing authority semantics and is separate follow-up work, not this migration.",
+    "No hard-coded corpus counts anywhere; every impact number is recomputed at the migration HEAD."
   ],
-  "context": "The direction is known but the implementation contract is intentionally not firm. Acceptance identity must be deterministic and future proof must not silently rebind, yet the legacy transition policy changes schema, migration, DONE, archive, unlock, projection, and rollback behavior. Wait for both the owner policy decision and the shared next-action contract, then replan this same Ticket into an executable implementation without smuggling a migration default into today's draft.",
+  "context": "Both prerequisites hold successful Outcomes: the shared next-action contract exists and the owner explicitly selected Git reconstruction with unresolved fallback. The accepted proposal defines per-criterion identity as the stable serialization of ticket_id, acceptance_id, defaulted authority and criterion text, the complete contract as the sorted set of those triples, reconstruction through firstCurrentAddition on HEAD ancestry only, and the fallback semantics under which drifted or unreconstructable proof stops contributing to DONE, archive, dependent unlock and CLOSE_OUT until independently reviewed. This Ticket implements that policy: one optional binding structure on the Evidence and Outcome schemas following the deliveries and origin precedent, a deterministic replayable format 2 to 3 migration with a dry-run impact report whose counts are always recomputed at the migration HEAD, a closed-contract mutation guard beside the origin guard, and stale or unresolved proof explained through the existing seven next-action rows with new stable reasons rather than a new status. The Ticket document itself stores no digest; identity stays purely derived so the contract cannot drift against itself. A reconstructed binding may record its provenance commit as a reference, never as identity. Review of legacy-unresolved cases follows existing authority semantics: criteria with human authority return to the owner, the rest to independent adjudication; the audit at the planning HEAD showed two drifted successful Outcomes including one archived delivery, and the exact set is recomputed by the dry run at execution time. The explicit reopen protocol for closed contracts remains future work.",
   "context_refs": [
     {
       "purpose": "Git-native schema and explicit migration boundary the implementation must preserve.",
@@ -33,15 +59,52 @@
     {
       "purpose": "Current Outcome contract whose future revision depends on the policy decision.",
       "ref": "skills/vibehub-core/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "The owner's selected policy this implementation realizes.",
+      "ref": ".vibehub/evidence/ticket-decide-legacy-proof-revision-policy/owner-selects-git-reconstruction-with-unresolved-fallback.yaml"
+    },
+    {
+      "purpose": "Accepted policy comparison, identity definition, fallback semantics, migration and rollback boundaries.",
+      "ref": "docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "purpose": "Proven reconstruction and audit implementation the migrator generalizes.",
+      "ref": "scripts/audit-legacy-proof.mjs"
+    },
+    {
+      "purpose": "HEAD-ancestry fixture and impact-surface pins to extend.",
+      "ref": "test/legacy-proof-audit.test.mjs"
+    },
+    {
+      "purpose": "The additive-schema and immutability-guard template both new guards follow.",
+      "ref": "test/ticket-origin.test.mjs"
+    },
+    {
+      "purpose": "Migration registry the format 2 to 3 entry joins.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Evidence schema gaining the optional binding.",
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Outcome schema gaining the optional contract binding.",
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "The seven-action projection contract the explanations must stay inside.",
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Evidence and Outcomes are mechanically bound to the exact Acceptance semantics they evaluated, so Ticket replanning cannot silently reuse stale proof or preserve DONE after the contract meaning changes.",
+  "maturity": "firm",
+  "outcome": "Every new Evidence and Outcome records exactly which acceptance semantics it evaluated, the legacy corpus is mechanically bound through Git reconstruction with drifted or unreconstructable proof marked unresolved and excluded from DONE, archive, unlock and CLOSE_OUT until review, closed contracts refuse silent acceptance edits, and every projection surface explains native, reconstructed, stale and unresolved proof from one canonical derivation.",
   "provenance_refs": [
     "conversation:2026-08-20-acceptance-rewrite-can-reuse-stale-evidence",
-    "dogfood:prototype-and-product-direction-ticket-replanning"
+    "dogfood:prototype-and-product-direction-ticket-replanning",
+    "conversation:2026-08-23-owner-selects-git-reconstruction-for-legacy-proof"
   ],
   "relations": [
     {
