@@ -74,7 +74,7 @@
         "path": "docs/PERSONAL_TICKET_HUB_DESIGN_NOTES.zh-CN.md"
       },
       {
-        "blob": "5b13cea46d196a647cca29d9c955ac444844047c",
+        "blob": "8d4023ad495ec3238e7e7baf669cf4d9de0000c4",
         "path": "docs/PERSONAL_TICKET_HUB_SOLUTION.zh-CN.md"
       },
       {
@@ -86,11 +86,11 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
-        "blob": "1a4a2fabb55ebf2505e99368cd14a5503d7512be",
+        "blob": "8866767171cfa5f800f5a531e3e39c4d2b808b00",
         "path": "docs/TICKET_FIRST_RUNTIME_DRIFT.zh-CN.md"
       },
       {
-        "blob": "a1cd51ff0d25c78e872f72a1f3baf838e3f16394",
+        "blob": "22119a2e576170038d93e68cd44102ef0288c399",
         "path": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
       },
       {
@@ -134,19 +134,19 @@
         "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
       },
       {
-        "blob": "a9d801279b9c3d9ddfc07ab08da39fbb62ee7384",
+        "blob": "d8fe8e959804afed54c0fae8811f9aeb4aa85593",
         "path": "docs/demos/personal-ticket-branch-workbench.html"
       },
       {
-        "blob": "94f34b4043e7f79c67a9d6a3dba22768df197d6f",
+        "blob": "ced1332d53cce7a05099484a8ebb28382620b17c",
         "path": "docs/demos/personal-ticket-goal-directions.html"
       },
       {
-        "blob": "8f7de5115f44025772a76dc478ef3a164cb10d7f",
+        "blob": "efab5256037d1fddd642c4f5b35fc0352dbffbfe",
         "path": "docs/demos/vibehub-workbench-webview.html"
       },
       {
-        "blob": "df365d7f2986684fa68c756704c569c6697f90b8",
+        "blob": "6c2224825e1a871f386d0622b8e3277f9da6f62c",
         "path": "docs/designs/personal-ticket-hub.md"
       },
       {
@@ -302,7 +302,7 @@
         "path": "docs/proposals/personal-ticket-hub/fixtures/valid/user-config.yaml"
       },
       {
-        "blob": "fe51eef66b3301b84288ccd8b9200451ff6809cf",
+        "blob": "6efb6cf9420c53036a7e9a9c8774ef817a151a73",
         "path": "docs/proposals/personal-ticket-hub/scripts/contract-validator.mjs"
       },
       {
@@ -326,8 +326,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-24T17:52:46.426Z",
-    "last_aligned_commit": "27f72a54d47d4e32004d7e048a63f368d2f912c3"
+    "checked_at": "2026-08-24T18:02:18.010Z",
+    "last_aligned_commit": "f258b61ce90982a7d17656f043fd453a394136bc"
   },
   "anchors": [
     "CHANGELOG.md",
