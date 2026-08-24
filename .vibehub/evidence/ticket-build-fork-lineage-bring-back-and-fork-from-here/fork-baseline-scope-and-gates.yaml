@@ -1,0 +1,27 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "fork-surfaces-hold-the-baseline-and-scope",
+      "binding": "native",
+      "digest": "301e82764733dcf682cfe993bc280709912ade0e1d0dfde888b195e01e8d8e57"
+    }
+  ],
+  "acceptance_ids": [
+    "fork-surfaces-hold-the-baseline-and-scope"
+  ],
+  "evidence_id": "fork-baseline-scope-and-gates",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T04:47:27Z",
+  "refs": [
+    "commit:b0db15e",
+    "commit:06d891a",
+    "apps/codex-first-shell/browser-interaction-guard.mjs",
+    "scripts/vh-codex-first-shell-guard.mjs",
+    "test/codex-first-shell-contrast.test.mjs",
+    "docs/proposals/codex-chat-conformance/conformance-matrix.json"
+  ],
+  "schema_version": 2,
+  "summary": "Commits b0db15e and 06d891a hold the baseline: the new surfaces trap and restore focus where they open, close on Escape, expose keyboard paths, meet the contrast floors at or above 4.5 to 1 in both themes and add no horizontal overflow at 390; a fork is never presented as a Task, Subtask or dependency, no sidebar fork tree ships and a static pin proves it; the review-only forkReview surfaces stay gated with their fixtures and capture driver passing. The conformance matrix gains three rows for the shipped behaviors with proof fields the matrix test enforces, moving pass from 29 to 32. At branch head 06d891a npm test reports 354 tests, 352 pass, 0 fail and the two DSH skips, npm run verify, npm run probe:codex and npm run guard:codex all exit 0 with the guard at 138 of 138 wide and 139 of 139 narrow in both schemes across all six frames plus motion, bridge, lifecycle and queue walks green. The negative control overlays the new guard on a cd05550 scratch export and fails 124 of 128 with exit 1, all four new check groups failing while the pre-existing 124 pass. During cleanup the implementer mistakenly terminated the demo shell's app-server child in a different worktree; the shell's own restart path respawned it within seconds with the recovery gate passing, which incidentally exercised the lifecycle machinery in real use.",
+  "ticket_id": "ticket-build-fork-lineage-bring-back-and-fork-from-here"
+}

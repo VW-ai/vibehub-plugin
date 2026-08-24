@@ -1,0 +1,27 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "source-chip-and-fork-listing-are-production",
+      "binding": "native",
+      "digest": "5bf2a44601ba6814a64199c86c55bdf49089e89cad47ad616cbbe0aee676aa0c"
+    }
+  ],
+  "acceptance_ids": [
+    "source-chip-and-fork-listing-are-production"
+  ],
+  "evidence_id": "source-chip-listing-and-missing-state-production",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T04:47:27Z",
+  "refs": [
+    "commit:279f421",
+    "commit:53947e6",
+    "apps/codex-first-shell/fork-lineage.mjs",
+    "apps/codex-first-shell/app.js",
+    "test/fork-lineage.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Commits 279f421 and 53947e6 promote the lineage projections into the production module apps/codex-first-shell/fork-lineage.mjs and ship the surfaces: a fork whose forkedFromId names a listed Thread renders a navigable source chip showing the source title and opening the source on the chat route, with the shared-Turn divergence note derived lazily from the two transcripts' common Turn-id prefix through readThread, withheld until the source is read and refreshed on each open, never invented; a source Thread's heading lists each fork by title and opens it; a fork with a missing source renders the dashed non-navigable state naming the id; and the raw Fork-of UUID line is deleted. test/fork-lineage.test.mjs covers the projection with six tests, guard checks cover the chip, the navigation, the listing, the missing state and the gone raw line at 1280x800 and 390x844 in Light and Dark with keyboard paths, and the review-only fixtures keep passing with the sidebar tree remaining review-gated.",
+  "ticket_id": "ticket-build-fork-lineage-bring-back-and-fork-from-here"
+}

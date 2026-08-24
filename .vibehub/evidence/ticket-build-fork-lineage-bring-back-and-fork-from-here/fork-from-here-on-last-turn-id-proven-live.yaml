@@ -1,0 +1,28 @@
+{
+  "acceptance_bindings": [
+    {
+      "acceptance_id": "fork-from-here-uses-the-stable-seam",
+      "binding": "native",
+      "digest": "225793df94ac29675156fde0029dbac6029e6ed99c1ab2ab8eb60531c91e2942"
+    }
+  ],
+  "acceptance_ids": [
+    "fork-from-here-uses-the-stable-seam"
+  ],
+  "evidence_id": "fork-from-here-on-last-turn-id-proven-live",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T04:47:27Z",
+  "refs": [
+    "commit:5756dff",
+    "commit:53947e6",
+    "test/codex-first-shell-fork.test.mjs",
+    "test/fixtures/codex-app-server-fixture.mjs",
+    "scripts/vh-codex-first-shell.mjs",
+    "packages/codex-adapter/upstream-lock.json",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Commits 5756dff and 53947e6 ship Fork from here on the stable seam: every finalized assistant message of a settled Turn offers the action through the bridge's finalized gating, dispatching the existing host fork action with lastTurnId set to that message's Turn; a static test proves thread/rollback stays unused; the action is absent on user and live messages and while the runtime is halted and disabled while running; the opened fork shows its source chip and placement handling is untouched. The fixture app-server now honors lastTurnId truncation with the inclusive boundary, terminal Turns replayed by id and in-progress refused, and a guard check proves a seeded two-Turn source cut at Turn one yields a fork whose transcript ends there while the source stays untruncated. The live proof on the installed 0.149.0 spent exactly two model Turns: source 01a03211-a55d-7b12-8faf-574050ba4b48 with two Turns, thread/fork with lastTurnId of the first yielded fork 01a03211-c022-7e40-8744-08fd3eb1b2e4 containing exactly that Turn with the same id and forkedFromId naming the source, the source stayed complete, and both Threads were deleted with zero remaining in the disposable cwd; the proof script and JSON are retained in the session scratchpad.",
+  "ticket_id": "ticket-build-fork-lineage-bring-back-and-fork-from-here"
+}
