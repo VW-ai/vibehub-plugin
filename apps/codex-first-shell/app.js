@@ -30,6 +30,7 @@ import { threadLocation } from "./thread-location.mjs";
 import { answersFromDraft, applyRequestDraft, loadRequestDraft, pruneRequestDrafts, requestDraftFromForm, saveRequestDraft } from "./request-drafts.mjs";
 import { buildOrigin, codexThreadRef, composeQuotedMessage, describeSelection, locateSelection, parseQuotedMessage, sha256Hex, sourceIdentityLabel } from "./quote-source.mjs";
 import { planTimelineReconciliation } from "./timeline-reconcile.mjs";
+import { bringBackQuote, forksOf, forkTreeRows, placementNote, resolveLineage, sharedTurnPrefix } from "./fork-review.mjs";
 
 const state = {
   route: "chat",
@@ -66,6 +67,10 @@ const state = {
   turnDiffs: new Map(),
   chatRenderFrame: 0,
   fixtureMode: false,
+  // The fork chat review gate (?forkFixture=…): null in ordinary use, so the
+  // production fork surfaces are untouched; { direction, variant } while a
+  // fork-lineage review fixture is mounted (docs/proposals/fork-chat).
+  forkReview: null,
   creatingThread: null,
   composerQuote: null,
   selectedQuote: null,
@@ -548,7 +553,7 @@ function tasksByThread() {
   return byThread;
 }
 
-function threadButton(thread) {
+function threadButton(thread, { forkDepth = 0 } = {}) {
   const active = thread.id === state.activeThreadId;
   // The presence dot is a live claim: it needs a live runtime as well as the
   // last status the app-server reported for the Thread.
@@ -560,9 +565,9 @@ function threadButton(thread) {
       ? "<em>TASK</em>"
       : born.size ? `<em data-born-tasks="${born.size}" title="${born.size} Task${born.size === 1 ? "" : "s"} born from or attached to this Chat">${born.size} TASK${born.size === 1 ? "" : "S"}</em>` : "";
   if (state.renaming?.threadId === thread.id && state.renaming.where === "sidebar") return `<div class="thread-row renaming" data-thread-row="${escapeHtml(thread.id)}">${renameFormMarkup(thread, "sidebar")}</div>`;
-  return `<div class="thread-row" data-thread-row="${escapeHtml(thread.id)}"><button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
-    <i class="thread-state${runtimeActive ? " active" : ""}"></i>
-    <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
+  return `<div class="thread-row" data-thread-row="${escapeHtml(thread.id)}"${forkDepth ? ` data-fork-depth="${forkDepth}"` : ""}><button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
+    ${forkDepth ? '<span class="fork-branch" aria-hidden="true">⑂</span>' : ""}<i class="thread-state${runtimeActive ? " active" : ""}"></i>
+    <span>${forkDepth ? '<span class="sr-only">Fork · </span>' : ""}<strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
     ${badge}
   </button><button class="thread-rename" type="button" data-rename-thread="${escapeHtml(thread.id)}" data-rename-where="sidebar" aria-label="Rename chat ${escapeHtml(titleForThread(thread))}" title="Rename chat">✎</button></div>`;
 }
@@ -661,6 +666,16 @@ function updateSidebar() {
   withRenameFocus(renderSidebar);
 }
 
+// One Sidebar list's rows. In ordinary use this is the flat listing; under
+// the fork review's sidebar direction (Direction B of
+// docs/proposals/fork-chat) forks indent under their source when the source
+// row is in the same visible list, from Thread.forkedFromId alone. DOM order
+// stays reading order, so the keyboard path is unchanged.
+function threadRowsMarkup(threads) {
+  if (state.forkReview?.direction !== "sidebar") return threads.map((thread) => threadButton(thread)).join("");
+  return forkTreeRows(threads).map(({ thread, depth }) => threadButton(thread, { forkDepth: depth })).join("");
+}
+
 function renderSidebar() {
   const list = $("#threadList");
   sidebarTasksByThread = tasksByThread();
@@ -672,14 +687,14 @@ function renderSidebar() {
   attention.hidden = needsYou.length === 0;
   $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you${taskOrigin(item.ticketId) ? ` · ${escapeHtml(originLabel(item.ticketId))}` : ""}</small></span></button>`).join("");
   $("#pinnedSection").hidden = state.pinned.length === 0;
-  $("#pinnedList").innerHTML = state.pinned.map(threadButton).join("");
+  $("#pinnedList").innerHTML = threadRowsMarkup(state.pinned);
   $("#projectList").innerHTML = state.projects.length
     ? state.projects.map((project) => `<section class="project-group" data-project-drop="${escapeHtml(project.id)}">
         <header><button class="project-toggle" type="button" data-toggle-project="${escapeHtml(project.id)}" aria-expanded="true" aria-label="Collapse ${escapeHtml(project.name)} group"><span class="project-dot"></span><strong>${escapeHtml(project.name)}</strong><small title="${project.hiddenElsewhere ? `${project.threads.length} here · ${project.hiddenElsewhere} in other folders hidden` : `${project.threads.length} in this folder`}">${project.threads.length}${project.hiddenElsewhere ? "+" : ""}</small></button><details class="project-menu"><summary aria-label="${escapeHtml(project.name)} group actions">•••</summary><div><button type="button" data-rename-project="${escapeHtml(project.id)}">Rename</button><button type="button" data-delete-project="${escapeHtml(project.id)}">Delete</button></div></details></header>
-        <div class="project-threads">${project.threads.map(threadButton).join("") || '<p class="muted">Drop a Chat here</p>'}</div>
+        <div class="project-threads">${threadRowsMarkup(project.threads) || '<p class="muted">Drop a Chat here</p>'}</div>
       </section>`).join("")
     : '<p class="muted">No chat groups yet. Chats stay in Recents.</p>';
-  list.innerHTML = state.recents.map(threadButton).join("") || '<p class="muted">No ungrouped chats in this folder.</p>';
+  list.innerHTML = threadRowsMarkup(state.recents) || '<p class="muted">No ungrouped chats in this folder.</p>';
   const hidden = state.bootstrap?.project?.visibility;
   const footnote = $("#recentsFootnote");
   const hiddenParts = [];
@@ -1483,6 +1498,33 @@ function patchTimeline(container, markup) {
   return plan;
 }
 
+// --- Fork lineage review surface (Direction A of docs/proposals/fork-chat) --
+// Mounted only while a ?forkFixture review fixture is active; ordinary use
+// keeps the production "Fork of <uuid>" line untouched. The chip resolves
+// forkedFromId against the listed Threads of this folder; a source those
+// lists do not carry is named missing instead of invented, and the forks of
+// the open Chat are listed from the same canonical rows.
+function forkLineageMarkup(thread) {
+  if (state.forkReview?.direction !== "chip") return "";
+  const parts = [];
+  const lineage = resolveLineage(thread, state.threads);
+  if (lineage?.missing) {
+    parts.push(`<span class="lineage-chip is-missing" title="Source thread ${escapeHtml(lineage.sourceId)}">⑂ Forked from a chat not listed in this folder</span><small class="lineage-note">Source ${escapeHtml(lineage.sourceId.slice(0, 8))}… is archived, deleted, or lives in another folder. There is nothing to open here.</small>`);
+  } else if (lineage) {
+    const source = lineage.source;
+    const prefix = sharedTurnPrefix(thread, source);
+    const divergence = prefix.sourceTotal ? ` · shares ${prefix.shared} of ${prefix.sourceTotal} source Turns${prefix.diverged ? ", then diverges" : ""}` : "";
+    const placement = placementNote(thread, source);
+    parts.push(`<button type="button" class="lineage-chip" data-open-lineage="${escapeHtml(source.id)}" aria-label="Open the source chat: ${escapeHtml(titleForThread(source))}">⑂ Forked from <strong>${escapeHtml(titleForThread(source))}</strong></button><small class="lineage-note">Lineage from Thread.forkedFromId${escapeHtml(divergence)}</small>${placement ? `<small class="lineage-note lineage-placement">${escapeHtml(placement)}</small>` : ""}`);
+  }
+  const forks = forksOf(thread.id, state.threads);
+  if (forks.length) {
+    const rows = forks.map((fork) => `<button type="button" class="fork-row" data-open-lineage="${escapeHtml(fork.id)}"><strong>${escapeHtml(titleForThread(fork))}</strong><small>${escapeHtml(`${fork.preview || "Codex Thread"} · ${fork.project ? `in the ${fork.project.name} group` : "in Recents"}`)}</small></button>`).join("");
+    parts.push(`<details class="fork-list" data-disclosure-id="fork-list" open><summary>⑂ ${forks.length} fork${forks.length === 1 ? "" : "s"} of this chat</summary><div class="fork-list-rows">${rows}</div></details>`);
+  }
+  return parts.length ? `<div class="thread-lineage" id="threadLineage">${parts.join("")}</div>` : "";
+}
+
 function renderChat({ preserveScroll = false } = {}) {
   setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `${state.fixtureMode ? "Review fixture · not runtime history" : `Thread ${state.activeThread.id.slice(0, 8)}…`} · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
   const existingFork = surface.querySelector("[data-fork-thread]");
@@ -1508,7 +1550,8 @@ function renderChat({ preserveScroll = false } = {}) {
   const activeProjectId = state.activeThread.project?.id ?? null;
   const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
   const projectOptions = [`<option value=""${activeProjectId === null ? " selected" : ""}>Recents</option>`, ...(pinnedId ? [`<option value="${escapeHtml(pinnedId)}"${activeProjectId === pinnedId ? " selected" : ""}>Pinned</option>`] : []), ...state.projects.map((project) => `<option value="${escapeHtml(project.id)}"${activeProjectId === project.id ? " selected" : ""}>${escapeHtml(project.name)}</option>`)].join("");
-  const lineage = state.activeThread.forkedFromId ? ` · Fork of ${state.activeThread.forkedFromId}` : "";
+  const lineage = state.activeThread.forkedFromId && state.forkReview?.direction !== "chip" ? ` · Fork of ${state.activeThread.forkedFromId}` : "";
+  const lineageReview = forkLineageMarkup(state.activeThread);
   const existingTimeline = $("#turns");
   if (preserveScroll && existingTimeline) {
     patchTimeline(existingTimeline, turnsMarkup(state.activeThread));
@@ -1517,7 +1560,7 @@ function renderChat({ preserveScroll = false } = {}) {
       : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     captureRequestDrafts(surface);
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><div class="thread-title-block" id="threadTitleBlock"></div><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p><p class="thread-posture" id="threadPosture" data-posture="unknown"></p><div class="thread-context" id="contextIndicator" data-state="unknown"></div></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><label><span class="sr-only">Permissions</span><select id="permissionsControl" aria-label="Permissions"></select></label><button type="button" data-compact-thread="${escapeHtml(state.activeThread.id)}" aria-label="Compact this chat's context" disabled>Compact</button><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><div class="thread-title-block" id="threadTitleBlock"></div><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p>${lineageReview}<p class="thread-posture" id="threadPosture" data-posture="unknown"></p><div class="thread-context" id="contextIndicator" data-state="unknown"></div></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><label><span class="sr-only">Permissions</span><select id="permissionsControl" aria-label="Permissions"></select></label><button type="button" data-compact-thread="${escapeHtml(state.activeThread.id)}" aria-label="Compact this chat's context" disabled>Compact</button><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
     renderThreadTitle();
   }
@@ -2028,7 +2071,10 @@ function renderComposerQuote() {
   const tray = $("#quoteTray");
   tray.hidden = !state.composerQuote;
   const source = state.composerQuote ? `Thread ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId} · Item ${state.composerQuote.itemId}` : "";
-  const where = state.composerQuote && state.composerQuote.threadId !== state.activeThreadId ? `From Codex Thread ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId}` : "From this Codex Turn";
+  // Review-only Bring Back labeling: when the quote's Thread is a listed fork
+  // of the open Chat, say so; the identity line itself is unchanged.
+  const quotedFromFork = state.forkReview && state.composerQuote && state.threads.find((thread) => thread.id === state.composerQuote.threadId)?.forkedFromId === state.activeThreadId;
+  const where = state.composerQuote && state.composerQuote.threadId !== state.activeThreadId ? `${quotedFromFork ? "Brought back from fork" : "From Codex Thread"} ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId}` : "From this Codex Turn";
   tray.innerHTML = state.composerQuote ? `<span><strong>Quoted response</strong><small>${escapeHtml(state.composerQuote.text.slice(0, 180))}${state.composerQuote.text.length > 180 ? "…" : ""}</small><small class="quote-source" title="${escapeHtml(source)}" aria-label="${escapeHtml(source)}">${escapeHtml(where)}</small></span><button type="button" data-remove-quote aria-label="Remove quoted response">×</button>` : "";
 }
 
@@ -2132,6 +2178,10 @@ function updateQuoteSelection() {
     if (bridge.available) { button.removeAttribute("title"); button.removeAttribute("aria-describedby"); }
     else { button.title = bridge.reason; button.setAttribute("aria-describedby", "selectionSheetHint"); }
   }
+  // Bring Back (Direction C of docs/proposals/fork-chat), review fixture
+  // only: offered on a finalized passage of a fork whose source is listed.
+  const bringBackButton = $("[data-bring-back]", sheet);
+  if (bringBackButton) bringBackButton.hidden = !(state.forkReview?.direction === "bringback" && finalized && resolveLineage(state.activeThread, state.threads)?.source);
   sheet.hidden = false;
   const width = sheet.offsetWidth || 112;
   sheet.style.left = `${Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2))}px`;
@@ -3634,6 +3684,35 @@ document.addEventListener("click", async (event) => {
     } catch (error) { notify(error.message); }
     return;
   }
+  // Fork lineage navigation (review fixture only): the source chip and the
+  // fork-list rows open the named Thread through the ordinary open path.
+  const openLineage = event.target.closest("[data-open-lineage]");
+  if (openLineage) {
+    if (!state.forkReview) return;
+    try { await openThread(openLineage.dataset.openLineage); } catch (error) { notify(error.message); }
+    return;
+  }
+  // Bring Back (review fixture only): the selected fork passage lands in the
+  // source Chat's composer as a quote carrying the fork's exact identity;
+  // the explicit send stays with the human and the fixture refuses it.
+  const bringBackButton = event.target.closest("[data-bring-back]");
+  if (bringBackButton) {
+    if (!state.forkReview || !state.selectedQuote) return;
+    const fork = state.activeThread;
+    const item = timelineItem(state.selectedQuote.itemKey);
+    const payload = bringBackQuote({ fork, turnId: item?._turnId, itemId: item?.id, itemKey: item?._key ?? null, text: state.selectedQuote.text });
+    if (!payload) return notify("Bring back needs a finalized passage in a fork whose source is listed.");
+    $("#selectionSheet").hidden = true;
+    window.getSelection()?.removeAllRanges?.();
+    try {
+      await openThread(payload.targetThreadId);
+      state.composerQuote = payload.quote;
+      renderComposerQuote();
+      $("#composerInput").focus();
+      notify("Fork result quoted into the source chat. Nothing is sent until you send it.");
+    } catch (error) { notify(error.message); }
+    return;
+  }
   const compactThread = event.target.closest("[data-compact-thread]");
   if (compactThread) { await compactActiveThread(compactThread); return; }
   const renameThread = event.target.closest("[data-rename-thread]");
@@ -4184,6 +4263,39 @@ function applyTaskFixture(fixture, variantName) {
   return state.taskWorkspace;
 }
 
+// Review fixture for the fork chat proposal (docs/proposals/fork-chat):
+// host-shaped Thread records, never runtime history. The action sink serves
+// reads of the fixture family only, so lineage navigation works while
+// nothing reaches the runtime — a send is refused honestly, no model is
+// spent, and nothing is written.
+function applyForkFixture(fixture, variantName) {
+  const variant = fixture.openByVariant[variantName] ? variantName : "chip";
+  state.fixtureMode = true;
+  state.forkReview = { direction: fixture.directionsByVariant[variant], variant };
+  const threads = fixture.threads.map((thread) => structuredClone(thread));
+  state.threads = threads;
+  state.pinned = [];
+  state.projects = [{ ...fixture.project, threads: threads.filter((thread) => thread.project?.id === fixture.project.id) }];
+  state.recents = threads.filter((thread) => !thread.project);
+  interactionGuardActionSink = async (payload) => {
+    if (payload.action === "readThread") {
+      const thread = threads.find((entry) => entry.id === payload.threadId);
+      if (!thread) throw new Error(`Review fixture only: no fixture thread ${payload.threadId}.`);
+      return { thread: structuredClone(thread) };
+    }
+    if (payload.action === "listQueue") return { queue: { threadId: payload.threadId, paused: false, pausedReason: null, lastError: null, limit: 20, items: [] } };
+    throw new Error("Review fixture only: nothing is sent and nothing is written.");
+  };
+  const open = threads.find((thread) => thread.id === fixture.openByVariant[variant]);
+  state.activeThreadId = open.id;
+  state.activeThread = structuredClone(open);
+  state.currentTurnId = null;
+  state.running = false;
+  $("#stopTurn").hidden = true;
+  updateSidebar();
+  setRoute("chat");
+}
+
 async function start() {
   try {
     const themes = ["system", "light", "dark"];
@@ -4217,6 +4329,11 @@ async function start() {
     const taskFixtureName = params.get("taskFixture");
     if (taskFixtureName) {
       applyTaskFixture(await fetch("/task-fixtures.json").then((response) => response.json()), taskFixtureName);
+      return;
+    }
+    const forkFixtureName = params.get("forkFixture");
+    if (forkFixtureName) {
+      applyForkFixture(await fetch("/fork-fixtures.json").then((response) => response.json()), forkFixtureName);
       return;
     }
     if (params.get("chatFixture") === "mixed") {

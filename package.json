@@ -28,6 +28,7 @@
     "prototype:dsh-shell": "node scripts/vh-dsh-persistent-shell-prototype.mjs",
     "shell:codex": "node scripts/vh-codex-first-shell.mjs",
     "guard:codex": "node scripts/vh-codex-first-shell-guard.mjs",
+    "review:fork-chat": "node scripts/vh-fork-chat-review.mjs",
     "prototype:harness": "node scripts/vh-harness-prototype.mjs",
     "prototype:harness:safari": "node scripts/vh-harness-prototype.mjs --safari",
     "test": "node --test test/*.test.mjs",

@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "proposal-pack-is-decision-ready"
+  ],
+  "evidence_id": "pack-decision-ready-and-gates-green",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:48:09Z",
+  "refs": [
+    "commit:4c63c68",
+    "commit:e3118fa",
+    "scripts/vh-fork-chat-review.mjs",
+    "docs/proposals/fork-chat/README.md",
+    "package.json"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 4c63c68 adds the one-command review driver npm run review:fork-chat serving the surfaces against fixtures without model spend and a captures mode that produced the checked-in PNGs; the pack presents the directions with captures, the recommended composition of A then C then D with B held and Compare waiting, exact costs, what stays out and eight exact owner decisions. At the reviewed state npm test reports 317 tests, 315 pass, 0 fail and the two DSH skips, npm run verify passes with the 67-file artifact, and the guard passes 109 of 109 wide and 110 of 110 narrow in both schemes with motion, bridge, lifecycle and queue walks green; the final commit touches only the capture driver and PNGs which no test or guard exercises, and production fork behavior is unchanged with the review state gated from ordinary use.",
+  "ticket_id": "ticket-propose-fork-chat-interaction-directions"
+}

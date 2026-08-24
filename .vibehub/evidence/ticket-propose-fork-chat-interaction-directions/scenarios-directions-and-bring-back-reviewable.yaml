@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "daily-scenarios-ground-the-directions",
+    "lineage-visibility-directions-are-reviewable",
+    "compare-and-bring-back-are-scoped-honestly"
+  ],
+  "evidence_id": "scenarios-directions-and-bring-back-reviewable",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-24T02:48:09Z",
+  "refs": [
+    "commit:3682da7",
+    "commit:99c7004",
+    "commit:8092719",
+    "apps/codex-first-shell/fork-review.mjs",
+    "apps/codex-first-shell/fork-fixtures.json",
+    "test/fork-review.test.mjs",
+    "docs/proposals/fork-chat/README.md",
+    "apps/codex-first-shell/quote-source.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The pack grounds fork in three daily engineering scenarios, the risky-instruction sandbox, prompt A and B comparison and alternative-approach exploration, evaluates every affordance against them, and lists anti-scenarios with their excluding decisions including that a fork is never a Task or dependency. Commits 3682da7 and 99c7004 build three review-only surfaces in the real shell gated on a fork review state that is null in production and fed by fixtures whose sink refuses sends with zero model spend: direction A replaces the raw UUID line with a navigable Forked-from chip carrying the derived shared-Turn note, a source-side N-forks listing and an honest dashed missing-source state; direction B indents forks under their listed source in the sidebar with a depth cap, screen-reader prefixes, flat orphans and the recency-reorder trade-off named; direction C makes a selection in a fork return to the source composer as a labeled quote that quote-source serializes with exact fork identity on an explicit human send. Each direction is captured wide and narrow in Light and Dark with keyboard-focus captures, twenty-three PNGs under docs/proposals/fork-chat/captures, and annotated with the canonical data and host projection it needs; a fourth direction, per-message Fork from here on stable lastTurnId, is defined but not built, and side-by-side Compare is costed as requiring a two-pane transcript surface and recommended to wait.",
+  "ticket_id": "ticket-propose-fork-chat-interaction-directions"
+}
