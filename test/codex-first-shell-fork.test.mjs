@@ -144,13 +144,46 @@ test("forkThread with lastTurnId creates a fork whose transcript ends at the cho
   assert.ok(!calls.some((call) => call.method === "thread/rollback"), "thread/rollback is never dispatched");
 });
 
-test("the fork seam stays thread/fork alone: the deprecated thread/rollback appears nowhere in the host or adapter", async () => {
-  const [host, projects, clientSource, harness] = await Promise.all([
+test("the fork seam stays thread/fork alone: the deprecated thread/rollback appears nowhere in the shell or adapter", async () => {
+  const [app, host, projects, clientSource, harness] = await Promise.all([
+    source("apps/codex-first-shell/app.js"),
     source("scripts/vh-codex-first-shell.mjs"),
     source("packages/codex-adapter/projects.mjs"),
     source("packages/codex-adapter/client.mjs"),
     source("packages/codex-adapter/harness.mjs"),
   ]);
-  assert.doesNotMatch(host + projects + clientSource + harness, /thread\/rollback/u, "the deprecated thread/rollback seam stays unused");
+  assert.doesNotMatch(app + host + projects + clientSource + harness, /thread\/rollback/u, "the deprecated thread/rollback seam stays unused");
   assert.match(host, /projects\.forkThread\(threadId,\s*\{\s*lastTurnId:\s*payload\.lastTurnId\s*\?\?\s*null\s*\}\)/u, "the host forwards lastTurnId to the adapter");
+  assert.match(app, /action:\s*"forkThread",\s*threadId:\s*state\.activeThreadId,\s*lastTurnId:\s*item\._turnId/u, "Fork from here sends the message's own Turn as lastTurnId");
+});
+
+test("the production lineage surfaces replaced the raw Fork-of line and never present a fork as a Task or dependency", async () => {
+  const [app, renderer, html] = await Promise.all([
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/chat-renderer.mjs"),
+    source("apps/codex-first-shell/index.html"),
+  ]);
+  // The raw " · Fork of <uuid>" heading line is gone; the navigable chip and
+  // the missing-source state render from the production lineage projection,
+  // outside any ?forkFixture gate.
+  assert.doesNotMatch(app, /Fork of \$\{/u, "the raw Fork-of UUID line is gone");
+  const chipMarkup = app.slice(app.indexOf("function forkLineageMarkup"), app.indexOf("function renderChat"));
+  assert.doesNotMatch(chipMarkup, /forkReview/u, "the chip, fork listing and missing state no longer sit behind the review gate");
+  assert.match(chipMarkup, /Forked from a chat not listed in this folder/u);
+  assert.match(chipMarkup, /data-open-lineage/u);
+  assert.doesNotMatch(chipMarkup, /Task|Subtask|dependency/u, "lineage copy never borrows Task language");
+  // The sidebar gains no fork tree in production: the indented projection
+  // stays behind the review gate's sidebar direction.
+  assert.match(app, /state\.forkReview\?\.direction !== "sidebar"/u, "the sidebar fork tree stays review-only");
+  // Bring Back stays an explicit human send: the draft is written to the
+  // source Thread's composer draft store and nothing dispatches a Turn.
+  const bringBack = app.slice(app.indexOf("async function bringBackToSource"), app.indexOf("function forkMessageActions"));
+  assert.match(bringBack, /saveThreadDraft\(state\.composerDrafts, payload\.targetThreadId/u);
+  assert.doesNotMatch(bringBack, /startTurn|queueTurn|steerTurn/u, "Bring Back never starts a Turn by itself");
+  assert.match(html, /data-bring-back hidden>Bring back to source/u, "the selection sheet offers the explicit action");
+  // The per-message actions ride the finalized gating the bridge already
+  // proved: renderForkMessageActions is emitted only for finalized items.
+  assert.match(renderer, /const forkActions = finalized \? renderForkMessageActions\(key, fork\) : ""/u);
+  assert.match(renderer, /data-fork-from/u);
+  assert.match(renderer, /data-bring-back-message/u);
 });

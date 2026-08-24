@@ -353,15 +353,29 @@ export function renderTurnAssociations({ turnId, entries }) {
   return `<div class="turn-associations" data-turn-id="${escapeHtml(turnId)}" data-association-turn="${escapeHtml(turnId)}" role="group" aria-label="VibeHub Tasks associated with this Turn"><span class="turn-associations-label">VibeHub Tasks</span>${links}</div>`;
 }
 
+// The per-message fork actions on a finalized assistant message: Bring back
+// to source when the open Chat is a fork whose source is listed, and Fork
+// from here — the desktop's own affordance shape — on the stable lastTurnId
+// seam. Both ride the same finalized gating as the bridge: never a streaming
+// item, never an item of a live Turn.
+export function renderForkMessageActions(key, fork) {
+  if (!fork) return "";
+  const bringBack = fork.bringBack ? `<button type="button" data-bring-back-message="${escapeHtml(key)}" title="Quote this message into the source chat's composer; nothing is sent until you send it">Bring back to source</button>` : "";
+  const forkFrom = fork.forkFrom ? `<button type="button" data-fork-from="${escapeHtml(key)}"${fork.forkFrom.disabled ? " disabled" : ""} title="Fork this chat from this message's Turn; later Turns stay here">Fork from here</button>` : "";
+  return `${bringBack}${forkFrom}`;
+}
+
 // `bridge` (host-owned availability) turns on the Create Task, Attach to Task
 // and Remember actions; without it the message renders only the native Copy
-// and Quote actions. The bridge is offered on finalized messages only, never
-// on a streaming item or an item of a live Turn. The Turn id and item id are
+// and Quote actions. `fork` turns on the per-message fork actions the same
+// way. All of them are offered on finalized messages only, never on a
+// streaming item or an item of a live Turn. The Turn id and item id are
 // stable DOM anchors so Return to source can scroll to and focus the exact
 // origin item.
-export function renderAgentMessage(item, budget = createRenderBudget(), { bridge = null } = {}) {
+export function renderAgentMessage(item, budget = createRenderBudget(), { bridge = null, fork = null } = {}) {
   const key = item._key ?? item.id;
   const finalized = messageFinalized(item);
   const actions = bridge && finalized ? renderBridgeActions(key, bridge) : "";
-  return `<div class="turn assistant" data-item-id="${escapeHtml(key)}" data-turn-id="${escapeHtml(item._turnId ?? "")}" data-source-item="${escapeHtml(item.id ?? "")}" data-finalized="${finalized ? "true" : "false"}" data-render-key="${escapeHtml(key)}" tabindex="-1"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text, budget)}${omissionMarkup(item._omittedCharacters)}${renderMemoryCitations(item.memoryCitation, budget)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(key)}">Copy</button><button type="button" data-quote-message="${escapeHtml(key)}">Quote</button>${actions}</footer></article></div>`;
+  const forkActions = finalized ? renderForkMessageActions(key, fork) : "";
+  return `<div class="turn assistant" data-item-id="${escapeHtml(key)}" data-turn-id="${escapeHtml(item._turnId ?? "")}" data-source-item="${escapeHtml(item.id ?? "")}" data-finalized="${finalized ? "true" : "false"}" data-render-key="${escapeHtml(key)}" tabindex="-1"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text, budget)}${omissionMarkup(item._omittedCharacters)}${renderMemoryCitations(item.memoryCitation, budget)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(key)}">Copy</button><button type="button" data-quote-message="${escapeHtml(key)}">Quote</button>${forkActions}${actions}</footer></article></div>`;
 }

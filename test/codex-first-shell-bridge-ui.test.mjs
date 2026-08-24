@@ -192,7 +192,7 @@ test("bridge surfaces are contained modals with keyboard paths, exact action sha
   assert.doesNotMatch(script + html, /localStorage|sessionStorage|indexedDB|caches\.open/i);
   // Finalized-only placement in the app: only the agent-message renderer
   // receives the bridge, and user messages never render actions.
-  assert.match(script, /renderAgentMessage\(item, budget, \{ bridge: bridgeAvailability\(\) \}\)/);
+  assert.match(script, /renderAgentMessage\(item, budget, \{ bridge: bridgeAvailability\(\), fork \}\)/);
   assert.equal((script.match(/renderBridgeActions/g) ?? []).length, 0, "app.js never renders bridge actions outside the agent-message renderer");
   assert.match(script, /if \(state\.fixtureMode\) return \{ available: false, reason: "Review fixture only/, "a review fixture is never a source of a real write");
   // Presentation provenance: markers, origin chip, Graph edge kind, sidebar.
