@@ -196,6 +196,12 @@ async function captureVariant(shellUrl, variant, frameName, scheme, failures) {
     // The transcript scrolls to its end on open; captures show the heading,
     // so scroll the conversation surface back to the top first.
     await chrome.evaluate(`document.querySelector('#surface').scrollTop = 0`);
+    // The narrow frame keeps the Sidebar in a drawer, so the sidebar
+    // direction's narrow state is the opened drawer.
+    if (variant.name === "sidebar" && frame.narrow) {
+      await chrome.evaluate(`document.querySelector('#openSidebar').click()`);
+      await chrome.waitFor(`document.querySelector('#appShell').classList.contains('sidebar-open')`);
+    }
     await chrome.evaluate(`new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))`, true);
     await chrome.screenshot(shot(variant.name));
     console.log(`[capture] ${variant.name} ${frameName} ${scheme}`);
