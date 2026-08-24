@@ -153,6 +153,18 @@ test("graph, handoff, and attention surfaces carry the canonical proof explanati
   assert.equal(rolledBack.capabilities.nextAction.summary.proof.mode, "legacy");
 });
 
+test("the next-action contract keeps exactly the seven actions and explains proof inside them", () => {
+  const contract = readFileSync(join(root, "skills/vibehub-core/contracts/ticket-next-action.md"), "utf8");
+  for (const action of ["DONE", "REPLAN", "WAIT", "REFINE", "NEEDS_HUMAN", "CLOSE_OUT", "EXECUTE"]) {
+    assert.match(contract, new RegExp(`\`${action}\``, "u"), `${action} stays a documented action`);
+  }
+  assert.equal((contract.match(/^\| [1-7] \|/gmu) ?? []).length, 7, "exactly seven precedence rows");
+  assert.match(contract, /`unresolved_legacy_outcome`/u);
+  assert.match(contract, /binding-current/u);
+  assert.match(contract, /never add a status/u);
+  assert.match(contract, /rollback restores/u);
+});
+
 test("the Workbench phase labels read the host slot and carry the explanation without recomputing", () => {
   const repo = surfaceRepo("surfaces-workbench-phase");
   const snapshot = buildUiSnapshot(repo, { scope: "all" });
