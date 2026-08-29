@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "rerun",
+      "criterion": "A scratch repository containing copies of `spatial-thread-workspace-prd-v0-original.md` and `peel-demo-v0-original.html` is absorbed end to end through the bulk path, and the run transcript is captured as Evidence. `~/Peel` is not modified."
+    },
+    {
+      "acceptance_id": "coverage-zero",
+      "criterion": "`vh.mjs context coverage` reports zero uncovered segments across both source files at the end of the run, with every exception carrying a stated reason."
+    },
+    {
+      "acceptance_id": "no-prompted-recovery",
+      "criterion": "The transcript shows coverage reaching zero through the pipeline's own passes, with no user message asking whether content was missed."
+    },
+    {
+      "acceptance_id": "tree-improves",
+      "authority": "human",
+      "criterion": "The resulting Room tree contains more than one room and separates product intent from UX and interaction evidence rather than collapsing into a single `product` room, and a person judges the split more usable than the checked-in result at `~/Peel/.vibehub/rooms/product/`."
+    }
+  ],
+  "constraints": [
+    "Do not modify `~/Peel`; it is the comparison baseline.",
+    "Do not tune the pipeline to Peel's two files; fixes must be general or recorded as known limits.",
+    "Agent analysis of tree quality is not human-origin Evidence for the human-authority criterion."
+  ],
+  "context": "Peel is the failure this work exists to fix and therefore the only honest regression case: the same two source files, the same cold start, a checked-in single-room result to compare against. The baseline lives outside this repository at `~/Peel/.vibehub/rooms/product/` (32 Contexts, one room) and the sources at `~/Peel/docs/product/source/` (`spatial-thread-workspace-prd-v0-original.md`, 1369 lines; `peel-demo-v0-original.html`, 672 lines). Verification runs in a scratch repository so `~/Peel` itself is never modified.",
+  "context_refs": [
+    {
+      "purpose": "Defines the verification and the exact baseline to compare against.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Peel's original PRD and demo HTML, re-absorbed through the new pipeline in a throwaway repository, produce a multi-room tree and zero uncovered segments, and a person judges the result better than the checked-in one-room outcome.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [
+    {
+      "rationale": "There is no pipeline to re-run Peel through until the bulk path exists.",
+      "target_ticket_id": "ticket-absorb-large-material-through-ingest",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

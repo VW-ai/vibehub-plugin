@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "renamed-skill",
+      "criterion": "`vibehub-ticket-review` is renamed `vibehub-review`, and every `$vibehub-ticket-review` invocation reference and `../vibehub-ticket-review/...` path reference across Skills, contracts, and references resolves to the new name with no dangling reference remaining."
+    },
+    {
+      "acceptance_id": "room-tree-surface",
+      "criterion": "The local UI can be launched focused on the Room tree, showing nesting, boundary, drift state, and per-room Context count, and renders correctly for a repository whose rooms contain zero Contexts."
+    },
+    {
+      "acceptance_id": "read-only-preserved",
+      "criterion": "The UI still projects fresh from `.vibehub/` on every refresh and gains no write route, no proposal or preview mode for unwritten state, no database, and no persisted cache."
+    },
+    {
+      "acceptance_id": "conversation-fallback",
+      "criterion": "When no browser is available the same Room tree is presentable in conversation from `vh.mjs` output alone."
+    },
+    {
+      "acceptance_id": "history-untouched",
+      "criterion": "Checked-in Evidence, Outcomes, and closed Tickets that name `vibehub-ticket-review` are left unrewritten; only live Skill and contract references are updated."
+    }
+  ],
+  "constraints": [
+    "Do not add a write route, Decision authority, or persisted state to the UI.",
+    "Do not rewrite historical records to match the new name."
+  ],
+  "context": "vibehub-ticket-review is already the sole presenter for Ticket events and vh-ui.mjs already projects rooms with nesting, drift state, and per-room Context counts. Generalizing the Skill avoids writing UI launch, port reuse, and no-browser fallback conventions twice. The absorption pipeline's only human gate depends on this surface existing.",
+  "context_refs": [
+    {
+      "purpose": "States why presentation is one responsibility and where the tree gate sits in the pipeline.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "The exact launcher conventions, bearer-fragment behavior, and no-browser fallback to preserve.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A single presentation Skill, vibehub-review, shows both the Ticket graph and the Room tree, so the absorption pipeline has a human gate to present the proposed tree through.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}

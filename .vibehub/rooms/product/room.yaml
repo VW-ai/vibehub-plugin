@@ -110,6 +110,10 @@
         "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
       },
       {
+        "blob": "7598183a790e60f0f2424b44892ef34b2e648f87",
+        "path": "docs/proposals/bulk-absorption.md"
+      },
+      {
         "blob": "85fafdaebc2668fb4e4f456d23b715c3bf858633",
         "path": "docs/proposals/card-corner-signal/README.md"
       },
@@ -186,8 +190,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T21:29:34.508Z",
-    "last_aligned_commit": "a584cdf34d7643067d5b8d5bad6e50e9958e6e1d"
+    "checked_at": "2026-08-29T08:41:04.178Z",
+    "last_aligned_commit": "3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
   },
   "anchors": [
     "CHANGELOG.md",

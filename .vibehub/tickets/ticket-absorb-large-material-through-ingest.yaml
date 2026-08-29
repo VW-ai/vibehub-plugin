@@ -1,0 +1,80 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "single-entry",
+      "criterion": "vibehub-ingest's description and its existing small-input path are unchanged, and the bulk path is reached by an internal branch on input shape. No user is asked to pick a Skill, a mode, or a size threshold."
+    },
+    {
+      "acceptance_id": "pipeline-documented",
+      "criterion": "`skills/vibehub-ingest/references/bulk-absorption.md` states the five passes with their exact commands, and `SKILL.md` grows only a branch condition plus a pointer to that reference."
+    },
+    {
+      "acceptance_id": "survey-before-write",
+      "criterion": "The documented pipeline requires reading every segment of every source and producing a topic list carrying source segment ids, before any Room or Context is written."
+    },
+    {
+      "acceptance_id": "tree-gate",
+      "criterion": "Pass 3 delegates Room writing to `$vibehub-distill` and presentation to `$vibehub-review`, and stops for explicit human confirmation of the tree before any Context is written. It is the only human gate in the pipeline."
+    },
+    {
+      "acceptance_id": "extraction-and-settle",
+      "criterion": "Pass 4 requires every emitted Context to cite a segment id, and requires a stated reason recorded as a room `coverage_exceptions` entry for any segment yielding zero Contexts. Pass 5 declares absorption incomplete while `vh.mjs context coverage` reports a non-zero uncovered total."
+    },
+    {
+      "acceptance_id": "sharding",
+      "criterion": "Parallel extraction is documented as sharded by Room and never by segment, with cross-room duplicate reconciliation performed by the orchestrator, and the sequential path performs identical steps for harnesses without subagents."
+    },
+    {
+      "acceptance_id": "distill-narrowed",
+      "criterion": "vibehub-distill's description marks it an internal mechanism invoked by ingest, ticket-plan, and migrate rather than a user-invoked Skill; its stated job is Room shape and alignment stamps; and `A small honest tree beats an exhaustive one` is replaced by splitting pressure naming the boundary-conjunction test and the distinct-reader test."
+    }
+  ],
+  "constraints": [
+    "Do not create a new user-facing Skill for large material; absorption is ingest's behavior at scale.",
+    "Do not name the branch or its reference after input size in anything a user must remember.",
+    "Do not delete vibehub-distill or rewrite the checked-in knowledge-room Context that describes it; narrow it in place.",
+    "Do not extend scope to semantic Room anchors, artifact-authority Context, or Ticket-splitting pressure.",
+    "Keep the pipeline harness-portable: subagents are an optimization, never a requirement."
+  ],
+  "context": "Today nothing in VibeHub defines how a large document becomes Context: distill builds a tree and defers extraction to a placement rule. Peel's cold start therefore yielded five Contexts from a 1369-line PRD until the user asked what was missing. This Ticket adds the missing process to the Skill that already owns knowledge writes, so users never have to choose between a small-input and a large-input Skill.",
+  "context_refs": [
+    {
+      "purpose": "The full pipeline design, the sharding rationale, and the impact scan that kept distill alive.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "The placement and trust rules absorbed Context must continue to follow.",
+      "ref": "skills/vibehub-ingest/references/knowledge-governance.json"
+    },
+    {
+      "purpose": "The exact anti-splitting sentence to replace and the tree-writing behavior to keep.",
+      "ref": "skills/vibehub-distill/SKILL.md"
+    },
+    {
+      "purpose": "The room that owns this change and whose recorded distill decisions must stay true.",
+      "ref": ".vibehub/rooms/knowledge/room.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "vibehub-ingest absorbs large source material through a five-pass pipeline that surveys every segment before writing, stops once for human confirmation of the Room tree, and refuses to finish while any segment is uncovered.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [
+    {
+      "rationale": "Passes 1 and 5 invoke `source segment` and `context coverage`; the pipeline cannot state an executable coverage gate before those commands exist.",
+      "target_ticket_id": "ticket-add-source-segmentation-and-coverage",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Pass 3's human gate presents the proposed tree through the Room tree surface, which does not exist until review is generalized.",
+      "target_ticket_id": "ticket-generalize-review-to-room-trees",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

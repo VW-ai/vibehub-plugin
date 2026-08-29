@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "segment-determinism",
+      "criterion": "`vh.mjs source segment --repo <root> --path <file>` returns identical segment ids for identical file bytes across repeated runs. Markdown splits at heading boundaries yielding `path#heading-slug`; every other file type splits into windows of at most 60 lines with boundaries snapped to the nearest blank line, yielding `path#L<start>-<end>`. Segments cover every line of the file with no gap and no overlap."
+    },
+    {
+      "acceptance_id": "coverage-recomputation",
+      "criterion": "`vh.mjs context coverage --repo <root> [--room <path>]` reports, per anchored source file, every segment cited by no Context `source.ref` or `evidence[].ref` and listed in no room `coverage_exceptions`, plus an uncovered total. Every value is recomputed from the working tree on each run and never read from stored state."
+    },
+    {
+      "acceptance_id": "room-schema-exceptions",
+      "criterion": "`room.schema.json` accepts an optional `coverage_exceptions` array of `{segment, reason}` objects; every existing room document without the field still validates, and `project validate` passes on this repository."
+    },
+    {
+      "acceptance_id": "no-new-store",
+      "criterion": "The change adds no manifest, progress file, cache, daemon, or second store. Segmentation and coverage are derived on every invocation."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover markdown heading splitting, non-markdown line-window splitting with blank-line snapping, a file shorter than one window, coverage with zero Contexts, coverage satisfied by an exception, and a segment cited only through `evidence[].ref`."
+    }
+  ],
+  "constraints": [
+    "Do not change `context.schema.json`; segment-level references are already legal in the free-text `source.ref` and `evidence[].ref` fields.",
+    "Keep the helper dependency-free and deterministic; semantic judgment belongs in Skills, not in this script.",
+    "Do not introduce a coverage document kind; exceptions live on the room that owns the anchor."
+  ],
+  "context": "Bulk absorption cannot promise 'nothing was dropped' unless coverage is computed rather than reported. Computation requires reproducible segmentation, so this Ticket lands the mechanical floor the pipeline stands on. It touches only the bundled script and the room schema; no Skill prose changes here.",
+  "context_refs": [
+    {
+      "purpose": "Defines the segmentation rules, the coverage obligation, and why both must be mechanical.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "Forbids the manifest or second store this Ticket must avoid.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "vh.mjs can deterministically segment any source file and recompute, from the working tree alone, which segments of anchored sources no Context cites.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

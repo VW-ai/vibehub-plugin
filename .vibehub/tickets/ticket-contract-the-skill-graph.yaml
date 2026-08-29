@@ -1,0 +1,48 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-contract",
+      "criterion": "`skills/vibehub-core/contracts/skill-graph.json` declares every Skill, its outbound invocation edges, and the events it owns, and matches the `$vibehub-*` references actually present in the checked-in SKILL.md files."
+    },
+    {
+      "acceptance_id": "validation",
+      "criterion": "`vh.mjs skills validate --repo <root>` fails on an unresolvable `$vibehub-*` reference, a Skill missing from the contract, an orphan Skill reachable from neither a user entry nor another Skill, and a cycle; it passes on this repository."
+    },
+    {
+      "acceptance_id": "no-runtime-role",
+      "criterion": "The contract and command are development-time validation only; no Skill's runtime behavior reads them, and nothing in `.vibehub/` records their output."
+    }
+  ],
+  "constraints": [
+    "Do not turn the graph into a router, a lifecycle, or runtime dispatch state.",
+    "Declare the graph as it is after the review rename, not as it was."
+  ],
+  "context": "Skill-to-skill dependencies exist only as prose references today. Planning this deliverable required grepping `$vibehub-*` by hand to discover that distill has no user entry and that deleting it would cascade through active Context. That check should be reproducible rather than remembered.",
+  "context_refs": [
+    {
+      "purpose": "Records the impact scan this contract makes repeatable, including the reversed distill decision.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "Bounds this to deterministic development-time validation in the bundled script.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Skill invocation graph is a checked-in contract that `vh.mjs skills validate` can check, so changing one Skill produces a runnable blast-radius report instead of an ad-hoc grep.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [
+    {
+      "rationale": "The contract must declare the post-rename graph; authoring it before the rename would ship a contract that is wrong on its first day.",
+      "target_ticket_id": "ticket-generalize-review-to-room-trees",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-contract-the-skill-graph"
+}
