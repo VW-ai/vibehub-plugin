@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "single-entry"
+  ],
+  "evidence_id": "evidence-ingest-branches-on-input-shape",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/SKILL.md",
+    "command:git diff --stat",
+    "command:git status --short"
+  ],
+  "schema_version": 1,
+  "summary": "`git diff skills/vibehub-ingest/SKILL.md` is +7/-0: one paragraph inserted between the capture-only paragraph and `## Workflow`. The frontmatter description line and all five numbered workflow steps plus the Guardrails section are byte-identical to HEAD, so the existing small-input path is unchanged. The inserted branch keys on input shape only -- 'When the material is one or more whole documents or files to be absorbed, rather than a claim, decision, or note the user has already stated' -- and opens with 'Branch on the shape of what was handed over, never on its size and never by asking the user to choose.' No size threshold, no mode name, and no Skill choice is put to the user; no new Skill directory was created (`git status --short` lists only the three modified files and the new reference).",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

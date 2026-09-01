@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "survey-before-write"
+  ],
+  "evidence_id": "evidence-survey-precedes-every-write",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md"
+  ],
+  "schema_version": 1,
+  "summary": "The reference's Pass 2 section is titled 'Survey (writes nothing)' and requires reading every segment of every source before anything is written, producing a topic list whose entries carry a name, one sentence, and the segment ids the topic appears in. It states explicitly that nothing is written to .vibehub/ in the pass -- no Room, no Context, no note file -- and Pass 3 (Rooms) and Pass 4 (Contexts) both follow it in document order. The 'Why this exists' section states why the pass is the checkable one: the Pass 1 segment list is finite and enumerable, so 'did you read all of it' has an answer, and stopping while segments remain uncovered is named a violation of the process rather than a judgment call.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

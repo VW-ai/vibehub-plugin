@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "sharding"
+  ],
+  "evidence_id": "evidence-sharding-by-room-not-segment",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "docs/proposals/bulk-absorption.md#parallelism"
+  ],
+  "schema_version": 1,
+  "summary": "The reference's 'Running the passes in parallel' section states in bold that Pass 4 shards by Room, never by segment, and gives the reason: a claim appearing in three chapters handed to three blind per-segment workers is extracted three times into duplicate Contexts with inconsistent ids, whereas Pass 3 has already assigned every segment to a Room so a per-Room worker guarantees de-duplication and relations inside its own Room. Cross-Room duplicates are reconciled by the orchestrator on merge, and workers write to disjoint Room directories so context put calls do not contend. Two safety rules are stated explicitly: a subagent's completion report is not evidence, and Pass 5 is computed rather than reported, so a worker that skipped segments surfaces as uncovered segment ids under its own Room. The section opens by declaring subagents an optimization and never a requirement, and requires the identical steps in the identical order sequentially where they are unavailable -- same output, different wall clock.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

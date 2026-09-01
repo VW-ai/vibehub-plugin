@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "tree-gate"
+  ],
+  "evidence_id": "evidence-tree-is-the-only-human-gate",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "skills/vibehub-review/SKILL.md",
+    "skills/vibehub-distill/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "Pass 3 is titled 'Propose the tree (the only human gate)' and its four numbered steps are: cluster surveyed topics and assign every segment to exactly one Room; delegate the Room writing to $vibehub-distill, which owns shape, boundaries, anchors and alignment stamps, leaving the Rooms as empty shells; present the written tree through $vibehub-review's Room tree surface with `node vh-ui.mjs --repo <root> --rooms`, falling back to $vibehub-review's `room tree` conversation presentation where no browser exists; and stop for explicit human confirmation before a single Context is written. The `--rooms` invocation and the zero-Context empty-shell state were taken from skills/vibehub-review/SKILL.md rather than invented -- that file documents `--rooms` as the Room tree entry and states a Room with zero Contexts is a first-class state. No other pass in the reference stops for a human.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

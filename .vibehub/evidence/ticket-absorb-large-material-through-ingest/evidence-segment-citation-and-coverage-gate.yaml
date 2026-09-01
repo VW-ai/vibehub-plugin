@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "extraction-and-settle"
+  ],
+  "evidence_id": "evidence-segment-citation-and-coverage-gate",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "skills/vibehub-core/contracts/room.schema.json",
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "Pass 4 requires every emitted Context to cite its exact Pass 1 segment id -- `path#heading-slug` or `path#L<start>-<end>` -- in source.ref or an evidence[].ref, and warns that a bare file path covers the whole file and defeats the purpose. A segment yielding zero Contexts requires a stated reason recorded as a {segment, reason} entry in the owning room.yaml's coverage_exceptions array, with a worked JSON example; 'nothing worth keeping' without a reason is named a skip, not an exception. That field is real: room.schema.json defines optional coverage_exceptions items requiring segment and reason with additionalProperties false. Pass 5 states in bold that absorption is not complete while `uncovered_total` is non-zero and directs the reader back to Pass 4 for those exact segment ids. `node skills/vibehub-core/scripts/vh.mjs context coverage --repo .` was run against this repository and returned ok:true with files_examined 140, segments_total 752, uncovered_total 640, per-room and per-file uncovered segment id lists -- the exact shape the pass reads.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

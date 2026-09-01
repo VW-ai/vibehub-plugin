@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "pipeline-documented"
+  ],
+  "evidence_id": "evidence-five-pass-reference-written",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "skills/vibehub-ingest/SKILL.md",
+    "command:node skills/vibehub-core/scripts/vh.mjs source segment --repo . --path docs/proposals/bulk-absorption.md",
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-ingest/references/bulk-absorption.md is new and carries one section per pass -- Segment, Survey, Propose the tree, Extract, Settle -- each with its exact command: `vh.mjs source segment --repo <root> --path <file>`, `vh-ui.mjs --repo <root> --rooms`, `vh.mjs context put --repo <root> --room <path> --input <context.json>`, and `vh.mjs context coverage --repo <root>`. Both vh.mjs commands were run against this repository before being written: `source segment --path docs/proposals/bulk-absorption.md` returned ok:true with strategy markdown-headings and segment_count 13, and `context coverage --repo .` returned ok:true with files_examined 140, segments_total 752, uncovered_total 640. SKILL.md grew only the branch paragraph naming `references/bulk-absorption.md`; it gained no second workflow.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

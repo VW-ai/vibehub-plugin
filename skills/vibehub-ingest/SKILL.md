@@ -13,6 +13,13 @@ Capture only when the user explicitly asks, or when another VibeHub workflow
 explicitly delegates durable capture. Do not poll conversation turns or infer a
 checkpoint cadence.
 
+Branch on the shape of what was handed over, never on its size and never by
+asking the user to choose. When the material is one or more whole documents or
+files to be absorbed, rather than a claim, decision, or note the user has
+already stated, follow `references/bulk-absorption.md` — it orchestrates the
+same writes below with a survey, a Room-tree gate, and a coverage obligation
+around them. Otherwise continue directly with the workflow.
+
 ## Workflow
 
 1. Decide whether the request is durable Context or executable work. A product

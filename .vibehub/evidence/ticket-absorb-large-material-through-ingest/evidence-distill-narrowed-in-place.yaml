@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "distill-narrowed"
+  ],
+  "evidence_id": "evidence-distill-narrowed-in-place",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-distill/SKILL.md",
+    "skills/vibehub-distill/agents/openai.yaml",
+    "command:git diff --stat",
+    "command:grep -rn 'small honest' skills/"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-distill/SKILL.md still exists and its workflow steps 1,2,4,5,6 and both guardrails are unchanged; the file is modified, not replaced (`git diff --stat` reports 17 insertions, 4 deletions across it). Its description now opens 'Internal mechanism that writes Room shape and alignment stamps' and closes 'Invoked by $vibehub-ingest, $vibehub-ticket-plan, and $vibehub-migrate, not called directly by a user.' A new opening paragraph states the job is Room shape and alignment stamps -- boundaries, nesting, anchors, and the stamp that makes drift computable -- and that the Skill does not extract Context. Step 3's sentence 'A small honest tree beats an exhaustive one -- rooms are cheap to split later with git mv' is gone; `grep -rn 'small honest' skills/` returns nothing. It is replaced by splitting pressure carrying both named tests: a room must split when its boundary needs \"and\" to join two unrelated concerns, or when its topics serve visibly different readers (product / engineering / design). agents/openai.yaml was reworded to match the internal role. .vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml and decision-stale-origin-layers.yaml were read and not edited; neither claims a user invokes distill by name, so both remain true.",
+  "ticket_id": "ticket-absorb-large-material-through-ingest"
+}

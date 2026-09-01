@@ -1,9 +1,15 @@
 ---
 name: vibehub-distill
-description: Build or resume a repository's Room tree when drift reports COLD_START, or refresh it on explicit user request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Use when a project has no Room tree yet or the user asks for a fresh distillation.
+description: Internal mechanism that writes Room shape and alignment stamps — building or resuming a repository's Room tree when drift reports COLD_START, and refreshing it on request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Invoked by $vibehub-ingest, $vibehub-ticket-plan, and $vibehub-migrate, not called directly by a user.
 ---
 
 # VibeHub Distill
+
+This Skill's job is Room shape and alignment stamps: boundaries, nesting,
+anchors, and the stamp that makes drift computable. It does not extract
+Context. A caller that needs a document turned into Context runs
+`$vibehub-ingest`, which invokes this Skill for the tree and then writes the
+Context itself.
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
@@ -24,9 +30,12 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    is no separate progress state to maintain.
 3. Propose the tree by judgment, not enumeration. A room is a bounded
    workspace someone does coherent work in, named by a semantic kebab-case
-   slug; nest a sub-room only when the parent genuinely composes it. A small
-   honest tree beats an exhaustive one — rooms are cheap to split later with
-   `git mv`.
+   slug; nest a sub-room only when the parent genuinely composes it. Split
+   under pressure rather than merging under it: a room must split when its
+   boundary needs "and" to join two unrelated concerns, or when its topics
+   serve visibly different readers (product / engineering / design). Collapsing
+   those into one room is how knowledge gets lost — rooms are cheap, and
+   splitting is `git mv` plus a boundary edit while they are still empty.
 4. Read enough of each room's territory to describe it truthfully, then write
    its `room.yaml` (`../vibehub-core/contracts/room.schema.json`): a description, a
    boundary that also says what the room is not, and anchors as
