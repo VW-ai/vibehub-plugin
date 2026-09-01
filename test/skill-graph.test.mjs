@@ -142,30 +142,39 @@ test("an edge the contract declares but no SKILL.md contains fails", () => {
   );
 });
 
-test("a retired name in a live reference fails, and the exempt classes do not", () => {
-  const repo = baseline("skill-graph-retired");
-  const retired = {
-    retired: [{
-      name: RETIRED,
-      replacement: "vibehub-alpha",
-      reason: "Renamed.",
-      allowed_paths: [{ path: "docs/RENAME.md", reason: "Prose describing the retirement." }],
-    }],
-  };
-  const contract = [
+const RENAME_LINE = `${RETIRED} became vibehub-alpha.`;
+
+// The retired-name cases share one shape: the baseline graph, one retired entry,
+// and whatever allowances the case is testing.
+function retiredRepo(label, allowed_paths) {
+  const repo = baseline(label);
+  graph(repo, [
     declare("vibehub-core", { entry: "infrastructure" }),
     declare("vibehub-alpha", { invokes: ["vibehub-beta"] }),
     declare("vibehub-beta", { entry: "internal" }),
-  ];
-  graph(repo, contract, retired);
+  ], {
+    retired: [{ name: RETIRED, replacement: "vibehub-alpha", reason: "Renamed.", allowed_paths }],
+  });
+  return repo;
+}
 
-  // Exempt: allowlisted prose, historical records, a dated META record, a
-  // closed Ticket, and a Context evidence[].ref that records a past proof.
-  write(repo, "docs/RENAME.md", `${RETIRED} became vibehub-alpha.\n`);
+const PROSE_ALLOWANCE = [{
+  path: "docs/RENAME.md",
+  text: RENAME_LINE,
+  reason: "Prose describing the retirement.",
+}];
+
+test("a retired name in a live reference fails, and the exempt classes do not", () => {
+  const repo = retiredRepo("skill-graph-retired", PROSE_ALLOWANCE);
+
+  // Exempt: the named occurrence in allowlisted prose, the archive directories,
+  // a closed Ticket, a META/legacy-* tree, and a Context evidence[].ref that
+  // records a past proof.
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
   write(repo, ".vibehub/evidence/ticket-old/proof.yaml", `{"note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/outcomes/ticket-closed.yaml", `{"note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/history/snapshot/old.yaml", `{"note": "${RETIRED}"}\n`);
-  write(repo, "META/room/artifacts/2026-01-02-note.md", `Named skills/${RETIRED}/SKILL.md then.\n`);
+  write(repo, "META/legacy-ui/note.md", `Named skills/${RETIRED}/SKILL.md then.\n`);
   write(repo, ".vibehub/tickets/ticket-closed.yaml", `{"note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/rooms/product/decision-x.yaml", `${JSON.stringify({
     kind: "context",
@@ -180,44 +189,156 @@ test("a retired name in a live reference fails, and the exempt classes do not", 
   assert.match(messages(validate(repo)), /META\/room\/spec\.md: Live reference to retired Skill/u);
 });
 
-test("an open Ticket is live, and an allowlist may not cover a $-invocation", () => {
-  const repo = baseline("skill-graph-retired-live");
-  graph(repo, [
-    declare("vibehub-core", { entry: "infrastructure" }),
-    declare("vibehub-alpha", { invokes: ["vibehub-beta"] }),
-    declare("vibehub-beta", { entry: "internal" }),
-  ], {
-    retired: [{
-      name: RETIRED,
-      replacement: "vibehub-alpha",
-      reason: "Renamed.",
-      allowed_paths: [{ path: "docs/RENAME.md", reason: "Prose describing the retirement." }],
-    }],
-  });
-  write(repo, "docs/RENAME.md", `${RETIRED} became vibehub-alpha.\n`);
+// A filename never earns an exemption. Both of these used to pass: a date-shaped
+// basename was read as "record", and a legacy- segment counted at any depth, so
+// anyone could date-prefix or reparent a live file to silence the rule.
+test("a META filename cannot buy an exemption", () => {
+  const repo = retiredRepo("skill-graph-retired-meta-name", []);
+
+  write(repo, "META/room/artifacts/2026-01-02-note.md", `See skills/${RETIRED}/SKILL.md.\n`);
+  assert.match(messages(validate(repo)), /2026-01-02-note\.md: Live reference to retired Skill/u);
+
+  write(repo, "META/room/artifacts/2026-01-02-note.md", "clean\n");
+  write(repo, "META/room/legacy-notes/live.md", `See skills/${RETIRED}/SKILL.md.\n`);
+  assert.match(messages(validate(repo)), /legacy-notes\/live\.md: Live reference to retired Skill/u);
+
+  // Only the segment directly under META/ is an archive, and only as a
+  // directory: META/legacy-note.md is a file wearing the name.
+  write(repo, "META/room/legacy-notes/live.md", "clean\n");
+  write(repo, "META/legacy-note.md", `See skills/${RETIRED}/SKILL.md.\n`);
+  assert.match(messages(validate(repo)), /META\/legacy-note\.md: Live reference to retired Skill/u);
+});
+
+// The property the old allowlist did not have: being listed excuses the named
+// occurrence, not the file around it.
+test("an allowance excuses one occurrence, not the file it sits in", () => {
+  const repo = retiredRepo("skill-graph-retired-per-occurrence", PROSE_ALLOWANCE);
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  // A live reference appended to the allowlisted file.
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\nlive: read ../${RETIRED}/assets/app.js at runtime\n`);
+  assert.match(messages(validate(repo)), /docs\/RENAME\.md: Live reference to retired Skill .* \(1 unexcused occurrence\)/u);
+
+  // An exact duplicate of the excused line is a second occurrence the allowance
+  // does not name: one allowance, one occurrence, unless it says otherwise.
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\n${RENAME_LINE}\n`);
+  assert.match(messages(validate(repo)), /docs\/RENAME\.md: Live reference to retired Skill/u);
+
+  // Near miss: the text an entry names must match exactly.
+  write(repo, "docs/RENAME.md", `${RETIRED} became  vibehub-alpha.\n`);
+  const near = messages(validate(repo));
+  assert.match(near, /docs\/RENAME\.md no longer contains the excused text/u);
+  assert.match(near, /docs\/RENAME\.md: Live reference to retired Skill/u);
+});
+
+test("an open Ticket is live, and an unnamed $-invocation fails inside an allowlisted file", () => {
+  const repo = retiredRepo("skill-graph-retired-live", PROSE_ALLOWANCE);
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
   write(repo, ".vibehub/tickets/ticket-open.yaml", `{"note": "${RETIRED}"}\n`);
   assert.match(messages(validate(repo)), /\.vibehub\/tickets\/ticket-open\.yaml: Live reference to retired Skill/u);
 
   write(repo, ".vibehub/tickets/ticket-open.yaml", '{"note": "clean"}\n');
-  write(repo, "docs/RENAME.md", `${RETIRED} became vibehub-alpha; never call $${RETIRED}.\n`);
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\nnever call $${RETIRED}.\n`);
   assert.match(messages(validate(repo)), /docs\/RENAME\.md: Retired Skill .* is invoked as/u);
 });
 
-test("an allowance whose file no longer names the retired Skill fails", () => {
-  const repo = baseline("skill-graph-stale-allowance");
+// The rule allows an allowance to name a $-invocation and say why. In this
+// layout it can never be used: the contract itself lives under
+// skills/vibehub-core/, so the moment an allowance quotes a $-invocation the
+// reference check sees a $-reference to a Skill that no longer has a folder and
+// rejects it there. A retired name therefore cannot be called anywhere, which is
+// stricter than the rule requires, and the second half of the case shows the
+// per-occurrence accounting is still what decides it.
+test("naming a $-invocation in an allowance is itself rejected", () => {
+  const call = `migration note: $${RETIRED} is gone; call $vibehub-alpha`;
+  const repo = retiredRepo("skill-graph-retired-named-call", [{
+    path: "docs/RENAME.md",
+    text: call,
+    reason: "A migration note has to show the old call to be useful.",
+  }]);
+  write(repo, "docs/RENAME.md", `${call}\n`);
+  assert.match(messages(validate(repo)), /\$vibehub-old-alpha names a Skill that does not exist under skills\//u);
+
+  // With the allowance withdrawn, the same file fails as an invocation.
   graph(repo, [
     declare("vibehub-core", { entry: "infrastructure" }),
     declare("vibehub-alpha", { invokes: ["vibehub-beta"] }),
     declare("vibehub-beta", { entry: "internal" }),
-  ], {
-    retired: [{
-      name: RETIRED,
-      replacement: "vibehub-alpha",
-      reason: "Renamed.",
-      allowed_paths: [{ path: "docs/GONE.md", reason: "Stale." }],
-    }],
-  });
-  assert.match(messages(validate(repo)), /docs\/GONE\.md no longer contains/u);
+  ], { retired: [{ name: RETIRED, replacement: "vibehub-alpha", reason: "Renamed.", allowed_paths: [] }] });
+  assert.match(messages(validate(repo)), /docs\/RENAME\.md: Retired Skill .* is invoked as/u);
+});
+
+// Context's source.ref/evidence[].ref exemption belongs to Context documents,
+// not to two field names any JSON file could adopt.
+test("only a Context document may claim the recorded-ref exemption", () => {
+  const repo = retiredRepo("skill-graph-retired-ref-class", []);
+  const body = (kind) => `${JSON.stringify({ kind, source: { ref: `skills/${RETIRED}/assets/app.js` } }, null, 2)}\n`;
+
+  write(repo, ".vibehub/rooms/product/decision-x.yaml", body("context"));
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  // Same fields, not a Context: a live config outside .vibehub/rooms/.
+  write(repo, "assets/config.json", body("context"));
+  assert.match(messages(validate(repo)), /assets\/config\.json: Live reference to retired Skill/u);
+
+  write(repo, "assets/config.json", "{}\n");
+  write(repo, ".vibehub/rooms/product/note.yaml", body("note"));
+  assert.match(messages(validate(repo)), /\.vibehub\/rooms\/product\/note\.yaml: Live reference to retired Skill/u);
+});
+
+test("a stale allowance fails: missing file, missing text, or a moved count", () => {
+  const gone = retiredRepo("skill-graph-stale-allowance", [{
+    path: "docs/GONE.md",
+    text: RENAME_LINE,
+    reason: "Stale.",
+  }]);
+  assert.match(messages(validate(gone)), /docs\/GONE\.md no longer contains/u);
+
+  const moved = retiredRepo("skill-graph-stale-text", PROSE_ALLOWANCE);
+  write(moved, "docs/RENAME.md", `${RETIRED} was renamed.\n`);
+  assert.match(messages(validate(moved)), /docs\/RENAME\.md no longer contains the excused text/u);
+
+  const counted = retiredRepo("skill-graph-stale-count", [{ ...PROSE_ALLOWANCE[0], occurrences: 2 }]);
+  write(counted, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.match(messages(validate(counted)), /carries 1 occurrence of .* but the allowance names 2/u);
+});
+
+// The shape rules exist so an allowance cannot be widened back into a file pass.
+test("an allowance may not be shaped into a blanket exemption", () => {
+  const noText = retiredRepo("skill-graph-allowance-no-text", [{ path: "docs/RENAME.md", reason: "No text." }]);
+  write(noText, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.match(messages(validate(noText)), /needs a path, the exact text it excuses, and a reason/u);
+
+  const unrelated = retiredRepo("skill-graph-allowance-unrelated", [{
+    path: "docs/RENAME.md",
+    text: "became vibehub-alpha",
+    reason: "Names no retired text.",
+  }]);
+  write(unrelated, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.match(messages(validate(unrelated)), /does not contain vibehub-old-alpha, so it excuses nothing/u);
+
+  const span = retiredRepo("skill-graph-allowance-span", [{
+    path: "docs/RENAME.md",
+    text: `${RENAME_LINE}\nand more.`,
+    reason: "The whole file.",
+  }]);
+  write(span, "docs/RENAME.md", `${RENAME_LINE}\nand more.\n`);
+  assert.match(messages(validate(span)), /must be a single line/u);
+
+  const directory = retiredRepo("skill-graph-allowance-directory", [{
+    path: "docs/",
+    text: RENAME_LINE,
+    reason: "A directory, not a file.",
+  }]);
+  write(directory, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  const messagesOut = messages(validate(directory));
+  assert.match(messagesOut, /docs\/ no longer contains/u);
+  assert.match(messagesOut, /docs\/RENAME\.md: Live reference to retired Skill/u);
+
+  const negative = retiredRepo("skill-graph-allowance-count", [{ ...PROSE_ALLOWANCE[0], occurrences: 0 }]);
+  write(negative, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.match(messages(validate(negative)), /occurrences must be a positive integer/u);
 });
 
 test("the checked-in skill graph is development-time only", () => {
@@ -225,6 +346,14 @@ test("the checked-in skill graph is development-time only", () => {
   assert.equal(contract.runtime_role, "none");
   assert.equal(contract.owner, "vibehub-core");
   assert.ok(contract.retired.some((entry) => entry.replacement === "vibehub-review"));
+  // Every real allowance names an occurrence, not a file.
+  for (const entry of contract.retired) {
+    for (const allowance of entry.allowed_paths ?? []) {
+      assert.ok(allowance.text.includes(entry.name), `${allowance.path} allowance names no occurrence`);
+      assert.ok(!/[\n\r]/u.test(allowance.text), `${allowance.path} allowance spans lines`);
+      assert.ok(allowance.reason.length > 0);
+    }
+  }
   // No Skill reads the contract, and the command records nothing in .vibehub/.
   const helperSource = readFileSync(helper, "utf8");
   assert.equal(helperSource.includes("writeDocument(join(repo, \".vibehub\""), false);

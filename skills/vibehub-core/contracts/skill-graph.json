@@ -132,31 +132,73 @@
       "allowed_paths": [
         {
           "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
-          "reason": "The Context that records the retirement decision; naming the old Skill is its subject."
+          "text": "旧的 vibehub-ticket-review/ 可能与新的 vibehub-review/ 并存",
+          "reason": "The retirement decision naming the stale folder an installer may be left with; the old name is the subject of the sentence."
+        },
+        {
+          "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
+          "text": "`-s vibehub-ticket-review` 的脚本",
+          "reason": "The same decision naming the hardcoded install flag a reader must change; quoting the old flag is what makes the instruction actionable."
+        },
+        {
+          "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
+          "text": "vibehub-ticket-review 改名 vibehub-review",
+          "reason": "The decision's summary line, which states the rename itself."
         },
         {
           "path": ".vibehub/rooms/ticket-lifecycle/decision-lifecycle-scoped-reference-validation.yaml",
+          "text": "该缺陷是重命名 vibehub-ticket-review 时暴露的",
           "reason": "Prose naming the rename as the event that exposed a pre-existing reference-validation defect."
         },
         {
-          "path": ".vibehub/tickets/ticket-contract-the-skill-graph.yaml",
-          "reason": "Open Ticket whose acceptance criterion is the retired-name rule itself."
+          "path": ".vibehub/tickets/ticket-detect-retired-skill-folders-after-update.yaml",
+          "text": "discovered while retiring vibehub-ticket-review",
+          "reason": "Open Ticket whose context names the rename that revealed the zombie-folder problem."
         },
         {
-          "path": ".vibehub/tickets/ticket-detect-retired-skill-folders-after-update.yaml",
-          "reason": "Open Ticket whose context describes the retirement that revealed the zombie-folder problem."
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "The installed `vibehub-ticket-review` Skill launches the versioned Plugin",
+          "reason": "Dated attestation recording what the runtime chain was on 2026-07-30, before the rename; rewriting it would falsify the record."
+        },
+        {
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "The installed `vibehub-ticket-review` Skill resolves the packaged",
+          "reason": "The same dated attestation restating the resolution step it verified at the time."
+        },
+        {
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "`skills/vibehub-ticket-review/SKILL.md`",
+          "reason": "The same dated attestation citing the file path it inspected at the time."
         },
         {
           "path": "docs/INSTALL.md",
-          "reason": "Prose telling an installer which stale folder to delete after the rename."
+          "text": "`vibehub-ticket-review` became `vibehub-review`",
+          "reason": "Prose telling an installer which stale folder to delete after the rename; naming it is the instruction."
         },
         {
           "path": "docs/proposals/bulk-absorption.md",
-          "reason": "Proposal prose describing the rename and its consequences."
+          "text": "Generalized from `vibehub-ticket-review`",
+          "reason": "Proposal table row describing what the renamed Skill was generalized from."
+        },
+        {
+          "path": "docs/proposals/bulk-absorption.md",
+          "text": "at 12 — `vibehub-ticket-review` is renamed",
+          "reason": "Proposal prose explaining that the Skill count is unchanged because this was a rename."
+        },
+        {
+          "path": "docs/proposals/bulk-absorption.md",
+          "text": "Renaming `vibehub-ticket-review` under this proposal",
+          "reason": "Proposal prose recording that the rename broke project validate, which is why the reference rule exists."
         },
         {
           "path": "scripts/measure-graph-layout.mjs",
-          "reason": "Documented LEGACY_APP_PATH constant used to read historical commits recorded before the rename."
+          "text": "was still named vibehub-ticket-review. The rename must not invalidate them.",
+          "reason": "Comment documenting why the legacy path constant below it exists."
+        },
+        {
+          "path": "scripts/measure-graph-layout.mjs",
+          "text": "const LEGACY_APP_PATH = \"skills/vibehub-ticket-review/assets/app.js\";",
+          "reason": "The LEGACY_APP_PATH constant itself: the measurement reads commits recorded before the rename, where this was the real path."
         }
       ]
     }

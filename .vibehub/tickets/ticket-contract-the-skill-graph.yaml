@@ -14,7 +14,7 @@
     },
     {
       "acceptance_id": "retired-names-stay-retired",
-      "criterion": "`skill-graph.json` declares retired Skill names with their replacement, and `skills validate` fails when a retired name appears in a live reference — a `$`-invocation, a `../<name>/` path, or a bare string in Skills, contracts, scripts, UI assets, or tests. Historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, and `META/legacy-*` are exempt, as is prose that deliberately names a retired Skill in order to describe its retirement."
+      "criterion": "`skill-graph.json` declares retired Skill names with their replacement, and `skills validate` fails when a retired name appears in a live reference — a `$`-invocation, a `../<name>/` or `skills/<name>/` path, or a bare string in Skills, contracts, scripts, UI assets, or tests. Exemption is per occurrence, never per file: an allowlist entry names the path AND the exact text it excuses AND why, and any occurrence in that file which the entry does not name still fails. An allowance whose file no longer contains the named text is itself a failure. Historical records — `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, `.vibehub/history/`, `META/legacy-*`, and Context `source.ref`/`evidence[].ref` — are exempt structurally. No other exemption may be inferred from a path or filename: a dated record under `META/` is exempt only through an explicit allowlist entry, never through a date-shaped basename, and a file whose only claim to exemption is its name must fail."
     }
   ],
   "constraints": [

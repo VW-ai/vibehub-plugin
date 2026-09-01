@@ -2008,14 +2008,20 @@ function findSkillCycle(adjacency) {
 // Context `source.ref` and `evidence[].ref` record what proved a past claim, so
 // they are subtracted structurally rather than by exempting the whole document:
 // the same file's prose stays under the rule.
-function recordedRefOccurrences(text, name) {
+//
+// The exemption belongs to Context, not to the two field names. It is claimed
+// only by a document that is one: a `kind: context` document under
+// .vibehub/rooms/. Otherwise any live JSON anywhere in the tree could carry a
+// retired path under a `source.ref` key and buy itself silence.
+function recordedRefOccurrences(path, text, name) {
+  if (!path.startsWith(".vibehub/rooms/")) return 0;
   let document;
   try {
     document = JSON.parse(text);
   } catch {
     return 0;
   }
-  if (!isObject(document)) return 0;
+  if (!isObject(document) || document.kind !== "context") return 0;
   const refs = [];
   if (isObject(document.source) && typeof document.source.ref === "string") refs.push(document.source.ref);
   for (const entry of Array.isArray(document.evidence) ? document.evidence : []) {
@@ -2028,7 +2034,12 @@ function recordedRefOccurrences(text, name) {
 // when they were written. Detected structurally, never by allowlist:
 //   - .vibehub/evidence/, .vibehub/outcomes/, and the .vibehub/history/ archive
 //   - a Ticket under .vibehub/tickets/ that already has an Outcome (closed)
-//   - a dated record under META/ (YYYY-MM-DD basename) or a META/legacy-* path
+//   - a META/legacy-* tree, matched only as the segment directly under META/
+// Every one of these is a whole directory whose contents are archived by
+// construction. A file's own name never earns an exemption: a dated basename
+// under META/ used to imply "record", which meant anyone could date-prefix a
+// live spec to silence the rule. A genuine dated record is exempted by an
+// explicit allowlist entry naming the text it carries, like any other file.
 // Everything else under META/ stays live, which is the point: an active META
 // spec naming skills/<retired>/SKILL.md is precisely the reference that slipped
 // past a careful human grep during the rename it documents.
@@ -2042,61 +2053,122 @@ function isHistoricalRecord(repo, path) {
   }
   if (path.startsWith("META/")) {
     const segments = path.split("/");
-    if (segments.some((segment) => segment.startsWith("legacy-"))) return true;
-    if (/^\d{4}-\d{2}-\d{2}/u.test(segments[segments.length - 1])) return true;
+    // Leading segment only: META/legacy-ui/note.md is archived, but
+    // META/09-ticket-runtime/legacy-notes/live.md is a live spec in a
+    // conveniently named folder.
+    if (segments.length > 2 && segments[1].startsWith("legacy-")) return true;
   }
   return false;
 }
 
-// Two of the exempt classes are not machine-detectable: prose that deliberately
-// names a retired Skill in order to describe its retirement, and a documented
-// legacy-path constant kept so historical commits stay readable. Intent is not
-// in the bytes, so the contract pins them by exact path. Everything else fails
-// by default. That default is the whole safety property — a new file that names
-// a retired Skill fails until a human adds it to `allowed_paths` with a reason,
-// which is a reviewable diff rather than a grep someone has to remember to run.
-// The allowlist is not a blanket pass: a `$`-invocation of a retired name is a
-// live call wherever it appears and fails even in an allowlisted file. Stale
-// entries fail too, so the list cannot rot into a silent blanket exemption.
+// One exempt class is not machine-detectable: an occurrence a human decided to
+// keep — prose describing the retirement, a documented legacy-path constant
+// kept so historical commits stay readable, a dated record under META/. Intent
+// is not in the bytes, so the contract pins those occurrences one by one.
+//
+// An allowance excuses OCCURRENCES, never a file. It names the path, the exact
+// `text` it excuses, how many times that text occurs (`occurrences`, default 1),
+// and why. Any occurrence of the retired name in that file which no allowance's
+// text accounts for still fails, so appending a live reference to an allowlisted
+// file is caught. The counts are what make it per-occurrence rather than
+// per-line: duplicating an excused line changes the count and fails.
+//
+// Three shape rules keep an allowance from degenerating back into a file pass:
+// its text must contain the retired name (otherwise it excuses nothing), must
+// be a single line (otherwise "text" could be the whole file), and must occur
+// exactly as many times as declared. A stale allowance — file gone, text gone,
+// or count moved — is itself a failure, so the list cannot rot into a silent
+// blanket exemption. A `$`-invocation is a live call wherever it appears and
+// fails inside an allowlisted file too, unless an allowance names that exact
+// `$`-carrying text and says why.
 function validateRetiredNames(repo, contract, files, errors) {
+  const texts = new Map(files.map((file) => [file.path, file.text]));
   for (const [index, entry] of (Array.isArray(contract.retired) ? contract.retired : []).entries()) {
     const path = `retired[${index}]`;
     if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string") {
       add(errors, path, "A retired entry needs a name and its replacement");
       continue;
     }
-    const allowed = new Map();
+    const allowances = [];
     for (const [allowIndex, allowance] of (Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []).entries()) {
-      if (!isObject(allowance) || typeof allowance.path !== "string" || typeof allowance.reason !== "string") {
-        add(errors, `${path}.allowed_paths[${allowIndex}]`, "An allowed path needs a path and a reason");
+      const where = `${path}.allowed_paths[${allowIndex}]`;
+      if (!isObject(allowance) || typeof allowance.path !== "string" || typeof allowance.text !== "string"
+        || typeof allowance.reason !== "string") {
+        add(errors, where, "An allowance needs a path, the exact text it excuses, and a reason");
         continue;
       }
-      allowed.set(allowance.path, allowance.reason);
+      if (!allowance.text.includes(entry.name)) {
+        add(errors, where, `The excused text does not contain ${entry.name}, so it excuses nothing`);
+        continue;
+      }
+      if (/[\n\r]/u.test(allowance.text)) {
+        add(errors, where, "The excused text must be a single line, naming one occurrence rather than a span");
+        continue;
+      }
+      const declared = allowance.occurrences ?? 1;
+      if (!Number.isInteger(declared) || declared < 1) {
+        add(errors, where, "occurrences must be a positive integer");
+        continue;
+      }
+      allowances.push({ where, path: allowance.path, text: allowance.text, declared });
     }
-    const seen = new Set();
+
+    // Stale allowances first: a count that no longer matches is a failure in its
+    // own right, and the excusing below is capped at what the file really holds.
+    for (const allowance of allowances) {
+      const text = texts.get(allowance.path);
+      if (text === undefined) {
+        add(errors, `${path}.allowed_paths`, `${allowance.path} no longer contains ${entry.name}; drop the allowance`);
+        continue;
+      }
+      const actual = countOccurrences(text, allowance.text);
+      if (actual === 0) {
+        add(
+          errors,
+          `${path}.allowed_paths`,
+          `${allowance.path} no longer contains the excused text ${JSON.stringify(allowance.text)}; drop or update the allowance`,
+        );
+      } else if (actual !== allowance.declared) {
+        add(
+          errors,
+          `${path}.allowed_paths`,
+          `${allowance.path} carries ${actual} occurrence${actual === 1 ? "" : "s"} of ${JSON.stringify(allowance.text)} but the allowance names ${allowance.declared}`,
+        );
+      }
+    }
+
+    const byPath = new Map();
+    for (const allowance of allowances) {
+      if (!byPath.has(allowance.path)) byPath.set(allowance.path, []);
+      byPath.get(allowance.path).push(allowance);
+    }
+
     for (const file of files) {
       if (file.path === SKILL_GRAPH_CONTRACT) continue;
       const total = countOccurrences(file.text, entry.name);
       if (total === 0) continue;
-      seen.add(file.path);
       if (isHistoricalRecord(repo, file.path)) continue;
-      if (file.text.includes(`$${entry.name}`)) {
+
+      let excusedName = 0;
+      let excusedCall = 0;
+      for (const allowance of byPath.get(file.path) ?? []) {
+        const covered = Math.min(countOccurrences(file.text, allowance.text), allowance.declared);
+        excusedName += covered * countOccurrences(allowance.text, entry.name);
+        excusedCall += covered * countOccurrences(allowance.text, `$${entry.name}`);
+      }
+
+      const calls = countOccurrences(file.text, `$${entry.name}`);
+      if (calls > excusedCall) {
         add(errors, file.path, `Retired Skill ${entry.name} is invoked as $${entry.name}; use $${entry.replacement}`);
         continue;
       }
-      if (allowed.has(file.path)) continue;
-      const live = total - recordedRefOccurrences(file.text, entry.name);
+      const live = total - recordedRefOccurrences(file.path, file.text, entry.name) - excusedName;
       if (live <= 0) continue;
       add(
         errors,
         file.path,
-        `Live reference to retired Skill ${entry.name} (${live} occurrence${live === 1 ? "" : "s"}); use ${entry.replacement}, or record why this path is exempt in ${SKILL_GRAPH_CONTRACT}`,
+        `Live reference to retired Skill ${entry.name} (${live} unexcused occurrence${live === 1 ? "" : "s"}); use ${entry.replacement}, or name the exact occurrence and its reason in ${SKILL_GRAPH_CONTRACT}`,
       );
-    }
-    for (const allowedPath of allowed.keys()) {
-      if (!seen.has(allowedPath)) {
-        add(errors, `${path}.allowed_paths`, `${allowedPath} no longer contains ${entry.name}; drop the allowance`);
-      }
     }
   }
 }
