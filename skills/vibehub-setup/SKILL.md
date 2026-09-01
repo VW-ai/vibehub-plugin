@@ -20,6 +20,27 @@ deliverable continues without another user command.
 1. Inspect the exact checkout for existing `AGENTS.md`, `CLAUDE.md`, `docs/`,
    `.github/copilot-instructions.md`, project-local skills, memory/context
    folders, and similarly named capture commands.
+
+   In the same pass, ask the helper whether any installed Skill folder carries
+   a name the plugin has retired:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs skills retired --repo <root>
+   ```
+
+   `npx skills add` copies Skill folders and never prunes one that disappeared
+   upstream, so a rename can leave the old folder installed beside its
+   replacement and present the Agent two Skills for the same job. The names
+   come from the packaged skill-graph contract that ships next to the helper,
+   never from this prose, so the answer stays true after any later rename. The
+   command reads the install locations it reports under `scanned` and writes
+   nothing.
+
+   When `retired` is empty — including in a project that never installed
+   through skills.sh, where `scanned` is empty too — say nothing about it and
+   continue. For each entry, report its exact `path` and its `replacement`,
+   and say that deleting the folder is the user's action: setup never deletes,
+   moves, or rewrites anything inside an agent Skill directory.
 2. If an existing durable-memory system may overlap, show the detected paths
    and ask the user to choose:
    - dual-write: preserve the existing system and teach its command to write

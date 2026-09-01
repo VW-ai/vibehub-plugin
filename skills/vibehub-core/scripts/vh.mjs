@@ -2702,8 +2702,71 @@ function validateSkillGraph(repo) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Retired Skill folders left behind by an update.
+//
+// `skills validate` above is a DEVELOPMENT-TIME check: it reads the contract at
+// `skills/vibehub-core/contracts/skill-graph.json` under --repo, which only
+// exists in this plugin's own checkout. `skills retired` answers a different
+// question, in a different place: a USER's project, which has no skills/ tree
+// at all — the Skill folders live under .claude/skills/ or .agents/skills/,
+// copied there by `npx skills add`. So the retired list is read from the copy
+// that TRAVELS WITH THIS SCRIPT (../contracts/skill-graph.json, the same
+// mechanism versions.json and dependency-hygiene.json already use). That copy
+// is guaranteed present wherever vh.mjs runs, because both ship inside the
+// vibehub-core folder, and it always describes the plugin version that is
+// actually installed. In this repository the two paths are the same file, so
+// the two operations cannot disagree here either.
+//
+// This reads directories and returns what it saw. It never deletes, moves, or
+// writes anything: removing an installed Skill from a user's agent directory
+// is the user's action. It runs only when the setup workflow asks — there is
+// no hook, watcher, or install-time daemon behind it.
+// ---------------------------------------------------------------------------
+
+const SKILL_GRAPH_PACKAGED = fileURLToPath(new URL("../contracts/skill-graph.json", import.meta.url));
+// Where an install actually lands. The first two are the directories
+// `npx skills add` was observed to write for the claude-code and codex agents;
+// the third is a repository that vendors Skill folders at its root, which is
+// the shape this plugin's own checkout has.
+const SKILL_INSTALL_LOCATIONS = [".claude/skills", ".agents/skills", "skills"];
+
+function retiredSkillFolders(repo) {
+  const contract = JSON.parse(readFileSync(SKILL_GRAPH_PACKAGED, "utf8"));
+  const retired = new Map();
+  for (const entry of Array.isArray(contract.retired) ? contract.retired : []) {
+    if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string") continue;
+    retired.set(entry.name, entry);
+  }
+
+  const scanned = [];
+  const found = [];
+  for (const location of SKILL_INSTALL_LOCATIONS) {
+    const absolute = join(repo, ...location.split("/"));
+    if (!existsSync(absolute) || !lstatSync(absolute).isDirectory()) continue;
+    scanned.push(location);
+    const installed = readdirSync(absolute, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+    for (const name of installed) {
+      const entry = retired.get(name);
+      if (!entry) continue;
+      found.push({
+        path: `${location}/${name}`,
+        name,
+        replacement: entry.replacement,
+        replacement_installed: installed.includes(entry.replacement),
+        reason: typeof entry.reason === "string" ? entry.reason : null,
+      });
+    }
+  }
+  return { locations: SKILL_INSTALL_LOCATIONS, scanned, retired: found };
+}
+
 function skillsOperation(operation, repo) {
   if (operation === "validate") return validateSkillGraph(repo);
+  if (operation === "retired") return retiredSkillFolders(repo);
   throw new VibeHubError("unsupported_operation", `Unsupported skills operation: ${operation}`);
 }
 

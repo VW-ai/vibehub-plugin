@@ -31,7 +31,10 @@ does not remove folders that no longer exist upstream. When a Skill is renamed
 an update and present a stale duplicate Skill to the Agent. Delete the old
 folder from `.claude/skills/`, `.agents/skills/`, or wherever your host
 installed it. Host marketplace installs are unaffected: their plugin cache is
-isolated per version.
+isolated per version. Setup notices this for you: while it inspects the
+checkout it names any installed Skill folder whose name the plugin has retired,
+along with the replacement. It only reports — the folder is inside your agent
+directory, so deleting it stays your action.
 
 **Host marketplaces.** The same layout ships through the Codex and Claude Code
 marketplaces; see the README for the exact commands.

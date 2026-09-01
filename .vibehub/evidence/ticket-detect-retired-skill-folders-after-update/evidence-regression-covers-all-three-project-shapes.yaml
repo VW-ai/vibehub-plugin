@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "regression"
+  ],
+  "evidence_id": "evidence-regression-covers-all-three-project-shapes",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T11:08:30.915Z",
+  "refs": [
+    "test/retired-skill-folders.test.mjs",
+    "test/skill-contracts.test.mjs",
+    "command:npm test",
+    "test:a project with a retired folder is told the exact path and the replacement",
+    "test:a project holding only the replacement produces nothing to report",
+    "test:a project that never installed through skills.sh is unaffected"
+  ],
+  "schema_version": 1,
+  "summary": "NEW FILE test/retired-skill-folders.test.mjs, 6 tests, no existing test modified. THE THREE REQUIRED SHAPES: (1) retired folder present — a temp project with the retired name installed in BOTH .claude/skills/ and .agents/skills/, plus the replacement in .claude/skills/ only; asserts scanned is ['.claude/skills','.agents/skills'] and that the two reported entries carry exactly the paths, the replacement, and replacement_installed true then false, in that order. (2) only the replacement present — asserts scanned is both locations and retired is []. (3) neither — a temp project holding only README.md; asserts scanned [] and retired []. THREE FURTHER TESTS: the read-only assertion (folder and contents unchanged, no .vibehub/ created, second run identical); this repository's own skills/ tree reports clean; and setup's SKILL.md cites `vh.mjs skills retired --repo`, carries the report-only sentence and the empty-list rule, and contains NO retired Skill name anywhere in its prose — that last assertion is what mechanically enforces the Ticket's third constraint. HOW THE TEST AVOIDS HARD-CODING: the retired name and replacement are read at load time from skills/vibehub-core/contracts/skill-graph.json, the same shared contract the helper reads. The literal retired name appears nowhere in the test source, so `skills validate`'s retired-name scan (which reads test/ like every other file) has nothing new to excuse and no allowance was added to the contract. If the contract's retired list were ever emptied the tests degrade to asserting an empty report rather than failing spuriously. AN INHERITED CHECK THAT NOW COVERS THIS: test/skill-contracts.test.mjs re-invokes every `vh.mjs <domain> <op>` cited in any SKILL.md against a bare temp repository and fails on invalid_argument / unsupported_operation / unsupported_domain; the new citation `skills retired` is picked up by that scan and returns ok:true there. VERIFY, real output taken 2026-09-01 in the worktree: `node --test test/retired-skill-folders.test.mjs` -> tests 6, pass 6, fail 0. `npm test` -> tests 206, pass 206, fail 0; the baseline handed to me was 200/200/0, so the delta is exactly the 6 new tests and nothing regressed. project validate --repo . -> ok:true valid:true, rooms 6, contexts 66, tickets 103, evidence 305, outcomes 94 (count taken before this Ticket's Evidence was appended); skills validate --repo . -> ok:true valid:true, skills 12, edges 19, events 9, files_scanned 1111. git status --short -> M docs/INSTALL.md, M skills/vibehub-core/scripts/vh.mjs, M skills/vibehub-setup/SKILL.md, ?? test/retired-skill-folders.test.mjs. LIMIT: the tests exercise the helper's envelope, not an Agent following the prose, and they cover the three install locations the script knows about, not hosts that install elsewhere. I did not commit, did not stash, did not close the Ticket, and do not judge whether this criterion is satisfied.",
+  "ticket_id": "ticket-detect-retired-skill-folders-after-update"
+}

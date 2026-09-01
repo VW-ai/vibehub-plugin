@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "reports-does-not-delete"
+  ],
+  "evidence_id": "evidence-the-check-reports-and-never-deletes",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T11:08:28.280Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-setup/SKILL.md",
+    "docs/INSTALL.md",
+    "test/retired-skill-folders.test.mjs",
+    "test:the report leaves the user's agent Skill directory exactly as it found it"
+  ],
+  "schema_version": 1,
+  "summary": "MECHANISM: retiredSkillFolders() calls only readFileSync (on the packaged contract), existsSync, lstatSync and readdirSync. There is no unlink, rm, rename, mkdir or write of any kind in it, and it touches nothing under .vibehub/ — unlike ticket/context/room operations it returns a value that the caller prints and nothing is persisted. It runs only when the setup workflow the user already invoked executes step 1; no hook, watcher, scheduled job, or install-time daemon was added, which is what skills/vibehub-setup/references/architecture-boundary.md forbids. TEST: 'the report leaves the user's agent Skill directory exactly as it found it' plants a retired folder under .claude/skills/, runs the operation, then asserts the folder still exists, its contents are still exactly ['SKILL.md'], the SKILL.md front matter is unchanged, and no .vibehub/ directory was created in the project; it then runs the operation a second time and gets the identical report, which would not hold if the first run had removed anything. PROSE: setup's step 1 ends 'report its exact path and its replacement, and say that deleting the folder is the user's action: setup never deletes, moves, or rewrites anything inside an agent Skill directory'; a test asserts that sentence is present. docs/INSTALL.md's rename note now says the same in user-facing words. DEMONSTRATION on the throwaway project: after the run that reported two entries, `ls .claude/skills` still showed vibehub-core, vibehub-review, vibehub-setup, vibehub-ticket-review and `ls .agents/skills` still showed vibehub-ticket-review — the reported folders were untouched. I then deleted them MYSELF, as the user would, and the same command returned retired []. VERIFY, real output taken 2026-09-01 in the worktree: project validate --repo . -> ok:true valid:true, rooms 6, contexts 66, tickets 103, evidence 305, outcomes 94 (count taken before this Ticket's Evidence was appended); skills validate --repo . -> ok:true valid:true, skills 12, edges 19, files_scanned 1111; npm test -> tests 206, pass 206, fail 0; git status --short -> M docs/INSTALL.md, M skills/vibehub-core/scripts/vh.mjs, M skills/vibehub-setup/SKILL.md, ?? test/retired-skill-folders.test.mjs. LIMIT: the guarantee is that the shipped code performs no write; it is not a sandbox, and I did not instrument the filesystem to prove absence of writes beyond reading the implementation and asserting the folder's state before and after. I did not commit, did not stash, did not close the Ticket, and do not judge whether this criterion is satisfied.",
+  "ticket_id": "ticket-detect-retired-skill-folders-after-update"
+}
