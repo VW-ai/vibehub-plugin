@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "validation"
+  ],
+  "evidence_id": "evidence-skills-validate-failure-modes",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:30:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/skill-graph.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs skills validate --repo .",
+    "test:an unresolvable $vibehub reference fails",
+    "test:a Skill present under skills but missing from the contract fails",
+    "test:an orphan Skill reachable from nothing fails",
+    "test:a cycle in the invocation subgraph fails",
+    "test:a reference in a SKILL.md that the contract declares no edge for fails",
+    "test:an edge the contract declares but no SKILL.md contains fails",
+    "test:this repository's real skill graph passes"
+  ],
+  "schema_version": 1,
+  "summary": "vh.mjs gained the skills domain with one operation, validate, returning the standard {ok,data} / {ok,error} envelope and reporting failures as validation_error with a details.errors list of {path,message}. Each of the six required failure modes has a named test built on a throwaway skills tree in a temp directory rather than by mutating the real one: unresolvable reference, undeclared Skill folder, orphan internal Skill, invocation cycle, reference with no declared edge, and declared edge with no reference. All 12 cases in test/skill-graph.test.mjs pass. Two real defects surfaced while making the check green rather than being worked around: skills validate rejected its own source comment for containing a bare $-invocation of a Skill from a folder with no such edge (the comment was reworded), and the first cut of the retired-name rule failed a closed Ticket that legitimately records a $-invocation of the old name, which corrected the rule's ordering so historical records are exempted before the $-form override applies. Run at 2026-09-01T09:23Z, node skills/vibehub-core/scripts/vh.mjs skills validate --repo . returns ok:true valid:true over 1078 scanned files, and npm test reports 175 tests, 175 pass, 0 fail.",
+  "ticket_id": "ticket-contract-the-skill-graph"
+}

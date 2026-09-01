@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "graph-contract"
+  ],
+  "evidence_id": "evidence-skill-graph-contract-declared",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:30:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/skill-graph.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/skill-graph.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs skills validate --repo .",
+    "test:this repository's real skill graph passes"
+  ],
+  "schema_version": 1,
+  "summary": "skill-graph.json declares all 12 folders under skills/ with entry kind, outbound edges by kind (invokes / presents / routes), and owned events. Run at 2026-09-01T09:23Z against this worktree it reports skills 12, edges 19, events 9, entry_points 9 (ingest, migrate, pr, query, review, setup, ticket-closeout, ticket-plan, ticket-run), internal 2 (distill, ticket-validate), infrastructure 1 (core). The graph is the post-rename, post-absorb one: vibehub-review carries the presenter role and the retired list maps vibehub-ticket-review to it, and vibehub-ingest declares invokes vibehub-distill plus presents vibehub-review, both witnessed by skills/vibehub-ingest/references/bulk-absorption.md lines 73, 76 and 82, with distill entry internal per its own description. Edge-to-reference agreement is enforced in both directions by skills validate, so the declared 19 edges are exactly the $vibehub-* references present in the checked-in skills tree: every reference is explained by a declared incident edge and every declared edge is witnessed by a reference. The declared event owners were cross-checked against skills/vibehub-review/references/ticket-lifecycle.json; all 9 lifecycle events have exactly one declaring Skill and the owners agree.",
+  "ticket_id": "ticket-contract-the-skill-graph"
+}

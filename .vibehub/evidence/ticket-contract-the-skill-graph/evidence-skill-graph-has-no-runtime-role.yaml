@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "no-runtime-role"
+  ],
+  "evidence_id": "evidence-skill-graph-has-no-runtime-role",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:30:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/skill-graph.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/skill-graph.test.mjs",
+    "test:the checked-in skill graph is development-time only",
+    "command:git status --short",
+    "command:node skills/vibehub-core/scripts/vh.mjs project validate --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "No SKILL.md cites skill-graph.json or the skills domain: the command is documented only in docs/proposals/bulk-absorption.md, so no Skill's runtime behavior reads the graph and nothing routes through it. The contract carries runtime_role none and a purpose stating it is not a router or a lifecycle. validateSkillGraph reads skills/ and the contract from the repository under --repo and calls no write path; it never touches dirs(repo) and writes no document. Proven observationally: at 2026-09-01T09:23Z, after running skills validate against this repository, git status --short listed only the two files this Ticket adds, skills/vibehub-core/contracts/skill-graph.json and test/skill-graph.test.mjs, with nothing created or modified under .vibehub/, and project validate --repo . returned ok:true valid:true format_version 2 with rooms 6, contexts 66, tickets 103, evidence 297, outcomes 92 and no unverifiable context refs, unchanged in shape by the new command.",
+  "ticket_id": "ticket-contract-the-skill-graph"
+}

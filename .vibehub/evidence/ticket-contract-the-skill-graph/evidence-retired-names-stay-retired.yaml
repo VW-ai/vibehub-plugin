@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "retired-names-stay-retired"
+  ],
+  "evidence_id": "evidence-retired-names-stay-retired",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:30:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/skill-graph.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/skill-graph.test.mjs",
+    "test:a retired name in a live reference fails, and the exempt classes do not",
+    "test:an open Ticket is live, and an allowlist may not cover a $-invocation",
+    "test:an allowance whose file no longer names the retired Skill fails",
+    ".vibehub/tickets/ticket-generalize-review-to-room-trees.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "skill-graph.json declares retired vibehub-ticket-review with replacement vibehub-review, a reason, and seven allowed_paths each carrying its own reason. skills validate walks every non-binary file in the repository (skipping .git, node_modules, the gitignored build outputs dist/coverage/test-results, and any nested checkout carrying its own .git) and fails on any occurrence of a retired name outside the exempt classes enumerated in the renamed-skill criterion of ticket-generalize-review-to-room-trees. Four classes are detected structurally with no allowlist: .vibehub/evidence/, .vibehub/outcomes/ and the .vibehub/history/ archive; a Ticket under .vibehub/tickets/ that already has an Outcome file; a dated (YYYY-MM-DD) basename or a legacy-* path segment under META/; and Context source.ref plus evidence[].ref occurrences, which are parsed out of the document and subtracted from the file's count so the same file's prose stays under the rule. The two classes that are not machine-detectable, prose deliberately describing the retirement and the documented LEGACY_APP_PATH constant in scripts/measure-graph-layout.mjs, are pinned by exact path in the contract with a reason each; the judgment call and its rationale are documented in a code comment above validateRetiredNames. The default is failure, which is the safety property: a new file naming a retired Skill fails until a human adds a reviewable allowance. The rule is deliberately not loose enough to have missed the original bug, proven by the test case that writes an active non-dated META/room/spec.md naming skills/<retired>/SKILL.md and asserts it fails while the dated META artifact beside it passes. Two further tightenings are tested: a $-invocation of a retired name fails even inside an allowlisted file, and an allowance whose file no longer contains the name fails so the list cannot rot. Run at 2026-09-01T09:23Z against this repository the check passes over 1078 scanned files, classifying every one of the 7 non-structural hits of vibehub-ticket-review through a declared allowance.",
+  "ticket_id": "ticket-contract-the-skill-graph"
+}
