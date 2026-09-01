@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "contract-and-frontier-agree"
+  ],
+  "evidence_id": "contract-and-frontier-agree-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:21:00Z",
+  "refs": [
+    "file:skills/vibehub-core/contracts/ticket-next-action.md",
+    "file:skills/vibehub-core/scripts/vh.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs ticket frontier --repo /tmp/peelproj",
+    "command:node skills/vibehub-core/scripts/vh.mjs project validate --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "Measured 2026-09-01T09:21Z. skills/vibehub-core/contracts/ticket-next-action.md now states rows 5 EXECUTE / 6 NEEDS_HUMAN / 7 CLOSE_OUT in that order, with prose saying a human-authority criterion is routed only once it is the remaining blocker, that this is routing order and never authority, and that a Ticket whose only unevidenced criteria are human-authority still reports NEEDS_HUMAN immediately. The projection code matches row for row: the CLOSE_OUT branch is now the unconditional tail because a Ticket that passes both routing rows has authority-satisfying Evidence for every criterion. ticket frontier over /tmp/peelproj puts ticket-verify-absorption-against-peel in ready_to_execute with needs_human empty; frontier grouping in vh.mjs is a pure by-action partition and needed no change. project validate --repo . reports valid:true, 6 rooms, 66 contexts, 103 tickets, 292 evidence, 92 outcomes, no unverifiable context refs.",
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}

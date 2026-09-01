@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "needs-human-when-human-is-the-remainder"
+  ],
+  "evidence_id": "needs-human-when-human-is-the-remainder-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:21:00Z",
+  "refs": [
+    "file:skills/vibehub-core/scripts/vh.mjs",
+    "test:test/ticket-next-action.test.mjs",
+    "command:npm test"
+  ],
+  "schema_version": 1,
+  "summary": "Measured 2026-09-01T09:21Z. test/ticket-next-action.test.mjs 'human routing waits until the human criterion is the remaining blocker' drives one mixed-authority Ticket (criterion-1, criterion-2 agent; criterion-3 human) through the whole sequence: zero Evidence -> EXECUTE naming [criterion-1, criterion-2]; Evidence on criterion-1 only -> EXECUTE naming [criterion-2]; Evidence on criterion-2 and criterion-3 from an Agent -> NEEDS_HUMAN / missing_human_evidence naming only [criterion-3]; human-origin Evidence on criterion-3 -> CLOSE_OUT. Agent-origin Evidence on criterion-3 does not satisfy it, so authority is unchanged; only the order in which the projection reports the blocker changed. A human-only-criterion Ticket with zero Evidence still projects NEEDS_HUMAN immediately. 163/163 tests pass, 0 fail.",
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}

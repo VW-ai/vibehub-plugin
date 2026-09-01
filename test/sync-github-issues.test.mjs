@@ -66,7 +66,9 @@ test("projection renders state, checklist, dependencies, evidence, and markers",
   assert.equal(done.state, "closed");
   assert.deepEqual(done.labels, ["state: done", "maturity: firm"]);
   assert.equal(open.state, "open");
-  assert.deepEqual(open.labels, ["state: needs-human", "maturity: firm"]);
+  // `ticket-open` still has an unevidenced agent-authority criterion, so it
+  // routes to EXECUTE even though it also carries a human-authority criterion.
+  assert.deepEqual(open.labels, ["state: ready", "maturity: firm"]);
   const numbers = new Map([["ticket-done", 7], ["ticket-open", 8]]);
   const doneBody = done.renderBody(numbers);
   assert.equal(markerValue(doneBody, TICKET_MARKER), "ticket-done");
@@ -107,7 +109,7 @@ test("drift in state, labels, or missing evidence is repaired without touching t
   const { byTicket } = planSync(p, remote);
   const ops = planUpdates(p, byTicket);
   assert.deepEqual(ops.map((o) => `${o.kind}:${o.ticket_id}`), ["comment:ticket-done", "comment:ticket-done", "close:ticket-done", "update:ticket-open"]);
-  assert.deepEqual(ops[3].addLabels, ["state: needs-human", "maturity: firm"]);
+  assert.deepEqual(ops[3].addLabels, ["state: ready", "maturity: firm"]);
   assert.deepEqual(ops[3].removeLabels, ["state: done"]);
 });
 

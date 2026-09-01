@@ -14,14 +14,24 @@ The first matching row wins:
 | 2 | Partial, failed, or deviated Outcome exists | `REPLAN` | `non_successful_outcome` | unresolved Acceptance IDs |
 | 3 | Any direct dependency lacks a successful Outcome | `WAIT` | `unresolved_direct_dependencies` | blocking Ticket IDs |
 | 4 | Ticket maturity is draft | `REFINE` | `draft_contract` | all current Acceptance IDs |
-| 5 | A reachable human-authority criterion lacks human-origin Evidence | `NEEDS_HUMAN` | `missing_human_evidence` | affected Acceptance IDs |
-| 6 | Every current criterion has authority-satisfying Evidence and no Outcome exists | `CLOSE_OUT` | `authority_satisfying_evidence_complete` | all current Acceptance IDs |
-| 7 | Otherwise | `EXECUTE` | `acceptance_evidence_incomplete` | criteria still lacking Evidence |
+| 5 | Any agent-authority criterion lacks Evidence | `EXECUTE` | `acceptance_evidence_incomplete` | agent-authority criteria still lacking Evidence |
+| 6 | A reachable human-authority criterion lacks human-origin Evidence | `NEEDS_HUMAN` | `missing_human_evidence` | affected human-authority Acceptance IDs |
+| 7 | Otherwise, every current criterion has authority-satisfying Evidence and no Outcome exists | `CLOSE_OUT` | `authority_satisfying_evidence_complete` | all current Acceptance IDs |
 
 Evidence satisfies an Agent-authority criterion when any Evidence record links
 that Acceptance ID. Evidence satisfies a human-authority criterion only when a
 linked record has `origin: human`. Raw Evidence count is never acceptance:
 `CLOSE_OUT` asks an independent Agent to adjudicate the current contract.
+
+A human-authority criterion is routed only once it is the remaining blocker.
+While agent-authority work is still unevidenced the projection reports
+`EXECUTE` and names exactly those agent-authority criteria, so a Ticket
+carrying terminal human sign-off is executable from the start and asks its
+person to judge a result that already exists. This is routing order only: it
+never lets an Agent satisfy or bypass a human-authority criterion, and a
+Ticket whose only unevidenced criteria are human-authority — including a
+Ticket with no agent-authority criteria at all — still reports `NEEDS_HUMAN`
+immediately. Rows 1 through 4 keep their precedence over both.
 
 `ticket frontier` groups the same projection into `ready_to_execute`,
 `ready_to_closeout`, `needs_human`, `needs_replan`, `needs_refinement`,

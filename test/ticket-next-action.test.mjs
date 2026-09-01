@@ -120,7 +120,7 @@ test("next action covers execution, authority, adjudication, dependencies, matur
   assert.deepEqual(actions["waiting-work"], ["WAIT", "unresolved_direct_dependencies"]);
   assert.deepEqual(actions["draft-contract"], ["REFINE", "draft_contract"]);
   assert.deepEqual(actions["human-authority"], ["NEEDS_HUMAN", "missing_human_evidence"]);
-  assert.deepEqual(actions["mixed-authority"], ["NEEDS_HUMAN", "missing_human_evidence"]);
+  assert.deepEqual(actions["mixed-authority"], ["EXECUTE", "acceptance_evidence_incomplete"]);
   assert.deepEqual(actions["v080-publication"], ["CLOSE_OUT", "authority_satisfying_evidence_complete"]);
   assert.deepEqual(actions["dogfood-repair"], ["CLOSE_OUT", "authority_satisfying_evidence_complete"]);
   assert.deepEqual(actions["successful-work"], ["DONE", "successful_outcome"]);
@@ -139,7 +139,7 @@ test("next action covers execution, authority, adjudication, dependencies, matur
   );
   assert.deepEqual(
     frontier.needs_human.map((item) => item.ticket.ticket_id),
-    ["human-authority", "mixed-authority"],
+    ["human-authority"],
   );
   assert.deepEqual(
     frontier.needs_replan.map((item) => item.ticket.ticket_id),
@@ -204,4 +204,137 @@ test("human precedence remains authority-aware and full Evidence never unlocks d
     "DONE",
   );
   assert.equal(itemById(frontier.ready_to_execute, "dependent").next_action.action, "EXECUTE");
+});
+
+test("human routing waits until the human criterion is the remaining blocker", () => {
+  const repo = tempRepo("next-action-human-ordering");
+  assert.equal(run(repo, "project", "init").status, 0);
+
+  const delivery = withAcceptance("terminal-signoff", 3, { human: [3] });
+  const humanOnly = withAcceptance("human-only", 1, { human: [1] });
+  assert.equal(run(repo, "ticket", "apply", { tickets: [delivery, humanOnly] }).status, 0);
+
+  // Mixed authority, before any Evidence: agent work remains, so the Ticket is
+  // executable and names only the agent-authority criteria.
+  let projection = run(repo, "ticket", "get", { ticket_id: "terminal-signoff" })
+    .envelope.data.next_action;
+  assert.equal(projection.action, "EXECUTE");
+  assert.equal(projection.reason, "acceptance_evidence_incomplete");
+  assert.deepEqual(projection.acceptance_ids, ["criterion-1", "criterion-2"]);
+
+  // A human-authority-only Ticket has no agent work to do, so it routes to the
+  // human immediately.
+  projection = run(repo, "ticket", "get", { ticket_id: "human-only" })
+    .envelope.data.next_action;
+  assert.equal(projection.action, "NEEDS_HUMAN");
+  assert.equal(projection.reason, "missing_human_evidence");
+  assert.deepEqual(projection.acceptance_ids, ["criterion-1"]);
+
+  let frontier = run(repo, "ticket", "frontier").envelope.data;
+  assert.deepEqual(frontier.ready_to_execute.map((item) => item.ticket.ticket_id), ["terminal-signoff"]);
+  assert.deepEqual(frontier.needs_human.map((item) => item.ticket.ticket_id), ["human-only"]);
+
+  // Partial agent Evidence still leaves agent work: still EXECUTE.
+  assert.equal(run(repo, "ticket", "evidence", evidence(
+    "signoff-agent-partial",
+    "terminal-signoff",
+    ["criterion-1"],
+  )).status, 0);
+  projection = run(repo, "ticket", "get", { ticket_id: "terminal-signoff" })
+    .envelope.data.next_action;
+  assert.equal(projection.action, "EXECUTE");
+  assert.deepEqual(projection.acceptance_ids, ["criterion-2"]);
+
+  // Every agent-authority criterion evidenced: the human criterion is now the
+  // remaining blocker, and Agent-origin Evidence cannot satisfy it.
+  assert.equal(run(repo, "ticket", "evidence", evidence(
+    "signoff-agent-rest",
+    "terminal-signoff",
+    ["criterion-2", "criterion-3"],
+  )).status, 0);
+  projection = run(repo, "ticket", "get", { ticket_id: "terminal-signoff" })
+    .envelope.data.next_action;
+  assert.equal(projection.action, "NEEDS_HUMAN");
+  assert.equal(projection.reason, "missing_human_evidence");
+  assert.deepEqual(projection.acceptance_ids, ["criterion-3"]);
+
+  frontier = run(repo, "ticket", "frontier").envelope.data;
+  assert.deepEqual(
+    frontier.needs_human.map((item) => item.ticket.ticket_id),
+    ["human-only", "terminal-signoff"],
+  );
+  assert.deepEqual(frontier.ready_to_execute.map((item) => item.ticket.ticket_id), []);
+
+  // Human-origin Evidence closes the last criterion and adjudication is next.
+  assert.equal(run(repo, "ticket", "evidence", evidence(
+    "signoff-human",
+    "terminal-signoff",
+    ["criterion-3"],
+    "human",
+  )).status, 0);
+  projection = run(repo, "ticket", "get", { ticket_id: "terminal-signoff" })
+    .envelope.data.next_action;
+  assert.equal(projection.action, "CLOSE_OUT");
+  assert.equal(projection.reason, "authority_satisfying_evidence_complete");
+});
+
+test("rows one through four still outrank both EXECUTE and NEEDS_HUMAN", () => {
+  const repo = tempRepo("next-action-higher-precedence");
+  assert.equal(run(repo, "project", "init").status, 0);
+
+  // Each Ticket carries the same mixed-authority shape with zero Evidence,
+  // which alone would project EXECUTE, so any other action proves precedence.
+  const mixed = (id, relations = []) => ({
+    ...withAcceptance(id, 2, { human: [2] }),
+    relations: relations.map((target) => ({
+      type: "depends_on",
+      target_ticket_id: target,
+      rationale: "The prerequisite must close first.",
+    })),
+  });
+  const draft = { ...mixed("mixed-draft"), maturity: "draft" };
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [
+      mixed("mixed-successful"),
+      mixed("mixed-partial"),
+      mixed("mixed-prerequisite"),
+      mixed("mixed-waiting", ["mixed-prerequisite"]),
+      draft,
+    ],
+  }).status, 0);
+
+  assert.equal(run(repo, "ticket", "evidence", evidence(
+    "successful-agent",
+    "mixed-successful",
+    ["criterion-1"],
+  )).status, 0);
+  assert.equal(run(repo, "ticket", "evidence", evidence(
+    "successful-human",
+    "mixed-successful",
+    ["criterion-2"],
+    "human",
+  )).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", outcome(
+    "mixed-successful",
+    "successful",
+    ["criterion-1", "criterion-2"],
+    [],
+    ["successful-agent", "successful-human"],
+  )).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", outcome(
+    "mixed-partial",
+    "partial",
+    [],
+    ["criterion-1", "criterion-2"],
+  )).status, 0);
+
+  const actionFor = (id) => {
+    const projection = run(repo, "ticket", "get", { ticket_id: id }).envelope.data.next_action;
+    return [projection.action, projection.reason];
+  };
+  assert.deepEqual(actionFor("mixed-successful"), ["DONE", "successful_outcome"]);
+  assert.deepEqual(actionFor("mixed-partial"), ["REPLAN", "non_successful_outcome"]);
+  assert.deepEqual(actionFor("mixed-waiting"), ["WAIT", "unresolved_direct_dependencies"]);
+  assert.deepEqual(actionFor("mixed-draft"), ["REFINE", "draft_contract"]);
+  assert.deepEqual(actionFor("mixed-prerequisite"), ["EXECUTE", "acceptance_evidence_incomplete"]);
 });

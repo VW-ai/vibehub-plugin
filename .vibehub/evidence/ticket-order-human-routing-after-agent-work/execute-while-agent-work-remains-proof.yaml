@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "execute-while-agent-work-remains"
+  ],
+  "evidence_id": "execute-while-agent-work-remains-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:21:00Z",
+  "refs": [
+    "file:skills/vibehub-core/scripts/vh.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs ticket get --repo /tmp/peelproj --input /tmp/pk2.json",
+    "test:test/ticket-next-action.test.mjs::human routing waits until the human criterion is the remaining blocker"
+  ],
+  "schema_version": 1,
+  "summary": "Measured 2026-09-01T09:21Z on working tree over baseline 960edd8. ticket-verify-absorption-against-peel (4 agent-authority criteria, 1 human-authority criterion, zero Evidence) applied without its two depends_on edges into a scratch repository at /tmp/peelproj so row 3 WAIT does not mask the routing rows. Baseline vh.mjs from HEAD projected {action: NEEDS_HUMAN, reason: missing_human_evidence, acceptance_ids: [tree-usability]}; the changed vh.mjs projects {action: EXECUTE, reason: acceptance_evidence_incomplete, acceptance_ids: [rerun, coverage-zero, no-prompted-recovery, tree-multi-room]} — exactly the four agent-authority criteria still lacking Evidence. Row 5 of ticketNextAction now returns EXECUTE for unevidenced agent-authority criteria before the NEEDS_HUMAN row is reached. Note: in the real repository the same Ticket still projects WAIT, because it now carries depends_on edges on ticket-absorb-large-material-through-ingest and on this Ticket.",
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}

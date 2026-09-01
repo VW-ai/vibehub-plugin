@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "higher-precedence-unchanged"
+  ],
+  "evidence_id": "higher-precedence-unchanged-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:21:00Z",
+  "refs": [
+    "file:skills/vibehub-core/scripts/vh.mjs",
+    "test:test/ticket-next-action.test.mjs::rows one through four still outrank both EXECUTE and NEEDS_HUMAN",
+    "command:npm test"
+  ],
+  "schema_version": 1,
+  "summary": "Measured 2026-09-01T09:21Z. test/ticket-next-action.test.mjs 'rows one through four still outrank both EXECUTE and NEEDS_HUMAN' builds five Tickets that all carry the same mixed-authority shape (one agent criterion, one human criterion) so that the routing rows alone would fire, then proves DONE / successful_outcome, REPLAN / non_successful_outcome, WAIT / unresolved_direct_dependencies and REFINE / draft_contract each still win, with the untouched control Ticket projecting EXECUTE / acceptance_evidence_incomplete. The pre-existing matrix test 'next action covers execution, authority, adjudication, dependencies, maturity, and Outcomes' still asserts the same four rows unchanged. No code above the routing rows was modified.",
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}

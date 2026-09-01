@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "regression"
+  ],
+  "evidence_id": "regression-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-01T09:21:00Z",
+  "refs": [
+    "file:test/ticket-next-action.test.mjs",
+    "file:test/sync-github-issues.test.mjs",
+    "command:npm test"
+  ],
+  "schema_version": 1,
+  "summary": "Measured 2026-09-01T09:21Z. Two new tests in test/ticket-next-action.test.mjs cover the mixed-authority Ticket before any Evidence, after partial agent Evidence, after full agent Evidence, and after human-origin Evidence; a human-only-criterion Ticket with no Evidence; and one Ticket per higher-precedence row. Two existing assertion sites were updated because they encoded the defect: test/ticket-next-action.test.mjs asserted mixed-authority (2 criteria, second human, zero Evidence) projected NEEDS_HUMAN and listed it under frontier.needs_human; test/sync-github-issues.test.mjs asserted the same shape produced the GitHub label 'state: needs-human'. Both now expect EXECUTE / 'state: ready'. npm test: 163 tests, 163 pass, 0 fail (baseline 161/161/0 plus these two new tests). git status --short: M ticket-next-action.md, M vh.mjs, M test/sync-github-issues.test.mjs, M test/ticket-next-action.test.mjs, plus another agent's untracked contracts/skill-graph.json.",
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}
