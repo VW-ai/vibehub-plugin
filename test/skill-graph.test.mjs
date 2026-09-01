@@ -3,7 +3,7 @@
 // touching the real one; the last case asserts the real repository passes.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { helper, root, run, tempRepo } from "./helpers.mjs";
 
@@ -172,7 +172,11 @@ test("a retired name in a live reference fails, and the exempt classes do not", 
   // records a past proof.
   write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
   write(repo, ".vibehub/evidence/ticket-old/proof.yaml", `{"note": "${RETIRED}"}\n`);
-  write(repo, ".vibehub/outcomes/ticket-closed.yaml", `{"note": "${RETIRED}"}\n`);
+  // The Outcome has to say `successful`: that is what makes the Ticket beside it
+  // a closed record rather than a live document. The earlier version of this
+  // case wrote an Outcome with no status at all and expected the Ticket to be
+  // exempt, which encoded the bug that any Outcome counts as closed.
+  write(repo, ".vibehub/outcomes/ticket-closed.yaml", `{"status": "successful", "note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/history/snapshot/old.yaml", `{"note": "${RETIRED}"}\n`);
   write(repo, "META/legacy-ui/note.md", `Named skills/${RETIRED}/SKILL.md then.\n`);
   write(repo, ".vibehub/tickets/ticket-closed.yaml", `{"note": "${RETIRED}"}\n`);
@@ -339,6 +343,173 @@ test("an allowance may not be shaped into a blanket exemption", () => {
   const negative = retiredRepo("skill-graph-allowance-count", [{ ...PROSE_ALLOWANCE[0], occurrences: 0 }]);
   write(negative, "docs/RENAME.md", `${RENAME_LINE}\n`);
   assert.match(messages(validate(negative)), /occurrences must be a positive integer/u);
+});
+
+// A Ticket is a closed record only once its Outcome says `successful`. A
+// partial, failed or deviated Outcome means the work is still live, so the
+// Ticket YAML is a live document — including the Ticket whose own criterion is
+// the one being adjudicated, which used to be excused by its own failure.
+test("only a successful Outcome turns a Ticket into a historical record", () => {
+  const repo = retiredRepo("skill-graph-retired-outcome-status", []);
+  write(repo, ".vibehub/tickets/ticket-x.yaml", `{"note": "${RETIRED}"}\n`);
+
+  for (const status of ["partial", "failed", "deviated"]) {
+    write(repo, ".vibehub/outcomes/ticket-x.yaml", `{"status": "${status}"}\n`);
+    assert.match(
+      messages(validate(repo)),
+      /\.vibehub\/tickets\/ticket-x\.yaml: Live reference to retired Skill/u,
+      `a ${status} Outcome must not silence its Ticket`,
+    );
+  }
+
+  // An Outcome with no status at all is not a closure either.
+  write(repo, ".vibehub/outcomes/ticket-x.yaml", '{"note": "no status"}\n');
+  assert.match(messages(validate(repo)), /ticket-x\.yaml: Live reference to retired Skill/u);
+
+  write(repo, ".vibehub/outcomes/ticket-x.yaml", '{"status": "successful"}\n');
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+});
+
+// The contract is not exempt from its own rule. It legitimately carries the
+// retired name in three parsed fields — each retired entry's name and
+// replacement, and each allowance's text — and those are subtracted
+// structurally. Everything else in the file is scanned like any other file.
+test("the contract file is scanned like any other file", () => {
+  const repo = retiredRepo("skill-graph-contract-scanned", PROSE_ALLOWANCE);
+  write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  // A stray key in the contract holding a live path. Under the old per-file
+  // skip this passed, in the one file the rule is defined in.
+  const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
+  contract.probe_live_reference = `../${RETIRED}/assets/app.js`;
+  write(repo, CONTRACT, `${JSON.stringify(contract, null, 2)}\n`);
+  assert.match(
+    messages(validate(repo)),
+    /skill-graph\.json: Live reference to retired Skill .* \(1 unexcused occurrence\)/u,
+  );
+
+  // An allowance's `reason` is prose, not an excused field: quoting a live path
+  // there fails too.
+  delete contract.probe_live_reference;
+  contract.retired[0].allowed_paths[0].reason = `Kept because skills/${RETIRED}/assets/app.js is still read.`;
+  write(repo, CONTRACT, `${JSON.stringify(contract, null, 2)}\n`);
+  assert.match(messages(validate(repo)), /skill-graph\.json: Live reference to retired Skill/u);
+});
+
+// An allowance text that is merely the bare name matches any occurrence in the
+// file, so swapping an excused prose mention for a live path would keep the
+// count at one and still pass.
+test("an allowance text must be narrower than the retired name itself", () => {
+  for (const text of [RETIRED, `  ${RETIRED}\t`, `${RETIRED} ${RETIRED}`]) {
+    const repo = retiredRepo(`skill-graph-bare-${text.length}`, [{
+      path: "docs/RENAME.md",
+      text,
+      reason: "Bare name.",
+    }]);
+    write(repo, "docs/RENAME.md", `live: ../${RETIRED}/assets/app.js\n`);
+    assert.match(messages(validate(repo)), /is no narrower than vibehub-old-alpha itself/u);
+  }
+});
+
+// Two allowances whose texts overlap the same occurrence used to subtract two,
+// which bought the file one silent live reference elsewhere. Spans are consumed,
+// not counted.
+test("overlapping allowances cannot excuse the same occurrence twice", () => {
+  const repo = retiredRepo("skill-graph-overlap", [
+    { path: "docs/RENAME.md", text: `note ${RETIRED}`, reason: "Left half." },
+    { path: "docs/RENAME.md", text: `${RETIRED} here`, reason: "Right half." },
+  ]);
+  write(repo, "docs/RENAME.md", `note ${RETIRED} here\nlive: ../${RETIRED}/assets/app.js\n`);
+  const out = messages(validate(repo));
+  assert.match(out, /docs\/RENAME\.md: Live reference to retired Skill .* \(1 unexcused occurrence\)/u);
+});
+
+// A differently-cased path is the same folder on a case-insensitive filesystem
+// and the same name to a reader.
+test("a case-varied reference to the retired name fails", () => {
+  const repo = retiredRepo("skill-graph-case", []);
+  write(repo, "docs/CASE.md", "See skills/Vibehub-Old-Alpha/SKILL.md.\n");
+  assert.match(messages(validate(repo)), /docs\/CASE\.md: Case-variant reference to retired Skill/u);
+});
+
+// Git checks a symlink in as a blob holding its target path, so that path is
+// checked-in content. The walk does not follow it and still cannot leave the
+// root.
+test("a symlink's target path is scanned as checked-in content", () => {
+  const repo = retiredRepo("skill-graph-symlink", []);
+  mkdirSync(join(repo, "docs"), { recursive: true });
+  symlinkSync(`../skills/${RETIRED}/assets/app.js`, join(repo, "docs", "app.js"));
+  assert.match(messages(validate(repo)), /docs\/app\.js: Live reference to retired Skill/u);
+});
+
+// One NUL byte used to classify a whole file as binary and skip it.
+test("a NUL byte does not hide a live reference", () => {
+  const repo = retiredRepo("skill-graph-nul", []);
+  write(repo, "docs/NUL.md", `See skills/${RETIRED}/SKILL.md.\n\0\n`);
+  assert.match(messages(validate(repo)), /docs\/NUL\.md: Live reference to retired Skill/u);
+});
+
+// Allowance texts are matched literally, never compiled as patterns.
+test("an allowance text carrying regex metacharacters is matched literally", () => {
+  const line = `note (a+b)* ${RETIRED} [x] $y | .*`;
+  const repo = retiredRepo("skill-graph-regex-text", [{
+    path: "docs/RX.md",
+    text: line,
+    reason: "Metacharacters in prose.",
+  }]);
+  write(repo, "docs/RX.md", `${line}\n`);
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  // It excuses that one occurrence and nothing else.
+  write(repo, "docs/RX.md", `${line}\nlive: ../${RETIRED}/assets/app.js\n`);
+  assert.match(messages(validate(repo)), /docs\/RX\.md: Live reference to retired Skill .* \(1 unexcused occurrence\)/u);
+});
+
+// The Context ref exemption removes the parsed field values, so a ref that
+// spells the name only after JSON unescaping cannot spend its subtraction on a
+// live prose mention elsewhere in the same document.
+test("the Context ref exemption is structural, not a count", () => {
+  const repo = retiredRepo("skill-graph-ref-structural", []);
+  const escaped = `skills/${RETIRED.replace("r", "\\u0072")}/SKILL.md`;
+  write(
+    repo,
+    ".vibehub/rooms/product/decision-y.yaml",
+    `{"kind": "context", "summary": "live prose: read skills/${RETIRED}/SKILL.md today", "source": {"ref": "${escaped}"}}\n`,
+  );
+  assert.match(messages(validate(repo)), /decision-y\.yaml: Live reference to retired Skill/u);
+
+  // The honest shape still passes: the ref records the proof, the prose is clean.
+  write(
+    repo,
+    ".vibehub/rooms/product/decision-y.yaml",
+    `{"kind": "context", "summary": "clean", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+});
+
+test("a retired entry needs a non-empty name", () => {
+  const repo = retiredRepo("skill-graph-empty-name", []);
+  const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
+  contract.retired[0].name = "";
+  write(repo, CONTRACT, `${JSON.stringify(contract, null, 2)}\n`);
+  assert.match(messages(validate(repo)), /needs a non-empty name and its replacement/u);
+});
+
+// The directories the scan skips are build output. The list is hardcoded rather
+// than derived from .gitignore, so this case fails the moment the two drift:
+// anything skipped but not gitignored could hold a tracked live reference.
+test("the scan skip list matches .gitignore", () => {
+  const source = readFileSync(helper, "utf8");
+  const declared = source.match(/const SKILL_SCAN_SKIP = new Set\(\[([^\]]*)\]\)/u);
+  assert.ok(declared, "SKILL_SCAN_SKIP is declared as a literal set");
+  const skipped = [...declared[1].matchAll(/"([^"]+)"/gu)].map((match) => match[1]);
+  const ignored = readFileSync(join(root, ".gitignore"), "utf8")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.endsWith("/") && !line.startsWith("#") && !line.startsWith("!"))
+    .map((line) => line.replace(/\/$/u, "").replace(/^\//u, ""));
+  assert.deepEqual([...skipped].sort(), [".git", ...ignored].sort());
 });
 
 test("the checked-in skill graph is development-time only", () => {

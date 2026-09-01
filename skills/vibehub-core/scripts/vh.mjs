@@ -4,6 +4,7 @@ import {
   lstatSync,
   mkdirSync,
   readFileSync,
+  readlinkSync,
   realpathSync,
   readdirSync,
   renameSync,
@@ -1927,14 +1928,29 @@ function skillDirectories(repo) {
     .sort();
 }
 
-// Walks text files under a repository-relative directory. Symlinks are neither
-// isFile nor isDirectory here, so they are skipped and cannot escape the root.
+// Walks files under a repository-relative directory.
+//
+// A symlink is never followed — that is what keeps the walk inside the root —
+// but it is not skipped either. Git checks a symlink in as a blob holding its
+// TARGET PATH, so that path string is the file's checked-in content and is
+// scanned like any other text. A link named `docs/app.js` pointing at
+// `../skills/<retired>/assets/app.js` used to be invisible to this walk.
+//
+// A file whose first 8000 bytes hold a NUL is classified binary. It is still
+// scanned, decoded as latin1, because a single NUL appended to a Markdown file
+// used to hide every reference in it. Binary files are marked so callers that
+// care about source structure (Skill references) can drop them; the retired
+// name check reads them.
 function walkTextFiles(repo, relative, out) {
   const absolute = join(repo, relative);
   if (!existsSync(absolute)) return;
   for (const entry of readdirSync(absolute, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
     if (SKILL_SCAN_SKIP.has(entry.name)) continue;
     const child = relative ? `${relative}/${entry.name}` : entry.name;
+    if (entry.isSymbolicLink()) {
+      out.push({ path: child, text: readlinkSync(join(repo, child)), symlink: true });
+      continue;
+    }
     // A nested checkout or worktree (anything carrying its own .git) is a
     // different repository's source, not this one's.
     if (entry.isDirectory()) {
@@ -1943,13 +1959,14 @@ function walkTextFiles(repo, relative, out) {
     }
     else if (entry.isFile()) {
       const buffer = readFileSync(join(repo, child));
-      if (isBinary(buffer)) continue;
-      out.push({ path: child, text: buffer.toString("utf8") });
+      const binary = isBinary(buffer);
+      out.push({ path: child, text: buffer.toString(binary ? "latin1" : "utf8"), binary });
     }
   }
 }
 
 function countOccurrences(text, needle) {
+  if (needle === "") return 0;
   let count = 0;
   let index = text.indexOf(needle);
   while (index !== -1) {
@@ -1969,6 +1986,7 @@ function skillReferences(repo, names) {
     const files = [];
     walkTextFiles(repo, `skills/${name}`, files);
     for (const file of files) {
+      if (file.binary) continue;
       for (const match of file.text.matchAll(SKILL_REFERENCE)) {
         const target = match[1];
         if (target === name) continue;
@@ -2004,37 +2022,54 @@ function findSkillCycle(adjacency) {
   return null;
 }
 
-// Occurrences of a retired name that a checked-in record legitimately carries.
-// Context `source.ref` and `evidence[].ref` record what proved a past claim, so
-// they are subtracted structurally rather than by exempting the whole document:
-// the same file's prose stays under the rule.
+// A Context document's `source.ref` and `evidence[].ref` record what proved a
+// past claim, so those two field VALUES are removed structurally — the document
+// is re-serialised with them blanked and whatever remains is scanned like any
+// other file. The same document's prose stays under the rule.
+//
+// Removing the parsed fields rather than subtracting their occurrence counts is
+// what makes this exact. A count subtracted from the whole file could be spent
+// on an occurrence somewhere else in it: a ref written with a JSON escape
+// (`vibehub-ticket-\u0072eview`) parses to the retired name while the raw bytes
+// never spell it, so the subtraction landed on a live prose mention instead.
 //
 // The exemption belongs to Context, not to the two field names. It is claimed
 // only by a document that is one: a `kind: context` document under
 // .vibehub/rooms/. Otherwise any live JSON anywhere in the tree could carry a
 // retired path under a `source.ref` key and buy itself silence.
-function recordedRefOccurrences(path, text, name) {
-  if (!path.startsWith(".vibehub/rooms/")) return 0;
+function contextResidual(path, text) {
+  if (!path.startsWith(".vibehub/rooms/")) return null;
   let document;
   try {
     document = JSON.parse(text);
   } catch {
-    return 0;
+    return null;
   }
-  if (!isObject(document) || document.kind !== "context") return 0;
-  const refs = [];
-  if (isObject(document.source) && typeof document.source.ref === "string") refs.push(document.source.ref);
-  for (const entry of Array.isArray(document.evidence) ? document.evidence : []) {
-    if (isObject(entry) && typeof entry.ref === "string") refs.push(entry.ref);
+  if (!isObject(document) || document.kind !== "context") return null;
+  const copy = JSON.parse(JSON.stringify(document));
+  if (isObject(copy.source) && typeof copy.source.ref === "string") copy.source.ref = "";
+  for (const entry of Array.isArray(copy.evidence) ? copy.evidence : []) {
+    if (isObject(entry) && typeof entry.ref === "string") entry.ref = "";
   }
-  return refs.reduce((total, ref) => total + countOccurrences(ref, name), 0);
+  return JSON.stringify(copy);
 }
 
 // Historical records, which name a retired Skill because that is what was true
 // when they were written. Detected structurally, never by allowlist:
 //   - .vibehub/evidence/, .vibehub/outcomes/, and the .vibehub/history/ archive
-//   - a Ticket under .vibehub/tickets/ that already has an Outcome (closed)
+//   - a Ticket under .vibehub/tickets/ whose Outcome is SUCCESSFUL
 //   - a META/legacy-* tree, matched only as the segment directly under META/
+//
+// A Ticket is a historical record only once its Outcome says `successful`. A
+// partial, failed or deviated Outcome means the work is still live — the
+// Ticket's own next_action is REPLAN — so its YAML is a live document whose
+// references still have to be right. This is deliberately STRICTER than the
+// notion of "closed" loadRepository uses for lifecycle-scoped context_refs,
+// which counts a Ticket as closed the moment any Outcome exists. The two are
+// answering different questions: a context ref is pinned to the commit that
+// closed the loop, whereas a retired name in a still-live Ticket is a reference
+// someone will read and copy tomorrow. The divergence is scoped to this check
+// on purpose; unifying it would change an accepted, closed behaviour.
 // Every one of these is a whole directory whose contents are archived by
 // construction. A file's own name never earns an exemption: a dated basename
 // under META/ used to imply "record", which meant anyone could date-prefix a
@@ -2049,7 +2084,15 @@ function isHistoricalRecord(repo, path) {
   if (path.startsWith(".vibehub/history/")) return true;
   if (path.startsWith(".vibehub/tickets/") && path.endsWith(".yaml")) {
     const id = path.slice(".vibehub/tickets/".length, -".yaml".length);
-    return existsSync(join(repo, ".vibehub", "outcomes", `${id}.yaml`));
+    const outcomePath = join(repo, ".vibehub", "outcomes", `${id}.yaml`);
+    if (!existsSync(outcomePath)) return false;
+    let outcome;
+    try {
+      outcome = readDocument(outcomePath);
+    } catch {
+      return false;
+    }
+    return isObject(outcome) && outcome.status === "successful";
   }
   if (path.startsWith("META/")) {
     const segments = path.split("/");
@@ -2073,20 +2116,79 @@ function isHistoricalRecord(repo, path) {
 // file is caught. The counts are what make it per-occurrence rather than
 // per-line: duplicating an excused line changes the count and fails.
 //
-// Three shape rules keep an allowance from degenerating back into a file pass:
+// Four shape rules keep an allowance from degenerating back into a file pass:
 // its text must contain the retired name (otherwise it excuses nothing), must
-// be a single line (otherwise "text" could be the whole file), and must occur
-// exactly as many times as declared. A stale allowance — file gone, text gone,
-// or count moved — is itself a failure, so the list cannot rot into a silent
-// blanket exemption. A `$`-invocation is a live call wherever it appears and
-// fails inside an allowlisted file too, unless an allowance names that exact
-// `$`-carrying text and says why.
-function validateRetiredNames(repo, contract, files, errors) {
+// be strictly NARROWER than the name (a text that is just the bare name excuses
+// any occurrence in the file, including a live path swapped in later — the
+// count stays at one and the file passes), must be a single line (otherwise
+// "text" could be the whole file), and must occur exactly as many times as
+// declared. A stale allowance — file gone, text gone, or count moved — is
+// itself a failure, so the list cannot rot into a silent blanket exemption. A
+// `$`-invocation is a live call wherever it appears and fails inside an
+// allowlisted file too, unless an allowance names that exact `$`-carrying text
+// and says why.
+//
+// Excusing works by DELETING each allowance's spans from the text and then
+// scanning what remains, not by subtracting counts. Counting let two
+// allowances whose texts overlap the same occurrence subtract two, buying the
+// file one silent live reference elsewhere; a deleted span can only be
+// consumed once.
+function stripAll(text, needle) {
+  return text.split(needle).join("");
+}
+
+function countOccurrencesInsensitive(text, needle) {
+  return countOccurrences(text.toLowerCase(), needle.toLowerCase());
+}
+
+// Removes up to `declared` occurrences of each allowance's text, longest text
+// first so a short allowance cannot eat the span a longer one names.
+function consumeAllowances(text, allowances) {
+  let residual = text;
+  for (const allowance of [...allowances].sort((a, b) => b.text.length - a.text.length)) {
+    for (let taken = 0; taken < allowance.declared; taken += 1) {
+      const at = residual.indexOf(allowance.text);
+      if (at === -1) break;
+      residual = residual.slice(0, at) + residual.slice(at + allowance.text.length);
+    }
+  }
+  return residual;
+}
+
+// The contract is scanned like every other file. It is not exempt by path —
+// that is exactly the per-file exemption this rule outlaws, and it used to let
+// any stray key in the contract carry a live `../<retired>/...` path.
+//
+// What the contract legitimately holds is three PARSED FIELDS: each retired
+// entry's `name` and `replacement`, and each allowance's `text`. Those values
+// are subtracted structurally by blanking them and re-serialising, so anything
+// else in the document — a stray key, a `reason` that quotes a live path, an
+// allowance `path` under the retired folder — is scanned normally and fails.
+function contractResidual(contract) {
+  const copy = JSON.parse(JSON.stringify(contract));
+  for (const entry of Array.isArray(copy.retired) ? copy.retired : []) {
+    if (!isObject(entry)) continue;
+    if (typeof entry.name === "string") entry.name = "";
+    if (typeof entry.replacement === "string") entry.replacement = "";
+    for (const allowance of Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []) {
+      if (isObject(allowance) && typeof allowance.text === "string") allowance.text = "";
+    }
+  }
+  return JSON.stringify(copy);
+}
+
+function validateRetiredNames(repo, contract, allFiles, errors) {
+  const files = allFiles.map((file) => {
+    if (file.path === SKILL_GRAPH_CONTRACT) return { ...file, text: contractResidual(contract) };
+    const residual = contextResidual(file.path, file.text);
+    return residual === null ? file : { ...file, text: residual };
+  });
   const texts = new Map(files.map((file) => [file.path, file.text]));
   for (const [index, entry] of (Array.isArray(contract.retired) ? contract.retired : []).entries()) {
     const path = `retired[${index}]`;
-    if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string") {
-      add(errors, path, "A retired entry needs a name and its replacement");
+    if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string"
+      || entry.name === "" || entry.replacement === "") {
+      add(errors, path, "A retired entry needs a non-empty name and its replacement");
       continue;
     }
     const allowances = [];
@@ -2097,8 +2199,20 @@ function validateRetiredNames(repo, contract, files, errors) {
         add(errors, where, "An allowance needs a path, the exact text it excuses, and a reason");
         continue;
       }
-      if (!allowance.text.includes(entry.name)) {
+      if (countOccurrencesInsensitive(allowance.text, entry.name) === 0) {
         add(errors, where, `The excused text does not contain ${entry.name}, so it excuses nothing`);
+        continue;
+      }
+      // Narrower than the bare name: strip every occurrence of the name and
+      // something meaningful must remain. A text that is the bare name on its
+      // own, or padded with whitespace, or repeated, would match any occurrence
+      // in the file and turn the allowance back into a count-bounded file pass.
+      if (stripAll(allowance.text.toLowerCase(), entry.name.toLowerCase()).trim() === "") {
+        add(
+          errors,
+          where,
+          `The excused text is no narrower than ${entry.name} itself; name the surrounding line so the allowance points at one occurrence`,
+        );
         continue;
       }
       if (/[\n\r]/u.test(allowance.text)) {
@@ -2144,31 +2258,35 @@ function validateRetiredNames(repo, contract, files, errors) {
     }
 
     for (const file of files) {
-      if (file.path === SKILL_GRAPH_CONTRACT) continue;
-      const total = countOccurrences(file.text, entry.name);
-      if (total === 0) continue;
+      if (countOccurrencesInsensitive(file.text, entry.name) === 0) continue;
       if (isHistoricalRecord(repo, file.path)) continue;
 
-      let excusedName = 0;
-      let excusedCall = 0;
-      for (const allowance of byPath.get(file.path) ?? []) {
-        const covered = Math.min(countOccurrences(file.text, allowance.text), allowance.declared);
-        excusedName += covered * countOccurrences(allowance.text, entry.name);
-        excusedCall += covered * countOccurrences(allowance.text, `$${entry.name}`);
-      }
+      const residual = consumeAllowances(file.text, byPath.get(file.path) ?? []);
 
-      const calls = countOccurrences(file.text, `$${entry.name}`);
-      if (calls > excusedCall) {
+      if (countOccurrences(residual, `$${entry.name}`) > 0) {
         add(errors, file.path, `Retired Skill ${entry.name} is invoked as $${entry.name}; use $${entry.replacement}`);
         continue;
       }
-      const live = total - recordedRefOccurrences(file.path, file.text, entry.name) - excusedName;
-      if (live <= 0) continue;
-      add(
-        errors,
-        file.path,
-        `Live reference to retired Skill ${entry.name} (${live} unexcused occurrence${live === 1 ? "" : "s"}); use ${entry.replacement}, or name the exact occurrence and its reason in ${SKILL_GRAPH_CONTRACT}`,
-      );
+      const live = countOccurrences(residual, entry.name);
+      if (live > 0) {
+        add(
+          errors,
+          file.path,
+          `Live reference to retired Skill ${entry.name} (${live} unexcused occurrence${live === 1 ? "" : "s"}); use ${entry.replacement}, or name the exact occurrence and its reason in ${SKILL_GRAPH_CONTRACT}`,
+        );
+        continue;
+      }
+      // A case-varied path is the same retired folder on a case-insensitive
+      // filesystem and the same name to a reader, so it cannot pass by
+      // spelling alone.
+      const variants = countOccurrencesInsensitive(residual, entry.name) - countOccurrences(residual, entry.name);
+      if (variants > 0) {
+        add(
+          errors,
+          file.path,
+          `Case-variant reference to retired Skill ${entry.name} (${variants} unexcused occurrence${variants === 1 ? "" : "s"}); use ${entry.replacement}`,
+        );
+      }
     }
   }
 }
