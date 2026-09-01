@@ -471,7 +471,10 @@ test("an allowance text carrying regex metacharacters is matched literally", () 
 // live prose mention elsewhere in the same document.
 test("the Context ref exemption is structural, not a count", () => {
   const repo = retiredRepo("skill-graph-ref-structural", []);
-  const escaped = `skills/${RETIRED.replace("r", "\\u0072")}/SKILL.md`;
+  // RETIRED carries no "r", so the previous `.replace("r", ...)` was a no-op and
+  // the ref went in unescaped: the laundering half of this case never ran. That
+  // encoded a bug -- it asserted a defence that was never exercised.
+  const escaped = `skills/${RETIRED.replace("a", "\\u0061")}/SKILL.md`;
   write(
     repo,
     ".vibehub/rooms/product/decision-y.yaml",
@@ -529,6 +532,187 @@ test("the checked-in skill graph is development-time only", () => {
   const helperSource = readFileSync(helper, "utf8");
   assert.equal(helperSource.includes("writeDocument(join(repo, \".vibehub\""), false);
   assert.match(helperSource, /Development-time validation only/u);
+});
+
+// Everything below attacks the raw-bytes rule directly. The legitimate fields of
+// a Context document and of the contract are exempted by consuming THEIR RAW
+// SPANS out of the checked-in text. Scanning a re-serialisation of the parse
+// instead -- which is what the previous implementation did -- made every byte
+// JSON.parse discards invisible, and a shadowed duplicate key is exactly such a
+// byte.
+
+const CONTEXT_PATH = ".vibehub/rooms/product/decision-dup.yaml";
+
+test("a duplicate JSON key cannot smuggle a live path into a Context document", () => {
+  const repo = retiredRepo("skill-graph-ctx-dup-key", []);
+
+  // Control: the ordinary path works. A plain extra key holding a live path fails.
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "probe": "../${RETIRED}/assets/app.js", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.match(messages(validate(repo)), /decision-dup\.yaml: Live reference to retired Skill/u);
+
+  // Attack: the same live path under a SHADOWED duplicate of the document's own
+  // first key. JSON.parse keeps only the later value, so a re-serialised scan
+  // never saw these bytes -- but they are in the file, in plain ASCII.
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "../${RETIRED}/assets/app.js", "kind": "context", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.match(messages(validate(repo)), /decision-dup\.yaml: Live reference to retired Skill/u);
+
+  // And a shadowed duplicate of the exempt field itself: only the surviving
+  // ref's span is consumed, so the shadowed one is unexplained content.
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "source": {"ref": "../${RETIRED}/assets/app.js", "ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.match(messages(validate(repo)), /decision-dup\.yaml: Live reference to retired Skill/u);
+
+  // The honest shape still passes.
+  write(repo, CONTEXT_PATH, `{"kind": "context", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`);
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+});
+
+test("a duplicate JSON key cannot smuggle a live path into the contract", () => {
+  const repo = retiredRepo("skill-graph-contract-dup-key", []);
+  const raw = readFileSync(join(repo, CONTRACT), "utf8");
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  // A duplicate of an existing top-level key whose SHADOWED value is a live path.
+  write(repo, CONTRACT, raw.replace(
+    '"owner": "vibehub-core"',
+    `"owner": "../${RETIRED}/assets/app.js",\n  "owner": "vibehub-core"`,
+  ));
+  assert.match(
+    messages(validate(repo)),
+    /skill-graph\.json: Live reference to retired Skill .* \(1 unexcused occurrence\)/u,
+  );
+
+  // A duplicate of an EXEMPT field: retired[].replacement. Only the surviving
+  // value's span is consumed.
+  write(repo, CONTRACT, raw.replace(
+    '"replacement": "vibehub-alpha"',
+    `"replacement": "../${RETIRED}/assets/app.js",\n      "replacement": "vibehub-alpha"`,
+  ));
+  assert.match(messages(validate(repo)), /skill-graph\.json: Live reference to retired Skill/u);
+});
+
+// A parsed field value is consumed as the SPAN it occupies, not as "every
+// occurrence of this string". A ref that happens to equal a live prose mention
+// elsewhere in the same document excuses only itself.
+test("an exempt ref excuses its own span, not every copy of its text", () => {
+  const repo = retiredRepo("skill-graph-ctx-same-text", []);
+  const path = `skills/${RETIRED}/SKILL.md`;
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "summary": "today you must still read ${path}", "source": {"ref": "${path}"}}\n`,
+  );
+  assert.match(
+    messages(validate(repo)),
+    /decision-dup\.yaml: Live reference to retired Skill .* \(1 unexcused occurrence\)/u,
+  );
+});
+
+// JSON escaping: the raw bytes of the exempt field can be spelled in ways the
+// parsed value is not. Consuming the SPAN makes the two agree by construction.
+test("JSON escaping in an exempt ref changes nothing", () => {
+  const repo = retiredRepo("skill-graph-ctx-escapes", []);
+  const escapedName = RETIRED.replace("a", "\\u0061");
+  const cases = [
+    // Escaped solidi -- legal JSON, and the raw bytes differ from the value.
+    `{"kind": "context", "source": {"ref": "skills\\/${RETIRED}\\/SKILL.md"}}`,
+    // A \u escape inside the name: the parsed value spells the retired name, the
+    // raw bytes never do. This is the laundering shape, and the span is consumed
+    // either way.
+    `{"kind": "context", "source": {"ref": "skills/${escapedName}/SKILL.md"}}`,
+    // A quote inside the value.
+    `{"kind": "context", "source": {"ref": "the \\"skills/${RETIRED}/SKILL.md\\" file"}}`,
+    // A value that appears zero times literally in the raw text: every character
+    // of the name is escaped.
+    `{"kind": "context", "source": {"ref": "${[...`skills/${RETIRED}/SKILL.md`].map((c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`).join("")}"}}`,
+  ];
+  for (const body of cases) {
+    write(repo, CONTEXT_PATH, `${body}\n`);
+    assert.equal(validate(repo).ok, true, `${body}\n${JSON.stringify(validate(repo))}`);
+
+    // Adding one live prose mention alongside still fails: the escape buys no
+    // credit that can be spent elsewhere.
+    write(repo, CONTEXT_PATH, `${body.slice(0, -1)}, "summary": "read skills/${RETIRED}/SKILL.md"}\n`);
+    assert.match(
+      messages(validate(repo)),
+      /decision-dup\.yaml: Live reference to retired Skill .* \(1 unexcused occurrence\)/u,
+      body,
+    );
+  }
+});
+
+// Not-JSON, and JSON with trailing content after the closing brace, both lose the
+// exemption entirely: the file is scanned whole rather than skipped.
+test("an unparseable Context document is scanned whole, not skipped", () => {
+  const repo = retiredRepo("skill-graph-ctx-unparseable", []);
+  for (const body of [
+    `{"kind": "context", "source": {"ref": "skills/${RETIRED}/SKILL.md"},}`,
+    `{"kind": "context", "source": {"ref": "skills/${RETIRED}/SKILL.md"}} trailing`,
+    `{"kind": "context", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}{"kind": "context"}`,
+    `not json at all: skills/${RETIRED}/SKILL.md`,
+  ]) {
+    write(repo, CONTEXT_PATH, `${body}\n`);
+    assert.match(messages(validate(repo)), /decision-dup\.yaml: Live reference to retired Skill/u, body);
+  }
+});
+
+// An unparseable contract cannot reach the retired-name scan at all: the command
+// reads it with readDocument first and refuses the whole run.
+test("an unparseable contract is refused before anything is exempted", () => {
+  const repo = retiredRepo("skill-graph-contract-unparseable", []);
+  const raw = readFileSync(join(repo, CONTRACT), "utf8");
+  write(repo, CONTRACT, `${raw.trimEnd()} trailing\n`);
+  const envelope = validate(repo);
+  assert.equal(envelope.ok, false);
+  assert.equal(envelope.error.code, "invalid_document");
+});
+
+// A `__proto__` member is an own property to JSON.parse. The positional parser
+// has to agree, or a document carrying one would be reported as a parser
+// disagreement it is not -- and a live path beside it must still fail.
+test("a __proto__ member is not mistaken for a parser disagreement", () => {
+  const repo = retiredRepo("skill-graph-ctx-proto", []);
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "__proto__": {"x": 1}, "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "__proto__": "../${RETIRED}/assets/app.js", "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  assert.match(messages(validate(repo)), /decision-dup\.yaml: Live reference to retired Skill/u);
+});
+
+// The positional parser is recursive, so a document nested far deeper than any
+// real Context document exhausts the stack where JSON.parse does not. That must
+// be LOUD and must consume nothing: the exemption is reported as not applied and
+// the file is scanned whole. A silent skip here would be the next bypass.
+test("a document the positional parser cannot handle fails loudly and is still scanned", () => {
+  const repo = retiredRepo("skill-graph-ctx-deep", []);
+  const deep = `${"[".repeat(20000)}1${"]".repeat(20000)}`;
+  write(
+    repo,
+    CONTEXT_PATH,
+    `{"kind": "context", "deep": ${deep}, "source": {"ref": "skills/${RETIRED}/SKILL.md"}}\n`,
+  );
+  const out = messages(validate(repo));
+  assert.match(out, /decision-dup\.yaml: Legitimate-field exemption not applied/u);
+  assert.match(out, /decision-dup\.yaml: Live reference to retired Skill/u);
 });
 
 test("this repository's real skill graph passes", () => {

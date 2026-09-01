@@ -2022,36 +2022,240 @@ function findSkillCycle(adjacency) {
   return null;
 }
 
-// A Context document's `source.ref` and `evidence[].ref` record what proved a
-// past claim, so those two field VALUES are removed structurally — the document
-// is re-serialised with them blanked and whatever remains is scanned like any
-// other file. The same document's prose stays under the rule.
+// Positional JSON parser.
 //
-// Removing the parsed fields rather than subtracting their occurrence counts is
-// what makes this exact. A count subtracted from the whole file could be spent
-// on an occurrence somewhere else in it: a ref written with a JSON escape
-// (`vibehub-ticket-\u0072eview`) parses to the retired name while the raw bytes
-// never spell it, so the subtraction landed on a live prose mention instead.
+// Every legitimate-field exemption below has to answer the same question: which
+// RAW BYTES of the checked-in file does this parsed value occupy? Re-serialising
+// the parse and scanning that answered a different question, and the difference
+// is a hole: any bytes JSON.parse discards — a shadowed duplicate key, the
+// original escaping, whitespace — never reached the scan at all, so a live
+// `../<retired>/...` path hidden under a duplicate key passed while sitting in
+// the file in plain ASCII. The scan reads the raw text; the parse only says
+// which SPANS of that raw text to consume first.
+//
+// The tree mirrors JSON.parse's own semantics so the spans describe the same
+// document: an object member is stored by key with the LAST duplicate winning,
+// which is exactly what makes a shadowed earlier duplicate's span survive into
+// the scan. Trailing content after the top-level value is a parse failure, as
+// it is for JSON.parse.
+const JSON_SIMPLE_ESCAPES = { '"': '"', "\\": "\\", "/": "/", b: "\b", f: "\f", n: "\n", r: "\r", t: "\t" };
+
+function parseJsonWithSpans(text) {
+  let at = 0;
+  const fail = (message) => {
+    throw new SyntaxError(`${message} at offset ${at}`);
+  };
+  const skipSpace = () => {
+    while (at < text.length && (text[at] === " " || text[at] === "\t" || text[at] === "\n" || text[at] === "\r")) at += 1;
+  };
+  function parseString() {
+    const start = at;
+    if (text[at] !== '"') fail("expected a string");
+    at += 1;
+    let value = "";
+    for (;;) {
+      if (at >= text.length) fail("unterminated string");
+      const ch = text[at];
+      if (ch === '"') {
+        at += 1;
+        break;
+      }
+      if (ch === "\\") {
+        const escape = text[at + 1];
+        at += 2;
+        if (escape === "u") {
+          const hex = text.slice(at, at + 4);
+          if (!/^[0-9a-fA-F]{4}$/u.test(hex)) fail("malformed \\u escape");
+          value += String.fromCharCode(Number.parseInt(hex, 16));
+          at += 4;
+          continue;
+        }
+        const simple = JSON_SIMPLE_ESCAPES[escape];
+        if (simple === undefined) fail("unknown escape");
+        value += simple;
+        continue;
+      }
+      if (ch < " ") fail("control character in a string");
+      value += ch;
+      at += 1;
+    }
+    return { type: "string", value, start, end: at };
+  }
+  function parseValue() {
+    skipSpace();
+    if (at >= text.length) fail("unexpected end of input");
+    const ch = text[at];
+    if (ch === "{") return parseObject();
+    if (ch === "[") return parseArray();
+    if (ch === '"') return parseString();
+    for (const [literal, value] of [["true", true], ["false", false], ["null", null]]) {
+      if (text.startsWith(literal, at)) {
+        at += literal.length;
+        return { type: "literal", value };
+      }
+    }
+    const number = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/u.exec(text.slice(at));
+    if (!number) fail("unexpected token");
+    at += number[0].length;
+    return { type: "literal", value: Number(number[0]) };
+  }
+  function parseObject() {
+    at += 1;
+    const members = new Map();
+    skipSpace();
+    if (text[at] === "}") {
+      at += 1;
+      return { type: "object", members };
+    }
+    for (;;) {
+      skipSpace();
+      const key = parseString();
+      skipSpace();
+      if (text[at] !== ":") fail("expected :");
+      at += 1;
+      // Last duplicate wins, as in JSON.parse. The earlier member's span is
+      // dropped here on purpose: those bytes are shadowed, so nothing excuses
+      // them and the scan must still see them.
+      members.set(key.value, parseValue());
+      skipSpace();
+      if (text[at] === ",") {
+        at += 1;
+        continue;
+      }
+      if (text[at] === "}") {
+        at += 1;
+        return { type: "object", members };
+      }
+      fail("expected , or }");
+    }
+  }
+  function parseArray() {
+    at += 1;
+    const items = [];
+    skipSpace();
+    if (text[at] === "]") {
+      at += 1;
+      return { type: "array", items };
+    }
+    for (;;) {
+      items.push(parseValue());
+      skipSpace();
+      if (text[at] === ",") {
+        at += 1;
+        continue;
+      }
+      if (text[at] === "]") {
+        at += 1;
+        return { type: "array", items };
+      }
+      fail("expected , or ]");
+    }
+  }
+  const root = parseValue();
+  skipSpace();
+  if (at !== text.length) fail("trailing content after the top-level value");
+  return root;
+}
+
+function nodeValue(node) {
+  if (node.type === "object") {
+    // A null prototype, so a `__proto__` member becomes an OWN property exactly
+    // as JSON.parse makes it. On a plain object literal the assignment would hit
+    // the prototype setter instead, the key would vanish from the comparison,
+    // and a document carrying `__proto__` would be reported as a parser
+    // disagreement it is not.
+    const out = Object.create(null);
+    for (const [key, child] of node.members) out[key] = nodeValue(child);
+    return out;
+  }
+  if (node.type === "array") return node.items.map(nodeValue);
+  return node.value;
+}
+
+function objectMember(node, key) {
+  return node && node.type === "object" ? node.members.get(key) : undefined;
+}
+
+function arrayItems(node) {
+  return node && node.type === "array" ? node.items : [];
+}
+
+// Replaces each span's CONTENTS with nothing, keeping the surrounding quotes so
+// the bytes on either side can never be joined into a name that was not there.
+// Spans are removed right to left so earlier offsets stay valid.
+function blankSpans(text, spans) {
+  let out = text;
+  for (const span of [...spans].sort((a, b) => b.start - a.start)) {
+    out = out.slice(0, span.start + 1) + out.slice(span.end - 1);
+  }
+  return out;
+}
+
+// The bridge between "which values are legitimate" and "which raw bytes to
+// consume". The positional parser must agree with JSON.parse about the
+// document, or the spans describe a file other than the one being scanned; a
+// disagreement is reported LOUDLY and nothing is consumed, so the raw text is
+// scanned whole. Failing closed and silent would let a parser quirk become the
+// next bypass, and failing open and quiet would let one land unnoticed.
+function legitimateSpans(text, select) {
+  let expected;
+  try {
+    expected = JSON.parse(text);
+  } catch {
+    return { skip: true };
+  }
+  let root;
+  try {
+    root = parseJsonWithSpans(text);
+  } catch (error) {
+    return { problem: `could not be located in the raw file (${error.message})` };
+  }
+  if (JSON.stringify(nodeValue(root)) !== JSON.stringify(expected)) {
+    return { problem: "the positional parse disagrees with JSON.parse about this document" };
+  }
+  return { document: expected, spans: select(root, expected) };
+}
+
+// A Context document's `source.ref` and `evidence[].ref` record what proved a
+// past claim, so those two field values are exempt — their RAW SPANS are
+// consumed out of the checked-in text and everything else in the file, prose
+// included, is scanned as bytes.
+//
+// Consuming the raw span rather than subtracting an occurrence count is what
+// makes this exact, and consuming it out of the RAW text rather than out of a
+// re-serialisation is what keeps it honest. A count subtracted from the whole
+// file could be spent on an occurrence somewhere else in it: a ref written with
+// a JSON escape (`vibehub-ticket-\u0072eview`) parses to the retired name while
+// the raw bytes never spell it, so the subtraction landed on a live prose
+// mention instead. Consuming the span removes the escaped bytes themselves and
+// leaves the prose mention to fail. And because the scan reads the raw file, a
+// live path carried by a shadowed duplicate key — bytes JSON.parse drops — is
+// no longer invisible.
 //
 // The exemption belongs to Context, not to the two field names. It is claimed
 // only by a document that is one: a `kind: context` document under
 // .vibehub/rooms/. Otherwise any live JSON anywhere in the tree could carry a
 // retired path under a `source.ref` key and buy itself silence.
-function contextResidual(path, text) {
+function contextSpans(path, text) {
   if (!path.startsWith(".vibehub/rooms/")) return null;
-  let document;
-  try {
-    document = JSON.parse(text);
-  } catch {
-    return null;
-  }
-  if (!isObject(document) || document.kind !== "context") return null;
-  const copy = JSON.parse(JSON.stringify(document));
-  if (isObject(copy.source) && typeof copy.source.ref === "string") copy.source.ref = "";
-  for (const entry of Array.isArray(copy.evidence) ? copy.evidence : []) {
-    if (isObject(entry) && typeof entry.ref === "string") entry.ref = "";
-  }
-  return JSON.stringify(copy);
+  const located = legitimateSpans(text, (root) => {
+    const spans = [];
+    const source = objectMember(root, "source");
+    const ref = objectMember(source, "ref");
+    if (ref && ref.type === "string") spans.push(ref);
+    for (const entry of arrayItems(objectMember(root, "evidence"))) {
+      const entryRef = objectMember(entry, "ref");
+      if (entryRef && entryRef.type === "string") spans.push(entryRef);
+    }
+    return spans;
+  });
+  // Not JSON at all, or not a Context document: no exemption, and no complaint
+  // either. A .vibehub/rooms/ file that is not a Context document is simply
+  // scanned like every other file in the tree.
+  if (located.skip) return null;
+  if (located.problem) return located;
+  if (!isObject(located.document) || located.document.kind !== "context") return null;
+  return located;
 }
 
 // Historical records, which name a retired Skill because that is what was true
@@ -2155,34 +2359,59 @@ function consumeAllowances(text, allowances) {
   return residual;
 }
 
-// The contract is scanned like every other file. It is not exempt by path —
-// that is exactly the per-file exemption this rule outlaws, and it used to let
-// any stray key in the contract carry a live `../<retired>/...` path.
+// The contract is scanned like every other file, and now as its own RAW BYTES.
+// It is not exempt by path — that is exactly the per-file exemption this rule
+// outlaws, and it used to let any stray key in the contract carry a live
+// `../<retired>/...` path.
 //
 // What the contract legitimately holds is three PARSED FIELDS: each retired
 // entry's `name` and `replacement`, and each allowance's `text`. Those values
-// are subtracted structurally by blanking them and re-serialising, so anything
-// else in the document — a stray key, a `reason` that quotes a live path, an
-// allowance `path` under the retired folder — is scanned normally and fails.
-function contractResidual(contract) {
-  const copy = JSON.parse(JSON.stringify(contract));
-  for (const entry of Array.isArray(copy.retired) ? copy.retired : []) {
-    if (!isObject(entry)) continue;
-    if (typeof entry.name === "string") entry.name = "";
-    if (typeof entry.replacement === "string") entry.replacement = "";
-    for (const allowance of Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []) {
-      if (isObject(allowance) && typeof allowance.text === "string") allowance.text = "";
+// are exempt by consuming THEIR RAW SPANS out of the checked-in file, so
+// anything else in the document — a stray key, a `reason` that quotes a live
+// path, an allowance `path` under the retired folder, or a value shadowed by a
+// duplicate key and therefore absent from the parse — is scanned normally and
+// fails.
+function contractSpans(text) {
+  const located = legitimateSpans(text, (root) => {
+    const spans = [];
+    for (const entry of arrayItems(objectMember(root, "retired"))) {
+      for (const key of ["name", "replacement"]) {
+        const field = objectMember(entry, key);
+        if (field && field.type === "string") spans.push(field);
+      }
+      for (const allowance of arrayItems(objectMember(entry, "allowed_paths"))) {
+        const field = objectMember(allowance, "text");
+        if (field && field.type === "string") spans.push(field);
+      }
     }
+    return spans;
+  });
+  // validateSkillGraph has already parsed the contract through readDocument, so
+  // a parse failure here means the bytes on disk are not the document the rest
+  // of the check ran against. Report it rather than silently exempting nothing.
+  if (located.skip) return { problem: "is not parseable as JSON, so its legitimate fields cannot be located" };
+  return located;
+}
+
+// Applies the legitimate-field exemptions to the raw text of one file.
+//
+// A located problem is a LOUD failure that consumes nothing: the file's raw
+// bytes are still scanned in full, so a file whose spans cannot be located can
+// only ever be reported as MORE suspicious, never less. The alternative —
+// skipping the file, or silently consuming nothing without saying so — is how a
+// parser disagreement becomes the next quiet bypass.
+function applyLegitimateSpans(file, errors) {
+  const located = file.path === SKILL_GRAPH_CONTRACT ? contractSpans(file.text) : contextSpans(file.path, file.text);
+  if (located === null) return file;
+  if (located.problem) {
+    add(errors, file.path, `Legitimate-field exemption not applied: the document ${located.problem}; the whole file is scanned`);
+    return file;
   }
-  return JSON.stringify(copy);
+  return { ...file, text: blankSpans(file.text, located.spans) };
 }
 
 function validateRetiredNames(repo, contract, allFiles, errors) {
-  const files = allFiles.map((file) => {
-    if (file.path === SKILL_GRAPH_CONTRACT) return { ...file, text: contractResidual(contract) };
-    const residual = contextResidual(file.path, file.text);
-    return residual === null ? file : { ...file, text: residual };
-  });
+  const files = allFiles.map((file) => applyLegitimateSpans(file, errors));
   const texts = new Map(files.map((file) => [file.path, file.text]));
   for (const [index, entry] of (Array.isArray(contract.retired) ? contract.retired : []).entries()) {
     const path = `retired[${index}]`;
