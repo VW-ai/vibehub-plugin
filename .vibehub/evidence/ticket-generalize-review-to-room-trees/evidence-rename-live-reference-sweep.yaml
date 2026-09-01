@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "renamed-skill"
+  ],
+  "evidence_id": "evidence-rename-live-reference-sweep",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+    "scripts/measure-graph-layout.mjs",
+    "skills/vibehub-review/SKILL.md",
+    "docs/INSTALL.md"
+  ],
+  "schema_version": 1,
+  "summary": "Independent audit of `grep -rn vibehub-ticket-review --exclude-dir=node_modules --exclude-dir=.git .`, classifying every hit. No live reference to the retired name remains in any Skill, contract, reference, script, UI asset, or test. Remaining hits fall only into the classes the criterion permits: historical records under .vibehub/evidence/, .vibehub/outcomes/, closed .vibehub/tickets/ (24 of them), the PR-18 snapshot archive under .vibehub/history/, and META/legacy-*; Context documents whose evidence[].ref records what proved a past decision; prose in docs/proposals/bulk-absorption.md, docs/INSTALL.md, and four open Tickets that deliberately names the old Skill in order to describe this rename, with no path ref among them; and the documented LEGACY_APP_PATH constant in scripts/measure-graph-layout.mjs, which exists precisely so metrics can still read app.js out of historical commits. The audit additionally caught one live reference the rename sweep had missed: META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml is state:active and named skills/vibehub-ticket-review/SKILL.md as a file reference; it was repointed to skills/vibehub-review/SKILL.md. Full suite after the fix: npm test -> tests 161, pass 161, fail 0.",
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}

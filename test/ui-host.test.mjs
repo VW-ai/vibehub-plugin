@@ -509,7 +509,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(authorizedUrl.hash, `#${token}`);
   assert.equal(authorizedUrl.searchParams.get("ticket"), "foundation");
   assert.equal(authorizedUrl.searchParams.get("view"), "log");
-  assert.deepEqual(focus, { ticket: "foundation", view: "log" });
+  assert.deepEqual(focus, { ticket: "foundation", view: "log", rooms: false, room: null });
 
   const health = await fetch(`${origin}/health`);
   assert.equal(health.status, 200);
@@ -766,7 +766,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /action === "NEEDS_HUMAN"/u);
   assert.match(model, /vibehub-ticket-run/u);
   assert.match(model, /vibehub-ticket-plan/u);
-  assert.match(model, /vibehub-ticket-review/u);
+  assert.match(model, /vibehub-review/u);
   assert.match(script, /function causalCone/u);
   assert.match(layout, /function relationPorts/u);
   assert.match(script, /edge-control-halo/u);
@@ -939,6 +939,8 @@ test("launcher flags stay intentionally narrow", () => {
     json: false,
     ticket: null,
     view: null,
+    rooms: false,
+    room: null,
   });
   assert.deepEqual(parseUiFlags([
     "--repo", ".", "--port", "4321", "--no-open", "--json",
@@ -950,7 +952,34 @@ test("launcher flags stay intentionally narrow", () => {
     json: true,
     ticket: "feature",
     view: "contract",
+    rooms: false,
+    room: null,
   });
+  assert.deepEqual(parseUiFlags(["--repo", ".", "--rooms"]), {
+    repo: process.cwd(),
+    port: 0,
+    open: true,
+    json: false,
+    ticket: null,
+    view: null,
+    rooms: true,
+    room: null,
+  });
+  assert.deepEqual(parseUiFlags(["--repo", ".", "--room", "product/ux"]), {
+    repo: process.cwd(),
+    port: 0,
+    open: true,
+    json: false,
+    ticket: null,
+    view: null,
+    rooms: true,
+    room: "product/ux",
+  });
+  assert.throws(() => parseUiFlags(["--room", "Product"]), /canonical Room path/u);
+  assert.throws(
+    () => parseUiFlags(["--rooms", "--ticket", "feature"]),
+    /cannot be combined with --ticket/u,
+  );
   assert.throws(() => parseUiFlags(["--db", "state.sqlite"]), /unknown flag/u);
   assert.throws(() => parseUiFlags(["--port", "70000"]), /between 0 and 65535/u);
   assert.throws(() => parseUiFlags(["--view", "log"]), /requires --ticket/u);

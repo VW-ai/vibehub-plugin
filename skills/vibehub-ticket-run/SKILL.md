@@ -13,7 +13,7 @@ There is no Run lease or compiled Context copy. The named branch, Ticket YAML,
 referenced Context, and Git status are the execution boundary, inside
 `../vibehub-setup/references/architecture-boundary.md`.
 
-Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../vibehub-review/references/ticket-lifecycle.json` before acting.
 Read `../vibehub-core/contracts/acceptance-authority.md`. An executor may satisfy
 Agent-authority criteria autonomously. It must not satisfy a human-authority
 criterion, set `origin: human`, or treat its own recommendation as the user's
@@ -68,7 +68,7 @@ UI launch mechanics.
 
 Stop only when execution reaches a human-authority criterion, missing
 permission, or material deviation. For `execution-needs-human`, ask
-`$vibehub-ticket-review` to present the exact Ticket's Contract, name the
+`$vibehub-review` to present the exact Ticket's Contract, name the
 acceptance ID and criterion, and wait for explicit human input. Fall back to
 the same facts in conversation when a browser is unavailable. Hard engineering
 work, implementation fog, and a future human boundary not reached yet are not

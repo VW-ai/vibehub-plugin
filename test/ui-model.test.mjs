@@ -7,7 +7,7 @@ import { test } from "node:test";
 function loadWorkbenchModel() {
   const source = readFileSync(join(
     process.cwd(),
-    "skills/vibehub-ticket-review/assets/app-model.js",
+    "skills/vibehub-review/assets/app-model.js",
   ), "utf8");
   const sandbox = { URL };
   sandbox.globalThis = sandbox;

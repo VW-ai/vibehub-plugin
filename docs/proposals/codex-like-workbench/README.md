@@ -56,5 +56,5 @@ token families, the five operational states, four attention states, redundant
 labels/icons, minimum text contrast, reduced motion, actual repository labels,
 and the three review viewport contracts.
 
-Production files under `skills/vibehub-ticket-review/assets/` are deliberately
+Production files under `skills/vibehub-review/assets/` are deliberately
 unchanged by this proposal Ticket.

@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "room-schema-exceptions"
+  ],
+  "evidence_id": "evidence-room-coverage-exceptions-optional",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/room.schema.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test:a coverage_exception on the owning room settles a segment and still validates",
+    "command:node skills/vibehub-core/scripts/vh.mjs project validate --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "room.schema.json gained an optional coverage_exceptions array of {segment, reason} objects with additionalProperties false and uniqueItems, and the vh.mjs room validator gained the matching allowed key plus non-empty-string and unique-segment checks. `node skills/vibehub-core/scripts/vh.mjs project validate --repo .` returns ok:true with rooms 6, contexts 63, tickets 100, evidence 273, outcomes 88 against this repository at HEAD plus only this Ticket's changes, proving every existing room document without the field still validates; the identical unmodified HEAD tree returns the identical envelope. The test `a coverage_exception on the owning room settles a segment and still validates` writes a room carrying three exceptions and asserts project validate exits 0.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

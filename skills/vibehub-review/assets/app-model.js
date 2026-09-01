@@ -268,7 +268,7 @@
     }
     if (action === "NEEDS_HUMAN") {
       return `Present the Contract for VibeHub Ticket ${ticketId} with the `
-        + "Skill vibehub-ticket-review and wait for explicit human input. "
+        + "Skill vibehub-review and wait for explicit human input. "
         + "Do not substitute Agent-origin Evidence for human authority.";
     }
     if (action === "REFINE") {
@@ -285,11 +285,11 @@
     }
     if (action === "WAIT") {
       return `Inspect VibeHub Ticket ${ticketId} with the Skill `
-        + "vibehub-ticket-review. It is waiting for direct prerequisites; do "
+        + "vibehub-review. It is waiting for direct prerequisites; do "
         + "not start vibehub-ticket-run until they close successfully.";
     }
     return `Inspect VibeHub Ticket ${ticketId} (currently ${stateLabel || "unprojected"}) `
-      + "with the Skill vibehub-ticket-review. Its derived next action is "
+      + "with the Skill vibehub-review. Its derived next action is "
       + `${action || "unavailable"}; do not start vibehub-ticket-run.`;
   }
 

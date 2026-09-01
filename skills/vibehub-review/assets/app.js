@@ -63,6 +63,9 @@
   const requestedDirection = normalizeLayoutDirection(
     focusQuery.get("direction"),
   );
+  const requestedRoomPath = focusQuery.get("room-focus");
+  const requestedRoomsSurface = focusQuery.get("surface") === "rooms"
+    || Boolean(requestedRoomPath);
 
   const elements = {
     projectName: document.querySelector("#projectName"),
@@ -148,6 +151,7 @@
   let toastTimer = null;
   let tooltipAnchor = null;
   let initialFocusPending = Boolean(requestedTicketId);
+  let initialRoomsPending = requestedRoomsSurface;
   let selectedRoom = null;
   let roomView = "context";
   let roomFilterSnapshot = null;
@@ -279,6 +283,16 @@
         await selectRelation(previousSelection.id, false);
       } else {
         renderGraphInspector({ open: false });
+      }
+      if (initialRoomsPending) {
+        initialRoomsPending = false;
+        toggleRooms(true);
+        if (requestedRoomPath
+          && (state.rooms?.rooms ?? []).some(
+            (room) => room.room === requestedRoomPath,
+          )) {
+          selectRoom(requestedRoomPath);
+        }
       }
       if (message) showToast(message);
       return true;
@@ -447,7 +461,8 @@
       : roomView === "tickets"
         ? room.consumingTickets.map((ticketId) => [ticketId, "Consumes this Room subtree"])
         : roomDriftRows(room);
-    elements.roomDetailContent.replaceChildren(...rows.map(([title, detail]) => {
+    const present = rows.length ? rows : [roomEmptyRow(roomView)];
+    elements.roomDetailContent.replaceChildren(...present.map(([title, detail]) => {
       const row = document.createElement("div");
       row.className = "room-detail-row";
       const strong = document.createElement("strong");
@@ -461,6 +476,13 @@
     elements.roomFilterAction.querySelector("span").textContent = elements.roomFilterAction.disabled
       ? "Showing related Tickets"
       : "Show related Tickets";
+  }
+
+  function roomEmptyRow(view) {
+    if (view === "tickets") {
+      return ["No Tickets", "No Ticket consumes this Room subtree yet."];
+    }
+    return ["No Context", "This Room is an empty shell: its boundary is set and no Context has been written into it yet."];
   }
 
   function roomStatePresentation(stateLabel) {

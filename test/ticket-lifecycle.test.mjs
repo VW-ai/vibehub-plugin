@@ -7,7 +7,7 @@ const root = process.cwd();
 const lifecyclePath = join(
   root,
   "skills",
-  "vibehub-ticket-review",
+  "vibehub-review",
   "references",
   "ticket-lifecycle.json",
 );
@@ -17,7 +17,7 @@ const skillPaths = new Map([
   ["vibehub-ticket-run", "skills/vibehub-ticket-run/SKILL.md"],
   ["vibehub-ticket-closeout", "skills/vibehub-ticket-closeout/SKILL.md"],
   ["vibehub-pr", "skills/vibehub-pr/SKILL.md"],
-  ["vibehub-ticket-review", "skills/vibehub-ticket-review/SKILL.md"],
+  ["vibehub-review", "skills/vibehub-review/SKILL.md"],
 ]);
 const allowedPresentations = new Set(["none", "conversation", "review"]);
 const allowedSurfaces = new Set([
@@ -37,7 +37,7 @@ function readLifecycle() {
 
 function validateLifecycle(contract) {
   assert.equal(contract.schema_version, 1);
-  assert.equal(contract.presenter, "vibehub-ticket-review");
+  assert.equal(contract.presenter, "vibehub-review");
   assert.equal(
     contract.planning_contracts.dependency_hygiene,
     "../../vibehub-core/contracts/dependency-hygiene.json",
@@ -134,9 +134,9 @@ test("Ticket Skills own only their lifecycle transitions", () => {
     ]),
   );
   for (const [skill, body] of skillBodies) {
-    const expectedReference = skill === "vibehub-ticket-review"
+    const expectedReference = skill === "vibehub-review"
       ? "references/ticket-lifecycle.json"
-      : "../vibehub-ticket-review/references/ticket-lifecycle.json";
+      : "../vibehub-review/references/ticket-lifecycle.json";
     assert.equal(body.includes(expectedReference), true, `${skill} misses lifecycle reference`);
   }
   for (const event of contract.events) {
@@ -175,7 +175,7 @@ test("Lifecycle scenarios preserve proactive review and quiet execution", () => 
 test("complete Evidence routes to bounded independent closeout", () => {
   const contract = validateLifecycle(readLifecycle());
   const runSkill = readFileSync(join(root, skillPaths.get("vibehub-ticket-run")), "utf8");
-  const reviewSkill = readFileSync(join(root, skillPaths.get("vibehub-ticket-review")), "utf8");
+  const reviewSkill = readFileSync(join(root, skillPaths.get("vibehub-review")), "utf8");
   assert.equal(contract.next_action_routing.EXECUTE.owner, "vibehub-ticket-run");
   assert.deepEqual(contract.next_action_routing.CLOSE_OUT, {
     owner: "vibehub-ticket-closeout",

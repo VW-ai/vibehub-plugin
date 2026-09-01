@@ -8,7 +8,7 @@ import { denseGraphFixtures } from "./fixtures/dense-graph-fixtures.mjs";
 function loadLayoutModel() {
   const source = readFileSync(join(
     process.cwd(),
-    "skills/vibehub-ticket-review/assets/app-layout.js",
+    "skills/vibehub-review/assets/app-layout.js",
   ), "utf8");
   const sandbox = {};
   sandbox.globalThis = sandbox;
@@ -55,7 +55,7 @@ test("ticket cards reserve breathing room above the bottom status row", () => {
   const model = loadLayoutModel();
   const renderer = readFileSync(join(
     process.cwd(),
-    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-review/assets/app.js",
   ), "utf8");
   assert.equal(model.NODE.width, 232);
   assert.equal(model.NODE.height, 104);

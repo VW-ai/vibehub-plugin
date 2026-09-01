@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "conversation-fallback"
+  ],
+  "evidence_id": "room-tree-conversation-command",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-01T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-review/SKILL.md",
+    "test/room-tree.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs room tree --repo .",
+    "command:node skills/vibehub-core/scripts/vh.mjs project validate --repo .",
+    "command:npm test"
+  ],
+  "schema_version": 1,
+  "summary": "The no-browser Room tree is now presentable from vh.mjs output alone: skills/vibehub-core/scripts/vh.mjs gains a read-only 'room tree' operation, and skills/vibehub-review/SKILL.md documents it in place of the earlier instruction to read .vibehub/rooms/<path>/room.yaml for boundary text. Run against this repository, node skills/vibehub-core/scripts/vh.mjs room tree --repo . returned cold_start false and six Rooms in path order, each carrying room, room_id, parent, description, boundary, drift and context_count: knowledge (parent null, DRIFTED on skills/vibehub-core/contracts/room.schema.json, 10 Contexts), marketing (parent null, STALE reason 'drift:site release assets changed outside this deliverable', 12), marketing/video (parent marketing, boundary 'Video clips and how they are produced. Messaging propositions themselves live in the parent marketing room.', FRESH, 10), product (parent null, DRIFTED, 30), ticket-lifecycle (parent null, DRIFTED, 1), workbench (parent null, boundary 'The read-only local graph workbench: projection, loopback host, assets, and interaction language. Not the canonical YAML documents it renders.', FRESH, 10). The projection is shared code, not a second implementation: vh.mjs exports projectRoomTree and roomContextEntries and skills/vibehub-core/scripts/vh-ui.mjs projectRooms is rewritten to build its browser view from them, so the conversation view and the UI view cannot disagree. Three tests in test/room-tree.test.mjs cover it: 'room tree projects nesting, boundary text, and per-room drift state' over a nested auth and auth/session fixture through COLD_START, FRESH, DRIFTED and STALE; 'room tree counts Contexts and keeps an empty Room at zero', including the empty repository projecting cold_start true with no rooms; and 'room tree and the UI Room projection cannot disagree about a repository', which compares the CLI subprocess envelope against buildUiSnapshot for both a fixture and this production repository. Suite after the change: 161 tests, 160 pass, 1 fail, the single failure being test/release.test.mjs asserting CHANGELOG.md has no '## Unreleased' heading, which is unrelated to this change and caused by concurrent CHANGELOG editing. node skills/vibehub-core/scripts/vh.mjs project validate --repo . returns valid true.",
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}

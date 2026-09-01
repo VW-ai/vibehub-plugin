@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "room-tree-surface",
+    "read-only-preserved"
+  ],
+  "evidence_id": "room-tree-launcher-and-empty-room-projection",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-review/SKILL.md",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-review/assets/app.js",
+    "test/ui-rooms.test.mjs",
+    "test/ui-host.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh-ui.mjs --repo . --room product/ux --no-open --json"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-review/SKILL.md documents one exact Room tree launcher invocation, node ../vibehub-core/scripts/vh-ui.mjs --repo <root> --rooms, implemented in skills/vibehub-core/scripts/vh-ui.mjs as --rooms and --room <room-path> focus flags that emit surface=rooms and room-focus=<path> on the short-lived bearer URL. Run against a fixture whose three nested Rooms hold zero Contexts, the launcher printed a valid launch envelope with focus {ticket:null,view:null,rooms:true,room:product/ux} and /api/state projected room product parent null boundary 'Product intent only.' 0 Contexts drift COLD_START and room product/ux parent product boundary 'UX and interaction evidence only.' 0 Contexts drift COLD_START. A POST to /api/state on the same host returned 405 read_only. skills/vibehub-review/assets/app.js opens the Rooms surface from the launcher URL only and renders an explicit empty-shell row instead of an empty panel. test/ui-rooms.test.mjs adds four tests covering the zero-Context tree projection, the empty-shell row, the launcher focus envelope with an unknown-Room rejection, and URL-only focus with no browser storage. Re-verified on 2026-09-01 against the current tree: parseUiFlags(['--repo',<fixture>,'--room','product/ux','--no-open','--json']) yields rooms true and room product/ux, the authorized URL carries ?surface=rooms&room-focus=product%2Fux, /api/state projects [['product',null,'Product intent only.',0,'COLD_START'],['product/ux','product','UX and interaction evidence only.',0,'COLD_START']], and POST /api/state returns 405 read_only. Suite at re-verification: 161 tests, 160 pass, 1 fail, the single failure being test/release.test.mjs asserting CHANGELOG.md carries no '## Unreleased' heading, unrelated to this Ticket.",
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}

@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "segment-determinism"
+  ],
+  "evidence_id": "evidence-source-segment-determinism",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/source-coverage.test.mjs",
+    "test:markdown splits at heading boundaries and is byte-identical across runs",
+    "test:non-markdown splits into 60-line windows snapped backwards to a blank line",
+    "test:a file shorter than one window is a single segment, and an empty file has none",
+    "command:node skills/vibehub-core/scripts/vh.mjs source segment --repo . --path docs/proposals/bulk-absorption.md"
+  ],
+  "schema_version": 1,
+  "summary": "vh.mjs gained `source segment --repo <root> --path <file>`. Running it twice on docs/proposals/bulk-absorption.md and twice on skills/vibehub-core/scripts/vh.mjs produced byte-identical stdout both times (verified with cmp). Markdown split at heading boundaries into 12 segments with ids such as docs/proposals/bulk-absorption.md#the-problem-reproduced; content before the first heading became <path>#_preamble; duplicate heading slugs disambiguate positionally as <slug>-2. vh.mjs itself split into 31 line windows, ids of the form skills/vibehub-core/scripts/vh.mjs#L55-109, maximum window 60 lines, contiguous from line 1 to line 1802 with no gap and no overlap. Tests `markdown splits at heading boundaries and is byte-identical across runs`, `non-markdown splits into 60-line windows snapped backwards to a blank line`, and `a file shorter than one window is a single segment, and an empty file has none` all pass in test/source-coverage.test.mjs.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

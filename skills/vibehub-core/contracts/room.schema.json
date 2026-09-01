@@ -32,7 +32,21 @@
       }
     },
     "stale": { "type": "boolean" },
-    "stale_reason": { "$ref": "#/$defs/text" }
+    "stale_reason": { "$ref": "#/$defs/text" },
+    "coverage_exceptions": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Segments of this room's anchored sources that deliberately yield no Context, each with a stated reason. Optional: rooms written before this field existed remain valid.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["segment", "reason"],
+        "properties": {
+          "segment": { "$ref": "#/$defs/text" },
+          "reason": { "$ref": "#/$defs/text" }
+        }
+      }
+    }
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },

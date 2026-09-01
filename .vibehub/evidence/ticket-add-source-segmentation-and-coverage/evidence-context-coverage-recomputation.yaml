@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "coverage-recomputation"
+  ],
+  "evidence_id": "evidence-context-coverage-recomputation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/source-coverage.test.mjs",
+    "test:coverage with zero Contexts reports every segment of every anchored file",
+    "test:a segment cited only through evidence[].ref counts as covered",
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo . --room marketing/video"
+  ],
+  "schema_version": 1,
+  "summary": "vh.mjs gained `context coverage --repo <root> [--room <path>]`. Run against a copy of this repository at HEAD it walked every anchored source file of all six rooms and reported files_examined 140, segments_total 746, uncovered_total 617, with per-room and per-file uncovered segment id lists; `--room marketing/video` narrowed the same computation to one room (45 uncovered of 56 segments), and an unknown --room returned {ok:false, code:not_found}. Coverage matches a segment when a Context source.ref or an evidence[].ref equals the segment id, or names the file with no fragment; segments listed in the owning room's coverage_exceptions are also settled. Tests `coverage with zero Contexts reports every segment of every anchored file`, `a coverage_exception on the owning room settles a segment and still validates`, and `a segment cited only through evidence[].ref counts as covered` pass; the exception test observes uncovered_total drop from 1 to 0 purely because a Context file appeared in the working tree, with no other command run.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

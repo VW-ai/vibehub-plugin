@@ -11,7 +11,7 @@ description: Independently validate a proposed or current lightweight VibeHub Ti
 
 Be independent and read-only. Do not rewrite or apply the candidate.
 
-Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../vibehub-review/references/ticket-lifecycle.json` before acting.
 Read `../vibehub-core/contracts/acceptance-authority.md` and verify that `human` appears only
 on the exact acceptance criteria that genuinely reserve human judgment. Never
 infer or remove authority from criterion wording.

@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "segment-determinism",
+    "coverage-recomputation",
+    "room-schema-exceptions",
+    "no-new-store",
+    "regression"
+  ],
+  "closed_at": "2026-09-01T00:00:00.000Z",
+  "evidence_ids": [
+    "evidence-source-segment-determinism",
+    "evidence-context-coverage-recomputation",
+    "evidence-room-coverage-exceptions-optional",
+    "evidence-segmentation-adds-no-store",
+    "evidence-segmentation-regression-tests"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independently adjudicated by re-running every claim rather than reading the Evidence. segment-determinism: `source segment` run twice on a Markdown file and on vh.mjs gave byte-identical stdout (cmp); a script re-derived segment arithmetic over all 1014 tracked text files and found first start 1, last end equal to the file's line count, every segment starting exactly one line after the previous end (no gap, no overlap), unique ids, `path#L<start>-<end>` form for non-Markdown with no window over 60 lines, and `path#heading-slug` for Markdown. Purpose-built fixtures confirmed duplicate headings disambiguate positionally (alpha, alpha-2, alpha-3), a heading inside a fenced block is text, a 1-line and a 3-line file each yield one segment, an empty file yields none, and a blank line at 55 snaps the window to L1-55. Pre-heading content becomes `#_preamble`, the only way to honor heading ids and total coverage at once. coverage-recomputation: `context coverage --repo .` twice gave identical bytes (files_examined 140, segments_total 753, uncovered_total 695); `--room marketing/video` narrowed to 45 uncovered of 56, an unknown room returned not_found, and binary files are reported as skipped rather than silently dropped. In a throwaway fixture repo, zero Contexts left all 4 segments uncovered, a bare-path `source.ref` covered a whole file, an `evidence[].ref` covered exactly its one segment, and a room `coverage_exceptions` entry suppressed exactly its segment while `project validate` stayed ok. Appending a heading to the source and then deleting the Context changed the totals on the very next run with no other command, proving derivation from the working tree and no stored state. room-schema-exceptions: the schema carries the optional array of {segment, reason} with additionalProperties false; all six existing room documents lack the field and `project validate --repo .` returns ok:true (rooms 6, contexts 63, tickets 102, evidence 278, outcomes 88). no-new-store: a full-tree file listing taken before and after running both new commands four times diffed empty; the new code region calls only existsSync, lstatSync, readFileSync and readdirSync, and the sole added Map is an in-memory memo inside another Ticket's ticketCommitResolver, not a persisted store. regression: all six named tests exist in test/source-coverage.test.mjs and assert the criterion rather than something weaker, including explicit contiguity and the 60-line bound; they pass 6/6 in isolation, and `npm test` reports tests 161, pass 160, fail 1. The single failure is `release is GitHub-only, reproducible, and documented`, which asserts CHANGELOG.md contains no `## Unreleased` heading. CHANGELOG.md is byte-identical to HEAD, and the heading was opened by commit ae61558 for the sibling vibehub-review rename; removing this Ticket's bullet would not clear it. That failure belongs to the in-flight rename work, not to this deliverable. On the disclosed deviation: no symlink exists anywhere in the tree, none is tracked in git, and every claim above was re-derived in a symlink-free working tree, so the temporary `skills/vibehub-ticket-review` symlink affected only whether the Evidence could be written past a then-broken validation and compromises none of what it asserts.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage",
+  "unresolved_acceptance_ids": []
+}

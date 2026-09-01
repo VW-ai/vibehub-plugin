@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "regression"
+  ],
+  "evidence_id": "evidence-segmentation-regression-tests",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "test/source-coverage.test.mjs",
+    "test:markdown splits at heading boundaries and is byte-identical across runs",
+    "test:non-markdown splits into 60-line windows snapped backwards to a blank line",
+    "test:a file shorter than one window is a single segment, and an empty file has none",
+    "test:coverage with zero Contexts reports every segment of every anchored file",
+    "test:a coverage_exception on the owning room settles a segment and still validates",
+    "test:a segment cited only through evidence[].ref counts as covered",
+    "command:node --test test/*.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "test/source-coverage.test.mjs adds six tests covering all six required cases: markdown heading splitting (with preamble, fenced-code headings ignored, duplicate slug disambiguation, and byte-identical repeat runs); non-markdown line-window splitting with blank-line snapping (a blank line five lines before the boundary pulls it back to L1-55, one twenty lines away is out of reach so the hard L1-60 boundary stands, and no window exceeds 60 lines); a file shorter than one window (plus a one-line file and an empty file); coverage with zero Contexts; coverage satisfied by a room coverage_exception; and a segment cited only through evidence[].ref. All six pass. Run against this repository at HEAD plus only this Ticket's changes, `node --test test/*.test.mjs` reported tests 149, pass 147, fail 2; the same two failures (`the repository format-2 audit makes delivery structure explicit and evidence-backed` and `dense routing materially reduces crossings and coincident segments against exact baselines`) occur identically on the unmodified HEAD tree at tests 143, pass 141, fail 2, so this change introduced no regression and added six passing tests.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

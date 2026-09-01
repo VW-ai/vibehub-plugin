@@ -51,12 +51,12 @@ try {
     "skills/vibehub-ticket-run/SKILL.md",
     "skills/vibehub-core/scripts/vh.mjs",
     "skills/vibehub-core/scripts/vh-ui.mjs",
-    "skills/vibehub-ticket-review/assets/index.html",
-    "skills/vibehub-ticket-review/assets/app.css",
-    "skills/vibehub-ticket-review/assets/app-layout.js",
-    "skills/vibehub-ticket-review/assets/app.js",
-    "skills/vibehub-ticket-review/assets/vibehub-mark.svg",
-    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/vibehub-review/assets/index.html",
+    "skills/vibehub-review/assets/app.css",
+    "skills/vibehub-review/assets/app-layout.js",
+    "skills/vibehub-review/assets/app.js",
+    "skills/vibehub-review/assets/vibehub-mark.svg",
+    "skills/vibehub-review/references/ticket-lifecycle.json",
     "skills/vibehub-setup/references/architecture-boundary.md",
     "skills/vibehub-ingest/references/knowledge-governance.json",
     "skills/vibehub-migrate/SKILL.md",
@@ -125,11 +125,11 @@ try {
   const lifecycle = JSON.parse(readFileSync(join(
     artifact,
     "skills",
-    "vibehub-ticket-review",
+    "vibehub-review",
     "references",
     "ticket-lifecycle.json",
   ), "utf8"));
-  if (lifecycle.presenter !== "vibehub-ticket-review"
+  if (lifecycle.presenter !== "vibehub-review"
     || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
     || lifecycle.planning_contracts?.dependency_hygiene !== "../../vibehub-core/contracts/dependency-hygiene.json"
     || lifecycle.next_action_routing?.EXECUTE?.owner !== "vibehub-ticket-run"
@@ -260,15 +260,15 @@ try {
   });
 
   const installedScript = readFileSync(
-    join(artifact, "skills", "vibehub-ticket-review", "assets", "app.js"),
+    join(artifact, "skills", "vibehub-review", "assets", "app.js"),
     "utf8",
   );
   const installedModel = readFileSync(
-    join(artifact, "skills", "vibehub-ticket-review", "assets", "app-model.js"),
+    join(artifact, "skills", "vibehub-review", "assets", "app-model.js"),
     "utf8",
   );
   const installedLayout = readFileSync(
-    join(artifact, "skills", "vibehub-ticket-review", "assets", "app-layout.js"),
+    join(artifact, "skills", "vibehub-review", "assets", "app-layout.js"),
     "utf8",
   );
   const installedHost = readFileSync(
@@ -276,13 +276,13 @@ try {
     "utf8",
   );
   const installedHtml = readFileSync(
-    join(artifact, "skills", "vibehub-ticket-review", "assets", "index.html"),
+    join(artifact, "skills", "vibehub-review", "assets", "index.html"),
     "utf8",
   );
   const installedFavicon = readFileSync(join(
     artifact,
     "skills",
-    "vibehub-ticket-review",
+    "vibehub-review",
     "assets",
     "vibehub-mark.svg",
   ));

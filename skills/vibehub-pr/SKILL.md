@@ -9,7 +9,7 @@ description: Prepare or review a pull request whose code and lightweight VibeHub
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
 > the host marketplace) before continuing; every VibeHub Skill needs that folder.
 
-Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../vibehub-review/references/ticket-lifecycle.json` before acting.
 This Skill owns `pr-review-ready`; it does not own UI launch mechanics.
 
 1. Inspect the branch diff, current Ticket, Evidence, Outcome, and relevant
@@ -33,7 +33,7 @@ This Skill owns `pr-review-ready`; it does not own UI launch mechanics.
    shared-reference diffs first — their blast radius exceeds prose — then the
    rooms this branch entered with their knowledge changes, then Ticket
    outcome, acceptance evidence, tests, and known gaps.
-5. Follow `pr-review-ready`: ask `$vibehub-ticket-review` to present the current
+5. Follow `pr-review-ready`: ask `$vibehub-review` to present the current
    branch graph before or alongside the PR handoff. This is a review surface,
    not publication authority.
 6. Use the available GitHub workflow to push/open/update the PR only when the

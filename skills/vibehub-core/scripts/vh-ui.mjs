@@ -9,8 +9,9 @@ import {
   assertValid,
   documents,
   loadRepository,
-  projectRoomDrift,
+  projectRoomTree,
   projectTicketQuery,
+  roomContextEntries,
   ticketArchived,
   ticketNextAction,
   ticketStatus,
@@ -22,6 +23,7 @@ const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
 const MAX_DIRTY_PATHS = 100;
 const TICKET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const FOCUS_VIEWS = new Set(["execution", "contract", "log"]);
+const ROOM_PATH_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/u;
 const ASSET_FILES = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
@@ -273,8 +275,8 @@ function handoffInstruction(ticketId, nextAction) {
       requiresIndependentAgent: true,
     },
     NEEDS_HUMAN: {
-      skill: "vibehub-ticket-review",
-      instruction: `Present the Contract for VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review and wait for explicit human input. Do not substitute Agent-origin Evidence for human authority.`,
+      skill: "vibehub-review",
+      instruction: `Present the Contract for VibeHub Ticket ${ticketId} with the Skill vibehub-review and wait for explicit human input. Do not substitute Agent-origin Evidence for human authority.`,
     },
     REFINE: {
       skill: "vibehub-ticket-plan",
@@ -285,12 +287,12 @@ function handoffInstruction(ticketId, nextAction) {
       instruction: `Replan VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-plan, preserving the non-successful Outcome.`,
     },
     WAIT: {
-      skill: "vibehub-ticket-review",
-      instruction: `Inspect VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review and wait for its direct prerequisites to close successfully.`,
+      skill: "vibehub-review",
+      instruction: `Inspect VibeHub Ticket ${ticketId} with the Skill vibehub-review and wait for its direct prerequisites to close successfully.`,
     },
     DONE: {
-      skill: "vibehub-ticket-review",
-      instruction: `Inspect the recorded Outcome for VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review.`,
+      skill: "vibehub-review",
+      instruction: `Inspect the recorded Outcome for VibeHub Ticket ${ticketId} with the Skill vibehub-review.`,
     },
   };
   return {
@@ -427,57 +429,38 @@ function projectGraph(repository, queryOptions = {}) {
 }
 
 function projectRooms(repo, repository) {
-  let drift;
-  try {
-    drift = projectRoomDrift(repo, repository);
-  } catch (error) {
-    if (error?.code !== "git_error") throw error;
-    drift = {
-      cold_start: true,
-      rooms: [...repository.rooms.documents.keys()].map((room) => ({
-        room,
-        state: "UNKNOWN",
-        reason: "Git snapshot unavailable",
-      })),
-    };
-  }
-  const driftByRoom = new Map(drift.rooms.map((item) => [item.room, item]));
-  const contextEntries = [...repository.contexts.documents.values()];
+  // Shares one projection with `vh.mjs room tree` so the browser view and the
+  // conversation fallback can never disagree about a Room's identity, nesting,
+  // boundary, drift state, or Context count.
+  const tree = projectRoomTree(repo, repository);
   const tickets = documents(repository.tickets.documents);
-  const rooms = [...repository.rooms.documents.entries()]
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([roomPath, entry]) => {
-      const prefix = `${join(repository.paths.rooms, ...roomPath.split("/"))}/`;
-      const contexts = contextEntries
-        .filter((item) => item.path.startsWith(prefix))
-        .map(({ document, path }) => ({
-          contextId: document.context_id,
-          type: document.type,
-          state: document.state,
-          summary: document.summary,
-          path: relative(repo, path).split("\\").join("/"),
-        }))
-        .sort((left, right) => left.contextId.localeCompare(right.contextId));
-      const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
-        const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
-        return match && (match[1] === roomPath || match[1].startsWith(`${roomPath}/`));
-      })).map((ticket) => ticket.ticket_id).sort();
-      return {
-        room: roomPath,
-        roomId: entry.document.room_id,
-        parent: roomPath.includes("/") ? roomPath.slice(0, roomPath.lastIndexOf("/")) : null,
-        description: entry.document.description,
-        boundary: entry.document.boundary,
-        anchors: entry.document.anchors,
-        contexts,
-        consumingTickets,
-        drift: (() => {
-          const item = driftByRoom.get(roomPath) ?? { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
-          return item.state === "UNKNOWN" ? { ...item, state: "COLD_START" } : item;
-        })(),
-      };
-    });
-  return { coldStart: drift.cold_start, rooms };
+  const rooms = tree.rooms.map((entry) => {
+    const roomPath = entry.room;
+    const document = repository.rooms.documents.get(roomPath).document;
+    const contexts = roomContextEntries(repository, roomPath).map(({ document: item, path }) => ({
+      contextId: item.context_id,
+      type: item.type,
+      state: item.state,
+      summary: item.summary,
+      path: relative(repo, path).split("\\").join("/"),
+    }));
+    const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
+      const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
+      return match && (match[1] === roomPath || match[1].startsWith(`${roomPath}/`));
+    })).map((ticket) => ticket.ticket_id).sort();
+    return {
+      room: roomPath,
+      roomId: entry.room_id,
+      parent: entry.parent,
+      description: entry.description,
+      boundary: entry.boundary,
+      anchors: document.anchors,
+      contexts,
+      consumingTickets,
+      drift: entry.drift,
+    };
+  });
+  return { coldStart: tree.cold_start, rooms };
 }
 
 function canonicalContextFromRef(repository, reference) {
@@ -784,7 +767,7 @@ function traceFrom(snapshot, url) {
 }
 
 function defaultAssetRoot() {
-  return resolve(dirname(fileURLToPath(import.meta.url)), "../../vibehub-ticket-review/assets");
+  return resolve(dirname(fileURLToPath(import.meta.url)), "../../vibehub-review/assets");
 }
 
 function assertAssets(assetRoot) {
@@ -796,7 +779,7 @@ function assertAssets(assetRoot) {
   }
 }
 
-function validateFocus(ticket, view) {
+function validateFocus(ticket, view, rooms = false, room = null) {
   if (ticket !== null && !TICKET_ID_PATTERN.test(ticket)) {
     throw new Error("--ticket must be a canonical Ticket ID");
   }
@@ -806,12 +789,20 @@ function validateFocus(ticket, view) {
   if (view !== null && ticket === null) {
     throw new Error("--view requires --ticket");
   }
+  if (room !== null && !ROOM_PATH_PATTERN.test(room)) {
+    throw new Error("--room must be a canonical Room path");
+  }
+  if ((rooms || room !== null) && ticket !== null) {
+    throw new Error("--rooms and --room cannot be combined with --ticket");
+  }
 }
 
-function focusedUrl(origin, token, ticket, view) {
+function focusedUrl(origin, token, ticket, view, rooms = false, room = null) {
   const url = new URL(`${origin}/`);
   if (ticket !== null) url.searchParams.set("ticket", ticket);
   if (view !== null) url.searchParams.set("view", view);
+  if (rooms || room !== null) url.searchParams.set("surface", "rooms");
+  if (room !== null) url.searchParams.set("room-focus", room);
   url.hash = token;
   return url.toString();
 }
@@ -887,6 +878,8 @@ export function startVibeHubUi({
   assetRoot = defaultAssetRoot(),
   ticket = null,
   view = null,
+  rooms = false,
+  room = null,
 } = {}) {
   if (!repoRoot) throw new Error("repoRoot is required");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
@@ -895,13 +888,17 @@ export function startVibeHubUi({
   if (!Number.isInteger(tokenLifetimeMs) || tokenLifetimeMs <= 0) {
     throw new Error("tokenLifetimeMs must be a positive integer");
   }
-  validateFocus(ticket, view);
+  validateFocus(ticket, view, rooms, room);
   if (!existsSync(resolve(repoRoot))) throw new Error(`Repository does not exist: ${repoRoot}`);
   assertAssets(assetRoot);
   const initialSnapshot = buildUiSnapshot(repoRoot);
   if (ticket !== null
     && !initialSnapshot.state.graph.tickets.some((item) => item.ticketId === ticket)) {
     throw new Error(`Unknown Ticket for --ticket: ${ticket}`);
+  }
+  if (room !== null
+    && !initialSnapshot.state.rooms.rooms.some((item) => item.room === room)) {
+    throw new Error(`Unknown Room for --room: ${room}`);
   }
   let origin = null;
   let closed = false;
@@ -973,10 +970,10 @@ export function startVibeHubUi({
       expiry.unref();
       resolveReady({
         origin,
-        url: focusedUrl(origin, token, ticket, view),
+        url: focusedUrl(origin, token, ticket, view, rooms, room),
         port: address.port,
         expiresInMs: tokenLifetimeMs,
-        focus: { ticket, view },
+        focus: { ticket, view, rooms: rooms || room !== null, room },
       });
     });
   });
@@ -1001,13 +998,15 @@ export function parseUiFlags(argv) {
   let json = false;
   let ticket = null;
   let view = null;
+  let rooms = false;
+  let room = null;
   const seen = new Set();
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index];
     if (seen.has(flag)) throw new Error(`repeated flag: ${flag}`);
     seen.add(flag);
     if (flag === "--repo" || flag === "--port"
-      || flag === "--ticket" || flag === "--view") {
+      || flag === "--ticket" || flag === "--view" || flag === "--room") {
       const value = argv[++index];
       if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
       if (flag === "--repo") repo = value;
@@ -1017,14 +1016,16 @@ export function parseUiFlags(argv) {
           throw new Error("--port must be an integer between 0 and 65535");
         }
       } else if (flag === "--ticket") ticket = value;
+      else if (flag === "--room") room = value;
       else view = value;
     } else if (flag === "--open") open = true;
     else if (flag === "--no-open") open = false;
     else if (flag === "--json") json = true;
+    else if (flag === "--rooms") rooms = true;
     else throw new Error(`unknown flag: ${flag}`);
   }
-  validateFocus(ticket, view);
-  return { repo: resolve(repo), port, open, json, ticket, view };
+  validateFocus(ticket, view, rooms, room);
+  return { repo: resolve(repo), port, open, json, ticket, view, rooms: rooms || room !== null, room };
 }
 
 function openBrowser(url) {
@@ -1047,6 +1048,8 @@ async function launch(argv) {
     port: flags.port,
     ticket: flags.ticket,
     view: flags.view,
+    rooms: flags.rooms,
+    room: flags.room,
   });
   const ready = await handle.ready;
   if (flags.json) {
@@ -1058,7 +1061,9 @@ async function launch(argv) {
       ...ready,
     })}\n`);
   } else {
-    process.stdout.write(`VibeHub Ticket graph (read-only)\n${ready.url}\n`);
+    process.stdout.write(`${
+      flags.rooms ? "VibeHub Room tree" : "VibeHub Ticket graph"
+    } (read-only)\n${ready.url}\n`);
   }
   if (flags.open) openBrowser(ready.url);
   const close = () => void handle.close();

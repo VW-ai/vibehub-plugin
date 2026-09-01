@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "history-untouched"
+  ],
+  "evidence_id": "evidence-rename-left-history-unrewritten",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    ".vibehub/rooms/workbench/room.yaml",
+    ".vibehub/tickets/ticket-rebuild-local-graph-workbench.yaml",
+    "docs/proposals/bulk-absorption.md"
+  ],
+  "schema_version": 1,
+  "summary": "The rename rewrote no historical record. 24 closed Tickets still carry context_refs naming skills/vibehub-ticket-review/ verbatim, and git status --short .vibehub/ shows no modification to any file under .vibehub/outcomes/ or .vibehub/evidence/. The two .vibehub files this cycle did change are live pointers, not records: .vibehub/rooms/workbench/room.yaml, whose anchors and alignment stamp are what drift is computed from right now, and the open Ticket ticket-generalize-review-to-room-trees, which had no Outcome. This supersedes an earlier staged Evidence document that claimed the workbench room.yaml edit had been reverted; that claim was false and the document was not appended.",
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}

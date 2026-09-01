@@ -68,10 +68,12 @@ function parseArgs(argv) {
   const rooms = [];
   let scope = null;
   let delivery = null;
+  let path = null;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--repo") repo = argv[++index] ?? "";
     else if (value === "--input") inputPath = argv[++index] ?? "";
+    else if (value === "--path") path = argv[++index] ?? "";
     else if (value === "--room") {
       room = argv[++index] ?? "";
       rooms.push(room);
@@ -86,7 +88,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...",
+      "Usage: vh.mjs <context|room|ticket|project|source> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]... [--path <file>]",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -101,6 +103,7 @@ function parseArgs(argv) {
     rooms,
     scope,
     delivery,
+    path,
   };
 }
 
@@ -197,6 +200,81 @@ function projectFormatPath(repo) {
 
 function add(errors, path, message) {
   errors.push({ path, message });
+}
+
+// Unverifiable is not failure. A closed Ticket's context ref that cannot be
+// checked because git is absent, the clone is shallow, or the commit was
+// garbage-collected is reported so a human can see it, but it does not fail
+// validation: failing would reintroduce exactly the brittleness this split
+// removes — a checked-in record would once again depend on the ambient
+// environment (git on PATH, full history) rather than on its own content.
+function addUnverifiable(unverifiable, path, message) {
+  unverifiable.push({ path, message });
+}
+
+// git that never throws and never inherits stdio: absent from PATH, a
+// non-repository directory, and an unknown revision all return null. Callers
+// treat null as "cannot verify", never as "verified absent".
+function gitQuiet(repo, args) {
+  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (result.error || result.status !== 0) return null;
+  return result.stdout;
+}
+
+const COMMIT_SHA = /^[0-9a-f]{7,40}$/u;
+
+// True only when <commit>:<path> is a readable regular file (blob) at that
+// commit. Anything else — missing commit, missing path, a tree — is false.
+function blobExistsAt(repo, commit, path) {
+  return (gitQuiet(repo, ["cat-file", "-t", `${commit}:${path}`]) ?? "").trim() === "blob";
+}
+
+// Which commit is "the commit recorded for this Ticket"? Three sources exist
+// in this repository's own data, and they are tried in this order:
+//
+//   1. `commit:<sha>` entries in the Ticket's provenance_refs — the most
+//      explicit statement anyone made about which commit this Ticket concerns.
+//   2. `delivered_commit` on the Ticket's deliveries — the commit the delivery
+//      actually landed as.
+//   3. The commit that recorded the Ticket's Outcome, from git's own history of
+//      .vibehub/outcomes/<id>.yaml.
+//
+// (3) is the load-bearing one and is deliberately last-resort-but-universal:
+// the Outcome schema has no commit field at all, and most closed Tickets here
+// carry neither a provenance commit nor a delivered_commit. (3) is also the
+// most defensible source available: it is git's own record of the tree as it
+// stood at the moment the Ticket was closed, it exists for every genuinely
+// closed and committed Ticket, and it requires editing no checked-in document
+// to come into being.
+function ticketCommitResolver(repo) {
+  const cache = new Map();
+  return (document) => {
+    const id = document.ticket_id;
+    if (cache.has(id)) return cache.get(id);
+    const candidates = [];
+    for (const provenance of document.provenance_refs ?? []) {
+      if (typeof provenance !== "string" || !provenance.startsWith("commit:")) continue;
+      // Provenance may point at one path inside a commit: "commit:<sha>:<path>".
+      const sha = provenance.slice("commit:".length).split(":")[0];
+      if (COMMIT_SHA.test(sha)) candidates.push(sha);
+    }
+    for (const delivery of document.deliveries ?? []) {
+      const sha = delivery?.delivered_commit;
+      if (typeof sha === "string" && COMMIT_SHA.test(sha)) candidates.push(sha);
+    }
+    const outcomePath = `.vibehub/outcomes/${id}.yaml`;
+    const closeout = (gitQuiet(repo, ["log", "-1", "--format=%H", "--", outcomePath]) ?? "").trim();
+    if (COMMIT_SHA.test(closeout)) candidates.push(closeout);
+    // Keep only commits this checkout can actually read: a shallow clone or a
+    // dropped object turns a candidate into "unverifiable", not into a failure.
+    const readable = [];
+    for (const sha of candidates) {
+      if (readable.includes(sha)) continue;
+      if (gitQuiet(repo, ["cat-file", "-e", `${sha}^{commit}`]) !== null) readable.push(sha);
+    }
+    cache.set(id, readable);
+    return readable;
+  };
 }
 
 function requiredString(errors, document, key, path, { id = false } = {}) {
@@ -405,7 +483,7 @@ function validateRoom(document, path = "room") {
     !strictKeys(
       errors,
       document,
-      new Set(["schema_version", "kind", "room_id", "description", "boundary", "anchors", "alignment", "stale", "stale_reason"]),
+      new Set(["schema_version", "kind", "room_id", "description", "boundary", "anchors", "alignment", "stale", "stale_reason", "coverage_exceptions"]),
       path,
     )
   ) return errors;
@@ -418,6 +496,27 @@ function validateRoom(document, path = "room") {
   if (typeof document.stale !== "boolean") add(errors, `${path}.stale`, "must be a boolean");
   if (document.stale_reason !== undefined && (typeof document.stale_reason !== "string" || !document.stale_reason.trim())) {
     add(errors, `${path}.stale_reason`, "must be a non-empty string when present");
+  }
+  // A segment that yields no Context is a decision, not an omission: the room
+  // that owns the anchor records the segment id and the stated reason. Optional
+  // so every room written before this field existed still validates.
+  if (document.coverage_exceptions !== undefined) {
+    if (!Array.isArray(document.coverage_exceptions)) {
+      add(errors, `${path}.coverage_exceptions`, "must be an array when present");
+    } else {
+      const seen = new Set();
+      document.coverage_exceptions.forEach((item, index) => {
+        const itemPath = `${path}.coverage_exceptions[${index}]`;
+        if (strictKeys(errors, item, new Set(["segment", "reason"]), itemPath)) {
+          requiredString(errors, item, "segment", itemPath);
+          requiredString(errors, item, "reason", itemPath);
+          if (typeof item.segment === "string") {
+            if (seen.has(item.segment)) add(errors, `${itemPath}.segment`, "must be unique");
+            seen.add(item.segment);
+          }
+        }
+      });
+    }
   }
   if (document.alignment !== undefined
     && strictKeys(errors, document.alignment, new Set(["last_aligned_commit", "checked_at", "anchor_hashes"]), `${path}.alignment`)) {
@@ -755,6 +854,7 @@ export function loadRepository(repo, overrides = {}) {
     outcomes.documents.set(document.ticket_id, { document, path: `<candidate:${document.ticket_id}>` });
   }
   const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
+  const unverifiable = [];
   for (const { document, path } of contexts.documents.values()) {
     for (const relation of document.relations ?? []) {
       if (!contexts.documents.has(relation.target_context_id)) {
@@ -762,22 +862,48 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
+  const recordedCommits = ticketCommitResolver(repo);
   for (const { document, path } of tickets.documents.values()) {
+    const closed = outcomes.documents.has(document.ticket_id);
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
       const target = typeof ref === "string" ? resolve(repo, ref) : "";
-      if (
-        typeof ref !== "string"
-        || isAbsolute(ref)
-        || (!target.startsWith(`${repo}${sep}`) && target !== repo)
-        || !existsSync(target)
-      ) {
-        add(errors, path, `unreadable Ticket context ref: ${String(ref)}`);
-      } else {
+      const wellFormed = typeof ref === "string"
+        && !isAbsolute(ref)
+        && (target.startsWith(`${repo}${sep}`) || target === repo);
+      if (wellFormed && existsSync(target)) {
         const stat = lstatSync(target);
         if (!stat.isFile() || stat.isSymbolicLink()) {
           add(errors, path, `Ticket context ref must be a regular file: ${ref}`);
         }
+        continue;
+      }
+      // An OPEN Ticket's context_refs are a live pointer: it is about to be
+      // executed, so every ref must be readable in the working tree. A
+      // malformed or escaping ref is never a record either.
+      if (!wellFormed || !closed) {
+        add(errors, path, `unreadable Ticket context ref: ${String(ref)}`);
+        continue;
+      }
+      // A CLOSED Ticket's context_refs are a record of what was read when the
+      // work was done, not a claim about today's directory layout. Resolve
+      // them against a commit recorded for that Ticket instead.
+      const commits = recordedCommits(document);
+      if (commits.length === 0) {
+        addUnverifiable(
+          unverifiable,
+          path,
+          `unverifiable Ticket context ref: ${ref} (closed Ticket; no recorded commit is readable here)`,
+        );
+        continue;
+      }
+      const commit = commits.find((candidate) => blobExistsAt(repo, candidate, ref));
+      if (!commit) {
+        add(
+          errors,
+          path,
+          `unreadable Ticket context ref: ${ref} (absent from the working tree and from recorded commit ${commits[0].slice(0, 8)})`,
+        );
       }
     }
     for (const relation of document.relations ?? []) {
@@ -836,7 +962,7 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
-  return { paths, rooms, contexts, tickets, evidence, outcomes, errors };
+  return { paths, rooms, contexts, tickets, evidence, outcomes, errors, unverifiable };
 }
 
 export function assertValid(errors, message = "VibeHub validation failed") {
@@ -901,6 +1027,7 @@ function contextOperation(operation, repo, input, options = {}) {
   const repository = loadRepository(repo);
   assertValid(repository.errors);
   if (operation === "validate") return { valid: true, context_count: repository.contexts.documents.size };
+  if (operation === "coverage") return contextCoverage(repo, repository, options.room ?? null);
   if (operation === "get") {
     if (typeof input.context_id !== "string" || !ID.test(input.context_id)) {
       throw new VibeHubError("invalid_input", "context get needs a valid context_id");
@@ -1413,6 +1540,48 @@ export function projectRoomDrift(repo, loadedRepository = null) {
   return { cold_start: false, rooms };
 }
 
+export function roomContextEntries(repository, roomPath) {
+  const prefix = join(repository.paths.rooms, ...roomPath.split("/")) + sep;
+  return [...repository.contexts.documents.values()]
+    .filter((item) => item.path.startsWith(prefix))
+    .sort((left, right) => left.document.context_id.localeCompare(right.document.context_id));
+}
+
+export function projectRoomTree(repo, loadedRepository = null) {
+  const repository = loadedRepository ?? loadRepository(repo);
+  assertValid(repository.errors);
+  let drift;
+  try {
+    drift = projectRoomDrift(repo, repository);
+  } catch (error) {
+    if (error?.code !== "git_error") throw error;
+    drift = {
+      cold_start: true,
+      rooms: [...repository.rooms.documents.keys()].map((room) => ({
+        room,
+        state: "UNKNOWN",
+        reason: "Git snapshot unavailable",
+      })),
+    };
+  }
+  const driftByRoom = new Map(drift.rooms.map((item) => [item.room, item]));
+  const rooms = [...repository.rooms.documents.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([roomPath, entry]) => {
+      const item = driftByRoom.get(roomPath) ?? { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+      return {
+        room: roomPath,
+        room_id: entry.document.room_id,
+        parent: roomPath.includes("/") ? roomPath.slice(0, roomPath.lastIndexOf("/")) : null,
+        description: entry.document.description,
+        boundary: entry.document.boundary,
+        drift: item.state === "UNKNOWN" ? { ...item, state: "COLD_START" } : item,
+        context_count: roomContextEntries(repository, roomPath).length,
+      };
+    });
+  return { cold_start: drift.cold_start, rooms };
+}
+
 function roomOperation(operation, repo, input, options = {}) {
   if (operation === "align" || operation === "stale") {
     assertCurrentProjectFormat(repo);
@@ -1421,6 +1590,9 @@ function roomOperation(operation, repo, input, options = {}) {
   assertValid(repository.errors);
   if (operation === "drift") {
     return projectRoomDrift(repo, repository);
+  }
+  if (operation === "tree") {
+    return projectRoomTree(repo, repository);
   }
   const entry = repository.rooms.documents.get(options.room ?? "");
   if (!entry) throw new VibeHubError("not_found", `Room not found: ${options.room ?? "(missing --room)"}`);
@@ -1452,6 +1624,274 @@ function roomOperation(operation, repo, input, options = {}) {
   throw new VibeHubError("unsupported_operation", `Unsupported room operation: ${operation}`);
 }
 
+// ---------------------------------------------------------------------------
+// Source segmentation.
+//
+// Coverage can only be *recomputed* if segmentation is reproducible, so every
+// rule below is a pure function of the file's bytes: no clock, no locale, no
+// randomness, no stored state. Identical bytes always yield identical ids.
+// ---------------------------------------------------------------------------
+
+// A non-markdown segment holds at most this many lines.
+const SEGMENT_WINDOW_LINES = 60;
+// A window boundary may move backwards at most this far to land on a blank
+// line. Backwards only: moving forwards would break the "at most 60" promise.
+const SEGMENT_SNAP_RADIUS = 10;
+const MARKDOWN_EXTENSIONS = [".md", ".markdown"];
+// Content before a markdown file's first heading is its own segment. The slug
+// rule below can never produce a leading underscore, so this id cannot collide
+// with a heading slug.
+const PREAMBLE_SLUG = "_preamble";
+
+function isMarkdownPath(path) {
+  const lower = path.toLowerCase();
+  return MARKDOWN_EXTENSIONS.some((extension) => lower.endsWith(extension));
+}
+
+// Lines are 1-indexed everywhere in segment ids. A single trailing newline is
+// the line terminator of the last line, not the start of an empty one, so it is
+// dropped before splitting; an empty file therefore has zero lines and zero
+// segments.
+function splitLines(content) {
+  if (content === "") return [];
+  return (content.endsWith("\n") ? content.slice(0, -1) : content).split("\n");
+}
+
+// GitHub-shaped, but spelled out here so it never depends on a library or on a
+// locale: lowercase (String#toLowerCase is locale-independent; toLocaleLowerCase
+// is not), every run of characters that is neither a Unicode letter nor a
+// Unicode digit collapses to a single "-", and leading/trailing "-" are dropped.
+// Letters and digits are kept rather than restricted to ASCII so a CJK heading
+// keeps its identity instead of collapsing to a bare fallback.
+function headingSlug(text) {
+  const slug = text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/gu, "");
+  return slug || "section";
+}
+
+// Markdown splits at ATX heading boundaries. Headings inside fenced code blocks
+// are text, not structure, so fences are tracked and their contents ignored.
+function markdownSegments(path, lines) {
+  if (lines.length === 0) return [];
+  const boundaries = [];
+  let fence = null;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const fenceMatch = /^\s{0,3}(`{3,}|~{3,})/u.exec(line);
+    if (fenceMatch) {
+      const marker = fenceMatch[1][0];
+      if (fence === null) fence = marker;
+      else if (fence === marker) fence = null;
+      continue;
+    }
+    if (fence !== null) continue;
+    const heading = /^\s{0,3}#{1,6}\s+(.*)$/u.exec(line);
+    if (heading) boundaries.push({ line: index, text: heading[1].replace(/\s+#+\s*$/u, "").trim() });
+  }
+  const segments = [];
+  const firstHeading = boundaries.length > 0 ? boundaries[0].line : lines.length;
+  if (firstHeading > 0) {
+    segments.push({ id: `${path}#${PREAMBLE_SLUG}`, slug: PREAMBLE_SLUG, heading: null, start: 1, end: firstHeading });
+  }
+  // Two headings can slug identically. Disambiguation is positional and
+  // deterministic: the first occurrence keeps the bare slug, the nth gets
+  // "-<n>" appended, in file order.
+  const seen = new Map();
+  boundaries.forEach((boundary, index) => {
+    const base = headingSlug(boundary.text);
+    const count = (seen.get(base) ?? 0) + 1;
+    seen.set(base, count);
+    const slug = count === 1 ? base : `${base}-${count}`;
+    const end = index + 1 < boundaries.length ? boundaries[index + 1].line : lines.length;
+    segments.push({ id: `${path}#${slug}`, slug, heading: boundary.text, start: boundary.line + 1, end });
+  });
+  return segments;
+}
+
+// Everything that is not markdown splits into line windows. The nominal end of
+// a window is start + 59. If that is not already the last line of the file, the
+// boundary is searched backwards from the nominal end, one line at a time, for
+// up to SEGMENT_SNAP_RADIUS lines, and moves to the first blank (whitespace-only)
+// line found; the blank line becomes the last line of the segment. If no blank
+// line is within reach, or the search would run past the start of the window,
+// the hard nominal boundary stands. The next window starts on the following
+// line, so segments always cover every line with no gap and no overlap.
+function windowSegments(path, lines) {
+  const segments = [];
+  let start = 0;
+  while (start < lines.length) {
+    const nominal = start + SEGMENT_WINDOW_LINES - 1;
+    let end;
+    if (nominal >= lines.length - 1) {
+      end = lines.length - 1;
+    } else {
+      end = nominal;
+      for (let distance = 0; distance <= SEGMENT_SNAP_RADIUS; distance += 1) {
+        const candidate = nominal - distance;
+        if (candidate < start) break;
+        if (lines[candidate].trim() === "") {
+          end = candidate;
+          break;
+        }
+      }
+    }
+    segments.push({ id: `${path}#L${start + 1}-${end + 1}`, start: start + 1, end: end + 1 });
+    start = end + 1;
+  }
+  return segments;
+}
+
+function segmentFile(path, content) {
+  const lines = splitLines(content);
+  return isMarkdownPath(path) ? markdownSegments(path, lines) : windowSegments(path, lines);
+}
+
+function repoRelativePath(repo, value) {
+  const root = resolve(repo);
+  const absolute = isAbsolute(value) ? resolve(value) : resolve(root, value);
+  if (absolute === root || !absolute.startsWith(`${root}${sep}`)) {
+    throw new VibeHubError("invalid_argument", `--path must name a file inside the repository: ${value}`);
+  }
+  return absolute.slice(root.length + 1).split(sep).join("/");
+}
+
+// A NUL byte in the first bytes of a file is the standard cheap binary signal.
+// Segmenting a binary blob into "lines" would be noise, not coverage.
+function isBinary(buffer) {
+  return buffer.subarray(0, 8000).includes(0);
+}
+
+function sourceOperation(operation, repo, options = {}) {
+  if (operation !== "segment") {
+    throw new VibeHubError("unsupported_operation", `Unsupported source operation: ${operation}`);
+  }
+  if (typeof options.path !== "string" || !options.path.trim()) {
+    throw new VibeHubError("invalid_argument", "source segment needs --path <file> relative to the repository root");
+  }
+  const relative = repoRelativePath(repo, options.path);
+  const absolute = join(repo, relative);
+  if (!existsSync(absolute) || !lstatSync(absolute).isFile()) {
+    throw new VibeHubError("not_found", `File not found: ${relative}`);
+  }
+  const buffer = readFileSync(absolute);
+  if (isBinary(buffer)) {
+    throw new VibeHubError("invalid_input", `Refusing to segment a binary file: ${relative}`);
+  }
+  const content = buffer.toString("utf8");
+  const segments = segmentFile(relative, content);
+  return {
+    path: relative,
+    strategy: isMarkdownPath(relative) ? "markdown-headings" : "line-windows",
+    lines: splitLines(content).length,
+    segment_count: segments.length,
+    segments,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Coverage.
+//
+// Everything here is derived from the working tree on every invocation: the
+// anchored files are walked, segmented, and matched against the Contexts that
+// are on disk right now. Nothing is cached and nothing is written.
+// ---------------------------------------------------------------------------
+
+function walkSourceFiles(repo, relative, out) {
+  const entries = readdirSync(join(repo, relative), { withFileTypes: true })
+    .sort((a, b) => (a.name < b.name ? -1 : 1));
+  for (const entry of entries) {
+    // .git is machinery, never source. Symlinks are neither isFile nor
+    // isDirectory here, so they are skipped and cannot escape the anchor.
+    if (entry.name === ".git") continue;
+    const child = `${relative}/${entry.name}`;
+    if (entry.isDirectory()) walkSourceFiles(repo, child, out);
+    else if (entry.isFile()) out.push(child);
+  }
+}
+
+function anchoredSourceFiles(repo, document) {
+  const files = [];
+  for (const anchor of document.anchors ?? []) {
+    if (typeof anchor !== "string") continue;
+    const relative = anchor.replace(/\/+$/u, "");
+    if (!relative || relative.split("/").includes("..")) continue;
+    const absolute = join(repo, relative);
+    if (!existsSync(absolute)) continue;
+    const stats = lstatSync(absolute);
+    if (stats.isFile()) files.push(relative);
+    else if (stats.isDirectory()) walkSourceFiles(repo, relative, files);
+  }
+  return [...new Set(files)].sort();
+}
+
+// Citations are collected repository-wide, not per room: a Context filed in one
+// room can legitimately cite a segment of a file anchored by another.
+function citationRefs(repository) {
+  const refs = new Set();
+  for (const { document } of repository.contexts.documents.values()) {
+    const sourceRef = document?.source?.ref;
+    if (typeof sourceRef === "string" && sourceRef.trim()) refs.add(sourceRef.trim());
+    for (const item of document?.evidence ?? []) {
+      if (typeof item?.ref === "string" && item.ref.trim()) refs.add(item.ref.trim());
+    }
+  }
+  return refs;
+}
+
+// A ref matches a segment when it equals the segment id. A bare file path with
+// no "#" fragment covers every segment of that file: citing a source without
+// narrowing to a segment is a claim about the whole of it, and treating it
+// otherwise would make coverage unreachable for anything cited as a document.
+function refCovers(refs, segmentId, filePath) {
+  return refs.has(segmentId) || refs.has(filePath);
+}
+
+function contextCoverage(repo, repository, roomFilter = null) {
+  if (roomFilter !== null && !repository.rooms.documents.has(roomFilter)) {
+    throw new VibeHubError("not_found", `Room not found: ${roomFilter}`);
+  }
+  const refs = citationRefs(repository);
+  const rooms = [];
+  let uncoveredTotal = 0;
+  let segmentsTotal = 0;
+  let filesExamined = 0;
+  const entries = [...repository.rooms.documents.entries()]
+    .filter(([roomPath]) => roomFilter === null || roomPath === roomFilter)
+    .sort(([a], [b]) => (a < b ? -1 : 1));
+  for (const [roomPath, { document }] of entries) {
+    const exceptions = new Set(
+      (document.coverage_exceptions ?? [])
+        .map((item) => item?.segment)
+        .filter((segment) => typeof segment === "string"),
+    );
+    const files = [];
+    let roomUncovered = 0;
+    for (const filePath of anchoredSourceFiles(repo, document)) {
+      const buffer = readFileSync(join(repo, filePath));
+      if (isBinary(buffer)) {
+        files.push({ path: filePath, skipped: "binary", segment_count: 0, uncovered: [] });
+        continue;
+      }
+      const segments = segmentFile(filePath, buffer.toString("utf8"));
+      filesExamined += 1;
+      segmentsTotal += segments.length;
+      const uncovered = segments
+        .filter((segment) => !refCovers(refs, segment.id, filePath)
+          && !refCovers(exceptions, segment.id, filePath))
+        .map((segment) => segment.id);
+      roomUncovered += uncovered.length;
+      files.push({ path: filePath, skipped: null, segment_count: segments.length, uncovered });
+    }
+    uncoveredTotal += roomUncovered;
+    rooms.push({ room: roomPath, files, uncovered: roomUncovered });
+  }
+  return {
+    rooms,
+    files_examined: filesExamined,
+    segments_total: segmentsTotal,
+    uncovered_total: uncoveredTotal,
+  };
+}
+
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
@@ -1467,6 +1907,7 @@ function projectOperation(operation, repo) {
       tickets: repository.tickets.documents.size,
       evidence: repository.evidence.documents.size,
       outcomes: repository.outcomes.documents.size,
+      unverifiable_context_refs: repository.unverifiable,
     };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported project operation: ${operation}`);
@@ -1485,6 +1926,7 @@ function run() {
     rooms: args.rooms,
   });
   else if (args.domain === "project") data = projectOperation(args.operation, args.repo, input);
+  else if (args.domain === "source") data = sourceOperation(args.operation, args.repo, { path: args.path });
   else throw new VibeHubError("unsupported_domain", `Unsupported domain: ${args.domain}`);
   process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
 }

@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "presenter": "vibehub-ticket-review",
+  "presenter": "vibehub-review",
   "next_action_routing": {
     "EXECUTE": { "owner": "vibehub-ticket-run", "independent_agent": false },
     "CLOSE_OUT": { "owner": "vibehub-ticket-closeout", "independent_agent": true },
-    "NEEDS_HUMAN": { "owner": "vibehub-ticket-review", "independent_agent": false },
+    "NEEDS_HUMAN": { "owner": "vibehub-review", "independent_agent": false },
     "REFINE": { "owner": "vibehub-ticket-plan", "independent_agent": false },
     "REPLAN": { "owner": "vibehub-ticket-plan", "independent_agent": false },
-    "WAIT": { "owner": "vibehub-ticket-review", "independent_agent": false },
-    "DONE": { "owner": "vibehub-ticket-review", "independent_agent": false }
+    "WAIT": { "owner": "vibehub-review", "independent_agent": false },
+    "DONE": { "owner": "vibehub-review", "independent_agent": false }
   },
   "planning_contracts": {
     "dependency_hygiene": "../../vibehub-core/contracts/dependency-hygiene.json"
@@ -94,7 +94,7 @@
     },
     {
       "event": "explicit-review",
-      "owner": "vibehub-ticket-review",
+      "owner": "vibehub-review",
       "presentation": "review",
       "surface": "requested",
       "continuation": "report",

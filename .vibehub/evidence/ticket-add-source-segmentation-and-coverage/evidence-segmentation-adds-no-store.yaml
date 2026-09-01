@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "no-new-store"
+  ],
+  "evidence_id": "evidence-segmentation-adds-no-store",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-29T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    "test/source-coverage.test.mjs",
+    "command:find . -type f | sort, taken before and after context coverage and source segment, diff empty"
+  ],
+  "schema_version": 1,
+  "summary": "The change touches three files: skills/vibehub-core/scripts/vh.mjs, skills/vibehub-core/contracts/room.schema.json, and the new test/source-coverage.test.mjs. No manifest, progress file, cache, daemon, or second store was added and no npm dependency was introduced. A full-tree file listing taken before and after running `context coverage` and `source segment` was identical: no file created, changed, or removed. Grepping the whole segmentation and coverage code region for writeFileSync, writeDocument, mkdirSync, and renameSync returns nothing; the new code reads only through readFileSync, readdirSync, existsSync, and lstatSync. Repeated `context coverage` runs produced byte-identical stdout, and `project validate` still reports the same document counts, so nothing is persisted between invocations.",
+  "ticket_id": "ticket-add-source-segmentation-and-coverage"
+}

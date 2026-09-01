@@ -13,7 +13,7 @@ Plan outcomes, not ceremony. One coherent deliverable is usually one Ticket.
 Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
-Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../vibehub-review/references/ticket-lifecycle.json` before acting.
 Read `../vibehub-core/contracts/acceptance-authority.md` before assigning acceptance
 authority. Omit `authority` (or use `agent`) for independently checkable work;
 use `human` only for the exact criterion whose decision owner must be a person.
@@ -104,7 +104,7 @@ is implied.
 
 8. Read the graph back and report Ticket IDs, paths, READY/BLOCKED state, and
    the next executable outcome. Follow `plan-applied`: ask
-   `$vibehub-ticket-review` to present the refreshed graph, focused on the new
+   `$vibehub-review` to present the refreshed graph, focused on the new
    Ticket when there is one clear subject. Git commit/PR is the review and
    rollback boundary.
 

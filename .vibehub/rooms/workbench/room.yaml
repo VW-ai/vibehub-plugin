@@ -2,47 +2,47 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "c2b00eb08e1c6fd24ac395e0ba065e8a127f4f0d",
-        "path": "skills/vibehub-ticket-review/SKILL.md"
+        "blob": "ad716ce6dd8a8cc3ce88f9e29fb8d8de2242359e",
+        "path": "skills/vibehub-review/SKILL.md"
       },
       {
-        "blob": "9d666f916f3b9050cc8f98420d571a6b54cb4812",
-        "path": "skills/vibehub-ticket-review/agents/openai.yaml"
+        "blob": "dca02ddc29eb16b69a0f9f0068c5c3021e577c57",
+        "path": "skills/vibehub-review/agents/openai.yaml"
       },
       {
         "blob": "692597d531c7d20d9ad9f31c26ed31cf18a9f97a",
-        "path": "skills/vibehub-ticket-review/assets/app-layout.js"
+        "path": "skills/vibehub-review/assets/app-layout.js"
       },
       {
-        "blob": "5694a40fb3b75112ea99bbd521ea61fdca7495aa",
-        "path": "skills/vibehub-ticket-review/assets/app-model.js"
+        "blob": "8e1dfc7081c9dbeed2d0774edafb9bc9ca39c71f",
+        "path": "skills/vibehub-review/assets/app-model.js"
       },
       {
         "blob": "754cd55cba2500773fe2346a02b2f849053c108f",
-        "path": "skills/vibehub-ticket-review/assets/app.css"
+        "path": "skills/vibehub-review/assets/app.css"
       },
       {
-        "blob": "ac845d24798da510b8dfe0edb6803dbf4fdd502c",
-        "path": "skills/vibehub-ticket-review/assets/app.js"
+        "blob": "9ee32aaff217d649708a4b3f01d8bb6580b90d85",
+        "path": "skills/vibehub-review/assets/app.js"
       },
       {
         "blob": "5effca213341ab14477c55ffd49755ae0fe10cb7",
-        "path": "skills/vibehub-ticket-review/assets/index.html"
+        "path": "skills/vibehub-review/assets/index.html"
       },
       {
         "blob": "76c7d1a1e6c75d145043f00b009d7f11d2e556e6",
-        "path": "skills/vibehub-ticket-review/assets/vibehub-mark.svg"
+        "path": "skills/vibehub-review/assets/vibehub-mark.svg"
       },
       {
-        "blob": "9ba4910d0242e80c1f1a793783330fcb153c28c0",
-        "path": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+        "blob": "5b720acc302917c52c677885eed50772a5705d59",
+        "path": "skills/vibehub-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-08-23T04:14:29.011Z",
-    "last_aligned_commit": "ae1d1eeeb54458b23728e478f6a8bd056228693a"
+    "checked_at": "2026-09-01T08:25:12.515Z",
+    "last_aligned_commit": "dcc9c4bf09f9adedd35d44bab4d1074b15ed82c6"
   },
   "anchors": [
-    "skills/vibehub-ticket-review/"
+    "skills/vibehub-review/"
   ],
   "boundary": "The read-only local graph workbench: projection, loopback host, assets, and interaction language. Not the canonical YAML documents it renders.",
   "description": "The local read-only graph UI that presents the Ticket graph and Context as a quiet, actionable workbench.",

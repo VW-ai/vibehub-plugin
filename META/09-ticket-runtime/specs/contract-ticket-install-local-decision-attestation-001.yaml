@@ -118,4 +118,4 @@ anchors:
   - file: "packages/cli/src/ticket-review-host.ts"
   - file: "packages/cli/src/main.ts"
   - file: "packages/mcp/src/runtime.ts"
-  - file: "skills/vibehub-ticket-review/SKILL.md"
+  - file: "skills/vibehub-review/SKILL.md"

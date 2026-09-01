@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "open-ticket-refs-at-head",
+    "live-pointers-still-checked",
+    "degrades-without-git",
+    "regression"
+  ],
+  "evidence_id": "evidence-lifecycle-ref-validation-regression",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    "test/ticket-context-ref-history.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "test/ticket-context-ref-history.test.mjs builds a real git repository, closes a Ticket whose ref points into a directory, then git mv's that directory, and covers all five required cases: a closed Ticket's ref resolving only at its commit; a closed Ticket's ref existing nowhere still failing; an open Ticket with the same dangling ref still failing against the working tree; a Room anchor staying a live pointer and still reporting DRIFTED after the same rename; and a tree with .git removed yielding an unverifiable entry rather than a failure. Full suite re-run independently: npm test -> tests 161, pass 161, fail 0.",
+  "ticket_id": "ticket-scope-reference-validation-to-lifecycle"
+}

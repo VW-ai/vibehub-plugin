@@ -138,7 +138,7 @@ async function exerciseInstalledFavicon(pluginRoot, label) {
   const faviconPath = join(
     pluginRoot,
     "skills",
-    "vibehub-ticket-review",
+    "vibehub-review",
     "assets",
     "vibehub-mark.svg",
   );
@@ -146,7 +146,7 @@ async function exerciseInstalledFavicon(pluginRoot, label) {
   const html = readFileSync(join(
     pluginRoot,
     "skills",
-    "vibehub-ticket-review",
+    "vibehub-review",
     "assets",
     "index.html",
   ), "utf8");
