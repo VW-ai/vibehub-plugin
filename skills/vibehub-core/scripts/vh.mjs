@@ -2420,6 +2420,20 @@ function validateRetiredNames(repo, contract, allFiles, errors) {
       add(errors, path, "A retired entry needs a non-empty name and its replacement");
       continue;
     }
+    // Both fields are BARE SKILL NAMES, matching the kebab-case grammar every
+    // folder under skills/ already follows. Two reasons, and either alone is
+    // enough. A `replacement` that is not a Skill name is meaningless as the
+    // guidance the failure message prints back to the user. And contractSpans
+    // consumes the raw spans of exactly these two fields, so without a grammar
+    // they are a place to park arbitrary text — a path, a sentence — inside the
+    // contract and have it exempted by key position rather than by being a
+    // name. Constraining the grammar is what makes that exemption safe.
+    for (const key of ["name", "replacement"]) {
+      if (!ID.test(entry[key])) {
+        add(errors, `${path}.${key}`, `must be a bare lowercase kebab-case Skill name, not ${JSON.stringify(entry[key])}`);
+      }
+    }
+    if (!ID.test(entry.name) || !ID.test(entry.replacement)) continue;
     const allowances = [];
     for (const [allowIndex, allowance] of (Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []).entries()) {
       const where = `${path}.allowed_paths[${allowIndex}]`;

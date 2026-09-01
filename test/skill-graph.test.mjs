@@ -397,6 +397,43 @@ test("the contract file is scanned like any other file", () => {
   assert.match(messages(validate(repo)), /skill-graph\.json: Live reference to retired Skill/u);
 });
 
+// `name` and `replacement` are the two fields whose raw spans the contract scan
+// subtracts, so their grammar is what bounds that subtraction. A bare kebab-case
+// Skill name — the grammar every folder under skills/ follows — carries no path
+// separator, whitespace, quote, or trailing punctuation, so nothing that is not
+// a Skill name can be parked there and exempted by key position. A `replacement`
+// that is not a Skill name is also useless as the guidance the error prints.
+test("a retired name and replacement must each be a bare Skill name", () => {
+  const wellFormed = retiredRepo("skill-graph-retired-token-ok", PROSE_ALLOWANCE);
+  write(wellFormed, "docs/RENAME.md", `${RENAME_LINE}\n`);
+  assert.equal(validate(wellFormed).ok, true, JSON.stringify(validate(wellFormed)));
+
+  // Each case sets one field to something that is not a Skill name.
+  const rejected = [
+    ["name", `../${RETIRED}/assets/app-nowhere-else.js`],
+    ["name", `skills/${RETIRED}/SKILL.md`],
+    ["name", `${RETIRED} (renamed)`],
+    ["replacement", `vibehub-alpha (the old skills/${RETIRED}/ folder is gone)`],
+    ["replacement", "vibehub-alpha/assets/app.js"],
+    ["replacement", "vibehub-alpha\nvibehub-beta"],
+    ["replacement", "\"vibehub-alpha\""],
+    ["replacement", "vibehub-alpha."],
+    ["replacement", "Vibehub-Alpha"],
+  ];
+  for (const [key, value] of rejected) {
+    const repo = retiredRepo(`skill-graph-retired-token-${key}-${value.length}`, PROSE_ALLOWANCE);
+    write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
+    const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
+    contract.retired[0][key] = value;
+    write(repo, CONTRACT, `${JSON.stringify(contract, null, 2)}\n`);
+    assert.match(
+      messages(validate(repo)),
+      new RegExp(`retired\\[0\\]\\.${key}: must be a bare lowercase kebab-case Skill name`, "u"),
+      `${key} = ${JSON.stringify(value)} should have been rejected`,
+    );
+  }
+});
+
 // An allowance text that is merely the bare name matches any occurrence in the
 // file, so swapping an excused prose mention for a live path would keep the
 // count at one and still pass.
