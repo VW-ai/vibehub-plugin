@@ -190,8 +190,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-01T08:45:19.599Z",
-    "last_aligned_commit": "6a601a3b155769c064baa88d6e57e5b060b7fadf"
+    "checked_at": "2026-09-01T09:13:59.109Z",
+    "last_aligned_commit": "718ee15d87bb01f50db99a33ad5490095137d188"
   },
   "anchors": [
     "CHANGELOG.md",

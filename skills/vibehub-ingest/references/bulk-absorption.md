@@ -39,8 +39,9 @@ cut by heading hierarchy into `path#heading-slug` ids (content before the
 first heading is `path#_preamble`); every other file type — HTML, code, plain
 text — is cut into line windows of at most 60 lines snapped to a nearby blank
 line, giving `path#L<start>-<end>`. Segments cover every line of the file
-with no gap and no overlap. A binary file is refused and reported as skipped
-rather than silently dropped.
+with no gap and no overlap. A binary file is refused outright by `source
+segment`, and appears in Pass 5's coverage report marked `skipped` rather than
+being silently dropped.
 
 Determinism is the point: coverage in Pass 5 can only be recomputed because
 the same file always cuts the same way. Keep each source's segment list for
