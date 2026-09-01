@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "dc5c7417c6eaed656ad38e5f4ddd579d34b1f54b",
+        "blob": "1db565873de5434fc9c6e6951996b0c5718984d4",
         "path": "docs/INSTALL.md"
       },
       {
@@ -110,7 +110,7 @@
         "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
       },
       {
-        "blob": "7598183a790e60f0f2424b44892ef34b2e648f87",
+        "blob": "0c05e2f281fceeb00ba828f6be3862d912eca78e",
         "path": "docs/proposals/bulk-absorption.md"
       },
       {
@@ -142,7 +142,7 @@
         "path": "docs/proposals/card-corner-signal/prototype.js"
       },
       {
-        "blob": "58d55bf49c411a39951ac316f81dc310f68cd4d4",
+        "blob": "fe5cafcb8161ccbf6ef4a4aea102d69f5e3f9718",
         "path": "docs/proposals/codex-like-workbench/README.md"
       },
       {
@@ -190,8 +190,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-29T08:41:04.178Z",
-    "last_aligned_commit": "3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+    "checked_at": "2026-09-01T08:45:19.599Z",
+    "last_aligned_commit": "6a601a3b155769c064baa88d6e57e5b060b7fadf"
   },
   "anchors": [
     "CHANGELOG.md",

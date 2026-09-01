@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-lifecycle-scoped-reference-validation",
+  "detail": "关键区分不是「历史与当下」，而是 live pointer 与 record。Room 的 anchors 与 alignment.anchor_hashes 是活指针，drift 此刻就由它们算出，必须对工作树校验，本决定不得让失效的 Room anchor 通过。尚无 Outcome 的 Ticket 其 context_refs 也是活指针，因为它即将被执行，维持对工作树校验。已有 Outcome 的 Ticket 其 context_refs 是记录，记的是当时读了什么，因此对该 Ticket 的某个已记录 commit 校验：依次尝试 provenance_refs 中的 commit:<sha>、deliveries[].delivered_commit、以及记录该 Outcome 的那个 commit；最后一项是唯一每张已关闭 Ticket 都必然存在的来源，且不需要改动任何已落盘文档。三者皆不可读时记为 unverifiable 而非失败——让一条已落盘记录的有效性取决于环境里有没有 git、历史是否完整，正是本决定要消除的脆弱性。此前的规则要求每条引用永远对 HEAD 可读，等于宣布本仓库永不能重构自身目录：任何改名只剩两条出路，改写历史或削弱校验，两条都不可接受。该缺陷是重命名 vibehub-ticket-review 时暴露的，但它一直潜伏，与那次改名无关。Context 的 source.ref 与 evidence[].ref 至今不受校验，它们同属记录，不在本决定中开始校验。",
+  "evidence": [
+    {
+      "note": "ticketCommitResolver、blobExistsAt 与 gitQuiet 的实现及其取舍注释。",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "note": "覆盖已关闭票仅在其 commit 可解析、处处不可解析仍失败、开放票悬空仍失败、Room anchor 仍报 drift、无 git 时降级为 unverifiable。",
+      "ref": "test/ticket-context-ref-history.test.mjs"
+    },
+    {
+      "note": "记录该缺陷是如何在执行中被暴露的。",
+      "ref": "docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-29T00:00:00Z",
+    "quote": "不太适配破坏性发版。不够git-native啊",
+    "ref": "conversation:2026-08-29-peel-knowledge-ingestion"
+  },
+  "state": "active",
+  "summary": "引用校验按生命周期分级：已关闭 Ticket 的引用是记录，对着它自己的 commit 校验",
+  "tags": [
+    "validation",
+    "ticket-lifecycle",
+    "git-native",
+    "references",
+    "refactoring"
+  ],
+  "type": "decision"
+}

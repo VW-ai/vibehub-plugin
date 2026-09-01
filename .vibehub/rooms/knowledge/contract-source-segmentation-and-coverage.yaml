@@ -1,0 +1,40 @@
+{
+  "context_id": "contract-source-segmentation-and-coverage",
+  "detail": "任何被 Room anchor 覆盖的源文件都能被 `vh.mjs source segment` 切成稳定 ID 的段落：Markdown 按标题层级切，段 ID 为 path#heading-slug，标题重复时按出现次序追加序号，首个标题之前的内容为 path#_preamble；其余一切文件类型按最多 60 行的窗口切，边界向后回溯最多 10 行吸附到最近空行，否则用硬边界，段 ID 为 path#L<start>-<end>。二进制文件拒绝切段并在覆盖率里显式标记为 skipped，不静默丢弃。段落必须覆盖文件每一行，无缝隙无重叠——这是覆盖率能成立的前提。`vh.mjs context coverage` 据此重算：每个段落是否被至少一条 Context 的 source.ref 或 evidence[].ref 引用，或被所属 Room 的 coverage_exceptions 显式豁免。裸文件路径（不带 #）视为覆盖整个文件。所有数值每次调用都从工作树重算，不存储、不缓存——因此并行摄入是安全的：子代理的完成汇报不可信，但覆盖率是算出来的，漏掉的段落必然显形。",
+  "evidence": [
+    {
+      "note": "source segment 与 context coverage 的实现。",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "note": "切段确定性、行窗口吸附、例外豁免与两种引用形式的回归测试。",
+      "ref": "test/source-coverage.test.mjs"
+    },
+    {
+      "note": "独立裁决对全仓库 1019 个文件重算了无缝隙无重叠性质。",
+      "ref": ".vibehub/outcomes/ticket-add-source-segmentation-and-coverage.yaml"
+    },
+    {
+      "note": "说明为什么覆盖率必须先于并行化立住。",
+      "ref": "docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-29T00:00:00Z",
+    "quote": "覆盖率是算出来的，不是听来的",
+    "ref": "conversation:2026-08-29-peel-knowledge-ingestion"
+  },
+  "state": "active",
+  "summary": "源材料切段必须确定性，覆盖率必须可重算而非可汇报",
+  "tags": [
+    "coverage",
+    "segmentation",
+    "ingest",
+    "determinism",
+    "absorption"
+  ],
+  "type": "contract"
+}

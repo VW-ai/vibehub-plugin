@@ -6,7 +6,7 @@
         "path": "skills/vibehub-core/contracts/context.schema.json"
       },
       {
-        "blob": "bf8884197dba4632d84d96d42c315baf5b767d63",
+        "blob": "47939f2b4b035f030647761429e53e96b8a2d988",
         "path": "skills/vibehub-core/contracts/room.schema.json"
       },
       {
@@ -50,8 +50,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-23T04:14:28.550Z",
-    "last_aligned_commit": "ae1d1eeeb54458b23728e478f6a8bd056228693a"
+    "checked_at": "2026-09-01T08:45:16.041Z",
+    "last_aligned_commit": "6a601a3b155769c064baa88d6e57e5b060b7fadf"
   },
   "anchors": [
     "skills/vibehub-core/contracts/context.schema.json",
