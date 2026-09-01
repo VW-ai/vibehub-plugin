@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "closed-ticket-refs-at-their-commit",
+      "criterion": "A Ticket that has a recorded Outcome has each `context_refs` entry validated against a commit recorded for that Ticket rather than against the working tree. A ref readable at that commit passes even when the path no longer exists at HEAD; a ref readable at neither the commit nor the working tree still fails."
+    },
+    {
+      "acceptance_id": "open-ticket-refs-at-head",
+      "criterion": "A Ticket with no recorded Outcome still requires every `context_refs` entry to be readable in the working tree, unchanged from today's behavior."
+    },
+    {
+      "acceptance_id": "live-pointers-still-checked",
+      "criterion": "Room `anchors` and `alignment.anchor_hashes` continue to resolve against the working tree. A Room anchoring a path that no longer exists is still reported; this change never makes a stale Room anchor pass."
+    },
+    {
+      "acceptance_id": "degrades-without-git",
+      "criterion": "Validation still runs in a checkout with no reachable git history: when the recorded commit cannot be read, a closed Ticket's unreadable ref is reported as an unverifiable ref rather than crashing or silently passing, and the test suite continues to pass when run outside a git checkout."
+    },
+    {
+      "acceptance_id": "repository-green",
+      "criterion": "`vh.mjs project validate --repo .` passes on this repository with `skills/vibehub-ticket-review/` renamed and no closed Ticket, Evidence, or Outcome document edited, and the full test suite passes."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover a closed Ticket whose ref exists only at its commit, a closed Ticket whose ref exists nowhere, an open Ticket with a dangling ref, a stale Room anchor, and the no-git fallback."
+    }
+  ],
+  "constraints": [
+    "Do not edit closed Tickets, Evidence, or Outcomes to make validation pass; the point of this Ticket is that they should not have to change.",
+    "Do not weaken validation for open Tickets or for Room anchors.",
+    "Do not begin validating Context `source.ref` or `evidence[].ref`; they are unchecked today and are records, not live pointers. Widening the check is separate work.",
+    "Keep the helper dependency-free; shell out to git rather than adding a git library."
+  ],
+  "context": "Executing ticket-generalize-review-to-room-trees surfaced this: renaming one skill directory made 37 context_refs across 24 closed Tickets unreadable and broke `project validate` repo-wide. The validator resolves every Ticket context_ref against the working tree forever, but a closed Ticket is a record of what was read at the time, not a promise about today's layout. As written, the rule means this repository can never restructure its own directories without rewriting closed records. Git's own answer is that content is addressed by commit, and Tickets already carry `commit:` provenance. The distinction that matters is live pointer versus record: a Room's anchors and alignment stamp are used to compute drift now and must stay resolvable; a closed Ticket's context_refs are not.",
+  "context_refs": [
+    {
+      "purpose": "The deliverable whose execution surfaced this defect.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "Where context_refs and provenance_refs are defined.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Git owns history; deterministic validation lives in the bundled script.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Reference validation distinguishes live pointers from historical records, so the repository can be restructured without either invalidating closed work or weakening the check.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:99c5245"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-scope-reference-validation-to-lifecycle"
+}

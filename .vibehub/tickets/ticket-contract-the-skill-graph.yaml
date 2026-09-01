@@ -6,18 +6,22 @@
     },
     {
       "acceptance_id": "validation",
-      "criterion": "`vh.mjs skills validate --repo <root>` fails on an unresolvable `$vibehub-*` reference, a Skill missing from the contract, an orphan Skill reachable from neither a user entry nor another Skill, and a cycle; it passes on this repository."
+      "criterion": "`vh.mjs skills validate --repo <root>` fails on an unresolvable `$vibehub-*` reference, a Skill missing from the contract, an orphan Skill reachable from neither a user entry nor another Skill, a cycle, a `$vibehub-*` reference present in a SKILL.md but not declared as an edge in the contract, and an edge declared in the contract that no SKILL.md contains. It passes on this repository."
     },
     {
       "acceptance_id": "no-runtime-role",
       "criterion": "The contract and command are development-time validation only; no Skill's runtime behavior reads them, and nothing in `.vibehub/` records their output."
+    },
+    {
+      "acceptance_id": "retired-names-stay-retired",
+      "criterion": "`skill-graph.json` declares retired Skill names with their replacement, and `skills validate` fails when a retired name appears in a live reference — a `$`-invocation, a `../<name>/` path, or a bare string in Skills, contracts, scripts, UI assets, or tests. Historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, and `META/legacy-*` are exempt, as is prose that deliberately names a retired Skill in order to describe its retirement."
     }
   ],
   "constraints": [
     "Do not turn the graph into a router, a lifecycle, or runtime dispatch state.",
-    "Declare the graph as it is after the review rename, not as it was."
+    "Declare the graph as it stands after both the review rename and the absorb changes, not as it was."
   ],
-  "context": "Skill-to-skill dependencies exist only as prose references today. Planning this deliverable required grepping `$vibehub-*` by hand to discover that distill has no user entry and that deleting it would cascade through active Context. That check should be reproducible rather than remembered.",
+  "context": "Skill-to-skill dependencies exist only as prose references today. Planning this deliverable required grepping `$vibehub-*` by hand to discover that distill has no user entry and that deleting it would cascade through active Context. That check should be reproducible rather than remembered. The rename of vibehub-ticket-review to vibehub-review makes this concrete: retiring a name is only safe if something mechanically prevents the old one from creeping back into live references.",
   "context_refs": [
     {
       "purpose": "Records the impact scan this contract makes repeatable, including the reversed distill decision.",
@@ -40,6 +44,11 @@
     {
       "rationale": "The contract must declare the post-rename graph; authoring it before the rename would ship a contract that is wrong on its first day.",
       "target_ticket_id": "ticket-generalize-review-to-room-trees",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Absorb adds the ingest -> distill and ingest -> review edges and removes distill's user-entry status, which the orphan rule reads; declaring the graph before that lands would ship a contract that is wrong on its first day.",
+      "target_ticket_id": "ticket-absorb-large-material-through-ingest",
       "type": "depends_on"
     }
   ],

@@ -25,6 +25,14 @@ inside the `vibehub-core` skill folder; a partial install that omits
 `vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
 directly. Update later with `npx skills update`.
 
+**Updating across a Skill rename.** `npx skills add` copies Skill folders and
+does not remove folders that no longer exist upstream. When a Skill is renamed
+— `vibehub-ticket-review` became `vibehub-review` — the old folder can survive
+an update and present a stale duplicate Skill to the Agent. Delete the old
+folder from `.claude/skills/`, `.agents/skills/`, or wherever your host
+installed it. Host marketplace installs are unaffected: their plugin cache is
+isolated per version.
+
 **Host marketplaces.** The same layout ships through the Codex and Claude Code
 marketplaces; see the README for the exact commands.
 
@@ -123,7 +131,7 @@ with a daemon or hook.
 Ticket Skills proactively present the focused graph after planning, at a
 protected human boundary, after closeout, and for PR review. Routine execution
 stays quiet. To open the graph explicitly as a fallback, ask the Agent to use
-`$vibehub-ticket-review` or launch the bundled helper:
+`$vibehub-review` or launch the bundled helper:
 
 ```bash
 node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --repo <repository>

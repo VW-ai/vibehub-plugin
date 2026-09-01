@@ -1,0 +1,57 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "detects-retired-folder",
+      "criterion": "When a project contains an installed Skill folder whose name is declared retired, setup reports the exact path and the replacement name, for every install location it already inspects."
+    },
+    {
+      "acceptance_id": "reports-does-not-delete",
+      "criterion": "Setup reports the stale folder and does not delete or modify it. Removing an installed Skill from the user's agent directory is the user's action, not setup's."
+    },
+    {
+      "acceptance_id": "quiet-when-clean",
+      "criterion": "A project with no retired Skill folder produces no additional output, and a project that never installed VibeHub through skills.sh is unaffected."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover a project with a retired folder present, a project with only the replacement present, and a project with neither."
+    }
+  ],
+  "constraints": [
+    "Do not delete, move, or rewrite anything inside the user's agent Skill directories.",
+    "Do not add a background check, hook, or install-time daemon; this runs only inside the setup workflow the user already invoked.",
+    "Take the retired-name list from the shared skill-graph contract rather than hard-coding names in the Skill prose."
+  ],
+  "context": "`npx skills add` copies Skill folders into a project and does not prune folders that no longer exist upstream, so renaming a Skill leaves the old folder in place beside the new one. The failure is not an error — it is two Skills visible to the Agent for the same job, the retired one still loadable because the shared helper it points at still exists. Host marketplace installs are unaffected: their plugin cache is isolated per version. skills.sh is not ours to change, but detection is: vibehub-setup already inspects the exact checkout for existing skills and memory systems, so it is the natural place to notice a retired folder. This is a general consequence of any Skill rename, discovered while retiring vibehub-ticket-review, and is deliberately not bundled into that rename.",
+  "context_refs": [
+    {
+      "purpose": "Documents the stale-folder consequence this Ticket detects.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "The workflow that already inspects the checkout for installed Skills.",
+      "ref": "skills/vibehub-setup/SKILL.md"
+    },
+    {
+      "purpose": "Forbids the background check or daemon this must not become.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A project that updated across a Skill rename is told about the stale Skill folder left behind, instead of silently offering an Agent two Skills for the same job.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:dcc9c4b"
+  ],
+  "relations": [
+    {
+      "rationale": "The retired-name list is declared in skill-graph.json; there is nothing for setup to read until that contract exists.",
+      "target_ticket_id": "ticket-contract-the-skill-graph",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-detect-retired-skill-folders-after-update"
+}

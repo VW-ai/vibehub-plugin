@@ -58,7 +58,7 @@
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "vibehub-ingest absorbs large source material through a five-pass pipeline that surveys every segment before writing, stops once for human confirmation of the Room tree, and refuses to finish while any segment is uncovered.",
+  "outcome": "vibehub-ingest carries a documented five-pass bulk path — survey before write, one human gate on the Room tree, a coverage gate that blocks completion — reachable by an internal branch, with vibehub-distill narrowed in place. Running the pipeline end to end against real material is proven separately by ticket-verify-absorption-against-peel.",
   "provenance_refs": [
     "conversation:2026-08-29-peel-knowledge-ingestion",
     "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"

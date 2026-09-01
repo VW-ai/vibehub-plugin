@@ -2,11 +2,11 @@
   "acceptance": [
     {
       "acceptance_id": "renamed-skill",
-      "criterion": "`vibehub-ticket-review` is renamed `vibehub-review`, and every `$vibehub-ticket-review` invocation reference and `../vibehub-ticket-review/...` path reference across Skills, contracts, and references resolves to the new name with no dangling reference remaining."
+      "criterion": "Every live reference to the name `vibehub-ticket-review` — `$`-invocation references, `../vibehub-ticket-review/...` path references, and bare-string occurrences in Skills, contracts, references, scripts, UI assets, and tests — resolves to `vibehub-review`. Verified by `grep -rn vibehub-ticket-review --exclude-dir=node_modules --exclude-dir=.git .` returning only these classes: historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, and `META/legacy-*`; prose that deliberately names the old name in order to describe this rename; and the documented legacy-path constant used to read historical commits in `scripts/measure-graph-layout.mjs`."
     },
     {
       "acceptance_id": "room-tree-surface",
-      "criterion": "The local UI can be launched focused on the Room tree, showing nesting, boundary, drift state, and per-room Context count, and renders correctly for a repository whose rooms contain zero Contexts."
+      "criterion": "The Skill documents one exact launcher invocation that opens the UI focused on the Room tree, and that invocation shows nesting, boundary, drift state, and per-room Context count. It renders correctly for a repository whose rooms contain zero Contexts, proven by a test covering the empty-room case."
     },
     {
       "acceptance_id": "read-only-preserved",
@@ -33,7 +33,7 @@
     },
     {
       "purpose": "The exact launcher conventions, bearer-fragment behavior, and no-browser fallback to preserve.",
-      "ref": "skills/vibehub-ticket-review/SKILL.md"
+      "ref": "skills/vibehub-review/SKILL.md"
     }
   ],
   "deliveries": [],

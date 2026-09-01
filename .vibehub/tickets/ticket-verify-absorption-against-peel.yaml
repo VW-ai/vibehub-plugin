@@ -13,9 +13,13 @@
       "criterion": "The transcript shows coverage reaching zero through the pipeline's own passes, with no user message asking whether content was missed."
     },
     {
-      "acceptance_id": "tree-improves",
+      "acceptance_id": "tree-multi-room",
+      "criterion": "The resulting Room tree contains more than one room, and no single room holds every Context the way the checked-in `~/Peel/.vibehub/rooms/product/` result does."
+    },
+    {
+      "acceptance_id": "tree-usability",
       "authority": "human",
-      "criterion": "The resulting Room tree contains more than one room and separates product intent from UX and interaction evidence rather than collapsing into a single `product` room, and a person judges the split more usable than the checked-in result at `~/Peel/.vibehub/rooms/product/`."
+      "criterion": "A person judges the resulting split — product intent separated from UX and interaction evidence — more usable than the checked-in single-room result at `~/Peel/.vibehub/rooms/product/`."
     }
   ],
   "constraints": [

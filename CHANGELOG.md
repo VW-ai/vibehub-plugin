@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking: the Skill `vibehub-ticket-review` is renamed `vibehub-review`.**
+  It now presents both the Ticket graph and the Room tree, so the old name
+  described only half of what it does. Installs through the Claude Code and
+  Codex marketplaces pick the new name up cleanly, because the plugin cache is
+  isolated per version. Installs through `npx skills add` copy Skill folders
+  into the project and do not prune folders that disappeared upstream, so a
+  stale `vibehub-ticket-review/` may remain beside the new `vibehub-review/`
+  after an update; delete the old folder once. Any script pinning
+  `-s vibehub-ticket-review` must move to `-s vibehub-review`.
+- Scope Ticket `context_refs` validation to the Ticket lifecycle. A closed
+  Ticket's references are a record of what was read at the time and now resolve
+  against a commit recorded for that Ticket; an open Ticket's references, and
+  every Room anchor and alignment stamp, still resolve against the working
+  tree. Restructuring directories no longer invalidates closed work, and no
+  closed record has to be rewritten to keep validation green.
+- Add `vh.mjs source segment` and `vh.mjs context coverage`, plus an optional
+  `coverage_exceptions` array on Room documents, so absorbed source material
+  can be checked for segments no Context cites. Both are recomputed from the
+  working tree on every run; no manifest or cache is introduced.
+
 ## 0.8.0 — 2026-08-13
 
 - Turn the shared Ticket graph into a canvas-first Web Workbench with explicit
