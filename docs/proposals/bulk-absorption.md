@@ -229,3 +229,40 @@ files and comparing against the checked-in single-room result: a tree with
 more than one room, separating product intent from UX/interaction evidence,
 and a coverage report reaching zero uncovered segments without the user
 having to ask.
+
+## Found during execution: reference validation is not lifecycle-aware
+
+Renaming `vibehub-ticket-review` under this proposal broke `project validate`
+repo-wide: 37 `context_refs` across 24 **closed** Tickets pointed at the old
+directory. The validator resolves every Ticket `context_ref` against the
+working tree, forever.
+
+That rule is wrong, and the rename only exposed it. A closed Ticket is a record
+of what was read when the work happened; it is not a promise about today's
+layout. Enforced against HEAD in perpetuity, it means this repository can never
+restructure its own directories without rewriting closed records — which its
+own constraints forbid. The two escape hatches are both bad: rewrite history,
+or weaken the check.
+
+The distinction the validator is missing is **live pointer vs. record**:
+
+| Reference | Nature | Resolve against |
+| --- | --- | --- |
+| Room `anchors`, `alignment.anchor_hashes` | live — drift is computed from them now | working tree |
+| Open Ticket `context_refs` | live — about to be executed | working tree |
+| Closed Ticket `context_refs` | record | the commit recorded for that Ticket |
+| Context `source.ref`, `evidence[].ref` | record | unvalidated today; leave it that way |
+
+Git already addresses content by commit, and Tickets already carry `commit:`
+provenance, so the fix needs no new state — only `git cat-file -e
+<commit>:<path>` and a lifecycle check.
+
+A second, narrower defect surfaced alongside it: validation is whole-repository
+and gates every write, so one unreadable reference freezes `ticket apply`,
+`ticket evidence`, and `room align` alike. That is fail-closed by design, but it
+also produced a bootstrap deadlock — the Ticket recording this defect could not
+be applied while the defect was active. Worth revisiting separately; not fixed
+here.
+
+Tracked as `ticket-scope-reference-validation-to-lifecycle`, which blocks the
+rename.
