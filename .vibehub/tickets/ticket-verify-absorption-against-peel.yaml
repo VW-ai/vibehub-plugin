@@ -47,6 +47,11 @@
       "rationale": "There is no pipeline to re-run Peel through until the bulk path exists.",
       "target_ticket_id": "ticket-absorb-large-material-through-ingest",
       "type": "depends_on"
+    },
+    {
+      "rationale": "This Ticket cannot route to EXECUTE while it carries a human-authority criterion, so its agent-authority work has no legal start until the routing order is fixed.",
+      "target_ticket_id": "ticket-order-human-routing-after-agent-work",
+      "type": "depends_on"
     }
   ],
   "schema_version": 2,

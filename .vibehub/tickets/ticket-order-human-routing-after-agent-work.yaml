@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "execute-while-agent-work-remains",
+      "criterion": "A Ticket with at least one agent-authority criterion lacking Evidence and at least one human-authority criterion lacking human-origin Evidence projects `EXECUTE` with reason `acceptance_evidence_incomplete`, and the reported IDs name the agent-authority criteria still lacking Evidence."
+    },
+    {
+      "acceptance_id": "needs-human-when-human-is-the-remainder",
+      "criterion": "Once every agent-authority criterion has Evidence and a human-authority criterion still lacks human-origin Evidence, the same Ticket projects `NEEDS_HUMAN` with reason `missing_human_evidence` and names only the affected human-authority criteria."
+    },
+    {
+      "acceptance_id": "higher-precedence-unchanged",
+      "criterion": "Rows 1 through 4 keep their precedence over both: a successful Outcome still projects DONE, a non-successful Outcome still projects REPLAN, an unresolved direct dependency still projects WAIT, and draft maturity still projects REFINE — each of these still outranks NEEDS_HUMAN and EXECUTE."
+    },
+    {
+      "acceptance_id": "contract-and-frontier-agree",
+      "criterion": "`ticket-next-action.md` states the revised ordering, and `ticket frontier` groups the same Ticket into `ready_to_execute` rather than `needs_human` while agent work remains, with the two staying consistent."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover the mixed-authority Ticket before any Evidence, the same Ticket after its agent criteria are evidenced, a human-only-criterion Ticket with no Evidence, and one case per higher-precedence row proving it still wins."
+    }
+  ],
+  "constraints": [
+    "Do not change what satisfies a criterion: an agent-authority criterion still needs any linked Evidence, a human-authority criterion still needs linked Evidence with origin: human.",
+    "Do not let an Agent satisfy or bypass a human-authority criterion; this changes routing order only, never authority.",
+    "Do not add state, a lease, or a second lifecycle; next_action stays a deterministic read projection.",
+    "Do not remove terminal human sign-off from delivery Tickets; ticket-plan's guidance is the behavior being made executable, not the thing being fixed."
+  ],
+  "context": "Discovered while trying to execute ticket-verify-absorption-against-peel. That Ticket has four agent-authority criteria and one human-authority criterion, zero Evidence, and no work done — yet next_action already reports NEEDS_HUMAN / missing_human_evidence. Row 5 of the precedence table in ticket-next-action.md fires before row 7 EXECUTE regardless of whether any agent work remains. Two checked-in contracts therefore contradict each other: ticket-plan explicitly endorses keeping terminal human sign-off inside the delivery Ticket when no downstream work needs its own scheduling boundary, while the routing projection makes any such Ticket permanently non-executable. The practical failure is that the human is asked to judge something that does not exist yet, and ticket-run — which starts routine execution only from EXECUTE — has no legal way to produce it. The fix is ordering, not new state: the projection is already a deterministic read over facts it has.",
+  "context_refs": [
+    {
+      "purpose": "The precedence table whose row 5 fires too early.",
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Defines what satisfies each authority and endorses terminal sign-off inside the delivery Ticket.",
+      "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "States the planning guidance the current routing makes unexecutable.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "The exact Ticket that exposed the contradiction.",
+      "ref": ".vibehub/tickets/ticket-verify-absorption-against-peel.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A Ticket carrying terminal human sign-off routes to EXECUTE while agent-authority work remains, and to NEEDS_HUMAN only once the human criterion is the remaining blocker.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:a1dde65"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-order-human-routing-after-agent-work"
+}
