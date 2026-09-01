@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "renamed-skill",
+    "room-tree-surface",
+    "read-only-preserved",
+    "conversation-fallback",
+    "history-untouched"
+  ],
+  "closed_at": "2026-09-01T09:00:00Z",
+  "evidence_ids": [
+    "evidence-rename-live-reference-sweep",
+    "evidence-rename-sweep-count-and-classification-correction",
+    "room-tree-launcher-and-empty-room-projection",
+    "room-tree-conversation-command",
+    "evidence-rename-left-history-unrewritten"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independently adjudicated; every criterion accepted on reproduced output. renamed-skill was re-adjudicated against the amended criterion rather than the version first examined, and holds on its literal text: I classified all 99 files containing the retired name and every one falls in a permitted class, with none unclassified. Zero occurrences remain in skills/ or test/, zero live $-invocations, and zero relative ../vibehub-ticket-review/ paths outside historical records. The amended criterion's stronger clause also holds: I scanned all 90 META specs carrying state: active and none names the retired Skill. The only META residue is three occurrences in META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md, a dated record whose co-listed anchors under packages/ do not exist in this repository at all, describing a superseded architecture; it is a record, not a live pointer. room-tree-surface: SKILL.md documents exactly one Room-tree launcher invocation, and running it with --no-open --json returned readOnly true, focus.rooms true, and a surface=rooms bearer URL, whose /api/state projects nesting, boundary, drift state, and Context count for all six Rooms; the zero-Context tests pass. read-only-preserved: I started the host and issued the writes myself, and POST, PUT, and DELETE on /api/state all return 405 read_only, with and without the bearer. conversation-fallback: room tree --repo . alone yields room, room_id, parent, description, boundary, drift.state, and context_count, so the tree is presentable without reading room.yaml, and SKILL.md documents that command in place of the earlier room.yaml instruction. history-untouched: across the whole cycle no file under .vibehub/evidence/ or .vibehub/outcomes/ was modified or deleted and no closed Ticket was edited. On the Room question, treating a Room's anchors and alignment stamp as a live pointer is correct, and I record that judgment explicitly: a room.yaml is neither Evidence, Outcome, nor closed Ticket, so it sits outside this criterion's protected set, and leaving workbench anchored at the dead path would have pinned that Room to permanently DRIFTED with nine phantom deletions and made it un-alignable. The sibling Ticket's live-pointers-still-checked criterion classifies it the same way. The corrected history-untouched Evidence is accurate, and the count and classification errors in the earlier sweep Evidence are now recorded in a filed correction rather than by rewriting those documents. One observation no criterion on this Ticket covers, recorded so a later reader is not misled: META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml is state: active and had its SKILL.md anchor correctly repointed, but twelve of its remaining anchors name packages/ paths absent from this repository, so that spec is effectively unanchored for reasons that predate and are unrelated to this rename. It is not a defect in this deliverable and did not affect any verdict.",
+  "ticket_id": "ticket-generalize-review-to-room-trees",
+  "unresolved_acceptance_ids": []
+}

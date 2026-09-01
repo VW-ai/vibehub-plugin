@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "closed-ticket-refs-at-their-commit",
+    "open-ticket-refs-at-head",
+    "live-pointers-still-checked",
+    "degrades-without-git",
+    "repository-green",
+    "regression"
+  ],
+  "closed_at": "2026-09-01T09:00:00Z",
+  "evidence_ids": [
+    "evidence-lifecycle-scoped-ref-validation",
+    "evidence-lifecycle-ref-validation-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independently adjudicated against a re-verified baseline; every criterion accepted on reproduced output rather than on the executor's summary. closed-ticket-refs-at-their-commit: skills/vibehub-ticket-review/ is absent from the tree while 23 closed Tickets still carry 36 context_refs naming it, and project validate returns valid:true with unverifiable_context_refs empty, so all 36 resolved at a recorded commit. I read the mechanism rather than trusting the result: ticketCommitResolver tries provenance commit:, then delivered_commit, then git log -1 over .vibehub/outcomes/<id>.yaml, keeps only commits this checkout can actually read, and blobExistsAt demands a real blob; resolution is tree-first, commit-second, and a ref readable at neither hard-fails. open-ticket-refs-at-head: the guard is unconditional for an unclosed Ticket, and zero open Tickets carry an old-path ref. live-pointers-still-checked: the anchor and drift code is untouched by this change, and room drift run live on this repository reports real DRIFTED and STALE states; project validate never checked anchor existence, and that division is unchanged. degrades-without-git: I built a copy of this repository with .git removed and ran validation in it, getting valid:true with 36 unverifiable entries and no crash. That choice is defensible and I endorse it: failing there would make a checked-in record's validity depend on ambient git and full history rather than on its own content, which is the brittleness this Ticket removes; reporting the gap visibly is the correct middle. repository-green: validate is valid:true and the suite is 161/161/0, and across the entire cycle every path under .vibehub/evidence/ and .vibehub/outcomes/ is an addition with no modification or deletion; four Ticket YAMLs changed and all four are open. regression: all five named cases exist in test/ticket-context-ref-history.test.mjs over real git fixtures, assert what the criterion says, and pass. Correcting the record: this Ticket's own context prose and evidence-lifecycle-scoped-ref-validation both say 37 refs across 24 closed Tickets; the true figures are 36 across 23, verified at HEAD and at 99c5245. The 24th was ticket-generalize-review-to-room-trees itself, which was open and whose ref was legitimately repointed rather than preserved. That Evidence also records contexts:63, now 66. Both are stale numbers around a claim that independently holds.",
+  "ticket_id": "ticket-scope-reference-validation-to-lifecycle",
+  "unresolved_acceptance_ids": []
+}
