@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "renamed-skill",
-      "criterion": "Every live reference to the name `vibehub-ticket-review` — `$`-invocation references, `../vibehub-ticket-review/...` path references, and bare-string occurrences in Skills, contracts, references, scripts, UI assets, and tests — resolves to `vibehub-review`. Verified by `grep -rn vibehub-ticket-review --exclude-dir=node_modules --exclude-dir=.git .` returning only these classes: historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, and `META/legacy-*`; prose that deliberately names the old name in order to describe this rename; and the documented legacy-path constant used to read historical commits in `scripts/measure-graph-layout.mjs`."
+      "criterion": "Every live reference to the name `vibehub-ticket-review` — `$`-invocation references, `../vibehub-ticket-review/...` path references, and bare-string occurrences in Skills, contracts, references, scripts, UI assets, and tests — resolves to `vibehub-review`. Verified by classifying every hit of `grep -rn vibehub-ticket-review --exclude-dir=node_modules --exclude-dir=.git .`, which may remain only in these classes: historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, and closed `.vibehub/tickets/`; the checked-in snapshot archive under `.vibehub/history/`; Context `source.ref` and `evidence[].ref`, which record what proved a past claim; dated records under `META/`, including `META/legacy-*`; prose that deliberately names the old Skill in order to describe this rename; and the documented legacy-path constant used to read historical commits in `scripts/measure-graph-layout.mjs`. No `META/` spec with `state: active` may name it."
     },
     {
       "acceptance_id": "room-tree-surface",
@@ -25,7 +25,7 @@
     "Do not add a write route, Decision authority, or persisted state to the UI.",
     "Do not rewrite historical records to match the new name."
   ],
-  "context": "vibehub-ticket-review is already the sole presenter for Ticket events and vh-ui.mjs already projects rooms with nesting, drift state, and per-room Context counts. Generalizing the Skill avoids writing UI launch, port reuse, and no-browser fallback conventions twice. The absorption pipeline's only human gate depends on this surface existing.",
+  "context": "The retired name vibehub-ticket-review was already the sole presenter for Ticket events and vh-ui.mjs already projects rooms with nesting, drift state, and per-room Context counts. Generalizing the Skill avoids writing UI launch, port reuse, and no-browser fallback conventions twice. The absorption pipeline's only human gate depends on this surface existing.",
   "context_refs": [
     {
       "purpose": "States why presentation is one responsibility and where the tree gate sits in the pipeline.",

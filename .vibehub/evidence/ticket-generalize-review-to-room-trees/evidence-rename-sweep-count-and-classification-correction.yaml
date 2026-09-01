@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "renamed-skill",
+    "history-untouched"
+  ],
+  "evidence_id": "evidence-rename-sweep-count-and-classification-correction",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    ".vibehub/tickets/ticket-generalize-review-to-room-trees.yaml",
+    "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+    ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-quiet-surface.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Correction to two earlier Evidence documents on this Ticket and to the one filed on ticket-scope-reference-validation-to-lifecycle. First, the count is wrong in all three: the closed Tickets still naming skills/vibehub-ticket-review/ in context_refs number 23 carrying 36 refs, not 24 carrying 37. Re-counted both at HEAD and at commit 99c5245: 23 both times. The 24th Ticket was ticket-generalize-review-to-room-trees itself, which was open, and whose ref was legitimately repointed rather than preserved. The material claim is unaffected; the number was. Second, evidence-rename-live-reference-sweep classified the surviving META occurrences as falling under META/legacy-*. That is false: META/legacy-21-workbench contains zero occurrences. The only META residue is three occurrences in META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md, a dated record whose co-listed anchors under packages/ do not exist in this repository at all, describing a superseded architecture. It is a historical record and the criterion's substantive requirement holds, but the earlier document filed it under the wrong class. Third, that criterion's own allowlist enumerated too few locations: it omitted the .vibehub/history/ snapshot archive and Context evidence[].ref, both of which carry real occurrences that ticket-scope-reference-validation-to-lifecycle's constraints already classify as records. The criterion has been amended to enumerate them and to add the stronger requirement that no META spec with state: active may name the retired Skill.",
+  "ticket_id": "ticket-generalize-review-to-room-trees"
+}
