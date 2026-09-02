@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "overlap-checked-on-write"
+  ],
+  "evidence_id": "evidence-room-put-rejects-overlap-at-write",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/room.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The overlap rule was factored out of loadRooms into two callable helpers, overlappingTerritory(pathA, documentA, pathB, documentB) and overlappingTerritoryMessage(pathA, pathB, overlapping); loadRooms and `room put` are now the only two callers, so both produce the identical message from one definition. Observed in a temp repo holding room auth with anchors [\"src/auth/\"]: putting room identity with anchors [\"src/auth/oauth\"] returned {\"ok\":false,\"error\":{\"code\":\"invalid_input\",\"message\":\"rooms identity and auth claim overlapping territory (src/auth/oauth); fuse or split them — two rooms must not own the same anchors\"}}, `ls .vibehub/rooms` still showed only `auth`, and `project validate` stayed {\"ok\":true,...,\"valid\":true}. A nested child (auth/oauth anchored at src/auth/oauth) is still accepted, matching the repository rule that containment permits shared territory.",
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

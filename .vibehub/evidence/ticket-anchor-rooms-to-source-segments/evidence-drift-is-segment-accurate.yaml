@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "drift-still-honest"
+  ],
+  "evidence_id": "evidence-drift-is-segment-accurate",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    "test/segment-anchors.test.mjs",
+    "test/room-drift.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "anchoredFiles became anchoredUnits: a path-prefix anchor still contributes one alignment entry per file, keyed by the file path and holding git's blob hash, byte-identical to before; a segment anchor contributes exactly one entry, keyed by the segment id and holding the SHA-1 of that segment's bytes (its lines plus their terminating newline). The schema now says so on alignment.anchor_hashes. Observed in a git temp repo: a room anchoring docs/prd.md#fork-flow aligns (aligned_files 1) -> FRESH; editing a line in another section of the same file -> still FRESH; editing a line inside the anchored section -> DRIFTED with changed:[\"docs/prd.md#fork-flow\"]; renaming the anchored heading -> DRIFTED with deleted:[\"docs/prd.md#fork-flow\"]. Observed in the Peel scratch repo: all eight rooms align and read FRESH; appending text to line 700 (inside #branched-from, owned by product/ux/fork-flow) leaves the other seven FRESH and drifts only product/ux/fork-flow with changed:[\"...#branched-from\"]; the file was then restored and all eight read FRESH again. Path-prefix behaviour is separately pinned by \"a path-prefix room still stamps file paths and blob hashes, unchanged\" (asserts the stamped blob equals `git hash-object`) and by the pre-existing test/room-drift.test.mjs, which still passes untouched. LIMIT, disclosed and not closed: for line-window segments (path#L<start>-<end>) an insertion or deletion earlier in the file shifts every later window, so those ids then cover different bytes and the anchoring rooms report DRIFTED even where their prose did not change. Markdown heading segments do not have this problem. This follows from the segmentation definition, which this Ticket is constrained not to change.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

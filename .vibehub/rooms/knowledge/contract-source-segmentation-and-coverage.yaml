@@ -1,6 +1,6 @@
 {
   "context_id": "contract-source-segmentation-and-coverage",
-  "detail": "任何被 Room anchor 覆盖的源文件都能被 `vh.mjs source segment` 切成稳定 ID 的段落：Markdown 按标题层级切，段 ID 为 path#heading-slug，标题重复时按出现次序追加序号，首个标题之前的内容为 path#_preamble；其余一切文件类型按最多 60 行的窗口切，边界向后回溯最多 10 行吸附到最近空行，否则用硬边界，段 ID 为 path#L<start>-<end>。二进制文件拒绝切段并在覆盖率里显式标记为 skipped，不静默丢弃。段落必须覆盖文件每一行，无缝隙无重叠——这是覆盖率能成立的前提。`vh.mjs context coverage` 据此重算：每个段落是否被至少一条 Context 的 source.ref 或 evidence[].ref 引用，或被所属 Room 的 coverage_exceptions 显式豁免。裸文件路径（不带 #）视为覆盖整个文件。所有数值每次调用都从工作树重算，不存储、不缓存——因此并行摄入是安全的：子代理的完成汇报不可信，但覆盖率是算出来的，漏掉的段落必然显形。",
+  "detail": "任何被 Room anchor 覆盖的源文件都能被 `vh.mjs source segment` 切成稳定 ID 的段落：Markdown 按标题层级切，段 ID 为 path#heading-slug，标题重复时按出现次序追加序号，首个标题之前的内容为 path#_preamble；其余一切文件类型按最多 60 行的窗口切，边界向后回溯最多 10 行吸附到最近空行，否则用硬边界，段 ID 为 path#L<start>-<end>。二进制文件拒绝切段并在覆盖率里显式标记为 skipped，不静默丢弃。段落必须覆盖文件每一行，无缝隙无重叠——这是覆盖率能成立的前提。`vh.mjs context coverage` 据此重算：每个段落是否被至少一条 Context 的 source.ref 或 evidence[].ref 引用，或被某个 Room 的 coverage_exceptions 显式豁免。豁免与引用一样按全仓库读取：coverage_exceptions 由拥有该 anchor 的 Room 声明并对其负责，但它陈述的是那个段落本身，因此在这个段落被计入的任何地方都生效，不必复制到同一文件的其他 owner Room（权威表述见 room.schema.json 的 coverage_exceptions description）。Room 的 anchor 除路径前缀外也可以直接是段落 ID（`path#heading-slug` 或 `path#L<start>-<end>`），此时该 Room 只拥有那一个段落，覆盖率也只对它问责；两个互不包含的 Room 的段落集合不得相交。裸文件路径（不带 #）视为覆盖整个文件。所有数值每次调用都从工作树重算，不存储、不缓存——因此并行摄入是安全的：子代理的完成汇报不可信，但覆盖率是算出来的，漏掉的段落必然显形。",
   "evidence": [
     {
       "note": "source segment 与 context coverage 的实现。",

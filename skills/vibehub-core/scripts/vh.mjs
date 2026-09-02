@@ -11,6 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -744,6 +745,54 @@ function loadMap(files, idField, validator, label) {
 
 const ROOM_FILE = "room.yaml";
 
+// An anchor is one of two things, and both name a *set of segments*:
+//   - a path prefix, "src/auth", naming every segment of every file under it;
+//   - a segment id, "docs/prd.md#fork-flow" or "src/app.html#L120-179", exactly
+//     the ids `source segment` emits, naming that one segment and no other.
+// The "#" is the discriminator, so every anchor written before segment anchors
+// existed parses as a path prefix and behaves exactly as it did.
+function parseAnchor(anchor) {
+  const hash = anchor.indexOf("#");
+  if (hash === -1) return { path: anchor.replace(/\/+$/u, ""), segment: null };
+  const path = anchor.slice(0, hash).replace(/\/+$/u, "");
+  return { path, segment: `${path}#${anchor.slice(hash + 1)}` };
+}
+
+// Two anchors collide when the segment sets they name intersect. That is decided
+// here in closed form rather than by segmenting files, and the two agree:
+// segments of one file are disjoint by construction, so two segment anchors
+// intersect only when they are the same id; a prefix owns every segment of every
+// file beneath it, so a prefix and a segment anchor intersect exactly when the
+// prefix covers the segment's file; and two prefixes name disjoint file sets
+// unless one contains the other. The rule is over *declared* territory: an
+// anchor that currently matches no file on disk still claims it.
+function anchorsCollide(a, b) {
+  if (a.segment !== null && b.segment !== null) return a.segment === b.segment;
+  if (a.segment !== null) return anchorMatches(b.path, a.path);
+  if (b.segment !== null) return anchorMatches(a.path, b.path);
+  return a.path === b.path || a.path.startsWith(`${b.path}/`) || b.path.startsWith(`${a.path}/`);
+}
+
+// The single definition of "these two rooms claim the same territory". Both the
+// repository-wide check in loadRooms and the write-time check in `room put`
+// call it, so a change to what overlap means lands in both at once. Returns the
+// anchors of A that collide with an anchor of B; an empty array means no clash.
+function overlappingTerritory(pathA, documentA, pathB, documentB) {
+  // A room nested inside the other is allowed to share territory: containment
+  // already says which one is the more specific owner.
+  if (pathA === pathB || pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) return [];
+  const anchorsB = (Array.isArray(documentB?.anchors) ? documentB.anchors : [])
+    .filter((anchor) => typeof anchor === "string")
+    .map(parseAnchor);
+  return (Array.isArray(documentA?.anchors) ? documentA.anchors : [])
+    .filter((anchorA) => typeof anchorA === "string"
+      && anchorsB.some((anchorB) => anchorsCollide(parseAnchor(anchorA), anchorB)));
+}
+
+function overlappingTerritoryMessage(pathA, pathB, overlapping) {
+  return `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`;
+}
+
 // Rooms are directories: the path carries containment, room.yaml carries the
 // room's own description. Every other .yaml inside a room is a Context entry.
 function loadRooms(roomsPath) {
@@ -789,16 +838,9 @@ function loadRooms(roomsPath) {
     for (let right = left + 1; right < entries.length; right += 1) {
       const [pathA, roomA] = entries[left];
       const [pathB, roomB] = entries[right];
-      if (pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) continue;
-      const overlapping = (Array.isArray(roomA.document?.anchors) ? roomA.document.anchors : [])
-        .filter((anchorA) => (Array.isArray(roomB.document?.anchors) ? roomB.document.anchors : [])
-          .some((anchorB) => {
-            const a = anchorA.replace(/\/+$/u, "");
-            const b = anchorB.replace(/\/+$/u, "");
-            return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
-          }));
+      const overlapping = overlappingTerritory(pathA, roomA.document, pathB, roomB.document);
       if (overlapping.length > 0) {
-        add(errors, roomA.path, `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`);
+        add(errors, roomA.path, overlappingTerritoryMessage(pathA, pathB, overlapping));
       }
     }
   }
@@ -1495,12 +1537,51 @@ function repoSnapshot(repo) {
   return snapshot;
 }
 
-function anchoredFiles(document, snapshot) {
-  const files = new Map();
+// The text of one segment, exactly as the file holds it, with the trailing
+// newline that terminates its last line. Hashing this and not the whole file is
+// what lets a room that anchors a segment stay FRESH while the rest of the file
+// moves underneath it.
+function segmentText(content, segment) {
+  return `${splitLines(content).slice(segment.start - 1, segment.end).join("\n")}\n`;
+}
+
+// What a room's alignment stamp records, one entry per anchored *unit*:
+//   - a path prefix contributes one entry per file it covers, keyed by the file
+//     path and holding git's blob hash — byte for byte what it recorded before
+//     segment anchors existed;
+//   - a segment anchor contributes exactly one entry, keyed by the segment id
+//     and holding the sha1 of that segment's bytes.
+// Both kinds live in the same `anchor_hashes` list because both answer the same
+// question: did the bytes this room was aligned against change?
+function anchoredUnits(repo, document, snapshot) {
+  const units = new Map();
+  const anchors = (document.anchors ?? []).filter((anchor) => typeof anchor === "string").map(parseAnchor);
+  const prefixes = anchors.filter((anchor) => anchor.segment === null);
   for (const [path, hash] of snapshot) {
-    if ((document.anchors ?? []).some((anchor) => anchorMatches(anchor, path))) files.set(path, hash);
+    if (prefixes.some((anchor) => anchorMatches(anchor.path, path))) units.set(path, hash);
   }
-  return files;
+  const byFile = new Map();
+  for (const anchor of anchors) {
+    if (anchor.segment === null) continue;
+    if (!byFile.has(anchor.path)) byFile.set(anchor.path, new Set());
+    byFile.get(anchor.path).add(anchor.segment);
+  }
+  for (const [path, wanted] of byFile) {
+    // A segment anchor on a file that is gone, unreadable, or binary resolves to
+    // nothing: the unit disappears from the current set and drift reports it as
+    // deleted, which is the honest answer.
+    if (!snapshot.has(path)) continue;
+    const absolute = join(repo, path);
+    if (!existsSync(absolute) || !lstatSync(absolute).isFile()) continue;
+    const buffer = readFileSync(absolute);
+    if (isBinary(buffer)) continue;
+    const content = buffer.toString("utf8");
+    for (const segment of segmentFile(path, content)) {
+      if (!wanted.has(segment.id)) continue;
+      units.set(segment.id, createHash("sha1").update(segmentText(content, segment)).digest("hex"));
+    }
+  }
+  return units;
 }
 
 function headIsBehind(repo, baseline) {
@@ -1518,7 +1599,7 @@ export function projectRoomDrift(repo, loadedRepository = null) {
     if (document.stale === true) {
       let hashesMatch = null;
       if (document.alignment) {
-        const current = anchoredFiles(document, snapshot);
+        const current = anchoredUnits(repo, document, snapshot);
         const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
         hashesMatch = current.size === recorded.size
           && [...current].every(([path, blob]) => recorded.get(path) === blob);
@@ -1533,7 +1614,7 @@ export function projectRoomDrift(repo, loadedRepository = null) {
         reason: "checkout is older than the alignment baseline; never realign specs backwards",
       };
     }
-    const current = anchoredFiles(document, snapshot);
+    const current = anchoredUnits(repo, document, snapshot);
     const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
     const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
     const added = [...current.keys()].filter((path) => !recorded.has(path));
@@ -1589,6 +1670,44 @@ export function projectRoomTree(repo, loadedRepository = null) {
 }
 
 function roomOperation(operation, repo, input, options = {}) {
+  // Creating a Room is a write like `context put`: validate the candidate
+  // first, refuse it whole if anything is wrong, and write nothing until every
+  // check has passed. Deleting a Room stays a `git rm` — there is no
+  // counterpart operation, on purpose.
+  if (operation === "put") {
+    assertCurrentProjectFormat(repo);
+    assertValid(validateRoom(input), "Room document is invalid");
+    if (!options.room) {
+      throw new VibeHubError("invalid_input", "a Room is its path; pass --room with the path this Room owns");
+    }
+    const slug = options.room.split("/").at(-1);
+    if (input.room_id !== slug) {
+      throw new VibeHubError("invalid_input", `room_id must equal its directory name: ${slug}`);
+    }
+    const repository = loadRepository(repo);
+    assertValid(repository.errors);
+    const parent = options.room.includes("/") ? options.room.slice(0, options.room.lastIndexOf("/")) : null;
+    if (parent && !repository.rooms.documents.has(parent)) {
+      throw new VibeHubError("not_found", `Parent room not found: ${parent}`);
+    }
+    // The overlap rule is enforced here, at the write, rather than left for a
+    // later `project validate` to discover in a tree that is already wrong.
+    for (const [otherPath, other] of repository.rooms.documents) {
+      const overlapping = overlappingTerritory(options.room, input, otherPath, other.document);
+      if (overlapping.length > 0) {
+        throw new VibeHubError(
+          "invalid_input",
+          overlappingTerritoryMessage(options.room, otherPath, overlapping),
+        );
+      }
+    }
+    const path = join(repository.paths.rooms, ...options.room.split("/"), ROOM_FILE);
+    const created = !repository.rooms.documents.has(options.room);
+    // Written exactly as given: no alignment is stamped here, so `room align`
+    // stays the only operation that can claim a Room is aligned with a commit.
+    writeDocument(path, input);
+    return { status: "written", room: options.room, room_id: input.room_id, created, path };
+  }
   if (operation === "align" || operation === "stale") {
     assertCurrentProjectFormat(repo);
   }
@@ -1606,7 +1725,7 @@ function roomOperation(operation, repo, input, options = {}) {
     if (entry.document.alignment && headIsBehind(repo, entry.document.alignment.last_aligned_commit)) {
       throw new VibeHubError("invalid_state", "checkout is older than the alignment baseline; refusing to realign backwards");
     }
-    const files = anchoredFiles(entry.document, repoSnapshot(repo));
+    const files = anchoredUnits(repo, entry.document, repoSnapshot(repo));
     const document = {
       ...entry.document,
       alignment: {
@@ -1814,19 +1933,44 @@ function walkSourceFiles(repo, relative, out) {
   }
 }
 
-function anchoredSourceFiles(repo, document) {
-  const files = [];
-  for (const anchor of document.anchors ?? []) {
-    if (typeof anchor !== "string") continue;
-    const relative = anchor.replace(/\/+$/u, "");
-    if (!relative || relative.split("/").includes("..")) continue;
-    const absolute = join(repo, relative);
+// The room's territory as files, each with the segments of that file the room
+// actually owns: null means "the whole file", a set means "these segment ids".
+// A path prefix that reaches a file wins over any segment anchor on the same
+// file in the same room — the room already owns all of it.
+function anchoredTerritory(repo, document) {
+  const anchors = (document.anchors ?? [])
+    .filter((anchor) => typeof anchor === "string")
+    .map(parseAnchor)
+    .filter((anchor) => anchor.path && !anchor.path.split("/").includes(".."));
+  const files = new Map();
+  for (const anchor of anchors) {
+    if (anchor.segment !== null) continue;
+    const absolute = join(repo, anchor.path);
     if (!existsSync(absolute)) continue;
     const stats = lstatSync(absolute);
-    if (stats.isFile()) files.push(relative);
-    else if (stats.isDirectory()) walkSourceFiles(repo, relative, files);
+    const reached = [];
+    if (stats.isFile()) reached.push(anchor.path);
+    else if (stats.isDirectory()) walkSourceFiles(repo, anchor.path, reached);
+    for (const path of reached) files.set(path, null);
   }
-  return [...new Set(files)].sort();
+  const missing = [];
+  for (const anchor of anchors) {
+    if (anchor.segment === null) continue;
+    if (files.get(anchor.path) === null) continue;
+    const absolute = join(repo, anchor.path);
+    if (!existsSync(absolute) || !lstatSync(absolute).isFile()) {
+      missing.push(anchor.segment);
+      continue;
+    }
+    if (!files.has(anchor.path)) files.set(anchor.path, new Set());
+    files.get(anchor.path).add(anchor.segment);
+  }
+  return {
+    files: [...files.entries()]
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([path, segments]) => ({ path, segments })),
+    missing,
+  };
 }
 
 // Citations are collected repository-wide, not per room: a Context filed in one
@@ -1851,11 +1995,29 @@ function refCovers(refs, segmentId, filePath) {
   return refs.has(segmentId) || refs.has(filePath);
 }
 
+// Exceptions are collected repository-wide, exactly like citations, and for the
+// same reason: once several rooms may anchor segments of one file, a segment is
+// counted wherever it is owned, and an exception that only settled the count for
+// the declaring room would have to be copied into every other owner. A
+// coverage_exceptions entry is a statement about a segment, not about a room, so
+// it settles that segment wherever it is counted. The room that declares it is
+// still the room that owns the anchor and answers for the judgement.
+function coverageExceptions(repository) {
+  const exceptions = new Set();
+  for (const { document } of repository.rooms.documents.values()) {
+    for (const item of document?.coverage_exceptions ?? []) {
+      if (typeof item?.segment === "string" && item.segment.trim()) exceptions.add(item.segment.trim());
+    }
+  }
+  return exceptions;
+}
+
 function contextCoverage(repo, repository, roomFilter = null) {
   if (roomFilter !== null && !repository.rooms.documents.has(roomFilter)) {
     throw new VibeHubError("not_found", `Room not found: ${roomFilter}`);
   }
   const refs = citationRefs(repository);
+  const exceptions = coverageExceptions(repository);
   const rooms = [];
   let uncoveredTotal = 0;
   let segmentsTotal = 0;
@@ -1864,20 +2026,25 @@ function contextCoverage(repo, repository, roomFilter = null) {
     .filter(([roomPath]) => roomFilter === null || roomPath === roomFilter)
     .sort(([a], [b]) => (a < b ? -1 : 1));
   for (const [roomPath, { document }] of entries) {
-    const exceptions = new Set(
-      (document.coverage_exceptions ?? [])
-        .map((item) => item?.segment)
-        .filter((segment) => typeof segment === "string"),
-    );
+    const territory = anchoredTerritory(repo, document);
     const files = [];
+    const unresolved = [...territory.missing];
     let roomUncovered = 0;
-    for (const filePath of anchoredSourceFiles(repo, document)) {
+    for (const { path: filePath, segments: owned } of territory.files) {
       const buffer = readFileSync(join(repo, filePath));
       if (isBinary(buffer)) {
         files.push({ path: filePath, skipped: "binary", segment_count: 0, uncovered: [] });
+        if (owned !== null) unresolved.push(...owned);
         continue;
       }
-      const segments = segmentFile(filePath, buffer.toString("utf8"));
+      const all = segmentFile(filePath, buffer.toString("utf8"));
+      // A room that anchors segments answers only for the segments it anchors;
+      // a room that anchors the path answers for the whole file, as before.
+      const segments = owned === null ? all : all.filter((segment) => owned.has(segment.id));
+      if (owned !== null) {
+        const present = new Set(all.map((segment) => segment.id));
+        unresolved.push(...[...owned].filter((id) => !present.has(id)).sort());
+      }
       filesExamined += 1;
       segmentsTotal += segments.length;
       const uncovered = segments
@@ -1888,7 +2055,9 @@ function contextCoverage(repo, repository, roomFilter = null) {
       files.push({ path: filePath, skipped: null, segment_count: segments.length, uncovered });
     }
     uncoveredTotal += roomUncovered;
-    rooms.push({ room: roomPath, files, uncovered: roomUncovered });
+    // An anchor naming a segment that no longer exists owns nothing and would
+    // otherwise vanish silently, so it is reported rather than counted.
+    rooms.push({ room: roomPath, files, uncovered: roomUncovered, unresolved_anchors: unresolved.sort() });
   }
   return {
     rooms,

@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "peel-tree-anchors-cleanly"
+  ],
+  "evidence_id": "evidence-peel-tree-anchors-cleanly",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    ".vibehub/tickets/ticket-anchor-rooms-to-source-segments.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The approved eight-Room Peel tree (product; positioning, domain-model, ux with fork-flow and overview, scope, prototype) was re-anchored in the scratch repo so that every sub-Room carries its own segment ids instead of anchors: []. `project validate --repo <peel>` -> {\"ok\":true,\"data\":{\"valid\":true,\"format_version\":2,\"rooms\":8,\"contexts\":0,...}} — the same tree that previously failed with 21 overlap errors. `context coverage --repo <peel>` -> files_examined 8, segments_total 108, uncovered_total 108, per-room 4/24/18/18/11/7/14/12 summing to 108. `context coverage --room <each of the eight>` returns that Room's own uncovered segment ids (e.g. product/ux/overview -> 7, starting at ...prd...#9-6-overview-mode; product/prototype -> 12, starting at ...peel-demo-v0-original.html#L1-60). All eight then align and `room drift` reports FRESH for all eight. LIMITS: the scratch repo holds zero Contexts, so uncovered_total is necessarily the full 108 — this proves per-Room accountability, not absorption; the segment-to-Room assignment is my own reading of each Room's checked-in description and boundary and has not been reviewed by a human; and those room.yaml edits live in the scratch repo's working tree, uncommitted, outside this repository.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

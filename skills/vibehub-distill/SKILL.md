@@ -37,10 +37,21 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    those into one room is how knowledge gets lost — rooms are cheap, and
    splitting is `git mv` plus a boundary edit while they are still empty.
 4. Read enough of each room's territory to describe it truthfully, then write
-   its `room.yaml` (`../vibehub-core/contracts/room.schema.json`): a description, a
+   its Room document (`../vibehub-core/contracts/room.schema.json`): a description, a
    boundary that also says what the room is not, and anchors as
-   segment-boundary path prefixes covering what its knowledge is about. Stamp
-   it immediately:
+   segment-boundary path prefixes covering what its knowledge is about. Write
+   it with the operation, never by hand-editing `room.yaml` — the write
+   validates the document and refuses anchors that overlap another room's
+   territory, so a bad tree is rejected instead of discovered later:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>
+   ```
+
+   `--room` is the room's path under `.vibehub/rooms/`; `room_id` must equal
+   its last segment, and a nested room's parent must already exist. The write
+   creates or replaces the whole document and stamps nothing. Stamp it
+   immediately afterwards:
 
    ```text
    node ../vibehub-core/scripts/vh.mjs room align --repo <root> --room <path>
@@ -54,6 +65,8 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 ## Guardrails
 
 - Never write a room for territory you have not read.
+- There is no room delete. Removing or moving a room is `git rm` / `git mv`
+  plus a boundary edit, the same way Context documents move.
 - Do not introduce progress files, manifests, or a second store; the tree and
   its stamps are the whole state, inside
   `../vibehub-setup/references/architecture-boundary.md`.

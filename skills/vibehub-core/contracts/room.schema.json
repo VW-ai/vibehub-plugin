@@ -11,7 +11,12 @@
     "room_id": { "$ref": "#/$defs/id" },
     "description": { "$ref": "#/$defs/text" },
     "boundary": { "$ref": "#/$defs/text" },
-    "anchors": { "type": "array", "items": { "$ref": "#/$defs/text" }, "uniqueItems": true },
+    "anchors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/text" },
+      "uniqueItems": true,
+      "description": "The room's territory. Each anchor is either a path prefix (\"src/auth\", matched on whole path segments, covering that path and everything under it) or a single source segment id as `vh.mjs source segment` emits it (\"docs/prd.md#fork-flow\", \"src/app.html#L120-179\"), covering that segment and no other. The \"#\" is the discriminator. Both forms name a set of segments, and two rooms where neither contains the other must not name intersecting sets."
+    },
     "alignment": {
       "type": "object",
       "additionalProperties": false,
@@ -22,6 +27,7 @@
         "anchor_hashes": {
           "type": "array",
           "uniqueItems": true,
+          "description": "One entry per anchored unit. A path-prefix anchor contributes one entry per file it covers, where \"path\" is the file path and \"blob\" is git's blob hash. A segment anchor contributes exactly one entry, where \"path\" is the segment id and \"blob\" is the SHA-1 of that segment's bytes — so the room drifts when the anchored segment's bytes change and stays fresh when only other parts of the same file change.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -36,7 +42,7 @@
     "coverage_exceptions": {
       "type": "array",
       "uniqueItems": true,
-      "description": "Segments of this room's anchored sources that deliberately yield no Context, each with a stated reason. Optional: rooms written before this field existed remain valid.",
+      "description": "Segments of this room's anchored sources that deliberately yield no Context, each with a stated reason. Declared by the room that owns the anchor, but read repository-wide, exactly as citations are: an exception is a statement about a segment, not about a room, so it settles that segment's count wherever the segment is counted and never has to be copied into a second room that also anchors part of the same file. Optional: rooms written before this field existed remain valid.",
       "items": {
         "type": "object",
         "additionalProperties": false,

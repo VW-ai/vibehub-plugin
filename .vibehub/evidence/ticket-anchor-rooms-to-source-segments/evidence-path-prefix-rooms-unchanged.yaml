@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "drift-still-honest",
+    "regression"
+  ],
+  "evidence_id": "evidence-path-prefix-rooms-unchanged",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    ".vibehub/rooms"
+  ],
+  "schema_version": 1,
+  "summary": "Direct differential proof that this is an extension and not a migration, run on this repository's own six path-prefix Rooms. The HEAD copy of vh.mjs (git show HEAD:...) was placed beside the changed script so it could resolve its contracts, and both were run on the same working tree: `room drift --repo .` output is byte-identical (diff -q reports no difference; states knowledge DRIFTED, marketing STALE, marketing/video FRESH, product DRIFTED, ticket-lifecycle DRIFTED, workbench FRESH, with changed lists naming file paths, not segment ids — the DRIFTED states are this Ticket's own edits to anchored files). `context coverage --repo .` is identical too: files_examined 141, segments_total 780, uncovered_total 650 on both, every room's files array and uncovered count equal, the only difference being the new always-present unresolved_anchors field, which is [] for every one of the six. The temporary HEAD copy was deleted after the comparison and does not appear in git status.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

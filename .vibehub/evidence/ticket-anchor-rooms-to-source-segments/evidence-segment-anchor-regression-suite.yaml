@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "regression"
+  ],
+  "evidence_id": "evidence-segment-anchor-regression-suite",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "test/segment-anchors.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "test/segment-anchors.test.mjs adds eight tests covering the seven cases the criterion names: a segment anchor owning one segment; four sibling rooms splitting one file with their coverage summing to the file's whole segment list, each id owned once; two rooms claiming one segment (rejected); a segment anchor inside a sibling's prefix anchor (rejected), with the nested and disjoint cases asserted to stay valid; an exception declared once and counted in another room; a citation filed in one room covering a segment anchored by another; an anchor naming a segment that does not exist reported as unresolved_anchors rather than silently owning nothing; drift firing on the anchored segment only, and a path-prefix room still stamping file paths and git blob hashes. `npm test` -> tests 218, pass 218, fail 0 (the worktree baseline at the start of this Ticket was 206; +8 from this file, +4 from the parallel ticket-give-rooms-a-write-operation work in the same worktree). `project validate --repo .` -> valid:true, rooms 6; `skills validate --repo .` -> valid:true, skills 12, files_scanned 1123 (both taken before this Evidence was appended, so the evidence count they report is lower than the current one). Validation cost measured on this repository, best of 5 runs each, HEAD copy vs the changed script: project validate 1.20s vs 1.20s, context coverage 1.21s vs 1.20s, room drift 1.43s vs 1.45s — no measurable cost, because the overlap rule is decided in closed form and never segments a file.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

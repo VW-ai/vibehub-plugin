@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "per-room-coverage-is-real"
+  ],
+  "evidence_id": "evidence-per-room-coverage-is-per-room",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/segment-anchors.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "contextCoverage now walks each room's territory as {file -> owned segments} (anchoredTerritory): a prefix anchor owns every segment of every file it reaches (unchanged); a segment anchor owns exactly its segment. Observed on the Peel scratch repo, whose two sources segment into 96 (PRD, 1369 lines) + 12 (demo HTML, 672 lines) = 108 segments: `context coverage` reports segments_total 108, uncovered_total 108, and per room product 4, product/positioning 24, product/domain-model 18, product/ux 18, product/ux/fork-flow 11, product/ux/overview 7, product/scope 14, product/prototype 12 — summing to 108 with every segment claimed once (the assignment script raises on a double claim, and the union was asserted equal to the full segment list). `context coverage --room <path>` for each of the eight returns that room's own segment ids. LIMIT: files_examined counts room-file pairs, so it reads 8 here for 2 distinct files; that field's semantics are pre-existing and were not changed.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

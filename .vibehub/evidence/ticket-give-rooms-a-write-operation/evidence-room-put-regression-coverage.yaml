@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "regression"
+  ],
+  "evidence_id": "evidence-room-put-regression-coverage",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "test/room.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Four tests were added to test/room.test.mjs: create/replace/reject-invalid-without-writing; the --room, room_id-matches-directory and parent-must-exist guards; overlap rejected at the write with the validation message while the tree stays valid, plus the nested-room exemption; and a byte-comparability test that puts each of this repository's six hand-maintained .vibehub/rooms/*/room.yaml documents into a fresh temp repo and asserts the written file is byte-identical to the checked-in source, together with an assertion that `room put` never adds an alignment block and preserves one passed in verbatim. `npm test` -> tests 210, pass 210, fail 0 (baseline 206; the four new tests are the difference). `node skills/vibehub-core/scripts/vh.mjs project validate --repo .` -> {\"ok\":true,\"data\":{\"valid\":true,\"format_version\":2,\"rooms\":6,\"contexts\":66,\"tickets\":105,\"evidence\":310,\"outcomes\":94,\"unverifiable_context_refs\":[]}}.",
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "siblings-may-share-a-file"
+  ],
+  "evidence_id": "evidence-overlap-moved-to-segment-granularity",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/segment-anchors.test.mjs",
+    "test/room.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The overlapping-territory rule was moved, not removed: overlappingTerritory now compares the segment sets two anchors name (anchorsCollide). Two segment anchors collide only when the ids are equal; a prefix and a segment anchor collide exactly when the prefix covers the segment's file; two prefixes collide on containment, as before. Observed in a temp repo: siblings anchoring docs/prd.md#positioning and docs/prd.md#domain-model -> project validate valid:true; two rooms both anchoring docs/prd.md#positioning -> exit non-zero with \"rooms ... claim overlapping territory (docs/prd.md#positioning)\"; a room anchoring \"docs\" beside a sibling anchoring docs/prd.md#positioning -> same rejection; the same pair as parent/child -> valid:true (containment exemption unchanged). The write-time check added by ticket-give-rooms-a-write-operation calls the same helper, so `room put` inherits this: putting a third room onto an already-owned segment returned {\"ok\":false,...\"rooms gamma and beta claim overlapping territory (docs/x.md#b)\"} while the first two puts succeeded. The comparison is closed-form: no file is segmented to decide overlap, so the check costs no additional I/O.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

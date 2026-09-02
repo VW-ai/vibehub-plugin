@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "exceptions-match-citations"
+  ],
+  "evidence_id": "evidence-exceptions-read-repository-wide",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    ".vibehub/rooms/knowledge/contract-source-segmentation-and-coverage.yaml",
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "test/segment-anchors.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The asymmetry is resolved by making coverage_exceptions repository-wide, exactly as citations already are (new coverageExceptions() beside citationRefs()): an exception is a statement about a segment, not about a room, so it settles that segment's count wherever it is counted and is never copied into a second room. The resolution is stated in skills/vibehub-core/contracts/room.schema.json on the coverage_exceptions description (the field's own definition, the more honest home), and echoed in the coverage contract .vibehub/rooms/knowledge/contract-source-segmentation-and-coverage.yaml (whose previous wording, \"被所属 Room 的 coverage_exceptions 显式豁免\", would otherwise now contradict it) and in Pass 4 of skills/vibehub-ingest/references/bulk-absorption.md. Observed: a repo where room \"product\" declares exceptions for docs/prd.md#_preamble (which it anchors) and docs/prd.md#domain-model (anchored by sibling room \"domain-model\") reports uncovered_total 0 overall and 0 for `--room domain-model`, with the exception written once. Test: \"one coverage_exception settles its segment wherever it is counted, without duplication\". LIMIT: an exception naming a bare file path still exempts that whole file, which was already true and is unchanged.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

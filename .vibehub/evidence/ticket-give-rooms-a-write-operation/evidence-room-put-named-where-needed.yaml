@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "documented-where-it-is-needed"
+  ],
+  "evidence_id": "evidence-room-put-named-where-needed",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-distill/SKILL.md",
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "test/skill-contracts.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "vibehub-distill/SKILL.md step 4 no longer says 'write its room.yaml': it says write the Room document with `node ../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>`, never by hand-editing room.yaml, states the --room / room_id / parent rules, says the write stamps nothing, and keeps `room align` as the immediate next step. A Guardrail was added saying there is no room delete — removal is git rm / git mv. bulk-absorption.md Pass 3 step 2 now names the same command as what $vibehub-distill runs, and Pass 4's coverage_exceptions paragraph says to add the entry by putting the Room again (replacing the whole document) instead of editing the room.yaml that owns the anchor. `node skills/vibehub-core/scripts/vh.mjs skills validate --repo .` -> {\"ok\":true,\"data\":{\"valid\":true,\"skills\":12,\"edges\":19,...,\"files_scanned\":1118}}, and test/skill-contracts.test.mjs (which re-invokes every cited command bare) passes with the new `room put` citation.",
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

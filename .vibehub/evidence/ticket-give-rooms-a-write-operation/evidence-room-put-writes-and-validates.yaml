@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "room-write-operation"
+  ],
+  "evidence_id": "evidence-room-put-writes-and-validates",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/room.test.mjs",
+    "skills/vibehub-core/contracts/room.schema.json"
+  ],
+  "schema_version": 1,
+  "summary": "`vh.mjs room put --repo <root> --room <path> --input <room.json>` now exists in roomOperation and returns the same {ok,data} envelope shape as `context put`. Ran in a fresh temp repo after `project init`: create -> {\"ok\":true,\"data\":{\"status\":\"written\",\"room\":\"auth\",\"room_id\":\"auth\",\"created\":true,\"path\":\"/private/tmp/vhroomtest/.vibehub/rooms/auth/room.yaml\"}}; replace with a revised description -> same envelope with \"created\":false; invalid document (description \"\", stale \"yes\", extra key) -> {\"ok\":false,\"error\":{\"code\":\"validation_error\",\"message\":\"Room document is invalid\",\"details\":{\"errors\":[{\"path\":\"room.extra\",\"message\":\"is not allowed\"},{\"path\":\"room.description\",\"message\":\"must be a non-empty string\"},{\"path\":\"room.stale\",\"message\":\"must be a boolean\"}]}}} and the previous document was still the one on disk. Validation runs before any write, so nothing is written for a rejected document. Bare `node vh.mjs room put --repo .` returns code validation_error, not invalid_argument, keeping test/skill-contracts.test.mjs green.",
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

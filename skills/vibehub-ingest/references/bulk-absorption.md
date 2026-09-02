@@ -69,10 +69,26 @@ where the uncovered count is computed from the same segment ids.
 
 1. Cluster the surveyed topics into a Room tree. Assign every segment to
    exactly one Room — that assignment is what makes Pass 4 shardable and it is
-   the reason this pass precedes extraction.
+   the reason this pass precedes extraction. Write the assignment into the
+   Rooms as anchors: an anchor is either a path prefix or a segment id from
+   Pass 1 (`docs/prd.md#4-fork-flow`, `demo.html#L118-177`), so sibling Rooms
+   can each own their own slices of one large file. Two Rooms where neither
+   contains the other must not anchor the same segment; that is what the
+   overlapping-territory check enforces. When the material is a handful of
+   files and the tree follows content, segment anchors are the normal case —
+   anchoring every Room at the file and leaving the sub-Rooms with
+   `anchors: []` collapses Pass 5's per-Room settlement onto the root.
 2. Delegate the writing of the Rooms to `$vibehub-distill`, which owns Room
-   shape, boundaries, anchors, and alignment stamps. The Rooms are empty
-   shells: no Context has been written yet.
+   shape, boundaries, anchors, and alignment stamps. It writes each one with
+   the Room write operation — not by hand-editing a `room.yaml` — so every
+   Room is validated and checked against the territory the existing Rooms
+   already claim before it lands:
+
+   ```text
+   node ../../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>
+   ```
+
+   The Rooms are empty shells: no Context has been written yet.
 3. Present the written tree through `$vibehub-review`'s Room tree surface:
 
    ```text
@@ -111,13 +127,26 @@ Two obligations make the walk auditable:
   or in an `evidence[].ref`. A bare file path counts as covering the whole
   file and defeats the point; cite the segment.
 - **Every segment that yields zero Contexts carries a stated reason.** Record
-  it as an entry in the `coverage_exceptions` array of the `room.yaml` that
-  owns the anchor covering that segment:
+  it as an entry in the `coverage_exceptions` array of the Room that owns the
+  anchor covering that segment:
 
   ```json
   { "segment": "docs/product/prd.md#8-appendix-changelog",
     "reason": "Release changelog; no durable claim." }
   ```
+
+  Add it by putting the Room again with the entry included, the same way the
+  Room was created — `room put` replaces the whole document, so carry the
+  existing fields through:
+
+  ```text
+  node ../../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>
+  ```
+
+  Exceptions are read repository-wide, exactly as citations are: the entry
+  settles that segment's count wherever the segment is counted, so it is
+  declared once, in the Room that owns the anchor, and never copied into
+  another Room that anchors a different part of the same file.
 
   "Nothing worth keeping" without a reason is not an exception, it is a skip.
   An exception is a claim the writer is accountable for, which is why it is

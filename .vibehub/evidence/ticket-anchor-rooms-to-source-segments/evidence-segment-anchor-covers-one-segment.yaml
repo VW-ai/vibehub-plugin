@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "segment-scoped-anchors"
+  ],
+  "evidence_id": "evidence-segment-anchor-covers-one-segment",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    "test/segment-anchors.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "An anchor containing \"#\" is now parsed as a segment id (parseAnchor in vh.mjs) and names exactly the segment `source segment` emits; an anchor without \"#\" is a path prefix and is unchanged. Segmentation itself was not touched. Observed: a room anchoring [\"docs/prd.md#fork-flow\"] over a four-segment file validates (project validate -> valid:true) and `context coverage` returns for it exactly files=[{path:\"docs/prd.md\",skipped:null,segment_count:1,uncovered:[\"docs/prd.md#fork-flow\"]}], segments_total 1, uncovered_total 1 — one segment, not the file. Test: \"a room may anchor one segment of a file and answers only for that segment\" in test/segment-anchors.test.mjs. In the Peel scratch repo the same holds at scale: product/ux/fork-flow anchors 11 segment ids and `context coverage --room product/ux/fork-flow` reports segments_total 11.",
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}
