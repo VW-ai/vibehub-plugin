@@ -1,46 +1,50 @@
 {
-  "acceptance": [
-    {
-      "acceptance_id": "refine-after-policy-recorded",
-      "criterion": "Once the version policy has a successful Outcome, replan this same Ticket to firm with exact acceptance for the CI gate and what triggers it, where the shipped-content definition is read from, whether and where a user-runnable staleness check ships, the extension to verify-release-version.mjs, and a rehearsal proving the observed 143-commit silent-staleness case no longer reproduces."
-    }
-  ],
-  "constraints": [
-    "Do not execute before the policy decision has a successful Outcome; the enforcement must implement the recorded policy rather than assume one.",
-    "Do not add runtime dependencies, a service, or per-install telemetry; identity must be derivable from the published source and the installed artifact alone.",
-    "Do not weaken the existing multi-manifest and tag agreement.",
-    "Any user-facing check must ship inside the artifact allowlist or be declared maintainer-side only."
-  ],
-  "context": "Direction only; the enforcement cannot be specified before the policy exists. Two facts already bound it. First, whatever gate lands must key off scripts/build-plugin-artifact.mjs's allowlist for what counts as shipped content rather than inventing a second list. Second, a staleness check that a user can run has to ship: PLUGIN_PATHS does not include scripts/, so a check placed there never reaches an installed user, and the refinement must either place it under skills/vibehub-core/scripts/ or state plainly that it is maintainer-side only. The decision this Ticket depends on determines which of these is even needed: a content-addressed distribution policy makes the CI bump gate unnecessary, while a bump-per-change policy makes it the whole deliverable.",
-  "context_refs": [
-    {
-      "purpose": "The check this Ticket extends.",
-      "ref": "scripts/verify-release-version.mjs"
-    },
-    {
-      "purpose": "Per-push verification a bump gate would join.",
-      "ref": ".github/workflows/verify.yml"
-    },
-    {
-      "purpose": "Both the definition of shipped content and the allowlist that decides whether a check can reach an installed user.",
-      "ref": "scripts/build-plugin-artifact.mjs"
-    }
-  ],
-  "deliveries": [],
-  "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The recorded version policy is enforced by the pipeline rather than by discipline, so shipped content cannot accumulate under an already-published version and an install that is behind is reported as behind.",
-  "provenance_refs": [
-    "conversation:2026-09-01-packaging-and-release-integrity",
-    "https://github.com/VW-ai/vibehub-plugin/issues/128"
-  ],
-  "relations": [
-    {
-      "rationale": "The enforcement implements a recorded policy; which mechanism is needed, and whether a CI bump gate is needed at all, follows from which policy is chosen.",
-      "target_ticket_id": "ticket-decide-release-version-policy",
-      "type": "depends_on"
-    }
-  ],
-  "schema_version": 2,
-  "ticket_id": "ticket-enforce-release-version-identity"
+ "acceptance": [
+  {
+   "acceptance_id": "refine-after-policy-recorded",
+   "criterion": "Once the version policy has a successful Outcome, replan this same Ticket to firm with exact acceptance for the CI gate and what triggers it, where the shipped-content definition is read from, whether and where a user-runnable staleness check ships, the extension to verify-release-version.mjs, and a rehearsal proving the observed 143-commit silent-staleness case no longer reproduces."
+  }
+ ],
+ "constraints": [
+  "Do not execute before the policy decision has a successful Outcome; the enforcement must implement the recorded policy rather than assume one.",
+  "Do not add runtime dependencies, a service, or per-install telemetry; identity must be derivable from the published source and the installed artifact alone.",
+  "Do not weaken the existing multi-manifest and tag agreement.",
+  "Any user-facing check must ship inside the artifact allowlist or be declared maintainer-side only."
+ ],
+ "context": "Direction only; the enforcement cannot be specified before the policy exists. Two facts already bound it. First, whatever gate lands must key off scripts/build-plugin-artifact.mjs's allowlist for what counts as shipped content rather than inventing a second list. Second, a staleness check that a user can run has to ship: PLUGIN_PATHS does not include scripts/, so a check placed there never reaches an installed user, and the refinement must either place it under skills/vibehub-core/scripts/ or state plainly that it is maintainer-side only. The decision this Ticket depends on determines which of these is even needed: a content-addressed distribution policy makes the CI bump gate unnecessary, while a bump-per-change policy makes it the whole deliverable. One input changed materially after this Ticket was planned. finding-npx-updates-by-content-not-by-version establishes that skills.sh never reads a declared version and updates by content hash or unconditional re-fetch, so once marketplace distribution is retired the silent-staleness failure this Ticket was written against cannot occur on the surviving path. Refinement must therefore start by asking whether a CI bump gate is still warranted at all, and if so on what grounds — release metadata that a human reads, and a version a migration entry can be keyed to, rather than protecting a user from running stale code. A staleness check that a user runs is likely to be unnecessary outright.",
+ "context_refs": [
+  {
+   "ref": ".vibehub/rooms/product/finding-npx-updates-by-content-not-by-version.yaml",
+   "purpose": "Establishes that the failure this Ticket was written against cannot occur on the surviving install path, which refinement must weigh before choosing a mechanism."
+  },
+  {
+   "purpose": "The check this Ticket extends.",
+   "ref": "scripts/verify-release-version.mjs"
+  },
+  {
+   "purpose": "Per-push verification a bump gate would join.",
+   "ref": ".github/workflows/verify.yml"
+  },
+  {
+   "purpose": "Both the definition of shipped content and the allowlist that decides whether a check can reach an installed user.",
+   "ref": "scripts/build-plugin-artifact.mjs"
+  }
+ ],
+ "deliveries": [],
+ "kind": "ticket",
+ "maturity": "draft",
+ "outcome": "The recorded version policy is enforced by the pipeline rather than by discipline, so shipped content cannot accumulate under an already-published version and an install that is behind is reported as behind.",
+ "provenance_refs": [
+  "conversation:2026-09-01-packaging-and-release-integrity",
+  "https://github.com/VW-ai/vibehub-plugin/issues/128"
+ ],
+ "relations": [
+  {
+   "rationale": "The enforcement implements a recorded policy; which mechanism is needed, and whether a CI bump gate is needed at all, follows from which policy is chosen.",
+   "target_ticket_id": "ticket-decide-release-version-policy",
+   "type": "depends_on"
+  }
+ ],
+ "schema_version": 2,
+ "ticket_id": "ticket-enforce-release-version-identity"
 }
