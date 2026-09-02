@@ -1,77 +1,86 @@
 {
-  "acceptance": [
-    {
-      "acceptance_id": "migration-entries-declare-both-halves",
-      "criterion": "Every entry in skills/vibehub-migrate/references/migrations.json separates its deterministic steps from those requiring Agent judgment, in a shape the engine can read rather than prose a reader must interpret; the existing 0.4-to-0.5, 0.5-unversioned-to-format-1, and format-1-to-format-2 entries are each classified, and the classification is defended in the Evidence step by step rather than asserted."
-    },
-    {
-      "acceptance_id": "mechanical-half-runs-on-its-own",
-      "criterion": "The engine can execute the declared mechanical steps for a project's applicable migrations with no Agent judgment, producing an ordinary reviewable Git change; run against a fixture at format 1, it yields a project where project compatibility returns CURRENT and project validate passes, and run against a fixture whose migration has no mechanical steps it makes no change and says so."
-    },
-    {
-      "acceptance_id": "unblocking-is-separated-from-enriching",
-      "criterion": "After the mechanical half runs, the project is writable, and the remaining semantic work is recorded as work still to be done rather than silently lost — a reader of the project can tell that, for example, deliveries arrays are empty pending classification rather than genuinely empty."
-    },
-    {
-      "acceptance_id": "migrate-skill-covers-only-judgment",
-      "criterion": "skills/vibehub-migrate/SKILL.md instructs the Agent to run the mechanical half through the engine and to spend its own reasoning only on the declared semantic steps, and test/skill-contracts.test.mjs asserts that the Skill's cited engine command exists and that the Skill no longer restates mechanical steps the reference owns."
-    },
-    {
-      "acceptance_id": "real-projects-rehearsed",
-      "criterion": "The path is rehearsed on disposable copies of the two real stale projects on this machine — Undercurrent at format 1 and nomi at 0.4-unversioned — and the Evidence records, for each, what the mechanical half completed unaided, what it correctly refused to guess, and whether the project became writable; no write touches the originals."
-    },
-    {
-      "acceptance_id": "classification-is-a-release-obligation",
-      "criterion": "docs/RELEASE.md requires a data-layer change to ship its migration entry with both halves declared, and a check fails when a migrations entry is added or changed without the classification, so the obligation is enforced rather than remembered."
-    }
-  ],
-  "constraints": [
-    "Do not add forward-compatibility shims or dual read paths; this splits how a migration is executed, not whether the data layer stays clean.",
-    "Do not let the mechanical half infer anything the reference marks as judgment; where an authoritative value cannot be established it writes the entry's declared empty or default value and says so.",
-    "The mechanical half never runs outside the project the user is in, and never on a dirty working tree without surfacing that first.",
-    "migrations.json remains the single source; the engine reads the classification rather than carrying a second copy of it.",
-    "Do not change the detection path or the honest triggers in decision-agent-driven-upgrade-migration.",
-    "Do not migrate the owner's real projects as part of this Ticket; rehearsals use disposable copies."
-  ],
-  "context": "skills/vibehub-migrate/references/migrations.json is the single versioned source of migration guidance, and every one of its entries is an undifferentiated list of Agent-facing prose steps. The steps are not undifferentiated in nature. In the format-1-to-format-2 entry, raising every Ticket document from schema_version 1 to 2, adding an explicit deliveries array, writing .vibehub/version.yaml with format_version 2, and proving compatibility and validation pass are all deterministic; classifying each Ticket's delivery membership from exact reviewable history, which the entry explicitly forbids inferring from status, branch name, filename, or prose, is judgment. The entry already permits an empty deliveries array when no authoritative delivery can be established, so the deterministic steps alone yield a structurally valid, writable format-2 project. The cost of not separating them is concrete and currently being paid: Undercurrent on the owner's machine is write-blocked at format 1, waiting on an Agent for work that is almost entirely mechanical. nomi is a harder case in the same shape, since its 0.4-to-0.5 entry genuinely needs judgment — building a Room tree and placing 19 flat Context entries into the lowest room that owns each claim — but even there, writing version.yaml and rewriting refs are mechanical once the placement is known. This Ticket implements decision-migrations-declare-mechanical-and-semantic-halves. It changes the shape of the migrations reference, adds an engine path that executes the mechanical half, narrows the migrate Skill to the semantic half, and makes the classification an obligation of any future release that changes the data layer rather than something rediscovered by whoever hits the migration.",
-  "context_refs": [
-    {
-      "purpose": "The decision this Ticket implements, including the format-1-to-format-2 worked example.",
-      "ref": ".vibehub/rooms/product/decision-migrations-declare-mechanical-and-semantic-halves.yaml"
-    },
-    {
-      "purpose": "The single versioned source whose entry shape changes.",
-      "ref": "skills/vibehub-migrate/references/migrations.json"
-    },
-    {
-      "purpose": "The Skill that currently owns the whole migration and afterwards owns only its semantic half.",
-      "ref": "skills/vibehub-migrate/SKILL.md"
-    },
-    {
-      "purpose": "The governing upgrade policy this refines without relaxing.",
-      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
-    },
-    {
-      "purpose": "Where the mechanical execution path lands, alongside the existing compatibility and validation logic.",
-      "ref": "skills/vibehub-core/scripts/vh.mjs"
-    },
-    {
-      "purpose": "Where the classification becomes an obligation of shipping a data-layer change.",
-      "ref": "docs/RELEASE.md"
-    },
-    {
-      "purpose": "Existing migration coverage the new fixtures join.",
-      "ref": "test/migration.test.mjs"
-    }
-  ],
-  "deliveries": [],
-  "kind": "ticket",
-  "maturity": "firm",
-  "outcome": "Every migration entry declares which of its steps code performs and which need an Agent, the mechanical half runs on its own and leaves the project valid and writable, and the Agent is asked only for the judgment that actually requires one.",
-  "provenance_refs": [
-    "conversation:2026-09-01-packaging-and-release-integrity"
-  ],
-  "relations": [],
-  "schema_version": 2,
-  "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
+ "acceptance": [
+  {
+   "acceptance_id": "migration-entries-declare-both-halves",
+   "criterion": "Every entry in skills/vibehub-migrate/references/migrations.json separates its deterministic steps from those requiring Agent judgment, in a shape the engine can read rather than prose a reader must interpret; the existing 0.4-to-0.5, 0.5-unversioned-to-format-1, and format-1-to-format-2 entries are each classified, and the classification is defended in the Evidence step by step rather than asserted."
+  },
+  {
+   "acceptance_id": "mechanical-half-runs-on-its-own",
+   "criterion": "The engine can execute the declared mechanical steps for a project's applicable migrations with no Agent judgment, producing an ordinary reviewable Git change; run against a fixture at format 1, it yields a project where project compatibility returns CURRENT and project validate passes, and run against a fixture whose migration has no mechanical steps it makes no change and says so."
+  },
+  {
+   "acceptance_id": "unblocking-is-separated-from-enriching",
+   "criterion": "After the mechanical half runs, the project is writable, and the remaining semantic work is recorded as work still to be done rather than silently lost — a reader of the project can tell that, for example, deliveries arrays are empty pending classification rather than genuinely empty."
+  },
+  {
+   "acceptance_id": "semantic-steps-carry-authoring-guidance",
+   "criterion": "Every step declared semantic carries the guidance an Agent needs to author the value: what the field is for, which existing material the value is derived from, what distinguishes a good value from a plausible one, and what must not be used as a shortcut. The format-1-to-format-2 delivery-membership rule is expressed in that shape rather than left as prose, and a check fails when a semantic step ships without guidance."
+  },
+  {
+   "acceptance_id": "back-fill-guidance-is-proven-on-a-real-field",
+   "criterion": "The guidance is exercised rather than only written: an Agent back-fills the declared semantic values for at least one migration step on a disposable copy of a real project, and the Evidence shows what it produced, which values it declined to invent, and that a second Agent given the same guidance and the same documents would have had the same instructions to follow."
+  },
+  {
+   "acceptance_id": "migrate-skill-covers-only-judgment",
+   "criterion": "skills/vibehub-migrate/SKILL.md instructs the Agent to run the mechanical half through the engine and to spend its own reasoning only on the declared semantic steps, and test/skill-contracts.test.mjs asserts that the Skill's cited engine command exists and that the Skill no longer restates mechanical steps the reference owns."
+  },
+  {
+   "acceptance_id": "real-projects-rehearsed",
+   "criterion": "The path is rehearsed on disposable copies of the two real stale projects on this machine — Undercurrent at format 1 and nomi at 0.4-unversioned — and the Evidence records, for each, what the mechanical half completed unaided, what it correctly refused to guess, and whether the project became writable; no write touches the originals."
+  },
+  {
+   "acceptance_id": "classification-is-a-release-obligation",
+   "criterion": "docs/RELEASE.md requires a data-layer change to ship its migration entry with both halves declared, and a check fails when a migrations entry is added or changed without the classification, so the obligation is enforced rather than remembered."
+  }
+ ],
+ "constraints": [
+  "Do not add forward-compatibility shims or dual read paths; this splits how a migration is executed, not whether the data layer stays clean.",
+  "Do not let the mechanical half infer anything the reference marks as judgment; where an authoritative value cannot be established it writes the entry's declared empty or default value and says so.",
+  "The mechanical half never runs outside the project the user is in, and never on a dirty working tree without surfacing that first.",
+  "migrations.json remains the single source; the engine reads the classification rather than carrying a second copy of it.",
+  "Do not change the detection path or the honest triggers in decision-agent-driven-upgrade-migration.",
+  "Do not migrate the owner's real projects as part of this Ticket; rehearsals use disposable copies.",
+  "Authoring guidance belongs in the migrations reference beside the step it governs, not in a Skill; the Skill points at it as it already points at the reference."
+ ],
+ "context": "skills/vibehub-migrate/references/migrations.json is the single versioned source of migration guidance, and every one of its entries is an undifferentiated list of Agent-facing prose steps. The steps are not undifferentiated in nature. In the format-1-to-format-2 entry, raising every Ticket document from schema_version 1 to 2, adding an explicit deliveries array, writing .vibehub/version.yaml with format_version 2, and proving compatibility and validation pass are all deterministic; classifying each Ticket's delivery membership from exact reviewable history, which the entry explicitly forbids inferring from status, branch name, filename, or prose, is judgment. The entry already permits an empty deliveries array when no authoritative delivery can be established, so the deterministic steps alone yield a structurally valid, writable format-2 project. The cost of not separating them is concrete and currently being paid: Undercurrent on the owner's machine is write-blocked at format 1, waiting on an Agent for work that is almost entirely mechanical. nomi is a harder case in the same shape, since its 0.4-to-0.5 entry genuinely needs judgment — building a Room tree and placing 19 flat Context entries into the lowest room that owns each claim — but even there, writing version.yaml and rewriting refs are mechanical once the placement is known. This Ticket implements decision-migrations-declare-mechanical-and-semantic-halves. It changes the shape of the migrations reference, adds an engine path that executes the mechanical half, narrows the migrate Skill to the semantic half, and makes the classification an obligation of any future release that changes the data layer rather than something rediscovered by whoever hits the migration. A second obligation attaches to the semantic half. When a format change adds a field whose content is written rather than computed — the worked example is a summary or subtitle on every Ticket — an Agent back-filling it across a hundred existing documents needs to know what the field is for, which existing material the value derives from, what makes a value good, and what must not be used as a shortcut. Without that, each back-fill is one Agent's private reading and no later reader can tell whether two values meant the same thing. The format-1-to-format-2 entry already carries exactly this kind of guidance for delivery membership, undeclared and mixed in beside mechanical steps; this Ticket makes it a declared part of the entry so it arrives from the same versioned source that says the field exists.",
+ "context_refs": [
+  {
+   "purpose": "The decision this Ticket implements, including the format-1-to-format-2 worked example.",
+   "ref": ".vibehub/rooms/product/decision-migrations-declare-mechanical-and-semantic-halves.yaml"
+  },
+  {
+   "purpose": "The single versioned source whose entry shape changes.",
+   "ref": "skills/vibehub-migrate/references/migrations.json"
+  },
+  {
+   "purpose": "The Skill that currently owns the whole migration and afterwards owns only its semantic half.",
+   "ref": "skills/vibehub-migrate/SKILL.md"
+  },
+  {
+   "purpose": "The governing upgrade policy this refines without relaxing.",
+   "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+  },
+  {
+   "purpose": "Where the mechanical execution path lands, alongside the existing compatibility and validation logic.",
+   "ref": "skills/vibehub-core/scripts/vh.mjs"
+  },
+  {
+   "purpose": "Where the classification becomes an obligation of shipping a data-layer change.",
+   "ref": "docs/RELEASE.md"
+  },
+  {
+   "purpose": "Existing migration coverage the new fixtures join.",
+   "ref": "test/migration.test.mjs"
+  }
+ ],
+ "deliveries": [],
+ "kind": "ticket",
+ "maturity": "firm",
+ "outcome": "Every migration entry declares which of its steps code performs and which need an Agent, the mechanical half runs on its own and leaves the project valid and writable, and every semantic step carries the guidance an Agent needs to author the field consistently rather than inventing its own reading of it.",
+ "provenance_refs": [
+  "conversation:2026-09-01-packaging-and-release-integrity"
+ ],
+ "relations": [],
+ "schema_version": 2,
+ "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }
