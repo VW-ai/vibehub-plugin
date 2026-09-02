@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "tree-usability"
+  ],
+  "evidence_id": "evidence-human-approves-peel-room-split",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-01T00:00:00Z",
+  "refs": [
+    "conversation:2026-09-01-peel-rerun-pass3-human-gate",
+    ".vibehub/tickets/ticket-verify-absorption-against-peel.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "At the Pass 3 human gate the repository owner reviewed the eight-room tree proposed from Peel's two source files — product, with positioning, domain-model, ux (holding fork-flow and overview), scope, and prototype beneath it — presented alongside the mapping of all 32 checked-in Contexts from the single `product` room at ~/Peel/.vibehub/rooms/product/ onto it, which drops the maximum single-room load from 32/32 to 5/32. Their verdict, in their own words: 「这个切法我理解是对的，但是我们的anchor的规则/模型是要调整的」 — the split is right, and separately the anchor rule and model must be adjusted. The approval is of the room split; it is not an approval of the current anchoring, which the same message asks to change.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

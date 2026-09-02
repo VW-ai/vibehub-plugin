@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "room-write-operation",
+      "criterion": "`vh.mjs room put --repo <root> --room <path> --input <room.json>` creates or replaces a Room document, validating it against room.schema.json and rejecting an invalid one without writing, in the same envelope shape as `context put`."
+    },
+    {
+      "acceptance_id": "overlap-checked-on-write",
+      "criterion": "A Room whose anchors overlap an existing Room's territory is rejected by the write itself, with the same message repository validation gives, rather than being written and discovered later."
+    },
+    {
+      "acceptance_id": "documented-where-it-is-needed",
+      "criterion": "`vibehub-distill/SKILL.md` and `skills/vibehub-ingest/references/bulk-absorption.md` name the exact command where they currently say to write a room.yaml, and neither implies a raw file write is the expected path."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover creating a Room, replacing one, rejecting an invalid document, rejecting an overlapping one, and that a Room created through the operation is byte-comparable with the hand-written form it replaces."
+    }
+  ],
+  "constraints": [
+    "Do not add a delete operation; removing a Room stays a git rm, consistent with how Context documents are moved with git.",
+    "Do not let the write stamp alignment; `room align` stays the only thing that stamps.",
+    "Keep the bare-invocation behaviour compatible with test/skill-contracts.test.mjs, which re-invokes every command it finds in a SKILL.md without arguments."
+  ],
+  "context": "The first real user of the bulk absorption pipeline reported that Pass 3 instructs the Agent to delegate Room writing to $vibehub-distill, but roomOperation supports only drift, tree, align and stale. Rooms are created by hand-writing .vibehub/rooms/<path>/room.yaml, and neither bulk-absorption.md nor vibehub-distill/SKILL.md says so — distill step 4 says write its room.yaml without saying that means a raw file write. A fresh Agent looks for a command and does not find one, then either stalls or invents a path.",
+  "context_refs": [
+    {
+      "purpose": "The step that says to write a room.yaml without naming a command.",
+      "ref": "skills/vibehub-distill/SKILL.md"
+    },
+    {
+      "purpose": "Pass 3 delegates Room writing to a Skill that has no write command.",
+      "ref": "skills/vibehub-ingest/references/bulk-absorption.md"
+    },
+    {
+      "purpose": "What the write must validate against.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Creating a Room is a helper operation an Agent can find and run, so the pipeline step that says to delegate Room writing names something that exists.",
+  "provenance_refs": [
+    "conversation:2026-09-01-peel-rerun-pass3-human-gate",
+    "commit:bf2eb1a"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

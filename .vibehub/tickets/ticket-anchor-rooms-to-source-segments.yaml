@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "segment-scoped-anchors",
+      "criterion": "A Room may anchor a bounded part of a source file, not only a path prefix, using the same segment identifiers `vh.mjs source segment` emits. A Room anchoring `docs/x.md#4-fork-flow` covers that segment and no other."
+    },
+    {
+      "acceptance_id": "siblings-may-share-a-file",
+      "criterion": "Two sibling Rooms anchoring disjoint segments of the same file both validate. Two Rooms anchoring the same segment, or a Room whose segment anchor falls inside a sibling's path-prefix anchor for the same file, are still rejected as overlapping territory — the rule moves to segment granularity rather than being removed."
+    },
+    {
+      "acceptance_id": "per-room-coverage-is-real",
+      "criterion": "`vh.mjs context coverage --repo <root> --room <path>` reports the uncovered segments of exactly that Room's anchored territory, for a sub-Room that anchors segments rather than a whole file, and the sum over a tree's Rooms accounts for every segment of every anchored file exactly once."
+    },
+    {
+      "acceptance_id": "exceptions-match-citations",
+      "criterion": "A `coverage_exceptions` entry lowers the uncovered count wherever the segment it names is counted, without having to be duplicated across Rooms; the asymmetry between per-Room exceptions and repository-wide citations is resolved and the resolution is stated in the room schema or the coverage contract."
+    },
+    {
+      "acceptance_id": "drift-still-honest",
+      "criterion": "Alignment and drift keep working for both anchor kinds: a Room anchoring segments reports DRIFTED when the bytes of those segments change, and does not report DRIFTED when only other parts of the same file change. A Room anchoring a path prefix behaves exactly as it does today."
+    },
+    {
+      "acceptance_id": "peel-tree-anchors-cleanly",
+      "criterion": "The eight-Room tree already approved for Peel — product with positioning, domain-model, ux (holding fork-flow and overview), scope, and prototype — validates with each sub-Room anchoring its own segments of the two source files rather than carrying an empty anchor list, and `context coverage --room <each sub-room>` returns that Room's own uncovered segments."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover a segment anchor, two siblings splitting one file, two Rooms claiming one segment (rejected), a segment anchor inside a sibling's prefix anchor (rejected), per-Room coverage summing to the whole file, an exception counted once, and drift firing on the anchored segments only."
+    }
+  ],
+  "constraints": [
+    "Do not remove the overlapping-territory rule; move it to segment granularity. Two Rooms owning the same knowledge is the defect it exists to prevent.",
+    "Existing Rooms with path-prefix anchors must keep validating and behaving identically; this is an extension, not a migration.",
+    "Do not change how segments are computed. `source segment` is the single definition of a segment and its determinism is what makes anchors stable.",
+    "Do not add a second store, manifest, or cache; anchors stay declared in room.yaml and everything else stays derived."
+  ],
+  "context": "Running Peel's two source files through the bulk pipeline proved the anchor model is the remaining blocker. Room anchors are path prefixes, and vh.mjs:801 rejects any two Rooms in a non-containment relationship whose anchors overlap. Both sources are single files, so a tree that assigns topical slices of one file to sibling Rooms is rejected outright — the first proposed tree failed with 21 overlap errors. The only shape the validator accepts is the root Room anchoring both files while every sub-Room carries anchors: []. That validates, but coverage accountability then collapses onto the root: `context coverage --room <sub-room>` is uninformative for every Room that actually holds Context, and Pass 4's by-Room sharding and Pass 5's per-Room settlement are unusable. The executor's judgement, which this Ticket accepts: Peel's original flat single Room may not have been only a diligence failure — it is close to the only shape the validator readily accepts when all material lives in one directory of files. A second, related asymmetry surfaced in the same run: contextCoverage reads coverage_exceptions per Room but reads citations repository-wide, so an exception only lowers the uncovered total for the Room that anchors the segment, and would have to be duplicated into every anchoring Room once several may anchor one file.",
+  "context_refs": [
+    {
+      "purpose": "States why the tree must follow content, and records this as the deferred root cause the Peel rerun forced.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "Where anchors are defined.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    },
+    {
+      "purpose": "The segmentation and coverage contract this must extend without contradicting.",
+      "ref": ".vibehub/rooms/knowledge/contract-source-segmentation-and-coverage.yaml"
+    },
+    {
+      "purpose": "Passes 4 and 5 depend on per-Room accountability that does not work today.",
+      "ref": "skills/vibehub-ingest/references/bulk-absorption.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Sibling Rooms can own different parts of the same source file, so a Room tree derived from content keeps per-Room coverage accountability instead of collapsing it onto the root.",
+  "provenance_refs": [
+    "conversation:2026-09-01-peel-rerun-pass3-human-gate",
+    "commit:bf2eb1a"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-anchor-rooms-to-source-segments"
+}

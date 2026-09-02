@@ -52,6 +52,11 @@
       "rationale": "This Ticket cannot route to EXECUTE while it carries a human-authority criterion, so its agent-authority work has no legal start until the routing order is fixed.",
       "target_ticket_id": "ticket-order-human-routing-after-agent-work",
       "type": "depends_on"
+    },
+    {
+      "rationale": "The approved tree can only be anchored per sub-Room, and Passes 4 and 5 can only settle coverage per Room, once a Room may anchor segments of a file rather than a path prefix.",
+      "target_ticket_id": "ticket-anchor-rooms-to-source-segments",
+      "type": "depends_on"
     }
   ],
   "schema_version": 2,
