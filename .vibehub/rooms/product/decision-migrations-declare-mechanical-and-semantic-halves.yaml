@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-migrations-declare-mechanical-and-semantic-halves",
+  "detail": "A migration is not one kind of work. Adding a semantic subtitle to Tickets is the clean illustration: creating the field, defaulting it, and rewriting every document is deterministic and belongs in code, while deciding what any particular subtitle should say requires reading the Ticket and judging. Treating the whole thing as Agent work makes the mechanical half needlessly expensive and, worse, holds a project hostage to attention it does not need. The existing format-1-to-format-2 entry proves this rather than illustrating it hypothetically. Its mechanical half is unambiguous: raise every Ticket document from schema_version 1 to 2, add an explicit deliveries array, write .vibehub/version.yaml with format_version 2, then prove compatibility and validation pass. Its semantic half is equally unambiguous: classify each Ticket's delivery membership from exact reviewable history, explicitly not inferred from status, branch name, filename, or prose. The entry already permits an empty deliveries array when no authoritative delivery can be established, which means the mechanical half alone produces a structurally valid, writable format-2 project and the semantic enrichment can follow later without blocking anything. Undercurrent on this machine sits write-blocked at format 1 for exactly this reason: work that code could finish is queued behind judgment nobody asked for. The rule: every release that changes the data layer declares, as part of shipping it, which steps are deterministic and which require an Agent. The classification is an obligation of the release, not a discovery made at migration time by whoever happens to hit it. The mechanical half must be executable on its own and must leave the project valid; the semantic half is separate, in-project, reviewable Agent work that enriches rather than unblocks. This refines decision-agent-driven-upgrade-migration, which treats upgrading as wholly Agent-driven restructure. Its no-shims rule and its honest-trigger rule stand unchanged; what changes is that an Agent is no longer required for the parts that never needed one. Left open for the implementing Ticket: whether the mechanical half runs the moment an Agent opens a stale project, or only under an explicit command. Nothing here authorises it to run in projects the user is not in; decision-upgrade-drives-every-affected-project keeps the machine-wide half read-only.",
+  "evidence": [
+    {
+      "note": "Owner stated the principle and the subtitle example, and framed it as a standing obligation for every future release that changes the data structure.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    },
+    {
+      "note": "Agent reading of the format-1-to-format-2 entry: it mixes both halves in one step list and permits an empty deliveries array, so its mechanical half alone would produce a valid format-2 project.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-upgrade-drives-every-affected-project",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:35:00.000Z",
+    "quote": "应该肯定存在，我们determinisitic 可以迁移的，和必须agent 来做的东西。比如说，我们给左右的ticket多一个语意的subtitle，那这个数据结构我们可以迁移，内容需要agent 来做。我理解就是，我们之后在做任何版本发布重构，都要看，我们的数据结构变化，什么是代码可以完成的，什么是需要agent 的",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "Every data-format change must classify its migration into the part code can perform and the part that needs an Agent's judgment, and the mechanical part must be able to run on its own",
+  "tags": [
+    "migration",
+    "upgrade",
+    "release",
+    "contracts",
+    "automation"
+  ],
+  "type": "decision"
+}
