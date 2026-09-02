@@ -177,29 +177,64 @@ test("human decision boundaries stay in the Ticket graph", () => {
 // exists to prevent, and prose alone cannot prevent it. These weld the Skill's
 // named independence sources to the set the engine actually accepts, and prove
 // the engine refuses the write rather than merely discouraging it.
-test("the closeout Skill names exactly the independence sources the engine accepts", () => {
-  const engine = readFileSync(helper, "utf8");
-  const declared = engine.match(/const INDEPENDENCE_SOURCES = new Set\(\[([^\]]*)\]\)/);
-  assert.ok(declared, "vh.mjs must declare INDEPENDENCE_SOURCES");
-  const accepted = [...declared[1].matchAll(/"([a-z_]+)"/g)].map((match) => match[1]).sort();
-  assert.deepEqual(accepted, ["different_human", "separate_session", "subagent"]);
+test("the closeout Skill names exactly the independence sources the engine accepts", async () => {
+  // Both halves are behavioural. Grepping vh.mjs for the constant proved
+  // useless: an adjudicator widened the validator without touching the
+  // constant and the whole suite still passed while the engine accepted a
+  // fourth value. So ask the engine what it accepts, and ask the Skill what it
+  // declares, and compare those.
+  const { INDEPENDENCE_SOURCES } = await import(join(root, "skills", "vibehub-core", "scripts", "vh.mjs"));
+  const accepted = [...INDEPENDENCE_SOURCES].sort();
 
   const skill = bodies.get("vibehub-ticket-closeout");
-  // Read the Skill's own declared list rather than guessing which backticked
-  // words are sources: a heuristic hardcodes the answer it should discover,
-  // and would pass a bogus fourth source added to that list.
-  const named = [...skill.matchAll(/^- `([a-z_]+)` — /gmu)].map((match) => match[1]).sort();
-  assert.deepEqual(named, accepted,
-    "the Skill's declared source list must equal the engine's accepted set, in both directions");
-  const schema = JSON.parse(readFileSync(
-    join(root, "skills", "vibehub-core", "contracts", "outcome.schema.json"),
-    "utf8",
-  ));
-  assert.deepEqual([...schema.properties.independence.properties.source.enum].sort(), accepted);
-  assert.ok(
-    !schema.required.includes("independence"),
-    "independence stays optional in the schema so Outcomes written before it remain readable",
+  const region = skill.match(
+    /<!-- independence-sources:start -->\n([\s\S]*?)<!-- independence-sources:end -->/u,
   );
+  assert.ok(region, "the Skill must delimit its declared source list");
+  const declared = [...region[1].matchAll(/^- `([a-z_]+)`/gmu)].map((match) => match[1]).sort();
+  assert.deepEqual(declared, accepted, "the declared list must equal the engine's set");
+
+  const repo = tempRepo("independence-sources");
+  assert.equal(invoke(repo, "project", "init").ok, true);
+  assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+    validation: { independent: false, note: "contract test" },
+    tickets: [ticket("probe-work")],
+  })).ok, true);
+  const attempt = (source) => invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "probe-work",
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: [],
+    summary: "contract test",
+    closed_at: "2026-09-02T00:00:00.000Z",
+    independence: { source, note: "contract test" },
+  }));
+  // A member must clear the independence check; it may still fail later for an
+  // unrelated reason, which is exactly what distinguishes the two.
+  const sourceRejected = (result) => result.ok === false
+    && (result.error.details?.errors ?? []).some((item) => item.path === "outcome.independence.source");
+  for (const source of accepted) {
+    assert.equal(sourceRejected(attempt(source)), false, `${source} must be accepted as a source`);
+  }
+  // Every other backticked token in the Skill must be refused by the engine, so
+  // a source named in prose outside the declared list cannot quietly work.
+  // Skill tokens, plus a fixed probe list of plausible widenings, so a
+  // validator quietly relaxed to accept a fourth value fails here even when
+  // nothing in the Skill mentions it. The probe list is a net, not a proof:
+  // a widening to a value nobody guessed still escapes, and a source named in
+  // prose that the engine already refuses is a documentation defect this test
+  // does not catch.
+  const probes = ["self_review", "self", "same_session", "none", "human", "agent", "executor"];
+  const others = [...new Set([
+    ...[...skill.matchAll(/`([a-z][a-z_]{2,})`/gu)].map((match) => match[1]),
+    ...probes,
+  ])].filter((token) => !accepted.includes(token));
+  for (const token of others) {
+    assert.equal(sourceRejected(attempt(token)), true, `${token} is not in the declared list, so the engine must refuse it as a source`);
+  }
 });
 
 test("closeout without a declared independence source writes no Outcome", () => {

@@ -589,7 +589,7 @@ function validateEvidence(document, path = "evidence") {
 // A closeout Agent must be independent from the executor. The engine cannot
 // verify that claim and must not try; it requires the claim to be made, so an
 // absent one is a rejected write rather than a silent self-adjudication.
-const INDEPENDENCE_SOURCES = new Set(["subagent", "separate_session", "different_human"]);
+export const INDEPENDENCE_SOURCES = new Set(["subagent", "separate_session", "different_human"]);
 
 function validateOutcome(document, path = "outcome") {
   const errors = [];

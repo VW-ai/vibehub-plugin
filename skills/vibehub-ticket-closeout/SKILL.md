@@ -12,9 +12,14 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 The closeout Agent must be independent from the executor. Independence comes
 from exactly one of three sources, and you must state which you used:
 
+<!-- independence-sources:start -->
 - `subagent` — a fresh Agent with no context from the execution
 - `separate_session` — a session started from the copied read-only handoff
 - `different_human` — a person other than whoever ran the work
+<!-- independence-sources:end -->
+
+This list is the whole set. No other value is accepted, and naming one
+anywhere else in this document is a defect the contract tests catch.
 
 If you can obtain none of them, **stop**. Write no Outcome, say which sources
 you tried, and report that this Ticket cannot be adjudicated from here. An
