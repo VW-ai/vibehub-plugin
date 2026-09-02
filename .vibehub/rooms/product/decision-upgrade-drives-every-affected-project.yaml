@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-upgrade-drives-every-affected-project",
+  "detail": "When a user takes an update, VibeHub is responsible for restructuring their existing project data — and that responsibility is machine-wide. The rejected alternative was the weaker reading: that the next Agent session which happens to open an affected project notices and offers migration. That leaves the user's other projects silently write-blocked for as long as they go untouched, which is exactly the observed failure — three projects on the owner's machine, two at MIGRATION_REQUIRED, unnoticed until a survey was run by hand. This extends the scope of decision-agent-driven-upgrade-migration rather than reversing it. That decision's honest triggers were a validation error naming a legacy structure, or the user asking to upgrade; the second trigger still applies and is still explicit, but it now covers every project the upgrade finds instead of the one the user is standing in. Nothing here permits background conversion: no scan and no write happens except inside a user-invoked upgrade, each project's restructure remains an ordinary reviewable Git change, and a project with uncommitted work is surfaced rather than silently modified. One consequence must not be discovered later: npx skills update belongs to skills.sh and cannot be hooked by VibeHub, so this obligation cannot attach to the documented update command. Honouring it requires VibeHub's own explicit upgrade entry, which is a cross-project surface running outside any project. That surface was previously treated as a someday question owned by nobody; this decision puts it on the critical path, and the boundary question it raises — whether VibeHub gains such an entry at all, and under what replacement for the no-required-CLI constraint — has to be answered before the upgrade experience can be built.",
+  "evidence": [
+    {
+      "note": "Owner chose the machine-wide reading over the next-session-in-an-affected-project reading, having been shown that the first is compatible with the existing migration decision as written and the second requires extending it.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:20:00.000Z",
+    "quote": "(ii) 更新那一刻就扫全机所有受影响项目并驱动迁移",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "An explicit upgrade discovers and drives every affected project on the machine, not only the project the user happens to be inside",
+  "tags": [
+    "upgrade",
+    "migration",
+    "install",
+    "cross-project",
+    "boundary"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,67 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "options-and-costs-are-written-up",
+      "criterion": "The candidate shapes for an outside-a-project entry are written out with their real costs — at minimum a one-shot npx invocation requiring no install, a documented manual procedure with no new entry at all, and any hosted or installed form — each judged against what decision-upgrade-drives-every-affected-project actually requires, against the two reasons the current boundary exists, and against what an existing user would have to do."
+    },
+    {
+      "acceptance_id": "replacement-constraint-is-proposed-and-testable",
+      "criterion": "If any option would relax the boundary, the exact replacement constraint is written as text that could be checked in, together with the mechanical assertion that would enforce it, so the boundary is narrowed rather than deleted; if no option relaxes it, that is stated with the reason."
+    },
+    {
+      "acceptance_id": "owner-decides",
+      "authority": "human",
+      "criterion": "The owner explicitly chooses whether VibeHub gains an outside-a-project entry and, if so, accepts the replacement constraint and the amendment to architecture-boundary.md; the choice and its reasoning are recorded as a decision Context in .vibehub/rooms/product referencing human-origin Evidence."
+    }
+  ],
+  "constraints": [
+    "This Ticket decides and records; it implements no entry point, no scanner, and no index.",
+    "Do not amend skills/vibehub-setup/references/architecture-boundary.md before the owner has chosen; a proposal is text in this Ticket's Evidence, not an edit to the boundary.",
+    "Do not answer ticket-vibehub-cli's question about splitting vh.mjs, and do not close it as a side effect.",
+    "Any proposed index must be derivable by scanning and disposable; a design where an index holds truth is out of scope and contradicts Git as the source of truth.",
+    "Do not propose a hosted service, account system, or telemetry."
+  ],
+  "context": "decision-upgrade-drives-every-affected-project commits VibeHub to discovering and driving migration across every affected project when a user takes an update. That obligation cannot attach to the documented update command, because npx skills update belongs to skills.sh and VibeHub cannot hook it. It therefore requires an entry point that runs outside any project — a surface VibeHub has never had, and one that skills/vibehub-setup/references/architecture-boundary.md currently forbids in its strongest form: the product ships no required CLI, MCP server, database, daemon, hook cadence, native runtime, local web service, background capture, or hidden state, and anything a Skill introduces beyond that is a defect rather than a feature. That boundary was written for two reasons and only one has expired. It avoided the old CLI-plus-local-database coupling, which is void now that truth lives in per-project Git. It also acted as a forcing constraint that pushed capability back into Skills and documents, which still works; removing it without a replacement would reintroduce the failure it prevented. A candidate replacement exists and is narrower and testable: new capability always lands in the engine, and any outside-a-project entry adds only cross-project scope, human-readable output, and invocation convenience, with zero capability that exists only there. Skills never call it and it is never a prerequisite for a Skill — a property that is true by construction, because a Skill's work is always in-project and the engine is already on its path, and that test/skill-contracts.test.mjs can assert in the same way it already asserts that every engine command a Skill cites resolves. What such an entry needs is small and derived: which projects on this machine hold a .vibehub, which format each is at, and whether a migration applies. All three are recoverable by scanning, so the index behind it can be a pure cache — deletable and rebuildable — and never becomes an authority. This Ticket does not absorb ticket-vibehub-cli, which is scoped to whether vh.mjs should be split behind a stable Agent-facing command; that is a maintainability question about the engine, while this is a product question about reach. The two answers constrain each other and should be read together, but they are not the same decision.",
+  "context_refs": [
+    {
+      "purpose": "The obligation that forces this decision and states why the documented update command cannot carry it.",
+      "ref": ".vibehub/rooms/product/decision-upgrade-drives-every-affected-project.yaml"
+    },
+    {
+      "purpose": "Where the never-forced-but-owned-when-taken rule was recorded.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "The constraint under question, in its current binding form.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "The original speed-first decision whose forcing-constraint role any replacement must preserve.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "The adjacent open question about splitting vh.mjs, which this Ticket must read alongside but must not absorb or close.",
+      "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
+    },
+    {
+      "purpose": "The existing prose-to-reality assertion pattern that a replacement constraint would use.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "States that VibeHub installs no global CLI; whatever is decided must leave this document true or change it deliberately.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner has decided whether VibeHub gains an explicit entry point that runs outside any single project, and what replaces the no-required-CLI constraint if it does, so the machine-wide upgrade obligation can be built against a settled boundary instead of around it.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/111",
+    "https://github.com/VW-ai/vibehub-plugin/issues/127"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface"
+}
