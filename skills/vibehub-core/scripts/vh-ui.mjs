@@ -646,7 +646,9 @@ function outcomeTrace(outcome, source) {
   };
 }
 
-function traceRecords(repository, source, ticketId = null) {
+// Exported so a contract test can assert the real projection instead of
+// grepping this file's source for the shape it hopes is there.
+export function traceRecords(repository, source, ticketId = null) {
   const evidence = documents(repository.evidence.documents)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
     .map((item) => evidenceTrace(item, source));

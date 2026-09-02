@@ -185,11 +185,12 @@ test("the closeout Skill names exactly the independence sources the engine accep
   assert.deepEqual(accepted, ["different_human", "separate_session", "subagent"]);
 
   const skill = bodies.get("vibehub-ticket-closeout");
-  const named = [...skill.matchAll(/`([a-z_]+)`/g)]
-    .map((match) => match[1])
-    .filter((word) => word.includes("_") || word === "subagent");
-  assert.deepEqual([...new Set(named)].sort(), accepted,
-    "the Skill must name every engine-accepted source and no others");
+  // Read the Skill's own declared list rather than guessing which backticked
+  // words are sources: a heuristic hardcodes the answer it should discover,
+  // and would pass a bogus fourth source added to that list.
+  const named = [...skill.matchAll(/^- `([a-z_]+)` — /gmu)].map((match) => match[1]).sort();
+  assert.deepEqual(named, accepted,
+    "the Skill's declared source list must equal the engine's accepted set, in both directions");
   const schema = JSON.parse(readFileSync(
     join(root, "skills", "vibehub-core", "contracts", "outcome.schema.json"),
     "utf8",
@@ -344,19 +345,23 @@ test("the declared independence source reaches a reader and the Workbench", asyn
   assert.match(written, /separate_session/u);
 
   // And so does the Log, which is the surface the closeout Skill sends them to.
-  const { buildUiTrace, loadRepository } = await import(
+  const { traceRecords } = await import(
     join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs")
-  ).catch(() => ({}));
-  if (typeof buildUiTrace === "function" && typeof loadRepository === "function") {
-    const trace = buildUiTrace(loadRepository(repo), "judged-work");
-    const entry = JSON.stringify(trace);
-    assert.match(entry, /separate_session/u, "the Log must show the declared source");
-    assert.match(entry, /declared, unverified/u, "and must say it is unverified");
-  } else {
-    const ui = readFileSync(join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs"), "utf8");
-    assert.match(ui, /independence: outcome\.independence \?\? null/u);
-    assert.match(ui, /declared, unverified/u);
-  }
+  );
+  const { loadRepository } = await import(
+    join(root, "skills", "vibehub-core", "scripts", "vh.mjs")
+  );
+  assert.equal(typeof traceRecords, "function", "the Log projection must be callable from a test");
+  const source = { worktreeRoot: repo, repositoryRoot: repo, branch: "test", resolvedCommit: null };
+  const outcomeEntry = traceRecords(loadRepository(repo), source, "judged-work")
+    .find((entry) => entry.kind === "outcome");
+  assert.ok(outcomeEntry, "the Log must carry the Outcome");
+  assert.deepEqual(outcomeEntry.independence, { source: "separate_session", note: "contract test" });
+  assert.match(
+    outcomeEntry.body,
+    /Independence: separate_session \(declared, unverified\)/u,
+    "the Log body a human reads must show the source and say it is unverified",
+  );
   const closeout = bodies.get("vibehub-ticket-closeout");
   assert.match(
     closeout,
