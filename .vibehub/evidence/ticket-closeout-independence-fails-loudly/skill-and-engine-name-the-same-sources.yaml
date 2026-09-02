@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "closeout-skill-matches-the-engine"
+  ],
+  "evidence_id": "skill-and-engine-name-the-same-sources",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:13:00.000Z",
+  "refs": [
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "test/skill-contracts.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-ticket-closeout/SKILL.md now names subagent, separate_session, and different_human with a one-line definition of each, requires the closeout to state which was used, and instructs the Agent to stop, write no Outcome, and report which sources it tried when none is available. test/skill-contracts.test.mjs 'the closeout Skill names exactly the independence sources the engine accepts' parses INDEPENDENCE_SOURCES out of vh.mjs, asserts the set equals the three, asserts every one is named in the Skill body, and asserts the schema enum matches — so the Skill and the engine cannot drift apart in either direction.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}
