@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "tree-multi-room"
+  ],
+  "evidence_id": "evidence-peel-baseline-figures-corrected",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "/Users/waynewang/Peel/.vibehub/rooms/product",
+    ".vibehub/evidence/ticket-verify-absorption-against-peel/peel-rerun-artifact.txt"
+  ],
+  "schema_version": 1,
+  "summary": "Correction to evidence-result-is-a-multi-room-tree, whose two figures were both wrong in the direction that flatters this Ticket's result. First: it says the baseline holds 32 Contexts of which only 13 derive from the two source files. Recounted directly against ~/Peel/.vibehub/rooms/product/: 13 is the count whose source.ref carries the distill: prefix, but 26 of the 32 cite one of the two source files in evidence[].ref. The baseline absorbed materially more from these sources than 13 implies, and the 13 figure was quoted without stating which measurement it was. The comparison that survives is not a count: it is that the 108 source segments are now each accounted for exactly once, and that no single Room holds everything. Second: the same document names prototype/status-visual-encoding and ux/four-attention-statuses as the highest cross-Room summary similarity at 0.33; recomputed, that pair is 0.324 and three other pairs are higher at 0.333. The stated 0.34 ceiling holds; the named maximum does not. Third, from the same audit and recorded here rather than left silent: prototype/prototype-sidebar-contents cites only #L233-292 while its summary and detail also describe markup living in #L293-351, so its content is covered but its citation is one segment too narrow.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

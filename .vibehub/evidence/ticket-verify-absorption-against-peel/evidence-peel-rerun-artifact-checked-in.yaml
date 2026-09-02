@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "rerun",
+    "no-prompted-recovery"
+  ],
+  "evidence_id": "evidence-peel-rerun-artifact-checked-in",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    ".vibehub/evidence/ticket-verify-absorption-against-peel/peel-rerun-artifact.txt"
+  ],
+  "schema_version": 1,
+  "summary": "The run is now preserved in the repository rather than only in a session-scoped scratch directory. .vibehub/evidence/ticket-verify-absorption-against-peel/peel-rerun-artifact.txt captures, from the settled scratch repository: its five commits, the final coverage envelope (files_examined 8, segments_total 108, uncovered_total 0, unresolved_anchors empty in all eight Rooms), the eight-Room tree with each Room's own segment anchors, all 138 Context documents grouped by Room with each one's type, summary, source ref and every evidence ref, and all 16 coverage exceptions with their stated reasons. That is the work list, the result, and the settlement in one checked-in file, so the run outlives the scratchpad and the 138 Contexts and their citations can be re-audited without it. On no-prompted-recovery: the artifact shows coverage reaching zero across the Room-by-Room commit sequence with the last segment resolved in the final commit, and no user message asking whether content was missed appears anywhere in the cycle; that is corroboration from preserved repository state rather than a captured conversation transcript, and it is stated here as corroboration rather than as proof.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

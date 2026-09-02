@@ -1,0 +1,716 @@
+# Peel re-absorption run artifact
+
+Sources: spatial-thread-workspace-prd-v0-original.md (1369 lines), peel-demo-v0-original.html (672 lines)
+Captured from the scratch repository after Pass 5 settled. The scratch repository is session-scoped; this file is the durable record.
+
+## Scratch repository commits
+3dd6807 pass 4/5: extract prototype room; uncovered_total reaches 0
+0c54d0e pass 4: extract ux, fork-flow, overview, scope rooms
+399ae84 pass 4: extract domain-model room (21 contexts, 3 exceptions)
+b20e8fa pass 4: extract positioning room (25 contexts, 4 exceptions)
+d72113f pass 4: extract product room (10 contexts, 4/4 segments covered)
+2a1c57b pass 3: anchor at root only; align tree
+4e07c2c pass 3: propose room tree (empty shells)
+a5ebecf import Peel source files
+
+## Final coverage envelope
+{
+    "ok": true,
+    "data": {
+        "rooms": [
+            {
+                "room": "product",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 4,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/domain-model",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 18,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/positioning",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 24,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/prototype",
+                "files": [
+                    {
+                        "path": "docs/product/source/peel-demo-v0-original.html",
+                        "skipped": null,
+                        "segment_count": 12,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/scope",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 14,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/ux",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 18,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/ux/fork-flow",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 11,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            },
+            {
+                "room": "product/ux/overview",
+                "files": [
+                    {
+                        "path": "docs/product/source/spatial-thread-workspace-prd-v0-original.md",
+                        "skipped": null,
+                        "segment_count": 7,
+                        "uncovered": []
+                    }
+                ],
+                "uncovered": 0,
+                "unresolved_anchors": []
+            }
+        ],
+        "files_examined": 8,
+        "segments_total": 108,
+        "uncovered_total": 0
+    }
+}
+
+## Room tree
+{
+    "ok": true,
+    "data": {
+        "cold_start": false,
+        "rooms": [
+            {
+                "room": "product",
+                "room_id": "product",
+                "parent": null,
+                "description": "The Spatial Thread Workspace product as a whole: the source documents themselves, their status and versioning, and claims that genuinely span every sub-room.",
+                "boundary": "Owns the identity and provenance of the product definition and anything true of the product at every altitude. Does not own positioning arguments, the domain model, UX contracts, V0 scope, or the prototype \u2014 each has its own sub-room and claims belong at the lowest owning level.",
+                "drift": {
+                    "room": "product",
+                    "state": "FRESH"
+                },
+                "context_count": 138
+            },
+            {
+                "room": "product/domain-model",
+                "room_id": "domain-model",
+                "parent": "product",
+                "description": "The objects the product is made of and who owns their state: Project, Space, Thread, Fork Edge, Worktree, Subagent, the Space lifecycle operations, and the Codex / app / shared source-of-truth split.",
+                "boundary": "Owns object definitions, their relationships and cardinality, lifecycle operations on them, and data ownership. Does not own how any object is presented or manipulated in the interface, nor the reasons the product chose these objects.",
+                "drift": {
+                    "room": "product/domain-model",
+                    "state": "FRESH"
+                },
+                "context_count": 21
+            },
+            {
+                "room": "product/positioning",
+                "room_id": "positioning",
+                "parent": "product",
+                "description": "Why this product exists and what it refuses to become: the linear-chat problem, the product thesis, goals, non-goals, target user and jobs, the six product-shape risks, and the deferred future direction.",
+                "boundary": "Owns the argument for the product and its outer edges \u2014 problem, thesis, goals, non-goals, user, risks, long-term direction. Does not own the object definitions those arguments refer to, the interaction contracts that implement them, or the V0 delivery list.",
+                "drift": {
+                    "room": "product/positioning",
+                    "state": "FRESH"
+                },
+                "context_count": 25
+            },
+            {
+                "room": "product/prototype",
+                "room_id": "prototype",
+                "parent": "product",
+                "description": "The checked-in self-contained demo as running evidence: its visual design system and layout constants, the app-shell markup, the seeded thread fixture, and the interaction behaviours it actually implements.",
+                "boundary": "Owns what the prototype demonstrates and how it is built, as a visual and interaction baseline. Does not own the product claims the prototype's documentation panels restate \u2014 those belong to positioning, domain-model and ux.",
+                "drift": {
+                    "room": "product/prototype",
+                    "state": "FRESH"
+                },
+                "context_count": 26
+            },
+            {
+                "room": "product/scope",
+                "room_id": "scope",
+                "parent": "product",
+                "description": "What V0 ships and how it is judged: the P0 launch list, the P1 follow-on list, the UX acceptance criteria, the activation / utility / reliability / dogfood metrics, and the ten decisions deferred to tech design.",
+                "boundary": "Owns the V0 delivery boundary and its pass conditions. Does not own why a capability is in or out \u2014 that is positioning \u2014 nor the contracts the criteria test, which live in the ux rooms.",
+                "drift": {
+                    "room": "product/scope",
+                    "state": "FRESH"
+                },
+                "context_count": 12
+            },
+            {
+                "room": "product/ux",
+                "room_id": "ux",
+                "parent": "product",
+                "description": "The interaction contracts of the product: the seven design principles, project entry and chat registration, Focus mode and its tree, the diff surface, voice dictation, the attention-status contract, subagent presentation, and the Open in Codex escape hatch.",
+                "boundary": "Owns UX principles and any interaction contract that is not specific to creating a fork or to the Overview surface \u2014 those are sub-rooms. Does not own object definitions, product rationale, or the V0 acceptance gate.",
+                "drift": {
+                    "room": "product/ux",
+                    "state": "FRESH"
+                },
+                "context_count": 44
+            },
+            {
+                "room": "product/ux/fork-flow",
+                "room_id": "fork-flow",
+                "parent": "product/ux",
+                "description": "Creating a branch: the Branch-from-here and Peel entries, the local Fork Draft, execution-location choice, the First-send commit and its failure rules, the Branched-from return, and the thread-naming lifecycle that follows.",
+                "boundary": "Owns everything between a user deciding to branch and the child thread being a durable, named Codex thread. Does not own how the resulting tree is displayed in Overview, nor what a Fork Edge is as an object.",
+                "drift": {
+                    "room": "product/ux/fork-flow",
+                    "state": "FRESH"
+                },
+                "context_count": 13
+            },
+            {
+                "room": "product/ux/overview",
+                "room_id": "overview",
+                "parent": "product/ux",
+                "description": "The Overview surface: entering and leaving it, the deterministic V0 card data contract and what it refuses to infer, initial and manual node placement, Tidy layout, and edge rendering rules.",
+                "boundary": "Owns the zoomed-out recognition state and its spatial memory guarantees. Does not own Focus-mode presentation, the fork-creation flow, or the meaning of a Fork Edge as a domain object.",
+                "drift": {
+                    "room": "product/ux/overview",
+                    "state": "FRESH"
+                },
+                "context_count": 8
+            }
+        ]
+    }
+}
+
+## Context documents per room, with the segments each cites
+
+### product/domain-model  (21 Contexts)
+- add-to-space-no-inferred-edges [constraint] :: An existing thread can be added to a Space, but only a real fork edge creates a parent-child relation; added threads without one are not auto-connected.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#add-to-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#add-to-space
+- archive-space-hides-only [contract] :: Archiving a Space only hides it and modifies no Codex thread.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#archive-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#archive-space
+- codex-owns [contract] :: Codex owns the project, thread id, transcript, turns and items, thread name, status, approvals, worktree and cwd, Git state, and subagent threads.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#codex-owns
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#codex-owns
+- codex-thread-deletion-needs-confirmation [constraint] :: Archiving or deleting a Codex thread operates on original Codex data, must be clearly distinguished from Remove from Space, and requires a second confirmation.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#archive-delete-codex-thread
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#archive-delete-codex-thread
+- create-space-sources [contract] :: A Space is created from Start a space on an existing chat, from the first Branch from here, or explicitly on the project page by choosing a root chat.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#create-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#create-space
+- fork-edge-fields [contract] :: A Fork Edge carries at least parentThreadId, childThreadId, forkedAtTurnId and createdAt.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-4-fork-edge
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-4-fork-edge
+- fork-edge-means-chat-fork-only [constraint] :: An edge always expresses a chat fork and never a Git branch, a worktree relation or a general dependency.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-4-fork-edge
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-4-fork-edge
+- our-app-owns [contract] :: The product owns Space, membership, fork edge metadata and fork turn anchor, spatial position, camera state, collapsed subtrees, last-viewed state, local fork draft, and per-thread scroll and composer draft.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#our-app-owns
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#our-app-owns
+- project-definition [contract] :: Project is Codex's existing concept reused unchanged: a long-lived shared context boundary of code, instructions, sources, chats and execution environments.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-1-project
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-1-project
+- project-to-space-one-to-many [contract] :: One Project can own several Spaces.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-1-project
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-1-project
+- remove-from-space-is-non-destructive [contract] :: Remove from Space deletes only membership, node position and space-specific metadata, never the Codex thread, transcript, worktree or Git changes.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#remove-from-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#remove-from-space
+- space-definition [contract] :: Space is the product's own first-class object: a set of threads the user has deliberately registered and organised around one question, not an automatic mirror of a project's chats.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+- space-name-is-product-local [contract] :: A Space name belongs only to this product, defaults to the root thread title, and is never synced to Codex.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#rename-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#rename-space
+- space-project-binding-rules [constraint] :: In V0 a Space binds to at most one primary Project, projectless Spaces are allowed, cross-project Spaces are not, and one Thread may appear in several Spaces by reference.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+- space-registration-is-deliberate [contract] :: Opening a chat to read it never joins a Space; registration happens only on Start a space, Add to space, or the first Branch from here.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-2-space
+- subagent-definition [contract] :: A Subagent is background activity inside one turn of a parent thread, not an ordinary thread node on the main fork tree.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-6-subagent
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-6-subagent
+- subagent-v0-behaviour [contract] :: In V0 subagents stay folded into the parent's activity, surface as a count and hover detail on the Overview card, and never affect the Space layout.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-6-subagent
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-6-subagent
+- thread-capabilities [contract] :: A Thread can be a Space root, fork from another thread, receive real Codex turns, run in Local or a Worktree, produce diffs, and spawn subagents.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-3-thread
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-3-thread
+- thread-is-real-codex-thread [contract] :: Thread corresponds to a real Codex Thread; the product does not copy the full transcript as its own source of truth.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-3-thread
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-3-thread
+- thread-title-shared-and-synchronized [contract] :: Thread title is the single shared field: renaming in this product writes back to Codex, and no divergent shadow title is maintained.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#shared-but-synchronized
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#shared-but-synchronized
+- worktree-is-thread-metadata [contract] :: Worktree is a Thread's optional execution location, shown as lightweight metadata, and it forms no second graph.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-5-worktree
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-5-worktree
+
+### product/positioning  (25 Contexts)
+- codex-app-server-enables-v0 [note] :: The Codex App Server already exposes the thread read, list, fork, name and turn APIs the product needs, so no conversation backend has to be rebuilt.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-4-为什么现在可以做
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-4-为什么现在可以做
+- convergence-is-not-auto-merge [constraint] :: Future convergence is a user-driven selection, not an automatic merge of two chats or an automatic Git merge, and it is not built before users actually accumulate forks.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#16-future-direction
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#16-future-direction
+- fork-can-be-a-real-experiment [note] :: Because a Codex Thread can read code, edit files, run commands and use Git, a fork can be a real experiment rather than only a discussion path.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-2-codex-fork-不只是思路分叉-也可能成为真实实验
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-2-codex-fork-不只是思路分叉-也可能成为真实实验
+- fork-from-live-parent-verified [note] :: The team verified empirically that a fork can be created from a parent thread even while that thread is open in the native Codex client.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-4-为什么现在可以做
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-4-为什么现在可以做
+- future-direction-convergence [note] :: After V0 stabilises the chat to fork to space to focus to overview loop, the product can grow toward compare, select, integrate and a convergence checkpoint.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#16-future-direction
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#16-future-direction
+- goal-consistency-with-codex [intent] :: V0 must stay consistent with native Codex: no shadow conversation and no thread name that exists only inside this product.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-5-保持与-codex-原生能力的一致性
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-5-保持与-codex-原生能力的一致性
+- goal-overview-higher-density [intent] :: V0 must make Overview carry higher information density than the Focus tree because the two answer different questions.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-3-让-overview-提供比-focus-tree-更高的信息密度
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-3-让-overview-提供比-focus-tree-更高的信息密度
+- goal-preserve-chat-quality [intent] :: V0 must keep a full-quality chat inside every thread; spatial UI may not degrade chat into a textbox on a canvas.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-2-保持高质量-chat-体验
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-2-保持高质量-chat-体验
+- goal-preserve-fork-provenance [intent] :: V0 must let the user see where the current chat forked from and what its parent, siblings and children are.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-1-保留-fork-的来源与结构
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-1-保留-fork-的来源与结构
+- goal-stable-spatial-memory [intent] :: V0 must preserve the spatial memory the user forms in Overview: adding a fork may not rearrange existing nodes and placed nodes keep their position across sessions.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-4-让-space-保持稳定的空间记忆
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-4-让-space-保持稳定的空间记忆
+- jobs-to-be-done [intent] :: The two jobs to be done are keeping branching directions in a visible structure and seeing where concurrent chats or worktrees forked from and what each is doing.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#jobs-to-be-done
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#jobs-to-be-done
+- linear-chat-cannot-express-thought-structure [note] :: Linear chat assumes a question-answer-followup shape, so a branching problem forces the user into four bad workarounds.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-1-线性-chat-无法表达真实的思考结构
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-1-线性-chat-无法表达真实的思考结构
+- message-is-anchor-not-node [contract] :: Thread is the first-class spatial object; a Message is only a precise fork anchor and never an independent node on the main graph.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-3-为什么不是普通-graph-tool
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-3-为什么不是普通-graph-tool
+- no-experiment-management-system [constraint] :: The higher value of code-backed forks must not be answered by building an experiment management system in V0.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-2-codex-fork-不只是思路分叉-也可能成为真实实验
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-2-codex-fork-不只是思路分叉-也可能成为真实实验
+- primary-user-definition [note] :: The primary user is an individual developer, product engineer or AI-native builder already using Codex on real projects with branching work habits.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#primary-user
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#primary-user
+- problem-is-fork-not-expressed [intent] :: The gap is not that users cannot fork but that the product stops expressing the fork once it exists.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-1-线性-chat-无法表达真实的思考结构
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-1-线性-chat-无法表达真实的思考结构
+- product-thesis-focus-and-overview [intent] :: The product thesis is that Focus lets the user keep working while Overview lets them see how that work branched.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#3-product-thesis
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#3-product-thesis
+- risk-codex-clone [constraint] :: Risk: the product decays into an ordinary Codex clone by spending its effort re-implementing Codex features.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-2-产品退化成普通-codex-clone
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-2-产品退化成普通-codex-clone
+- risk-execution-dashboard [constraint] :: Risk: the product decays into an agent or execution dashboard once worktree, subagent, diff and test status take over the interface.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-3-产品退化成-agent-execution-dashboard
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-3-产品退化成-agent-execution-dashboard
+- risk-graph-viewer [constraint] :: Risk: the product decays into a pretty graph viewer where the user must still open every chat to learn anything.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-1-产品退化成-graph-viewer
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-1-产品退化成-graph-viewer
+- risk-no-spatial-memory [constraint] :: Risk: spatial position never becomes memory because automatic layout keeps nodes jumping.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-5-空间位置无法形成记忆
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-5-空间位置无法形成记忆
+- risk-untrustworthy-overview [constraint] :: Risk: Overview looks informative but is not trustworthy because the model misreads discussion as decision.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-4-overview-信息看似丰富但不可信
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-4-overview-信息看似丰富但不可信
+- risk-worktree-fork-friction [constraint] :: Risk: the worktree choice adds friction so the user must reason about the Git environment on every fork.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-6-worktree-选择增加-fork-摩擦
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#risk-6-worktree-选择增加-fork-摩擦
+- v0-non-goals-list [constraint] :: Seventeen capabilities are explicitly out of scope for V0, from generic graph editing and agent orchestration to convergence and multi-user collaboration.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#5-non-goals
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#5-non-goals
+- why-not-a-generic-graph-tool [decision] :: Message-as-canvas-node prototypes fail twice, so the graph belongs underneath the chat rather than the chat inside the graph.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-3-为什么不是普通-graph-tool
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-3-为什么不是普通-graph-tool
+
+### product/prototype  (26 Contexts)
+- overview-card-visual-contract [contract] :: An Overview node is a 294px card at least 205px tall, lifting on hover, with a hover popover for subagents and a dotted canvas ground behind it.
+    source: docs/product/source/peel-demo-v0-original.html#L178-232
+    evidence: docs/product/source/peel-demo-v0-original.html#L178-232
+- per-message-branch-affordance [contract] :: Every assistant message carries a branch affordance that appears on hover, plus a persistent one on the last assistant message: an inline Branch from here action and a circular anchor handle in the right margin.
+    source: docs/product/source/peel-demo-v0-original.html#L178-232
+    evidence: docs/product/source/peel-demo-v0-original.html#L178-232
+- prototype-app-header-controls [contract] :: The app header carries a click-to-rename thread title, a project and space breadcrumb, a worktree diff button, the Focus and Overview toggle, and an overflow holding Open in Codex.
+    source: docs/product/source/peel-demo-v0-original.html#L293-351
+    evidence: docs/product/source/peel-demo-v0-original.html#L293-351
+- prototype-composer-and-runtime-row [contract] :: The composer carries attach, dictate and send controls, and a fork runtime row that appears only for a draft, offering Current workspace or Create new worktree with the caption that First Send commits the fork.
+    source: docs/product/source/peel-demo-v0-original.html#L293-351
+    evidence: docs/product/source/peel-demo-v0-original.html#L293-351
+- prototype-design-tokens [contract] :: The prototype fixes its visual system as CSS custom properties: a warm neutral paper palette, four semantic status colours, two shadow levels, and four layout dimensions.
+    source: docs/product/source/peel-demo-v0-original.html#L1-60
+    evidence: docs/product/source/peel-demo-v0-original.html#L1-60
+- prototype-drag-persists-position [contract] :: Dragging a card updates the thread's stored position in canvas coordinates, redraws its edges live, and confirms with the toast Position saved to Space.
+    source: docs/product/source/peel-demo-v0-original.html#L628-672
+    evidence: docs/product/source/peel-demo-v0-original.html#L628-672
+- prototype-fixture-space [note] :: The prototype ships a concrete six-thread example Space whose shape demonstrates a fork of a fork.
+    source: docs/product/source/peel-demo-v0-original.html#L517-576
+    evidence: docs/product/source/peel-demo-v0-original.html#L517-576
+- prototype-focus-overview-contract-table [contract] :: The UX Contract panel states Focus and Overview as two information contracts over the same threads, each with its own question, main surface, information density and rationale.
+    source: docs/product/source/peel-demo-v0-original.html#L404-463
+    evidence: docs/product/source/peel-demo-v0-original.html#L404-463
+- prototype-fork-draft-lifecycle [contract] :: The prototype implements the full draft lifecycle: the Peel layer plays first, a local draft thread is created, Escape cancels it by deleting it and returning to the parent, and only Send makes it durable.
+    source: docs/product/source/peel-demo-v0-original.html#L577-627
+    evidence: docs/product/source/peel-demo-v0-original.html#L577-627
+- prototype-hero-flow-five-steps [contract] :: The hero flow is rendered as five steps: search and open, branch from here, Fork Draft, first-send commit, and the stable Focus or Overview shell.
+    source: docs/product/source/peel-demo-v0-original.html#L464-516
+    evidence: docs/product/source/peel-demo-v0-original.html#L464-516
+- prototype-is-self-contained [constraint] :: The prototype is a single self-contained HTML file with no external assets or dependencies, meant to be copied into a project and opened directly in a browser.
+    source: docs/product/source/peel-demo-v0-original.html#L1-60
+    evidence: docs/product/source/peel-demo-v0-original.html#L1-60
+- prototype-overview-and-peel-surfaces [contract] :: The Overview stage carries a title block, zoom controls and a hint naming its three gestures, while the Peel layer stages the fork as a source card, a growing line and a child card.
+    source: docs/product/source/peel-demo-v0-original.html#L352-403
+    evidence: docs/product/source/peel-demo-v0-original.html#L352-403
+- prototype-overview-rendering [contract] :: Overview renders drafts out of the graph, draws parent-child edges as horizontal bezier curves, and highlights the edges touching the active thread.
+    source: docs/product/source/peel-demo-v0-original.html#L628-672
+    evidence: docs/product/source/peel-demo-v0-original.html#L628-672
+- prototype-ownership-split [contract] :: The prototype renders the source-of-truth split as two facing lists, Codex owns and Spatial owns, framed by the premise that the spatial layer must stay thin.
+    source: docs/product/source/peel-demo-v0-original.html#L404-463
+    evidence: docs/product/source/peel-demo-v0-original.html#L404-463
+- prototype-rename-feedback [contract] :: Renaming from either the tree or the Overview card replaces the label with an inline input and confirms with the toast Thread name synced to Codex.
+    source: docs/product/source/peel-demo-v0-original.html#L577-627
+    evidence: docs/product/source/peel-demo-v0-original.html#L577-627
+- prototype-sidebar-contents [contract] :: The product sidebar shows Search Codex chats and New space actions above a Project section, a Spaces list, and a Recent chats list, with the user profile pinned at the bottom.
+    source: docs/product/source/peel-demo-v0-original.html#L233-292
+    evidence: docs/product/source/peel-demo-v0-original.html#L233-292
+- prototype-six-principles-have-veto [constraint] :: The prototype states six UX principles and gives them veto power over later additions such as diff, convergence or GitHub.
+    source: docs/product/source/peel-demo-v0-original.html#L464-516
+    evidence: docs/product/source/peel-demo-v0-original.html#L464-516
+- prototype-thesis-panel-hero [note] :: The Why & Model panel leads with the positioning line and states that Project is where work happens while Space is the shape one question takes.
+    source: docs/product/source/peel-demo-v0-original.html#L352-403
+    evidence: docs/product/source/peel-demo-v0-original.html#L352-403
+- prototype-thread-title-origin [contract] :: Each fixture thread records a titleOrigin of manual, generated or fallback, making the naming stage part of the thread's state.
+    source: docs/product/source/peel-demo-v0-original.html#L517-576
+    evidence: docs/product/source/peel-demo-v0-original.html#L517-576
+- prototype-three-panel-structure [contract] :: The artifact is organised as three top-level panels — Prototype, Why & Model, and UX Contract — switched by tabs in a shared top bar.
+    source: docs/product/source/peel-demo-v0-original.html#L233-292
+    evidence: docs/product/source/peel-demo-v0-original.html#L233-292
+- prototype-three-products-it-is-not [constraint] :: The prototype names the three products this one must not become: a Codex replacement, a graph editor, and an execution dashboard.
+    source: docs/product/source/peel-demo-v0-original.html#L404-463
+    evidence: docs/product/source/peel-demo-v0-original.html#L404-463
+- prototype-title-generation-rules [contract] :: The prototype generates titles in two deterministic steps: truncate the first prompt to 42 characters, then substitute a short keyword-derived title after the first turn.
+    source: docs/product/source/peel-demo-v0-original.html#L577-627
+    evidence: docs/product/source/peel-demo-v0-original.html#L577-627
+- prototype-two-of-six-objects-on-graph [contract] :: The prototype states the object model as six objects of which only two — Thread and Fork Edge — form the spatial structure.
+    source: docs/product/source/peel-demo-v0-original.html#L404-463
+    evidence: docs/product/source/peel-demo-v0-original.html#L404-463
+- prototype-v0-scope-framing [decision] :: The prototype frames starting off correctly as getting the hardest-to-reverse information architecture and interaction semantics right first, rather than building more at the start.
+    source: docs/product/source/peel-demo-v0-original.html#L464-516
+    evidence: docs/product/source/peel-demo-v0-original.html#L464-516
+- prototype-zoom-and-escape-behaviour [contract] :: Overview zoom is bounded to 0.7 through 1.25 with a reset, and Escape cancels a Fork Draft first and only closes the diff drawer when there is no draft.
+    source: docs/product/source/peel-demo-v0-original.html#L628-672
+    evidence: docs/product/source/peel-demo-v0-original.html#L628-672
+- status-visual-encoding [contract] :: The four attention statuses have distinct non-textual encodings: running pulses blue, needs-approval is amber, failed is red, and new-result adds a small blue corner dot.
+    source: docs/product/source/peel-demo-v0-original.html#L118-177
+    evidence: docs/product/source/peel-demo-v0-original.html#L118-177
+
+### product  (10 Contexts)
+- core-interaction-sequence [contract] :: The canonical interaction is search an existing Codex chat, bring it into a Space, branch from here, continue in a real Codex child thread, zoom out, and re-enter any branch.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+- design-anchor-focus-overview-prototype [constraint] :: The confirmed Focus to Overview interaction prototype is the design anchor the PRD is written against.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+- doc-status-v0-draft [note] :: The PRD is V0.1, dated 2026-08-24, and its status is Draft for alignment rather than an approved specification.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+- final-product-definition [intent] :: Spatial Thread Workspace is a spatialised fork workspace around one question inside a Codex Project that keeps a full familiar chat experience while keeping fork provenance, activity and results visible.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#18-final-product-definition
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#18-final-product-definition
+- prd-authoring-standard [convention] :: The PRD is written to a review-ready standard that documents rationale, boundaries and evolution rather than enumerating features.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#_preamble
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#_preamble
+- product-core-problem [intent] :: The product exists to keep the origin, relationship, status and result of parallel directions visible once one question splits, without degrading the normal chat experience.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+- product-name-undecided [decision] :: The product ships under the working name Spatial Thread Workspace; the real product name is explicitly undecided.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#spatial-thread-workspace-工作名-v0-产品需求文档
+- source-references-openai-docs [note] :: The PRD's external claims about Codex capabilities are cited to five OpenAI documentation pages carried as link references at the end of the document.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#18-final-product-definition
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#18-final-product-definition
+- space-entry-trigger-conditions [contract] :: A chat is registered into a Space only once the user recognises one of four conditions; most Codex conversations never enter the product.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+- v0-single-purpose [constraint] :: V0 does one thing well: letting a Codex chat continue to exist as a spatial structure once it becomes non-linear.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#1-executive-summary
+
+### product/scope  (12 Contexts)
+- acceptance-focus-fidelity [contract] :: Focus fidelity acceptance: the full chat passes through no canvas scale transform, selection and copy work, the composer does not move with the camera, code blocks scroll, streaming causes no scroll jump, scrolling up stops auto-follow, switching threads restores scroll and draft, and approvals appear in the thread that produced them.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-fidelity
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-fidelity
+- acceptance-fork [contract] :: Fork acceptance: the Fork Draft is visible within 150ms of clicking Branch from here, the composer focuses immediately, cancelling creates no durable thread, a failed First Send loses no text, the child appears in tree and Overview immediately on success, and the child can return to the exact parent fork turn.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork
+- acceptance-naming [contract] :: Naming acceptance: the first prompt forms a temporary title, a short title may be generated after the first turn, inline rename syncs to Codex, and a user rename is never automatically overwritten.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#naming
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#naming
+- acceptance-overview [contract] :: Overview acceptance: no transcript or composer, every card's main content traces back to a real turn, no unlabelled model inference, adding a child moves no existing node, positions persist across reopening, any card returns to Focus, and the main structure stays understandable at 30 to 50 nodes.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#overview
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#overview
+- deferred-decisions-do-not-block [decision] :: The deferred decisions do not change the V0 product structure and therefore must not block design or foundational implementation.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#17-deferred-decisions
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#17-deferred-decisions
+- deferred-decisions-list [note] :: Ten decisions are deferred to tech design, real Codex schema inspection and dogfood, from worktree creation mechanics to the earliest entry condition for convergence.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#17-deferred-decisions
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#17-deferred-decisions
+- dogfood-signals [note] :: Dogfood observation focuses on nine behavioural questions about when and how users fork, navigate, choose worktrees, open diffs, rename, and what information helps them recognise threads.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#dogfood-signals
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#dogfood-signals
+- metric-activation [contract] :: Activation target: a user can create their first fork within 30 seconds of opening an existing Codex chat, and a new user needs no understanding of node, edge, graph or Git terminology to fork.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#activation
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#activation
+- metric-core-utility [contract] :: Core utility target: in Spaces with at least two forks users return to non-current branches through the tree or Overview, judge each branch's direction and status from Overview without opening the transcript, and can state the current thread's parent and siblings accurately.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#core-utility
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#core-utility
+- metric-reliability [contract] :: Reliability targets: zero Fork Draft loss, rename sync success above 99 percent, fork edges consistent with real Codex thread relations, zero unexpected node position changes, and worktree creation failure never losing a thread or prompt.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#reliability
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#reliability
+- p0-launch-requirements [contract] :: P0 launch scope is twenty-five requirements spanning Codex read and search, Space creation, Focus mode, the full fork commit path, Overview, naming sync, voice, worktree hints, statuses and state restoration.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#p0-launch-requirements
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#p0-launch-requirements
+- p1-post-v0-additions [note] :: P1 items may follow V0: discovering externally created forks, recovering their turn anchors, keyboard-first Overview navigation, collapse and park, show recent only, tidy layout, space search, pin thread, and a fuller unknown-item renderer.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#p1-可在-v0-后追加
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#p1-可在-v0-后追加
+
+### product/ux/fork-flow  (13 Contexts)
+- branched-from-return [contract] :: The child transcript shows a Branched from divider at the end of shared history, and clicking it switches to the parent, scrolls to the exact fork turn, briefly highlights it, and restores the child's scroll and draft on return.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#branched-from
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#branched-from
+- draft-title-new-branch [contract] :: Before First Send a Fork Draft is titled New branch.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft-2
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft-2
+- execution-location-picker [contract] :: For a Git-backed parent the composer shows a lightweight workspace picker offering Continue in current workspace or Create a new worktree.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#execution-location
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#execution-location
+- execution-location-requirements [constraint] :: The workspace picker must not be a modal, must remain changeable until First Send, must not change the fork tree, and its default policy and implementation are deferred.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#execution-location
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#execution-location
+- first-send-commit-sequence [contract] :: First Send is the commit point: prepare the worktree if needed, call thread/fork, fork at the exact turn via lastTurnId, save the parent, child and fork turn, start the first turn, and promote the draft to a durable node.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send-commit
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send-commit
+- first-send-failure-rules [constraint] :: Every First Send failure mode preserves the user's work: no failure may lose composer content.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send-commit
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send-commit
+- first-send-temporary-title [contract] :: On First Send the first user prompt becomes the temporary title through deterministic truncation.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-send
+- fork-draft-is-local [contract] :: Clicking Branch from here creates a local Fork Draft rather than a durable Codex thread.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft
+- fork-draft-ui-behaviour [contract] :: The Fork Draft shows a new child chat surface with the composer focused and the fork relation immediately visible, stays out of the durable Overview, and Escape cancels it without creating an empty thread or worktree.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#fork-draft
+- fork-two-equivalent-entries [contract] :: A fork can be started either from the Branch from here message action on a completed turn or by dragging the Peel handle, and both produce exactly the same result.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#entry
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#entry
+- generated-short-title [contract] :: After the first turn completes the system may generate a shorter title and syncs it back to the Codex thread.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-turn-completed
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#first-turn-completed
+- inline-rename-locations [contract] :: The user can rename inline from the Focus tree, the Overview card or the thread header, and the rename is written back to the real thread through thread/name/set.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#inline-rename
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#inline-rename
+- manual-rename-is-final [constraint] :: Once the user renames a thread manually, the system never automatically overwrites that name again.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#inline-rename
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#inline-rename
+
+### product/ux/overview  (8 Contexts)
+- overview-card-click-returns-to-focus [contract] :: Clicking any card re-enters that thread's Focus mode.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-6-overview-mode
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-6-overview-mode
+- overview-card-excludes-inference [constraint] :: The V0 card does not show model-inferred Decision, Conclusion, Open Question or Rejected Direction; these belong to a future interpretation layer.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#v0-overview-card-信息
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#v0-overview-card-信息
+- overview-card-required-fields [contract] :: The V0 Overview card must carry title, Branched from and fork turn snippet, latest user prompt and latest completed result snippets, last active time and turn count, status, worktree name and changed file count, and subagent count and status.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#v0-overview-card-信息
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#v0-overview-card-信息
+- overview-edge-rendering-rules [contract] :: Edges express only forks, render at low contrast by default, strengthen on the active path or hover, use no colour-coded branch types, and cannot be drawn by the user.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#edge
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#edge
+- overview-initial-placement [contract] :: Root sits at a stable starting position, children default to the right of or downstream from the parent, siblings keep recognisable spacing, and adding a child never rearranges existing nodes.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#initial-placement
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#initial-placement
+- overview-manual-position-persisted [contract] :: The user can drag Overview cards and the position is persisted to Space metadata.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#manual-position
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#manual-position
+- overview-mode-transition [contract] :: Entering Overview collapses the full chat into a thread preview, removes the composer, leaves no thread focused, and makes the complete fork graph the main interface.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-6-overview-mode
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-6-overview-mode
+- tidy-layout-is-explicit-only [constraint] :: An explicit Tidy layout action may be offered, but the system may never rearrange everything automatically in the background.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#tidy-layout
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#tidy-layout
+
+### product/ux  (23 Contexts)
+- chat-search-result-fields [contract] :: Chat search results show thread title, preview, owning project, update time, and optionally the worktree or branch name.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-2-search-and-register-an-existing-chat
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-2-search-and-register-an-existing-chat
+- diff-surface-contract [contract] :: Clicking a worktree hint opens a temporary diff surface with file list, additions and deletions, file or hunk diffs, and Open worktree, Open in Editor and Open in Codex actions.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-8-worktree-and-diff
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-8-worktree-and-diff
+- diff-v0-exclusions [constraint] :: V0 implements no worktree dashboard, Git graph, branch management, commit/push/PR main flow, or automatic comparison of several worktrees.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-8-worktree-and-diff
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-8-worktree-and-diff
+- direct-branch-creates-space [contract] :: If the user goes straight to Branch from here, the system creates a Space with the current chat as root, names it from the root thread title, and makes the fork its first child.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-2-search-and-register-an-existing-chat
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-2-search-and-register-an-existing-chat
+- focus-mode-layout [contract] :: Focus is the everyday working state: a persistent tree on the left beside a full-fidelity chat carrying transcript, commands, file changes, approvals and the composer.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-3-focus-mode
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-3-focus-mode
+- focus-tree-information-contract [contract] :: The Focus tree shows title, hierarchy, current node, the four attention statuses and optional worktree and changed-file hints, and deliberately withholds summaries, snippets, decisions, open questions and diffs.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-tree-展示
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-tree-展示
+- focus-tree-scaling-behaviour [contract] :: When a Space grows large the Focus tree expands the current path, siblings and direct children first and allows unrelated subtrees to collapse, with Overview still showing the full structure.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-tree-展示
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#focus-tree-展示
+- four-attention-statuses [contract] :: Non-focused threads use exactly four attention statuses — Running, Needs approval, New result, Failed — and idle shows no status.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-10-thread-status-and-attention
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-10-thread-status-and-attention
+- new-result-is-deterministic [contract] :: New result is computed by comparing latestCompletedTurnId with lastViewedTurnId, not by model judgement.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-10-thread-status-and-attention
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-10-thread-status-and-attention
+- open-in-codex-escape-hatch [contract] :: Every thread always offers Open in Codex, Open worktree and View original so the user is never locked into an incomplete client.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-12-open-in-codex
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-12-open-in-codex
+- principle-chat-first-space-second [constraint] :: Principle 8.1: the default state must look first like a high-quality Codex chat; spatial structure becomes the main visual only on fork or in Overview.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-1-chat-first-space-second
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-1-chat-first-space-second
+- principle-deterministic-before-interpretive [constraint] :: Principle 8.4: V0 Overview shows only verifiable information and never lets the model announce what the user has decided.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-4-deterministic-before-interpretive
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-4-deterministic-before-interpretive
+- principle-different-information-contracts [constraint] :: Principle 8.3: the Focus tree is low information density and only navigates, while the Overview card is high density and helps identify each direction.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-3-focus-与-overview-使用不同的信息契约
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-3-focus-与-overview-使用不同的信息契约
+- principle-execution-is-context [constraint] :: Principle 8.6: worktrees, diffs and file changes attach to a Thread but never become a new first-class navigation system.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-6-execution-is-context-not-product-structure
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-6-execution-is-context-not-product-structure
+- principle-familiar-first [constraint] :: Principle 8.7: Branch from here is the standard entry every user understands, and the Peel drag may not become the only way in.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-7-familiar-first-high-bandwidth-second
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-7-familiar-first-high-bandwidth-second
+- principle-graph-underneath-chat-on-top [constraint] :: Principle 8.2: the Focus chat uses full screen-space layout and is never scaled inside a canvas node.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-2-graph-underneath-chat-on-top
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-2-graph-underneath-chat-on-top
+- principle-stable-spatial-memory [constraint] :: Principle 8.5: the positions of existing nodes are not reshuffled because a new node was added.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-5-stable-spatial-memory
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-5-stable-spatial-memory
+- project-entry-actions [contract] :: From project entry the user can open an existing Space, search an existing Codex chat, create a Space from a chat, or add a chat to an existing Space.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-1-project-entry
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-1-project-entry
+- project-entry-surface [contract] :: On entering a Codex Project the user sees existing Spaces and recent Codex chats with search, not an automatic chat graph.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-1-project-entry
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-1-project-entry
+- subagent-card-presentation [contract] :: A parent thread card shows a subagent count, and hovering reveals each agent's name, role, task and status.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-11-subagent-activity
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-11-subagent-activity
+- subagent-info-sources-no-summary [constraint] :: Subagent detail is drawn from real fields — agent name, role, first delegated task, runtime status and latest completed result snippet — and no additional summary is generated.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-11-subagent-activity
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-11-subagent-activity
+- voice-dictation-flow [contract] :: The composer carries a microphone: record, transcribe, insert editable text into the composer, let the user review or edit, then send.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-9-voice-dictation
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-9-voice-dictation
+- voice-dictation-requirements [constraint] :: Dictation and typing share one draft, the transcript must be editable before sending, drafts are stored per thread and survive thread switches, Overview has no composer so no recording, and no custom vocabulary or keyword prompts are added.
+    source: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-9-voice-dictation
+    evidence: docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-9-voice-dictation
+
+## Coverage exceptions, with stated reasons
+
+### product/domain-model
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#7-core-domain-model
+    Bare section heading for chapter 7 with no body; the six domain objects are subsections 7.1 through 7.6, each a separate segment and extracted there.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#10-space-lifecycle
+    Bare section heading for chapter 10 with no body; the six lifecycle operations are subsections and are extracted as their own segments.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#11-source-of-truth
+    Bare section heading for chapter 11 with no body; the ownership split is carried by the Codex Owns, Our App Owns and Shared but Synchronized subsections, extracted separately.
+
+### product/positioning
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#2-why-为什么需要这个产品
+    Bare section heading for chapter 2 with no body; every claim it introduces is carried by subsections 2.1 through 2.4, which are separate segments and are extracted there.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#4-goals
+    Section heading plus a single framing line (V0 必须实现以下价值) that announces the list; the five goals themselves are subsections 4.1 through 4.5, extracted as their own segments.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#6-target-user
+    Bare section heading for chapter 6 with no body; the user definition and jobs to be done are the Primary User and Jobs to Be Done subsections, extracted separately.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#15-risks-and-mitigations
+    Bare section heading for chapter 15 with no body; each of the six risks and its mitigations is a separate segment and is extracted there.
+
+### product/prototype
+- docs/product/source/peel-demo-v0-original.html#L61-117
+    Presentational CSS only: rules for the top tabs and actions, the page-panel and app-window frames, and every product-sidebar element down to the profile block. It states no product claim of its own — the values it consumes (palette, sidebar and tree widths, shadows) are declared in the :root token block of L1-60 and are captured there, and the meaning of the sidebar it styles is carried by the sidebar markup and its toast copy in L233-292 and captured there. Extracting from these lines would either restate one of those two Contexts or record styling that a restyle would invalidate without changing any product decision.
+
+### product/scope
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#12-v0-functional-scope
+    Bare section heading for chapter 12 with no body; the P0 and P1 lists are its two child segments and are extracted there.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#13-ux-acceptance-criteria
+    Bare section heading for chapter 13 with no body; the four acceptance groups Focus Fidelity, Fork, Overview and Naming are child segments and are extracted separately.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#14-success-metrics
+    Bare section heading for chapter 14 with no body; the four metric groups Activation, Core Utility, Reliability and Dogfood Signals are child segments and are extracted separately.
+
+### product/ux/fork-flow
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-4-branch-from-here
+    Bare subsection heading for 9.4 with no body; the fork flow is carried by its own child segments Entry, Fork Draft, Execution Location, First-send Commit and Branched From, each extracted separately.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-5-thread-naming
+    Bare subsection heading for 9.5 with no body; the four naming stages and inline rename are child segments and are extracted there.
+
+### product/ux/overview
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-7-spatial-layout
+    Bare subsection heading for 9.7 with no body; the layout rules are carried by its child segments Initial Placement, Manual Position, Tidy Layout and Edge, each extracted separately.
+
+### product/ux
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#8-product-design-principles
+    Bare section heading for chapter 8 with no body; the seven principles are subsections 8.1 through 8.7, each a separate segment and extracted there.
+- docs/product/source/spatial-thread-workspace-prd-v0-original.md#9-core-user-journey
+    Bare section heading for chapter 9 with no body; the twelve journey steps are subsections 9.1 through 9.12, extracted as their own segments across this room and its fork-flow and overview sub-rooms.
