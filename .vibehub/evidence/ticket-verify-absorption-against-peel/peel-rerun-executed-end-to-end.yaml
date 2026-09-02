@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "rerun"
+  ],
+  "evidence_id": "peel-rerun-executed-end-to-end",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "scratch-repo:/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-vibehub-history-folder-0c57f2/9168e6b3-7571-4afb-a824-6fef3ad3de32/scratchpad/peel-rerun",
+    "commit:3dd6807 pass 4/5: extract prototype room; uncovered_total reaches 0",
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "command:git -C ~/Peel status --porcelain (identical before and after the run)"
+  ],
+  "schema_version": 1,
+  "summary": "Peel's two source files were absorbed end to end through the bulk path in a scratch repository, and ~/Peel was not modified. The scratch repo at scratchpad/peel-rerun holds copies of spatial-thread-workspace-prd-v0-original.md (1369 lines) and peel-demo-v0-original.html (672 lines). Pass 1 cut them into 96 markdown-heading segments and 12 line-window segments, 108 total. Passes 2 and 3 produced and human-approved an eight-Room tree (product, positioning, domain-model, ux, ux/fork-flow, ux/overview, scope, prototype) with per-Room segment anchors. This run executed Passes 4 and 5 following skills/vibehub-ingest/references/bulk-absorption.md, walking every segment Room by Room sequentially -- the reference's documented path for a harness without subagents -- and writing 138 Contexts plus 16 coverage_exceptions. Work is committed in the scratch repo across five commits ending at 3dd6807, with a clean working tree. git -C ~/Peel status --porcelain was captured before the run and again after it and the two outputs are identical: five modified files under apps/desktop and nine untracked paths, all pre-existing and none touched by this run. No file under ~/Peel was read for writing or edited at any point.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

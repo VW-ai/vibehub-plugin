@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "last-hash-wins",
+      "criterion": "`parseAnchor` splits an anchor at its last `#`. A Room anchoring the segment id `source segment` emits for a file whose path contains `#` resolves to exactly that segment, reports it under that Room's coverage, and does not appear in `unresolved_anchors`."
+    },
+    {
+      "acceptance_id": "prefix-collision-is-honest",
+      "criterion": "A path-prefix anchor is judged against the real path: anchoring `docs/a` does not collide with a segment of `docs/a#b.md` unless `docs/a` is a genuine path-segment-boundary prefix of it, matching how prefix anchors already behave for files without `#`."
+    },
+    {
+      "acceptance_id": "alignment-survives-a-documented-reput",
+      "criterion": "Pass 4 of `skills/vibehub-ingest/references/bulk-absorption.md` names `alignment` explicitly among the fields to carry through when re-putting a Room to record a `coverage_exception`, so following the documented path does not silently drop a Room's stamp."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover a segment id whose file path contains `#` resolving correctly, a prefix anchor that must not collide with such a file, a prefix anchor that must still collide, and a Room re-put with its alignment carried through keeping its drift state."
+    }
+  ],
+  "constraints": [
+    "Do not change how segments are computed; `source segment` stays the single definition.",
+    "Do not make room put preserve alignment implicitly. The write must never stamp; the fix is documentation, so that what the stamp says stays a property of what the caller wrote.",
+    "Do not weaken the overlapping-territory rule while fixing the parse."
+  ],
+  "context": "Two defects the segment-anchor adjudication surfaced and recorded as follow-ups rather than criterion failures. First: parseAnchor splits an anchor at the FIRST '#', so for a source file at docs/a#b.md the id `source segment` itself emits, docs/a#b.md#_preamble, resolves to nothing when a Room anchors it — it lands in unresolved_anchors — and a sibling anchoring the prefix docs/a is spuriously rejected as overlapping. Splitting at the last '#' closes the emitted-id half without touching segmentation, which the anchor Ticket was constrained not to change. Second: room put is a whole-document replace that keeps only what the caller passes, so a Room re-put without its alignment block loses the stamp and reports UNKNOWN / never aligned. Pass 4 of bulk-absorption.md tells the Agent to re-put a Room purely to add a coverage_exception and says to carry existing fields through without naming alignment, which is the exact sharp edge.",
+  "context_refs": [
+    {
+      "purpose": "parseAnchor, anchorsCollide, and the room put write path.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Records the broken closed-form claim and names the fix.",
+      "ref": ".vibehub/outcomes/ticket-anchor-rooms-to-source-segments.yaml"
+    },
+    {
+      "purpose": "Pass 4's re-put instruction that omits alignment.",
+      "ref": "skills/vibehub-ingest/references/bulk-absorption.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "An anchor naming a segment of a source file whose path contains # resolves to that segment, and Pass 4 tells the Agent to carry a Room's alignment through a re-put.",
+  "provenance_refs": [
+    "conversation:2026-09-01-segment-anchor-closeout",
+    "commit:cd5591f"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-parse-anchors-at-the-last-hash"
+}

@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "no-prompted-recovery"
+  ],
+  "evidence_id": "zero-reached-without-prompted-recovery",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo <scratch> (run at baseline, per Room, and at the end)",
+    "scratch-repo commits: d72113f product, positioning, domain-model, ux/fork-flow/overview/scope, 3dd6807 prototype",
+    "skills/vibehub-ingest/references/bulk-absorption.md (Pass 5: absorption is not complete while uncovered_total is non-zero)"
+  ],
+  "schema_version": 1,
+  "summary": "Stated plainly: it is true. Coverage reached zero through the pipeline's own passes, and no user message during this run asked whether content had been missed. The run received one instruction at the start, to execute Passes 4 and 5 against the approved tree; there was no further user turn before uncovered_total reached 0. The work list at every step came from context coverage output rather than from a person noticing a gap: the baseline envelope was confirmed at 108 uncovered before extraction began, each Room was settled and re-checked with context coverage --room, and the last outstanding item -- peel-demo-v0-original.html#L61-117, surfaced by the command after the prototype Room's 26 Contexts were written -- was found by running the command, not by being told. This is the contrast the criterion targets: the checked-in Peel baseline reached 32 Contexts only after a human asked what had been lost, whereas here the segment list made the remainder computable and the recovery step never had to be prompted.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

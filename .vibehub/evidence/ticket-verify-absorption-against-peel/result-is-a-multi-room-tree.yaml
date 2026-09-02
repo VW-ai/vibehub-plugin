@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "tree-multi-room"
+  ],
+  "evidence_id": "result-is-a-multi-room-tree",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "scratch-repo:.vibehub/rooms/ -- product 10, positioning 25, domain-model 21, ux 23, ux/fork-flow 13, ux/overview 8, scope 12, prototype 26 (138 total)",
+    "baseline:~/Peel/.vibehub/rooms/product/ -- 32 Contexts in a single room",
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo <scratch> -> 8 rooms, each uncovered 0",
+    "commit:3dd6807 pass 4/5: extract prototype room; uncovered_total reaches 0"
+  ],
+  "schema_version": 1,
+  "summary": "The result is eight Rooms, and no single Room holds everything. Per-Room Context counts, taken by counting the .yaml files in each Room directory excluding room.yaml at the time of writing: product 10, product/positioning 25, product/domain-model 21, product/ux 23, product/ux/fork-flow 13, product/ux/overview 8, product/scope 12, product/prototype 26. Total 138 Contexts across 8 Rooms. The largest Room, prototype, holds 26 of 138, which is 19 percent; the root product Room holds 10, which is 7 percent, so the tree did not collapse onto the root. Every Room anchors its own segments and settles its own coverage independently, all eight reporting uncovered 0. The checked-in baseline at ~/Peel/.vibehub/rooms/product/ is one Room holding 32 Contexts, of which the Ticket records only 13 as deriving from these two files; this run produced 138 Contexts from the same two files distributed across eight Rooms. Cross-Room reconciliation was run at merge as the reference requires: all 138 context_ids are unique and no cross-Room pair of summaries exceeded a 0.34 token-overlap similarity, the highest being 0.33 between prototype/status-visual-encoding and ux/four-attention-statuses, which are distinct claims -- one the PRD's status vocabulary, the other the prototype's visual encoding of it. This Evidence reports structure and counts only; whether the split is more usable than the baseline is the separate human-authority criterion and is not judged here.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}

@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "coverage-zero"
+  ],
+  "evidence_id": "coverage-reaches-zero-uncovered",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-02T00:00:00Z",
+  "refs": [
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo <scratch> -> {\"files_examined\":8,\"segments_total\":108,\"uncovered_total\":0}",
+    "scratch-repo:.vibehub/rooms/**/room.yaml (16 coverage_exceptions entries with reasons)",
+    "commit:3dd6807 pass 4/5: extract prototype room; uncovered_total reaches 0"
+  ],
+  "schema_version": 1,
+  "summary": "vh.mjs context coverage reports zero uncovered segments across both source files. The final envelope, taken from the command's own output at the time of writing: files_examined 8, segments_total 108, uncovered_total 0, with every one of the eight Rooms reporting uncovered 0 and unresolved_anchors []. The 108 segments are the 96 markdown-heading segments of the PRD and the 12 line-window segments of the HTML. 92 segments were settled by Contexts citing the exact segment id in source.ref and evidence[].ref -- no citation was widened to a bare file path -- and 16 by coverage_exceptions entries. All 16 exceptions carry a stated reason. Fifteen are structural: fourteen bare section headings whose body is entirely in child segments extracted separately (2-why, 6-target-user, 15-risks-and-mitigations, 7-core-domain-model, 10-space-lifecycle, 11-source-of-truth, 8-product-design-principles, 9-core-user-journey, 9-4-branch-from-here, 9-5-thread-naming, 9-7-spatial-layout, 12-v0-functional-scope, 13-ux-acceptance-criteria, 14-success-metrics) plus 4-goals, a heading with one framing line announcing the list its subsections carry. The sixteenth is peel-demo-v0-original.html#L61-117, presentational CSS for the top bar and sidebar chrome, exempted because the token values it consumes are declared and captured in L1-60 and the meaning of the sidebar it styles is captured from the markup in L233-292, so any extraction there would restate an existing Context or record styling that a restyle would invalidate. No exception was widened to make the count fall; each names what the segment contains and where its content was captured instead.",
+  "ticket_id": "ticket-verify-absorption-against-peel"
+}
