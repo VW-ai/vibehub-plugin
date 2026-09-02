@@ -185,8 +185,11 @@ test("the closeout Skill names exactly the independence sources the engine accep
   assert.deepEqual(accepted, ["different_human", "separate_session", "subagent"]);
 
   const skill = bodies.get("vibehub-ticket-closeout");
-  const named = accepted.filter((source) => skill.includes(`\`${source}\``));
-  assert.deepEqual(named, accepted, "every engine-accepted source must be named in the Skill");
+  const named = [...skill.matchAll(/`([a-z_]+)`/g)]
+    .map((match) => match[1])
+    .filter((word) => word.includes("_") || word === "subagent");
+  assert.deepEqual([...new Set(named)].sort(), accepted,
+    "the Skill must name every engine-accepted source and no others");
   const schema = JSON.parse(readFileSync(
     join(root, "skills", "vibehub-core", "contracts", "outcome.schema.json"),
     "utf8",
@@ -211,7 +214,7 @@ test("closeout without a declared independence source writes no Outcome", () => 
     kind: "ticket_outcome",
     ticket_id: "subject-work",
     status: "successful",
-    accepted_acceptance_ids: ["acceptance-1"],
+    accepted_acceptance_ids: ["works"],
     unresolved_acceptance_ids: [],
     evidence_ids: [],
     summary: "contract test",
@@ -225,11 +228,27 @@ test("closeout without a declared independence source writes no Outcome", () => 
     false,
     "a refused closeout must leave no Outcome behind",
   );
+  // The criterion is that a refused closeout leaves the Ticket at CLOSE_OUT, so
+  // the fixture must actually be routing there: give every criterion Evidence.
+  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "subject-work-proof",
+    ticket_id: "subject-work",
+    acceptance_ids: ["works"],
+    summary: "contract test",
+    refs: ["conversation:contract-test"],
+    recorded_at: "2026-09-02T00:00:00.000Z",
+  })).ok, true);
+  const routed = invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: "subject-work" }));
+  assert.equal(routed.data.next_action.action, "CLOSE_OUT");
+  const refusedAgain = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, outcome));
+  assert.equal(refusedAgain.error.code, "missing_independence");
   assert.equal(
     invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: "subject-work" }))
       .data.next_action.action,
-    "EXECUTE",
-    "the Ticket keeps routing as work, not as adjudicated",
+    "CLOSE_OUT",
+    "a refused closeout leaves the Ticket awaiting adjudication, not adjudicated",
   );
 
   const rejected = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
@@ -250,7 +269,7 @@ test("ticket apply records whether an independent Agent validated the batch", ()
   assert.equal(undeclared.error.code, "missing_validation_declaration");
   assert.equal(existsSync(join(repo, ".vibehub", "tickets", "undeclared-work.yaml")), false);
 
-  for (const [independent, expected] of [[true, "validation:independent"], [false, "validation:none"]]) {
+  for (const [independent, expected] of [[true, "plan-validation:independent"], [false, "plan-validation:none"]]) {
     const id = independent ? "validated-work" : "skipped-work";
     assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
       validation: { independent, note: "contract test" },
@@ -261,16 +280,83 @@ test("ticket apply records whether an independent Agent validated the batch", ()
       written.data.ticket.provenance_refs.includes(expected),
       `${id} must carry ${expected}`,
     );
+    // Re-applying must replace, not accumulate.
+    assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+      validation: { independent, note: "contract test" },
+      tickets: [written.data.ticket],
+    })).ok, true);
+    const again = invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: id }));
+    assert.deepEqual(
+      again.data.ticket.provenance_refs.filter((ref) => ref.startsWith("plan-validation:")),
+      [expected],
+      "a rerun records exactly one plan-validation ref",
+    );
   }
+
+  // The bare `validation:` namespace already carries a different meaning in
+  // checked-in Tickets; recording must not touch it.
+  const preserved = ticket("history-work");
+  preserved.provenance_refs = ["validation:ticket-that-validated-this"];
+  assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+    validation: { independent: true, note: "contract test" },
+    tickets: [preserved],
+  })).ok, true);
+  assert.deepEqual(
+    invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: "history-work" }))
+      .data.ticket.provenance_refs,
+    ["validation:ticket-that-validated-this", "plan-validation:independent"],
+    "an existing validation: ref survives the recording",
+  );
 });
 
-test("the declared independence source reaches a reader and the Workbench", () => {
-  const ui = readFileSync(join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs"), "utf8");
-  assert.match(
-    ui,
-    /outcomeRecord:\s*outcome\b/u,
-    "the subject projection must carry the whole Outcome document, so a new field like independence reaches the Workbench without a second allowlist to update",
-  );
+test("the declared independence source reaches a reader and the Workbench", async () => {
+  const repo = tempRepo("independence-visible");
+  assert.equal(invoke(repo, "project", "init").ok, true);
+  assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+    validation: { independent: true, note: "contract test" },
+    tickets: [ticket("judged-work")],
+  })).ok, true);
+  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "judged-work-proof",
+    ticket_id: "judged-work",
+    acceptance_ids: ["works"],
+    summary: "contract test",
+    refs: ["conversation:contract-test"],
+    recorded_at: "2026-09-02T00:00:00.000Z",
+  })).ok, true);
+  assert.equal(invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "judged-work",
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["judged-work-proof"],
+    summary: "contract test",
+    closed_at: "2026-09-02T00:01:00.000Z",
+    independence: { source: "separate_session", note: "contract test" },
+  })).ok, true);
+
+  // A reader of the checked-in document sees it.
+  const written = readFileSync(join(repo, ".vibehub", "outcomes", "judged-work.yaml"), "utf8");
+  assert.match(written, /separate_session/u);
+
+  // And so does the Log, which is the surface the closeout Skill sends them to.
+  const { buildUiTrace, loadRepository } = await import(
+    join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs")
+  ).catch(() => ({}));
+  if (typeof buildUiTrace === "function" && typeof loadRepository === "function") {
+    const trace = buildUiTrace(loadRepository(repo), "judged-work");
+    const entry = JSON.stringify(trace);
+    assert.match(entry, /separate_session/u, "the Log must show the declared source");
+    assert.match(entry, /declared, unverified/u, "and must say it is unverified");
+  } else {
+    const ui = readFileSync(join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs"), "utf8");
+    assert.match(ui, /independence: outcome\.independence \?\? null/u);
+    assert.match(ui, /declared, unverified/u);
+  }
   const closeout = bodies.get("vibehub-ticket-closeout");
   assert.match(
     closeout,

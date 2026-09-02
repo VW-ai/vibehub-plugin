@@ -93,10 +93,17 @@ is implied.
    material-risk choice remains blocked for the user; ordinary engineering fog
    does not. When no independent Agent is available, say so rather than
    passing over it: step 7 requires the batch to declare which happened.
-7. Apply the unchanged passing batch:
+7. Apply the unchanged passing batch. The input declares whether step 6
+   actually happened; the engine refuses a batch that does not say, and records
+   the answer on every Ticket it writes as a `plan-validation:independent` or
+   `plan-validation:none` provenance ref, so a skip stays visible afterwards:
 
    ```text
    node ../vibehub-core/scripts/vh.mjs ticket apply --repo <root> --input <tickets.json>
+   ```
+
+   ```json
+   { "validation": { "independent": true, "note": "..." }, "tickets": [ ... ] }
    ```
 
    Read any structured `advice` in the success envelope. A completed-dependency

@@ -617,9 +617,16 @@ function outcomeTrace(outcome, source) {
     unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
     occurredAt: outcome.closed_at,
     summary: outcome.summary,
+    // The Log is where the closeout Skill sends a reader, so the declared
+    // independence source has to survive this allowlist or it is invisible on
+    // the surface that matters. Unverified by design: shown, never trusted.
+    independence: outcome.independence ?? null,
     body: [
       `Accepted: ${outcome.accepted_acceptance_ids.join(", ") || "none"}`,
       `Unresolved: ${outcome.unresolved_acceptance_ids.join(", ") || "none"}`,
+      outcome.independence
+        ? `Independence: ${outcome.independence.source} (declared, unverified)`
+        : "Independence: not declared",
     ].join("\n"),
     targets: [{
       ...typedReference(source, outcomeRef),

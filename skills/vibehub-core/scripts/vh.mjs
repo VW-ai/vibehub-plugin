@@ -1258,12 +1258,17 @@ function ticketOperation(operation, repo, input, options = {}) {
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
-    const validationRef = input.validation.independent ? "validation:independent" : "validation:none";
+    // Namespaced deliberately: bare `validation:` is already used in checked-in
+    // Tickets to name the Ticket or decision that validated a claim, and
+    // rewriting that would erase history on every re-apply.
+    const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
     const written = [];
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
-      const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("validation:"));
-      writeDocument(path, { ...ticket, provenance_refs: [...provenance, validationRef] });
+      const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:"));
+      const recorded = { ...ticket, provenance_refs: [...provenance, validationRef] };
+      assertValid(validateTicket(recorded, `tickets[${ticket.ticket_id}]`), "Ticket candidate is invalid");
+      writeDocument(path, recorded);
       written.push(path);
     }
     return {

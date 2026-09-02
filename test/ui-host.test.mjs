@@ -173,7 +173,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     prerequisiteTicketId: "foundation",
     dependentTicketId: "feature",
     rationale: "feature needs foundation.",
-    provenanceRefs: ["test:ticket-vertical-slice", "validation:none"],
+    provenanceRefs: ["test:ticket-vertical-slice", "plan-validation:none"],
   });
 });
 
