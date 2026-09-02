@@ -59,7 +59,7 @@ function exerciseInstalledHelper(helper, label) {
     relations: [],
     provenance_refs: ["test:host-marketplaces"],
   };
-  assert.equal(invoke(helper, current, "ticket", "apply", { tickets: [baseTicket] }).status, 0);
+  assert.equal(invoke(helper, current, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [baseTicket] }).status, 0);
   assert.equal(invoke(helper, current, "ticket", "evidence", {
     schema_version: 1,
     kind: "ticket_evidence",
@@ -72,7 +72,7 @@ function exerciseInstalledHelper(helper, label) {
   }).status, 0);
   assert.equal(invoke(helper, current, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "completed-baseline",
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -91,7 +91,7 @@ function exerciseInstalledHelper(helper, label) {
       rationale: "Consumes the exact completed artifact.",
     }],
   };
-  const advised = invoke(helper, current, "ticket", "apply", { tickets: [consumer] });
+  const advised = invoke(helper, current, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [consumer] });
   assert.equal(advised.status, 0);
   assert.deepEqual(
     advised.envelope.data.advice.map(({ code, level, blocking, ticket_id, target_ticket_id }) => ({
@@ -109,7 +109,7 @@ function exerciseInstalledHelper(helper, label) {
   const migration = temporaryRoot(`vibehub-${label}-migration-`);
   mkdirSync(join(migration, ".vibehub", "rooms"), { recursive: true });
   const migrationCompatibility = invoke(helper, migration, "project", "compatibility");
-  const refusedLegacyWrite = invoke(helper, migration, "ticket", "apply", { tickets: [] });
+  const refusedLegacyWrite = invoke(helper, migration, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] });
 
   const newer = temporaryRoot(`vibehub-${label}-newer-`);
   assert.equal(invoke(helper, newer, "project", "init").status, 0);
@@ -118,7 +118,7 @@ function exerciseInstalledHelper(helper, label) {
     `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 3 })}\n`,
   );
   const newerCompatibility = invoke(helper, newer, "project", "compatibility");
-  const refusedNewerWrite = invoke(helper, newer, "ticket", "apply", { tickets: [] });
+  const refusedNewerWrite = invoke(helper, newer, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] });
 
   assert.equal(refusedLegacyWrite.envelope.error.code, "format_mismatch");
   assert.equal(refusedNewerWrite.envelope.error.code, "format_mismatch");

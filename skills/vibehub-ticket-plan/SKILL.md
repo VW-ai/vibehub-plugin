@@ -88,10 +88,11 @@ is implied.
    an explicit non-empty causal rationale; otherwise move the exact Ticket,
    Outcome, Evidence, Context, or source file into `context_refs`. Do not
    manufacture migration, review, or dogfood stages.
-6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate
-   when an independent Agent is available. The validator is read-only. A
-   protected product, permission, or material-risk choice remains blocked for
-   the user; ordinary engineering fog does not.
+6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate.
+   The validator is read-only. A protected product, permission, or
+   material-risk choice remains blocked for the user; ordinary engineering fog
+   does not. When no independent Agent is available, say so rather than
+   passing over it: step 7 requires the batch to declare which happened.
 7. Apply the unchanged passing batch:
 
    ```text

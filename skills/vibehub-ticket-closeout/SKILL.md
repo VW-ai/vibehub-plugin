@@ -9,7 +9,17 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
 > the host marketplace) before continuing; every VibeHub Skill needs that folder.
 
-The closeout Agent must be independent from the executor.
+The closeout Agent must be independent from the executor. Independence comes
+from exactly one of three sources, and you must state which you used:
+
+- `subagent` — a fresh Agent with no context from the execution
+- `separate_session` — a session started from the copied read-only handoff
+- `different_human` — a person other than whoever ran the work
+
+If you can obtain none of them, **stop**. Write no Outcome, say which sources
+you tried, and report that this Ticket cannot be adjudicated from here. An
+executor grading its own work is the one failure this Skill exists to prevent,
+and `ticket closeout` rejects an Outcome that declares no source.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 Read `../vibehub-core/contracts/acceptance-authority.md`. A human-authority criterion can be
@@ -32,7 +42,10 @@ This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
    accept an executor's summary as proof.
 3. Create one complete Outcome using `../vibehub-core/contracts/outcome.schema.json`.
    `successful` requires every criterion accepted with referenced Evidence.
-   Use `partial`, `failed`, or `deviated` honestly otherwise.
+   Use `partial`, `failed`, or `deviated` honestly otherwise. Carry
+   `independence: { source, note }` naming how you were independent; the engine
+   records that claim and never verifies it, so a reader can see what was
+   asserted but not that it was true.
 4. Persist it:
 
    ```text

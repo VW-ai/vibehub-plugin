@@ -586,6 +586,11 @@ function validateEvidence(document, path = "evidence") {
   return errors;
 }
 
+// A closeout Agent must be independent from the executor. The engine cannot
+// verify that claim and must not try; it requires the claim to be made, so an
+// absent one is a rejected write rather than a silent self-adjudication.
+const INDEPENDENCE_SOURCES = new Set(["subagent", "separate_session", "different_human"]);
+
 function validateOutcome(document, path = "outcome") {
   const errors = [];
   if (
@@ -602,6 +607,7 @@ function validateOutcome(document, path = "outcome") {
         "evidence_ids",
         "summary",
         "closed_at",
+        "independence",
       ]),
       path,
     )
@@ -616,6 +622,21 @@ function validateOutcome(document, path = "outcome") {
   requiredString(errors, document, "summary", path);
   requiredString(errors, document, "closed_at", path);
   if (Number.isNaN(Date.parse(document.closed_at))) add(errors, `${path}.closed_at`, "must be an ISO-compatible date-time");
+  // Optional on read so the Outcomes written before this contract stay valid;
+  // `ticket closeout` requires it when writing a new one.
+  if (document.independence !== undefined) {
+    const independence = document.independence;
+    if (typeof independence !== "object" || independence === null || Array.isArray(independence)) {
+      add(errors, `${path}.independence`, "must be an object");
+    } else if (!strictKeys(errors, independence, new Set(["source", "note"]), `${path}.independence`)) {
+      // strictKeys already recorded the unknown key
+    } else {
+      if (!INDEPENDENCE_SOURCES.has(independence.source)) {
+        add(errors, `${path}.independence.source`, `must be one of ${[...INDEPENDENCE_SOURCES].join(", ")}`);
+      }
+      if (independence.note !== undefined) requiredString(errors, independence, "note", `${path}.independence`);
+    }
+  }
   return errors;
 }
 
@@ -1213,6 +1234,18 @@ function ticketOperation(operation, repo, input, options = {}) {
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
       throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
     }
+    // The plan Skill asks a separate Agent to validate a candidate "when an
+    // independent Agent is available". Left implicit, an unavailable one is
+    // indistinguishable from an unasked one. The declaration is required so a
+    // skip is recorded rather than merely undetected; like the closeout
+    // declaration, the engine records the claim and never verifies it.
+    if (typeof input.validation !== "object" || input.validation === null
+      || typeof input.validation.independent !== "boolean") {
+      throw new VibeHubError(
+        "missing_validation_declaration",
+        'ticket apply needs a validation declaration: {"validation":{"independent":true|false,"note":"..."}}. State whether a separate Agent validated this candidate; an unrecorded skip is not permitted.',
+      );
+    }
     const errors = input.tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
     const ids = new Set();
     for (const ticket of input.tickets) {
@@ -1225,10 +1258,12 @@ function ticketOperation(operation, repo, input, options = {}) {
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
+    const validationRef = input.validation.independent ? "validation:independent" : "validation:none";
     const written = [];
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
-      writeDocument(path, ticket);
+      const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("validation:"));
+      writeDocument(path, { ...ticket, provenance_refs: [...provenance, validationRef] });
       written.push(path);
     }
     return {
@@ -1250,6 +1285,12 @@ function ticketOperation(operation, repo, input, options = {}) {
   }
   if (operation === "closeout") {
     assertCurrentProjectFormat(repo);
+    if (input.independence === undefined) {
+      throw new VibeHubError(
+        "missing_independence",
+        `ticket closeout needs an independence declaration: {"independence":{"source":"<${[...INDEPENDENCE_SOURCES].join("|")}>","note":"..."}}. The closeout Agent must be independent from the executor; if no independent source is available, stop and report that rather than adjudicating your own work.`,
+      );
+    }
     const errors = validateOutcome(input);
     assertValid(errors, "Outcome document is invalid");
     const repository = loadRepository(repo, { outcomes: [input] });

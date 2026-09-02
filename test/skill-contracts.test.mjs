@@ -8,7 +8,15 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { helper, root } from "./helpers.mjs";
+import { helper, root, tempRepo, ticket } from "./helpers.mjs";
+import { writeFileSync } from "node:fs";
+
+let inputSeq = 0;
+function writeInput(repo, document) {
+  const path = join(repo, `.input-${(inputSeq += 1)}.json`);
+  writeFileSync(path, JSON.stringify(document));
+  return path;
+}
 
 const skillNames = readdirSync(join(root, "skills"), { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && entry.name.startsWith("vibehub-"))
@@ -163,4 +171,110 @@ test("human decision boundaries stay in the Ticket graph", () => {
   assert.match(bodies.get("vibehub-ticket-run"), /split out a new\s+human-decision Ticket/u);
   assert.match(bodies.get("vibehub-ticket-validate"), /represented by direct\s+Ticket dependencies/u);
   assert.match(bodies.get("vibehub-ticket-validate"), /remain `maturity: draft`/u);
+});
+
+// An executor grading its own work is the failure vibehub-ticket-closeout
+// exists to prevent, and prose alone cannot prevent it. These weld the Skill's
+// named independence sources to the set the engine actually accepts, and prove
+// the engine refuses the write rather than merely discouraging it.
+test("the closeout Skill names exactly the independence sources the engine accepts", () => {
+  const engine = readFileSync(helper, "utf8");
+  const declared = engine.match(/const INDEPENDENCE_SOURCES = new Set\(\[([^\]]*)\]\)/);
+  assert.ok(declared, "vh.mjs must declare INDEPENDENCE_SOURCES");
+  const accepted = [...declared[1].matchAll(/"([a-z_]+)"/g)].map((match) => match[1]).sort();
+  assert.deepEqual(accepted, ["different_human", "separate_session", "subagent"]);
+
+  const skill = bodies.get("vibehub-ticket-closeout");
+  const named = accepted.filter((source) => skill.includes(`\`${source}\``));
+  assert.deepEqual(named, accepted, "every engine-accepted source must be named in the Skill");
+  const schema = JSON.parse(readFileSync(
+    join(root, "skills", "vibehub-core", "contracts", "outcome.schema.json"),
+    "utf8",
+  ));
+  assert.deepEqual([...schema.properties.independence.properties.source.enum].sort(), accepted);
+  assert.ok(
+    !schema.required.includes("independence"),
+    "independence stays optional in the schema so Outcomes written before it remain readable",
+  );
+});
+
+test("closeout without a declared independence source writes no Outcome", () => {
+  const repo = tempRepo("closeout-independence");
+  assert.equal(invoke(repo, "project", "init").ok, true);
+  assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+    validation: { independent: false, note: "contract test" },
+    tickets: [ticket("subject-work")],
+  })).ok, true);
+
+  const outcome = {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "subject-work",
+    status: "successful",
+    accepted_acceptance_ids: ["acceptance-1"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: [],
+    summary: "contract test",
+    closed_at: "2026-09-02T00:00:00.000Z",
+  };
+  const refused = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, outcome));
+  assert.equal(refused.ok, false);
+  assert.equal(refused.error.code, "missing_independence");
+  assert.equal(
+    existsSync(join(repo, ".vibehub", "outcomes", "subject-work.yaml")),
+    false,
+    "a refused closeout must leave no Outcome behind",
+  );
+  assert.equal(
+    invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: "subject-work" }))
+      .data.next_action.action,
+    "EXECUTE",
+    "the Ticket keeps routing as work, not as adjudicated",
+  );
+
+  const rejected = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
+    ...outcome, independence: { source: "myself" },
+  }));
+  assert.equal(rejected.ok, false);
+  assert.equal(rejected.error.code, "validation_error");
+});
+
+test("ticket apply records whether an independent Agent validated the batch", () => {
+  const repo = tempRepo("apply-validation");
+  assert.equal(invoke(repo, "project", "init").ok, true);
+
+  const undeclared = invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+    tickets: [ticket("undeclared-work")],
+  }));
+  assert.equal(undeclared.ok, false);
+  assert.equal(undeclared.error.code, "missing_validation_declaration");
+  assert.equal(existsSync(join(repo, ".vibehub", "tickets", "undeclared-work.yaml")), false);
+
+  for (const [independent, expected] of [[true, "validation:independent"], [false, "validation:none"]]) {
+    const id = independent ? "validated-work" : "skipped-work";
+    assert.equal(invoke(repo, "ticket", "apply", "--input", writeInput(repo, {
+      validation: { independent, note: "contract test" },
+      tickets: [ticket(id)],
+    })).ok, true);
+    const written = invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: id }));
+    assert.ok(
+      written.data.ticket.provenance_refs.includes(expected),
+      `${id} must carry ${expected}`,
+    );
+  }
+});
+
+test("the declared independence source reaches a reader and the Workbench", () => {
+  const ui = readFileSync(join(root, "skills", "vibehub-core", "scripts", "vh-ui.mjs"), "utf8");
+  assert.match(
+    ui,
+    /outcomeRecord:\s*outcome\b/u,
+    "the subject projection must carry the whole Outcome document, so a new field like independence reaches the Workbench without a second allowlist to update",
+  );
+  const closeout = bodies.get("vibehub-ticket-closeout");
+  assert.match(
+    closeout,
+    /records that claim and never verifies it/u,
+    "the Skill must say plainly that the declaration is unverified, so nobody reads it as proof",
+  );
 });

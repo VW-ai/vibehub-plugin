@@ -166,8 +166,7 @@ try {
   }, ["--room", "product"]);
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
-  invoke(helper, "ticket", "apply", {
-    tickets: [{
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
       schema_version: 2,
       kind: "ticket",
       ticket_id: "ticket-build-entry-fixture",
@@ -209,6 +208,7 @@ try {
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
+    independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-build-entry-fixture",
     status: "successful",
     accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
@@ -217,8 +217,7 @@ try {
     summary: "The installed artifact completed the executable entry Ticket.",
     closed_at: "2026-08-09T08:01:00.000Z",
   });
-  invoke(helper, "ticket", "apply", {
-    tickets: [{
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
       schema_version: 2,
       kind: "ticket",
       ticket_id: "ticket-human-authority-fixture",
@@ -250,6 +249,7 @@ try {
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
+    independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-human-authority-fixture",
     status: "successful",
     accepted_acceptance_ids: ["owner-confirms-authority"],

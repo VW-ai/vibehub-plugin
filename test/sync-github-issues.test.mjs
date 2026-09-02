@@ -30,7 +30,7 @@ function fixtureRepo() {
     relations: [{ type: "depends_on", target_ticket_id: "ticket-done", rationale: "needs it" }],
   })));
   writeFileSync(join(repo, ".vibehub", "outcomes", "ticket-done.yaml"), JSON.stringify({
-    schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-done", status: "successful",
+    schema_version: 1, kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" }, ticket_id: "ticket-done", status: "successful",
     accepted_acceptance_ids: ["a1", "a2"], unresolved_acceptance_ids: [], evidence_ids: ["proof-one", "owner-signoff"],
     summary: "All good.", closed_at: "2026-08-01T00:00:00Z",
   }));

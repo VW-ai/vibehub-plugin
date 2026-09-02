@@ -56,7 +56,7 @@ test("unversioned 0.4 and 0.5 shapes require migration and every write gate refu
     run(legacy05, "context", "put", {}, ["--room", "product"]),
     run(legacy05, "room", "align", undefined, ["--room", "product"]),
     run(legacy05, "room", "stale", { reason: "test" }, ["--room", "product"]),
-    run(legacy05, "ticket", "apply", { tickets: [] }),
+    run(legacy05, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] }),
     run(legacy05, "ticket", "evidence", {}),
     run(legacy05, "ticket", "closeout", {}),
   ];
@@ -96,7 +96,7 @@ test("malformed and unsupported-newer format markers fail read-only without muta
   assert.equal(compatibility.envelope.data.state, "UNSUPPORTED_NEWER");
   assert.equal(compatibility.envelope.data.current_format, 3);
   assert.equal(compatibility.envelope.data.target_format, 2);
-  const attemptedWrite = run(newer, "ticket", "apply", { tickets: [] });
+  const attemptedWrite = run(newer, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] });
   assert.equal(attemptedWrite.envelope.error.code, "format_mismatch");
   assert.equal(readFileSync(markerPath(newer), "utf8"), newerSource);
 });
