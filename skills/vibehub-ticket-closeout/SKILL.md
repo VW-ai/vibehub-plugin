@@ -18,8 +18,10 @@ from exactly one of three sources, and you must state which you used:
 - `different_human` — a person other than whoever ran the work
 <!-- independence-sources:end -->
 
-This list is the whole set. No other value is accepted, and naming one
-anywhere else in this document is a defect the contract tests catch.
+This list is the whole set: `ticket closeout` refuses any other value, and
+the contract tests hold the list and the engine to each other. Declaring a
+source anywhere but this list is a documentation defect no test catches — do
+not do it.
 
 If you can obtain none of them, **stop**. Write no Outcome, say which sources
 you tried, and report that this Ticket cannot be adjudicated from here. An

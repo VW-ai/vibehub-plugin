@@ -191,8 +191,26 @@ test("the closeout Skill names exactly the independence sources the engine accep
     /<!-- independence-sources:start -->\n([\s\S]*?)<!-- independence-sources:end -->/u,
   );
   assert.ok(region, "the Skill must delimit its declared source list");
-  const declared = [...region[1].matchAll(/^- `([a-z_]+)`/gmu)].map((match) => match[1]).sort();
-  assert.deepEqual(declared, accepted, "the declared list must equal the engine's set");
+  // Harvest source-shaped bullets from the whole document, not only the
+  // delimited region: a source declared in a bullet outside it is still a
+  // source the Skill names, and scoping the parse to the region is how the
+  // previous version let one through.
+  const declared = [...skill.matchAll(/^- `([a-z_]+)` — /gmu)].map((match) => match[1]).sort();
+  assert.deepEqual(declared, accepted, "every source-shaped bullet in the Skill must be an engine source, and every engine source must be a bullet");
+  const inRegion = [...region[1].matchAll(/^- `([a-z_]+)` — /gmu)].map((match) => match[1]).sort();
+  assert.deepEqual(inRegion, accepted, "and they must all live inside the delimited list");
+
+  // Restored: 7068be4 deleted these when it rewrote this test and replaced
+  // them with nothing, so the schema drifted unguarded.
+  const schema = JSON.parse(readFileSync(
+    join(root, "skills", "vibehub-core", "contracts", "outcome.schema.json"),
+    "utf8",
+  ));
+  assert.deepEqual([...schema.properties.independence.properties.source.enum].sort(), accepted);
+  assert.ok(
+    !schema.required.includes("independence"),
+    "independence stays optional in the schema so Outcomes written before it remain readable",
+  );
 
   const repo = tempRepo("independence-sources");
   assert.equal(invoke(repo, "project", "init").ok, true);
