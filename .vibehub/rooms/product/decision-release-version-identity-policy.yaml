@@ -1,0 +1,33 @@
+{
+  "context_id": "decision-release-version-identity-policy",
+  "detail": "Three rules, decided together. First, a change to content inside the artifact allowlist cannot land while the declared version still equals the last published release: the version string is what every host uses as its cache key, so a version that does not move is a version that lies. Second, that cost does not fall on each commit: main between releases carries a distinguishable pre-release identity, so the release number itself is only chosen at release time. Third, and this is the part that reaches users: VibeHub never forces an update. A project may sit on an older version indefinitely and nothing nags, auto-upgrades, or breaks. But an update that is taken is owned end to end — VibeHub is responsible for restructuring that user's existing project data into the new format, not for announcing that their format is stale and leaving them to it. The evidence that this third rule is currently unmet is the owner's own machine: three VibeHub projects, two of them write-blocked at MIGRATION_REQUIRED, with the owner unaware until a survey was run by hand. The update command on the supported install path is npx skills update, so this is where the obligation attaches. One design question is deliberately left open for the cross-project upgrade Ticket to answer rather than being settled here: whether the restructure is offered by the next Agent session that opens an affected project, or discovered and driven at update time across every project on the machine. The first is compatible with decision-agent-driven-upgrade-migration as written; the second would require amending it, since that decision forbids background conversion.",
+  "evidence": [
+    {
+      "note": "Owner stated the three rules and confirmed the restatement of them verbatim before this Context was written.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:00:00.000Z",
+    "quote": "改了就得升版本合理吧，这个配合上pre-release，同时我们可以不强制你非要更新啊，但是如果更新了那我们就要主动帮用户handle 原本的数据的重构的工作",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "A declared version must move whenever shipped content moves, main between releases carries a pre-release identity, updating is never forced, and an update that is taken must carry the user's data restructure with it",
+  "tags": [
+    "release",
+    "versioning",
+    "compatibility",
+    "migration",
+    "upgrade"
+  ],
+  "type": "decision"
+}
