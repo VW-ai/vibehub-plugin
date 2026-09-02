@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-surface-ownership-exists",
+      "criterion": "Refinement first establishes which Ticket owns the question of whether a cross-project surface exists at all — by replanning ticket-vibehub-cli to cover cross-project scope, or by creating the smallest new decision Ticket — and only then replans this same Ticket to firm with exact acceptance for the entry point and its install requirements, the bounded discovery scope and its exclusions, the per-project report, the pending-upgrade marker's location for unversioned projects and its removal as part of the migration diff, whether a local coding Agent is launched or a copy-paste prompt emitted, the explicit per-run choice about touching project data, and rerun safety."
+    }
+  ],
+  "constraints": [
+    "Preserve decision-agent-driven-upgrade-migration: no forward-compatibility shims and no background conversion; a marker is a detection artifact read at the next explicit session, never an implicit trigger.",
+    "Never write to a project outside an explicit user-visible action, and never write to a project with a dirty working tree without saying so.",
+    "Any machine survey must be bounded, opt-outable, and must transmit nothing off the machine.",
+    "Do not build a hosted upgrade service, a registry held as authority over project state, or telemetry.",
+    "Launching a local Agent must be host-agnostic in contract rather than wired to one vendor's CLI.",
+    "Stay inside skills/vibehub-setup/references/architecture-boundary.md unless a decision Ticket has explicitly amended it."
+  ],
+  "context": "Direction only. A survey of one developer's machine on 2026-09-01 found three VibeHub projects, of which two were write-blocked and their owner did not know: Undercurrent at format_version 1, and nomi at 0.4-unversioned with no .vibehub/version.yaml and a populated flat .vibehub/context/ of 19 entries, both returning format_mismatch MIGRATION_REQUIRED against the current engine. Per-project detection already works, on demand, from inside a project, using format_version alone and needing nothing else. What is missing is any surface that can ask the question across projects without being inside one, and any signal that survives until the next session in an affected project. That surface is neither an in-project Skill nor a repository-only maintenance script, and no Ticket currently owns the question of whether it should exist: ticket-vibehub-cli is scoped to splitting vh.mjs behind a stable Agent-facing command and its constraints forbid a required global install, so it cannot answer a cross-project scope question as written. One design fact is already established and will not change: nomi has no version.yaml at all, so a pending-upgrade marker cannot live in the version file for the very case that most needs one. A second observation is deliberately not carried as a constraint — that installs currently contain the plugin's own .vibehub tree, which a naive directory walk would mistake for a user project — because it disappears once the marketplace publishes only the artifact.",
+  "context_refs": [
+    {
+      "purpose": "Governing upgrade policy: agent-driven restructure, honest triggers, no shims.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "The per-project capability this Ticket would drive across many projects.",
+      "ref": "skills/vibehub-migrate/SKILL.md"
+    },
+    {
+      "purpose": "Versioned migration entries a survey must match a project against.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "The nearest existing Ticket, whose scope is vh.mjs module seams rather than cross-project reach; refinement must decide whether it is widened or a new decision Ticket is created.",
+      "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
+    },
+    {
+      "purpose": "The boundary any cross-project entry must not violate without an explicit amendment.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Upgrading VibeHub can account for every project on a machine rather than only the one the user happens to be inside: affected projects are found and reported, a project whose checked-in data predates the new format carries a signal the next Agent session will see, and the remaining judgment work is done under Git review.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/127"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
+}

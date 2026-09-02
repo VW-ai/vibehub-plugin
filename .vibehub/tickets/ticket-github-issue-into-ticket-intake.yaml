@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ref-contradiction-resolved-one-way",
+      "criterion": "Either the engine's context-ref rule is widened to accept external URLs with the validation that implies, or the recorded decision is corrected so an Issue is cited through provenance_refs; whichever is chosen, the engine, decision-github-issues-are-a-read-only-ticket-projection, and the intake path all state the same thing afterwards, and a test asserts the agreement."
+    },
+    {
+      "acceptance_id": "intake-path-is-defined-and-invocable",
+      "criterion": "Given a GitHub Issue reference, an Agent can produce a proposed Ticket for owner review that cites the Issue in whichever field the resolved rule permits, and the path is written down where an Agent will find it rather than reconstructed each time."
+    },
+    {
+      "acceptance_id": "inbound-and-mirrored-issues-are-distinguishable",
+      "criterion": "Inbound and mirrored Issues are unambiguously distinguishable to a reader and to scripts/sync-github-issues.mjs, so an inbound Issue is never adopted, retitled, relabeled, or closed by the mirror; a fixture holding both kinds produces a plan that touches only the mirrored ones."
+    },
+    {
+      "acceptance_id": "source-of-truth-is-not-inverted",
+      "criterion": "Intake reads the Issue once, at the owner's request: no ongoing sync, no Issue-number field added to the Ticket schema, and no later Issue edit or comment changes a checked-in document without a fresh deliberate planning pass."
+    },
+    {
+      "acceptance_id": "intake-declines-with-a-testable-signal",
+      "criterion": "When an Issue is discussion, duplicates an existing Ticket, or is too underspecified to carry an outcome, intake produces a declined result naming the reason and, for a duplicate, the existing Ticket; a fixture covers one Issue of each kind and asserts the declined result rather than describing expected model behavior."
+    },
+    {
+      "acceptance_id": "issue-topology-rule-recorded",
+      "criterion": "A decision Context records what becomes of an inbound Issue once its Ticket exists — linked and closed, left open as discussion, or converted — so duplicate pairs cannot accumulate silently."
+    },
+    {
+      "acceptance_id": "topology-rule-applied-to-the-real-issues",
+      "authority": "human",
+      "criterion": "The owner applies or authorizes applying the recorded rule to the Issues filed on 2026-09-01, because doing so writes to Issues in the owner's own repository under the owner's name; recorded as human-origin Evidence."
+    },
+    {
+      "acceptance_id": "round-trip-rehearsed-on-a-fresh-issue",
+      "criterion": "A rehearsal takes an Issue that has not already been hand-planned through intake to a proposed Ticket, runs the mirror, and shows the mirrored Issue and the inbound Issue coexisting per the recorded rule with no sync churn on a rerun; the five Issues already consumed by hand planning are excluded, since re-running intake on them would duplicate existing Tickets."
+    }
+  ],
+  "constraints": [
+    "Preserve one-way projection: never read Issue titles, bodies, comments, or state into .vibehub documents outside an explicit human-initiated intake action.",
+    "Preserve decision-external-work-systems-compose-into-personal-tickets: GitHub composes into personal Tickets and never becomes their organizer.",
+    "No webhook receiver, bot account, polling service, or bidirectional sync; intake is Agent-invoked and human-approved.",
+    "No new Ticket schema field for an Issue number; the link lives in whichever existing ref field the resolved rule permits.",
+    "Human Issue comments remain discussion; durable decisions still enter through vibehub-ingest.",
+    "Intake proposes and never lands a Ticket on main unreviewed."
+  ],
+  "context": "ticket-mirror-tickets-to-github-issues established that Git is the source of truth and GitHub Issues are a read-only projection keyed by a hidden vibehub:ticket-id marker, and decision-github-issues-are-a-read-only-ticket-projection records that an outside Issue becomes a Ticket only through deliberate planning that cites the Issue URL as a context ref. The engine has never permitted that: loadRepository requires every context_refs entry to resolve to a regular file inside the repository, so an http URL is rejected and no checked-in Ticket uses one. The recorded rule and the implementation have therefore contradicted each other since the rule was written, and the first hand-run intake attempt hit it immediately — a batch of six Tickets citing Issue URLs as context refs was rejected outright and the URLs had to move to provenance_refs. Beyond that, five Issues filed by hand on 2026-09-01 carried an invented convention: Ticket-shaped bodies deliberately without the mirror's marker, plus a hand-written note that they are proposals rather than projections. Nothing defines that convention, nothing distinguishes inbound from mirrored Issues to a reader or to the sync script, and nothing says what becomes of an inbound Issue once its Ticket exists and starts producing a mirrored Issue of its own.",
+  "context_refs": [
+    {
+      "purpose": "Establishes the one-way rule and already names the manual intake path this Ticket implements.",
+      "ref": ".vibehub/tickets/ticket-mirror-tickets-to-github-issues.yaml"
+    },
+    {
+      "purpose": "Marker and projection logic that must keep ignoring inbound Issues.",
+      "ref": "scripts/sync-github-issues.mjs"
+    },
+    {
+      "purpose": "loadRepository's context-ref rule, which rejects URLs and is one half of the contradiction this Ticket resolves.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Boundary forbidding an external system from organizing personal Tickets.",
+      "ref": ".vibehub/rooms/product/decision-external-work-systems-compose-into-personal-tickets.yaml"
+    },
+    {
+      "purpose": "Canonical planning entry that intake must route through rather than bypass.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Where durable context from Issue discussion belongs when it is context rather than work.",
+      "ref": "skills/vibehub-ingest/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "An Issue filed by a human on GitHub has a defined, repeatable, rehearsed way into the Ticket graph, and the contradiction between the recorded intake rule and what the engine actually permits is resolved rather than worked around.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/129"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-github-issue-into-ticket-intake"
+}

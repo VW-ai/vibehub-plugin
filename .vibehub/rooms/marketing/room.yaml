@@ -121,5 +121,6 @@
   "kind": "room",
   "room_id": "marketing",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift: 7 marketing files changed by the website publish work; unrelated to the packaging, release-identity, and closeout-integrity deliverable entered here"
 }
