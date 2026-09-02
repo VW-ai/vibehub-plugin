@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "closeout-skill-matches-the-engine"
+  ],
+  "evidence_id": "source-check-is-behavioural-on-both-sides",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T02:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "test/skill-contracts.test.mjs",
+    "commit:7068be42cdd7f92a2b84dc96e5f6aaddb12f77f0"
+  ],
+  "schema_version": 1,
+  "summary": "SUPERSEDES skill-engine-set-check-is-bidirectional, which was true only between the Skill's bullet list and a hardcoded literal in the test. Independent adjudication found two escapes: a bogus source declared in the Skill's prose rather than its list passed (a regression — the version it replaced caught that), and the engine half was still a source grep, so widening the validator without touching the constant let the whole suite pass while the engine genuinely accepted a fourth value; nothing anywhere asserted an out-of-set source is refused. Both halves are now behavioural. INDEPENDENCE_SOURCES is exported from vh.mjs and imported by the test rather than regexed out of it. The Skill delimits its declared list between independence-sources markers and states plainly that the list is the whole set. Every declared member is probed against the real engine through ticket closeout and must clear the independence check; every other backticked token in the Skill, plus a fixed probe list of plausible widenings (self_review, self, same_session, none, human, agent, executor), must be refused with an error on outcome.independence.source. Mutation-checked against the adjudicator's exact escape: widening the validator to accept self_review now fails the test whether or not the Skill mentions it. HONEST LIMITATION, recorded rather than argued away: the probe list is a net, not a proof — a widening to a value nobody guessed still escapes, and a source named in prose that the engine already refuses is a documentation defect this test does not catch.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}
