@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "last-hash-wins"
+  ],
+  "evidence_id": "evidence-last-hash-wins",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/segment-anchors.test.mjs",
+    "test:a segment of a file whose path contains # resolves from the id source segment emits",
+    "command:node skills/vibehub-core/scripts/vh.mjs source segment --repo /tmp/hashprobe3 --path 'docs/a#b.md'",
+    "command:node skills/vibehub-core/scripts/vh.mjs context coverage --repo /tmp/hashprobe3"
+  ],
+  "schema_version": 1,
+  "summary": "parseAnchor now splits at anchor.lastIndexOf(\"#\") instead of indexOf(\"#\"); nothing else changed. Reproduction on a throwaway repo holding docs/a#b.md: `source segment` emits {\"id\":\"docs/a#b.md#_preamble\",\"slug\":\"_preamble\",\"start\":1,\"end\":3} both before and after (segmentation untouched). BEFORE, a Room anchoring exactly that id gave `context coverage`: rooms[0] = {room:probe, files:[], uncovered:0, unresolved_anchors:[\"docs/a#b.md#_preamble\"]}, files_examined 0, segments_total 0 — the tool could not parse the id it had just emitted. AFTER: rooms[0] = {room:probe, files:[{path:\"docs/a#b.md\", skipped:null, segment_count:1, uncovered:[\"docs/a#b.md#_preamble\"]}], uncovered:1, unresolved_anchors:[]}, files_examined 1, segments_total 1, uncovered_total 1. The last-# rule is exact rather than heuristic because the slug side is minted by segmentFile and never contains \"#\" (heading slugs are [a-z0-9-], line windows are L<n>-<n>, the preamble slug is the fixed _preamble), so the last \"#\" is the boundary the id was assembled at. Verified on two further shapes: a file at docs/two#a#b.md (id docs/two#a#b.md#_preamble, two hashes) and a file whose name ENDS in a hash, docs/trail# (line-windows id docs/trail##L1-1, adjacent hashes) — both resolve with unresolved_anchors [] and segment_count 1. Cost of the reading chosen, disclosed rather than hidden: an anchor is now read slug-side-first, so an anchor naming a WHOLE FILE whose own name contains \"#\" is unreachable — \"docs/a#b.md\" parses as segment \"b.md\" of file \"docs/a\", never as the file docs/a#b.md. This is unchanged from the first-# rule (both readings resolve that exact string the same way), so the fix neither creates nor closes it; the ambiguity is inherent because a segment id and such a path are the same string. Segment anchors on that file still work, which is the reading that matters for coverage, and the losing reading costs only the ability to claim such a file by prefix. Recorded in a comment above parseAnchor.",
+  "ticket_id": "ticket-parse-anchors-at-the-last-hash"
+}

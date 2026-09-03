@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "prefix-collision-is-honest"
+  ],
+  "evidence_id": "evidence-prefix-collision-is-honest",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/segment-anchors.test.mjs",
+    "test:a prefix anchor is judged against the real path, so docs/a does not own a segment of docs/a#b.md",
+    "test:a prefix anchor that really does contain the segment's file still collides",
+    "command:node skills/vibehub-core/scripts/vh.mjs room put --repo /tmp/hashprobe3 --room sib --input sib.json"
+  ],
+  "schema_version": 1,
+  "summary": "anchorsCollide, overlappingTerritory and anchorMatches were NOT changed; the collision rule is honest again purely because parseAnchor now hands them the real file path. BEFORE, `room put` of a sibling anchoring the prefix docs/a alongside a Room anchoring docs/a#b.md#_preamble was rejected: {ok:false, code:invalid_input, message:\"rooms sib and probe claim overlapping territory (docs/a); fuse or split them — two rooms must not own the same anchors\"} — spurious, because docs/a is not a file or directory that exists and the segment belongs to the different file docs/a#b.md. AFTER: {ok:true, status:\"written\", room:\"sib\", created:true}, and `project validate` on the two-Room tree returns valid:true. The rule was not weakened: the segment anchor's path parses as docs/a#b.md, and anchorMatches asks the same path-segment-boundary question it always asked (path === prefix || path.startsWith(prefix + \"/\")), which \"docs/a#b.md\".startsWith(\"docs/a/\") fails and \"docs/a#b.md\".startsWith(\"docs/\") passes. The must-still-collide direction was verified in the same repository: a Room anchoring the prefix docs is still rejected against the same segment Room with {ok:false, code:invalid_input, message:\"rooms wide and probe claim overlapping territory (docs); fuse or split them ...\"}. Both directions are pinned at the write (room put) and in repository-wide validation (project validate), because overlappingTerritory is the single definition both call. Segment-vs-segment collision is untouched: two segment anchors still collide only when their ids are equal, and the pre-existing tests for that (\"two rooms claiming one segment, and a segment inside a sibling's prefix, are both rejected\") still pass unmodified.",
+  "ticket_id": "ticket-parse-anchors-at-the-last-hash"
+}

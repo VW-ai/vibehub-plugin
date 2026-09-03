@@ -136,8 +136,15 @@ Two obligations make the walk auditable:
   ```
 
   Add it by putting the Room again with the entry included, the same way the
-  Room was created — `room put` replaces the whole document, so carry the
-  existing fields through:
+  Room was created — `room put` replaces the whole document and writes exactly
+  what it is given, so read the current `room.yaml` first and carry every
+  existing field through, **`alignment` included**. `room put` never stamps an
+  alignment of its own, on purpose: what a stamp says stays a property of what
+  the caller wrote. So a re-put that omits `alignment` silently drops the
+  Room's stamp and the Room reports `UNKNOWN` / never aligned in `room drift`,
+  with no error at the write. Carry the block through verbatim; do not
+  re-run `room align` to repair it, which would restamp against the current
+  HEAD and claim an alignment that was never checked.
 
   ```text
   node ../../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>

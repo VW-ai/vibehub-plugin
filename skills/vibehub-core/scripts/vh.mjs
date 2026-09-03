@@ -751,8 +751,22 @@ const ROOM_FILE = "room.yaml";
 //     the ids `source segment` emits, naming that one segment and no other.
 // The "#" is the discriminator, so every anchor written before segment anchors
 // existed parses as a path prefix and behaves exactly as it did.
+//
+// The split is at the LAST "#", not the first, because a segment id is built as
+// `<file path>#<slug>` and a file path may itself contain "#". Splitting at the
+// first "#" made `source segment`'s own output for docs/a#b.md — the id
+// "docs/a#b.md#_preamble" — parse as a segment of the nonexistent file "docs/a",
+// so it resolved to nothing and spuriously collided with a real "docs/a" anchor.
+// The slug side is what `source segment` mints and never contains "#" (heading
+// slugs are [a-z0-9-], line ranges are L<n>-<n>, and _preamble is fixed), so the
+// last "#" is exactly the boundary the id was assembled at.
+//
+// The cost: a whole anchor string is read slug-side-first, so an anchor naming a
+// FILE whose own name contains "#" ("docs/a#b.md", meaning "all of that file")
+// is unreachable — it parses as segment "b.md" of "docs/a". That reading loses,
+// on purpose; see the anchor-parsing note in the Ticket evidence.
 function parseAnchor(anchor) {
-  const hash = anchor.indexOf("#");
+  const hash = anchor.lastIndexOf("#");
   if (hash === -1) return { path: anchor.replace(/\/+$/u, ""), segment: null };
   const path = anchor.slice(0, hash).replace(/\/+$/u, "");
   return { path, segment: `${path}#${anchor.slice(hash + 1)}` };

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { context, room, run, tempRepo, writeRoom } from "./helpers.mjs";
@@ -223,4 +223,102 @@ test("a path-prefix room still stamps file paths and blob hashes, unchanged", ()
   const drifted = run(repo, "room", "drift").envelope.data.rooms.find((item) => item.room === "docs-owner");
   assert.equal(drifted.state, "DRIFTED");
   assert.deepEqual(drifted.changed, ["docs/prd.md"]);
+});
+
+// --- A source file whose own path contains "#" -----------------------------
+//
+// `source segment` mints ids as `<file path>#<slug>`, so for docs/a#b.md it
+// emits "docs/a#b.md#_preamble" — a string with two "#". Parsing that at the
+// FIRST "#" read it as a segment of the nonexistent file "docs/a", which made
+// the tool unable to parse the id it had just emitted.
+
+function hashPathRepo(label) {
+  const repo = tempRepo(label);
+  assert.equal(run(repo, "project", "init").status, 0);
+  writeSource(repo, "docs/a#b.md", ["Body of the hash-named file."]);
+  return repo;
+}
+
+test("a segment of a file whose path contains # resolves from the id source segment emits", () => {
+  const repo = hashPathRepo("segment-anchor-hash-path");
+  const minted = run(repo, "source", "segment", undefined, ["--path", "docs/a#b.md"]).envelope.data;
+  assert.deepEqual(minted.segments.map((item) => item.id), ["docs/a#b.md#_preamble"]);
+
+  writeRoom(repo, "probe", room("probe", { anchors: [minted.segments[0].id] }));
+  assert.equal(run(repo, "project", "validate").status, 0);
+
+  const data = run(repo, "context", "coverage").envelope.data;
+  assert.deepEqual(data.rooms[0].unresolved_anchors, []);
+  assert.deepEqual(data.rooms[0].files, [
+    { path: "docs/a#b.md", skipped: null, segment_count: 1, uncovered: ["docs/a#b.md#_preamble"] },
+  ]);
+  assert.equal(data.files_examined, 1);
+  assert.equal(data.uncovered_total, 1);
+});
+
+test("a prefix anchor is judged against the real path, so docs/a does not own a segment of docs/a#b.md", () => {
+  // "docs/a" is not a path-segment-boundary prefix of "docs/a#b.md", so the two
+  // rooms name disjoint sets and must both be allowed to stand.
+  const repo = hashPathRepo("segment-anchor-hash-no-collision");
+  writeRoom(repo, "probe", room("probe", { anchors: ["docs/a#b.md#_preamble"] }));
+  writeRoom(repo, "sib", room("sib", { anchors: ["docs/a"] }));
+  const validated = run(repo, "project", "validate");
+  assert.equal(validated.status, 0, validated.stdout);
+
+  // And the same judgement at the write, not only in repository validation.
+  const written = hashPathRepo("segment-anchor-hash-no-collision-write");
+  writeRoom(written, "probe", room("probe", { anchors: ["docs/a#b.md#_preamble"] }));
+  const put = run(written, "room", "put", room("sib", { anchors: ["docs/a"] }), ["--room", "sib"]);
+  assert.equal(put.status, 0, put.stdout);
+});
+
+test("a prefix anchor that really does contain the segment's file still collides", () => {
+  const repo = hashPathRepo("segment-anchor-hash-collision");
+  writeRoom(repo, "probe", room("probe", { anchors: ["docs/a#b.md#_preamble"] }));
+  writeRoom(repo, "wide", room("wide", { anchors: ["docs"] }));
+  const swallowed = run(repo, "project", "validate");
+  assert.notEqual(swallowed.status, 0);
+  assert.match(JSON.stringify(swallowed.envelope.error.details), /claim overlapping territory/);
+
+  const written = hashPathRepo("segment-anchor-hash-collision-write");
+  writeRoom(written, "probe", room("probe", { anchors: ["docs/a#b.md#_preamble"] }));
+  const put = run(written, "room", "put", room("wide", { anchors: ["docs"] }), ["--room", "wide"]);
+  assert.notEqual(put.status, 0);
+  assert.match(put.envelope.error.message, /claim overlapping territory \(docs\)/);
+});
+
+test("re-putting a room to add a coverage_exception keeps its drift state when alignment is carried through", () => {
+  // The documented Pass 4 path: `room put` is a whole-document replace that
+  // never stamps, so the caller must carry `alignment` through by hand. This
+  // pins the behaviour the documentation now names — carried through, the stamp
+  // survives; dropped, the room goes back to never-aligned.
+  const repo = gitPrdRepo("segment-anchor-reput-alignment");
+  const created = run(repo, "room", "put", room("fork-flow", { anchors: ["docs/prd.md#fork-flow"] }), ["--room", "fork-flow"]);
+  assert.equal(created.status, 0, created.stdout);
+  sh(repo, "add", "-A");
+  sh(repo, "commit", "-qm", "baseline");
+  assert.equal(run(repo, "room", "align", undefined, ["--room", "fork-flow"]).status, 0);
+
+  const roomPath = join(repo, ".vibehub", "rooms", "fork-flow", "room.yaml");
+  const stamped = JSON.parse(readFileSync(roomPath, "utf8"));
+  assert.equal(run(repo, "room", "drift").envelope.data.rooms.find((item) => item.room === "fork-flow").state, "FRESH");
+
+  const withException = {
+    ...stamped,
+    coverage_exceptions: [{ segment: "docs/prd.md#fork-flow", reason: "Restated in the domain model." }],
+  };
+  const reput = run(repo, "room", "put", withException, ["--room", "fork-flow"]);
+  assert.equal(reput.status, 0, reput.stdout);
+  const after = run(repo, "room", "drift").envelope.data.rooms.find((item) => item.room === "fork-flow");
+  assert.equal(after.state, "FRESH");
+  assert.deepEqual(JSON.parse(readFileSync(roomPath, "utf8")).alignment, stamped.alignment);
+  assert.equal(run(repo, "context", "coverage").envelope.data.uncovered_total, 0);
+
+  // Dropping the block is what the documentation warns about: no error, but the
+  // room reports never-aligned. `room put` must not restore it implicitly.
+  const dropped = { ...withException };
+  delete dropped.alignment;
+  assert.equal(run(repo, "room", "put", dropped, ["--room", "fork-flow"]).status, 0);
+  assert.equal(JSON.parse(readFileSync(roomPath, "utf8")).alignment, undefined);
+  assert.equal(run(repo, "room", "drift").envelope.data.rooms.find((item) => item.room === "fork-flow").state, "UNKNOWN");
 });

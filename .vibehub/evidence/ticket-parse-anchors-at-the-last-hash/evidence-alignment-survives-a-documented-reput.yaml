@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "alignment-survives-a-documented-reput"
+  ],
+  "evidence_id": "evidence-alignment-survives-a-documented-reput",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T00:00:00.000Z",
+  "refs": [
+    "skills/vibehub-ingest/references/bulk-absorption.md",
+    "test/segment-anchors.test.mjs",
+    "test:re-putting a room to add a coverage_exception keeps its drift state when alignment is carried through"
+  ],
+  "schema_version": 1,
+  "summary": "Documentation-only, as the Ticket constrains. Pass 4's coverage_exception instruction in skills/vibehub-ingest/references/bulk-absorption.md read: \"`room put` replaces the whole document, so carry the existing fields through\" — it never named alignment, which is the exact field a re-put silently drops. It now reads: \"`room put` replaces the whole document and writes exactly what it is given, so read the current room.yaml first and carry every existing field through, **`alignment` included**. `room put` never stamps an alignment of its own, on purpose: what a stamp says stays a property of what the caller wrote. So a re-put that omits `alignment` silently drops the Room's stamp and the Room reports UNKNOWN / never aligned in `room drift`, with no error at the write. Carry the block through verbatim; do not re-run `room align` to repair it, which would restamp against the current HEAD and claim an alignment that was never checked.\" No code changed: `room put` remains a whole-document replace that writes exactly its input and never stamps, so what a stamp says stays a property of what the caller wrote. The last sentence closes the obvious wrong repair — reaching for `room align` after noticing the loss would mint a stamp against HEAD that no one ever checked, converting a visible UNKNOWN into an invisible false FRESH.",
+  "ticket_id": "ticket-parse-anchors-at-the-last-hash"
+}
