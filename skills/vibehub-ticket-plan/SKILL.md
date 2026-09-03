@@ -77,6 +77,16 @@ is implied.
 4. Query Context only for facts that govern the deliverable or fill a real
    planning gap. The Ticket itself carries enough `context`, `context_refs`,
    constraints, and acceptance for a fresh Agent.
+   Resolve every `context_ref` through the shared engine operation, whether it
+   names the current tree or immutable Git history:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+   ```
+
+   `ref.json` is `{"ref":"<Ticket context_ref>"}`. Consume the returned
+   source and identity; never interpret a versioned ref as a filesystem path
+   or check out its commit.
 5. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "project_format": 2,
+  "project_format": 3,
   "document_schemas": {
     "ticket": 2
   }

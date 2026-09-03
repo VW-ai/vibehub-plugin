@@ -10,7 +10,7 @@
         "path": "skills/vibehub-core/contracts/evidence.schema.json"
       },
       {
-        "blob": "ebbc595d15ff936f9ee351d8d56abeae78ca2491",
+        "blob": "57365dc4814e0d04daf357c6e8c50b37174a40c2",
         "path": "skills/vibehub-core/contracts/outcome.schema.json"
       },
       {
@@ -18,15 +18,15 @@
         "path": "skills/vibehub-core/contracts/project-format.schema.json"
       },
       {
-        "blob": "08a0f116a2d0b65398574cc99d14d332e940ac25",
+        "blob": "530a77f50fb3173519a2a7ac78e09451f7e4fb5a",
         "path": "skills/vibehub-core/contracts/ticket.schema.json"
       },
       {
-        "blob": "50abedb1685ab40afd6afa8d2f7b9481b5ce7bd2",
+        "blob": "41abe47c7b54e87d84e70eba51c43fd650c883d0",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
-        "blob": "df4e92d1a152f2b0a5c16de35614aaa995368264",
+        "blob": "aa93e70823d5a6b665953c86e497ac73b58618c4",
         "path": "skills/vibehub-ticket-closeout/SKILL.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
       },
       {
-        "blob": "d01c3f89ebe196e4f3ca7a76df250ebbb44e8a5d",
+        "blob": "41a41b7059085718c9c3b10ac35accbadf52a729",
         "path": "skills/vibehub-ticket-plan/SKILL.md"
       },
       {
@@ -42,7 +42,7 @@
         "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
       },
       {
-        "blob": "72796885a697e08873686ee980246057df4da4c7",
+        "blob": "325d50b2f7fda9eae355f0cf1579a851288b6c7e",
         "path": "skills/vibehub-ticket-run/SKILL.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "skills/vibehub-ticket-run/agents/openai.yaml"
       },
       {
-        "blob": "d35e9d75e211f4b3449c5ef0f7081721e9cf9e8b",
+        "blob": "c29d321d618e4f12dc81227f50c6bdcf0f67c99f",
         "path": "skills/vibehub-ticket-validate/SKILL.md"
       },
       {
@@ -58,8 +58,8 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-23T04:14:28.851Z",
-    "last_aligned_commit": "ae1d1eeeb54458b23728e478f6a8bd056228693a"
+    "checked_at": "2026-09-03T05:56:55.355Z",
+    "last_aligned_commit": "fda33fa6821d28c70109adcdd8dbfdc434c1d656"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
@@ -78,6 +78,5 @@
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift: current lifecycle engine and Skill edits belong to the independence-gate work, not the historical Git-reference Ticket being planned"
+  "stale": false
 }

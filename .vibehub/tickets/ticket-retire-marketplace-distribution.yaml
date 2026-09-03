@@ -78,6 +78,22 @@
     {
       "purpose": "The earlier decision that made npx the recommended path, which this Ticket completes.",
       "ref": ".vibehub/tickets/ticket-decide-npx-first-install-experience.yaml"
+    },
+    {
+      "purpose": "Exact Claude marketplace builder inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:scripts/build-claude-marketplace.mjs"
+    },
+    {
+      "purpose": "Exact Codex marketplace builder inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:scripts/build-codex-marketplace.mjs"
+    },
+    {
+      "purpose": "Exact cross-host marketplace test inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
+    },
+    {
+      "purpose": "Exact Codex marketplace manifest identified by the first partial Outcome and inspected before remediation removed it.",
+      "ref": "commit:33de83c2526258a48340863ab752d45ff7b56140:.agents/plugins/marketplace.json"
     }
   ],
   "deliveries": [],
@@ -87,10 +103,6 @@
   "provenance_refs": [
     "conversation:2026-09-01-packaging-and-release-integrity",
     "https://github.com/VW-ai/vibehub-plugin/issues/131",
-    "deleted-path:scripts/build-claude-marketplace.mjs",
-    "deleted-path:scripts/build-codex-marketplace.mjs",
-    "deleted-path:test/host-marketplaces.test.mjs",
-    "deleted-path:.agents/plugins/marketplace.json",
     "plan-validation:independent"
   ],
   "relations": [],

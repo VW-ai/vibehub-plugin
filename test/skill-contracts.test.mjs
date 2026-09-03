@@ -88,7 +88,7 @@ test("skills point at their governing shared references", () => {
   assert.equal(migrations.schema_version, 2);
   assert.equal(migrations.owner, "vibehub-migrate");
   assert.equal(migrations.current_format, versions.project_format);
-  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 3);
+  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 4);
   for (const migration of migrations.migrations) {
     assert.ok(Array.isArray(migration.mechanical.declared_paths));
     assert.ok(Array.isArray(migration.mechanical.actions));
@@ -129,6 +129,17 @@ test("skills point at their governing shared references", () => {
     deliveryAudit.mechanical.actions[0].pending_semantic_ref,
   );
   assert.match(deliveryAudit.semantic.steps[0].forbidden_shortcuts.join(" "), /Ticket status/u);
+  const historicalRefs = migrations.migrations.find((migration) => migration.from === "format-2");
+  assert.equal(historicalRefs.to, "format-3");
+  assert.deepEqual(historicalRefs.document_schema_versions, {
+    ticket: { from: 2, to: 2 },
+  });
+  assert.deepEqual(historicalRefs.mechanical.actions, [
+    { type: "write-project-format", format_version: 3 },
+  ]);
+  assert.equal(historicalRefs.semantic.steps[0].step_id, "bind-deleted-path-provenance-to-exact-history");
+  assert.match(historicalRefs.semantic.steps[0].good_value, /commit:<40-hex>:/u);
+  assert.match(historicalRefs.semantic.steps[0].forbidden_shortcuts.join(" "), /any containing commit/u);
   assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
   assert.ok(
     bodies.get("vibehub-migrate").includes("project migrate-mechanical --repo <root>"),
@@ -155,6 +166,7 @@ test("skills point at their governing shared references", () => {
     deliveryAudit.document_schema_versions.ticket.to,
     versions.document_schemas.ticket,
   );
+  assert.equal(historicalRefs.document_schema_versions.ticket.to, versions.document_schemas.ticket);
 
   const authority = "vibehub-core/contracts/acceptance-authority.md";
   assert.ok(existsSync(join(root, "skills", authority)));
@@ -206,6 +218,29 @@ test("human decision boundaries stay in the Ticket graph", () => {
   assert.match(bodies.get("vibehub-ticket-run"), /split out a new\s+human-decision Ticket/u);
   assert.match(bodies.get("vibehub-ticket-validate"), /represented by direct\s+Ticket dependencies/u);
   assert.match(bodies.get("vibehub-ticket-validate"), /remain `maturity: draft`/u);
+});
+
+test("every Ticket context consumer uses the shared current-or-history resolver", () => {
+  const command = "node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>";
+  for (const name of [
+    "vibehub-ticket-plan",
+    "vibehub-ticket-run",
+    "vibehub-ticket-validate",
+    "vibehub-query",
+    "vibehub-ticket-review",
+  ]) {
+    const body = bodies.get(name);
+    assert.ok(body.includes(command), `${name} must use the shared resolver command`);
+    assert.match(body, /<Ticket context_ref>/u, `${name} must pass the exact Ticket ref`);
+    assert.match(body, /returned[\s\S]{0,120}(?:source|identity)|(?:source|identity)[\s\S]{0,120}returned/u, `${name} must consume resolver output`);
+    assert.match(body, /(?:[Nn]ever|Do not|without)[\s\S]{0,160}check(?:ing)? out/u, `${name} must forbid historical checkout`);
+  }
+
+  const schema = JSON.parse(readFileSync(
+    join(root, "skills", "vibehub-core", "contracts", "ticket.schema.json"),
+    "utf8",
+  ));
+  assert.match(schema.properties.context_refs.items.properties.ref.description, /commit:<40-lowercase-hex>:/u);
 });
 
 // An executor grading its own work is the failure vibehub-ticket-closeout

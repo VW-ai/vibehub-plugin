@@ -70,6 +70,10 @@
     {
       "purpose": "Release contract tests to realign with the focused README.",
       "ref": "test/release.test.mjs"
+    },
+    {
+      "purpose": "Exact pre-retirement Codex manifest whose five-prompt surface informed this Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
     }
   ],
   "deliveries": [
@@ -86,8 +90,7 @@
   "provenance_refs": [
     "conversation:2026-08-02-readme-dark-mode-and-one-line-principle",
     "git:5fb2bed",
-    "github:pr-11",
-    "deleted-path:.codex-plugin/plugin.json"
+    "github:pr-11"
   ],
   "relations": [
     {

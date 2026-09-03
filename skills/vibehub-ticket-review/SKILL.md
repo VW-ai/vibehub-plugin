@@ -72,6 +72,17 @@ node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
 
 Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,
 direct dependencies, acceptance, Evidence, and Outcome in the conversation.
+Resolve every displayed or consumed `context_ref` through the shared engine
+operation so current paths and immutable historical refs have one source and
+identity contract:
+
+```text
+node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+```
+
+`ref.json` is `{"ref":"<Ticket context_ref>"}`. Do not check out a historical
+commit or bypass the resolver with ad hoc Git commands. Consume the returned
+source and identity when presenting the reference.
 When `next_action.action` is `CLOSE_OUT`, present it as independent review work
 and route it to `$vibehub-ticket-closeout`; never call Ticket Run again. When a
 bounded list is requested, report only `ready_to_closeout` from this exact

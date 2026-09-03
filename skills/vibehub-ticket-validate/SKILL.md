@@ -36,7 +36,17 @@ projected as canonical UI state.
 
 3. Verify each Ticket promises an observable outcome, has acceptance that can
    be independently checked, lists only direct dependencies, carries enough
-   checked-in Context for a fresh Agent, and encodes every judgment whose
+   checked-in Context for a fresh Agent, and resolves every `context_ref`
+   through the shared operation below rather than treating valid-looking
+   syntax as readable Context:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+   ```
+
+   `ref.json` is `{"ref":"<Ticket context_ref>"}`; consume the returned
+   source and immutable identity without checking out a historical commit.
+   Verify that the Ticket encodes every judgment whose
    decision owner must be the user as human-authority acceptance. When such a
    decision gates independently schedulable downstream work, verify that the
    proposal, decision, and implementation boundary is represented by direct

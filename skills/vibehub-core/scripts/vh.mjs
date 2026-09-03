@@ -11,6 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -52,6 +53,7 @@ const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
 const COMMIT_HASH = /^[0-9a-f]{40}$/u;
+const VERSIONED_CONTEXT_REF = /^commit:([0-9a-f]{40}):(.+)$/u;
 
 class VibeHubError extends Error {
   constructor(code, message, details = null) {
@@ -87,7 +89,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; project operations include init, compatibility, migrate-mechanical, and validate",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; context operations include put and resolve; project operations include init, compatibility, migrate-mechanical, and validate",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -194,6 +196,107 @@ function dirs(repo) {
 
 function projectFormatPath(repo) {
   return join(repo, ".vibehub", PROJECT_FORMAT_FILE);
+}
+
+function invalidContextRef(message, ref) {
+  throw new VibeHubError("invalid_context_ref", `${message}: ${String(ref)}`);
+}
+
+function validateContextRefPath(path, ref) {
+  if (!path || isAbsolute(path) || /^[A-Za-z]:/u.test(path)) {
+    invalidContextRef("Ticket context ref path must be non-empty and repository-relative", ref);
+  }
+  if (path.includes("\\") || path.includes("//") || path.endsWith("/")) {
+    invalidContextRef("Ticket context ref path must use canonical forward-slash separators", ref);
+  }
+  if (path.split("/").some((segment) => segment === "" || segment === "." || segment === "..")) {
+    invalidContextRef("Ticket context ref path must not contain empty, current, or parent traversal segments", ref);
+  }
+}
+
+export function parseTicketContextRef(ref) {
+  if (typeof ref !== "string" || ref.trim() === "") {
+    invalidContextRef("Ticket context ref must be a non-empty string", ref);
+  }
+  if (ref.startsWith("commit:")) {
+    const match = ref.match(VERSIONED_CONTEXT_REF);
+    if (!match) {
+      invalidContextRef("Versioned Ticket context ref must equal commit:<40-lowercase-hex>:<repo-relative-path>", ref);
+    }
+    const [, commit, path] = match;
+    validateContextRefPath(path, ref);
+    return { kind: "versioned", ref, commit, path };
+  }
+  validateContextRefPath(ref, ref);
+  return { kind: "current", ref, commit: null, path: ref };
+}
+
+function gitBlobId(bytes) {
+  return createHash("sha1")
+    .update(Buffer.from(`blob ${bytes.length}\0`, "utf8"))
+    .update(bytes)
+    .digest("hex");
+}
+
+export function resolveTicketContextRef(repo, ref) {
+  const parsed = parseTicketContextRef(ref);
+  if (parsed.kind === "current") {
+    const target = resolve(repo, parsed.path);
+    if (!target.startsWith(`${resolve(repo)}${sep}`) || !existsSync(target)) {
+      throw new VibeHubError("context_ref_missing_path", `Ticket context ref path does not exist: ${parsed.path}`);
+    }
+    const stat = lstatSync(target);
+    if (stat.isSymbolicLink()) {
+      throw new VibeHubError("context_ref_symlink", `Ticket context ref path is a symlink: ${parsed.path}`);
+    }
+    if (!stat.isFile()) {
+      throw new VibeHubError("context_ref_not_regular_file", `Ticket context ref path is not a regular file: ${parsed.path}`);
+    }
+    const bytes = readFileSync(target);
+    const blob = gitBlobId(bytes);
+    return {
+      ref: parsed.ref,
+      kind: parsed.kind,
+      identity: { revision: "WORKTREE", path: parsed.path, blob },
+      source: bytes.toString("utf8"),
+      source_base64: bytes.toString("base64"),
+    };
+  }
+
+  const objectType = git(repo, ["cat-file", "-t", parsed.commit], { allowFailure: true });
+  if (objectType.status !== 0) {
+    throw new VibeHubError("context_ref_missing_commit", `Ticket context ref commit is unavailable: ${parsed.commit}`);
+  }
+  if (objectType.stdout.trim() !== "commit") {
+    throw new VibeHubError("context_ref_not_commit", `Ticket context ref revision is not a commit object: ${parsed.commit}`);
+  }
+  const listed = git(repo, ["ls-tree", "-z", parsed.commit, "--", parsed.path], { allowFailure: true });
+  if (listed.status !== 0 || listed.stdout === "") {
+    throw new VibeHubError("context_ref_missing_path", `Ticket context ref path is absent at ${parsed.commit}: ${parsed.path}`);
+  }
+  const entry = listed.stdout.split("\0").find(Boolean) ?? "";
+  const tab = entry.indexOf("\t");
+  const [mode, type, blob] = tab < 0 ? [] : entry.slice(0, tab).split(" ");
+  if (type === "tree") {
+    throw new VibeHubError("context_ref_directory", `Ticket context ref path is a directory at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (mode === "120000") {
+    throw new VibeHubError("context_ref_symlink", `Ticket context ref path is a symlink at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (mode === "160000" || type === "commit") {
+    throw new VibeHubError("context_ref_submodule", `Ticket context ref path is a submodule at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (type !== "blob" || !new Set(["100644", "100755"]).has(mode)) {
+    throw new VibeHubError("context_ref_not_regular_file", `Ticket context ref path is not a regular blob at ${parsed.commit}: ${parsed.path}`);
+  }
+  const bytes = git(repo, ["cat-file", "blob", blob], { binary: true }).stdout;
+  return {
+    ref: parsed.ref,
+    kind: parsed.kind,
+    identity: { commit: parsed.commit, path: parsed.path, blob },
+    source: bytes.toString("utf8"),
+    source_base64: bytes.toString("base64"),
+  };
 }
 
 function add(errors, path, message) {
@@ -1083,19 +1186,10 @@ export function loadRepository(repo, overrides = {}) {
   for (const { document, path } of tickets.documents.values()) {
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
-      const target = typeof ref === "string" ? resolve(repo, ref) : "";
-      if (
-        typeof ref !== "string"
-        || isAbsolute(ref)
-        || (!target.startsWith(`${repo}${sep}`) && target !== repo)
-        || !existsSync(target)
-      ) {
-        add(errors, path, `unreadable Ticket context ref: ${String(ref)}`);
-      } else {
-        const stat = lstatSync(target);
-        if (!stat.isFile() || stat.isSymbolicLink()) {
-          add(errors, path, `Ticket context ref must be a regular file: ${ref}`);
-        }
+      try {
+        resolveTicketContextRef(repo, ref);
+      } catch (error) {
+        add(errors, path, error instanceof Error ? error.message : `unreadable Ticket context ref: ${String(ref)}`);
       }
     }
     for (const relation of document.relations ?? []) {
@@ -1215,6 +1309,13 @@ function contextOperation(operation, repo, input, options = {}) {
     }
     writeDocument(path, input);
     return { status: "written", context_id: input.context_id, room: options.room ?? null, path };
+  }
+  if (operation === "resolve") {
+    assertCurrentProjectFormat(repo);
+    if (typeof input.ref !== "string" || input.ref.trim() === "") {
+      throw new VibeHubError("invalid_input", "context resolve needs a non-empty ref");
+    }
+    return resolveTicketContextRef(repo, input.ref);
   }
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -1669,8 +1770,13 @@ function ticketOperation(operation, repo, input, options = {}) {
   throw new VibeHubError("unsupported_operation", `Unsupported ticket operation: ${operation}`);
 }
 
-function git(repo, args, { allowFailure = false } = {}) {
-  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+function git(repo, args, { allowFailure = false, binary = false } = {}) {
+  // Every caller accepts repository paths. Disable repository-configured
+  // fsmonitor hooks so validation, resolution, and drift reads stay inert.
+  const result = spawnSync("git", ["-c", "core.fsmonitor=false", "-C", repo, ...args], {
+    ...(binary ? {} : { encoding: "utf8" }),
+    maxBuffer: 64 * 1024 * 1024,
+  });
   if (result.error) throw new VibeHubError("git_error", `git is unavailable: ${result.error.message}`);
   if (result.status !== 0 && !allowFailure) {
     throw new VibeHubError("git_error", `git ${args[0]} failed: ${(result.stderr || "").trim()}`);

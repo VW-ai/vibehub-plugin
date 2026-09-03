@@ -31,6 +31,19 @@ function fixture() {
   assert.equal(run(repo, "context", "put", context(), ["--room", "product"]).status, 0);
   mkdirSync(join(repo, "docs"));
   writeFileSync(join(repo, "docs", "LOCAL_GRAPH_DESIGN.md"), "# Local graph design\n");
+  writeFileSync(join(repo, "docs", "HISTORICAL.md"), "# Historical design\n\nImmutable reviewed bytes.\n");
+  execFileSync("git", ["init"], { cwd: repo, stdio: "ignore" });
+  execFileSync("git", ["add", "docs/HISTORICAL.md"], { cwd: repo });
+  execFileSync("git", [
+    "-c", "user.name=VibeHub Test",
+    "-c", "user.email=vibehub@example.test",
+    "commit", "-m", "Record historical design",
+  ], { cwd: repo, stdio: "ignore" });
+  const historicalCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: repo,
+    encoding: "utf8",
+  }).trim();
+  rmSync(join(repo, "docs", "HISTORICAL.md"));
   const feature = ticket("feature", ["foundation"]);
   feature.acceptance[0].authority = "human";
   feature.context_refs = [
@@ -41,6 +54,10 @@ function fixture() {
     {
       ref: "docs/LOCAL_GRAPH_DESIGN.md",
       purpose: "Design source when present.",
+    },
+    {
+      ref: `commit:${historicalCommit}:docs/HISTORICAL.md`,
+      purpose: "Exact historical design source.",
     },
   ];
   const foundation = ticket("foundation");
@@ -603,6 +620,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
+  assert.equal(featureSubject.contextPackage.contextRefs[2].kind, "source");
+  assert.match(featureSubject.contextPackage.contextRefs[2].identity.commit, /^[0-9a-f]{40}$/u);
+  assert.equal(featureSubject.contextPackage.contextRefs[2].identity.path, "docs/HISTORICAL.md");
+  assert.match(featureSubject.contextPackage.contextRefs[2].identity.blob, /^[0-9a-f]{40}$/u);
+  assert.deepEqual(
+    featureSubject.contextPackage.agentPayload.contextRefs[2].identity,
+    featureSubject.contextPackage.contextRefs[2].identity,
+  );
   assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
   assert.equal(featureSubject.contextPackage.nextAction.action, "NEEDS_HUMAN");
   assert.deepEqual(

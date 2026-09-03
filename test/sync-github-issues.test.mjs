@@ -23,7 +23,7 @@ function ticket(id, extra = {}) {
 function fixtureRepo() {
   const repo = tempRepo("sync-issues");
   for (const d of ["tickets", "outcomes", "evidence/ticket-done", "rooms"]) mkdirSync(join(repo, ".vibehub", d), { recursive: true });
-  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 2 }));
+  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 3 }));
   writeFileSync(join(repo, "README.md"), "# demo\n");
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-done.yaml"), JSON.stringify(ticket("ticket-done")));
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-open.yaml"), JSON.stringify(ticket("ticket-open", {

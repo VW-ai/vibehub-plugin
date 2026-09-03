@@ -49,6 +49,10 @@
     {
       "purpose": "Completed explicit maturity and REFINE behavior included in the release.",
       "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+    },
+    {
+      "purpose": "Exact pre-retirement cross-host marketplace test used by the v0.6 release proof.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
     }
   ],
   "deliveries": [
@@ -66,8 +70,7 @@
   "provenance_refs": [
     "conversation:2026-08-10-v060-release-request",
     "github:pull-request-15",
-    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a",
-    "deleted-path:test/host-marketplaces.test.mjs"
+    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
   ],
   "relations": [
     {

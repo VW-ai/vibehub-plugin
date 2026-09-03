@@ -79,6 +79,14 @@
     {
       "purpose": "Approved local graph visual for the public product story.",
       "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    },
+    {
+      "purpose": "Exact pre-retirement Codex plugin release identity and product metadata used by the v0.4 release Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
+    },
+    {
+      "purpose": "Exact pre-retirement Claude marketplace release identity used by the v0.4 release Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.claude-plugin/marketplace.json"
     }
   ],
   "deliveries": [
@@ -96,9 +104,7 @@
     "conversation:2026-08-02-owner-requests-main-merge-and-formal-release",
     "git:v0.3.0",
     "git:938e2a8",
-    "github:release-v0.3.0-is-current-latest",
-    "deleted-path:.codex-plugin/plugin.json",
-    "deleted-path:.claude-plugin/marketplace.json"
+    "github:release-v0.3.0-is-current-latest"
   ],
   "relations": [
     {

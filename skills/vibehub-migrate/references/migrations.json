@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 2,
+  "current_format": 3,
   "migrations": [
     {
       "migration_id": "0-4-unversioned-to-0-5-unversioned",
@@ -110,6 +110,53 @@
               "Audit each Ticket against exact reviewable history and populate only authoritative deliveries.",
               "Leave deliveries empty when no authoritative delivery can be established.",
               "Remove migration-pending:format-1-to-format-2:classify-delivery-membership from that Ticket's provenance_refs only after its audit is complete."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "migration_id": "format-2-to-format-3",
+      "from": "format-2",
+      "to": "format-3",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 2,
+          "to": 2
+        }
+      },
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 2 and target_format 3 after immutable historical Ticket context refs became readable project data.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "write-project-format",
+            "format_version": 3
+          }
+        ]
+      },
+      "semantic": {
+        "steps": [
+          {
+            "step_id": "bind-deleted-path-provenance-to-exact-history",
+            "purpose": "Replace a temporary deleted-path provenance workaround with readable immutable Ticket Context only when reviewable Git history identifies the exact commit and blob that informed that Ticket.",
+            "derives_from": [
+              "Each exact deleted-path provenance entry and the Ticket that carries it.",
+              "The Ticket-creation or decision commit and its parent history, not merely any commit in which the path happened to exist.",
+              "The shared context resolve operation proving the selected commit names a regular historical blob with the expected bytes."
+            ],
+            "good_value": "An established case moves from deleted-path:<path> provenance to a context_ref whose ref is commit:<40-hex>:<path> and whose purpose states why those exact bytes informed the Ticket; an ambiguous case keeps an explicit unresolved deleted-path provenance note.",
+            "forbidden_shortcuts": [
+              "Do not choose the newest, oldest, or any containing commit without evidence that it is the version the Ticket actually used.",
+              "Do not restore or copy the retired file into the working tree, Ticket, archive, cache, or database.",
+              "Do not remove an unresolved deleted-path note or imply that mechanical migration completed semantic selection."
+            ],
+            "instructions": [
+              "Audit every deleted-path provenance entry against the Ticket's exact Git history and record reviewable Evidence for the selection or ambiguity.",
+              "For an established case, add commit:<40-hex>:<repo-relative-path> to context_refs, verify it with context resolve, and remove only the matching deleted-path provenance entry.",
+              "For an ambiguous case, retain a deleted-path provenance note that explicitly says selection remains unresolved, then validate the project."
             ]
           }
         ]

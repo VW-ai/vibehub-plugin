@@ -33,6 +33,10 @@
     {
       "purpose": "Original decision to rebuild only gaps demonstrated by real use and keep deterministic behavior in dependency-free scripts.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Exact pre-retirement cross-host marketplace test whose parity expectations informed the CLI evaluation.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
     }
   ],
   "deliveries": [],
@@ -42,8 +46,7 @@
   "provenance_refs": [
     "conversation:2026-08-04-future-cli-idea",
     "conversation:2026-08-04-vh-mjs-maintainability-evaluation",
-    "task:5c6d85a3a430d2dc5308f35e5d0e5115",
-    "deleted-path:test/host-marketplaces.test.mjs"
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
   ],
   "relations": [],
   "schema_version": 2,

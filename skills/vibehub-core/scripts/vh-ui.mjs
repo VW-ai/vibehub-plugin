@@ -11,6 +11,7 @@ import {
   loadRepository,
   projectRoomDrift,
   projectTicketQuery,
+  resolveTicketContextRef,
   ticketArchived,
   ticketNextAction,
   ticketStatus,
@@ -520,11 +521,16 @@ function ticketContextPackage(ticket, relations, repository, source) {
     criterion: item.criterion,
     authority: acceptanceAuthority(item),
   }));
-  const contextRefs = ticket.context_refs.map((item) => ({
-    ...item,
-    kind: canonicalContextFromRef(repository, item.ref) ? "context" : "source",
-    canonicalContext: canonicalContextFromRef(repository, item.ref),
-  }));
+  const contextRefs = ticket.context_refs.map((item) => {
+    const canonicalContext = canonicalContextFromRef(repository, item.ref);
+    const resolved = resolveTicketContextRef(source.worktreeRoot, item.ref);
+    return {
+      ...item,
+      kind: canonicalContext ? "context" : "source",
+      canonicalContext,
+      identity: resolved.identity,
+    };
+  });
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
     ticketId: ticket.ticket_id,
@@ -543,7 +549,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     humanBoundaries: attention.criteria,
     evidence,
     constraints: ticket.constraints,
-    contextRefs: ticket.context_refs,
+    contextRefs,
     relations: ticket.relations,
     provenanceRefs: ticket.provenance_refs,
     source: source.agentPayload,

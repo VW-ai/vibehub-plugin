@@ -25,6 +25,18 @@ node ../vibehub-core/scripts/vh.mjs context get --repo <root> --input <id.json>
 Search repository files directly when the answer is implementation evidence
 rather than durable Context.
 
+When a Ticket supplies `context_refs`, read each current or historical source
+through the same engine resolver used by validation, planning, execution, and
+review:
+
+```text
+node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+```
+
+`ref.json` is `{"ref":"<Ticket context_ref>"}`. Report the returned source
+and identity; never check out a referenced commit or treat a versioned ref as
+a working-tree filename.
+
 Return the relevant Context IDs, their claims, source/evidence, and any visible
 conflict or gap. An empty result is an honest empty result after `ok:true`; a
 failed envelope is unavailable, not empty.
