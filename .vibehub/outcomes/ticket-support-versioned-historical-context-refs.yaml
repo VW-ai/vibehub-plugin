@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "versioned-ref-has-one-canonical-shape",
+    "exact-historical-content-is-readable",
+    "resolution-never-mutates-worktrees",
+    "ticket-consumers-use-the-same-resolver",
+    "marketplace-workarounds-become-readable-history-without-guessing",
+    "format-2-to-3-ships-its-migration-contract"
+  ],
+  "closed_at": "2026-09-03T06:04:36Z",
+  "evidence_ids": [
+    "historical-context-resolver-proof",
+    "marketplace-historical-context-binding-proof",
+    "format-two-to-three-context-migration-proof"
+  ],
+  "independence": {
+    "note": "A fresh closeout Agent independently inspected the Ticket, implementation, all Evidence, exact historical bindings, migration contract, and consumer/UI surfaces; it reran focused checks and the full 187/187 verification suite without modifying the worktree.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Successfully delivered canonical immutable Git historical context refs backed by one shared parser and resolver. Historical sources resolve exact regular blobs with machine-readable failures and without mutating or depending on worktree state; planning, execution, validation, query, and review share that behavior. All ten marketplace-retirement provenance workarounds now point to independently verified historical commit/blob identities without restoring retired files. Project format advances from 2 to 3 while Ticket schema remains 2, with marker-only mechanical migration and exact-history selection explicitly retained as semantic work. Independent verification passed 187/187 and reproduced the 65-file, 3,224,849-byte release artifact.",
+  "ticket_id": "ticket-support-versioned-historical-context-refs",
+  "unresolved_acceptance_ids": []
+}
