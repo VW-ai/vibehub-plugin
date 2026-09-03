@@ -23,7 +23,7 @@ inside the `vibehub-core` skill folder; a partial install that omits
 — each Skill detects that and tells the Agent to run
 `npx skills add VW-ai/vibehub-plugin -s vibehub-core`.
 `vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
-directly. Update later with `npx skills update`.
+directly.
 
 There is no second install path. Host marketplace distribution was retired:
 it delivered the whole development repository rather than the Skills, and its
@@ -105,10 +105,27 @@ explicit migration boundary before restructuring them. `UNSUPPORTED_NEWER`
 means the repository needs a newer plugin; VibeHub does not guess or downgrade
 the data.
 
-Run `npx skills update` to take a new version. It compares the content of
-each installed Skill folder against the repository rather than a declared
-version string, so an unchanged version number cannot leave you on stale
-Skills. Repository migration remains a separate reviewed action.
+For a release upgrade, choose one immutable release tag and repeat it in both
+commands (replace `<host>` with `codex`, `claude-code`, or another skills.sh
+host, and replace the roots with directories you explicitly want scanned):
+
+```bash
+npx skills add https://github.com/VW-ai/vibehub-plugin/tree/<release-tag> -a <host> -s '*' -y
+npx --yes https://github.com/VW-ai/vibehub-plugin/releases/download/<release-tag>/vibehub-upgrade.tgz \
+  --root <bounded-root> [--root <another-root>]
+```
+
+Do not pair `npx skills update` with a floating `releases/latest` upgrader:
+the default branch and latest published Release may be different revisions.
+The one-shot upgrader verifies and prints its embedded tag, commit, engine,
+contracts, and migration registry before discovery. It follows no symlinks,
+scans only below the explicit roots, then includes only the registered
+worktrees of repositories found there. A safe worktree is mechanically
+migrated and receives one local reviewable commit. Dirty, detached, missing,
+unsupported, semantic-first, or otherwise unsafe worktrees are unchanged and
+reported with an exact reason. Nothing is pushed. Open a later Agent session
+inside each worktree that reports semantic-pending refs to complete only that
+guided semantic work.
 
 **Claude Code.** Run `/reload-plugins` after an update when you want the new
 Skills in the current process, then start or resume work.

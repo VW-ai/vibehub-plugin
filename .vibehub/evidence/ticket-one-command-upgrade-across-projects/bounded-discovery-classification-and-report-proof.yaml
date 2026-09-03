@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "discovery-is-explicit-bounded-and-worktree-complete",
+    "classification-and-preview-use-the-shared-migration-contract",
+    "multi-project-report-is-exhaustive-retryable-and-semantic-aware"
+  ],
+  "evidence_id": "bounded-discovery-classification-and-report-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:30:39Z",
+  "refs": [
+    "scripts/vibehub-upgrade.mjs",
+    "test/upgrade.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-migrate/references/migrations.json"
+  ],
+  "schema_version": 1,
+  "summary": "The coordinator realpath-normalizes only explicit non-symlink roots, skips .git/.vibehub and directory symlinks, discovers Git repositories through a .vibehub candidate, deduplicates common Git directories, and fans out only through git worktree list --porcelain. Every coordinator Git subprocess disables repository-configured fsmonitor before read-only preflight. It invokes the packaged sibling vh.mjs for compatibility, validation of CURRENT data, twice-identical disposable migrate-mechanical previews, and post-preview validation, while carrying no migration action table. The mixed real-Git fixture proves main plus a registered sibling outside the root each get distinct local commits; dirty and prunable registered siblings are unchanged and reported; an unregistered branch, an ordinary project outside the root, and that project's symlink inside the root are unchanged. A second fixture proves valid current, schema-invalid current, unaffected, unsupported-newer, and semantic-first classification with zero commits: schema-invalid format-2 data is unsupported with validation_error, never current. Reports include repository/path/branch, old/new HEAD, format, state/reason/diagnostic, migration IDs, commit ID, and semantic pending refs; rerun changes migrated worktrees to current and remains idempotent.",
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
+}

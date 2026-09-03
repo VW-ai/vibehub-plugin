@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "release-paired-one-shot-package-is-verifiable",
+    "architecture-docs-and-artifact-enforce-the-narrow-exception"
+  ],
+  "evidence_id": "release-paired-one-shot-package-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:35:40Z",
+  "refs": [
+    "scripts/build-upgrade-package.mjs",
+    "scripts/vibehub-upgrade.mjs",
+    ".github/workflows/release.yml",
+    "test/upgrade.test.mjs",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "scripts/build-upgrade-package.mjs builds vibehub-upgrade.tgz from an explicit 13-source-file allowlist plus generated package.json and release-identity.json. One exported exact contract-path set drives both packaging and runtime verification. The npm-layout package has exactly one vibehub-upgrade bin, no dependency or lifecycle-script fields, embeds the tag, 40-hex commit, project format, coordinator/engine/migrations hashes and every exact contract hash, and the runtime verifies the manifest has neither omitted nor extra paths before root normalization or discovery. After verification it immediately prints the complete stable identity to stderr before root normalization/discovery, while stdout retains one final JSON envelope; an injected after-root-normalization failure proves the printed tag, commit, engine hash, migrations hash, and contract manifest precede discovery completion. test/upgrade.test.mjs also proves two builds are byte-identical, checksum and allowlist are exact, a real npx invocation infers and runs the one bin, missing --root fails before discovery, packaged-engine tampering is rejected, and deleting a manifest entry while tampering that omitted contract is also rejected as release_identity_mismatch. .github/workflows/release.yml builds and attaches the versioned asset and checksum from GITHUB_REF_NAME/GITHUB_SHA without npm publication.",
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
+}

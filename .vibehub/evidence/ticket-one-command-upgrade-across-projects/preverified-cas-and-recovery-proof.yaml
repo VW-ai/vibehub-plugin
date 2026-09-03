@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "one-safe-worktree-produces-one-preverified-local-commit",
+    "every-non-success-proves-byte-and-git-invariance"
+  ],
+  "evidence_id": "preverified-cas-and-recovery-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:30:39Z",
+  "refs": [
+    "scripts/vibehub-upgrade.mjs",
+    "test/upgrade.test.mjs",
+    "docs/proposals/cross-project-upgrade-surface.md"
+  ],
+  "schema_version": 1,
+  "summary": "For each safe worktree, scripts/vibehub-upgrade.mjs captures named branch/HEAD, clean porcelain and exact index bytes; compares declared paths to baseline Git blobs; uses a temporary GIT_INDEX_FILE plus hash-object/update-index/write-tree and unsigned commit-tree; verifies sole parent, tree, exact path set and blob hashes; rechecks branch, HEAD, status, and index before atomically materializing proven bytes and index; then requires declared bytes/types, exact real-index bytes and tree, staged-only declared porcelain, and no unstaged changes. Every coordinator Git subprocess begins with `-c core.fsmonitor=false`; restoration receives and checks the baseline branch and HEAD both before and after restoring exact files/index. It removes the index lock before the sole terminal `git -c core.hooksPath=<new-empty-dir> update-ref <branch> <commit> <old>` CAS. A recording-Git behavioral proxy observes every real invocation, proves the required plumbing/CAS path, and rejects branch enumeration, stash, reset, checkout, clean, git commit, push/fetch/pull, or remote mutation. Real fixtures configure hostile fsmonitor, reference-transaction/commit hooks, and a hostile signing helper and prove no sentinel runs. Failure tests use read-only Git observations with GIT_OPTIONAL_LOCKS=0 and cover five discovery boundaries, six preflight boundaries, both previews, object/index/tree/commit preparation, pre-materialization, worktree/index writes, final gate, pre-CAS, and an actually rejected CAS; every case proves original HEAD, branch, exact real-index SHA-256 and entries, status, and file digests. The restored after-index-write case retries from the identical old HEAD, migrates successfully, and leaves no index lock. A forced unprovable restore returns fatal recovery_failed and leaves the next repository untouched; a simulated post-CAS reporting failure remains migrated and never rolls back.",
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
+}

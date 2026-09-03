@@ -112,6 +112,25 @@ try {
   if (existsSync(join(artifact, ".claude-plugin", "marketplace.json"))) {
     throw new Error("artifact still ships a marketplace manifest");
   }
+  const installedBoundary = readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-setup",
+    "references",
+    "architecture-boundary.md",
+  ), "utf8");
+  if (!/One narrow exception is the explicitly invoked `vibehub-upgrade` one-shot/u.test(installedBoundary)
+    || !/no general-purpose or globally installed CLI/u.test(installedBoundary)
+    || !/never authorizes another\s+filesystem scan/u.test(installedBoundary)
+    || !/must not add compatibility shims, telemetry, network reporting/u.test(installedBoundary)) {
+    throw new Error("installed architecture boundary is missing the bounded one-shot upgrade exception");
+  }
+  const installedInstall = readFileSync(join(artifact, "docs", "INSTALL.md"), "utf8");
+  if (!installedInstall.includes("tree/<release-tag>")
+    || !installedInstall.includes("releases/download/<release-tag>/vibehub-upgrade.tgz")
+    || !installedInstall.includes("Nothing is pushed")) {
+    throw new Error("installed upgrade documentation is missing same-tag, explicit local-only behavior");
+  }
   const installedPlanSkill = readFileSync(
     join(artifact, "skills", "vibehub-ticket-plan", "SKILL.md"),
     "utf8",

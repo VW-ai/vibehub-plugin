@@ -114,6 +114,9 @@ test("release is GitHub-only, reproducible, and documented", () => {
     "verify-release-version.mjs",
     "npm run verify",
     "npm run build",
+    "build-upgrade-package.mjs",
+    "vibehub-upgrade.tgz",
+    "vibehub-upgrade.tgz.sha256",
     "sha256sum",
     "cd dist",
     "gh release create",
@@ -123,5 +126,7 @@ test("release is GitHub-only, reproducible, and documented", () => {
   const procedure = read("docs/RELEASE.md");
   assert.match(procedure, /Merge the verified PR/u);
   assert.match(procedure, /Tag the exact merged `main` commit/u);
-  assert.match(procedure, /npm is not a release or installation surface/u);
+  assert.match(procedure, /npm is an execution client/u);
+  assert.match(procedure, /not a registry release or global installation surface/u);
+  assert.match(procedure, /same tag and commit identity/u);
 });

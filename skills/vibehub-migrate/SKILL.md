@@ -44,7 +44,11 @@ actions. This Skill supplies only the judgment named by declared semantic steps.
    durable pending refs remain; only `current` with no pending steps is a
    no-work result. The operation neither discovers other projects or
    worktrees nor commits or pushes; a separate upgrade coordinator may invoke
-   it once per safe registered worktree.
+   it once per safe registered worktree. When the current session follows that
+   explicit upgrade, read its report or exact Git history and tell the user the
+   40-hex local migration commit for this worktree before doing semantic work;
+   do not infer a commit from branch position or claim that one commit updated
+   sibling worktrees.
 4. Spend Agent reasoning only on each returned semantic step, following its
    `purpose`, `derives_from`, `good_value`, `forbidden_shortcuts`, and
    `instructions`. Placement judgment follows
