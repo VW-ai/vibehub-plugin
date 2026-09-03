@@ -7,6 +7,7 @@ import {
   realpathSync,
   readdirSync,
   renameSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -86,7 +87,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; project operations include init, compatibility, migrate-mechanical, and validate",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -322,6 +323,302 @@ function projectCompatibility(repo) {
     reason: initialized
       ? "This repository predates the project format marker and needs an explicit migration before writes are allowed."
       : "This repository has not been initialized for VibeHub.",
+  };
+}
+
+function validateMigrationsReference(reference) {
+  const errors = [];
+  if (!strictKeys(
+    errors,
+    reference,
+    new Set(["schema_version", "owner", "current_format", "migrations"]),
+    "migrations",
+  )) return errors;
+  if (reference.schema_version !== 2) add(errors, "migrations.schema_version", "must equal 2");
+  if (reference.owner !== "vibehub-migrate") add(errors, "migrations.owner", "must equal vibehub-migrate");
+  if (reference.current_format !== CURRENT_PROJECT_FORMAT) {
+    add(errors, "migrations.current_format", `must equal ${CURRENT_PROJECT_FORMAT}`);
+  }
+  if (!Array.isArray(reference.migrations) || reference.migrations.length === 0) {
+    add(errors, "migrations.migrations", "must be a non-empty array");
+    return errors;
+  }
+  const ids = new Set();
+  const fromFormats = new Set();
+  reference.migrations.forEach((migration, index) => {
+    const path = `migrations.migrations[${index}]`;
+    if (!strictKeys(
+      errors,
+      migration,
+      new Set(["migration_id", "from", "to", "detect", "document_schema_versions", "mechanical", "semantic"]),
+      path,
+    )) return;
+    requiredString(errors, migration, "migration_id", path, { id: true });
+    requiredString(errors, migration, "from", path);
+    requiredString(errors, migration, "to", path);
+    requiredString(errors, migration, "detect", path);
+    if (ids.has(migration.migration_id)) add(errors, `${path}.migration_id`, "must be unique");
+    if (fromFormats.has(migration.from)) add(errors, `${path}.from`, "must be unique");
+    ids.add(migration.migration_id);
+    fromFormats.add(migration.from);
+
+    const mechanicalPath = `${path}.mechanical`;
+    if (strictKeys(errors, migration.mechanical, new Set(["declared_paths", "actions"]), mechanicalPath)) {
+      stringArray(errors, migration.mechanical.declared_paths, `${mechanicalPath}.declared_paths`);
+      if (!Array.isArray(migration.mechanical.actions)) {
+        add(errors, `${mechanicalPath}.actions`, "must be an array");
+      } else migration.mechanical.actions.forEach((action, actionIndex) => {
+        const actionPath = `${mechanicalPath}.actions[${actionIndex}]`;
+        if (!isObject(action)) {
+          add(errors, actionPath, "must be an object");
+        } else if (action.type === "write-project-format") {
+          strictKeys(errors, action, new Set(["type", "format_version"]), actionPath);
+          if (!Number.isInteger(action.format_version) || action.format_version < 1) {
+            add(errors, `${actionPath}.format_version`, "must be a positive integer");
+          }
+        } else if (action.type === "upgrade-ticket-schema") {
+          strictKeys(
+            errors,
+            action,
+            new Set(["type", "from", "to", "defaults", "pending_semantic_ref"]),
+            actionPath,
+          );
+          if (!Number.isInteger(action.from) || !Number.isInteger(action.to)) {
+            add(errors, actionPath, "from and to must be integers");
+          }
+          if (!isObject(action.defaults)) add(errors, `${actionPath}.defaults`, "must be an object");
+          requiredString(errors, action, "pending_semantic_ref", actionPath);
+        } else {
+          add(errors, `${actionPath}.type`, "is not a supported mechanical migration action");
+        }
+      });
+    }
+
+    const semanticPath = `${path}.semantic`;
+    if (strictKeys(errors, migration.semantic, new Set(["steps"]), semanticPath)) {
+      if (!Array.isArray(migration.semantic.steps)) {
+        add(errors, `${semanticPath}.steps`, "must be an array");
+      } else migration.semantic.steps.forEach((step, stepIndex) => {
+        const stepPath = `${semanticPath}.steps[${stepIndex}]`;
+        if (!strictKeys(
+          errors,
+          step,
+          new Set(["step_id", "pending_ref", "purpose", "derives_from", "good_value", "forbidden_shortcuts", "instructions"]),
+          stepPath,
+        )) return;
+        requiredString(errors, step, "step_id", stepPath, { id: true });
+        if (step.pending_ref !== undefined) requiredString(errors, step, "pending_ref", stepPath);
+        requiredString(errors, step, "purpose", stepPath);
+        stringArray(errors, step.derives_from, `${stepPath}.derives_from`, { nonEmpty: true });
+        requiredString(errors, step, "good_value", stepPath);
+        stringArray(errors, step.forbidden_shortcuts, `${stepPath}.forbidden_shortcuts`, { nonEmpty: true });
+        stringArray(errors, step.instructions, `${stepPath}.instructions`, { nonEmpty: true });
+      });
+    }
+    for (const action of migration.mechanical?.actions ?? []) {
+      if (action.pending_semantic_ref !== undefined
+        && !migration.semantic?.steps?.some((step) => step.pending_ref === action.pending_semantic_ref)) {
+        add(
+          errors,
+          `${path}.mechanical.actions`,
+          `pending semantic ref ${action.pending_semantic_ref} must name a semantic step in the same migration`,
+        );
+      }
+    }
+  });
+  return errors;
+}
+
+function migrationFormatKey(detectedFormat) {
+  return Number.isInteger(detectedFormat) ? `format-${detectedFormat}` : detectedFormat;
+}
+
+function migrationPathMatches(path, declared) {
+  if (path === declared) return true;
+  if (!declared.endsWith("/*.yaml")) return false;
+  const directory = declared.slice(0, -"*.yaml".length);
+  const remainder = path.startsWith(directory) ? path.slice(directory.length) : "";
+  return remainder.endsWith(".yaml") && !remainder.includes("/");
+}
+
+function relativeProjectPath(repo, path) {
+  const prefix = `${resolve(repo)}${sep}`;
+  const absolute = resolve(path);
+  if (!absolute.startsWith(prefix)) {
+    throw new VibeHubError("migration_error", `Migration path escapes the selected repository: ${absolute}`);
+  }
+  return absolute.slice(prefix.length).split(sep).join("/");
+}
+
+function pendingSemanticRefs(repo) {
+  const refs = new Set();
+  for (const path of yamlFiles(dirs(repo).tickets)) {
+    const document = readDocument(path);
+    for (const ref of Array.isArray(document.provenance_refs) ? document.provenance_refs : []) {
+      if (ref.startsWith("migration-pending:")) refs.add(ref);
+    }
+  }
+  return [...refs].sort();
+}
+
+function guidanceForPendingRefs(reference, refs) {
+  const pending = new Set(refs);
+  return reference.migrations.flatMap((migration) => migration.semantic.steps
+    .filter((step) => step.pending_ref && pending.has(step.pending_ref))
+    .map((step) => ({ migration_id: migration.migration_id, ...step })));
+}
+
+function migrateMechanical(repo) {
+  const migrationsReference = JSON.parse(readFileSync(
+    fileURLToPath(new URL("../../vibehub-migrate/references/migrations.json", import.meta.url)),
+    "utf8",
+  ));
+  const referenceErrors = validateMigrationsReference(migrationsReference);
+  assertValid(referenceErrors, "Migration reference is invalid");
+  const compatibility = projectCompatibility(repo);
+  if (compatibility.state === "UNSUPPORTED_NEWER") {
+    throw new VibeHubError("format_mismatch", compatibility.reason, { compatibility });
+  }
+  if (compatibility.detected_format === "uninitialized") {
+    throw new VibeHubError(
+      "format_mismatch",
+      "Uninitialized projects use project init; there is no migration path.",
+      { compatibility },
+    );
+  }
+  if (compatibility.state === "CURRENT") {
+    const pending = pendingSemanticRefs(repo);
+    return {
+      status: pending.length > 0 ? "current_with_semantic_pending" : "current",
+      changed_paths: [],
+      applied_migrations: [],
+      pending_semantic_refs: pending,
+      pending_semantic_steps: guidanceForPendingRefs(migrationsReference, pending),
+      target_format: CURRENT_PROJECT_FORMAT,
+    };
+  }
+
+  const migrations = new Map(migrationsReference.migrations.map((item) => [item.from, item]));
+  const plannedWrites = new Map();
+  const applied = [];
+  const pendingSteps = [];
+  let format = migrationFormatKey(compatibility.detected_format);
+  const visited = new Set();
+
+  while (format !== `format-${CURRENT_PROJECT_FORMAT}`) {
+    if (visited.has(format)) {
+      throw new VibeHubError("migration_error", `Migration path contains a cycle at ${format}`);
+    }
+    visited.add(format);
+    const migration = migrations.get(format);
+    if (!migration) {
+      throw new VibeHubError("migration_path_missing", `No declared migration starts at ${format}`);
+    }
+    const actions = migration.mechanical.actions;
+    const semanticSteps = migration.semantic.steps.map((step) => ({
+      migration_id: migration.migration_id,
+      ...step,
+    }));
+    pendingSteps.push(...semanticSteps);
+    if (actions.length === 0) {
+      return {
+        status: "semantic_required",
+        detected_format: compatibility.detected_format,
+        target_format: CURRENT_PROJECT_FORMAT,
+        changed_paths: [],
+        applied_migrations: [],
+        pending_semantic_steps: pendingSteps,
+        reason: `Migration ${migration.migration_id} has no mechanical actions and requires Agent judgment before the path can continue.`,
+      };
+    }
+
+    for (const action of actions) {
+      if (action.type === "write-project-format") {
+        plannedWrites.set(projectFormatPath(repo), {
+          document: {
+            schema_version: 1,
+            kind: "vibehub_project",
+            format_version: action.format_version,
+          },
+          migration,
+        });
+      } else if (action.type === "upgrade-ticket-schema") {
+        for (const path of yamlFiles(dirs(repo).tickets)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.from, action.to].includes(existing.schema_version)) {
+            throw new VibeHubError(
+              "migration_error",
+              `${path} has Ticket schema ${existing.schema_version}; expected ${action.from} or ${action.to}`,
+            );
+          }
+          const document = { ...existing, schema_version: action.to };
+          for (const [key, value] of Object.entries(action.defaults)) {
+            if (document[key] === undefined) document[key] = structuredClone(value);
+          }
+          if (!Array.isArray(document.provenance_refs)) {
+            throw new VibeHubError("migration_error", `${path}.provenance_refs must be an array`);
+          }
+          if (!document.provenance_refs.includes(action.pending_semantic_ref)) {
+            document.provenance_refs = [...document.provenance_refs, action.pending_semantic_ref];
+          }
+          assertValid(validateTicket(document, path), "Mechanically migrated Ticket is invalid");
+          plannedWrites.set(path, { document, migration });
+        }
+      }
+    }
+    applied.push(migration.migration_id);
+    format = migration.to;
+  }
+
+  const changedPaths = [];
+  const originals = new Map();
+  for (const [path, { document, migration }] of plannedWrites) {
+    const relative = relativeProjectPath(repo, path);
+    if (!migration.mechanical.declared_paths.some((declared) => migrationPathMatches(relative, declared))) {
+      throw new VibeHubError(
+        "migration_error",
+        `Migration ${migration.migration_id} attempted undeclared path ${relative}`,
+      );
+    }
+    if (!existsSync(path) || readFileSync(path, "utf8") !== serialize(document)) {
+      originals.set(path, existsSync(path) ? readFileSync(path, "utf8") : null);
+      changedPaths.push(relative);
+    }
+  }
+  try {
+    for (const [path, source] of originals) {
+      writeDocument(path, plannedWrites.get(path).document);
+    }
+    const migratedCompatibility = projectCompatibility(repo);
+    if (migratedCompatibility.state !== "CURRENT") {
+      throw new VibeHubError(
+        "migration_error",
+        "Mechanical migration stopped before the current format",
+        { compatibility: migratedCompatibility },
+      );
+    }
+    const repository = loadRepository(repo);
+    assertValid(repository.errors, "Mechanically migrated project is invalid");
+  } catch (error) {
+    for (const [path, source] of [...originals].reverse()) {
+      if (source === null) {
+        if (existsSync(path)) unlinkSync(path);
+      } else {
+        const temporary = `${path}.rollback-${process.pid}`;
+        writeFileSync(temporary, source, { flag: "wx" });
+        renameSync(temporary, path);
+      }
+    }
+    throw error;
+  }
+  return {
+    status: pendingSteps.length > 0 ? "migrated_with_semantic_pending" : "migrated",
+    detected_format: compatibility.detected_format,
+    target_format: CURRENT_PROJECT_FORMAT,
+    changed_paths: changedPaths.sort(),
+    applied_migrations: applied,
+    pending_semantic_refs: pendingSemanticRefs(repo),
+    pending_semantic_steps: pendingSteps,
   };
 }
 
@@ -1501,6 +1798,7 @@ function roomOperation(operation, repo, input, options = {}) {
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
+  if (operation === "migrate-mechanical") return migrateMechanical(repo);
   if (operation === "validate") {
     const compatibility = assertCurrentProjectFormat(repo);
     const repository = loadRepository(repo);

@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "mechanical-half-runs-on-its-own",
+    "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
+    "unblocking-is-separated-from-enriching"
+  ],
+  "evidence_id": "mechanical-migration-engine-and-isolation-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T02:51:25.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-migrate/references/migrations.json",
+    "test/migration.test.mjs",
+    "test-run:node --test test/migration.test.mjs test/skill-contracts.test.mjs:12-of-12"
+  ],
+  "schema_version": 1,
+  "summary": "The project migrate-mechanical operation reads migrations.json, permits only declared action types and paths, and runs without Git discovery or mutation. The format-1 fixture reaches CURRENT format 2 and passes project validate while each mechanically empty deliveries array is distinguishable from an audited empty value by migration-pending:format-1-to-format-2:classify-delivery-membership. A separate fresh engine invocation on that now-CURRENT project returns current_with_semantic_pending, no changed paths, the pending ref, and the matching complete semantic-step guidance, so later sessions do not lose the enrichment handoff. The 0.4 semantic-only fixture reports semantic_required with changed_paths [], writes no marker, and preserves exact Context and Ticket bytes. A real Git repository fixture with a registered sibling worktree proves only the passed worktree's declared Ticket and version paths change; sibling tracked bytes and status, both HEADs, all refs, and commit count remain identical. A failed post-write validation restores every original byte.",
+  "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
+}

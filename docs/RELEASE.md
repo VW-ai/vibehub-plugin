@@ -25,3 +25,17 @@ npm is not a release or installation surface for this product generation.
    and run `sha256sum --check vibehub-plugin-X.Y.Z.tar.gz.sha256`.
 
 Never create the final tag or GitHub Release from a feature branch.
+
+## Data-layer changes
+
+Any release that changes the project format or a persisted document schema must
+update `skills/vibehub-migrate/references/migrations.json` in the same change.
+Every added or changed migration entry must declare both
+`mechanical.declared_paths` plus `mechanical.actions` and `semantic.steps`.
+Every semantic step must carry its purpose, source material, good-value rule,
+forbidden shortcuts, and executable instructions. An empty half is declared as
+an empty array, never omitted.
+
+`test/skill-contracts.test.mjs` enforces this classification and
+`test/migration.test.mjs` exercises the mechanical operation. A data-layer
+change is not releasable when either check fails.

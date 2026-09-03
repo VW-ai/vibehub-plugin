@@ -85,27 +85,62 @@ test("skills point at their governing shared references", () => {
 
   const migrations = JSON.parse(readFileSync(join(root, "skills", "vibehub-migrate", "references", "migrations.json"), "utf8"));
   const versions = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "versions.json"), "utf8"));
+  assert.equal(migrations.schema_version, 2);
   assert.equal(migrations.owner, "vibehub-migrate");
   assert.equal(migrations.current_format, versions.project_format);
-  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length >= 1);
+  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 3);
+  for (const migration of migrations.migrations) {
+    assert.ok(Array.isArray(migration.mechanical.declared_paths));
+    assert.ok(Array.isArray(migration.mechanical.actions));
+    assert.ok(Array.isArray(migration.semantic.steps));
+    for (const step of migration.semantic.steps) {
+      assert.ok(typeof step.purpose === "string" && step.purpose.length > 0);
+      assert.ok(Array.isArray(step.derives_from) && step.derives_from.length > 0);
+      assert.ok(typeof step.good_value === "string" && step.good_value.length > 0);
+      assert.ok(Array.isArray(step.forbidden_shortcuts) && step.forbidden_shortcuts.length > 0);
+      assert.ok(Array.isArray(step.instructions) && step.instructions.length > 0);
+    }
+  }
   const first = migrations.migrations[0];
-  assert.equal(first.from, "0.4");
-  assert.equal(first.to, "0.5");
-  assert.ok(typeof first.detect === "string" && first.steps.length >= 3);
+  assert.equal(first.from, "0.4-unversioned");
+  assert.equal(first.to, "0.5-unversioned");
+  assert.equal(first.mechanical.actions.length, 0);
+  assert.equal(first.semantic.steps[0].step_id, "design-room-tree-and-place-contexts");
   const formatMarker = migrations.migrations.find((migration) => migration.from === "0.5-unversioned");
   assert.equal(formatMarker.to, "format-1");
   assert.match(formatMarker.detect, /project compatibility/u);
-  assert.ok(formatMarker.steps.some((step) => step.includes(".vibehub/version.yaml")));
+  assert.deepEqual(formatMarker.mechanical.actions, [
+    { type: "write-project-format", format_version: 1 },
+  ]);
+  assert.deepEqual(formatMarker.semantic.steps, []);
   const deliveryAudit = migrations.migrations.find((migration) => migration.from === "format-1");
   assert.equal(deliveryAudit.to, "format-2");
   assert.deepEqual(deliveryAudit.document_schema_versions, {
     ticket: { from: 1, to: 2 },
   });
   assert.match(deliveryAudit.detect, /detected_format 1/u);
-  assert.ok(deliveryAudit.steps.some((step) => step.includes("deliveries array")));
-  assert.ok(deliveryAudit.steps.some((step) => step.includes("schema_version 1 to schema_version 2")));
-  assert.ok(deliveryAudit.steps.some((step) => step.includes("format_version 2")));
+  assert.deepEqual(deliveryAudit.mechanical.actions.map((action) => action.type), [
+    "upgrade-ticket-schema",
+    "write-project-format",
+  ]);
+  assert.equal(deliveryAudit.semantic.steps[0].step_id, "classify-delivery-membership");
+  assert.equal(
+    deliveryAudit.semantic.steps[0].pending_ref,
+    deliveryAudit.mechanical.actions[0].pending_semantic_ref,
+  );
+  assert.match(deliveryAudit.semantic.steps[0].forbidden_shortcuts.join(" "), /Ticket status/u);
   assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
+  assert.ok(
+    bodies.get("vibehub-migrate").includes("project migrate-mechanical --repo <root>"),
+    "vibehub-migrate misses the mechanical engine command",
+  );
+  assert.equal(
+    bodies.get("vibehub-migrate").includes("write .vibehub/version.yaml"),
+    false,
+    "vibehub-migrate must not restate reference-owned mechanical actions",
+  );
+  assert.doesNotMatch(bodies.get("vibehub-migrate"), /CURRENT` stops with no work/u);
+  assert.match(bodies.get("vibehub-migrate"), /current_with_semantic_pending/u);
 
   const projectFormat = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");

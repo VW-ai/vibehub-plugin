@@ -1,11 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { context, room, root, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
-test("the complete 0.4-to-current migration takes a flat-context repo from failing to valid", () => {
+function git(repo, ...args) {
+  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  return result.stdout;
+}
+
+function trackedSnapshot(repo) {
+  return Object.fromEntries(
+    git(repo, "ls-files", "-z")
+      .split("\0")
+      .filter(Boolean)
+      .map((path) => [path, readFileSync(join(repo, path), "utf8")]),
+  );
+}
+
+test("a semantic-only 0.4 step makes no change, then the engine completes the mechanical path", () => {
   const repo = tempRepo("migrate-04-to-05");
   assert.equal(run(repo, "project", "init").status, 0);
   unlinkSync(join(repo, ".vibehub", "version.yaml"));
@@ -35,9 +50,27 @@ test("the complete 0.4-to-current migration takes a flat-context repo from faili
     "0.4-unversioned",
   );
 
-  // The migrations.json steps, performed mechanically:
-  // 1. build a room tree; 2. move the entry into its owning room;
-  // 3. rewrite the ticket ref to the roomed path.
+  const beforeMechanical = {
+    context: readFileSync(join(repo, ".vibehub", "context", "decision-use-tickets.yaml"), "utf8"),
+    ticket: readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"),
+  };
+  const refused = run(repo, "project", "migrate-mechanical");
+  assert.equal(refused.status, 0, refused.stderr);
+  assert.equal(refused.envelope.data.status, "semantic_required");
+  assert.deepEqual(refused.envelope.data.changed_paths, []);
+  assert.equal(refused.envelope.data.pending_semantic_steps[0].step_id, "design-room-tree-and-place-contexts");
+  assert.equal(
+    readFileSync(join(repo, ".vibehub", "context", "decision-use-tickets.yaml"), "utf8"),
+    beforeMechanical.context,
+  );
+  assert.equal(
+    readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"),
+    beforeMechanical.ticket,
+  );
+  assert.equal(existsSync(join(repo, ".vibehub", "version.yaml")), false);
+
+  // Agent judgment supplies the Room design and placement, including the
+  // destination-dependent ref rewrite. The engine owns everything after it.
   writeRoom(repo, "product", room("product"));
   renameSync(
     join(repo, ".vibehub", "context", "decision-use-tickets.yaml"),
@@ -56,35 +89,107 @@ test("the complete 0.4-to-current migration takes a flat-context repo from faili
   assert.equal(roomedCompatibility.envelope.data.state, "MIGRATION_REQUIRED");
   assert.equal(roomedCompatibility.envelope.data.detected_format, "0.5-unversioned");
 
-  writeFileSync(
-    join(repo, ".vibehub", "version.yaml"),
-    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 1 }, null, 2)}\n`,
-  );
-  const format1Compatibility = run(repo, "project", "compatibility");
-  assert.equal(format1Compatibility.status, 0);
-  assert.equal(format1Compatibility.envelope.data.state, "MIGRATION_REQUIRED");
-  assert.equal(format1Compatibility.envelope.data.detected_format, 1);
-  assert.equal(format1Compatibility.envelope.data.target_format, 2);
-
-  writeFileSync(
-    join(repo, ".vibehub", "version.yaml"),
-    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 2 }, null, 2)}\n`,
-  );
-  const prematureMarker = run(repo, "project", "validate");
-  assert.notEqual(prematureMarker.status, 0);
-  assert.match(JSON.stringify(prematureMarker.envelope.error.details), /schema_version.*must equal 2/u);
-
-  const audited = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"));
-  audited.schema_version = 2;
-  audited.deliveries = [];
-  writeFileSync(
-    join(repo, ".vibehub", "tickets", "feature.yaml"),
-    `${JSON.stringify(audited, null, 2)}\n`,
-  );
+  const completed = run(repo, "project", "migrate-mechanical");
+  assert.equal(completed.status, 0, completed.stderr);
+  assert.equal(completed.envelope.data.status, "migrated_with_semantic_pending");
+  assert.deepEqual(completed.envelope.data.applied_migrations, [
+    "0-5-unversioned-to-format-1",
+    "format-1-to-format-2",
+  ]);
+  assert.deepEqual(completed.envelope.data.changed_paths, [
+    ".vibehub/tickets/feature.yaml",
+    ".vibehub/version.yaml",
+  ]);
+  const pendingTicket = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"));
+  assert.equal(pendingTicket.schema_version, 2);
+  assert.deepEqual(pendingTicket.deliveries, []);
+  assert.ok(pendingTicket.provenance_refs.includes(
+    "migration-pending:format-1-to-format-2:classify-delivery-membership",
+  ));
+  const resumed = run(repo, "project", "migrate-mechanical");
+  assert.equal(resumed.status, 0, resumed.stderr);
+  assert.equal(resumed.envelope.data.status, "current_with_semantic_pending");
+  assert.deepEqual(resumed.envelope.data.changed_paths, []);
+  assert.equal(resumed.envelope.data.pending_semantic_steps[0].step_id, "classify-delivery-membership");
+  assert.match(resumed.envelope.data.pending_semantic_steps[0].purpose, /delivered/u);
+  assert.ok(resumed.envelope.data.pending_semantic_steps[0].derives_from.length > 0);
+  assert.ok(resumed.envelope.data.pending_semantic_steps[0].forbidden_shortcuts.length > 0);
+  assert.ok(resumed.envelope.data.pending_semantic_steps[0].instructions.length > 0);
   const healed = run(repo, "project", "validate");
   assert.equal(healed.status, 0, healed.stdout);
   const queried = run(repo, "context", "query", { query: "development entry" });
   assert.equal(queried.envelope.data.count, 1);
+});
+
+test("mechanical migration changes only declared paths in the exact worktree", () => {
+  const repo = tempRepo("migrate-one-worktree");
+  assert.equal(run(repo, "project", "init").status, 0);
+  const legacy = ticket("feature");
+  legacy.schema_version = 1;
+  delete legacy.deliveries;
+  writeFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), `${JSON.stringify(legacy, null, 2)}\n`);
+  writeFileSync(
+    join(repo, ".vibehub", "version.yaml"),
+    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 1 }, null, 2)}\n`,
+  );
+  git(repo, "init");
+  git(repo, "config", "user.name", "VibeHub Test");
+  git(repo, "config", "user.email", "vibehub@example.test");
+  git(repo, "add", ".");
+  git(repo, "commit", "-m", "format 1 fixture");
+  const sibling = `${repo}-sibling`;
+  git(repo, "worktree", "add", "-b", "sibling", sibling);
+
+  const siblingBefore = trackedSnapshot(sibling);
+  const siblingStatusBefore = git(sibling, "status", "--porcelain=v1", "--untracked-files=all");
+  const mainHeadBefore = git(repo, "rev-parse", "HEAD");
+  const siblingHeadBefore = git(sibling, "rev-parse", "HEAD");
+  const refsBefore = git(repo, "show-ref");
+  const commitsBefore = git(repo, "rev-list", "--all", "--count");
+
+  const migrated = run(repo, "project", "migrate-mechanical");
+  assert.equal(migrated.status, 0, migrated.stderr);
+  assert.deepEqual(migrated.envelope.data.changed_paths, [
+    ".vibehub/tickets/feature.yaml",
+    ".vibehub/version.yaml",
+  ]);
+  assert.equal(run(repo, "project", "compatibility").envelope.data.state, "CURRENT");
+  assert.equal(run(repo, "project", "validate").status, 0);
+
+  assert.deepEqual(trackedSnapshot(sibling), siblingBefore);
+  assert.equal(git(sibling, "status", "--porcelain=v1", "--untracked-files=all"), siblingStatusBefore);
+  assert.equal(git(repo, "rev-parse", "HEAD"), mainHeadBefore);
+  assert.equal(git(sibling, "rev-parse", "HEAD"), siblingHeadBefore);
+  assert.equal(git(repo, "show-ref"), refsBefore);
+  assert.equal(git(repo, "rev-list", "--all", "--count"), commitsBefore);
+  assert.deepEqual(
+    git(repo, "status", "--porcelain=v1").split("\n").filter(Boolean).sort(),
+    [" M .vibehub/tickets/feature.yaml", " M .vibehub/version.yaml"],
+  );
+});
+
+test("a failed post-migration validation restores every original byte", () => {
+  const repo = tempRepo("migrate-rollback");
+  assert.equal(run(repo, "project", "init").status, 0);
+  const legacy = ticket("feature");
+  legacy.schema_version = 1;
+  delete legacy.deliveries;
+  legacy.context_refs = [{ ref: "docs/missing.md", purpose: "Deliberately invalid fixture." }];
+  const ticketPath = join(repo, ".vibehub", "tickets", "feature.yaml");
+  const versionPath = join(repo, ".vibehub", "version.yaml");
+  writeFileSync(ticketPath, `${JSON.stringify(legacy, null, 2)}\n`);
+  writeFileSync(
+    versionPath,
+    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 1 }, null, 2)}\n`,
+  );
+  const ticketBefore = readFileSync(ticketPath, "utf8");
+  const versionBefore = readFileSync(versionPath, "utf8");
+
+  const failed = run(repo, "project", "migrate-mechanical");
+  assert.notEqual(failed.status, 0);
+  assert.equal(failed.envelope.error.code, "validation_error");
+  assert.equal(readFileSync(ticketPath, "utf8"), ticketBefore);
+  assert.equal(readFileSync(versionPath, "utf8"), versionBefore);
 });
 
 test("the repository format-2 audit makes delivery structure explicit and evidence-backed", () => {
