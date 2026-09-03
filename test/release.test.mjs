@@ -55,8 +55,8 @@ test("README is a dark-safe one-line product surface", () => {
   for (const phase of ["DRAFT", "READY", "RUNNING", "DONE"]) assert.match(readme, new RegExp(`\\b${phase}\\b`, "u"));
   assert.match(readme, /Recommended action stays primary/u);
   assert.doesNotMatch(readme, /docs\/assets\/local-graph\/[^\s"')]+\.jpe?g/iu);
-  assert.match(readme, /codex plugin marketplace add VW-ai\/vibehub-plugin/u);
-  assert.match(readme, /\/plugin install vibehub@vibehub/u);
+  assert.match(readme, /npx skills add VW-ai\/vibehub-plugin/u);
+  assert.doesNotMatch(readme, /plugin marketplace add|plugin install vibehub@vibehub/u);
   assert.doesNotMatch(readme, /but no global CLI|MCP server, database|background capture/u);
   assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
 });
@@ -88,8 +88,11 @@ test("README Workbench screenshots match the checked-in Retina capture manifest"
 });
 
 test("the canonical entry routes through existing Setup and Ticket Plan", () => {
-  const codex = JSON.parse(read(".codex-plugin/plugin.json"));
-  assert.deepEqual(codex.interface.defaultPrompt, ["Start this with VibeHub."]);
+  // The canonical entry prompt lived in the Codex marketplace manifest, which
+  // was retired with the rest of marketplace distribution; the Skills are now
+  // its only home.
+  const setup = read("skills/vibehub-setup/SKILL.md");
+  assert.match(setup, /Start this with VibeHub\./u);
   const plan = read("skills/vibehub-ticket-plan/SKILL.md");
   assert.match(plan, /canonical user entry “Start this with VibeHub\.”/u);
   assert.match(plan, /use `\$vibehub-setup` first and then/u);

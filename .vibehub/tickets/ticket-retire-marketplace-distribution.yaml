@@ -52,18 +52,6 @@
    "ref": "scripts/verify-release-version.mjs"
   },
   {
-   "purpose": "One of the two builders removed.",
-   "ref": "scripts/build-claude-marketplace.mjs"
-  },
-  {
-   "purpose": "The other builder removed; its removal is why the Codex path must be confirmed on npx.",
-   "ref": "scripts/build-codex-marketplace.mjs"
-  },
-  {
-   "purpose": "Exists only for this path.",
-   "ref": "test/host-marketplaces.test.mjs"
-  },
-  {
    "purpose": "Example of the partial-install fallback line that all eleven Skills carry.",
    "ref": "skills/vibehub-core/SKILL.md"
   },
@@ -82,7 +70,10 @@
  "outcome": "VibeHub has one supported way in. Host marketplace distribution is removed rather than repaired, npx skills add is the only documented install path, and nothing in the repository, the release pipeline, or the Skills still points a user at a marketplace.",
  "provenance_refs": [
   "conversation:2026-09-01-packaging-and-release-integrity",
-  "https://github.com/VW-ai/vibehub-plugin/issues/131"
+  "https://github.com/VW-ai/vibehub-plugin/issues/131",
+  "deleted-path:scripts/build-claude-marketplace.mjs",
+  "deleted-path:scripts/build-codex-marketplace.mjs",
+  "deleted-path:test/host-marketplaces.test.mjs"
  ],
  "relations": [],
  "schema_version": 2,

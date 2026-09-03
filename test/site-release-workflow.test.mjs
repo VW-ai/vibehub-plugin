@@ -10,12 +10,11 @@ async function source(path) {
 }
 
 test("the public-site release workflow is repository-local and discoverable", async () => {
-  const [skill, agents, packageJson, readme, manifest, artifactBuilder] = await Promise.all([
+  const [skill, agents, packageJson, readme, artifactBuilder] = await Promise.all([
     source("site/release/SKILL.md"),
     source("AGENTS.md"),
     source("site/package.json"),
     source("site/README.md"),
-    source(".codex-plugin/plugin.json"),
     source("scripts/build-plugin-artifact.mjs"),
   ]);
 
@@ -29,7 +28,7 @@ test("the public-site release workflow is repository-local and discoverable", as
   assert.match(packageJson, /"release:deploy"/);
   assert.match(packageJson, /"release:verify"/);
   assert.match(readme, /Production: \[vibehub\.team\]\(https:\/\/vibehub\.team\)/);
-  assert.match(manifest, /"skills": "\.\/skills\/"/);
+  assert.match(artifactBuilder, /"skills",/);
   assert.doesNotMatch(artifactBuilder, /["']site\/release["']/);
   await assert.rejects(access(new URL("site/.openai/hosting.json", root)), { code: "ENOENT" });
 });

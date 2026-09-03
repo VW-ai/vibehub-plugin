@@ -48,10 +48,6 @@
       "ref": "assets/brand/vibehub-logo.svg"
     },
     {
-      "purpose": "Current five-prompt surface to reduce to the single user entry.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Existing focused home for setup and fallback launcher details.",
       "ref": "docs/INSTALL.md"
     },
@@ -90,7 +86,8 @@
   "provenance_refs": [
     "conversation:2026-08-02-readme-dark-mode-and-one-line-principle",
     "git:5fb2bed",
-    "github:pr-11"
+    "github:pr-11",
+    "deleted-path:.codex-plugin/plugin.json"
   ],
   "relations": [
     {

@@ -58,10 +58,6 @@
       "ref": ".github/workflows/sync-issues.yml"
     },
     {
-      "purpose": "Codex manifest pointing at ./skills/.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Boundary: dependency-free Skills, no CLI.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     }
@@ -71,7 +67,8 @@
   "maturity": "firm",
   "outcome": "npx skills add VW-ai/vibehub-plugin installs a working VibeHub into any skills-capable agent because the shared helper and contracts travel inside a vibehub-core skill folder; the marketplace bundles ship the same layout; project setup offers the GitHub Issues mirror once as an optional copy; README and INSTALL lead with the one-line install.",
   "provenance_refs": [
-    "conversation:2026-08-22-tickets-as-github-issues"
+    "conversation:2026-08-22-tickets-as-github-issues",
+    "deleted-path:.codex-plugin/plugin.json"
   ],
   "relations": [
     {

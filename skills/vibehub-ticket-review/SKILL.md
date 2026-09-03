@@ -6,8 +6,8 @@ description: Present or review the checked-in VibeHub Ticket graph through the r
 # VibeHub Ticket Review
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Read `references/ticket-lifecycle.json` before acting. This Skill owns
 `explicit-review` and is the sole presenter for every event whose

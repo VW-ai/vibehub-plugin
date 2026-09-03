@@ -25,8 +25,11 @@ inside the `vibehub-core` skill folder; a partial install that omits
 `vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
 directly. Update later with `npx skills update`.
 
-**Host marketplaces.** The same layout ships through the Codex and Claude Code
-marketplaces; see the README for the exact commands.
+There is no second install path. Host marketplace distribution was retired:
+it delivered the whole development repository rather than the Skills, and its
+version-string cache key let an install go stale in silence. If you installed
+VibeHub through a Claude Code or Codex marketplace, remove it there and run the
+command above instead.
 
 ## Requirements
 
@@ -102,20 +105,16 @@ explicit migration boundary before restructuring them. `UNSUPPORTED_NEWER`
 means the repository needs a newer plugin; VibeHub does not guess or downgrade
 the data.
 
-**Claude Code.** Claude Code can refresh auto-update-enabled marketplaces and
-installed plugins. Run `/reload-plugins` after an update when you want the new
-bundle in the current process, then start or resume work; repository migration
-remains a separate reviewed action.
+Run `npx skills update` to take a new version. It compares the content of
+each installed Skill folder against the repository rather than a declared
+version string, so an unchanged version number cannot leave you on stale
+Skills. Repository migration remains a separate reviewed action.
 
-**Codex.** Current Codex releases expose explicit Git marketplace refresh:
+**Claude Code.** Run `/reload-plugins` after an update when you want the new
+Skills in the current process, then start or resume work.
 
-```bash
-codex plugin marketplace upgrade vibehub
-```
-
-Refresh or reinstall `vibehub@vibehub` from the plugin browser, then start a
-new session. Codex does not currently expose a documented plugin hot-reload or
-background installed-plugin updater, so VibeHub does not claim or emulate one
+**Codex.** Start a new session after an update. Codex does not currently
+expose a documented Skill hot-reload, so VibeHub does not claim or emulate one
 with a daemon or hook.
 
 ## Ticket graph presentation

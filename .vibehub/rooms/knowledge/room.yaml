@@ -66,5 +66,6 @@
   "kind": "room",
   "room_id": "knowledge",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift: current knowledge Skill edits belong to the marketplace-retirement work, not the historical Git-reference Ticket being planned"
 }

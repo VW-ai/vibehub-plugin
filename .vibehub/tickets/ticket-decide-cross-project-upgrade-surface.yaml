@@ -1,68 +1,91 @@
 {
- "acceptance": [
-  {
-   "acceptance_id": "options-and-costs-are-written-up",
-   "criterion": "The candidate shapes for a read-only outside-a-project entry are written out with their real costs — at minimum a one-shot npx invocation requiring no install, a documented manual procedure with no new entry at all, and any installed form — each judged against what decision-upgrade-drives-every-affected-project actually requires now that migration stays per-project, against the two reasons the current boundary exists, and against what an existing user would have to do."
-  },
-  {
-   "acceptance_id": "replacement-constraint-is-proposed-and-testable",
-   "criterion": "If any option would relax the boundary, the exact replacement constraint is written as text that could be checked in, together with the mechanical assertion that would enforce it, so the boundary is narrowed rather than deleted; if no option relaxes it, that is stated with the reason."
-  },
-  {
-   "acceptance_id": "owner-decides",
-   "authority": "human",
-   "criterion": "The owner explicitly chooses whether VibeHub gains an outside-a-project entry and, if so, accepts the replacement constraint and the amendment to architecture-boundary.md; the choice and its reasoning are recorded as a decision Context in .vibehub/rooms/product referencing human-origin Evidence."
-  }
- ],
- "constraints": [
-  "This Ticket decides and records; it implements no entry point, no scanner, and no index.",
-  "Do not amend skills/vibehub-setup/references/architecture-boundary.md before the owner has chosen; a proposal is text in this Ticket's Evidence, not an edit to the boundary.",
-  "Do not answer ticket-vibehub-cli's question about splitting vh.mjs, and do not close it as a side effect.",
-  "Any proposed index must be derivable by scanning and disposable; a design where an index holds truth is out of scope and contradicts Git as the source of truth.",
-  "Do not propose a hosted service, account system, or telemetry.",
-  "Decide against the read-only reporter that is actually required, not against a general cross-project tool; if a wider surface is wanted, that is a separate decision with its own justification."
- ],
- "context": "decision-upgrade-drives-every-affected-project commits VibeHub to discovering and driving migration across every affected project when a user takes an update. That obligation is deliberately narrow: the machine-wide half only discovers and reports, while the migration itself stays with the next Agent session opened in each project. Even so it cannot attach to the documented update command, because npx skills update belongs to skills.sh and VibeHub cannot hook it. It therefore requires an entry point that runs outside any project — a surface VibeHub has never had, and one that skills/vibehub-setup/references/architecture-boundary.md currently forbids in its strongest form: the product ships no required CLI, MCP server, database, daemon, hook cadence, native runtime, local web service, background capture, or hidden state, and anything a Skill introduces beyond that is a defect rather than a feature. That boundary was written for two reasons and only one has expired. It avoided the old CLI-plus-local-database coupling, which is void now that truth lives in per-project Git. It also acted as a forcing constraint that pushed capability back into Skills and documents, which still works; removing it without a replacement would reintroduce the failure it prevented. A candidate replacement exists and is narrower and testable: new capability always lands in the engine, and any outside-a-project entry adds only cross-project scope, human-readable output, and invocation convenience, with zero capability that exists only there. Skills never call it and it is never a prerequisite for a Skill — a property that is true by construction, because a Skill's work is always in-project and the engine is already on its path, and that test/skill-contracts.test.mjs can assert in the same way it already asserts that every engine command a Skill cites resolves. What such an entry needs is small and derived: which projects on this machine hold a .vibehub, which format each is at, and whether a migration applies. All three are recoverable by scanning, so the index behind it can be a pure cache — deletable and rebuildable — and never becomes an authority. This Ticket does not absorb ticket-vibehub-cli, which is scoped to whether vh.mjs should be split behind a stable Agent-facing command; that is a maintainability question about the engine, while this is a product question about reach. The two answers constrain each other and should be read together, but they are not the same decision. The scope of what is being decided is smaller than it first appears, and the decision should be made against the smaller thing: the entry reads .vibehub directories, reports formats and migration states, and writes nothing outside the project the user is in. A read-only reporter is a weaker precedent than a general cross-project tool, and whether the boundary should be narrowed for it is a different question from whether it should be narrowed for one that acts.",
- "context_refs": [
-  {
-   "purpose": "The obligation that forces this decision and states why the documented update command cannot carry it.",
-   "ref": ".vibehub/rooms/product/decision-upgrade-drives-every-affected-project.yaml"
-  },
-  {
-   "purpose": "Where the never-forced-but-owned-when-taken rule was recorded.",
-   "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
-  },
-  {
-   "purpose": "The constraint under question, in its current binding form.",
-   "ref": "skills/vibehub-setup/references/architecture-boundary.md"
-  },
-  {
-   "purpose": "The original speed-first decision whose forcing-constraint role any replacement must preserve.",
-   "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
-  },
-  {
-   "purpose": "The adjacent open question about splitting vh.mjs, which this Ticket must read alongside but must not absorb or close.",
-   "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
-  },
-  {
-   "purpose": "The existing prose-to-reality assertion pattern that a replacement constraint would use.",
-   "ref": "test/skill-contracts.test.mjs"
-  },
-  {
-   "purpose": "States that VibeHub installs no global CLI; whatever is decided must leave this document true or change it deliberately.",
-   "ref": "docs/INSTALL.md"
-  }
- ],
- "deliveries": [],
- "kind": "ticket",
- "maturity": "firm",
- "outcome": "The owner has decided whether VibeHub gains a read-only entry point that runs outside any single project, and what replaces the no-required-CLI constraint if it does, so the machine-wide upgrade report can be built against a settled boundary instead of around it.",
- "provenance_refs": [
-  "conversation:2026-09-01-packaging-and-release-integrity",
-  "https://github.com/VW-ai/vibehub-plugin/issues/111",
-  "https://github.com/VW-ai/vibehub-plugin/issues/127"
- ],
- "relations": [],
- "schema_version": 2,
- "ticket_id": "ticket-decide-cross-project-upgrade-surface"
+  "acceptance": [
+    {
+      "acceptance_id": "invocation-shapes-are-compared-and-one-is-selected",
+      "criterion": "One-shot npx and any installed invocation shape are compared against the owner-approved write-capable upgrade behavior, including first install, subsequent update, cross-host availability, permission scope, failure recovery, and what command an existing user actually runs; the Evidence selects the smallest shape that can perform the complete flow and explains why the rejected shape cannot do so more cheaply."
+    },
+    {
+      "acceptance_id": "replacement-boundary-is-exact-and-testable",
+      "criterion": "Evidence supplies exact replacement text for architecture-boundary.md that permits one explicit outside-project upgrade entry while requiring all migration semantics to remain in the shared engine and migrations reference, limiting the entry to invocation, discovery, per-worktree orchestration, local commit, and reporting, and forbidding Skill dependency, background invocation, daemon or service state, authoritative indexes, telemetry, and push; it also names the mechanical assertions that will enforce each boundary in implementation."
+    },
+    {
+      "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
+      "criterion": "The operational definition of safe and unsafe is written as deterministic preflight, preview, pre-commit, and failure rules: registered/reachable/writable, named branch, no Git operation, completely clean status, recognized complete migration chain, same-HEAD deterministic preview limited to declared paths, valid writable result with semantic work explicitly pending, unchanged pre-commit snapshot, and successful local commit; current, unsupported, and pending are distinguished, and every non-success path proves no user bytes are changed."
+    },
+    {
+      "acceptance_id": "owner-selects-explicit-upgrade-behavior",
+      "authority": "human",
+      "criterion": "The owner explicitly chooses an outside-project upgrade experience that enumerates all registered existing worktrees, mechanically migrates and locally commits each safe worktree separately, skips and reports unsafe worktrees, never pushes, and leaves remaining semantic migration to later in-worktree Agent sessions; the decision is recorded in product Context without claiming one commit updates multiple worktrees or unregistered branches."
+    }
+  ],
+  "constraints": [
+    "This Ticket decides and records the invocation and replacement architecture boundary; it implements no entry, scanner, migration, commit, or index.",
+    "Do not amend architecture-boundary.md until this Ticket has a successful independent Outcome; the exact proposed text and tests are Evidence first.",
+    "Do not answer ticket-vibehub-cli's maintainability question or make a general-purpose CLI as a side effect.",
+    "Project and worktree discovery may use only bounded explicit roots and disposable derived state; no index may become authority over Git.",
+    "Do not propose a hosted service, account system, telemetry, background process, automatic stash/reset, or push.",
+    "Unsafe worktrees are reported and left byte-for-byte unchanged; implementation may not silently relax the clean-tree, named-branch, no-Git-operation, recognized-chain, deterministic-preview, validation, unchanged-snapshot, or local-commit gates.",
+    "A semantic migration step may remain pending after the mechanical commit only when the declared migration contract says the mechanical result is valid and writable and records the pending semantic work explicitly."
+  ],
+  "context": "The owner has now settled the product behavior that was open when this Ticket was created. An explicit VibeHub upgrade does more than report: it discovers affected projects, enumerates every registered existing worktree, attempts the declared mechanical migration separately on each safe worktree, validates it, creates a local migration commit, reports the worktree-to-commit mapping and every skipped reason, never pushes, and leaves semantic work to a later Agent session in that worktree. decision-explicit-upgrade-migrates-safe-worktrees supersedes the earlier read-only machine-wide decision. Safety starts deliberately conservative: automatic write requires a reachable writable registered worktree on a named branch, no Git operation in progress, a completely clean status, a complete recognized migration chain, a same-HEAD deterministic preview touching only declared paths and reaching valid CURRENT state, an unchanged pre-commit snapshot, and a successful local commit; current is a no-op, malformed or newer is unsupported, and every other failure is pending with an exact reason. The remaining decision work is engineering-boundary work rather than another product choice: compare one-shot and installed invocation shapes against this behavior, select the smallest one, and replace the old absolute no-required-CLI sentence with a testable exception. The candidate exception is narrow: all migration semantics remain in the shared engine and migrations reference; the outside-project entry adds only explicit invocation, discovery, per-worktree orchestration, local commit, and human-readable reporting; no Skill depends on it, no background process invokes it, and it owns no durable truth outside Git.",
+  "context_refs": [
+    {
+      "purpose": "The owner's current decision establishing write-capable, all-registered-worktree upgrade behavior and the conservative safety predicate.",
+      "ref": ".vibehub/rooms/product/decision-explicit-upgrade-migrates-safe-worktrees.yaml"
+    },
+    {
+      "purpose": "Superseded read-only policy whose rationale and rejected machine-wide write boundary this decision deliberately revises.",
+      "ref": ".vibehub/rooms/product/decision-upgrade-drives-every-affected-project.yaml"
+    },
+    {
+      "purpose": "Updating remains optional, but an update taken owns the user's data restructure.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "Current absolute architecture boundary that needs one narrow, enforceable exception.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "Original forcing constraint whose Skill-first and Git-native benefits the replacement must preserve.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Superseded location policy whose mechanical/semantic classification and authoring-guidance obligations remain binding through the successor decision.",
+      "ref": ".vibehub/rooms/product/decision-migrations-declare-mechanical-and-semantic-halves.yaml"
+    },
+    {
+      "purpose": "Single migration source whose complete chains, classification, defaults, and semantic guidance govern safe fan-out.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Dependent draft that will be refined from this decision's successful Outcome rather than rewritten prematurely.",
+      "ref": ".vibehub/tickets/ticket-one-command-upgrade-across-projects.yaml"
+    },
+    {
+      "purpose": "Adjacent future CLI-maintainability question that this decision must not absorb.",
+      "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
+    },
+    {
+      "purpose": "Existing prose-to-engine assertion pattern for the replacement constraint.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "Current installation document whose no-global-CLI claim must remain true or be narrowed deliberately.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The explicit outside-project VibeHub upgrade entry has a settled invocation shape and an implementation-ready, mechanically enforceable architecture boundary for discovering every registered worktree, migrating only safe ones through shared engine semantics, creating local reviewable commits, reporting every result, and never running in the background or pushing.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety",
+    "https://github.com/VW-ai/vibehub-plugin/issues/111",
+    "https://github.com/VW-ai/vibehub-plugin/issues/127",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface"
 }

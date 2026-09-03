@@ -49,5 +49,6 @@
   "kind": "room",
   "room_id": "workbench",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift: current review Skill edit belongs to the independence-gate work, not the historical Git-reference Ticket being planned"
 }

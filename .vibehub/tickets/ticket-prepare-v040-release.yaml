@@ -61,16 +61,8 @@
       "ref": "package.json"
     },
     {
-      "purpose": "Codex plugin release identity and product metadata.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Claude plugin release identity.",
       "ref": ".claude-plugin/plugin.json"
-    },
-    {
-      "purpose": "Claude marketplace release identity.",
-      "ref": ".claude-plugin/marketplace.json"
     },
     {
       "purpose": "Current dependency-free CI baseline that release must preserve.",
@@ -104,7 +96,9 @@
     "conversation:2026-08-02-owner-requests-main-merge-and-formal-release",
     "git:v0.3.0",
     "git:938e2a8",
-    "github:release-v0.3.0-is-current-latest"
+    "github:release-v0.3.0-is-current-latest",
+    "deleted-path:.codex-plugin/plugin.json",
+    "deleted-path:.claude-plugin/marketplace.json"
   ],
   "relations": [
     {

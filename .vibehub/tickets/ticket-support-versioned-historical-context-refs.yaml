@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "versioned-ref-has-one-canonical-shape",
+      "criterion": "Ticket context_refs accept the canonical form commit:<40-hex-sha>:<repo-relative-path> in addition to existing current-tree paths; the grammar rejects abbreviated or moving revisions, empty or absolute paths, traversal, malformed separators, and non-file Git objects, and one shared parser/resolver owns the rule rather than duplicating it across commands."
+    },
+    {
+      "acceptance_id": "exact-historical-content-is-readable",
+      "criterion": "The engine exposes an Agent-readable operation that resolves either context_ref form and returns the cited source plus its identity; for a versioned ref it reads the exact blob at the declared commit even when the path is deleted or has different current content, and it returns a machine-readable error for a missing commit, missing path, directory, symlink, or submodule."
+    },
+    {
+      "acceptance_id": "resolution-never-mutates-worktrees",
+      "criterion": "Resolving and validating a versioned ref uses Git object access only and never checks out a commit, changes HEAD or index state, creates or edits a working-tree file, or depends on which branch another worktree has checked out; tests exercise the operation from a dirty worktree and prove its status and bytes are unchanged."
+    },
+    {
+      "acceptance_id": "ticket-consumers-use-the-same-resolver",
+      "criterion": "Planning, execution, validation, query, and review guidance that asks an Agent to consume Ticket context_refs points to the same engine resolution behavior, so a versioned ref is usable Context rather than merely a string that passes project validation; contract tests fail if Skill guidance names a different syntax or bypasses the resolver."
+    },
+    {
+      "acceptance_id": "marketplace-workarounds-become-readable-history-without-guessing",
+      "criterion": "For each of the nine deleted-path provenance workarounds created by marketplace retirement, reviewable Evidence identifies whether Git history establishes the exact commit/blob that informed the Ticket rather than merely any commit containing the path. Every established case becomes a versioned context_ref and resolves to those exact historical bytes without restoring the retired file; every ambiguous case remains an explicit unresolved provenance note instead of being guessed, and project validation passes in either case."
+    },
+    {
+      "acceptance_id": "format-2-to-3-ships-its-migration-contract",
+      "criterion": "The release advances project format 2 to format 3 while keeping Ticket document schema at 2, and the versions and migrations references advance together. The migration declares as mechanical that ordinary current-tree refs stay unchanged, validation runs, and the project marker rises; it declares historical deleted-path-to-commit selection semantic with guidance requiring exact Git evidence and unresolved handling. Fixtures prove the mechanical upgrade, the semantic boundary, and rejection by an older-format compatibility check rather than accidental forward compatibility."
+    }
+  ],
+  "constraints": [
+    "Git remains the only historical content store; do not copy deleted source bodies into Tickets, add an archive directory, database, cache, hosted service, or hidden state.",
+    "A versioned ref must name a full commit object present in the repository and a regular blob path at that commit; branches, tags, abbreviated SHAs, external URLs, and filesystem paths outside the repository are not equivalent identities.",
+    "Do not weaken validation for existing current-tree refs, and do not accept a versioned ref without proving the object can be read.",
+    "Do not restore retired marketplace files merely to satisfy historical Tickets.",
+    "Follow the declared mechanical/semantic migration boundary; code may identify a commit only when Git establishes it unambiguously and must leave judgment visible when it cannot.",
+    "Do not decide or implement upgrade-time, cross-project, or cross-worktree migration orchestration in this Ticket; consume the per-project migration mechanism and leave trigger/scope policy to its own human decision and downstream Ticket."
+  ],
+  "context": "Retiring marketplace distribution exposed a missing data concept: context_refs are validated only as regular files in the current working tree, so deleting a shipped file invalidated six Tickets and nine references, including completed historical records. The immediate, owner-approved unblock preserves each path as a provenance string prefixed deleted-path:, which is honest but no longer readable as Ticket Context. The durable model should let a context_ref identify both the repository path and the exact Git commit whose blob the Ticket used. Use the explicit form commit:<40-hex-sha>:<repo-relative-path>; a full immutable commit prevents branch movement from silently changing the source, while the path preserves human meaning. Resolution must read Git objects without checking out, resetting, or modifying any worktree. Current working-tree path refs remain supported. This advances project format 2 to format 3 while Ticket documents remain schema_version 2 because their object shape does not change. The format-2-to-format-3 mechanical migration leaves every ordinary current-tree context_ref unchanged and raises the project marker after validating them; it never guesses a historical commit from a deleted-path provenance string. Converting those temporary workarounds is semantic: each chosen commit/blob must be tied by reviewable Git evidence to the version that actually informed the Ticket, and an ambiguous case remains an explicit unresolved provenance note. This Ticket consumes the migration mechanism from ticket-split-migrations-into-mechanical-and-semantic; it does not decide when upgrades run or whether they act across projects or worktrees.",
+  "context_refs": [
+    {
+      "purpose": "The Ticket whose file retirement exposed the missing historical-reference concept and contains the temporary deleted-path workaround.",
+      "ref": ".vibehub/tickets/ticket-retire-marketplace-distribution.yaml"
+    },
+    {
+      "purpose": "Current validator and command surface where context_ref parsing, validation, and resolution belong.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Current Ticket document contract whose ref semantics are extended.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Planning guidance that treats context_refs as the readable inputs carried by a Ticket.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Execution guidance that must consume exact Ticket Context consistently.",
+      "ref": "skills/vibehub-ticket-run/SKILL.md"
+    },
+    {
+      "purpose": "Existing Ticket validation and context-ref regression coverage to extend.",
+      "ref": "test/ticket.test.mjs"
+    },
+    {
+      "purpose": "Binding rule that every data-format change declares its mechanical and semantic migration halves.",
+      "ref": ".vibehub/rooms/product/decision-migrations-declare-mechanical-and-semantic-halves.yaml"
+    },
+    {
+      "purpose": "Direct prerequisite that supplies the classified migration reference and independently runnable mechanical executor this format transition consumes.",
+      "ref": ".vibehub/tickets/ticket-split-migrations-into-mechanical-and-semantic.yaml"
+    },
+    {
+      "purpose": "Single versioned migration source that must carry this format transition.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Canonical project-format and Ticket-schema identities advanced by the change.",
+      "ref": "skills/vibehub-core/contracts/versions.json"
+    },
+    {
+      "purpose": "Compatibility and write-gate coverage for the explicit format-2-to-format-3 boundary.",
+      "ref": "test/project-format.test.mjs"
+    },
+    {
+      "purpose": "Migration fixtures to extend with the mechanical and semantic halves of this transition.",
+      "ref": "test/migration.test.mjs"
+    },
+    {
+      "purpose": "Prose-to-engine contract checks for the one canonical ref syntax and resolver.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "Query guidance that must consume exact historical refs through the shared resolver.",
+      "ref": "skills/vibehub-query/SKILL.md"
+    },
+    {
+      "purpose": "Validation guidance that must use the shared resolver rather than merely accept a string.",
+      "ref": "skills/vibehub-ticket-validate/SKILL.md"
+    },
+    {
+      "purpose": "Review guidance that must display and preserve the immutable source identity.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A Ticket can cite the exact immutable version of a repository file that informed it, so later deletion or modification of that file preserves readable historical Context instead of invalidating the project or forcing the completed Ticket to misstate its source.",
+  "provenance_refs": [
+    "conversation:2026-09-02-historical-context-refs-and-worktree-migrations",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The format-2-to-format-3 transition requires the engine-readable mechanical/semantic classification and mechanical executor that this prerequisite delivers.",
+      "target_ticket_id": "ticket-split-migrations-into-mechanical-and-semantic",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The historical conversion criterion consumes the finalized set of deleted marketplace paths and provenance workarounds produced by this retirement.",
+      "target_ticket_id": "ticket-retire-marketplace-distribution",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-support-versioned-historical-context-refs"
+}

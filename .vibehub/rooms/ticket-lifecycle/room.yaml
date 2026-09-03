@@ -78,5 +78,6 @@
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift: current lifecycle engine and Skill edits belong to the independence-gate work, not the historical Git-reference Ticket being planned"
 }

@@ -35,7 +35,6 @@ try {
   const stats = buildPluginArtifact({ artifactRoot: artifact });
   for (const required of [
     ".claude-plugin/plugin.json",
-    ".codex-plugin/plugin.json",
     "assets/brand/vibehub-logo-dark.svg",
     "assets/brand/vibehub-logo.svg",
     "CHANGELOG.md",
@@ -108,10 +107,10 @@ try {
   ]) {
     if (existsSync(join(artifact, forbidden))) throw new Error(`artifact contains forbidden ${forbidden}`);
   }
-  const codex = JSON.parse(readFileSync(join(artifact, ".codex-plugin", "plugin.json"), "utf8"));
-  if (codex.mcpServers || codex.hooks) throw new Error("Codex manifest still requires MCP or hooks");
-  if (JSON.stringify(codex.interface?.defaultPrompt) !== JSON.stringify(["Start this with VibeHub."])) {
-    throw new Error("Codex manifest does not expose the one canonical VibeHub entry");
+  const claudeManifest = JSON.parse(readFileSync(join(artifact, ".claude-plugin", "plugin.json"), "utf8"));
+  if (claudeManifest.mcpServers || claudeManifest.hooks) throw new Error("plugin manifest still requires MCP or hooks");
+  if (existsSync(join(artifact, ".claude-plugin", "marketplace.json"))) {
+    throw new Error("artifact still ships a marketplace manifest");
   }
   const installedPlanSkill = readFileSync(
     join(artifact, "skills", "vibehub-ticket-plan", "SKILL.md"),

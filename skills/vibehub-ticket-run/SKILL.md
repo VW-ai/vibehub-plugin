@@ -6,8 +6,8 @@ description: Execute one READY lightweight VibeHub Ticket from its checked-in Gi
 # VibeHub Ticket Run
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 There is no Run lease or compiled Context copy. The named branch, Ticket YAML,
 referenced Context, and Git status are the execution boundary, inside

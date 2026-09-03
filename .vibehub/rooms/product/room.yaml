@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "3b9d6fd1fb651ecebf5a4e305c65ffa962d8f42a",
+        "blob": "a9a22e59cc1ee10bf93b134b64cf528aab0b493a",
         "path": "README.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "dc5c7417c6eaed656ad38e5f4ddd579d34b1f54b",
+        "blob": "dec9e9e22d76154647ba906982537d6cb913a66b",
         "path": "docs/INSTALL.md"
       },
       {
@@ -166,6 +166,10 @@
         "path": "docs/proposals/npx-first-install-experience.md"
       },
       {
+        "blob": "46133ab329a21226613cadbd9bdc943671072f9f",
+        "path": "docs/proposals/release-version-identity.md"
+      },
+      {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
@@ -186,8 +190,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T21:29:34.508Z",
-    "last_aligned_commit": "a584cdf34d7643067d5b8d5bad6e50e9958e6e1d"
+    "checked_at": "2026-09-02T23:16:29.406Z",
+    "last_aligned_commit": "f371bf64d02fc4deb17568402eeb42af27af2302"
   },
   "anchors": [
     "CHANGELOG.md",

@@ -43,10 +43,6 @@
       "ref": "test/release.test.mjs"
     },
     {
-      "purpose": "Clean Codex and Claude Code marketplace support proof.",
-      "ref": "test/host-marketplaces.test.mjs"
-    },
-    {
       "purpose": "Completed feature set and Evidence behind the v0.6.0 human-decision boundary release.",
       "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
     },
@@ -70,7 +66,8 @@
   "provenance_refs": [
     "conversation:2026-08-10-v060-release-request",
     "github:pull-request-15",
-    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
+    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a",
+    "deleted-path:test/host-marketplaces.test.mjs"
   ],
   "relations": [
     {

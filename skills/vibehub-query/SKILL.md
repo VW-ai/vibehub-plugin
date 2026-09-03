@@ -6,8 +6,8 @@ description: Retrieve lightweight Git-native VibeHub Context for a Ticket, file,
 # VibeHub Query
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Use the smallest query that can answer the task. The Room tree under
 `.vibehub/rooms/` is the source of truth — every Context entry lives inside

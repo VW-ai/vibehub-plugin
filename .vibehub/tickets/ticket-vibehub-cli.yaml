@@ -27,10 +27,6 @@
       "ref": "test/project-format.test.mjs"
     },
     {
-      "purpose": "Cross-host clean-install parity expected from any future CLI distribution shape.",
-      "ref": "test/host-marketplaces.test.mjs"
-    },
-    {
       "purpose": "Binding lightweight boundary that currently forbids a required CLI or runtime service.",
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     },
@@ -46,7 +42,8 @@
   "provenance_refs": [
     "conversation:2026-08-04-future-cli-idea",
     "conversation:2026-08-04-vh-mjs-maintainability-evaluation",
-    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115",
+    "deleted-path:test/host-marketplaces.test.mjs"
   ],
   "relations": [],
   "schema_version": 2,

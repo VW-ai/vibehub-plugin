@@ -6,8 +6,8 @@ description: Upgrade a project's checked-in .vibehub data from an older VibeHub 
 # VibeHub Migrate
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Upgrading is a restructure, not a compatibility layer. Current project and
 document versions live in `../vibehub-core/contracts/versions.json`; the matching upgrade
@@ -26,8 +26,8 @@ mechanically before a migration is complete; this Skill supplies the judgment.
    path in `references/migrations.json`. `UNSUPPORTED_NEWER` needs a newer
    plugin, never a guessed downgrade.
 2. Preview the affected checked-in paths and the planned transformations.
-   Cross the explicit migration boundary before writing; plugin installation,
-   marketplace refresh, validation, query, and UI launch never grant it.
+   Cross the explicit migration boundary before writing; installing or
+   updating Skills, validation, query, and UI launch never grant it.
 3. Apply the selected steps as ordinary Git changes. Placement judgment follows
    `../vibehub-ingest/references/knowledge-governance.json`; a missing Room
    tree is built with `$vibehub-distill` first.
