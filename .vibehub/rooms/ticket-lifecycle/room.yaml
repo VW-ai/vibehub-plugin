@@ -22,7 +22,7 @@
         "path": "skills/vibehub-core/contracts/ticket.schema.json"
       },
       {
-        "blob": "807b68249c197d8a652a969956d200059d28bfcd",
+        "blob": "e019858a2234dd131b4b9df8de8cf8b460ea637b",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
@@ -58,8 +58,8 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-01T08:45:17.813Z",
-    "last_aligned_commit": "6a601a3b155769c064baa88d6e57e5b060b7fadf"
+    "checked_at": "2026-09-03T07:29:15.412Z",
+    "last_aligned_commit": "8f3dc69b32bca44648bb38ba6f3362b7157683ae"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
