@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "anchors-normalized-before-collision",
+      "criterion": "Anchors are normalised to a canonical repository-relative form before collision is decided, so `.`, `./docs`, `docs/`, and `docs` are compared as the territory each actually denotes. Two Rooms whose normalised territories overlap are rejected at `room put` and by `project validate`, with the existing overlapping-territory message."
+    },
+    {
+      "acceptance_id": "repo-root-anchor-is-honest",
+      "criterion": "A Room anchoring the repository root is either rejected, or accepted and then genuinely treated as owning everything — including colliding with every other anchored Room. Whichever is chosen is stated in the room schema, and the current silent middle where it owns files without colliding is gone."
+    },
+    {
+      "acceptance_id": "empty-territory-anchors-are-reported",
+      "criterion": "An anchor that denotes no territory — `#`, `/`, and any other form parsing to an empty path — is rejected at write, or reported in `unresolved_anchors`. It is never silently accepted and then filtered out of the missing-anchor report."
+    },
+    {
+      "acceptance_id": "vibehub-internals-not-anchorable",
+      "criterion": "An anchor cannot draw `.vibehub/` documents into a Room's coverage territory; Room, Context, Evidence, Outcome and Ticket documents are not source material to be absorbed."
+    },
+    {
+      "acceptance_id": "existing-anchors-unchanged",
+      "criterion": "Every Room checked in today keeps validating with identical drift, coverage, and alignment output. Normalisation changes which anchor forms are recognised as equivalent, not what any current anchor means."
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover `.` against `docs`, `./docs` against `docs`, a trailing slash against its bare form, `#` and `/` as whole anchors, an anchor reaching into `.vibehub/`, and the full existing Room set validating unchanged."
+    }
+  ],
+  "constraints": [
+    "Do not weaken the overlapping-territory rule; this closes ways around it.",
+    "Do not change how segments are computed, and do not change what a segment anchor means.",
+    "Keep normalisation textual and deterministic; do not resolve symlinks or touch the filesystem to decide whether two anchors collide."
+  ],
+  "context": "Found by adjudication, and pre-existing rather than introduced: anchorsCollide compares anchors as strings, so a Room anchoring \".\" and a Room anchoring \"docs\" are judged non-overlapping while both in fact own docs/. Reproduced — both room put calls succeed, project validate returns valid:true, and context coverage shows the two Rooms owning the same file; the \".\" Room additionally owns .vibehub/ internals. That is exactly the defect the overlapping-territory rule exists to prevent, reached through an anchor form the rule does not normalise. A related family escapes a different check: \"#\" and \"/\" parse to an empty path, own nothing, and are filtered out by anchoredTerritory before the missing-anchor report, so they are neither honoured nor flagged. Both behaviours are identical before and after the last-hash parse fix.",
+  "context_refs": [
+    {
+      "purpose": "parseAnchor, anchorsCollide, overlappingTerritory, anchoredTerritory.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Where the anchor form and any new rule must be stated.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    },
+    {
+      "purpose": "Records the reproduction and that it predates the parse fix.",
+      "ref": ".vibehub/outcomes/ticket-parse-anchors-at-the-last-hash.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Two Rooms cannot claim the same territory through an anchor form the collision check fails to recognise, and an anchor that owns nothing is reported rather than silently accepted.",
+  "provenance_refs": [
+    "conversation:2026-09-02-final-closeout",
+    "commit:6e3c153"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-normalize-anchors-before-collision"
+}
