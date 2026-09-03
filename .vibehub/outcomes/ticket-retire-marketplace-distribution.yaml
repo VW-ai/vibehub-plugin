@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "release-identity-survives-the-removal",
+    "the-surviving-path-and-the-migration-are-proven-by-doing",
+    "owner-accepts-the-single-path"
+  ],
+  "closed_at": "2026-09-03T05:16:31Z",
+  "evidence_ids": [
+    "marketplace-surface-removal-proof",
+    "clean-npx-installs-and-marketplace-migration-proof",
+    "retired-marketplace-release-rehearsal-proof",
+    "owner-confirms-single-npx-path"
+  ],
+  "independence": {
+    "note": "A fresh closeout subagent that did not execute the implementation independently inspected the Ticket, evidence, repository state, preserved proof artifacts, and tests.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent closeout accepted the surviving two-declaration release identity and rehearsed tag workflow, the clean Claude Code and Codex npx installs plus byte-identical copied-real-install migration rehearsal, and the owner's explicit post-change confirmation. Closeout remains partial because the public site still offers and tests both retired marketplace command paths, docs/proposals/npx-first-install-experience.md still says marketplace commands keep working and host marketplace upgrade remains available, and tracked .agents/plugins/marketplace.json remains without a recorded load-bearing reason or retirement decision. Those current files contradict the Ticket's repository-wide single-path outcome and leave marketplace surface and manifest fate unresolved.",
+  "ticket_id": "ticket-retire-marketplace-distribution",
+  "unresolved_acceptance_ids": [
+    "nothing-points-a-user-at-a-marketplace",
+    "marketplace-machinery-is-removed-not-orphaned",
+    "the-checked-in-manifests-have-a-decided-fate"
+  ]
+}

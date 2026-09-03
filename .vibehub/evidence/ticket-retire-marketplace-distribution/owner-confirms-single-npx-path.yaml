@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "owner-accepts-the-single-path"
+  ],
+  "evidence_id": "owner-confirms-single-npx-path",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-03T05:06:48Z",
+  "refs": [
+    "conversation:2026-09-02-marketplace-retirement-confirmation",
+    ".vibehub/evidence/ticket-retire-marketplace-distribution/clean-npx-installs-and-marketplace-migration-proof.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "After being shown the completed implementation and the concrete proof results — fresh Claude Code and Codex installs each producing 12 Skills / 48 files / 429,057 bytes with no marketplace manifest, versus the existing 31,180 KiB marketplace clone plus 17,032 KiB cache, and a successful migration rehearsal on a byte-identical disposable copy without touching the original install — the owner explicitly replied ‘确认’ to the question whether fully retiring marketplace support and keeping only `npx skills add` remains the right choice in practice.",
+  "ticket_id": "ticket-retire-marketplace-distribution"
+}
