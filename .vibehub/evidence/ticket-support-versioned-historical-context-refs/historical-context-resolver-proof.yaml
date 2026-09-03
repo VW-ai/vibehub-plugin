@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "versioned-ref-has-one-canonical-shape",
+    "exact-historical-content-is-readable",
+    "resolution-never-mutates-worktrees",
+    "ticket-consumers-use-the-same-resolver"
+  ],
+  "evidence_id": "historical-context-resolver-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T05:57:34Z",
+  "refs": [
+    "commit:89a2e557925de26bbd6aab0d79aee2967b2ae143",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/ticket.schema.json",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "test/context-ref.test.mjs",
+    "test/skill-contracts.test.mjs",
+    "test/ui-host.test.mjs",
+    "command:node --test test/context-ref.test.mjs test/skill-contracts.test.mjs",
+    "command:node --test test/ui-host.test.mjs",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 89a2e557925de26bbd6aab0d79aee2967b2ae143 adds one parser and resolver for current paths and canonical commit:<40-lowercase-hex>:<repo-relative-path> refs. The resolver rejects moving or malformed identities and non-regular Git objects, returns source bytes plus commit/path/blob or WORKTREE/path/blob identity, and reads historical blobs through Git object commands with repository fsmonitor disabled. Focused tests prove exact deleted and divergent-current bytes, machine-readable missing/object errors, unchanged dirty worktree HEAD/index/status/bytes, identical resolution from sibling worktrees on different branches, object-aware Ticket validation, UI/Agent handoff identity, and one resolver command across planning, run, validation, query, and review Skills. The repository-wide npm run verify passed 187/187 with zero skipped.",
+  "ticket_id": "ticket-support-versioned-historical-context-refs"
+}

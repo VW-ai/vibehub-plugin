@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "format-2-to-3-ships-its-migration-contract"
+  ],
+  "evidence_id": "format-two-to-three-context-migration-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T05:57:34Z",
+  "refs": [
+    "commit:89a2e557925de26bbd6aab0d79aee2967b2ae143",
+    ".vibehub/version.yaml",
+    "skills/vibehub-core/contracts/versions.json",
+    "skills/vibehub-migrate/references/migrations.json",
+    "test/migration.test.mjs",
+    "test/project-format.test.mjs",
+    "command:node --test test/project-format.test.mjs test/migration.test.mjs",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 89a2e557925de26bbd6aab0d79aee2967b2ae143 advances the project format marker, versions contract, and migration catalog together from format 2 to 3 while Ticket schema remains 2. The declared mechanical step writes only .vibehub/version.yaml after validation and leaves ordinary current-tree context refs byte-identical; its semantic step requires exact Git evidence before binding deleted provenance to a commit and explicitly forbids guessing, restoring retired files, or hiding unresolved cases. Tests prove the 2-to-3 mechanical boundary, semantic guidance, the full legacy migration chain, current format validation, and rejection of format 3 by an older format-2 helper. The full verification suite passed 187/187 and reproduced a 65-file, 3,224,849-byte artifact.",
+  "ticket_id": "ticket-support-versioned-historical-context-refs"
+}
