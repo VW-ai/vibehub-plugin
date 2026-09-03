@@ -1,11 +1,12 @@
 # Install VibeHub
 
-VibeHub is a Skill-first plugin. Installation copies manifests, Skills,
-schemas, dependency-free helper scripts, and the local graph UI assets. It does
-not install a global CLI, MCP server, hook process, database, native module, or
-daemon. The read-only UI host starts in the foreground when a Ticket lifecycle
-moment needs a visual review, or when explicitly requested as a fallback, and
-exits with its launcher process.
+VibeHub is Skill-first. `npx skills add` copies the Skill directories, including
+their bundled schemas, dependency-free helper scripts, and local graph UI
+assets. It does not copy a marketplace bundle or install a global CLI, MCP
+server, hook process, database, native module, or daemon. The read-only UI host
+starts in the foreground when a Ticket lifecycle moment needs a visual review,
+or when explicitly requested as a fallback, and exits with its launcher
+process.
 
 ## Install
 
@@ -30,6 +31,12 @@ it delivered the whole development repository rather than the Skills, and its
 version-string cache key let an install go stale in silence. If you installed
 VibeHub through a Claude Code or Codex marketplace, remove it there and run the
 command above instead.
+
+The source repository retains `.claude-plugin/plugin.json` only because
+skills.sh reads it as repository metadata and the release checker uses its
+version as an identity anchor. It is not installed as a marketplace. The
+marketplace manifest and the retired Codex plugin manifest were removed with
+their builders and tests.
 
 ## Requirements
 

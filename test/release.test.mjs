@@ -59,6 +59,10 @@ test("README is a dark-safe one-line product surface", () => {
   assert.doesNotMatch(readme, /plugin marketplace add|plugin install vibehub@vibehub/u);
   assert.doesNotMatch(readme, /but no global CLI|MCP server, database|background capture/u);
   assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
+  const install = read("docs/INSTALL.md");
+  assert.match(install, /retains `.claude-plugin\/plugin\.json` only because\s+skills\.sh reads it as repository metadata/u);
+  assert.match(install, /marketplace manifest and the retired Codex plugin manifest were removed/u);
+  assert.doesNotMatch(install, /Installation copies manifests/u);
 });
 
 test("README Workbench screenshots match the checked-in Retina capture manifest", () => {
@@ -129,4 +133,6 @@ test("release is GitHub-only, reproducible, and documented", () => {
   assert.match(procedure, /npm is an execution client/u);
   assert.match(procedure, /not a registry release or global installation surface/u);
   assert.match(procedure, /same tag and commit identity/u);
+  assert.match(procedure, /the package\s+and retained Claude plugin manifest as the only release-version\s+declarations/u);
+  assert.doesNotMatch(procedure, /both plugin manifests|Claude marketplace\s+metadata/u);
 });

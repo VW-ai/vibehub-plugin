@@ -4,8 +4,11 @@ VibeHub's release surface is a versioned plugin archive plus a release-paired
 one-shot data-upgrade tarball on GitHub Releases. npm is an execution client
 for that exact asset, not a registry release or global installation surface.
 
-1. Update `package.json`, both plugin manifests, the Claude marketplace
-   metadata, and `CHANGELOG.md` to the same version.
+1. Update `package.json`, `.claude-plugin/plugin.json`, and `CHANGELOG.md` to
+   the same version. `scripts/verify-release-version.mjs` treats the package
+   and retained Claude plugin manifest as the only release-version
+   declarations; marketplace manifests and the retired Codex plugin manifest
+   are not release inputs.
 2. Run `npm run verify` and open a PR to `main` with the relevant VibeHub Ticket
    Outcome and Evidence.
 3. Merge the verified PR.

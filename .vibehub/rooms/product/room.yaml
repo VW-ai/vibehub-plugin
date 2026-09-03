@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "eabe2fd725006df8c40988081263befae3b0b32a",
+        "blob": "354c3941c092aae5ab0e5563e35da1733615f1d7",
         "path": "docs/INSTALL.md"
       },
       {
@@ -62,7 +62,7 @@
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
-        "blob": "bb2b505e518153e7c5d821b8924e5b3ab80b0524",
+        "blob": "5e89c920081613ed98986d63d67fe0164a66732f",
         "path": "docs/RELEASE.md"
       },
       {
@@ -194,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-03T03:59:16.944Z",
-    "last_aligned_commit": "b54112bb7f33818d6094939ff3005eb16f358cd9"
+    "checked_at": "2026-09-03T04:52:49.867Z",
+    "last_aligned_commit": "9a1dd99c8f9707ad896fff2a2ac8c094d74ba4bd"
   },
   "anchors": [
     "CHANGELOG.md",
