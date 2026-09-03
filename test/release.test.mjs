@@ -65,6 +65,19 @@ test("README is a dark-safe one-line product surface", () => {
   assert.doesNotMatch(install, /Installation copies manifests/u);
 });
 
+test("retired marketplace distribution cannot reappear in active surfaces", () => {
+  assert.equal(existsSync(join(root, ".agents/plugins/marketplace.json")), false);
+  const site = read("site/app/page.tsx");
+  const siteTest = read("site/tests/rendered-html.test.mjs");
+  const historicalProposal = read("docs/proposals/npx-first-install-experience.md");
+  const retiredCommands = /plugin marketplace add|plugin install vibehub@vibehub/u;
+
+  assert.doesNotMatch(site, retiredCommands);
+  assert.doesNotMatch(siteTest, /assert\.match\([^\n]+(?:plugin marketplace add|plugin install vibehub@vibehub)/u);
+  assert.doesNotMatch(historicalProposal, /marketplace commands keep working|host marketplace upgrade|marketplace path keeps working/u);
+  assert.match(historicalProposal, /Historical proposal[\s\S]+only supported install path now/u);
+});
+
 test("README Workbench screenshots match the checked-in Retina capture manifest", () => {
   const manifest = JSON.parse(read("docs/assets/local-graph/readme-capture-manifest.json"));
   assert.equal(manifest.source_commit, "55c52b49b9d7caffe0ce5c048529269dbfdb9261");

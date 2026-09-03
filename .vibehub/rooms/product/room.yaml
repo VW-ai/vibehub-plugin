@@ -166,7 +166,7 @@
         "path": "docs/proposals/cross-project-upgrade-surface.md"
       },
       {
-        "blob": "7f317eea2f5dd522f0f0de592cf96f3d58a975ea",
+        "blob": "6e64fa1bea59eb6c6eeead75d969a452aa94df35",
         "path": "docs/proposals/npx-first-install-experience.md"
       },
       {
@@ -194,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-03T04:52:49.867Z",
-    "last_aligned_commit": "9a1dd99c8f9707ad896fff2a2ac8c094d74ba4bd"
+    "checked_at": "2026-09-03T05:22:16.832Z",
+    "last_aligned_commit": "33de83c2526258a48340863ab752d45ff7b56140"
   },
   "anchors": [
     "CHANGELOG.md",
