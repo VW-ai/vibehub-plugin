@@ -1,55 +1,116 @@
 {
- "acceptance": [
-  {
-   "acceptance_id": "refine-after-surface-decided",
-   "criterion": "Once ticket-decide-cross-project-upgrade-surface has a successful Outcome, replan this same Ticket to firm against whatever read-only entry it settled, with exact acceptance for the bounded discovery scope and its exclusions, the per-project report of format version and migration state, what the user is told about a project that needs migration and how they act on it later, and rerun safety. Writing into other projects is out of scope by decision."
-  }
- ],
- "constraints": [
-  "The machine-wide half is read-only: it reports, and it never writes into a project other than by the user's later, in-project action.",
-  "Preserve decision-agent-driven-upgrade-migration as extended by decision-upgrade-drives-every-affected-project: no forward-compatibility shims, no background conversion, no scan outside an explicit user-invoked upgrade.",
-  "Any machine survey must be bounded, opt-outable, and must transmit nothing off the machine.",
-  "Do not build a hosted upgrade service, an index held as authority over project state, or telemetry.",
-  "A project the user never migrates keeps working on its existing version; the report states the situation and does not nag."
- ],
- "context": "Direction only; the entry point's shape is not yet decided. A survey of one developer's machine on 2026-09-01 found three VibeHub projects, of which two were write-blocked and their owner did not know: Undercurrent at format_version 1, and nomi at 0.4-unversioned with no .vibehub/version.yaml and a populated flat .vibehub/context/ of 19 entries, both returning format_mismatch MIGRATION_REQUIRED against the current engine. Per-project detection already works, on demand, from inside a project, using format_version alone. decision-upgrade-drives-every-affected-project commits VibeHub to reporting machine-wide while leaving the migration itself to the next Agent session opened in each project. That split matters for scope: the doing already works, and this Ticket delivers only the finding out. It is still unbuildable until one thing is settled — npx skills update belongs to skills.sh and cannot be hooked, so the obligation needs VibeHub's own entry point running outside any project, and whether such an entry may exist at all is a boundary question owned by ticket-decide-cross-project-upgrade-surface. Two facts are already fixed and will not change with that decision. nomi has no version.yaml at all, so a pending-upgrade marker cannot live in the version file for the very case that most needs one. And a project with uncommitted work must be surfaced rather than silently modified: Undercurrent currently carries unstaged edits alongside its stale format. A third observation is deliberately not carried as a constraint — that installs today contain the plugin's own .vibehub tree, which a naive directory walk would mistake for a user project — because retiring marketplace distribution removes it.",
- "context_refs": [
-  {
-   "ref": ".vibehub/rooms/product/decision-upgrade-drives-every-affected-project.yaml",
-   "purpose": "The obligation this Ticket delivers, and the reason it is machine-wide rather than per-project."
-  },
-  {
-   "ref": ".vibehub/tickets/ticket-decide-cross-project-upgrade-surface.yaml",
-   "purpose": "Owns the entry-point question this Ticket cannot answer for itself."
-  },
-  {
-   "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml",
-   "purpose": "Governing upgrade policy: agent-driven restructure, honest triggers, no shims."
-  },
-  {
-   "ref": "skills/vibehub-migrate/SKILL.md",
-   "purpose": "The per-project capability this Ticket drives across many projects."
-  },
-  {
-   "ref": "skills/vibehub-migrate/references/migrations.json",
-   "purpose": "Versioned migration entries a survey must match a project against."
-  }
- ],
- "deliveries": [],
- "kind": "ticket",
- "maturity": "draft",
- "outcome": "Taking a VibeHub update tells the user the full extent of what it implies: every project on the machine that holds VibeHub data is found and reported with its format and migration state, so no project stays silently write-blocked while its owner is unaware. The migration itself remains the next Agent session's work in that project.",
- "provenance_refs": [
-  "conversation:2026-09-01-packaging-and-release-integrity",
-  "https://github.com/VW-ai/vibehub-plugin/issues/127"
- ],
- "relations": [
-  {
-   "type": "depends_on",
-   "target_ticket_id": "ticket-decide-cross-project-upgrade-surface",
-   "rationale": "The entry point running outside any project is what this Ticket is built on; whether it may exist, and in what form, is decided there."
-  }
- ],
- "schema_version": 2,
- "ticket_id": "ticket-one-command-upgrade-across-projects"
+  "acceptance": [
+    {
+      "acceptance_id": "release-paired-one-shot-package-is-verifiable",
+      "criterion": "The release build emits a deterministic dependency-free npm-layout `vibehub-upgrade.tgz` plus checksum from an explicit allowlist, with exactly one `vibehub-upgrade` bin and no install lifecycle script or registry publication; the asset embeds one immutable release tag and commit plus that release's coordinator, `vh.mjs`, contracts, and migrations reference, refuses internal identity disagreement before discovery, prints the identity, and the documented install/update recipe repeats the same `<release-tag>` in the tagged Skills source and versioned asset URL rather than combining `skills update` with `releases/latest`."
+    },
+    {
+      "acceptance_id": "discovery-is-explicit-bounded-and-worktree-complete",
+      "criterion": "The command rejects missing `--root` before discovery, realpath-normalizes each explicit existing readable directory, does not follow directory symlinks or descend into `.git` or `.vibehub`, identifies candidate working repositories through Git, deduplicates them by common Git-directory identity, and fans out only through each discovered repository's `git worktree list --porcelain` records; fixtures prove that all registered records including outside-root siblings, missing/prunable worktrees, and non-VibeHub worktrees are reported, while unregistered branches, sibling filesystem areas, and projects outside every root are neither scanned nor changed."
+    },
+    {
+      "acceptance_id": "classification-and-preview-use-the-shared-migration-contract",
+      "criterion": "Each registered worktree is classified as `current`, `unaffected`, `unsupported`, `pending`, or `migrated` using the exact conservative preflight and twice-identical same-HEAD disposable-preview rules in `docs/proposals/cross-project-upgrade-surface.md`; the coordinator invokes its packaged sibling mechanical engine and reads its packaged migrations reference, contains no duplicate migration action table, rewrite rule, placement rule, or semantic prompt, and creates no real-worktree write or commit for every state except eligible migration."
+    },
+    {
+      "acceptance_id": "one-safe-worktree-produces-one-preverified-local-commit",
+      "criterion": "For one eligible worktree, a temporary `GIT_INDEX_FILE` seeded from baseline HEAD constructs an unsigned prepared commit whose sole parent, exact changed-path set, tree, and blob digests are verified before user-visible mutation; after materialization, declared bytes/types equal preview, the real index writes the prepared tree, and porcelain is exactly the expected staged-only declared set before one compare-and-swap `git -c core.hooksPath=<new-controlled-empty-dir> update-ref <named-branch> <prepared-commit> <baseline-head>` makes the prepared commit terminally successful, with no `git commit`, repository hook, signing helper, other ref movement, or push."
+    },
+    {
+      "acceptance_id": "every-non-success-proves-byte-and-git-invariance",
+      "criterion": "Failure injection at every discovery, preflight, preview, temporary-object, materialization, real-index, final-gate, and CAS edge proves that every non-success leaves or restores baseline HEAD, branch, real-index checksum and entries, complete porcelain status, file existence/type/bytes, and all undeclared paths; restoration failure aborts the entire command as `recovery_failed` instead of reporting safe pending or continuing writes, and hostile commit/reference-transaction hooks plus signing-helper sentinels prove none runs, including during the isolated update-ref CAS."
+    },
+    {
+      "acceptance_id": "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
+      "criterion": "A mixed multi-project, multi-worktree fixture produces exactly one independently validated local commit for each safe worktree and zero commits elsewhere, never pushes, and prints both human-readable output and a JSON envelope containing every registered worktree's canonical path, repository identity, old/new HEAD, project format, state, stable reason/diagnostic, migration IDs, commit ID when migrated, and semantic-pending refs; rerunning after complete success is idempotent `current`, and rerunning after a proven restored failure starts from the same baseline without a persistent index."
+    },
+    {
+      "acceptance_id": "architecture-docs-and-artifact-enforce-the-narrow-exception",
+      "criterion": "`skills/vibehub-setup/references/architecture-boundary.md` is replaced with the exact post-decision text in `docs/proposals/cross-project-upgrade-surface.md`; installation, release, migration, and user-facing documentation state the same-tag two-command release flow, explicit-root authority, safe-worktree commit behavior, no push, and later semantic Agent action; contract, source-inspection, release-artifact, cross-host invocation, and end-to-end tests prove no Skill, project instruction, UI, workflow trigger, install hook, background process, daemon, service, database, telemetry client, compatibility shim, or persistent index invokes or extends the one-shot exception, and full `npm run verify` passes."
+    }
+  ],
+  "constraints": [
+    "Implement the exact successful decision and proposal; do not reopen the invocation choice, unsafe predicate, or owner-approved registered-worktree behavior inside execution.",
+    "The one-shot package is a GitHub Release asset only: no npm-registry publication, global installation requirement, general-purpose CLI, package dependency, or development-repository execution.",
+    "All migration semantics remain in the shared engine and migrations reference; the coordinator may discover, classify, orchestrate, commit, and report but may not carry a second migration implementation.",
+    "Never scan without at least one explicit bounded root, follow directory symlinks, enumerate unregistered branches, or treat discovered repository authority as permission to scan its surrounding filesystem.",
+    "Never stash, reset, checkout, clean, invoke repository hooks or signing helpers, push, mutate a remote, create background work, transmit telemetry, or persist a machine/project index as authority.",
+    "Only a terminal successful compare-and-swap may produce `migrated`; every other result must prove no user bytes or Git-visible baseline state changed, and `recovery_failed` stops subsequent writes.",
+    "A mechanical result may be committed only when it is valid and writable at CURRENT format with every declared semantic step represented by durable pending guidance for a later Agent session.",
+    "Do not absorb `ticket-vibehub-cli`, historical-context-ref format 3, hosted services, UI launch mechanics, or automatic push into this delivery."
+  ],
+  "context": "The prerequisite decision is successful and replaces this Ticket's original read-only draft. The selected outside-project surface is a dependency-free npm-layout `vibehub-upgrade.tgz` attached to each GitHub Release, with exactly one bin. Release upgrade is a two-command, same-tag recipe: install Skills from `https://github.com/VW-ai/vibehub-plugin/tree/<release-tag>`, then run `npx --yes https://github.com/VW-ai/vibehub-plugin/releases/download/<release-tag>/vibehub-upgrade.tgz --root <bounded-root> [--root <another-root>]`. The data-upgrade half is one command and is identical across hosts. `npx skills update` plus a floating `releases/latest` upgrader is not supported because the two can resolve different revisions. The package embeds and self-checks the same release's coordinator, shared `vh.mjs`, contracts, and migration registry; it owns orchestration, not migration semantics. Discovery never defaults to a home or machine scan: it finds `.vibehub` only below realpath-normalized explicit roots without following symlinks, deduplicates repositories by common Git directory, and expands outside a root only through that repository's `git worktree list --porcelain` records. Each registered worktree is classified independently. Automatic write requires a reachable writable worktree with `.vibehub`, named non-unborn branch, no merge/rebase/cherry-pick/revert/bisect, byte-empty complete porcelain status, recognized older format, complete mechanical chain, and twice-identical disposable preview from the same HEAD that changes only declared paths, reaches valid CURRENT state, and records any semantic work as pending. Before real writes, a temporary index constructs and verifies the exact future tree and unsigned commit. After materialization, the final pre-CAS gate rechecks branch/HEAD, declared bytes and types, real-index tree equality, and exact staged-only status. The sole success boundary is `git -c core.hooksPath=<new-controlled-empty-dir> update-ref <branch> <prepared-commit> <old-head>`; all pre-CAS failures restore and prove the exact clean preimage, while successful CAS is terminal. Git commit hooks, reference-transaction hooks, signing helpers, stash, reset, checkout, clean, push, background invocation, telemetry, and a durable project index remain forbidden. The successful decision's proposal contains the exact architecture-boundary replacement and test obligations; implement them without broadening into the separate general-CLI maintainability question.",
+  "context_refs": [
+    {
+      "purpose": "Successful independent Outcome that unlocks this refinement and accepts the exact invocation, boundary, safety, and owner-choice contract.",
+      "ref": ".vibehub/outcomes/ticket-decide-cross-project-upgrade-surface.yaml"
+    },
+    {
+      "purpose": "Exact selected commands, comparison, replacement boundary text, enforcement assertions, and deterministic safety state machine to implement.",
+      "ref": "docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "purpose": "Owner authority for all registered worktrees, separate local commits, unsafe reporting, no push, and later semantic migration.",
+      "ref": ".vibehub/rooms/product/decision-explicit-upgrade-migrates-safe-worktrees.yaml"
+    },
+    {
+      "purpose": "Completed implementation baseline proving the one-worktree mechanical engine and migration classification this coordinator must reuse.",
+      "ref": ".vibehub/outcomes/ticket-split-migrations-into-mechanical-and-semantic.yaml"
+    },
+    {
+      "purpose": "Shared dependency-free engine whose mechanical operation is the only migration executor the coordinator may call.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Single release-versioned source of complete chains, declared paths, mechanical actions, semantic guidance, and pending refs.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Current absolute boundary that this implementation replaces exactly with the independently accepted narrow exception.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "Existing tag-driven GitHub-only release path where the deterministic upgrade asset and checksum are added.",
+      "ref": ".github/workflows/release.yml"
+    },
+    {
+      "purpose": "Release artifact allowlist and dependency-free verification seam to extend for the one-shot package.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Current mechanical migration and rollback coverage that coordinator fixtures build upon without duplicating semantics.",
+      "ref": "test/migration.test.mjs"
+    },
+    {
+      "purpose": "Prose-to-engine and architecture-boundary contract checks to extend.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "User installation/update contract that must describe release pairing and later semantic action truthfully.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Maintainer release procedure that must build, checksum, attach, and verify the tag-identical one-shot asset.",
+      "ref": "docs/RELEASE.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "One explicit, release-pinned VibeHub data-upgrade command discovers projects only beneath user-supplied roots, enumerates every registered worktree of each discovered repository, mechanically migrates and creates one local reviewable commit for each independently safe worktree, leaves every other worktree unchanged with an exact reported reason, never pushes, and preserves the later in-worktree Agent boundary for semantic migration.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety",
+    "https://github.com/VW-ai/vibehub-plugin/issues/127",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Its successful Outcome is the exact causal input that selects the release-paired entry, replacement boundary, conservative transaction, and owner-authorized worktree behavior implemented here.",
+      "target_ticket_id": "ticket-decide-cross-project-upgrade-surface",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
 }

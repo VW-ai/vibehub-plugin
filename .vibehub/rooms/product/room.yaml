@@ -62,7 +62,7 @@
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
-        "blob": "bba25862b59850c49e883185e4aaee76b3ec692d",
+        "blob": "7fef24121e50287f535e4fbce004f204876f3565",
         "path": "docs/RELEASE.md"
       },
       {
@@ -162,6 +162,10 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
+        "blob": "2f0819da0c63b463041eb890ad07b6d4201316f0",
+        "path": "docs/proposals/cross-project-upgrade-surface.md"
+      },
+      {
         "blob": "7f317eea2f5dd522f0f0de592cf96f3d58a975ea",
         "path": "docs/proposals/npx-first-install-experience.md"
       },
@@ -190,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-02T23:16:29.406Z",
-    "last_aligned_commit": "f371bf64d02fc4deb17568402eeb42af27af2302"
+    "checked_at": "2026-09-03T03:35:55.476Z",
+    "last_aligned_commit": "cf46cf6164895da90a0f3708695d31314bf51490"
   },
   "anchors": [
     "CHANGELOG.md",
