@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "closeout-skill-matches-the-engine",
+    "declaration-has-a-defined-home"
+  ],
+  "evidence_id": "schema-guard-restored-and-skill-claim-corrected",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T02:30:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/outcome.schema.json",
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "test/skill-contracts.test.mjs",
+    "commit:88d65896cd094064039cce74294d73d4d4ccf2c2"
+  ],
+  "schema_version": 1,
+  "summary": "SUPERSEDES independence-field-has-a-home-without-breaking-history, whose closing claim was stale and false: it said the contract test asserts the schema enum equals the engine's set and that independence is absent from the schema's required list. Commit 7068be4 deleted both assertions while rewriting that test and replaced them with nothing, and nothing else in the repository read outcome.schema.json, so the schema drifted unguarded — an independent adjudicator proved it by replacing the enum with a bogus value while all 147 tests still passed. Both assertions are restored. Separately, the same commit had written a false sentence into skills/vibehub-ticket-closeout/SKILL.md claiming that naming a source anywhere else in the document is a defect the contract tests catch; the tests do not catch that, and the same commit recorded the true version in the Evidence while shipping the false one in the Skill a maintainer actually reads. The sentence now states what holds: the tests hold the declared list and the engine to each other, and a source declared outside the list is a documentation defect no test catches. The declared list is additionally harvested from source-shaped bullets anywhere in the document and separately asserted to live inside the delimiters, so a bullet placed outside the region fails rather than being ignored. Mutation-checked, all five caught: schema enum replaced with a bogus value; independence added to the schema's required list; a bogus source bullet outside the delimited region; the validator widened to accept self_review; a declared source removed from the engine set. The substance of declaration-has-a-defined-home was never in doubt and was verified independently at the previous adjudication; what was wrong was the Evidence describing how it is guarded.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

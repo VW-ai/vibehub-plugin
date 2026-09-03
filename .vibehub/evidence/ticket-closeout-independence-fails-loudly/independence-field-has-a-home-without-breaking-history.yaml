@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "declaration-has-a-defined-home"
+  ],
+  "evidence_id": "independence-field-has-a-home-without-breaking-history",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:11:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/outcome.schema.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/skill-contracts.test.mjs",
+    "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
+  ],
+  "schema_version": 1,
+  "summary": "outcome.schema.json gains an explicit independence object with a required source enum and an optional free-text note, deliberately absent from the schema's required list. Read tolerance and write strictness are separated on purpose: validateOutcome accepts a document without the field so the 89 Outcomes written before this contract remain valid and readable, while the ticket closeout write path requires it. Confirmed by project validate on the real repository after the change: valid true, outcomes 89, no document rejected. The field is documented in the schema as a self-declared provenance claim the engine records and never verifies. The contract test asserts the schema enum equals the engine's INDEPENDENCE_SOURCES set and that independence is not in required.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

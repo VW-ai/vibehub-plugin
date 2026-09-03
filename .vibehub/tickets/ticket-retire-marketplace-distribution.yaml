@@ -1,0 +1,111 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "nothing-points-a-user-at-a-marketplace",
+      "criterion": "No document a user reads and no Skill still names a marketplace install: README.md, docs/INSTALL.md, and all eleven SKILL.md partial-install fallbacks present npx skills add and npx skills update only. A single mechanical check fails if a marketplace install command reappears in either surface, so the line cannot creep back."
+    },
+    {
+      "acceptance_id": "marketplace-machinery-is-removed-not-orphaned",
+      "criterion": "scripts/build-claude-marketplace.mjs, scripts/build-codex-marketplace.mjs, their npm scripts, test/host-marketplaces.test.mjs, and the marketplace portions of test/release.test.mjs are removed together, leaving no script, test, or workflow step that builds or verifies a marketplace; npm run verify passes with the remaining suite and the removal is visible as deletions rather than as dead code left in place."
+    },
+    {
+      "acceptance_id": "release-identity-survives-the-removal",
+      "criterion": "verify-release-version.mjs no longer derives version declarations from a marketplace manifest and still enforces agreement across the declarations that remain plus the tag; the release workflow passes end to end on a rehearsed tag, and what it now compares is stated in docs/RELEASE.md."
+    },
+    {
+      "acceptance_id": "the-checked-in-manifests-have-a-decided-fate",
+      "criterion": "What becomes of .claude-plugin/marketplace.json and the .codex-plugin and .claude-plugin manifests is decided and implemented — removed, or kept solely because the host still requires them for a Skill-directory install — and the reason is recorded, so no later reader has to infer whether a leftover file is load-bearing."
+    },
+    {
+      "acceptance_id": "the-surviving-path-and-the-migration-are-proven-by-doing",
+      "criterion": "npx skills add VW-ai/vibehub-plugin is performed against a clean checkout for both a Claude Code and a Codex agent directory and the Evidence records what landed and its size; and the migration written for existing marketplace users is performed on a real marketplace install, recording the before and after. Documentation asserting either is not Evidence for it."
+    },
+    {
+      "acceptance_id": "owner-accepts-the-single-path",
+      "authority": "human",
+      "criterion": "The owner confirms, after the change, that removing marketplace support is right in practice rather than only on paper — having seen what a fresh npx install produces and what an existing marketplace user experiences; recorded as human-origin Evidence."
+    }
+  ],
+  "constraints": [
+    "Retire, do not deprecate-and-keep: leaving the builders in place behind a note reproduces the surface this Ticket removes.",
+    "Do not change what npx skills add installs; this Ticket removes a path, it does not redesign the surviving one.",
+    "Preserve decision-agent-driven-upgrade-migration and the architecture boundary; nothing here introduces a CLI, service, or hidden state.",
+    "Do not delete a manifest the host still requires for a Skill-directory install merely because it carries the word marketplace; establish which are load-bearing before removing any.",
+    "Keep npm run verify green at every commit rather than only at the end."
+  ],
+  "context": "npx-first was already chosen and implemented: ticket-decide-npx-first-install-experience recorded path A, a self-contained vibehub-core skill folder making skills.sh supported, and docs/INSTALL.md names npx skills add VW-ai/vibehub-plugin as the recommended path with marketplaces listed after it. The marketplace path was kept alongside and rotted. It delivers the entire development repository twice — measured at 30M for the marketplace clone including 14M of git history, plus 17M for the plugin cache, 47M of the 54M total under ~/.claude/plugins — against the 544K of skills/ that npx installs. No install-time filtering exists in the marketplace mechanism, so repairing it required publishing a generated marketplace from a dedicated repository, with a new publication pipeline, a bound on that repository's history growth, and a migration for existing users: a large permanent surface for a path the documentation does not recommend. The owner chose retirement. The cost is known before execution and is not small: eleven SKILL.md files carry a partial-install fallback line naming the host marketplace; verify-release-version.mjs derives two of its five agreeing version declarations from .claude-plugin/marketplace.json; scripts/build-claude-marketplace.mjs, scripts/build-codex-marketplace.mjs, test/host-marketplaces.test.mjs, and parts of test/release.test.mjs exist only for this path; README.md line 19 and docs/INSTALL.md both advertise it; and the Codex marketplace entry goes with the Claude one, which is acceptable only because npx skills add installs into .agents/skills/ as well as .claude/skills/. Anyone currently installed through a marketplace — including the owner — must move to npx, and for them this is an improvement rather than a regression, since a 47M install becomes a 544K one. The acceptance was trimmed from eight criteria to six before execution, deliberately. The independence-gate Ticket that preceded this one carried three meta-criteria of the form 'a test asserts that…', and each fix produced a new artifact that could itself be wrong, so four adjudication rounds went almost entirely to guard quality rather than to the feature. Here the doc-and-Skill criteria are merged behind one mechanical check, and the two proof criteria are merged into one that requires performing the install and the migration rather than describing them.",
+  "context_refs": [
+    {
+      "purpose": "The decision this Ticket implements, including the accepted costs.",
+      "ref": ".vibehub/rooms/product/decision-npx-is-the-only-supported-install-path.yaml"
+    },
+    {
+      "purpose": "Names npx as recommended and marketplaces as the secondary path; the primary document to change.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Line 19 advertises both host marketplace commands.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Derives two of five agreeing version declarations from the marketplace manifest; must survive the removal.",
+      "ref": "scripts/verify-release-version.mjs"
+    },
+    {
+      "purpose": "Example of the partial-install fallback line that all eleven Skills carry.",
+      "ref": "skills/vibehub-core/SKILL.md"
+    },
+    {
+      "purpose": "Where the assertion preventing the marketplace line from returning belongs.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "The first independent partial Outcome that identified the exact remaining marketplace surfaces for this execution cycle.",
+      "ref": ".vibehub/outcomes/ticket-retire-marketplace-distribution.yaml"
+    },
+    {
+      "purpose": "The public install actions and copied Agent brief found to retain host marketplace commands.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "The rendered-site contract that must reject retired marketplace commands.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    },
+    {
+      "purpose": "The historical npx-first proposal that must identify later marketplace retirement instead of presenting stale current guidance.",
+      "ref": "docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "purpose": "The earlier decision that made npx the recommended path, which this Ticket completes.",
+      "ref": ".vibehub/tickets/ticket-decide-npx-first-install-experience.yaml"
+    },
+    {
+      "purpose": "Exact Claude marketplace builder inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:scripts/build-claude-marketplace.mjs"
+    },
+    {
+      "purpose": "Exact Codex marketplace builder inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:scripts/build-codex-marketplace.mjs"
+    },
+    {
+      "purpose": "Exact cross-host marketplace test inspected in the parent snapshot before this Ticket removed it.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
+    },
+    {
+      "purpose": "Exact Codex marketplace manifest identified by the first partial Outcome and inspected before remediation removed it.",
+      "ref": "commit:33de83c2526258a48340863ab752d45ff7b56140:.agents/plugins/marketplace.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub has one supported way in. Host marketplace distribution is removed rather than repaired, npx skills add is the only documented install path, and nothing in the repository, the release pipeline, or the Skills still points a user at a marketplace.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/131",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-retire-marketplace-distribution"
+}

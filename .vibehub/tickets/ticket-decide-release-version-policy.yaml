@@ -1,0 +1,54 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "options-are-laid-out-with-consequences",
+      "criterion": "Each candidate policy is written out with its concrete consequences for the release pipeline, for a contributor landing a change to shipped content, for what a host concludes from two equal version strings, and for already-published v0.x tags; at minimum the bump-per-shipped-change, distinguishable-pre-release-identity, and content-addressed-distribution options are covered, and each is judged against the observed 143-commit failure."
+    },
+    {
+      "acceptance_id": "owner-records-the-policy",
+      "authority": "human",
+      "criterion": "The owner explicitly chooses one policy, having seen the options and their consequences, and the choice with its reasoning is recorded as a decision Context in .vibehub/rooms/product referencing human-origin Evidence."
+    }
+  ],
+  "constraints": [
+    "This Ticket decides and records; it does not implement the enforcement.",
+    "Do not rewrite or retag published v0.x releases to fit a new scheme.",
+    "Do not weaken the existing five-manifest and tag agreement; any policy must be additive to it.",
+    "Describe host-specific update behavior as an observation about that host, never as a special case encoded in the plugin.",
+    "Data-format migration policy stays out of scope; this is release identity only."
+  ],
+  "context": "Observed on a real install: the local plugin sat at 648c5f62 while main was at 928ed611, exactly 143 commits ahead, with a restructured skills tree, a new vibehub-core, changes to all eleven SKILL.md files, changed migration guidance, and fully replaced Workbench assets. Both declared 0.8.0. The host reported that vibehub was already at the latest version and did nothing; only uninstall followed by install produced current content. The host mechanism is confirmed rather than inferred: the declared version string is the cache key, resolved from the marketplace entry's version, else plugin.json's version, else the git commit SHA. A plugin that declares a version therefore goes silently stale whenever content moves and the string does not; one that declares none is compared by SHA and cannot. verify-release-version.mjs already forces five manifests and the tag to agree on one version, but nothing forces a bump when shipped content changes and nothing gives main between releases a distinguishable identity. What a public version number means, whether main carries a pre-release identity, and what a contributor must do when landing a shipped change are public-surface and contributor-workflow choices, which this repository already treats as owner decisions rather than executor judgment. All three candidate policies are grounded in facts already established rather than requiring new investigation: bump-per-shipped-change follows from the allowlist in scripts/build-plugin-artifact.mjs, a distinguishable pre-release identity follows from the release cadence in CHANGELOG.md, and content-addressed distribution follows directly from the confirmed resolution order — a plugin declaring no version anywhere is compared by git commit SHA and therefore cannot go silently stale, which is why that option would make a CI bump gate unnecessary. Writing the three up with their consequences is a write-up, not a study.",
+  "context_refs": [
+    {
+      "purpose": "The existing agreement across package.json, both plugin manifests, the marketplace manifest, its plugin entry, and the tag, which any policy must extend rather than replace.",
+      "ref": "scripts/verify-release-version.mjs"
+    },
+    {
+      "purpose": "Where a version is currently minted and published.",
+      "ref": ".github/workflows/release.yml"
+    },
+    {
+      "purpose": "The current release record and the cadence any pre-release identity must fit.",
+      "ref": "CHANGELOG.md"
+    },
+    {
+      "purpose": "Defines shipped content, which is what a policy about content-versus-version has to be written against.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Existing release-adjacent policy whose form and placement the new decision Context should follow.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner records what a declared VibeHub version means, so that a host comparing versions, a contributor landing a change, and a user reading an update message all rely on the same rule instead of an accident of the pipeline.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/128"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-release-version-policy"
+}

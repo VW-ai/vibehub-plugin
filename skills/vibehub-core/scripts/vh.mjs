@@ -7,9 +7,11 @@ import {
   realpathSync,
   readdirSync,
   renameSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,6 +53,7 @@ const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
 const COMMIT_HASH = /^[0-9a-f]{40}$/u;
+const VERSIONED_CONTEXT_REF = /^commit:([0-9a-f]{40}):(.+)$/u;
 
 class VibeHubError extends Error {
   constructor(code, message, details = null) {
@@ -86,7 +89,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; context operations include put and resolve; project operations include init, compatibility, migrate-mechanical, and validate",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -193,6 +196,107 @@ function dirs(repo) {
 
 function projectFormatPath(repo) {
   return join(repo, ".vibehub", PROJECT_FORMAT_FILE);
+}
+
+function invalidContextRef(message, ref) {
+  throw new VibeHubError("invalid_context_ref", `${message}: ${String(ref)}`);
+}
+
+function validateContextRefPath(path, ref) {
+  if (!path || isAbsolute(path) || /^[A-Za-z]:/u.test(path)) {
+    invalidContextRef("Ticket context ref path must be non-empty and repository-relative", ref);
+  }
+  if (path.includes("\\") || path.includes("//") || path.endsWith("/")) {
+    invalidContextRef("Ticket context ref path must use canonical forward-slash separators", ref);
+  }
+  if (path.split("/").some((segment) => segment === "" || segment === "." || segment === "..")) {
+    invalidContextRef("Ticket context ref path must not contain empty, current, or parent traversal segments", ref);
+  }
+}
+
+export function parseTicketContextRef(ref) {
+  if (typeof ref !== "string" || ref.trim() === "") {
+    invalidContextRef("Ticket context ref must be a non-empty string", ref);
+  }
+  if (ref.startsWith("commit:")) {
+    const match = ref.match(VERSIONED_CONTEXT_REF);
+    if (!match) {
+      invalidContextRef("Versioned Ticket context ref must equal commit:<40-lowercase-hex>:<repo-relative-path>", ref);
+    }
+    const [, commit, path] = match;
+    validateContextRefPath(path, ref);
+    return { kind: "versioned", ref, commit, path };
+  }
+  validateContextRefPath(ref, ref);
+  return { kind: "current", ref, commit: null, path: ref };
+}
+
+function gitBlobId(bytes) {
+  return createHash("sha1")
+    .update(Buffer.from(`blob ${bytes.length}\0`, "utf8"))
+    .update(bytes)
+    .digest("hex");
+}
+
+export function resolveTicketContextRef(repo, ref) {
+  const parsed = parseTicketContextRef(ref);
+  if (parsed.kind === "current") {
+    const target = resolve(repo, parsed.path);
+    if (!target.startsWith(`${resolve(repo)}${sep}`) || !existsSync(target)) {
+      throw new VibeHubError("context_ref_missing_path", `Ticket context ref path does not exist: ${parsed.path}`);
+    }
+    const stat = lstatSync(target);
+    if (stat.isSymbolicLink()) {
+      throw new VibeHubError("context_ref_symlink", `Ticket context ref path is a symlink: ${parsed.path}`);
+    }
+    if (!stat.isFile()) {
+      throw new VibeHubError("context_ref_not_regular_file", `Ticket context ref path is not a regular file: ${parsed.path}`);
+    }
+    const bytes = readFileSync(target);
+    const blob = gitBlobId(bytes);
+    return {
+      ref: parsed.ref,
+      kind: parsed.kind,
+      identity: { revision: "WORKTREE", path: parsed.path, blob },
+      source: bytes.toString("utf8"),
+      source_base64: bytes.toString("base64"),
+    };
+  }
+
+  const objectType = git(repo, ["cat-file", "-t", parsed.commit], { allowFailure: true });
+  if (objectType.status !== 0) {
+    throw new VibeHubError("context_ref_missing_commit", `Ticket context ref commit is unavailable: ${parsed.commit}`);
+  }
+  if (objectType.stdout.trim() !== "commit") {
+    throw new VibeHubError("context_ref_not_commit", `Ticket context ref revision is not a commit object: ${parsed.commit}`);
+  }
+  const listed = git(repo, ["ls-tree", "-z", parsed.commit, "--", parsed.path], { allowFailure: true });
+  if (listed.status !== 0 || listed.stdout === "") {
+    throw new VibeHubError("context_ref_missing_path", `Ticket context ref path is absent at ${parsed.commit}: ${parsed.path}`);
+  }
+  const entry = listed.stdout.split("\0").find(Boolean) ?? "";
+  const tab = entry.indexOf("\t");
+  const [mode, type, blob] = tab < 0 ? [] : entry.slice(0, tab).split(" ");
+  if (type === "tree") {
+    throw new VibeHubError("context_ref_directory", `Ticket context ref path is a directory at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (mode === "120000") {
+    throw new VibeHubError("context_ref_symlink", `Ticket context ref path is a symlink at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (mode === "160000" || type === "commit") {
+    throw new VibeHubError("context_ref_submodule", `Ticket context ref path is a submodule at ${parsed.commit}: ${parsed.path}`);
+  }
+  if (type !== "blob" || !new Set(["100644", "100755"]).has(mode)) {
+    throw new VibeHubError("context_ref_not_regular_file", `Ticket context ref path is not a regular blob at ${parsed.commit}: ${parsed.path}`);
+  }
+  const bytes = git(repo, ["cat-file", "blob", blob], { binary: true }).stdout;
+  return {
+    ref: parsed.ref,
+    kind: parsed.kind,
+    identity: { commit: parsed.commit, path: parsed.path, blob },
+    source: bytes.toString("utf8"),
+    source_base64: bytes.toString("base64"),
+  };
 }
 
 function add(errors, path, message) {
@@ -322,6 +426,302 @@ function projectCompatibility(repo) {
     reason: initialized
       ? "This repository predates the project format marker and needs an explicit migration before writes are allowed."
       : "This repository has not been initialized for VibeHub.",
+  };
+}
+
+function validateMigrationsReference(reference) {
+  const errors = [];
+  if (!strictKeys(
+    errors,
+    reference,
+    new Set(["schema_version", "owner", "current_format", "migrations"]),
+    "migrations",
+  )) return errors;
+  if (reference.schema_version !== 2) add(errors, "migrations.schema_version", "must equal 2");
+  if (reference.owner !== "vibehub-migrate") add(errors, "migrations.owner", "must equal vibehub-migrate");
+  if (reference.current_format !== CURRENT_PROJECT_FORMAT) {
+    add(errors, "migrations.current_format", `must equal ${CURRENT_PROJECT_FORMAT}`);
+  }
+  if (!Array.isArray(reference.migrations) || reference.migrations.length === 0) {
+    add(errors, "migrations.migrations", "must be a non-empty array");
+    return errors;
+  }
+  const ids = new Set();
+  const fromFormats = new Set();
+  reference.migrations.forEach((migration, index) => {
+    const path = `migrations.migrations[${index}]`;
+    if (!strictKeys(
+      errors,
+      migration,
+      new Set(["migration_id", "from", "to", "detect", "document_schema_versions", "mechanical", "semantic"]),
+      path,
+    )) return;
+    requiredString(errors, migration, "migration_id", path, { id: true });
+    requiredString(errors, migration, "from", path);
+    requiredString(errors, migration, "to", path);
+    requiredString(errors, migration, "detect", path);
+    if (ids.has(migration.migration_id)) add(errors, `${path}.migration_id`, "must be unique");
+    if (fromFormats.has(migration.from)) add(errors, `${path}.from`, "must be unique");
+    ids.add(migration.migration_id);
+    fromFormats.add(migration.from);
+
+    const mechanicalPath = `${path}.mechanical`;
+    if (strictKeys(errors, migration.mechanical, new Set(["declared_paths", "actions"]), mechanicalPath)) {
+      stringArray(errors, migration.mechanical.declared_paths, `${mechanicalPath}.declared_paths`);
+      if (!Array.isArray(migration.mechanical.actions)) {
+        add(errors, `${mechanicalPath}.actions`, "must be an array");
+      } else migration.mechanical.actions.forEach((action, actionIndex) => {
+        const actionPath = `${mechanicalPath}.actions[${actionIndex}]`;
+        if (!isObject(action)) {
+          add(errors, actionPath, "must be an object");
+        } else if (action.type === "write-project-format") {
+          strictKeys(errors, action, new Set(["type", "format_version"]), actionPath);
+          if (!Number.isInteger(action.format_version) || action.format_version < 1) {
+            add(errors, `${actionPath}.format_version`, "must be a positive integer");
+          }
+        } else if (action.type === "upgrade-ticket-schema") {
+          strictKeys(
+            errors,
+            action,
+            new Set(["type", "from", "to", "defaults", "pending_semantic_ref"]),
+            actionPath,
+          );
+          if (!Number.isInteger(action.from) || !Number.isInteger(action.to)) {
+            add(errors, actionPath, "from and to must be integers");
+          }
+          if (!isObject(action.defaults)) add(errors, `${actionPath}.defaults`, "must be an object");
+          requiredString(errors, action, "pending_semantic_ref", actionPath);
+        } else {
+          add(errors, `${actionPath}.type`, "is not a supported mechanical migration action");
+        }
+      });
+    }
+
+    const semanticPath = `${path}.semantic`;
+    if (strictKeys(errors, migration.semantic, new Set(["steps"]), semanticPath)) {
+      if (!Array.isArray(migration.semantic.steps)) {
+        add(errors, `${semanticPath}.steps`, "must be an array");
+      } else migration.semantic.steps.forEach((step, stepIndex) => {
+        const stepPath = `${semanticPath}.steps[${stepIndex}]`;
+        if (!strictKeys(
+          errors,
+          step,
+          new Set(["step_id", "pending_ref", "purpose", "derives_from", "good_value", "forbidden_shortcuts", "instructions"]),
+          stepPath,
+        )) return;
+        requiredString(errors, step, "step_id", stepPath, { id: true });
+        if (step.pending_ref !== undefined) requiredString(errors, step, "pending_ref", stepPath);
+        requiredString(errors, step, "purpose", stepPath);
+        stringArray(errors, step.derives_from, `${stepPath}.derives_from`, { nonEmpty: true });
+        requiredString(errors, step, "good_value", stepPath);
+        stringArray(errors, step.forbidden_shortcuts, `${stepPath}.forbidden_shortcuts`, { nonEmpty: true });
+        stringArray(errors, step.instructions, `${stepPath}.instructions`, { nonEmpty: true });
+      });
+    }
+    for (const action of migration.mechanical?.actions ?? []) {
+      if (action.pending_semantic_ref !== undefined
+        && !migration.semantic?.steps?.some((step) => step.pending_ref === action.pending_semantic_ref)) {
+        add(
+          errors,
+          `${path}.mechanical.actions`,
+          `pending semantic ref ${action.pending_semantic_ref} must name a semantic step in the same migration`,
+        );
+      }
+    }
+  });
+  return errors;
+}
+
+function migrationFormatKey(detectedFormat) {
+  return Number.isInteger(detectedFormat) ? `format-${detectedFormat}` : detectedFormat;
+}
+
+function migrationPathMatches(path, declared) {
+  if (path === declared) return true;
+  if (!declared.endsWith("/*.yaml")) return false;
+  const directory = declared.slice(0, -"*.yaml".length);
+  const remainder = path.startsWith(directory) ? path.slice(directory.length) : "";
+  return remainder.endsWith(".yaml") && !remainder.includes("/");
+}
+
+function relativeProjectPath(repo, path) {
+  const prefix = `${resolve(repo)}${sep}`;
+  const absolute = resolve(path);
+  if (!absolute.startsWith(prefix)) {
+    throw new VibeHubError("migration_error", `Migration path escapes the selected repository: ${absolute}`);
+  }
+  return absolute.slice(prefix.length).split(sep).join("/");
+}
+
+function pendingSemanticRefs(repo) {
+  const refs = new Set();
+  for (const path of yamlFiles(dirs(repo).tickets)) {
+    const document = readDocument(path);
+    for (const ref of Array.isArray(document.provenance_refs) ? document.provenance_refs : []) {
+      if (ref.startsWith("migration-pending:")) refs.add(ref);
+    }
+  }
+  return [...refs].sort();
+}
+
+function guidanceForPendingRefs(reference, refs) {
+  const pending = new Set(refs);
+  return reference.migrations.flatMap((migration) => migration.semantic.steps
+    .filter((step) => step.pending_ref && pending.has(step.pending_ref))
+    .map((step) => ({ migration_id: migration.migration_id, ...step })));
+}
+
+function migrateMechanical(repo) {
+  const migrationsReference = JSON.parse(readFileSync(
+    fileURLToPath(new URL("../../vibehub-migrate/references/migrations.json", import.meta.url)),
+    "utf8",
+  ));
+  const referenceErrors = validateMigrationsReference(migrationsReference);
+  assertValid(referenceErrors, "Migration reference is invalid");
+  const compatibility = projectCompatibility(repo);
+  if (compatibility.state === "UNSUPPORTED_NEWER") {
+    throw new VibeHubError("format_mismatch", compatibility.reason, { compatibility });
+  }
+  if (compatibility.detected_format === "uninitialized") {
+    throw new VibeHubError(
+      "format_mismatch",
+      "Uninitialized projects use project init; there is no migration path.",
+      { compatibility },
+    );
+  }
+  if (compatibility.state === "CURRENT") {
+    const pending = pendingSemanticRefs(repo);
+    return {
+      status: pending.length > 0 ? "current_with_semantic_pending" : "current",
+      changed_paths: [],
+      applied_migrations: [],
+      pending_semantic_refs: pending,
+      pending_semantic_steps: guidanceForPendingRefs(migrationsReference, pending),
+      target_format: CURRENT_PROJECT_FORMAT,
+    };
+  }
+
+  const migrations = new Map(migrationsReference.migrations.map((item) => [item.from, item]));
+  const plannedWrites = new Map();
+  const applied = [];
+  const pendingSteps = [];
+  let format = migrationFormatKey(compatibility.detected_format);
+  const visited = new Set();
+
+  while (format !== `format-${CURRENT_PROJECT_FORMAT}`) {
+    if (visited.has(format)) {
+      throw new VibeHubError("migration_error", `Migration path contains a cycle at ${format}`);
+    }
+    visited.add(format);
+    const migration = migrations.get(format);
+    if (!migration) {
+      throw new VibeHubError("migration_path_missing", `No declared migration starts at ${format}`);
+    }
+    const actions = migration.mechanical.actions;
+    const semanticSteps = migration.semantic.steps.map((step) => ({
+      migration_id: migration.migration_id,
+      ...step,
+    }));
+    pendingSteps.push(...semanticSteps);
+    if (actions.length === 0) {
+      return {
+        status: "semantic_required",
+        detected_format: compatibility.detected_format,
+        target_format: CURRENT_PROJECT_FORMAT,
+        changed_paths: [],
+        applied_migrations: [],
+        pending_semantic_steps: pendingSteps,
+        reason: `Migration ${migration.migration_id} has no mechanical actions and requires Agent judgment before the path can continue.`,
+      };
+    }
+
+    for (const action of actions) {
+      if (action.type === "write-project-format") {
+        plannedWrites.set(projectFormatPath(repo), {
+          document: {
+            schema_version: 1,
+            kind: "vibehub_project",
+            format_version: action.format_version,
+          },
+          migration,
+        });
+      } else if (action.type === "upgrade-ticket-schema") {
+        for (const path of yamlFiles(dirs(repo).tickets)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.from, action.to].includes(existing.schema_version)) {
+            throw new VibeHubError(
+              "migration_error",
+              `${path} has Ticket schema ${existing.schema_version}; expected ${action.from} or ${action.to}`,
+            );
+          }
+          const document = { ...existing, schema_version: action.to };
+          for (const [key, value] of Object.entries(action.defaults)) {
+            if (document[key] === undefined) document[key] = structuredClone(value);
+          }
+          if (!Array.isArray(document.provenance_refs)) {
+            throw new VibeHubError("migration_error", `${path}.provenance_refs must be an array`);
+          }
+          if (!document.provenance_refs.includes(action.pending_semantic_ref)) {
+            document.provenance_refs = [...document.provenance_refs, action.pending_semantic_ref];
+          }
+          assertValid(validateTicket(document, path), "Mechanically migrated Ticket is invalid");
+          plannedWrites.set(path, { document, migration });
+        }
+      }
+    }
+    applied.push(migration.migration_id);
+    format = migration.to;
+  }
+
+  const changedPaths = [];
+  const originals = new Map();
+  for (const [path, { document, migration }] of plannedWrites) {
+    const relative = relativeProjectPath(repo, path);
+    if (!migration.mechanical.declared_paths.some((declared) => migrationPathMatches(relative, declared))) {
+      throw new VibeHubError(
+        "migration_error",
+        `Migration ${migration.migration_id} attempted undeclared path ${relative}`,
+      );
+    }
+    if (!existsSync(path) || readFileSync(path, "utf8") !== serialize(document)) {
+      originals.set(path, existsSync(path) ? readFileSync(path, "utf8") : null);
+      changedPaths.push(relative);
+    }
+  }
+  try {
+    for (const [path, source] of originals) {
+      writeDocument(path, plannedWrites.get(path).document);
+    }
+    const migratedCompatibility = projectCompatibility(repo);
+    if (migratedCompatibility.state !== "CURRENT") {
+      throw new VibeHubError(
+        "migration_error",
+        "Mechanical migration stopped before the current format",
+        { compatibility: migratedCompatibility },
+      );
+    }
+    const repository = loadRepository(repo);
+    assertValid(repository.errors, "Mechanically migrated project is invalid");
+  } catch (error) {
+    for (const [path, source] of [...originals].reverse()) {
+      if (source === null) {
+        if (existsSync(path)) unlinkSync(path);
+      } else {
+        const temporary = `${path}.rollback-${process.pid}`;
+        writeFileSync(temporary, source, { flag: "wx" });
+        renameSync(temporary, path);
+      }
+    }
+    throw error;
+  }
+  return {
+    status: pendingSteps.length > 0 ? "migrated_with_semantic_pending" : "migrated",
+    detected_format: compatibility.detected_format,
+    target_format: CURRENT_PROJECT_FORMAT,
+    changed_paths: changedPaths.sort(),
+    applied_migrations: applied,
+    pending_semantic_refs: pendingSemanticRefs(repo),
+    pending_semantic_steps: pendingSteps,
   };
 }
 
@@ -586,6 +986,11 @@ function validateEvidence(document, path = "evidence") {
   return errors;
 }
 
+// A closeout Agent must be independent from the executor. The engine cannot
+// verify that claim and must not try; it requires the claim to be made, so an
+// absent one is a rejected write rather than a silent self-adjudication.
+export const INDEPENDENCE_SOURCES = new Set(["subagent", "separate_session", "different_human"]);
+
 function validateOutcome(document, path = "outcome") {
   const errors = [];
   if (
@@ -602,6 +1007,7 @@ function validateOutcome(document, path = "outcome") {
         "evidence_ids",
         "summary",
         "closed_at",
+        "independence",
       ]),
       path,
     )
@@ -616,6 +1022,21 @@ function validateOutcome(document, path = "outcome") {
   requiredString(errors, document, "summary", path);
   requiredString(errors, document, "closed_at", path);
   if (Number.isNaN(Date.parse(document.closed_at))) add(errors, `${path}.closed_at`, "must be an ISO-compatible date-time");
+  // Optional on read so the Outcomes written before this contract stay valid;
+  // `ticket closeout` requires it when writing a new one.
+  if (document.independence !== undefined) {
+    const independence = document.independence;
+    if (typeof independence !== "object" || independence === null || Array.isArray(independence)) {
+      add(errors, `${path}.independence`, "must be an object");
+    } else if (!strictKeys(errors, independence, new Set(["source", "note"]), `${path}.independence`)) {
+      // strictKeys already recorded the unknown key
+    } else {
+      if (!INDEPENDENCE_SOURCES.has(independence.source)) {
+        add(errors, `${path}.independence.source`, `must be one of ${[...INDEPENDENCE_SOURCES].join(", ")}`);
+      }
+      if (independence.note !== undefined) requiredString(errors, independence, "note", `${path}.independence`);
+    }
+  }
   return errors;
 }
 
@@ -765,19 +1186,10 @@ export function loadRepository(repo, overrides = {}) {
   for (const { document, path } of tickets.documents.values()) {
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
-      const target = typeof ref === "string" ? resolve(repo, ref) : "";
-      if (
-        typeof ref !== "string"
-        || isAbsolute(ref)
-        || (!target.startsWith(`${repo}${sep}`) && target !== repo)
-        || !existsSync(target)
-      ) {
-        add(errors, path, `unreadable Ticket context ref: ${String(ref)}`);
-      } else {
-        const stat = lstatSync(target);
-        if (!stat.isFile() || stat.isSymbolicLink()) {
-          add(errors, path, `Ticket context ref must be a regular file: ${ref}`);
-        }
+      try {
+        resolveTicketContextRef(repo, ref);
+      } catch (error) {
+        add(errors, path, error instanceof Error ? error.message : `unreadable Ticket context ref: ${String(ref)}`);
       }
     }
     for (const relation of document.relations ?? []) {
@@ -897,6 +1309,13 @@ function contextOperation(operation, repo, input, options = {}) {
     }
     writeDocument(path, input);
     return { status: "written", context_id: input.context_id, room: options.room ?? null, path };
+  }
+  if (operation === "resolve") {
+    assertCurrentProjectFormat(repo);
+    if (typeof input.ref !== "string" || input.ref.trim() === "") {
+      throw new VibeHubError("invalid_input", "context resolve needs a non-empty ref");
+    }
+    return resolveTicketContextRef(repo, input.ref);
   }
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -1213,6 +1632,18 @@ function ticketOperation(operation, repo, input, options = {}) {
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
       throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
     }
+    // The plan Skill asks a separate Agent to validate a candidate "when an
+    // independent Agent is available". Left implicit, an unavailable one is
+    // indistinguishable from an unasked one. The declaration is required so a
+    // skip is recorded rather than merely undetected; like the closeout
+    // declaration, the engine records the claim and never verifies it.
+    if (typeof input.validation !== "object" || input.validation === null
+      || typeof input.validation.independent !== "boolean") {
+      throw new VibeHubError(
+        "missing_validation_declaration",
+        'ticket apply needs a validation declaration: {"validation":{"independent":true|false,"note":"..."}}. State whether a separate Agent validated this candidate; an unrecorded skip is not permitted.',
+      );
+    }
     const errors = input.tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
     const ids = new Set();
     for (const ticket of input.tickets) {
@@ -1225,10 +1656,17 @@ function ticketOperation(operation, repo, input, options = {}) {
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
+    // Namespaced deliberately: bare `validation:` is already used in checked-in
+    // Tickets to name the Ticket or decision that validated a claim, and
+    // rewriting that would erase history on every re-apply.
+    const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
     const written = [];
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
-      writeDocument(path, ticket);
+      const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:"));
+      const recorded = { ...ticket, provenance_refs: [...provenance, validationRef] };
+      assertValid(validateTicket(recorded, `tickets[${ticket.ticket_id}]`), "Ticket candidate is invalid");
+      writeDocument(path, recorded);
       written.push(path);
     }
     return {
@@ -1250,6 +1688,12 @@ function ticketOperation(operation, repo, input, options = {}) {
   }
   if (operation === "closeout") {
     assertCurrentProjectFormat(repo);
+    if (input.independence === undefined) {
+      throw new VibeHubError(
+        "missing_independence",
+        `ticket closeout needs an independence declaration: {"independence":{"source":"<${[...INDEPENDENCE_SOURCES].join("|")}>","note":"..."}}. The closeout Agent must be independent from the executor; if no independent source is available, stop and report that rather than adjudicating your own work.`,
+      );
+    }
     const errors = validateOutcome(input);
     assertValid(errors, "Outcome document is invalid");
     const repository = loadRepository(repo, { outcomes: [input] });
@@ -1326,8 +1770,13 @@ function ticketOperation(operation, repo, input, options = {}) {
   throw new VibeHubError("unsupported_operation", `Unsupported ticket operation: ${operation}`);
 }
 
-function git(repo, args, { allowFailure = false } = {}) {
-  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+function git(repo, args, { allowFailure = false, binary = false } = {}) {
+  // Every caller accepts repository paths. Disable repository-configured
+  // fsmonitor hooks so validation, resolution, and drift reads stay inert.
+  const result = spawnSync("git", ["-c", "core.fsmonitor=false", "-C", repo, ...args], {
+    ...(binary ? {} : { encoding: "utf8" }),
+    maxBuffer: 64 * 1024 * 1024,
+  });
   if (result.error) throw new VibeHubError("git_error", `git is unavailable: ${result.error.message}`);
   if (result.status !== 0 && !allowFailure) {
     throw new VibeHubError("git_error", `git ${args[0]} failed: ${(result.stderr || "").trim()}`);
@@ -1455,6 +1904,7 @@ function roomOperation(operation, repo, input, options = {}) {
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
+  if (operation === "migrate-mechanical") return migrateMechanical(repo);
   if (operation === "validate") {
     const compatibility = assertCurrentProjectFormat(repo);
     const repository = loadRepository(repo);

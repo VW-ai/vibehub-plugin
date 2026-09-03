@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "3b9d6fd1fb651ecebf5a4e305c65ffa962d8f42a",
+        "blob": "a9a22e59cc1ee10bf93b134b64cf528aab0b493a",
         "path": "README.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "dc5c7417c6eaed656ad38e5f4ddd579d34b1f54b",
+        "blob": "354c3941c092aae5ab0e5563e35da1733615f1d7",
         "path": "docs/INSTALL.md"
       },
       {
@@ -62,7 +62,7 @@
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
-        "blob": "bba25862b59850c49e883185e4aaee76b3ec692d",
+        "blob": "5e89c920081613ed98986d63d67fe0164a66732f",
         "path": "docs/RELEASE.md"
       },
       {
@@ -162,8 +162,16 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
-        "blob": "7f317eea2f5dd522f0f0de592cf96f3d58a975ea",
+        "blob": "2f0819da0c63b463041eb890ad07b6d4201316f0",
+        "path": "docs/proposals/cross-project-upgrade-surface.md"
+      },
+      {
+        "blob": "6e64fa1bea59eb6c6eeead75d969a452aa94df35",
         "path": "docs/proposals/npx-first-install-experience.md"
+      },
+      {
+        "blob": "46133ab329a21226613cadbd9bdc943671072f9f",
+        "path": "docs/proposals/release-version-identity.md"
       },
       {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
@@ -186,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T21:29:34.508Z",
-    "last_aligned_commit": "a584cdf34d7643067d5b8d5bad6e50e9958e6e1d"
+    "checked_at": "2026-09-03T05:22:16.832Z",
+    "last_aligned_commit": "33de83c2526258a48340863ab752d45ff7b56140"
   },
   "anchors": [
     "CHANGELOG.md",

@@ -6,11 +6,11 @@
         "path": "site/.gitignore"
       },
       {
-        "blob": "f96c156cdf01324f9d59f2b6578ca8583e5bafcf",
+        "blob": "84def1579a7264af2e87b35ba60f0f4483582992",
         "path": "site/README.md"
       },
       {
-        "blob": "7a236797727f7e1f09e7d23e1aa0e3d19bf20b65",
+        "blob": "7d9a41b4eb8029f56ab52326e97b361d25ac5d47",
         "path": "site/app/globals.css"
       },
       {
@@ -18,7 +18,7 @@
         "path": "site/app/layout.tsx"
       },
       {
-        "blob": "3b6ffe553fd78ce319755e7d215cc23362366ba7",
+        "blob": "017db21c2441c7ce465e11173c23d10db2324062",
         "path": "site/app/page.tsx"
       },
       {
@@ -34,7 +34,7 @@
         "path": "site/package-lock.json"
       },
       {
-        "blob": "7afbbe7c5ef78f57766dc94997f7725925e3fc8e",
+        "blob": "847d86ed0d6ef5e79c77bc5049472f487b25f792",
         "path": "site/package.json"
       },
       {
@@ -62,11 +62,11 @@
         "path": "site/public/og.png"
       },
       {
-        "blob": "13ab54799633cb3409adbd6a2895744cde95767d",
+        "blob": "619ceaf9145ff2da8a85b6fad63fe27aa9677677",
         "path": "site/public/robots.txt"
       },
       {
-        "blob": "b98cb986b29cb19725c2f7cf6434c7d9b54395af",
+        "blob": "c49cc27959d2ca81d85b96e29dc485f7ec31a61c",
         "path": "site/public/sitemap.xml"
       },
       {
@@ -82,7 +82,7 @@
         "path": "site/public/vibehub-mark.svg"
       },
       {
-        "blob": "f41a77bd5a045dafa28c7511f4e37b677980982c",
+        "blob": "a2d39026e138a3e6671f534f25c359a955c8fa7c",
         "path": "site/release/SKILL.md"
       },
       {
@@ -90,11 +90,11 @@
         "path": "site/release/agents/openai.yaml"
       },
       {
-        "blob": "8093afee06719fcc9ac237fbcfb0cb559725b27d",
+        "blob": "ce233f2aade3efd233c41034e7848cc632196594",
         "path": "site/release/scripts/release.mjs"
       },
       {
-        "blob": "26f17ce8425ee767e0260290e9b9f9e67644a9bd",
+        "blob": "baab461f73c300d9f88b4b149c37b3dd8d8b040a",
         "path": "site/tests/rendered-html.test.mjs"
       },
       {
@@ -110,8 +110,8 @@
         "path": "site/worker/index.ts"
       }
     ],
-    "checked_at": "2026-08-23T07:13:47.414Z",
-    "last_aligned_commit": "3ac979dc97269f6be284fc1691c9c1e8feb25675"
+    "checked_at": "2026-09-03T06:33:44.815Z",
+    "last_aligned_commit": "b8f037974c72cb43239934fba5b2a655acadbcac"
   },
   "anchors": [
     "site/"
@@ -121,6 +121,5 @@
   "kind": "room",
   "room_id": "marketing",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift: unrelated marketing files deferred while recording the ACP/acpx runtime decision"
+  "stale": false
 }

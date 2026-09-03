@@ -1,31 +1,64 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 2,
+  "current_format": 3,
   "migrations": [
     {
-      "from": "0.4",
-      "to": "0.5",
+      "migration_id": "0-4-unversioned-to-0-5-unversioned",
+      "from": "0.4-unversioned",
+      "to": "0.5-unversioned",
       "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 0.4-unversioned for a populated legacy .vibehub/context/ directory.",
-      "steps": [
-        "Before writing, preview every legacy Context path and every Ticket context_ref that will change; cross the explicit migration boundary once for this reviewed set.",
-        "When .vibehub/rooms/ is missing or empty, build the Room tree first with the distill skill (cold start); do not invent rooms for territory you have not read.",
-        "Move every entry out of .vibehub/context/ into the lowest room that owns its claim, per the placement rule in the knowledge-governance reference, using git mv; remove the emptied directory.",
-        "Rewrite every ticket context_ref that names a .vibehub/context/ path to the entry's new roomed path.",
-        "Continue with the 0.5-unversioned-to-format-1 step and every following format step; the room move alone is not the current project format."
-      ]
+      "mechanical": {
+        "declared_paths": [],
+        "actions": []
+      },
+      "semantic": {
+        "steps": [
+          {
+            "step_id": "design-room-tree-and-place-contexts",
+            "purpose": "Give every durable Context one lowest-owning Room so retrieval has an explicit product boundary instead of a flat global bag.",
+            "derives_from": [
+              "Every legacy .vibehub/context/*.yaml claim and relation.",
+              "Repository code, docs, and existing product boundaries named by those claims.",
+              "The lowest-owning-room placement rule in skills/vibehub-ingest/references/knowledge-governance.json."
+            ],
+            "good_value": "The smallest Room tree that covers territory actually read, with each Context placed in the lowest Room that owns the whole claim and every affected Ticket context_ref rewritten to that reviewed destination.",
+            "forbidden_shortcuts": [
+              "Do not invent Rooms for repository territory that was not read.",
+              "Do not assign by filename, tag, or directory similarity when the Context claim belongs elsewhere.",
+              "Do not leave copies, a populated legacy .vibehub/context/ directory, dual paths, or guessed Ticket refs."
+            ],
+            "instructions": [
+              "Build the Room tree with vibehub-distill when .vibehub/rooms/ is missing or empty.",
+              "Move each legacy Context with Git into its reviewed lowest-owning Room and remove the empty legacy directory.",
+              "Rewrite every exact Ticket context_ref from the old path to the reviewed new path, then rerun the mechanical operation."
+            ]
+          }
+        ]
+      }
     },
     {
+      "migration_id": "0-5-unversioned-to-format-1",
       "from": "0.5-unversioned",
       "to": "format-1",
       "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 0.5-unversioned after the Room layout is present but .vibehub/version.yaml is absent.",
-      "steps": [
-        "Preview the one new checked-in path .vibehub/version.yaml and confirm that the repository no longer contains populated legacy .vibehub/context/ entries.",
-        "After the explicit migration boundary, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 1.",
-        "Continue with the format-1-to-format-2 step; format 1 is no longer current."
-      ]
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "write-project-format",
+            "format_version": 1
+          }
+        ]
+      },
+      "semantic": {
+        "steps": []
+      }
     },
     {
+      "migration_id": "format-1-to-format-2",
       "from": "format-1",
       "to": "format-2",
       "document_schema_versions": {
@@ -35,12 +68,99 @@
         }
       },
       "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 1 and target_format 2 after Ticket delivery membership became canonical project data.",
-      "steps": [
-        "Preview every canonical Ticket and classify its delivery membership from exact reviewable history; do not infer delivery from Ticket status, branch name, filename, prose, or whichever pull request is currently open.",
-        "Upgrade every Ticket document from schema_version 1 to schema_version 2 and add an explicit deliveries array. For a delivered pull request, record its canonical GitHub pull request URL, state delivered, exact mergedAt timestamp, and 40-hex merge commit. For an exact delivered cherry-pick, record the commit ref, timestamp, and delivered commit. Leave an empty array when no authoritative delivery can be established.",
-        "After the reviewed Ticket audit, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 2.",
-        "Prove project compatibility returns CURRENT, project validate passes, the current Ticket graph is action-focused, and room drift remains honest."
-      ]
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/tickets/*.yaml",
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "upgrade-ticket-schema",
+            "from": 1,
+            "to": 2,
+            "defaults": {
+              "deliveries": []
+            },
+            "pending_semantic_ref": "migration-pending:format-1-to-format-2:classify-delivery-membership"
+          },
+          {
+            "type": "write-project-format",
+            "format_version": 2
+          }
+        ]
+      },
+      "semantic": {
+        "steps": [
+          {
+            "step_id": "classify-delivery-membership",
+            "pending_ref": "migration-pending:format-1-to-format-2:classify-delivery-membership",
+            "purpose": "Record whether and exactly where each Ticket outcome was delivered so status and current branch state are not mistaken for historical delivery truth.",
+            "derives_from": [
+              "Exact reviewable Git history for the Ticket and candidate delivery commit.",
+              "Canonical merged GitHub pull-request metadata when a pull request delivered the outcome.",
+              "An exact delivered cherry-pick commit when no canonical pull request is authoritative."
+            ],
+            "good_value": "Each authoritative delivery records the canonical ref, delivered state, exact timestamp, and 40-hex delivered commit; a genuinely undelivered Ticket remains empty only after the same history audit.",
+            "forbidden_shortcuts": [
+              "Do not infer delivery from Ticket status, branch name, filename, prose, or whichever pull request is currently open.",
+              "Do not invent a delivery when exact history cannot establish one.",
+              "Do not treat the mechanically written empty array as a completed classification."
+            ],
+            "instructions": [
+              "Audit each Ticket against exact reviewable history and populate only authoritative deliveries.",
+              "Leave deliveries empty when no authoritative delivery can be established.",
+              "Remove migration-pending:format-1-to-format-2:classify-delivery-membership from that Ticket's provenance_refs only after its audit is complete."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "migration_id": "format-2-to-format-3",
+      "from": "format-2",
+      "to": "format-3",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 2,
+          "to": 2
+        }
+      },
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 2 and target_format 3 after immutable historical Ticket context refs became readable project data.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "write-project-format",
+            "format_version": 3
+          }
+        ]
+      },
+      "semantic": {
+        "steps": [
+          {
+            "step_id": "bind-deleted-path-provenance-to-exact-history",
+            "purpose": "Replace a temporary deleted-path provenance workaround with readable immutable Ticket Context only when reviewable Git history identifies the exact commit and blob that informed that Ticket.",
+            "derives_from": [
+              "Each exact deleted-path provenance entry and the Ticket that carries it.",
+              "The Ticket-creation or decision commit and its parent history, not merely any commit in which the path happened to exist.",
+              "The shared context resolve operation proving the selected commit names a regular historical blob with the expected bytes."
+            ],
+            "good_value": "An established case moves from deleted-path:<path> provenance to a context_ref whose ref is commit:<40-hex>:<path> and whose purpose states why those exact bytes informed the Ticket; an ambiguous case keeps an explicit unresolved deleted-path provenance note.",
+            "forbidden_shortcuts": [
+              "Do not choose the newest, oldest, or any containing commit without evidence that it is the version the Ticket actually used.",
+              "Do not restore or copy the retired file into the working tree, Ticket, archive, cache, or database.",
+              "Do not remove an unresolved deleted-path note or imply that mechanical migration completed semantic selection."
+            ],
+            "instructions": [
+              "Audit every deleted-path provenance entry against the Ticket's exact Git history and record reviewable Evidence for the selection or ambiguity.",
+              "For an established case, add commit:<40-hex>:<repo-relative-path> to context_refs, verify it with context resolve, and remove only the matching deleted-path provenance entry.",
+              "For an ambiguous case, retain a deleted-path provenance note that explicitly says selection remains unresolved, then validate the project."
+            ]
+          }
+        ]
+      }
     }
   ]
 }

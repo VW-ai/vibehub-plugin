@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "release-paired-one-shot-package-is-verifiable",
+    "discovery-is-explicit-bounded-and-worktree-complete",
+    "classification-and-preview-use-the-shared-migration-contract",
+    "one-safe-worktree-produces-one-preverified-local-commit",
+    "every-non-success-proves-byte-and-git-invariance",
+    "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
+    "architecture-docs-and-artifact-enforce-the-narrow-exception"
+  ],
+  "evidence_id": "upgrade-boundary-docs-and-full-suite-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:35:40Z",
+  "refs": [
+    "skills/vibehub-setup/references/architecture-boundary.md",
+    "docs/INSTALL.md",
+    "docs/RELEASE.md",
+    "skills/vibehub-migrate/SKILL.md",
+    "scripts/verify-plugin-artifact.mjs",
+    "test/upgrade.test.mjs",
+    "test/release.test.mjs",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-setup/references/architecture-boundary.md exactly matches the independently accepted replacement text. docs/INSTALL.md and docs/RELEASE.md document one immutable tag across Skills and the versioned asset, explicit roots, safe per-worktree local commits, no push, and later semantic Agent work; vibehub-migrate tells that later Agent to report the exact 40-hex worktree migration commit without inferring sibling coverage. Source/contract tests prove no Skill invokes the entry and the coordinator contains no forbidden Git command path; a recording-Git proxy plus hostile fsmonitor/hook/signing sentinels prove the runtime subprocess boundary. Final `npm run verify` exited 0 on 2026-09-03: 178 tests passed, 0 failed, 0 skipped, followed by a successful clean installed-plugin artifact verification of 65 files and 3,213,802 bytes including the narrowed boundary and same-tag documentation.",
+  "ticket_id": "ticket-one-command-upgrade-across-projects"
+}

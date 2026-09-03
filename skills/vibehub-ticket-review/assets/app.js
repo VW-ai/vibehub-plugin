@@ -2076,7 +2076,16 @@
     object.append(contextObjectHeading(item, null));
     const purpose = document.createElement("p");
     purpose.textContent = item.purpose;
-    object.append(purpose, contextActions({
+    object.append(purpose);
+    if (item.identity) {
+      const identity = document.createElement("code");
+      identity.className = "context-source-identity";
+      identity.textContent = item.identity.commit
+        ? `commit:${item.identity.commit}:${item.identity.path} · blob:${item.identity.blob}`
+        : `${item.identity.revision}:${item.identity.path} · blob:${item.identity.blob}`;
+      object.append(identity);
+    }
+    object.append(contextActions({
       kind: "vibehub_source_reference",
       ref: item.ref,
       purpose: item.purpose,

@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "nothing-points-a-user-at-a-marketplace",
+    "marketplace-machinery-is-removed-not-orphaned",
+    "release-identity-survives-the-removal",
+    "the-checked-in-manifests-have-a-decided-fate",
+    "the-surviving-path-and-the-migration-are-proven-by-doing",
+    "owner-accepts-the-single-path"
+  ],
+  "closed_at": "2026-09-03T05:33:54Z",
+  "evidence_ids": [
+    "marketplace-surface-removal-proof",
+    "marketplace-retirement-remediation-proof",
+    "retired-marketplace-release-rehearsal-proof",
+    "clean-npx-installs-and-marketplace-migration-proof",
+    "owner-confirms-single-npx-path"
+  ],
+  "independence": {
+    "note": "An independent closeout subagent that did not execute the remediation reread the current Ticket, prior Outcome, all Evidence, commits, repository surfaces, preserved proof artifacts, and test results.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent re-adjudication accepted all six criteria. Current active documentation, all eleven partial-install Skill fallbacks, and the public site expose only npx Skills installation; the historical proposal is explicitly labeled and no longer presents marketplace commands as current. Marketplace builders, npm scripts, host tests, site command assertions, .claude-plugin/marketplace.json, .codex-plugin/plugin.json, and .agents/plugins/marketplace.json are deleted, while .claude-plugin/plugin.json remains with its documented skills.sh metadata and release-identity purpose. The two surviving release declarations and v0.8.0 tag agree; the rehearsed artifacts and checksums reproduce. Preserved proof independently confirms clean Claude Code and Codex installs plus the byte-identical copied-real-install migration, and human-origin Evidence faithfully records the owner's explicit post-change confirmation.",
+  "ticket_id": "ticket-retire-marketplace-distribution",
+  "unresolved_acceptance_ids": []
+}

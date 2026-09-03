@@ -1,0 +1,73 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "engine-requires-a-declared-independence-source",
+      "criterion": "node vh.mjs ticket closeout rejects an Outcome whose input does not declare an independence source drawn from a closed set covering a subagent with no execution context, a separate session started from the handoff, and a different human; the rejection is a machine-readable error envelope, writes nothing under .vibehub/outcomes, and leaves the Ticket's next_action at CLOSE_OUT, proven by a test that asserts no file appears."
+    },
+    {
+      "acceptance_id": "declaration-has-a-defined-home",
+      "criterion": "The declaration is carried by an explicit field whose addition to outcome.schema.json is made deliberately, with the schema's compatibility handling stated, rather than smuggled into summary free text; existing Outcomes without the field remain valid and readable."
+    },
+    {
+      "acceptance_id": "the-record-shows-who-judged",
+      "criterion": "A reader of a checked-in Outcome, and the Workbench projection of it, can see the declared independence source without reconstructing the session. The criterion is presence and readability only: because the engine must not verify the claim, an executor that declares a source it did not use produces an Outcome that is not mechanically distinguishable, and the gain is that silence becomes a false statement in a reviewable Git document rather than an absence."
+    },
+    {
+      "acceptance_id": "closeout-skill-matches-the-engine",
+      "criterion": "skills/vibehub-ticket-closeout/SKILL.md names the same closed set of independence sources, instructs the Agent to declare which was used, and instructs it to halt and report what is missing rather than proceed when none is available; test/skill-contracts.test.mjs asserts that the sources named in the Skill are exactly those the engine accepts."
+    },
+    {
+      "acceptance_id": "validate-path-states-the-skip",
+      "criterion": "The same engine seam covers the validation path: node vh.mjs ticket apply requires its input to declare whether an independent Agent validated the candidate, so an unrecorded skip is rejected rather than merely undetected; a test asserts that an input omitting the declaration writes no Ticket. If the executor concludes this seam is wrong for apply, the Outcome must state why the asymmetry with closeout is acceptable rather than leaving the validation path on an honor system by default."
+    }
+  ],
+  "constraints": [
+    "Do not require a specific host mechanism; subagent, separate session, and second human all remain valid independence sources, and the engine checks only that one is declared.",
+    "The declaration is a lightweight provenance claim in a Git document, exactly as acceptance-authority.md frames provenance; do not build an identity, permission, approval, or attestation system, and do not attempt to verify the claim's truth.",
+    "Do not weaken acceptance-authority.md: human-authority criteria still require origin: human Evidence regardless of how agent independence was obtained.",
+    "The rejection must be cheap to resolve and must never strand a Ticket whose Evidence is already complete.",
+    "No new service, daemon, runtime, or hidden state; the change lives in vh.mjs, the schema, and the Skills."
+  ],
+  "context": "vibehub-ticket-closeout states that the closeout Agent must be independent from the executor and that an executor's summary is not proof; ticket-next-action.md states that CLOSE_OUT asks an independent Agent to adjudicate; vibehub-ticket-plan step 6 asks a separate Agent to validate a candidate only when an independent Agent is available. None of these is enforced. The product ships one mechanism for obtaining independence — the Workbench copies a handoff string a human pastes into a fresh session — and no check that it happened. When independence is unavailable the Skills do not fail; the executing context adjudicates its own work and writes a successful Outcome indistinguishable from a legitimate one. Prose in a SKILL.md is read by a model and cannot enforce anything, so a Skill-only fix produces a better-worded honor system, which is the thing that is already broken. The enforceable seam is the engine: ticket closeout takes an input document, so it can require a declared independence source and reject the write without one. That is an input requirement on a Git document, not an identity, permission, or attestation system. One real obstacle must be owned rather than assumed away: outcome.schema.json is additionalProperties:false with nine fields and no place to carry how independence was obtained, so this Ticket either adds a field to that schema or defines exactly where the declaration lives.",
+  "context_refs": [
+    {
+      "purpose": "States the independence requirement and the do-not-accept-executor-summaries rule that nothing currently enforces.",
+      "ref": "skills/vibehub-ticket-closeout/SKILL.md"
+    },
+    {
+      "purpose": "Closed nine-field schema with no home for the declaration; this Ticket must change it deliberately.",
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "Defines CLOSE_OUT as asking an independent Agent to adjudicate.",
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Step 6's conditional wording that currently permits an invisible skip of independent validation.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "The handoff-copy action, currently the only shipped mechanism for obtaining independence.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    },
+    {
+      "purpose": "Frames provenance claims as lightweight Git-document claims rather than an attestation system; the constraint this Ticket works inside.",
+      "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "Existing prose-to-reality assertions where the Skill-versus-engine agreement belongs.",
+      "ref": "test/skill-contracts.test.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Closeout cannot silently adjudicate the work of the context that produced it: the engine refuses to record an Outcome unless the closeout declares how it obtained independence, and the declaration is visible in the recorded Outcome.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "https://github.com/VW-ai/vibehub-plugin/issues/130"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

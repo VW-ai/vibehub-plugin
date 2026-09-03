@@ -20,7 +20,7 @@ function closeSuccessfully(repo, ticketId) {
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: ticketId,
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -55,8 +55,7 @@ test("delivery archive and shared current/all/delivery/Room queries stay truthfu
   const boundary = delivered("archived-boundary", ["old-history"]);
   const current = ticket("current-work", ["archived-boundary"]);
   current.context_refs = [{ ref: contextRef, purpose: "Web query authority." }];
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [old, boundary, current, ticket("unrelated-current")],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [old, boundary, current, ticket("unrelated-current")],
   }).status, 0);
   closeSuccessfully(repo, "old-history");
   closeSuccessfully(repo, "archived-boundary");
@@ -100,16 +99,16 @@ test("delivery schema requires an explicit array and enforces discriminated stat
   assert.equal(run(repo, "project", "init").status, 0);
   const legacy = ticket("legacy-schema");
   legacy.schema_version = 1;
-  const rejectedLegacy = run(repo, "ticket", "apply", { tickets: [legacy] });
+  const rejectedLegacy = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [legacy] });
   assert.notEqual(rejectedLegacy.status, 0);
   assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 2/u);
   const missing = ticket("missing-deliveries");
   delete missing.deliveries;
-  assert.notEqual(run(repo, "ticket", "apply", { tickets: [missing] }).status, 0);
-  assert.equal(run(repo, "ticket", "apply", { tickets: [ticket("explicit-current")] }).status, 0);
+  assert.notEqual(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [missing] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("explicit-current")] }).status, 0);
   const proposed = ticket("proposed-work");
   proposed.deliveries = [{ kind: "pull_request", ref: deliveryRef, state: "proposed" }];
-  assert.equal(run(repo, "ticket", "apply", { tickets: [proposed] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [proposed] }).status, 0);
   const invalid = ticket("invalid-delivery");
   invalid.deliveries = [{
     kind: "pull_request",
@@ -117,7 +116,7 @@ test("delivery schema requires an explicit array and enforces discriminated stat
     state: "proposed",
     delivered_commit: deliveredCommit,
   }];
-  const rejected = run(repo, "ticket", "apply", { tickets: [invalid] });
+  const rejected = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [invalid] });
   assert.notEqual(rejected.status, 0);
   assert.match(JSON.stringify(rejected.envelope.error.details), /only for delivered/u);
   const duplicate = ticket("duplicate-delivery");
@@ -126,7 +125,7 @@ test("delivery schema requires an explicit array and enforces discriminated stat
     { kind: "pull_request", ref: deliveryRef, state: "abandoned" },
   ];
   assert.match(
-    JSON.stringify(run(repo, "ticket", "apply", { tickets: [duplicate] }).envelope.error.details),
+    JSON.stringify(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [duplicate] }).envelope.error.details),
     /unique per Ticket/u,
   );
 });
@@ -138,8 +137,7 @@ test("current scope is seeded by actionable Tickets rather than delivery metadat
   const boundary = ticket("done-boundary", ["old-done"]);
   const unrelated = ticket("unrelated-done");
   const current = ticket("current-work", ["done-boundary"]);
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [old, boundary, unrelated, current],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [old, boundary, unrelated, current],
   }).status, 0);
   for (const id of ["old-done", "done-boundary", "unrelated-done"]) closeSuccessfully(repo, id);
 
@@ -200,8 +198,7 @@ test("archive state table stays orthogonal to Outcome status, revert, and reopen
 test("Ticket graph validates dependencies and successful closeout unlocks only direct dependents", () => {
   const repo = tempRepo("ticket-vertical");
   assert.equal(run(repo, "project", "init").status, 0);
-  const applied = run(repo, "ticket", "apply", {
-    tickets: [ticket("base"), ticket("dependent", ["base"]), ticket("downstream", ["dependent"])],
+  const applied = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("base"), ticket("dependent", ["base"]), ticket("downstream", ["dependent"])],
   });
   assert.equal(applied.status, 0, applied.stdout);
 
@@ -235,7 +232,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
 
   const closeout = run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "base",
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -260,7 +257,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "dependent",
     status: "partial",
     accepted_acceptance_ids: [],
@@ -276,8 +273,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
 test("new dependencies on DONE Tickets return deterministic nonblocking planning advice", () => {
   const repo = tempRepo("ticket-completed-dependency-advice");
   assert.equal(run(repo, "project", "init").status, 0);
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [ticket("completed-baseline"), ticket("active-prerequisite")],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("completed-baseline"), ticket("active-prerequisite")],
   }).status, 0);
   closeSuccessfully(repo, "completed-baseline");
 
@@ -286,14 +282,14 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
     ref: ".vibehub/outcomes/completed-baseline.yaml",
     purpose: "Completed implementation baseline, not an execution unlock.",
   }];
-  const contextApply = run(repo, "ticket", "apply", { tickets: [contextOnly] });
+  const contextApply = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [contextOnly] });
   assert.equal(contextApply.status, 0, contextApply.stdout);
   assert.deepEqual(contextApply.envelope.data.advice, []);
   assert.deepEqual(run(repo, "ticket", "graph").envelope.data.stubs, []);
 
   const candidate = ticket("historical-causal-consumer", ["completed-baseline"]);
   candidate.relations[0].rationale = "Consumes the exact completed migration artifact.";
-  const advised = run(repo, "ticket", "apply", { tickets: [candidate] });
+  const advised = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [candidate] });
   assert.equal(advised.status, 0, advised.stdout);
   assert.deepEqual(advised.envelope.data.advice, [{
     code: "completed-dependency-review",
@@ -317,20 +313,20 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
     true,
   );
 
-  const repeated = run(repo, "ticket", "apply", { tickets: [candidate] });
+  const repeated = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [candidate] });
   assert.equal(repeated.status, 0, repeated.stdout);
   assert.deepEqual(repeated.envelope.data.advice, []);
 
   const missingRationale = ticket("missing-rationale-consumer", ["completed-baseline"]);
   delete missingRationale.relations[0].rationale;
-  const missingRationaleApply = run(repo, "ticket", "apply", { tickets: [missingRationale] });
+  const missingRationaleApply = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [missingRationale] });
   assert.equal(missingRationaleApply.status, 0, missingRationaleApply.stdout);
   assert.equal(missingRationaleApply.envelope.data.advice[0].blocking, false);
   assert.equal(missingRationaleApply.envelope.data.advice[0].rationale, null);
   assert.equal(missingRationaleApply.envelope.data.advice[0].rationale_present, false);
 
   const activeConsumer = ticket("active-consumer", ["active-prerequisite"]);
-  const activeApply = run(repo, "ticket", "apply", { tickets: [activeConsumer] });
+  const activeApply = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [activeConsumer] });
   assert.equal(activeApply.status, 0, activeApply.stdout);
   assert.deepEqual(activeApply.envelope.data.advice, []);
   assert.equal(
@@ -349,8 +345,7 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
   const joinConsumer = ticket("join-consumer", ["completed-baseline", "active-prerequisite"]);
   joinConsumer.relations[0].rationale = "Joins the accepted baseline with pending active work.";
   joinConsumer.relations[1].rationale = "Joins pending active work with the accepted baseline.";
-  const topologyApply = run(repo, "ticket", "apply", {
-    tickets: [releaseConsumer, forkRight, joinConsumer, migrationConsumer, forkLeft],
+  const topologyApply = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [releaseConsumer, forkRight, joinConsumer, migrationConsumer, forkLeft],
   });
   assert.equal(topologyApply.status, 0, topologyApply.stdout);
   assert.deepEqual(
@@ -390,14 +385,13 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
 test("Ticket validation rejects missing endpoints and dependency cycles", () => {
   const missingRepo = tempRepo("ticket-missing");
   assert.equal(run(missingRepo, "project", "init").status, 0);
-  const missing = run(missingRepo, "ticket", "apply", { tickets: [ticket("a", ["missing"])] });
+  const missing = run(missingRepo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("a", ["missing"])] });
   assert.notEqual(missing.status, 0);
   assert.match(JSON.stringify(missing.envelope.error.details), /dangling Ticket dependency/);
 
   const cycleRepo = tempRepo("ticket-cycle");
   assert.equal(run(cycleRepo, "project", "init").status, 0);
-  const cycle = run(cycleRepo, "ticket", "apply", {
-    tickets: [ticket("a", ["b"]), ticket("b", ["a"])],
+  const cycle = run(cycleRepo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("a", ["b"]), ticket("b", ["a"])],
   });
   assert.notEqual(cycle.status, 0);
   assert.match(JSON.stringify(cycle.envelope.error.details), /dependency cycle/);
@@ -411,12 +405,11 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   human.acceptance[0].authority = "human";
   const invalid = ticket("invalid-authority");
   invalid.acceptance[0].authority = "robot";
-  const rejected = run(repo, "ticket", "apply", { tickets: [invalid] });
+  const rejected = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [invalid] });
   assert.notEqual(rejected.status, 0);
   assert.match(JSON.stringify(rejected.envelope.error.details), /authority/u);
 
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [
       ticket("agent-default"),
       human,
       ticket("after-human", ["human-boundary"]),
@@ -458,7 +451,7 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   }).status, 0);
   const selfAccepted = run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "human-boundary",
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -491,7 +484,7 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   );
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "human-boundary",
     status: "successful",
     accepted_acceptance_ids: ["works"],

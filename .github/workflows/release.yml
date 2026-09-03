@@ -25,6 +25,8 @@ jobs:
         run: npm run verify
       - name: Build plugin
         run: npm run build
+      - name: Build release-paired data upgrader
+        run: node scripts/build-upgrade-package.mjs --out dist --tag "$GITHUB_REF_NAME" --commit "$GITHUB_SHA"
       - name: Package release
         run: |
           archive="vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
@@ -37,4 +39,5 @@ jobs:
         run: |
           archive="vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
           gh release create "$GITHUB_REF_NAME" "dist/$archive" "dist/$archive.sha256" \
+            "dist/vibehub-upgrade.tgz" "dist/vibehub-upgrade.tgz.sha256" \
             --verify-tag --generate-notes --title "VibeHub $GITHUB_REF_NAME"

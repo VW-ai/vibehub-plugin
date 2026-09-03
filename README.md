@@ -16,7 +16,7 @@ One line for any skills-capable agent — Claude Code, Codex, Cursor, and more. 
 npx skills add VW-ai/vibehub-plugin
 ```
 
-Prefer a host marketplace? Codex: `codex plugin marketplace add VW-ai/vibehub-plugin` then `codex plugin add vibehub@vibehub` · Claude Code: `/plugin marketplace add VW-ai/vibehub-plugin`, `/plugin install vibehub@vibehub`, `/reload-plugins`.
+Update later with `npx skills update`. This is the only supported install path; host marketplace distribution was retired.
 
 Then open the repository in a fresh Agent session, describe one concrete deliverable, and say:
 

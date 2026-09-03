@@ -1,0 +1,91 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "invocation-shapes-are-compared-and-one-is-selected",
+      "criterion": "One-shot npx and any installed invocation shape are compared against the owner-approved write-capable upgrade behavior, including first install, subsequent update, cross-host availability, permission scope, failure recovery, and what command an existing user actually runs; the Evidence selects the smallest shape that can perform the complete flow and explains why the rejected shape cannot do so more cheaply."
+    },
+    {
+      "acceptance_id": "replacement-boundary-is-exact-and-testable",
+      "criterion": "Evidence supplies exact replacement text for architecture-boundary.md that permits one explicit outside-project upgrade entry while requiring all migration semantics to remain in the shared engine and migrations reference, limiting the entry to invocation, discovery, per-worktree orchestration, local commit, and reporting, and forbidding Skill dependency, background invocation, daemon or service state, authoritative indexes, telemetry, and push; it also names the mechanical assertions that will enforce each boundary in implementation."
+    },
+    {
+      "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
+      "criterion": "The operational definition of safe and unsafe is written as deterministic preflight, preview, pre-commit, and failure rules: registered/reachable/writable, named branch, no Git operation, completely clean status, recognized complete migration chain, same-HEAD deterministic preview limited to declared paths, valid writable result with semantic work explicitly pending, unchanged pre-commit snapshot, and successful local commit; current, unsupported, and pending are distinguished, and every non-success path proves no user bytes are changed."
+    },
+    {
+      "acceptance_id": "owner-selects-explicit-upgrade-behavior",
+      "authority": "human",
+      "criterion": "The owner explicitly chooses an outside-project upgrade experience that enumerates all registered existing worktrees, mechanically migrates and locally commits each safe worktree separately, skips and reports unsafe worktrees, never pushes, and leaves remaining semantic migration to later in-worktree Agent sessions; the decision is recorded in product Context without claiming one commit updates multiple worktrees or unregistered branches."
+    }
+  ],
+  "constraints": [
+    "This Ticket decides and records the invocation and replacement architecture boundary; it implements no entry, scanner, migration, commit, or index.",
+    "Do not amend architecture-boundary.md until this Ticket has a successful independent Outcome; the exact proposed text and tests are Evidence first.",
+    "Do not answer ticket-vibehub-cli's maintainability question or make a general-purpose CLI as a side effect.",
+    "Project and worktree discovery may use only bounded explicit roots and disposable derived state; no index may become authority over Git.",
+    "Do not propose a hosted service, account system, telemetry, background process, automatic stash/reset, or push.",
+    "Unsafe worktrees are reported and left byte-for-byte unchanged; implementation may not silently relax the clean-tree, named-branch, no-Git-operation, recognized-chain, deterministic-preview, validation, unchanged-snapshot, or local-commit gates.",
+    "A semantic migration step may remain pending after the mechanical commit only when the declared migration contract says the mechanical result is valid and writable and records the pending semantic work explicitly."
+  ],
+  "context": "The owner has now settled the product behavior that was open when this Ticket was created. An explicit VibeHub upgrade does more than report: it discovers affected projects, enumerates every registered existing worktree, attempts the declared mechanical migration separately on each safe worktree, validates it, creates a local migration commit, reports the worktree-to-commit mapping and every skipped reason, never pushes, and leaves semantic work to a later Agent session in that worktree. decision-explicit-upgrade-migrates-safe-worktrees supersedes the earlier read-only machine-wide decision. Safety starts deliberately conservative: automatic write requires a reachable writable registered worktree on a named branch, no Git operation in progress, a completely clean status, a complete recognized migration chain, a same-HEAD deterministic preview touching only declared paths and reaching valid CURRENT state, an unchanged pre-commit snapshot, and a successful local commit; current is a no-op, malformed or newer is unsupported, and every other failure is pending with an exact reason. The remaining decision work is engineering-boundary work rather than another product choice: compare one-shot and installed invocation shapes against this behavior, select the smallest one, and replace the old absolute no-required-CLI sentence with a testable exception. The candidate exception is narrow: all migration semantics remain in the shared engine and migrations reference; the outside-project entry adds only explicit invocation, discovery, per-worktree orchestration, local commit, and human-readable reporting; no Skill depends on it, no background process invokes it, and it owns no durable truth outside Git.",
+  "context_refs": [
+    {
+      "purpose": "The owner's current decision establishing write-capable, all-registered-worktree upgrade behavior and the conservative safety predicate.",
+      "ref": ".vibehub/rooms/product/decision-explicit-upgrade-migrates-safe-worktrees.yaml"
+    },
+    {
+      "purpose": "Superseded read-only policy whose rationale and rejected machine-wide write boundary this decision deliberately revises.",
+      "ref": ".vibehub/rooms/product/decision-upgrade-drives-every-affected-project.yaml"
+    },
+    {
+      "purpose": "Updating remains optional, but an update taken owns the user's data restructure.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "Current absolute architecture boundary that needs one narrow, enforceable exception.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "Original forcing constraint whose Skill-first and Git-native benefits the replacement must preserve.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Superseded location policy whose mechanical/semantic classification and authoring-guidance obligations remain binding through the successor decision.",
+      "ref": ".vibehub/rooms/product/decision-migrations-declare-mechanical-and-semantic-halves.yaml"
+    },
+    {
+      "purpose": "Single migration source whose complete chains, classification, defaults, and semantic guidance govern safe fan-out.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Dependent draft that will be refined from this decision's successful Outcome rather than rewritten prematurely.",
+      "ref": ".vibehub/tickets/ticket-one-command-upgrade-across-projects.yaml"
+    },
+    {
+      "purpose": "Adjacent future CLI-maintainability question that this decision must not absorb.",
+      "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
+    },
+    {
+      "purpose": "Existing prose-to-engine assertion pattern for the replacement constraint.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "Current installation document whose no-global-CLI claim must remain true or be narrowed deliberately.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The explicit outside-project VibeHub upgrade entry has a settled invocation shape and an implementation-ready, mechanically enforceable architecture boundary for discovering every registered worktree, migrating only safe ones through shared engine semantics, creating local reviewable commits, reporting every result, and never running in the background or pushing.",
+  "provenance_refs": [
+    "conversation:2026-09-01-packaging-and-release-integrity",
+    "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety",
+    "https://github.com/VW-ai/vibehub-plugin/issues/111",
+    "https://github.com/VW-ai/vibehub-plugin/issues/127",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface"
+}

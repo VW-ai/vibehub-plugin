@@ -1,6 +1,6 @@
 ---
 name: vibehub-core
-description: Shared helper script, schemas, and templates that every other VibeHub Skill calls through a relative path. Nothing here is invoked directly; it ships as a skill folder only so installers that copy skill folders one by one (skills.sh, marketplaces) carry it alongside the Skills that need it.
+description: Shared helper script, schemas, and templates that every other VibeHub Skill calls through a relative path. Nothing here is invoked directly; it ships as a skill folder only so installers that copy skill folders one by one (skills.sh) carry it alongside the Skills that need it.
 ---
 
 # VibeHub Core

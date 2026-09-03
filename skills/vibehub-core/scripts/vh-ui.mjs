@@ -11,6 +11,7 @@ import {
   loadRepository,
   projectRoomDrift,
   projectTicketQuery,
+  resolveTicketContextRef,
   ticketArchived,
   ticketNextAction,
   ticketStatus,
@@ -520,11 +521,16 @@ function ticketContextPackage(ticket, relations, repository, source) {
     criterion: item.criterion,
     authority: acceptanceAuthority(item),
   }));
-  const contextRefs = ticket.context_refs.map((item) => ({
-    ...item,
-    kind: canonicalContextFromRef(repository, item.ref) ? "context" : "source",
-    canonicalContext: canonicalContextFromRef(repository, item.ref),
-  }));
+  const contextRefs = ticket.context_refs.map((item) => {
+    const canonicalContext = canonicalContextFromRef(repository, item.ref);
+    const resolved = resolveTicketContextRef(source.worktreeRoot, item.ref);
+    return {
+      ...item,
+      kind: canonicalContext ? "context" : "source",
+      canonicalContext,
+      identity: resolved.identity,
+    };
+  });
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
     ticketId: ticket.ticket_id,
@@ -543,7 +549,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     humanBoundaries: attention.criteria,
     evidence,
     constraints: ticket.constraints,
-    contextRefs: ticket.context_refs,
+    contextRefs,
     relations: ticket.relations,
     provenanceRefs: ticket.provenance_refs,
     source: source.agentPayload,
@@ -617,9 +623,16 @@ function outcomeTrace(outcome, source) {
     unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
     occurredAt: outcome.closed_at,
     summary: outcome.summary,
+    // The Log is where the closeout Skill sends a reader, so the declared
+    // independence source has to survive this allowlist or it is invisible on
+    // the surface that matters. Unverified by design: shown, never trusted.
+    independence: outcome.independence ?? null,
     body: [
       `Accepted: ${outcome.accepted_acceptance_ids.join(", ") || "none"}`,
       `Unresolved: ${outcome.unresolved_acceptance_ids.join(", ") || "none"}`,
+      outcome.independence
+        ? `Independence: ${outcome.independence.source} (declared, unverified)`
+        : "Independence: not declared",
     ].join("\n"),
     targets: [{
       ...typedReference(source, outcomeRef),
@@ -639,7 +652,9 @@ function outcomeTrace(outcome, source) {
   };
 }
 
-function traceRecords(repository, source, ticketId = null) {
+// Exported so a contract test can assert the real projection instead of
+// grepping this file's source for the shape it hopes is there.
+export function traceRecords(repository, source, ticketId = null) {
   const evidence = documents(repository.evidence.documents)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
     .map((item) => evidenceTrace(item, source));

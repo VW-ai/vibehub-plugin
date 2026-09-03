@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "migration-entries-declare-both-halves",
+    "semantic-steps-carry-authoring-guidance",
+    "classification-is-a-release-obligation"
+  ],
+  "evidence_id": "migration-halves-and-guidance-contract",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T02:41:17.000Z",
+  "refs": [
+    "skills/vibehub-migrate/references/migrations.json",
+    "docs/RELEASE.md",
+    "test/skill-contracts.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "migrations.json schema v2 classifies all three existing transitions step by step. 0.4-unversioned to 0.5-unversioned has no mechanical action: Room topology, lowest-owning placement, and the destination-dependent Ticket ref rewrite all require the same reviewed placement judgment, so code refuses the whole step until that judgment exists. 0.5-unversioned to format 1 has one deterministic marker write and no semantic step. Format 1 to 2 mechanically raises Ticket schema 1 to 2, defaults deliveries to [], adds a durable per-Ticket migration-pending provenance ref, and advances the project marker; exact delivery classification remains semantic because only reviewable Git/PR/cherry-pick history can establish it. Every semantic step declares purpose, derivation sources, the good-value rule, forbidden shortcuts, and instructions. RELEASE.md makes both halves a same-change data-layer release obligation, and the contract test loops over every entry and semantic step so an omitted classification or guidance field fails.",
+  "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
+}

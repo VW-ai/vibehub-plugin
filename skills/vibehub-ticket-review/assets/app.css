@@ -2116,6 +2116,13 @@ summary:focus-visible {
   letter-spacing: -0.003em;
 }
 
+.context-source-identity {
+  margin: 0 11px 10px;
+  overflow-wrap: anywhere;
+  color: var(--quiet);
+  font: 7px/1.45 var(--mono);
+}
+
 .context-object-body {
   display: grid;
   gap: 10px;

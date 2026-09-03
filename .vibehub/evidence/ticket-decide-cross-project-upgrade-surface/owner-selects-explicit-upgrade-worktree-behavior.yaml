@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "owner-selects-explicit-upgrade-behavior"
+  ],
+  "evidence_id": "owner-selects-explicit-upgrade-worktree-behavior",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-03T02:12:37Z",
+  "refs": [
+    "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety",
+    ".vibehub/rooms/product/decision-explicit-upgrade-migrates-safe-worktrees.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The owner explicitly confirmed that an upgrade covers every registered existing Git worktree as a separate branch snapshot, that mechanical migration may create a separate local reviewable commit in each safe worktree, that one commit must not be treated as updating the others, and that VibeHub never pushes those commits. The owner also accepted the explicit-upgrade rule that unsafe worktrees are skipped and reported, leaves the exact unsafe predicate for engineering definition, and keeps remaining semantic migration with later Agent sessions in each worktree. This Evidence records only those human choices; the conservative safety predicate is separately Agent-authority acceptance.",
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface"
+}

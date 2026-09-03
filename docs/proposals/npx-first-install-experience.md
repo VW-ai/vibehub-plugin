@@ -2,6 +2,10 @@
 
 Ticket: `ticket-propose-npx-first-install-experience` · 2026-08-22
 
+> Historical proposal. Path A was implemented, and a later product decision
+> retired host marketplace distribution. The only supported install path now
+> is `npx skills add VW-ai/vibehub-plugin`; see `docs/INSTALL.md`.
+
 ## The problem, reproduced
 
 `npx skills add VW-ai/vibehub-plugin` already works today — and produces a
@@ -50,12 +54,12 @@ references to `../vibehub-core/scripts/vh.mjs` and
 
 | | |
 | --- | --- |
-| User types | `npx skills add VW-ai/vibehub-plugin` (all hosts) — marketplace commands keep working unchanged |
+| User types | `npx skills add VW-ai/vibehub-plugin` (all skills-capable hosts); a later decision retired the then-existing marketplace alternatives |
 | Lands on disk | 12 folders under `.claude/skills/` or `.agents/skills/`; relative paths resolve because siblings are copied together |
-| Helper reachability | by construction; same relative layout in the marketplace bundle, so one layout serves both paths |
+| Helper reachability | by construction; the shared helper lands as a sibling Skill folder |
 | Version skew | none — skill text and helper ship together |
 | Network | GitHub fetch at install only; zero afterwards |
-| Upgrade | `npx skills update` or host marketplace upgrade; `project compatibility` unchanged |
+| Upgrade | `npx skills update`; project compatibility was unchanged by this proposal and is handled separately |
 | Cost | rename + sed across 11 SKILL.md, tests, `build-plugin-artifact`/`verify-plugin-artifact`, plugin manifests; ~1 focused Ticket |
 | Risks | a 12th "skill" appears in agent listings (mitigated by its description); `-s <one-skill>` partial installs omit core — document "install all" |
 | Boundary | fully inside `decision-speed-first-skill-plugin`: still no CLI, daemon, or registry |
@@ -115,10 +119,11 @@ The workflow needs no change.
 
 ## Recommendation
 
-**Path A now.** It fixes a live defect, gives the one-line
+**Path A was recommended and later implemented.** It fixed a live defect, gave the one-line
 `npx skills add VW-ai/vibehub-plugin` the owner wants across every
 skills-capable host, keeps the no-network, no-registry, no-CLI boundary, and
-costs one Ticket. The marketplace path keeps working from the same layout.
+cost one Ticket. A later decision retired the marketplace path rather than
+maintaining it as a second distribution surface.
 
 **Path B deferred, not rejected.** It is the right move only when a human —
 not an Agent — needs to initialize a project outside any agent session. Today

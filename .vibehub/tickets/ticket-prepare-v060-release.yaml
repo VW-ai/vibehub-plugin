@@ -43,16 +43,16 @@
       "ref": "test/release.test.mjs"
     },
     {
-      "purpose": "Clean Codex and Claude Code marketplace support proof.",
-      "ref": "test/host-marketplaces.test.mjs"
-    },
-    {
       "purpose": "Completed feature set and Evidence behind the v0.6.0 human-decision boundary release.",
       "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
     },
     {
       "purpose": "Completed explicit maturity and REFINE behavior included in the release.",
       "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+    },
+    {
+      "purpose": "Exact pre-retirement cross-host marketplace test used by the v0.6 release proof.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
     }
   ],
   "deliveries": [

@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "marketplace-workarounds-become-readable-history-without-guessing"
+  ],
+  "evidence_id": "marketplace-historical-context-binding-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T05:57:34Z",
+  "refs": [
+    "commit:89a2e557925de26bbd6aab0d79aee2967b2ae143",
+    "commit:f371bf64d02fc4deb17568402eeb42af27af2302",
+    "commit:33de83c2526258a48340863ab752d45ff7b56140",
+    "commit:9425e0cfaed2ce2e7e3b8a6786a69de5f8ffc9dd",
+    "commit:594599e4b37d7753c6b750b0dc8d954f76c8afd3",
+    "test/context-ref.test.mjs",
+    ".vibehub/tickets/ticket-retire-marketplace-distribution.yaml",
+    ".vibehub/outcomes/ticket-retire-marketplace-distribution.yaml",
+    "command:node --test test/context-ref.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs project validate --repo ."
+  ],
+  "schema_version": 1,
+  "summary": "A repository-level audit at commit 89a2e557925de26bbd6aab0d79aee2967b2ae143 proves all ten deleted-path provenance workarounds across the six marketplace-affected Tickets now use exact immutable context refs and no deleted-path workaround remains. Nine refs bind to parent f371bf64d02fc4deb17568402eeb42af27af2302 of the reviewed marketplace deletion commit 9425e0c, whose predecessor Tickets and deletion Ticket establish the cited files; the tenth binds .agents/plugins/marketplace.json to partial-closeout commit 33de83c2526258a48340863ab752d45ff7b56140, whose Outcome identified that residual surface before commit 594599e removed it. The test asserts every expected commit/path/blob tuple, verifies the deletion commits, and resolves all ten exact byte sources without restoring a retired file. Project validation passes with no unresolved case.",
+  "ticket_id": "ticket-support-versioned-historical-context-refs"
+}

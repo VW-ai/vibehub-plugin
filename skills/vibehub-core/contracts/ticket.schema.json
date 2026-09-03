@@ -48,7 +48,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["ref", "purpose"],
-        "properties": { "ref": { "$ref": "#/$defs/text" }, "purpose": { "$ref": "#/$defs/text" } }
+        "properties": {
+          "ref": {
+            "$ref": "#/$defs/text",
+            "description": "A current repository-relative regular-file path or commit:<40-lowercase-hex>:<repo-relative-regular-blob-path>."
+          },
+          "purpose": { "$ref": "#/$defs/text" }
+        }
       }
     },
     "relations": {

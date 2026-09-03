@@ -6,8 +6,8 @@ description: Explicitly capture durable user intent, decisions, constraints, con
 # VibeHub Ingest
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Capture only when the user explicitly asks, or when another VibeHub workflow
 explicitly delegates durable capture. Do not poll conversation turns or infer a

@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "validate-path-states-the-skip"
+  ],
+  "evidence_id": "apply-records-whether-validation-happened",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:14:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "test/skill-contracts.test.mjs",
+    "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
+  ],
+  "schema_version": 1,
+  "summary": "The same engine seam was applied to the validation path rather than leaving it on an honour system, which is what the criterion invited the executor to justify otherwise. node vh.mjs ticket apply now rejects a batch whose input omits validation.independent with code missing_validation_declaration and writes no Ticket, and records the answer durably on every Ticket it writes as a validation:independent or validation:none provenance ref, replacing any earlier validation: entry so reruns stay idempotent. vibehub-ticket-plan step 6 no longer says 'when an independent Agent is available' and step 7 documents the declaration and the recorded ref. test/skill-contracts.test.mjs 'ticket apply records whether an independent Agent validated the batch' asserts the rejection, the absent Ticket file, and both recorded forms. Note the asymmetry this removes: closeout gets a rejection and so does apply, so neither path can skip its independent reader silently.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

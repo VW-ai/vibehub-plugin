@@ -31,6 +31,19 @@ function fixture() {
   assert.equal(run(repo, "context", "put", context(), ["--room", "product"]).status, 0);
   mkdirSync(join(repo, "docs"));
   writeFileSync(join(repo, "docs", "LOCAL_GRAPH_DESIGN.md"), "# Local graph design\n");
+  writeFileSync(join(repo, "docs", "HISTORICAL.md"), "# Historical design\n\nImmutable reviewed bytes.\n");
+  execFileSync("git", ["init"], { cwd: repo, stdio: "ignore" });
+  execFileSync("git", ["add", "docs/HISTORICAL.md"], { cwd: repo });
+  execFileSync("git", [
+    "-c", "user.name=VibeHub Test",
+    "-c", "user.email=vibehub@example.test",
+    "commit", "-m", "Record historical design",
+  ], { cwd: repo, stdio: "ignore" });
+  const historicalCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: repo,
+    encoding: "utf8",
+  }).trim();
+  rmSync(join(repo, "docs", "HISTORICAL.md"));
   const feature = ticket("feature", ["foundation"]);
   feature.acceptance[0].authority = "human";
   feature.context_refs = [
@@ -42,11 +55,14 @@ function fixture() {
       ref: "docs/LOCAL_GRAPH_DESIGN.md",
       purpose: "Design source when present.",
     },
+    {
+      ref: `commit:${historicalCommit}:docs/HISTORICAL.md`,
+      purpose: "Exact historical design source.",
+    },
   ];
   const foundation = ticket("foundation");
   foundation.acceptance[0].authority = "human";
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [
       foundation,
       feature,
       ticket("closeout-ready"),
@@ -81,7 +97,7 @@ function fixture() {
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "foundation",
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -92,7 +108,7 @@ function fixture() {
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "unsuccessful",
     status: "failed",
     accepted_acceptance_ids: [],
@@ -174,7 +190,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     prerequisiteTicketId: "foundation",
     dependentTicketId: "feature",
     rationale: "feature needs foundation.",
-    provenanceRefs: ["test:ticket-vertical-slice"],
+    provenanceRefs: ["test:ticket-vertical-slice", "plan-validation:none"],
   });
 });
 
@@ -184,8 +200,7 @@ test("human attention projection distinguishes upcoming, pending, recorded, and 
   upcoming.acceptance[0].authority = "human";
   const recorded = ticket("human-recorded");
   recorded.acceptance[0].authority = "human";
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [upcoming, recorded],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [upcoming, recorded],
   }).status, 0);
   assert.equal(run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -238,8 +253,7 @@ test("Workbench projection preserves the observed execution and adjudication cor
   humanMissing.acceptance[0].authority = "human";
   const humanComplete = ticket("human-complete");
   humanComplete.acceptance[0].authority = "human";
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [
       ticket("zero"),
       partial,
       ticket("agent-complete"),
@@ -269,7 +283,7 @@ test("Workbench projection preserves the observed execution and adjudication cor
   }
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "successful",
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -280,7 +294,7 @@ test("Workbench projection preserves the observed execution and adjudication cor
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: "failed",
     status: "failed",
     accepted_acceptance_ids: [],
@@ -353,8 +367,7 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
   assert.equal(run(repo, "project", "init").status, 0);
   const prerequisites = Array.from({ length: 5 }, (_, index) => `prerequisite-${index + 1}`);
   const dependents = Array.from({ length: 5 }, (_, index) => `dependent-${index + 1}`);
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [
       ...prerequisites.map((id) => ticket(id)),
       ticket("causal-center", prerequisites),
       ...dependents.map((id) => ticket(id, ["causal-center"])),
@@ -372,7 +385,7 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: prerequisites[0],
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -383,7 +396,7 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: prerequisites[1],
     status: "failed",
     accepted_acceptance_ids: [],
@@ -439,8 +452,7 @@ test("Web projection shares current/all archive queries and progressive history 
   };
   const old = { ...ticket("old-history"), deliveries: [delivery] };
   const boundary = { ...ticket("archived-boundary", ["old-history"]), deliveries: [delivery] };
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [old, boundary, ticket("current-work", ["archived-boundary"]), ticket("other-current")],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [old, boundary, ticket("current-work", ["archived-boundary"]), ticket("other-current")],
   }).status, 0);
   for (const id of ["old-history", "archived-boundary"]) {
     assert.equal(run(repo, "ticket", "evidence", {
@@ -455,7 +467,7 @@ test("Web projection shares current/all archive queries and progressive history 
     }).status, 0);
     assert.equal(run(repo, "ticket", "closeout", {
       schema_version: 1,
-      kind: "ticket_outcome",
+      kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
       ticket_id: id,
       status: "successful",
       accepted_acceptance_ids: ["works"],
@@ -608,6 +620,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
+  assert.equal(featureSubject.contextPackage.contextRefs[2].kind, "source");
+  assert.match(featureSubject.contextPackage.contextRefs[2].identity.commit, /^[0-9a-f]{40}$/u);
+  assert.equal(featureSubject.contextPackage.contextRefs[2].identity.path, "docs/HISTORICAL.md");
+  assert.match(featureSubject.contextPackage.contextRefs[2].identity.blob, /^[0-9a-f]{40}$/u);
+  assert.deepEqual(
+    featureSubject.contextPackage.agentPayload.contextRefs[2].identity,
+    featureSubject.contextPackage.contextRefs[2].identity,
+  );
   assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
   assert.equal(featureSubject.contextPackage.nextAction.action, "NEEDS_HUMAN");
   assert.deepEqual(
@@ -906,8 +926,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 
   const newlyVisible = ticket("newly-visible");
   newlyVisible.maturity = "draft";
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [newlyVisible],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [newlyVisible],
   }).status, 0);
   const refreshed = (await (await fetch(
     `${origin}/api/state`,

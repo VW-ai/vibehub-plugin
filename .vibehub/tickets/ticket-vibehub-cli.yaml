@@ -27,16 +27,16 @@
       "ref": "test/project-format.test.mjs"
     },
     {
-      "purpose": "Cross-host clean-install parity expected from any future CLI distribution shape.",
-      "ref": "test/host-marketplaces.test.mjs"
-    },
-    {
       "purpose": "Binding lightweight boundary that currently forbids a required CLI or runtime service.",
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     },
     {
       "purpose": "Original decision to rebuild only gaps demonstrated by real use and keep deterministic behavior in dependency-free scripts.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Exact pre-retirement cross-host marketplace test whose parity expectations informed the CLI evaluation.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
     }
   ],
   "deliveries": [],

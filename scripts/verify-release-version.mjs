@@ -10,16 +10,14 @@ function readJson(path) {
 }
 
 export function readReleaseIdentity() {
+  // Two of the five declarations this used to compare came from marketplace
+  // manifests. Marketplace distribution is retired, so the surviving identity
+  // is package.json, the Claude plugin manifest, and the tag.
   const packageJson = readJson("package.json");
-  const codex = readJson(".codex-plugin/plugin.json");
   const claude = readJson(".claude-plugin/plugin.json");
-  const marketplace = readJson(".claude-plugin/marketplace.json");
   const versions = {
     package: packageJson.version,
-    codex: codex.version,
     claude: claude.version,
-    marketplace: marketplace.version,
-    marketplacePlugin: marketplace.plugins?.[0]?.version,
   };
   const unique = new Set(Object.values(versions));
   if (unique.size !== 1 || unique.has(undefined)) {

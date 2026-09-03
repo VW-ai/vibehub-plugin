@@ -55,10 +55,27 @@ test("README is a dark-safe one-line product surface", () => {
   for (const phase of ["DRAFT", "READY", "RUNNING", "DONE"]) assert.match(readme, new RegExp(`\\b${phase}\\b`, "u"));
   assert.match(readme, /Recommended action stays primary/u);
   assert.doesNotMatch(readme, /docs\/assets\/local-graph\/[^\s"')]+\.jpe?g/iu);
-  assert.match(readme, /codex plugin marketplace add VW-ai\/vibehub-plugin/u);
-  assert.match(readme, /\/plugin install vibehub@vibehub/u);
+  assert.match(readme, /npx skills add VW-ai\/vibehub-plugin/u);
+  assert.doesNotMatch(readme, /plugin marketplace add|plugin install vibehub@vibehub/u);
   assert.doesNotMatch(readme, /but no global CLI|MCP server, database|background capture/u);
   assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
+  const install = read("docs/INSTALL.md");
+  assert.match(install, /retains `.claude-plugin\/plugin\.json` only because\s+skills\.sh reads it as repository metadata/u);
+  assert.match(install, /marketplace manifest and the retired Codex plugin manifest were removed/u);
+  assert.doesNotMatch(install, /Installation copies manifests/u);
+});
+
+test("retired marketplace distribution cannot reappear in active surfaces", () => {
+  assert.equal(existsSync(join(root, ".agents/plugins/marketplace.json")), false);
+  const site = read("site/app/page.tsx");
+  const siteTest = read("site/tests/rendered-html.test.mjs");
+  const historicalProposal = read("docs/proposals/npx-first-install-experience.md");
+  const retiredCommands = /plugin marketplace add|plugin install vibehub@vibehub/u;
+
+  assert.doesNotMatch(site, retiredCommands);
+  assert.doesNotMatch(siteTest, /assert\.match\([^\n]+(?:plugin marketplace add|plugin install vibehub@vibehub)/u);
+  assert.doesNotMatch(historicalProposal, /marketplace commands keep working|host marketplace upgrade|marketplace path keeps working/u);
+  assert.match(historicalProposal, /Historical proposal[\s\S]+only supported install path now/u);
 });
 
 test("README Workbench screenshots match the checked-in Retina capture manifest", () => {
@@ -88,8 +105,11 @@ test("README Workbench screenshots match the checked-in Retina capture manifest"
 });
 
 test("the canonical entry routes through existing Setup and Ticket Plan", () => {
-  const codex = JSON.parse(read(".codex-plugin/plugin.json"));
-  assert.deepEqual(codex.interface.defaultPrompt, ["Start this with VibeHub."]);
+  // The canonical entry prompt lived in the Codex marketplace manifest, which
+  // was retired with the rest of marketplace distribution; the Skills are now
+  // its only home.
+  const setup = read("skills/vibehub-setup/SKILL.md");
+  assert.match(setup, /Start this with VibeHub\./u);
   const plan = read("skills/vibehub-ticket-plan/SKILL.md");
   assert.match(plan, /canonical user entry “Start this with VibeHub\.”/u);
   assert.match(plan, /use `\$vibehub-setup` first and then/u);
@@ -111,6 +131,9 @@ test("release is GitHub-only, reproducible, and documented", () => {
     "verify-release-version.mjs",
     "npm run verify",
     "npm run build",
+    "build-upgrade-package.mjs",
+    "vibehub-upgrade.tgz",
+    "vibehub-upgrade.tgz.sha256",
     "sha256sum",
     "cd dist",
     "gh release create",
@@ -120,5 +143,9 @@ test("release is GitHub-only, reproducible, and documented", () => {
   const procedure = read("docs/RELEASE.md");
   assert.match(procedure, /Merge the verified PR/u);
   assert.match(procedure, /Tag the exact merged `main` commit/u);
-  assert.match(procedure, /npm is not a release or installation surface/u);
+  assert.match(procedure, /npm is an execution client/u);
+  assert.match(procedure, /not a registry release or global installation surface/u);
+  assert.match(procedure, /same tag and commit identity/u);
+  assert.match(procedure, /the package\s+and retained Claude plugin manifest as the only release-version\s+declarations/u);
+  assert.doesNotMatch(procedure, /both plugin manifests|Claude marketplace\s+metadata/u);
 });

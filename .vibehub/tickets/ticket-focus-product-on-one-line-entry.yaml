@@ -48,10 +48,6 @@
       "ref": "assets/brand/vibehub-logo.svg"
     },
     {
-      "purpose": "Current five-prompt surface to reduce to the single user entry.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Existing focused home for setup and fallback launcher details.",
       "ref": "docs/INSTALL.md"
     },
@@ -74,6 +70,10 @@
     {
       "purpose": "Release contract tests to realign with the focused README.",
       "ref": "test/release.test.mjs"
+    },
+    {
+      "purpose": "Exact pre-retirement Codex manifest whose five-prompt surface informed this Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
     }
   ],
   "deliveries": [

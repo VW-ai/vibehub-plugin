@@ -23,14 +23,14 @@ function ticket(id, extra = {}) {
 function fixtureRepo() {
   const repo = tempRepo("sync-issues");
   for (const d of ["tickets", "outcomes", "evidence/ticket-done", "rooms"]) mkdirSync(join(repo, ".vibehub", d), { recursive: true });
-  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 2 }));
+  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 3 }));
   writeFileSync(join(repo, "README.md"), "# demo\n");
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-done.yaml"), JSON.stringify(ticket("ticket-done")));
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-open.yaml"), JSON.stringify(ticket("ticket-open", {
     relations: [{ type: "depends_on", target_ticket_id: "ticket-done", rationale: "needs it" }],
   })));
   writeFileSync(join(repo, ".vibehub", "outcomes", "ticket-done.yaml"), JSON.stringify({
-    schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-done", status: "successful",
+    schema_version: 1, kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" }, ticket_id: "ticket-done", status: "successful",
     accepted_acceptance_ids: ["a1", "a2"], unresolved_acceptance_ids: [], evidence_ids: ["proof-one", "owner-signoff"],
     summary: "All good.", closed_at: "2026-08-01T00:00:00Z",
   }));

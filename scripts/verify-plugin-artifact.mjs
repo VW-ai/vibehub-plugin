@@ -35,7 +35,6 @@ try {
   const stats = buildPluginArtifact({ artifactRoot: artifact });
   for (const required of [
     ".claude-plugin/plugin.json",
-    ".codex-plugin/plugin.json",
     "assets/brand/vibehub-logo-dark.svg",
     "assets/brand/vibehub-logo.svg",
     "CHANGELOG.md",
@@ -108,10 +107,29 @@ try {
   ]) {
     if (existsSync(join(artifact, forbidden))) throw new Error(`artifact contains forbidden ${forbidden}`);
   }
-  const codex = JSON.parse(readFileSync(join(artifact, ".codex-plugin", "plugin.json"), "utf8"));
-  if (codex.mcpServers || codex.hooks) throw new Error("Codex manifest still requires MCP or hooks");
-  if (JSON.stringify(codex.interface?.defaultPrompt) !== JSON.stringify(["Start this with VibeHub."])) {
-    throw new Error("Codex manifest does not expose the one canonical VibeHub entry");
+  const claudeManifest = JSON.parse(readFileSync(join(artifact, ".claude-plugin", "plugin.json"), "utf8"));
+  if (claudeManifest.mcpServers || claudeManifest.hooks) throw new Error("plugin manifest still requires MCP or hooks");
+  if (existsSync(join(artifact, ".claude-plugin", "marketplace.json"))) {
+    throw new Error("artifact still ships a marketplace manifest");
+  }
+  const installedBoundary = readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-setup",
+    "references",
+    "architecture-boundary.md",
+  ), "utf8");
+  if (!/One narrow exception is the explicitly invoked `vibehub-upgrade` one-shot/u.test(installedBoundary)
+    || !/no general-purpose or globally installed CLI/u.test(installedBoundary)
+    || !/never authorizes another\s+filesystem scan/u.test(installedBoundary)
+    || !/must not add compatibility shims, telemetry, network reporting/u.test(installedBoundary)) {
+    throw new Error("installed architecture boundary is missing the bounded one-shot upgrade exception");
+  }
+  const installedInstall = readFileSync(join(artifact, "docs", "INSTALL.md"), "utf8");
+  if (!installedInstall.includes("tree/<release-tag>")
+    || !installedInstall.includes("releases/download/<release-tag>/vibehub-upgrade.tgz")
+    || !installedInstall.includes("Nothing is pushed")) {
+    throw new Error("installed upgrade documentation is missing same-tag, explicit local-only behavior");
   }
   const installedPlanSkill = readFileSync(
     join(artifact, "skills", "vibehub-ticket-plan", "SKILL.md"),
@@ -166,8 +184,7 @@ try {
   }, ["--room", "product"]);
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
-  invoke(helper, "ticket", "apply", {
-    tickets: [{
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
       schema_version: 2,
       kind: "ticket",
       ticket_id: "ticket-build-entry-fixture",
@@ -209,6 +226,7 @@ try {
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
+    independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-build-entry-fixture",
     status: "successful",
     accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
@@ -217,8 +235,7 @@ try {
     summary: "The installed artifact completed the executable entry Ticket.",
     closed_at: "2026-08-09T08:01:00.000Z",
   });
-  invoke(helper, "ticket", "apply", {
-    tickets: [{
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
       schema_version: 2,
       kind: "ticket",
       ticket_id: "ticket-human-authority-fixture",
@@ -250,6 +267,7 @@ try {
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
+    independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-human-authority-fixture",
     status: "successful",
     accepted_acceptance_ids: ["owner-confirms-authority"],

@@ -4,20 +4,95 @@
   "title": "VibeHub Ticket Outcome",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "ticket_id", "status", "accepted_acceptance_ids", "unresolved_acceptance_ids", "evidence_ids", "summary", "closed_at"],
+  "required": [
+    "schema_version",
+    "kind",
+    "ticket_id",
+    "status",
+    "accepted_acceptance_ids",
+    "unresolved_acceptance_ids",
+    "evidence_ids",
+    "summary",
+    "closed_at"
+  ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "kind": { "const": "ticket_outcome" },
-    "ticket_id": { "$ref": "#/$defs/id" },
-    "status": { "enum": ["successful", "partial", "failed", "deviated"] },
-    "accepted_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
-    "unresolved_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
-    "evidence_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
-    "summary": { "$ref": "#/$defs/text" },
-    "closed_at": { "type": "string", "format": "date-time" }
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "ticket_outcome"
+    },
+    "ticket_id": {
+      "$ref": "#/$defs/id"
+    },
+    "status": {
+      "enum": [
+        "successful",
+        "partial",
+        "failed",
+        "deviated"
+      ]
+    },
+    "accepted_acceptance_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "unresolved_acceptance_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/text"
+    },
+    "closed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ],
+      "description": "How the adjudicating Agent obtained independence from the executor. Optional in the schema so Outcomes written before this contract existed stay valid and readable; required by `ticket closeout` when writing a new Outcome. A self-declared provenance claim: the engine records it and never verifies it.",
+      "properties": {
+        "source": {
+          "enum": [
+            "subagent",
+            "separate_session",
+            "different_human"
+          ],
+          "description": "subagent: a fresh Agent with no execution context. separate_session: a session started from the copied handoff. different_human: a person other than the one who ran the work."
+        },
+        "note": {
+          "$ref": "#/$defs/text",
+          "description": "How that source was obtained, in one readable sentence."
+        }
+      }
+    }
   },
   "$defs": {
-    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
   }
 }

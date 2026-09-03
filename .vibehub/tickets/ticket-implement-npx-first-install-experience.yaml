@@ -58,12 +58,12 @@
       "ref": ".github/workflows/sync-issues.yml"
     },
     {
-      "purpose": "Codex manifest pointing at ./skills/.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Boundary: dependency-free Skills, no CLI.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Exact pre-retirement Codex manifest whose Skill-directory layout informed this implementation.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
     }
   ],
   "deliveries": [],

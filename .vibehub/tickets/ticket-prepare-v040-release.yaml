@@ -61,16 +61,8 @@
       "ref": "package.json"
     },
     {
-      "purpose": "Codex plugin release identity and product metadata.",
-      "ref": ".codex-plugin/plugin.json"
-    },
-    {
       "purpose": "Claude plugin release identity.",
       "ref": ".claude-plugin/plugin.json"
-    },
-    {
-      "purpose": "Claude marketplace release identity.",
-      "ref": ".claude-plugin/marketplace.json"
     },
     {
       "purpose": "Current dependency-free CI baseline that release must preserve.",
@@ -87,6 +79,14 @@
     {
       "purpose": "Approved local graph visual for the public product story.",
       "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    },
+    {
+      "purpose": "Exact pre-retirement Codex plugin release identity and product metadata used by the v0.4 release Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
+    },
+    {
+      "purpose": "Exact pre-retirement Claude marketplace release identity used by the v0.4 release Ticket.",
+      "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.claude-plugin/marketplace.json"
     }
   ],
   "deliveries": [

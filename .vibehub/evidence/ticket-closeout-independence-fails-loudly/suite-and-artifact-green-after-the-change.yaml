@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "engine-requires-a-declared-independence-source",
+    "validate-path-states-the-skip"
+  ],
+  "evidence_id": "suite-and-artifact-green-after-the-change",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T00:15:00.000Z",
+  "refs": [
+    "test/skill-contracts.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "test/ui-host.test.mjs",
+    "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
+  ],
+  "schema_version": 1,
+  "summary": "npm run verify passes end to end after the change: 147 tests, fail 0, and the plugin artifact builds and verifies at 67 files / 3,194,128 bytes. Call sites that had to learn the new declarations were updated rather than worked around: six test files, plus scripts/verify-plugin-artifact.mjs's own ticket apply and ticket closeout fixtures. One assertion in test/ui-host.test.mjs was updated rather than silenced — the projected provenanceRefs now legitimately include validation:none, which is the recorded skip becoming visible in the Workbench exactly as intended.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

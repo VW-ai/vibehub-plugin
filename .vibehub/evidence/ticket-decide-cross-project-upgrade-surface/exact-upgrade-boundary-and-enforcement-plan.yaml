@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "replacement-boundary-is-exact-and-testable"
+  ],
+  "evidence_id": "exact-upgrade-boundary-and-enforcement-plan",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-03T03:23:54.000Z",
+  "refs": [
+    "docs/proposals/cross-project-upgrade-surface.md",
+    "skills/vibehub-setup/references/architecture-boundary.md",
+    "test/skill-contracts.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    ".github/workflows/release.yml"
+  ],
+  "schema_version": 1,
+  "summary": "The revised proposal contains the exact complete replacement body for architecture-boundary.md, held as Evidence while the current boundary remains unmodified. The text permits only one explicitly invoked dependency-free GitHub Release one-shot entry and limits it to bounded roots, repository discovery, git worktree list fan-out for that repository, calls into its packaged shared engine/reference, one local commit per success, and exhaustive reporting. It forbids owned migration semantics, a durable index, Skill dependency, background/install/hook/UI invocation, a general or global CLI, compatibility shims, telemetry, network reporting from the entry, stash/reset, and push. Eight mechanical assertion groups cover release allowlist/single-bin/no-registry and immutable tag identity; no implicit invoker; realpath/discovery bounds; no duplicated migration rules; a strict Git subprocess allow/deny set; multi-worktree report proof; failure injection around a terminal CAS; and no background/index/telemetry plus idempotence. Because Git ref updates can invoke reference-transaction hooks, the asserted CAS command uses a newly created controlled empty core.hooksPath, and hostile reference-transaction plus signing-helper sentinels must never run. The governed boundary itself is still unchanged before Outcome.",
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface"
+}

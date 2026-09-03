@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "the-record-shows-who-judged"
+  ],
+  "evidence_id": "declaration-reaches-the-log-probed-not-grepped",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-02T01:10:00.000Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "test/skill-contracts.test.mjs",
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "commit:79650be324d2dd742fc2c744e2919306a31fad0a"
+  ],
+  "schema_version": 1,
+  "summary": "SUPERSEDES declaration-is-readable-and-projected, which is stale: it claimed the Workbench needed no change because vh-ui.mjs projects the whole Outcome document, and cited a test that has since been deleted. Both claims were wrong. /api/trace projects Outcomes through outcomeTrace(), an explicit field allowlist, and independence never reached it — which matters because closeout SKILL.md step 5 sends a reader to exactly that Log. outcomeTrace now carries independence and renders 'Independence: <source> (declared, unverified)' in the body a human reads. traceRecords is exported so the test can call the real projection: it applies a Ticket, records Evidence, writes an Outcome declaring separate_session, then asserts the projected entry's independence object and body text. The previous test guarded its probe behind a typeof check on buildUiTrace, a function that never existed, so the branch was dead and every run silently fell back to grepping source; an independent adjudicator proved it by deleting the implementation while the test still passed. Mutation-checked now: removing the independence line from outcomeTrace makes this test fail. Recorded unchanged from before: the engine must not verify the claim, so a dishonest declaration remains mechanically indistinguishable; the criterion is presence and readability, and that is what is met.",
+  "ticket_id": "ticket-closeout-independence-fails-loudly"
+}

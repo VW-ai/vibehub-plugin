@@ -1,19 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readFileSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { run, tempRepo } from "./helpers.mjs";
+import { root, run, tempRepo } from "./helpers.mjs";
 
 const marker = {
   schema_version: 1,
   kind: "vibehub_project",
-  format_version: 2,
+  format_version: 3,
 };
 
 function markerPath(repo) {
@@ -24,7 +26,7 @@ test("project init writes the canonical format marker and compatibility is curre
   const repo = tempRepo("project-format-current");
   const initialized = run(repo, "project", "init");
   assert.equal(initialized.status, 0, initialized.stdout);
-  assert.equal(initialized.envelope.data.format_version, 2);
+  assert.equal(initialized.envelope.data.format_version, 3);
   assert.deepEqual(JSON.parse(readFileSync(markerPath(repo), "utf8")), marker);
 
   const compatibility = run(repo, "project", "compatibility");
@@ -35,9 +37,9 @@ test("project init writes the canonical format marker and compatibility is curre
       current: compatibility.envelope.data.current_format,
       target: compatibility.envelope.data.target_format,
     },
-    { state: "CURRENT", current: 2, target: 2 },
+    { state: "CURRENT", current: 3, target: 3 },
   );
-  assert.equal(run(repo, "project", "validate").envelope.data.format_version, 2);
+  assert.equal(run(repo, "project", "validate").envelope.data.format_version, 3);
 });
 
 test("unversioned 0.4 and 0.5 shapes require migration and every write gate refuses", () => {
@@ -56,7 +58,7 @@ test("unversioned 0.4 and 0.5 shapes require migration and every write gate refu
     run(legacy05, "context", "put", {}, ["--room", "product"]),
     run(legacy05, "room", "align", undefined, ["--room", "product"]),
     run(legacy05, "room", "stale", { reason: "test" }, ["--room", "product"]),
-    run(legacy05, "ticket", "apply", { tickets: [] }),
+    run(legacy05, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] }),
     run(legacy05, "ticket", "evidence", {}),
     run(legacy05, "ticket", "closeout", {}),
   ];
@@ -89,14 +91,35 @@ test("malformed and unsupported-newer format markers fail read-only without muta
 
   const newer = tempRepo("project-format-newer");
   assert.equal(run(newer, "project", "init").status, 0);
-  const newerSource = `${JSON.stringify({ ...marker, format_version: 3 }, null, 2)}\n`;
+  const newerSource = `${JSON.stringify({ ...marker, format_version: 4 }, null, 2)}\n`;
   writeFileSync(markerPath(newer), newerSource);
   const compatibility = run(newer, "project", "compatibility");
   assert.equal(compatibility.status, 0);
   assert.equal(compatibility.envelope.data.state, "UNSUPPORTED_NEWER");
-  assert.equal(compatibility.envelope.data.current_format, 3);
-  assert.equal(compatibility.envelope.data.target_format, 2);
-  const attemptedWrite = run(newer, "ticket", "apply", { tickets: [] });
+  assert.equal(compatibility.envelope.data.current_format, 4);
+  assert.equal(compatibility.envelope.data.target_format, 3);
+  const attemptedWrite = run(newer, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] });
   assert.equal(attemptedWrite.envelope.error.code, "format_mismatch");
   assert.equal(readFileSync(markerPath(newer), "utf8"), newerSource);
+});
+
+test("an older format-2 helper rejects a format-3 project as unsupported newer", () => {
+  const repo = tempRepo("project-format-old-helper");
+  assert.equal(run(repo, "project", "init").status, 0);
+  const oldCore = join(repo, "old-vibehub-core");
+  cpSync(join(root, "skills", "vibehub-core"), oldCore, { recursive: true });
+  const versionsPath = join(oldCore, "contracts", "versions.json");
+  const versions = JSON.parse(readFileSync(versionsPath, "utf8"));
+  versions.project_format = 2;
+  writeFileSync(versionsPath, `${JSON.stringify(versions, null, 2)}\n`);
+
+  const result = spawnSync(process.execPath, [
+    join(oldCore, "scripts", "vh.mjs"),
+    "project", "compatibility", "--repo", repo,
+  ], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.data.state, "UNSUPPORTED_NEWER");
+  assert.equal(envelope.data.current_format, 3);
+  assert.equal(envelope.data.target_format, 2);
 });
