@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "the-surviving-path-and-the-migration-are-proven-by-doing"
+  ],
+  "evidence_id": "clean-npx-installs-and-marketplace-migration-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:54:03Z",
+  "refs": [
+    "docs/INSTALL.md",
+    "command:npx --yes skills add VW-ai/vibehub-plugin -a claude-code -s '*' -y",
+    "command:npx --yes skills add VW-ai/vibehub-plugin -a codex -s '*' -y",
+    "observation:/Users/bytedance/.claude/plugins/marketplaces/vibehub",
+    "observation:/Users/bytedance/.claude/plugins/cache/vibehub/vibehub",
+    "conversation:2026-09-01-packaging-and-release-integrity"
+  ],
+  "schema_version": 1,
+  "summary": "On 2026-09-03, the real GitHub command `npx --yes skills add VW-ai/vibehub-plugin -a <host> -s '*' -y` completed from separate empty Claude Code and Codex project directories. Each installed exactly 12 VibeHub Skill directories, 48 regular files, and 429,057 file bytes (552 KiB allocated), with no plugin.json or marketplace.json. The owner's existing VibeHub marketplace installation was observed read-only at 31,180 KiB for its marketplace clone plus 17,032 KiB for its cache. Both real directories were copied byte-for-byte to a disposable tree and `diff -qr` proved the copies exact; the copies were moved out of their active marketplace/cache paths into recoverable quarantine, then the documented npx command installed the same 12 Skills / 48 files / 429,057 bytes with no manifest into the migrated project. The original marketplace and cache paths were never changed and remained byte-identical to the quarantined proof copies afterward.",
+  "ticket_id": "ticket-retire-marketplace-distribution"
+}

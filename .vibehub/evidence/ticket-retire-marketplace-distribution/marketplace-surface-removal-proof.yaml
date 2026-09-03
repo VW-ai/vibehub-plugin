@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "nothing-points-a-user-at-a-marketplace",
+    "marketplace-machinery-is-removed-not-orphaned",
+    "the-checked-in-manifests-have-a-decided-fate"
+  ],
+  "evidence_id": "marketplace-surface-removal-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T04:54:03Z",
+  "refs": [
+    "commit:9425e0cfaed2ce2e7e3b8a6786a69de5f8ffc9dd",
+    "commit:1941573557a14433d761a06a55c51359b68a8a50",
+    "README.md",
+    "docs/INSTALL.md",
+    "docs/RELEASE.md",
+    "scripts/verify-release-version.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "test/release.test.mjs",
+    "test/install-templates.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 9425e0cfaed2ce2e7e3b8a6786a69de5f8ffc9dd removes both marketplace builders, their npm entry points, the host-marketplaces test, .claude-plugin/marketplace.json, and .codex-plugin/plugin.json, while rewriting README, INSTALL, all twelve current Skill repair lines, release tests, version verification, and artifact assembly around npx Skills only. Commit 1941573557a14433d761a06a55c51359b68a8a50 corrects the remaining release prose: package.json and the retained .claude-plugin/plugin.json are the only release-version declarations; the Claude manifest remains solely because skills.sh reads repository metadata and the release checker uses its version, not as a marketplace install. Current release/install tests mechanically reject marketplace commands and the stale retired-manifest wording.",
+  "ticket_id": "ticket-retire-marketplace-distribution"
+}
