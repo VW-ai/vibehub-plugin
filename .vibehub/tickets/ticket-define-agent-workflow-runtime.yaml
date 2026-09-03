@@ -1,0 +1,96 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "strict-versioned-contracts",
+      "criterion": "Checked-in versioned strict contracts plus representative valid and invalid JSON-compatible YAML fixtures define AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt, and dependency-free validation deterministically accepts and rejects those fixtures."
+    },
+    {
+      "acceptance_id": "agent-profile-semantics",
+      "criterion": "AgentProfile identifies a runtime or harness adapter, model selector, and prompt policy; native/default means using the runtime's native behavior with no VibeHub prompt overlay, append is represented explicitly, and profiles contain no OAuth credential, access token, secret, live session identity, or mutable execution state."
+    },
+    {
+      "acceptance_id": "workflow-role-semantics",
+      "criterion": "WorkflowProfile is a reusable versioned method that maps planning, execution, closeout, and learn roles to AgentProfile references without embedding provider or model choices in the Ticket schema; closeout requires an executor-distinct Agent or session, and learn produces a governed provenance-bearing writeback proposal rather than silently mutating Context."
+    },
+    {
+      "acceptance_id": "binding-and-receipt-semantics",
+      "criterion": "RunBinding binds the exact Ticket revision, WorkflowProfile version, AgentProfile version, ContextBinding or equivalent exact context digest, repository/worktree/source identity, and attempt identity; ExecutionReceipt records the resolved runtime adapter and version, resolved model, prompt mode, digest of every VibeHub-owned prompt overlay, and result references while live process, heartbeat, approval, and resume state remain local runtime coordination."
+    },
+    {
+      "acceptance_id": "local-auth-boundary",
+      "criterion": "The contracts include Codex-native/default and Claude-Code-native/default examples whose adapters delegate authentication to the installed local runtimes; credentials are neither imported into VibeHub documents nor copied through ContextBinding, events, Evidence, receipts, logs, or Git, and unavailable authentication is surfaced as an explicit attention condition."
+    },
+    {
+      "acceptance_id": "canonical-lifecycle-preserved",
+      "criterion": "The contracts and tests demonstrate that Run events and ExecutionReceipt do not determine Ticket readiness or completion, executor output does not self-certify acceptance, only independently adjudicated Outcome completes a Ticket, and semantic completion remains reconstructable from Git-native Ticket, Context, Evidence, and Outcome after all daemon or local runtime state is lost."
+    },
+    {
+      "acceptance_id": "existing-authority-reconciled",
+      "criterion": "The resulting design explicitly records whether it fits, amends, or supersedes decision-speed-first-skill-plugin; it resolves the Workflow/Plan/Ticket/Run distinction without treating historical META as hidden authority and does not introduce a provider marketplace, general-purpose workflow engine, second Ticket lifecycle, or second canonical datastore."
+    },
+    {
+      "acceptance_id": "owner-ratifies-contract-boundary",
+      "authority": "human",
+      "criterion": "The repository owner explicitly accepts AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt as the minimal abstraction boundary and accepts the documented treatment of local authentication, native/default prompting, independent closeout, and governed writeback."
+    }
+  ],
+  "constraints": [
+    "Do not implement or require a Desktop wrapper, daemon, DSH package, Codex adapter, Claude Code adapter, or OAuth login flow in this Ticket.",
+    "Do not store, parse, copy, commit, log, or transmit OAuth credentials, access tokens, refresh tokens, keychain contents, or provider session secrets.",
+    "Do not add provider, model, Agent, Workflow, or live Run state directly to the Ticket schema; bind replaceable execution choices outside the stable Ticket contract.",
+    "Keep any local host or daemon a thin optional execution and projection adapter; it must not own semantic currentness, readiness, completion, Context authority, or a second lifecycle.",
+    "Preserve exact bounded context, acceptance-linked Evidence, executor-distinct closeout, and proposal-only governed Context writeback.",
+    "Do not build a generic provider marketplace, universal workflow engine, permissions framework, cloud account system, or cross-repository scheduler; permissions and policy may expose only a documented future extension point.",
+    "A provider-native prompt may remain opaque, but every VibeHub-owned overlay and profile or workflow revision used by an attempt must be identifiable and reproducible."
+  ],
+  "context": "This Ticket defines the protocol boundary, schemas, examples, and validation fixtures; it does not implement the Desktop, daemon, DSH integration, provider adapters, or OAuth login. AgentProfile is reusable executor configuration rather than durable Agent session state. WorkflowProfile maps semantic roles to replaceable profiles. RunBinding identifies one exact invocation; ExecutionReceipt records reproducible non-secret provenance without becoming completion authority. The design must explicitly reconcile the current speed-first boundary with the later ContextBinding and Harness direction instead of silently reviving the deleted generic runtime.",
+  "context_refs": [
+    {
+      "purpose": "Current product authority for Ticket-led routing to replaceable Agents.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    },
+    {
+      "purpose": "Domain boundary separating stable Tasks, Context, Evidence, and Outcome from replaceable executors and Run state.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Current canonical lightweight boundary that any new runtime contract must explicitly preserve, amend, or supersede.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Unresolved Workflow, Plan, Ticket, and Run distinction this Ticket must settle.",
+      "ref": "META/09-ticket-runtime/specs/decision-ticket-workflow-role-001.yaml"
+    },
+    {
+      "purpose": "Existing exact fail-closed execution-context semantics to preserve or explicitly reconcile.",
+      "ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml"
+    },
+    {
+      "purpose": "Existing executor Evidence and independent closeout contract.",
+      "ref": "META/09-ticket-runtime/specs/contract-ticket-closeout-001.yaml"
+    },
+    {
+      "purpose": "Product-level definitions of Ticket, replaceable Agent, Run, attention, and governed Context activation.",
+      "ref": "docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "purpose": "Completed source and runtime evidence for executor adapters, Run projection, resume, approval, and canonical Git boundaries.",
+      "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "purpose": "Evidence explaining why the removed generic runtime and hidden state must not be recreated.",
+      "ref": "docs/SPEED_FIRST_CLEANUP.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub has a ratified minimal provider-neutral contract set for versioned AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt so a local host can route Ticket planning, execution, independent closeout, and governed learn/writeback between locally authenticated Codex and Claude Code runtimes while Git-native Ticket, Context, Evidence, and Outcome remain semantic truth.",
+  "provenance_refs": [
+    "conversation:2026-09-02-local-codex-claude-agent-workflow",
+    "context:decision-ticket-routes-replaceable-agents"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-define-agent-workflow-runtime"
+}
