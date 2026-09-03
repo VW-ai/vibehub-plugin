@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "nothing-points-a-user-at-a-marketplace",
+    "marketplace-machinery-is-removed-not-orphaned",
+    "the-checked-in-manifests-have-a-decided-fate"
+  ],
+  "evidence_id": "marketplace-retirement-remediation-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-03T05:24:48Z",
+  "refs": [
+    "commit:594599e4b37d7753c6b750b0dc8d954f76c8afd3",
+    "site/app/page.tsx",
+    "site/tests/rendered-html.test.mjs",
+    "docs/proposals/npx-first-install-experience.md",
+    "test/release.test.mjs",
+    "command:NEXT_PUBLIC_SITE_URL=https://vibehub.team npm test",
+    "command:npm run verify",
+    ".vibehub/outcomes/ticket-retire-marketplace-distribution.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "After the first independent closeout found three residual surfaces, commit 594599e4b37d7753c6b750b0dc8d954f76c8afd3 removed the Codex marketplace manifest at .agents/plugins/marketplace.json; removed both host marketplace command constants, buttons, copied Agent instructions, and status messages from the public site; converted the older npx-first proposal into an explicitly historical document whose current guidance names npx Skills as the only supported install path; and added source plus rendered-output regression assertions that reject the retired commands and manifest. Site lint passed. A production-configured static site build and rendered HTML suite passed 9/9 with NEXT_PUBLIC_SITE_URL=https://vibehub.team. The repository-wide npm run verify passed 179/179 with zero skipped and reproduced the 65-file, 3,214,375-byte dependency-free artifact. Product Room drift was reconciled to FRESH; unrelated pre-existing stale Rooms remained untouched.",
+  "ticket_id": "ticket-retire-marketplace-distribution"
+}
