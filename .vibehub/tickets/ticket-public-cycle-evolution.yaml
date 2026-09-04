@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "post-decision-cycle-evolves-in-order",
-      "criterion": "Selecting any palette immediately applies it in the App, keeps successful Outcome unavailable, then deterministically brings the visitor to the Ticket View while Evidence is the current stage, and only afterward reveals successful Outcome plus returned Context; the sequence is explicit in the state schedule and rendered contract rather than jumping directly from choice to completion."
+      "acceptance_id": "cycle-evolution-is-verified",
+      "criterion": "Rendered assertions, lint, static production build, full repository tests, responsive source contracts, canonical VibeHub validation, and Plugin artifact verification pass after the evolution refinement.",
+      "identity": "sha256:ebde5114b9c7e984d6fd7203a33c3dfe436d49a3ae89d67f210f23c9d1223442",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "graph-projects-progressive-causality",
-      "criterion": "The Ticket graph mechanically projects future, current, and completed states for Human, Evidence, Outcome, and every connecting edge from the existing Phase; future stages stay readable but quiet, the current stage is unmistakable, completed stages remain stable, and no duplicate progress model or fake execution state is introduced."
+      "criterion": "The Ticket graph mechanically projects future, current, and completed states for Human, Evidence, Outcome, and every connecting edge from the existing Phase; future stages stay readable but quiet, the current stage is unmistakable, completed stages remain stable, and no duplicate progress model or fake execution state is introduced.",
+      "identity": "sha256:27215c8a3e7bb117ced5982a0f37363fe41e9e6e83d82cebba631f81077e207e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "motion-explains-without-obstructing",
-      "criterion": "Explanatory graph/workspace/context-return movement uses only existing CSS tokens with transform and opacity, strong ease-out/ease-in-out curves, and sub-300ms UI transitions; manual App/Ticket tabs, keyboard submission, reset, copy, founder, and navigation actions remain immediate, and no motion or UI library is added."
+      "criterion": "Explanatory graph/workspace/context-return movement uses only existing CSS tokens with transform and opacity, strong ease-out/ease-in-out curves, and sub-300ms UI transitions; manual App/Ticket tabs, keyboard submission, reset, copy, founder, and navigation actions remain immediate, and no motion or UI library is added.",
+      "identity": "sha256:23ec3d9c70c1ab81de5584e1dead4eee15d77f944ea707af83c2e3ddbd6e8830",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "criterion": "Selecting any palette immediately applies it in the App, keeps successful Outcome unavailable, then deterministically brings the visitor to the Ticket View while Evidence is the current stage, and only afterward reveals successful Outcome plus returned Context; the sequence is explicit in the state schedule and rendered contract rather than jumping directly from choice to completion.",
+      "identity": "sha256:50e9879be6aaaa53ce5f9ce64c46f272414c119a90d9eec78bae3a8b39cf54bf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "reduced-motion-preserves-the-sequence",
-      "criterion": "prefers-reduced-motion removes spatial travel while preserving readable state/color changes and the same causal phase sequence; fine-pointer hover remains gated and neither desktop nor 390px layouts gain page overflow or lose access to Chat, App, Ticket, the human choice, Evidence, Outcome, or returned Context."
-    },
-    {
-      "acceptance_id": "cycle-evolution-is-verified",
-      "criterion": "Rendered assertions, lint, static production build, full repository tests, responsive source contracts, canonical VibeHub validation, and Plugin artifact verification pass after the evolution refinement."
+      "criterion": "prefers-reduced-motion removes spatial travel while preserving readable state/color changes and the same causal phase sequence; fine-pointer hover remains gated and neither desktop nor 390px layouts gain page overflow or lose access to Chat, App, Ticket, the human choice, Evidence, Outcome, or returned Context.",
+      "identity": "sha256:3e6abe6710a6c7f0a4c4211b623c62c1a17144122ea42c547b38291f817a2d4c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Name the motion purpose as explanation, spatial consistency, or state indication; do not add decorative parallax, mouse tracking, autoplay loops, floating cards, celebration, bounce, blur spectacle, or motion to frequently used controls.",
     "Use CSS transitions and @starting-style only; do not add Motion, Framer Motion, GSAP, Three.js, a timeline library, or a second animation token system.",
@@ -32,11 +48,11 @@
   "context_refs": [
     {
       "purpose": "Latest successful public entrance and identity implementation this motion refinement preserves.",
-      "ref": ".vibehub/outcomes/ticket-public-founders-brand-icons.yaml"
+      "ref": ".vibehub/outcomes/ticket-public-founders-brand-icons/contract-v1.yaml"
     },
     {
       "purpose": "Accepted deterministic lifecycle and human-boundary interaction contract.",
-      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site.yaml"
+      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site/contract-v1.yaml"
     },
     {
       "purpose": "Binding restrained motion, semantic state, accessibility, and spatial-workbench quality standard.",
@@ -59,6 +75,39 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cycle-evolution-is-verified",
+          "identity": "sha256:ebde5114b9c7e984d6fd7203a33c3dfe436d49a3ae89d67f210f23c9d1223442",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-projects-progressive-causality",
+          "identity": "sha256:27215c8a3e7bb117ced5982a0f37363fe41e9e6e83d82cebba631f81077e207e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "motion-explains-without-obstructing",
+          "identity": "sha256:23ec3d9c70c1ab81de5584e1dead4eee15d77f944ea707af83c2e3ddbd6e8830",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "post-decision-cycle-evolves-in-order",
+          "identity": "sha256:50e9879be6aaaa53ce5f9ce64c46f272414c119a90d9eec78bae3a8b39cf54bf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reduced-motion-preserves-the-sequence",
+          "identity": "sha256:3e6abe6710a6c7f0a4c4211b623c62c1a17144122ea42c547b38291f817a2d4c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a4a32d832545b13a28fbe527bdbcd82bece5f54d87ef69aef9a9545041eab829",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "kind": "pull_request",
@@ -78,6 +127,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-public-cycle-evolution"
 }

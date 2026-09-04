@@ -1,0 +1,24 @@
+{
+  "accepted_acceptance_ids": [
+    "core-loop-direction-decided",
+    "information-language-decided",
+    "initial-shell-and-dsh-direction-decided"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T19:01:05Z",
+  "contract_revision": {
+    "identity": "sha256:bb56e386f32a2e078d957b7aa7cad1e4f2a3600394d2701fdceff491d01df749",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "owner-records-current-task-workbench-direction"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts the owner's current V1 product and composition decision from human-origin Evidence. Task is the durable unit and the Ticket Graph is the first frame; entering a Task enters its working Context Space, while normal Chat remains a Human-led exploration and steering surface around the Agent-led Task loop. One Global Work Graph carries Task nodes and lighter Chat meta nodes, with Project scope, topology-derived clusters, semantic zoom, and Context-anchored intervention rather than invented parent-task ontology. V1 is a non-invasive DeepSeek Harness Plugin with one or two first-class Graph or Task surfaces, additive Chat actions, Theme integration, and a substantial coherent reskin—not an upstream fork, executor-coupled task adapter, or wholesale replacement shell. This decision does not approve the current low-fidelity visual design or claim that the remaining interaction details are complete.",
+  "ticket_id": "ticket-decide-task-harness-product-direction",
+  "unresolved_acceptance_ids": []
+}

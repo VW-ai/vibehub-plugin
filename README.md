@@ -24,7 +24,7 @@ Then open the repository in a fresh Agent session, describe one concrete deliver
 
 **What you get**
 
-- **One Ticket per request, in Git.** Acceptance, Evidence, and Outcome live as ordinary files next to the code, so any Agent can resume from repository truth and any human can review or revert it.
+- **One Ticket per request, in Git.** Acceptance contracts evolve through append-only revisions; Evidence and Outcomes bind the exact revision they judged. Old success remains readable history without silently closing a newer contract, and every record stays an ordinary file next to the code.
 - **A graph of the work, not a list.** The local Workbench shows DRAFT, READY, RUNNING, and DONE Tickets with their real prerequisites and unlocks, and tells you the next action.
 - **Your team sees it on GitHub.** Every Ticket on `main` mirrors one-way to a GitHub Issue — checklist, Evidence comments, native *Blocked by* links — with no Agent in the loop.
 

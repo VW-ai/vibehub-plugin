@@ -4,6 +4,25 @@
     "bound-context-is-inspectable",
     "read-only-boundary-remains-light"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "identity": "sha256:f24a32ae1d33610fad6dbf97d6e24e4f85efa472ec4b3cdaf4259b1bbb98e630",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "identity": "sha256:b5fe59bca4c77fc35364d18b648067726153146f05d9da62651db5ba85a92e84",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "bound-context-agent-only-actions",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T20:07:17.000Z",
@@ -16,7 +35,7 @@
     "file:skills/scripts/vh-ui.mjs",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood clarified that each Bound Context object should expose only one Copy for Agent action and should never show raw Source or Evidence JSON. Commit e14476f removes per-reference editor and GitHub actions from Bound Context while retaining those mechanical links in the dedicated Source Dock. Canonical Context remains human-readable through parsed Source quote/ref/time, Evidence note/ref records, directional Relations, and compact identity. A real-browser audit of the current Ticket found exactly one Copy for Agent button, no links, and no Source/Evidence JSON dump in every visible Bound Context object. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227583 bytes.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

@@ -3,9 +3,13 @@
     {
       "acceptance_id": "ui-only-scope-chosen",
       "authority": "human",
-      "criterion": "The repository owner explicitly decides that the replacement delivery keeps the approved shared Ticket-graph UI upgrade, excludes the macOS Desktop product version and its product entry points from the final tree, and preserves earlier PR Ticket, Evidence, and Outcome records with later Tickets appended rather than deleting history."
+      "criterion": "The repository owner explicitly decides that the replacement delivery keeps the approved shared Ticket-graph UI upgrade, excludes the macOS Desktop product version and its product entry points from the final tree, and preserves earlier PR Ticket, Evidence, and Outcome records with later Tickets appended rather than deleting history.",
+      "identity": "sha256:d1b388fe2084942d36d918e85b7931041237dd26387c545ce852dabb2a62b802",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket records the product decision only; it does not implement or certify the replacement delivery.",
     "Only explicit owner input with a readable conversation reference may be recorded as human-origin Evidence.",
@@ -20,6 +24,19 @@
     {
       "purpose": "Binding visual and interaction quality standard for the retained UI scope.",
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ui-only-scope-chosen",
+          "identity": "sha256:d1b388fe2084942d36d918e85b7931041237dd26387c545ce852dabb2a62b802",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:03f338792f7c39809fe9f9dbfbd27f1e5010e266157dff02caa236285a079762",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -40,6 +57,7 @@
     "conversation:2026-08-11-pr18-ui-business-review"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-pr18-ui-only-scope"
 }

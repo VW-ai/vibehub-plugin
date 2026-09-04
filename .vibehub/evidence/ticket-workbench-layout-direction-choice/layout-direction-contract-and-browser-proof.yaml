@@ -6,6 +6,35 @@
     "focus-and-attention-survive-direction-change",
     "direction-choice-is-behavior-tested"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "layout-authority-is-amended",
+      "identity": "sha256:81c821f42e093023d5043474b00f9a73757c1c5e5aa96ed4abc0799d431f584b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "both-directions-are-real-layouts",
+      "identity": "sha256:c369bb919dbfea3f9ab6ad33797b7654b4f033703954f9abb07f53cf43d3d68b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "direction-state-is-explicit-and-copyable",
+      "identity": "sha256:70150e2aad27cce358a96b0af8a82a2fe6998e6110be8f7dfc31e6732db198f4",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "focus-and-attention-survive-direction-change",
+      "identity": "sha256:244f44d8fcb42975fe14e66f627499ee2b336dbd56aac55e24146dbc085f1d6d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "direction-choice-is-behavior-tested",
+      "identity": "sha256:386b9aba2ea6fa6c8b4497b40f7547204699502ca092667f190a844924fbb5ba",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "layout-direction-contract-and-browser-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +49,7 @@
     "browser:orientation-aware-arrow-key-causal-navigation",
     "room:product-and-workbench-fresh-at-edf4140"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit edf4140 amends the active Workbench Context and local graph authority from mandatory top-to-bottom to one deterministic two-orientation causal layout. The same sorted ranks, Ticket nodes, relations, Inspector, minimap, pan/zoom, source truth, and causal cone render left-to-right by default or top-to-bottom by explicit accessible controls; left-to-right uses right/left relation ports and ArrowLeft/ArrowRight causality, while top-to-bottom uses bottom/top ports and ArrowUp/ArrowDown. Direction is normalized to ltr or ttb, written as an explicit direction URL query while preserving Ticket, Execution/Contract/Log lens, and the 64-character bearer fragment, and an invalid value visibly normalized to ltr. A second live-host browser tab restored ticket-workbench-layout-direction-choice, Log, ttb, and the fragment exactly. Switching direction without reload preserved the selected Ticket, Log lens, complete related/dimmed causal projection, and attention/state classes; a graph-tools propagation repair also prevents direction, Fit, or zoom controls from accidentally clearing Inspector focus. Real-browser geometry at 1440x960 showed the canvas-first → layout-direction → dense-layout causal chain advancing monotonically in x for ltr and y for ttb, with orientation-matched SVG paths and minimap endpoints. At 1180x820 both controls were visible and document scrollWidth equalled 1180. At 390x844 both orientations had document scrollWidth 390 and every direction/zoom/Fit control measured 44x44; the reduced-motion rule remained active. Keyboard ArrowUp in ttb and ArrowLeft in ltr each moved from layout-direction to its canvas-first prerequisite. Full verification passed 52/52 tests plus the 53-file, 664546-byte dependency-free artifact, project/Ticket validation passed, and Product plus Workbench were aligned to edf4140 with all four Rooms FRESH.",
   "ticket_id": "ticket-workbench-layout-direction-choice"
 }

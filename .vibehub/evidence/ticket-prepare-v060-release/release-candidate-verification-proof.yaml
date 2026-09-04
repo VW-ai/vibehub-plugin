@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "release-candidate-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "release-candidate-verified",
+      "identity": "sha256:721d7cf49dd5d2ffdc7aab468c311272583ede767ea0357178c4f14d69836691",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "release-candidate-verification-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +24,7 @@
     "command:node skills/scripts/vh.mjs room drift --repo /Users/bytedance/personal/vibehub-plugin",
     "command:git diff --check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh release verification passed: npm run verify completed 46/46 tests and verified a 52-file, 381647-byte clean plugin artifact; its host-marketplace test built Codex and Claude Code artifacts and proved identical skill sets, contracts, versions, and format behavior. npm run build produced dist/plugin with the same 52 files and 381647 bytes. The v0.6.0 tag/version guard, project validation (format 1, 4 Rooms, 29 Contexts, 32 Tickets, 103 Evidence, 24 Outcomes), Ticket validation, and git diff --check passed. After reconciling the changed CHANGELOG.md anchor and aligning product, room drift reported knowledge, product, ticket-lifecycle, and workbench all FRESH.",
   "ticket_id": "ticket-prepare-v060-release"
 }

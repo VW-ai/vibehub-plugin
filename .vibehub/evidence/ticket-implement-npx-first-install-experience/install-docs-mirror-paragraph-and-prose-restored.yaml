@@ -3,6 +3,20 @@
     "install-docs-lead-with-one-line",
     "all-live-references-repointed"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "install-docs-lead-with-one-line",
+      "identity": "sha256:6b8f7351723d1739a4da471c97ac6d74ba4d028888e5dcc40022a436fe35724f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "all-live-references-repointed",
+      "identity": "sha256:2f10734e760887558e4fad31a2cfa014baefe20c5139720b1aaf3ba463a9a49d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "install-docs-mirror-paragraph-and-prose-restored",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T02:29:02Z",
@@ -12,7 +26,7 @@
     ".vibehub/tickets/ticket-room-taxonomy-foundation.yaml",
     ".vibehub/tickets/ticket-vibehub-cli.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After the partial Outcome: docs/INSTALL.md now describes the setup-time GitHub Issues mirror option (one workflow plus a self-contained scripts/vibehub folder, runs in Actions without the plugin, no Agent runs it) under the setup section, and the three historical Tickets whose prose my path rewrite had touched (ticket-propose-npx-first-install-experience, ticket-room-taxonomy-foundation, ticket-vibehub-cli) are restored byte-for-byte from 751d768 except for their context_refs paths; git diff against 751d768 shows zero non-ref line changes in those files. project validate valid; npm test 142/142.",
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

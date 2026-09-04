@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "taxonomy-reflected"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "taxonomy-reflected",
+      "identity": "sha256:6f4afbec970fbae27453c7a5600aa04178f2b112ee595aef2c9613d4160d9873",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "taxonomy-visible-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T00:54:48.000Z",
@@ -9,7 +18,7 @@
     "commit:6d16979",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Contract-layer tests are grouped in test/skill-contracts.test.mjs whose header names the three-layer convention, making unit (script tests), contract (this file plus the lifecycle ownership test), and e2e (social independent validate/closeout) visibly distinct in the test tree; full suite passes 33/33 and the plugin artifact builds and verifies with both new references bundled (47 files).",
   "ticket_id": "ticket-contractize-skill-system"
 }

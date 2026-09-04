@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "marketplace-bundles-ship-the-same-layout"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "marketplace-bundles-ship-the-same-layout",
+      "identity": "sha256:b8d9710f09ca43f0853919859c2e583432559f80e9c0476dfb01deddd0ece512",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "artifact-and-marketplace-tests",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T02:26:00Z",
@@ -10,7 +19,7 @@
     "scripts/verify-plugin-artifact.mjs",
     "test/host-marketplaces.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "npm run verify:artifact builds the plugin artifact and passes with its required-file list naming skills/vibehub-core/scripts/vh.mjs, vh-ui.mjs, and the seven contract files; test/host-marketplaces.test.mjs runs the Codex and Claude Code marketplace builds against the new paths and passes; release tests pass.",
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

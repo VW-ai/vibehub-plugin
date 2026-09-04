@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "release-identity-survives-the-removal"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "release-identity-survives-the-removal",
+      "identity": "sha256:1bd268afe2b3f096363a9f278dbe71a2f321991405085c6eef865f6935dcb7e8",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "retired-marketplace-release-rehearsal-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-03T04:54:03Z",
@@ -15,7 +24,7 @@
     "command:node scripts/verify-release-version.mjs --tag v0.8.0",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "At clean commit 1941573557a14433d761a06a55c51359b68a8a50, `verify-release-version.mjs --tag v0.8.0` returned one agreeing 0.8.0 identity from package.json and the retained Claude manifest. A release-step rehearsal built the dependency-free plugin artifact at 65 files / 3,214,375 bytes and the release-paired upgrade asset at 32,674 bytes; the plugin archive SHA-256 was 8be7761d7212befa98ad8ece1be43429b705eeb88f92712eb2752d457b595bd4 and the upgrade archive plus generated checksum agreed on 244c53bbc8d6a588fee22a37b5a331748dbd90d763267e694103f9a7b07682ab. The preceding full `npm run verify` passed 178/178 with zero skipped, and docs/RELEASE.md now states the exact surviving declarations and GitHub-only workflow.",
   "ticket_id": "ticket-retire-marketplace-distribution"
 }

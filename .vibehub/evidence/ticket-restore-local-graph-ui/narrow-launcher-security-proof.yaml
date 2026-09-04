@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "launcher-is-narrow-and-safe"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "launcher-is-narrow-and-safe",
+      "identity": "sha256:85439fda90c4bc2df626e0843a28b472df99b319e332ca785e3b1d64c6d366c2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "narrow-launcher-security-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T07:18:44Z",
@@ -10,7 +19,7 @@
     "test/ui-host.test.mjs",
     "command:node skills/scripts/vh-ui.mjs --repo . --no-open --json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The dependency-free launcher accepts only repo, port, open/no-open, and json flags; rejects the former database flag; defaults to an ephemeral 127.0.0.1 port; uses a random short-lived bearer fragment; applies no-store/CSP/frame/referrer/content-type headers; exposes only GET/HEAD health, assets, state, subject, and trace; rejects POST as read-only; and closes on signal or token expiry.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

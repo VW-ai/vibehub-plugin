@@ -4,6 +4,25 @@
     "information-language-decided",
     "initial-shell-and-dsh-direction-decided"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "core-loop-direction-decided",
+      "identity": "sha256:f0b78b1f4daee2e65a8493a199b5d3d01038e0ea37d95bfd0a547532e2813622",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "information-language-decided",
+      "identity": "sha256:0ae13bf5a5095bae91b2122ce348f7f05e573a0a7828e8ab71b751a96d67e7f3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "initial-shell-and-dsh-direction-decided",
+      "identity": "sha256:8e42f75ee073cb42e9fbf86a6f9763568476bfc175e8fa51c3f2cecf21fa5bfd",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "owner-records-current-task-workbench-direction",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -17,7 +36,7 @@
     "conversation:2026-08-20-derived-task-hierarchy-correction",
     "conversation:2026-08-20-topology-derived-task-clusters"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Across the current product review, the owner explicitly chose Task rather than Chat as the durable product unit and the VibeHub Ticket Graph as the first frame. Entering a Task enters its working Context Space; normal Chat remains the open Human-led exploration and steering surface with explicit Fork, Compare, Bring Back, scoped Context, conversion to Task, Start, human attention, Evidence review, and closeout. The owner accepted one Global Work Graph with Task nodes and lighter Chat meta nodes, Project-owned or standalone Tasks, and topology-derived visual clusters rather than inventing High-Level, Parent, Child, or Subtask ontology. The owner also corrected the earlier wholesale-shell direction: V1 should remain a non-invasive DeepSeek Harness Plugin using one or two VibeHub Graph or Task pages, additive Chat actions and official Theme composition, with a substantial coherent Codex/Linear-quality reskin but no upstream fork or executor-internal task coupling. This is explicit product and composition approval, not approval of the current low-fidelity visual design or all remaining interaction details.",
   "ticket_id": "ticket-decide-task-harness-product-direction"
 }

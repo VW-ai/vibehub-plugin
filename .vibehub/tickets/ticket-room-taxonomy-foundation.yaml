@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "room-schema",
-      "criterion": "skills/contracts/room.schema.json defines room.yaml (description, boundary, anchor globs, alignment block with last_aligned_commit, checked_at and per-file blob hashes, stale flag with optional reason) and validates every checked-in room.yaml."
-    },
-    {
-      "acceptance_id": "vh-room-validation",
-      "criterion": "vh.mjs validates a nested rooms/ tree — room.yaml presence per room directory, slug rules, schema validity, and context entries inside room directories resolving in context query — with node --test coverage."
-    },
-    {
       "acceptance_id": "context-placement",
-      "criterion": "vh.mjs context put accepts an optional room path and writes the entry inside that room directory; flat root-level entries keep working unchanged."
+      "criterion": "vh.mjs context put accepts an optional room path and writes the entry inside that room directory; flat root-level entries keep working unchanged.",
+      "identity": "sha256:5ea0ef63f2045675df27fe01f1ca36bd5a229db3bbd6066462221b24220572f7",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "dogfood-rooms",
-      "criterion": "This repository's own .vibehub gains an initial rooms/ tree and the existing context entries are placed into their owning rooms (root only for genuinely cross-room items)."
+      "criterion": "This repository's own .vibehub gains an initial rooms/ tree and the existing context entries are placed into their owning rooms (root only for genuinely cross-room items).",
+      "identity": "sha256:d0def1d3d091c1dcf561751f1b396472d46c03464475ae2928e1c18f91da6575",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "room-schema",
+      "criterion": "skills/contracts/room.schema.json defines room.yaml (description, boundary, anchor globs, alignment block with last_aligned_commit, checked_at and per-file blob hashes, stale flag with optional reason) and validates every checked-in room.yaml.",
+      "identity": "sha256:1dbb24f9a7e2ce5a0aef427aaaff8594f650d8d6e8d1713a4582c4cf9b5105b4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "vh-room-validation",
+      "criterion": "vh.mjs validates a nested rooms/ tree — room.yaml presence per room directory, slug rules, schema validity, and context entries inside room directories resolving in context query — with node --test coverage.",
+      "identity": "sha256:db47e5e1b34ab38b5e09d84807a97e85a896ff048cbfa9492cd38ca4df94864d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Semantic kebab-case slugs only; numbering, hashes, and timestamps in filenames are forbidden.",
     "Dependency-free Node built-ins only; JSON-compatible YAML documents; no database, daemon, or CAS store.",
@@ -31,6 +44,34 @@
     {
       "purpose": "Speed-first boundaries: what must not be reintroduced.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-placement",
+          "identity": "sha256:5ea0ef63f2045675df27fe01f1ca36bd5a229db3bbd6066462221b24220572f7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dogfood-rooms",
+          "identity": "sha256:d0def1d3d091c1dcf561751f1b396472d46c03464475ae2928e1c18f91da6575",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "room-schema",
+          "identity": "sha256:1dbb24f9a7e2ce5a0aef427aaaff8594f650d8d6e8d1713a4582c4cf9b5105b4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "vh-room-validation",
+          "identity": "sha256:db47e5e1b34ab38b5e09d84807a97e85a896ff048cbfa9492cd38ca4df94864d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7526b3af829b849182fb2ecaf2687427cf45c89d6ba884b1c80faca7a93e4431",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -49,6 +90,7 @@
     "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-room-taxonomy-foundation"
 }

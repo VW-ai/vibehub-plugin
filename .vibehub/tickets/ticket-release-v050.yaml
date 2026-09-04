@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "version-identity",
-      "criterion": "package.json, .claude-plugin/plugin.json, .codex-plugin/plugin.json, the Claude marketplace metadata, and CHANGELOG.md all state 0.5.0 with a dated changelog entry covering the Room-world capabilities and the migration path; npm run verify passes."
-    },
-    {
       "acceptance_id": "release-pr-merged",
-      "criterion": "The release branch merges to main through a PR carrying the Ticket Outcome and Evidence, authorized by the owner."
+      "criterion": "The release branch merges to main through a PR carrying the Ticket Outcome and Evidence, authorized by the owner.",
+      "identity": "sha256:f826079e12292cf58484c7286f87c6c650e9db0e13c9f23f297c9460b27c2156",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "tag-and-release-verified",
-      "criterion": "The v0.5.0 tag points at the merged main commit, the workflow-created GitHub Release carries the archive and SHA-256 checksum, and the checksum verifies against the downloaded archive."
+      "criterion": "The v0.5.0 tag points at the merged main commit, the workflow-created GitHub Release carries the archive and SHA-256 checksum, and the checksum verifies against the downloaded archive.",
+      "identity": "sha256:6cde97af4caf904083e588c36de7caf2a78eaa3c8291cd713e87ba0d70395650",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "version-identity",
+      "criterion": "package.json, .claude-plugin/plugin.json, .codex-plugin/plugin.json, the Claude marketplace metadata, and CHANGELOG.md all state 0.5.0 with a dated changelog entry covering the Room-world capabilities and the migration path; npm run verify passes.",
+      "identity": "sha256:9ef0aa67fec815fa138603d57fffc766705a349405faeb03e0e950a50be0d25c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Never tag or release from a feature branch; the tag targets the exact merged main commit.",
     "npm is not a release surface.",
@@ -29,6 +39,29 @@
       "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "release-pr-merged",
+          "identity": "sha256:f826079e12292cf58484c7286f87c6c650e9db0e13c9f23f297c9460b27c2156",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tag-and-release-verified",
+          "identity": "sha256:6cde97af4caf904083e588c36de7caf2a78eaa3c8291cd713e87ba0d70395650",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "version-identity",
+          "identity": "sha256:9ef0aa67fec815fa138603d57fffc766705a349405faeb03e0e950a50be0d25c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:76ac79b74f78b6991d51244d3642f0c3f1b496a6da42395c01a2be56b0191b53",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "outcome": "VibeHub v0.5.0 ships: version identity synchronized across package.json, both plugin manifests, marketplace metadata, and CHANGELOG; the release PR merges verified; the tag builds the GitHub Release with archive and checksum.",
@@ -43,6 +76,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-release-v050"
 }

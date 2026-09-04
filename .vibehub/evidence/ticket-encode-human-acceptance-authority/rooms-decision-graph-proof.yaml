@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "rooms-flow-proves-graph-boundary"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "rooms-flow-proves-graph-boundary",
+      "identity": "sha256:1372dc4188ef05b1d2806007b57a6a685dae4eaaf0d92f03ae8b64f068812d92",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "rooms-decision-graph-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +25,7 @@
     "test:npm-test-46-of-46",
     "verification:plugin-artifact-52-files-378280-bytes"
   ],
+  "schema_version": 2,
   "summary": "The former combined Rooms Ticket is now a three-node direct dependency chain whose implementation node is maturity: draft. Mechanical graph output reports the proposal READY, the human-decision Ticket BLOCKED by the proposal, and draft implementation BLOCKED by the decision. UI projection reports the decision UPCOMING rather than PENDING while its proposal prerequisite is unresolved. The draft-maturity test now uses an authority: human blocker and proves that its successful human-origin Outcome moves the dependent only to REFINE, never READY; Ticket Plan must rewrite that same Ticket before execution.",
-  "schema_version": 1,
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

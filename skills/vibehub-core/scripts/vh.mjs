@@ -12,8 +12,26 @@ import {
 } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  REVISION_BINDING_ORIGINS,
+  REVISION_BINDING_STATES,
+  REVISION_IDENTITY,
+  acceptanceIdentity,
+  acceptanceReference,
+  acceptanceRevisionKey,
+  activeAcceptance,
+  activeAcceptanceReferenceMap,
+  activeContract,
+  appendTicketContractRevision,
+  buildContractRevision,
+  contractIdentity,
+  evidenceBoundReferenceMap,
+  outcomeBindsContract,
+  semanticDigest,
+  stableValue,
+} from "./revision-contract.mjs";
 
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CONTEXT_TYPES = new Set([
@@ -49,6 +67,9 @@ const DEPENDENCY_HYGIENE = JSON.parse(readFileSync(
 ));
 const CURRENT_PROJECT_FORMAT = VERSION_CONTRACT.project_format;
 const CURRENT_TICKET_SCHEMA = VERSION_CONTRACT.document_schemas.ticket;
+const CURRENT_EVIDENCE_SCHEMA = VERSION_CONTRACT.document_schemas.evidence;
+const CURRENT_OUTCOME_SCHEMA = VERSION_CONTRACT.document_schemas.outcome;
+const PROOF_REVISION_PENDING_REF = "migration-pending:format-3-to-format-4:reconstruct-proof-revisions";
 const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
@@ -89,7 +110,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; context operations include put and resolve; project operations include init, compatibility, migrate-mechanical, and validate",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; context operations include put and resolve; project operations include init, compatibility, migrate-mechanical, migrate-proof-revisions, and validate",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -125,13 +146,7 @@ function isObject(value) {
 }
 
 function stable(value) {
-  if (Array.isArray(value)) return value.map(stable);
-  if (!isObject(value)) return value;
-  return Object.fromEntries(
-    Object.keys(value)
-      .sort()
-      .map((key) => [key, stable(value[key])]),
-  );
+  return stableValue(value);
 }
 
 function serialize(document) {
@@ -491,6 +506,26 @@ function validateMigrationsReference(reference) {
           }
           if (!isObject(action.defaults)) add(errors, `${actionPath}.defaults`, "must be an object");
           requiredString(errors, action, "pending_semantic_ref", actionPath);
+        } else if (action.type === "upgrade-proof-revision-schemas") {
+          strictKeys(
+            errors,
+            action,
+            new Set([
+              "type",
+              "ticket_from",
+              "ticket_to",
+              "evidence_from",
+              "evidence_to",
+              "outcome_from",
+              "outcome_to",
+              "pending_semantic_ref",
+            ]),
+            actionPath,
+          );
+          for (const key of ["ticket_from", "ticket_to", "evidence_from", "evidence_to", "outcome_from", "outcome_to"]) {
+            if (!Number.isInteger(action[key])) add(errors, `${actionPath}.${key}`, "must be an integer");
+          }
+          requiredString(errors, action, "pending_semantic_ref", actionPath);
         } else {
           add(errors, `${actionPath}.type`, "is not a supported mechanical migration action");
         }
@@ -537,11 +572,16 @@ function migrationFormatKey(detectedFormat) {
 }
 
 function migrationPathMatches(path, declared) {
-  if (path === declared) return true;
-  if (!declared.endsWith("/*.yaml")) return false;
-  const directory = declared.slice(0, -"*.yaml".length);
-  const remainder = path.startsWith(directory) ? path.slice(directory.length) : "";
-  return remainder.endsWith(".yaml") && !remainder.includes("/");
+  let source = "^";
+  for (let index = 0; index < declared.length; index += 1) {
+    const character = declared[index];
+    if (character === "*" && declared[index + 1] === "*") {
+      source += ".*";
+      index += 1;
+    } else if (character === "*") source += "[^/]*";
+    else source += character.replace(/[\\^$.*+?()[\]{}|]/gu, "\\$&");
+  }
+  return new RegExp(`${source}$`, "u").test(path);
 }
 
 function relativeProjectPath(repo, path) {
@@ -664,7 +704,76 @@ function migrateMechanical(repo) {
           if (!document.provenance_refs.includes(action.pending_semantic_ref)) {
             document.provenance_refs = [...document.provenance_refs, action.pending_semantic_ref];
           }
+          // A multi-hop migration may materialize an intermediate schema that
+          // the current validator intentionally no longer accepts. Validate
+          // the complete candidate only after every declared hop is applied.
+          plannedWrites.set(path, { document, migration });
+        }
+      } else if (action.type === "upgrade-proof-revision-schemas") {
+        for (const path of yamlFiles(dirs(repo).tickets)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.ticket_from, action.ticket_to].includes(existing.schema_version)) {
+            throw new VibeHubError(
+              "migration_error",
+              `${path} has Ticket schema ${existing.schema_version}; expected ${action.ticket_from} or ${action.ticket_to}`,
+            );
+          }
+          if (existing.schema_version === action.ticket_to && existing.revision_state === "bound") continue;
+          const document = {
+            ...existing,
+            schema_version: action.ticket_to,
+            revision_state: "legacy-pending-reconstruction",
+          };
+          delete document.active_contract_revision;
+          delete document.contract_revisions;
+          if (!Array.isArray(document.provenance_refs)) {
+            throw new VibeHubError("migration_error", `${path}.provenance_refs must be an array`);
+          }
+          if (!document.provenance_refs.includes(action.pending_semantic_ref)) {
+            document.provenance_refs = [...document.provenance_refs, action.pending_semantic_ref];
+          }
           assertValid(validateTicket(document, path), "Mechanically migrated Ticket is invalid");
+          plannedWrites.set(path, { document, migration });
+        }
+        for (const path of nestedYamlFiles(dirs(repo).evidence)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.evidence_from, action.evidence_to].includes(existing.schema_version)) {
+            throw new VibeHubError(
+              "migration_error",
+              `${path} has Evidence schema ${existing.schema_version}; expected ${action.evidence_from} or ${action.evidence_to}`,
+            );
+          }
+          if (existing.schema_version === action.evidence_to && existing.binding_state === "bound") continue;
+          const document = {
+            ...existing,
+            schema_version: action.evidence_to,
+            binding_state: "legacy-pending-reconstruction",
+          };
+          delete document.binding_origin;
+          delete document.acceptance_revisions;
+          delete document.unresolved;
+          assertValid(validateEvidence(document, path), "Mechanically migrated Evidence is invalid");
+          plannedWrites.set(path, { document, migration });
+        }
+        for (const path of nestedYamlFiles(dirs(repo).outcomes)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.outcome_from, action.outcome_to].includes(existing.schema_version)) {
+            throw new VibeHubError(
+              "migration_error",
+              `${path} has Outcome schema ${existing.schema_version}; expected ${action.outcome_from} or ${action.outcome_to}`,
+            );
+          }
+          if (existing.schema_version === action.outcome_to && existing.binding_state === "bound") continue;
+          const document = {
+            ...existing,
+            schema_version: action.outcome_to,
+            outcome_id: "legacy-pending",
+            binding_state: "legacy-pending-reconstruction",
+          };
+          delete document.binding_origin;
+          delete document.contract_revision;
+          delete document.unresolved;
+          assertValid(validateOutcome(document, path), "Mechanically migrated Outcome is invalid");
           plannedWrites.set(path, { document, migration });
         }
       }
@@ -722,6 +831,347 @@ function migrateMechanical(repo) {
     applied_migrations: applied,
     pending_semantic_refs: pendingSemanticRefs(repo),
     pending_semantic_steps: pendingSteps,
+  };
+}
+
+function gitDocumentAt(repo, commit, path) {
+  if (!commit) return null;
+  const result = git(repo, ["show", `${commit}:${path}`], { allowFailure: true });
+  if (result.status !== 0) return null;
+  try {
+    return JSON.parse(result.stdout);
+  } catch {
+    return null;
+  }
+}
+
+function proofAddition(repo, path) {
+  // Exact-path additions are intentional: a delete/re-add yields more than
+  // one plausible birth event and must be reported as ambiguous, not silently
+  // collapsed by --follow onto the newest lineage.
+  const result = git(repo, ["log", "--diff-filter=A", "--format=%H", "HEAD", "--", path], {
+    allowFailure: true,
+  });
+  const commits = result.stdout.trim().split("\n").filter(Boolean);
+  if (commits.length === 0) return { state: "missing-history", commits: [] };
+  if (commits.length > 1) return { state: "ambiguous-history", commits };
+  return { state: "found", commits, commit: commits[0] };
+}
+
+function legacyAcceptanceSemantic(item) {
+  return {
+    acceptance_id: item.acceptance_id,
+    criterion: item.criterion,
+    ...(item.authority === undefined ? {} : { authority: item.authority }),
+  };
+}
+
+function acceptanceSemanticKey(item) {
+  return semanticDigest({
+    acceptance_id: item.acceptance_id,
+    criterion: item.criterion,
+    authority: item.authority ?? "agent",
+  });
+}
+
+function contractMembershipKey(references) {
+  return JSON.stringify([...references]
+    .map(({ acceptance_id, revision, identity }) => ({ acceptance_id, revision, identity }))
+    .sort((left, right) => left.acceptance_id.localeCompare(right.acceptance_id)
+      || left.revision - right.revision));
+}
+
+function unresolvedBinding(addition, path) {
+  return {
+    reason: addition.state,
+    attempted_refs: addition.commits.length > 0
+      ? addition.commits.map((commit) => `commit:${commit}:${path}`)
+      : [`git-addition:${path}`],
+  };
+}
+
+function restoreFiles(originals) {
+  for (const [path, source] of [...originals].reverse()) {
+    if (source === null) {
+      if (existsSync(path)) unlinkSync(path);
+    } else {
+      const temporary = `${path}.rollback-${process.pid}`;
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(temporary, source, { flag: "wx" });
+      renameSync(temporary, path);
+    }
+  }
+}
+
+function migrateProofRevisions(repo) {
+  assertCurrentProjectFormat(repo);
+  const before = loadRepository(repo);
+  assertValid(before.errors);
+  const pendingTickets = documents(before.tickets.documents)
+    .filter((ticket) => ticket.revision_state === "legacy-pending-reconstruction");
+  if (pendingTickets.length === 0) {
+    return {
+      status: "current",
+      changed_paths: [],
+      tickets_reconstructed: 0,
+      evidence_bound: 0,
+      outcomes_bound: 0,
+      unresolved: 0,
+    };
+  }
+
+  const commitOrder = new Map(git(repo, ["rev-list", "--reverse", "HEAD"]).stdout
+    .trim().split("\n").filter(Boolean).map((commit, index) => [commit, index]));
+  const writes = new Map();
+  const deletions = new Set();
+  const outcomePathMoves = new Map();
+  let evidenceBound = 0;
+  let outcomesBound = 0;
+  let unresolved = 0;
+
+  for (const pendingTicket of pendingTickets) {
+    const ticketId = pendingTicket.ticket_id;
+    const ticketPath = `.vibehub/tickets/${ticketId}.yaml`;
+    const ticketEvidence = documents(before.evidence.documents)
+      .filter((item) => item.ticket_id === ticketId);
+    const ticketOutcomes = outcomesForTicket(before, ticketId);
+    const proofEvents = [];
+    for (const evidence of ticketEvidence) {
+      const path = `.vibehub/evidence/${ticketId}/${evidence.evidence_id}.yaml`;
+      const addition = proofAddition(repo, path);
+      proofEvents.push({ kind: "evidence", document: evidence, path, addition });
+    }
+    for (const outcome of ticketOutcomes) {
+      const entry = before.outcomes.history.get(`${ticketId}:${outcome.outcome_id}`);
+      const path = relative(repo, entry.path).split(sep).join("/");
+      const addition = proofAddition(repo, path);
+      proofEvents.push({ kind: "outcome", document: outcome, path, addition });
+    }
+
+    const versionsById = new Map();
+    const addAcceptance = (item, rank) => {
+      if (!item || typeof item.acceptance_id !== "string" || typeof item.criterion !== "string") return;
+      const semantic = legacyAcceptanceSemantic(item);
+      const key = acceptanceSemanticKey(semantic);
+      const versions = versionsById.get(semantic.acceptance_id) ?? new Map();
+      const existing = versions.get(key);
+      if (!existing || rank < existing.rank) versions.set(key, { semantic, rank, key });
+      versionsById.set(semantic.acceptance_id, versions);
+    };
+    const currentRank = commitOrder.size + 1;
+    for (const item of pendingTicket.acceptance) addAcceptance(item, currentRank);
+
+    for (const event of proofEvents) {
+      if (event.addition.state !== "found") continue;
+      const historical = gitDocumentAt(repo, event.addition.commit, ticketPath);
+      event.historicalTicket = historical;
+      event.rank = commitOrder.get(event.addition.commit) ?? currentRank;
+      if (!historical || !Array.isArray(historical.acceptance)) continue;
+      const ids = event.kind === "evidence"
+        ? new Set(event.document.acceptance_ids)
+        : null;
+      for (const item of historical.acceptance) {
+        if (ids === null || ids.has(item.acceptance_id)) addAcceptance(item, event.rank);
+      }
+    }
+
+    const currentById = new Map(pendingTicket.acceptance.map((item) => [item.acceptance_id, acceptanceSemanticKey(item)]));
+    const acceptance = [];
+    const resolvedVersions = new Map();
+    for (const acceptanceId of [...versionsById.keys()].sort()) {
+      const versions = [...versionsById.get(acceptanceId).values()]
+        .sort((left, right) => left.rank - right.rank || left.key.localeCompare(right.key));
+      versions.forEach((entry, index) => {
+        const revision = {
+          ...entry.semantic,
+          revision: index + 1,
+          state: currentById.get(acceptanceId) === entry.key ? "active" : "retired",
+        };
+        const materialized = {
+          ...revision,
+          identity: acceptanceIdentity(ticketId, revision),
+        };
+        acceptance.push(materialized);
+        resolvedVersions.set(`${acceptanceId}:${entry.key}`, materialized);
+      });
+    }
+    acceptance.sort((left, right) => left.acceptance_id.localeCompare(right.acceptance_id)
+      || left.revision - right.revision);
+
+    const resolveSnapshot = (historical) => {
+      if (!historical || !Array.isArray(historical.acceptance)) return null;
+      const references = [];
+      for (const item of historical.acceptance) {
+        const resolved = resolvedVersions.get(`${item.acceptance_id}:${acceptanceSemanticKey(item)}`);
+        if (!resolved) return null;
+        references.push(acceptanceReference(resolved));
+      }
+      return references.sort((left, right) => left.acceptance_id.localeCompare(right.acceptance_id)
+        || left.revision - right.revision);
+    };
+
+    const outcomeEvents = proofEvents
+      .filter((event) => event.kind === "outcome" && event.historicalTicket)
+      .sort((left, right) => left.rank - right.rank || left.path.localeCompare(right.path));
+    const contractRevisions = [];
+    const outcomeContracts = new Map();
+    let priorMembership = null;
+    for (const event of outcomeEvents) {
+      const references = resolveSnapshot(event.historicalTicket);
+      if (!references) continue;
+      const membership = contractMembershipKey(references);
+      if (membership !== priorMembership) {
+        const contract = { revision: contractRevisions.length + 1, acceptance_revisions: references };
+        contractRevisions.push({ ...contract, identity: contractIdentity(ticketId, contract) });
+        priorMembership = membership;
+      }
+      outcomeContracts.set(event.path, contractRevisions.at(-1));
+    }
+    const currentReferences = pendingTicket.acceptance.map((item) =>
+      acceptanceReference(resolvedVersions.get(`${item.acceptance_id}:${acceptanceSemanticKey(item)}`)))
+      .sort((left, right) => left.acceptance_id.localeCompare(right.acceptance_id)
+        || left.revision - right.revision);
+    const currentMembership = contractMembershipKey(currentReferences);
+    if (currentMembership !== priorMembership || contractRevisions.length === 0) {
+      const contract = { revision: contractRevisions.length + 1, acceptance_revisions: currentReferences };
+      contractRevisions.push({ ...contract, identity: contractIdentity(ticketId, contract) });
+    }
+    const activeContractRevision = contractRevisions.at(-1).revision;
+    const reconstructedTicket = {
+      ...pendingTicket,
+      revision_state: "bound",
+      acceptance,
+      active_contract_revision: activeContractRevision,
+      contract_revisions: contractRevisions,
+      provenance_refs: pendingTicket.provenance_refs.filter((ref) => ref !== PROOF_REVISION_PENDING_REF),
+    };
+    assertValid(validateTicket(reconstructedTicket, ticketPath), "Reconstructed Ticket is invalid");
+    writes.set(join(repo, ticketPath), reconstructedTicket);
+
+    for (const event of proofEvents) {
+      const absolute = join(repo, event.path);
+      if (event.addition.state !== "found" || !event.historicalTicket) {
+        unresolved += 1;
+        const result = {
+          ...event.document,
+          schema_version: event.kind === "evidence" ? CURRENT_EVIDENCE_SCHEMA : CURRENT_OUTCOME_SCHEMA,
+          binding_state: "legacy-unresolved",
+          unresolved: unresolvedBinding(event.addition, event.path),
+        };
+        delete result.binding_origin;
+        delete result.acceptance_revisions;
+        delete result.contract_revision;
+        if (event.kind === "outcome") result.outcome_id = "legacy-unresolved";
+        writes.set(absolute, result);
+        continue;
+      }
+      if (event.kind === "evidence") {
+        const historicalById = new Map(event.historicalTicket.acceptance.map((item) => [item.acceptance_id, item]));
+        const references = event.document.acceptance_ids.map((acceptanceId) => {
+          const historical = historicalById.get(acceptanceId);
+          return historical
+            ? resolvedVersions.get(`${acceptanceId}:${acceptanceSemanticKey(historical)}`)
+            : null;
+        });
+        if (references.some((item) => !item)) {
+          unresolved += 1;
+          const result = {
+            ...event.document,
+            schema_version: CURRENT_EVIDENCE_SCHEMA,
+            binding_state: "legacy-unresolved",
+            unresolved: {
+              reason: "missing-history",
+              attempted_refs: [`commit:${event.addition.commit}:${ticketPath}`],
+            },
+          };
+          delete result.binding_origin;
+          delete result.acceptance_revisions;
+          writes.set(absolute, result);
+        } else {
+          evidenceBound += 1;
+          const result = {
+            ...event.document,
+            schema_version: CURRENT_EVIDENCE_SCHEMA,
+            binding_state: "bound",
+            binding_origin: "reconstructed",
+            acceptance_revisions: references.map(acceptanceReference),
+          };
+          delete result.unresolved;
+          writes.set(absolute, result);
+        }
+      } else {
+        const contract = outcomeContracts.get(event.path);
+        const referencedEvidence = event.document.evidence_ids
+          .map((evidenceId) => proofEvents.find((candidate) =>
+            candidate.kind === "evidence" && candidate.document.evidence_id === evidenceId));
+        const evidenceResolvable = referencedEvidence.every((candidate) =>
+          candidate && candidate.addition.state === "found" && candidate.historicalTicket);
+        if (!contract || !evidenceResolvable) {
+          unresolved += 1;
+          const result = {
+            ...event.document,
+            schema_version: CURRENT_OUTCOME_SCHEMA,
+            outcome_id: "legacy-unresolved",
+            binding_state: "legacy-unresolved",
+            unresolved: {
+              reason: "missing-history",
+              attempted_refs: [`commit:${event.addition.commit}:${ticketPath}`],
+            },
+          };
+          delete result.binding_origin;
+          delete result.contract_revision;
+          writes.set(absolute, result);
+        } else {
+          outcomesBound += 1;
+          const result = {
+            ...event.document,
+            schema_version: CURRENT_OUTCOME_SCHEMA,
+            outcome_id: `contract-v${contract.revision}`,
+            binding_state: "bound",
+            binding_origin: "reconstructed",
+            contract_revision: { revision: contract.revision, identity: contract.identity },
+          };
+          delete result.unresolved;
+          const target = join(repo, ".vibehub", "outcomes", ticketId, `${result.outcome_id}.yaml`);
+          writes.set(target, result);
+          if (target !== absolute) {
+            deletions.add(absolute);
+            outcomePathMoves.set(event.path, relativeProjectPath(repo, target));
+          }
+        }
+      }
+    }
+  }
+
+  for (const [path, document] of writes) {
+    if (!path.startsWith(`${dirs(repo).tickets}${sep}`)) continue;
+    const rewrittenRefs = document.context_refs.map((contextRef) => ({
+      ...contextRef,
+      ref: outcomePathMoves.get(contextRef.ref) ?? contextRef.ref,
+    }));
+    if (JSON.stringify(rewrittenRefs) !== JSON.stringify(document.context_refs)) {
+      writes.set(path, { ...document, context_refs: rewrittenRefs });
+    }
+  }
+
+  const touched = new Set([...writes.keys(), ...deletions]);
+  const originals = new Map([...touched].map((path) => [path, existsSync(path) ? readFileSync(path, "utf8") : null]));
+  try {
+    for (const [path, document] of writes) writeDocument(path, document);
+    for (const path of deletions) if (existsSync(path)) unlinkSync(path);
+    const migrated = loadRepository(repo);
+    assertValid(migrated.errors, "Proof revision migration produced an invalid project");
+  } catch (error) {
+    restoreFiles(originals);
+    throw error;
+  }
+  return {
+    status: unresolved > 0 ? "migrated_with_unresolved" : "migrated",
+    changed_paths: [...touched].map((path) => relativeProjectPath(repo, path)).sort(),
+    tickets_reconstructed: pendingTickets.length,
+    evidence_bound: evidenceBound,
+    outcomes_bound: outcomesBound,
+    unresolved,
   };
 }
 
@@ -854,6 +1304,9 @@ function validateTicket(document, path = "ticket") {
         "schema_version",
         "kind",
         "ticket_id",
+        "revision_state",
+        "active_contract_revision",
+        "contract_revisions",
         "maturity",
         "outcome",
         "deliveries",
@@ -871,6 +1324,9 @@ function validateTicket(document, path = "ticket") {
     add(errors, `${path}.schema_version`, `must equal ${CURRENT_TICKET_SCHEMA}`);
   }
   if (document.kind !== "ticket") add(errors, `${path}.kind`, "must equal ticket");
+  if (!["bound", "legacy-pending-reconstruction"].includes(document.revision_state)) {
+    add(errors, `${path}.revision_state`, "must equal bound or legacy-pending-reconstruction");
+  }
   if (document.maturity !== undefined && !["firm", "draft"].includes(document.maturity)) {
     add(errors, `${path}.maturity`, "must equal firm or draft when present");
   }
@@ -912,7 +1368,7 @@ function validateTicket(document, path = "ticket") {
   requiredString(errors, document, "context", path);
   if (!Array.isArray(document.acceptance) || document.acceptance.length === 0) {
     add(errors, `${path}.acceptance`, "must contain at least one criterion");
-  } else {
+  } else if (document.revision_state === "legacy-pending-reconstruction") {
     const ids = new Set();
     document.acceptance.forEach((item, index) => {
       const itemPath = `${path}.acceptance[${index}]`;
@@ -926,6 +1382,146 @@ function validateTicket(document, path = "ticket") {
         ids.add(item.acceptance_id);
       }
     });
+    if (document.active_contract_revision !== undefined) {
+      add(errors, `${path}.active_contract_revision`, "is forbidden while legacy reconstruction is pending");
+    }
+    if (document.contract_revisions !== undefined) {
+      add(errors, `${path}.contract_revisions`, "is forbidden while legacy reconstruction is pending");
+    }
+    if (!Array.isArray(document.provenance_refs)
+      || !document.provenance_refs.includes(PROOF_REVISION_PENDING_REF)) {
+      add(errors, `${path}.provenance_refs`, `must contain ${PROOF_REVISION_PENDING_REF} while legacy reconstruction is pending`);
+    }
+  } else if (document.revision_state === "bound") {
+    const keys = new Set();
+    const byKey = new Map();
+    const revisionsById = new Map();
+    const activeIds = new Set();
+    document.acceptance.forEach((item, index) => {
+      const itemPath = `${path}.acceptance[${index}]`;
+      if (!strictKeys(
+        errors,
+        item,
+        new Set(["acceptance_id", "revision", "identity", "criterion", "authority", "state", "derived_from", "presentation"]),
+        itemPath,
+      )) return;
+      requiredString(errors, item, "acceptance_id", itemPath, { id: true });
+      if (!Number.isInteger(item.revision) || item.revision < 1) {
+        add(errors, `${itemPath}.revision`, "must be a positive integer");
+      }
+      requiredString(errors, item, "identity", itemPath);
+      if (!REVISION_IDENTITY.test(item.identity ?? "")) add(errors, `${itemPath}.identity`, "must be sha256:<64-lowercase-hex>");
+      requiredString(errors, item, "criterion", itemPath);
+      if (item.authority !== undefined && !ACCEPTANCE_AUTHORITIES.has(item.authority)) {
+        add(errors, `${itemPath}.authority`, "must equal agent or human when present");
+      }
+      if (!["active", "retired"].includes(item.state)) add(errors, `${itemPath}.state`, "must equal active or retired");
+      if (item.presentation !== undefined) {
+        const presentationPath = `${itemPath}.presentation`;
+        if (strictKeys(errors, item.presentation, new Set(["label", "description"]), presentationPath)) {
+          if (Object.keys(item.presentation).length === 0) add(errors, presentationPath, "must contain label or description");
+          if (item.presentation.label !== undefined) requiredString(errors, item.presentation, "label", presentationPath);
+          if (item.presentation.description !== undefined) requiredString(errors, item.presentation, "description", presentationPath);
+        }
+      }
+      if (item.derived_from !== undefined && !Array.isArray(item.derived_from)) {
+        add(errors, `${itemPath}.derived_from`, "must be an array");
+      } else {
+        const lineage = new Set();
+        for (const [lineageIndex, reference] of (item.derived_from ?? []).entries()) {
+          const lineagePath = `${itemPath}.derived_from[${lineageIndex}]`;
+          if (!strictKeys(errors, reference, new Set(["acceptance_id", "revision"]), lineagePath)) continue;
+          requiredString(errors, reference, "acceptance_id", lineagePath, { id: true });
+          if (!Number.isInteger(reference.revision) || reference.revision < 1) {
+            add(errors, `${lineagePath}.revision`, "must be a positive integer");
+          }
+          const key = acceptanceRevisionKey(reference);
+          if (lineage.has(key)) add(errors, lineagePath, "must be unique");
+          lineage.add(key);
+        }
+      }
+      const key = acceptanceRevisionKey(item);
+      if (keys.has(key)) add(errors, itemPath, "acceptance_id and revision pair must be unique");
+      keys.add(key);
+      byKey.set(key, item);
+      const revisions = revisionsById.get(item.acceptance_id) ?? [];
+      revisions.push(item.revision);
+      revisionsById.set(item.acceptance_id, revisions);
+      if (item.state === "active") {
+        if (activeIds.has(item.acceptance_id)) add(errors, itemPath, "only one revision per acceptance_id may be active");
+        activeIds.add(item.acceptance_id);
+      }
+      if (item.identity !== acceptanceIdentity(document.ticket_id, item)) {
+        add(errors, `${itemPath}.identity`, "does not match canonical immutable Acceptance revision content");
+      }
+    });
+    for (const [acceptanceId, revisions] of revisionsById) {
+      const sorted = [...revisions].sort((left, right) => left - right);
+      sorted.forEach((revision, index) => {
+        if (revision !== index + 1) add(errors, `${path}.acceptance`, `${acceptanceId} revisions must be contiguous from 1`);
+      });
+    }
+    for (const item of document.acceptance) {
+      for (const reference of item.derived_from ?? []) {
+        const source = byKey.get(acceptanceRevisionKey(reference));
+        if (!source) add(errors, `${path}.acceptance`, `derived_from references missing revision ${acceptanceRevisionKey(reference)}`);
+        else {
+          if (source.acceptance_id === item.acceptance_id) {
+            add(errors, `${path}.acceptance`, "derived_from is only for split or merge across logical Acceptance IDs");
+          }
+          if (source.state !== "retired") add(errors, `${path}.acceptance`, `derived_from source ${acceptanceRevisionKey(reference)} must be retired`);
+        }
+      }
+    }
+    if (!Number.isInteger(document.active_contract_revision) || document.active_contract_revision < 1) {
+      add(errors, `${path}.active_contract_revision`, "must be a positive integer");
+    }
+    if (!Array.isArray(document.contract_revisions) || document.contract_revisions.length === 0) {
+      add(errors, `${path}.contract_revisions`, "must contain at least one Contract revision");
+    } else {
+      const contractNumbers = new Set();
+      document.contract_revisions.forEach((contract, index) => {
+        const contractPath = `${path}.contract_revisions[${index}]`;
+        if (!strictKeys(errors, contract, new Set(["revision", "identity", "acceptance_revisions"]), contractPath)) return;
+        if (!Number.isInteger(contract.revision) || contract.revision < 1) add(errors, `${contractPath}.revision`, "must be a positive integer");
+        if (contractNumbers.has(contract.revision)) add(errors, `${contractPath}.revision`, "must be unique");
+        contractNumbers.add(contract.revision);
+        requiredString(errors, contract, "identity", contractPath);
+        if (!REVISION_IDENTITY.test(contract.identity ?? "")) add(errors, `${contractPath}.identity`, "must be sha256:<64-lowercase-hex>");
+        if (!Array.isArray(contract.acceptance_revisions)) add(errors, `${contractPath}.acceptance_revisions`, "must be an array");
+        else {
+          const members = new Set();
+          contract.acceptance_revisions.forEach((reference, referenceIndex) => {
+            const referencePath = `${contractPath}.acceptance_revisions[${referenceIndex}]`;
+            if (!strictKeys(errors, reference, new Set(["acceptance_id", "revision", "identity"]), referencePath)) return;
+            requiredString(errors, reference, "acceptance_id", referencePath, { id: true });
+            if (!Number.isInteger(reference.revision) || reference.revision < 1) add(errors, `${referencePath}.revision`, "must be a positive integer");
+            if (!REVISION_IDENTITY.test(reference.identity ?? "")) add(errors, `${referencePath}.identity`, "must be sha256:<64-lowercase-hex>");
+            const key = acceptanceRevisionKey(reference);
+            if (members.has(key)) add(errors, referencePath, "must be unique within one Contract revision");
+            members.add(key);
+            const acceptance = byKey.get(key);
+            if (!acceptance) add(errors, referencePath, `references missing Acceptance revision ${key}`);
+            else if (acceptance.identity !== reference.identity) add(errors, `${referencePath}.identity`, `does not match Acceptance revision ${key}`);
+          });
+        }
+        if (contract.identity !== contractIdentity(document.ticket_id, contract)) {
+          add(errors, `${contractPath}.identity`, "does not match canonical immutable Contract revision content");
+        }
+      });
+      const sorted = [...contractNumbers].sort((left, right) => left - right);
+      sorted.forEach((revision, index) => {
+        if (revision !== index + 1) add(errors, `${path}.contract_revisions`, "Contract revisions must be contiguous from 1");
+      });
+      if (document.active_contract_revision !== Math.max(...contractNumbers)) {
+        add(errors, `${path}.active_contract_revision`, "must select the latest Contract revision; reversion appends a new revision");
+      }
+      const active = document.contract_revisions.find((contract) => contract.revision === document.active_contract_revision);
+      const expected = buildContractRevision(document.ticket_id, document.active_contract_revision, document.acceptance);
+      if (active && JSON.stringify(stable(active.acceptance_revisions)) !== JSON.stringify(stable(expected.acceptance_revisions))) {
+        add(errors, `${path}.active_contract_revision`, "active Contract membership must equal the exact active Acceptance revisions");
+      }
+    }
   }
   stringArray(errors, document.constraints, `${path}.constraints`);
   if (!Array.isArray(document.context_refs)) add(errors, `${path}.context_refs`, "must be an array");
@@ -951,6 +1547,14 @@ function validateTicket(document, path = "ticket") {
   return errors;
 }
 
+function validateUnresolvedBinding(errors, unresolved, path) {
+  if (!strictKeys(errors, unresolved, new Set(["reason", "attempted_refs"]), path)) return;
+  if (!["missing-history", "ambiguous-history"].includes(unresolved.reason)) {
+    add(errors, `${path}.reason`, "must equal missing-history or ambiguous-history");
+  }
+  stringArray(errors, unresolved.attempted_refs, `${path}.attempted_refs`, { nonEmpty: true });
+}
+
 function validateEvidence(document, path = "evidence") {
   const errors = [];
   if (
@@ -963,6 +1567,10 @@ function validateEvidence(document, path = "evidence") {
         "evidence_id",
         "ticket_id",
         "acceptance_ids",
+        "binding_state",
+        "binding_origin",
+        "acceptance_revisions",
+        "unresolved",
         "summary",
         "refs",
         "origin",
@@ -971,11 +1579,44 @@ function validateEvidence(document, path = "evidence") {
       path,
     )
   ) return errors;
-  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (document.schema_version !== CURRENT_EVIDENCE_SCHEMA) {
+    add(errors, `${path}.schema_version`, `must equal ${CURRENT_EVIDENCE_SCHEMA}`);
+  }
   if (document.kind !== "ticket_evidence") add(errors, `${path}.kind`, "must equal ticket_evidence");
   requiredString(errors, document, "evidence_id", path, { id: true });
   requiredString(errors, document, "ticket_id", path, { id: true });
   stringArray(errors, document.acceptance_ids, `${path}.acceptance_ids`, { nonEmpty: true, ids: true });
+  if (!REVISION_BINDING_STATES.has(document.binding_state)) {
+    add(errors, `${path}.binding_state`, "must equal bound, legacy-pending-reconstruction, or legacy-unresolved");
+  }
+  if (document.binding_state === "bound") {
+    if (!REVISION_BINDING_ORIGINS.has(document.binding_origin)) {
+      add(errors, `${path}.binding_origin`, "must equal native or reconstructed");
+    }
+    if (!Array.isArray(document.acceptance_revisions) || document.acceptance_revisions.length === 0) {
+      add(errors, `${path}.acceptance_revisions`, "must be a non-empty array for bound Evidence");
+    } else {
+      const ids = new Set();
+      document.acceptance_revisions.forEach((reference, index) => {
+        const referencePath = `${path}.acceptance_revisions[${index}]`;
+        if (!strictKeys(errors, reference, new Set(["acceptance_id", "revision", "identity"]), referencePath)) return;
+        requiredString(errors, reference, "acceptance_id", referencePath, { id: true });
+        if (!Number.isInteger(reference.revision) || reference.revision < 1) add(errors, `${referencePath}.revision`, "must be a positive integer");
+        if (!REVISION_IDENTITY.test(reference.identity ?? "")) add(errors, `${referencePath}.identity`, "must be sha256:<64-lowercase-hex>");
+        if (ids.has(reference.acceptance_id)) add(errors, `${referencePath}.acceptance_id`, "must be unique");
+        ids.add(reference.acceptance_id);
+      });
+      if (JSON.stringify([...ids].sort()) !== JSON.stringify([...document.acceptance_ids].sort())) {
+        add(errors, `${path}.acceptance_revisions`, "must bind exactly the asserted acceptance_ids");
+      }
+    }
+    if (document.unresolved !== undefined) add(errors, `${path}.unresolved`, "is forbidden for bound Evidence");
+  } else {
+    if (document.binding_origin !== undefined) add(errors, `${path}.binding_origin`, "is allowed only for bound Evidence");
+    if (document.acceptance_revisions !== undefined) add(errors, `${path}.acceptance_revisions`, "is allowed only for bound Evidence");
+    if (document.binding_state === "legacy-unresolved") validateUnresolvedBinding(errors, document.unresolved, `${path}.unresolved`);
+    else if (document.unresolved !== undefined) add(errors, `${path}.unresolved`, "is allowed only for legacy-unresolved Evidence");
+  }
   requiredString(errors, document, "summary", path);
   stringArray(errors, document.refs, `${path}.refs`, { nonEmpty: true });
   if (document.origin !== undefined && !EVIDENCE_ORIGINS.has(document.origin)) {
@@ -1000,7 +1641,12 @@ function validateOutcome(document, path = "outcome") {
       new Set([
         "schema_version",
         "kind",
+        "outcome_id",
         "ticket_id",
+        "binding_state",
+        "binding_origin",
+        "contract_revision",
+        "unresolved",
         "status",
         "accepted_acceptance_ids",
         "unresolved_acceptance_ids",
@@ -1012,9 +1658,42 @@ function validateOutcome(document, path = "outcome") {
       path,
     )
   ) return errors;
-  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (document.schema_version !== CURRENT_OUTCOME_SCHEMA) {
+    add(errors, `${path}.schema_version`, `must equal ${CURRENT_OUTCOME_SCHEMA}`);
+  }
   if (document.kind !== "ticket_outcome") add(errors, `${path}.kind`, "must equal ticket_outcome");
+  requiredString(errors, document, "outcome_id", path, { id: true });
   requiredString(errors, document, "ticket_id", path, { id: true });
+  if (!REVISION_BINDING_STATES.has(document.binding_state)) {
+    add(errors, `${path}.binding_state`, "must equal bound, legacy-pending-reconstruction, or legacy-unresolved");
+  }
+  if (document.binding_state === "bound") {
+    if (!REVISION_BINDING_ORIGINS.has(document.binding_origin)) add(errors, `${path}.binding_origin`, "must equal native or reconstructed");
+    if (!strictKeys(errors, document.contract_revision, new Set(["revision", "identity"]), `${path}.contract_revision`)) {
+      // strictKeys records the shape error.
+    } else {
+      if (!Number.isInteger(document.contract_revision.revision) || document.contract_revision.revision < 1) {
+        add(errors, `${path}.contract_revision.revision`, "must be a positive integer");
+      }
+      if (!REVISION_IDENTITY.test(document.contract_revision.identity ?? "")) {
+        add(errors, `${path}.contract_revision.identity`, "must be sha256:<64-lowercase-hex>");
+      }
+      if (document.outcome_id !== `contract-v${document.contract_revision.revision}`) {
+        add(errors, `${path}.outcome_id`, "must equal contract-v<bound-revision>");
+      }
+    }
+    if (document.unresolved !== undefined) add(errors, `${path}.unresolved`, "is forbidden for bound Outcome");
+  } else {
+    if (document.binding_origin !== undefined) add(errors, `${path}.binding_origin`, "is allowed only for bound Outcome");
+    if (document.contract_revision !== undefined) add(errors, `${path}.contract_revision`, "is allowed only for bound Outcome");
+    if (document.binding_state === "legacy-pending-reconstruction") {
+      if (document.outcome_id !== "legacy-pending") add(errors, `${path}.outcome_id`, "must equal legacy-pending while reconstruction is pending");
+      if (document.unresolved !== undefined) add(errors, `${path}.unresolved`, "is allowed only for legacy-unresolved Outcome");
+    } else {
+      if (document.outcome_id !== "legacy-unresolved") add(errors, `${path}.outcome_id`, "must equal legacy-unresolved when reconstruction failed");
+      validateUnresolvedBinding(errors, document.unresolved, `${path}.unresolved`);
+    }
+  }
   if (!OUTCOME_STATUSES.has(document.status)) add(errors, `${path}.status`, "is not supported");
   stringArray(errors, document.accepted_acceptance_ids, `${path}.accepted_acceptance_ids`, { ids: true });
   stringArray(errors, document.unresolved_acceptance_ids, `${path}.unresolved_acceptance_ids`, { ids: true });
@@ -1061,6 +1740,67 @@ function loadMap(files, idField, validator, label) {
     }
   }
   return { documents, errors };
+}
+
+function loadOutcomes(path) {
+  const history = new Map();
+  const byTicket = new Map();
+  const errors = [];
+  for (const file of nestedYamlFiles(path)) {
+    let document;
+    try {
+      document = readDocument(file);
+    } catch (error) {
+      add(errors, file, error instanceof Error ? error.message : String(error));
+      continue;
+    }
+    errors.push(...validateOutcome(document, file));
+    if (typeof document?.ticket_id !== "string" || typeof document?.outcome_id !== "string") continue;
+    const key = `${document.ticket_id}:${document.outcome_id}`;
+    if (history.has(key)) add(errors, file, `duplicate Outcome identity: ${key}`);
+    else history.set(key, { document, path: file });
+    const entries = byTicket.get(document.ticket_id) ?? [];
+    entries.push({ document, path: file });
+    byTicket.set(document.ticket_id, entries);
+    const expected = document.binding_state === "bound"
+      ? join(path, document.ticket_id, `${document.outcome_id}.yaml`)
+      : join(path, `${document.ticket_id}.yaml`);
+    if (file !== expected) add(errors, file, `Outcome path must be ${expected}`);
+  }
+  for (const entries of byTicket.values()) {
+    entries.sort((left, right) => {
+      const leftRevision = left.document.contract_revision?.revision ?? 0;
+      const rightRevision = right.document.contract_revision?.revision ?? 0;
+      return leftRevision - rightRevision || left.document.outcome_id.localeCompare(right.document.outcome_id);
+    });
+  }
+  const documents = new Map();
+  for (const [ticketId, entries] of byTicket) {
+    const latest = [...entries].reverse().find(({ document }) => document.binding_state === "bound")
+      ?? entries.at(-1);
+    if (latest) documents.set(ticketId, latest);
+  }
+  return { documents, history, byTicket, errors };
+}
+
+export function outcomeDocuments(repository) {
+  if (repository.outcomes.history) return documents(repository.outcomes.history);
+  return documents(repository.outcomes.documents);
+}
+
+export function outcomesForTicket(repository, ticketId) {
+  if (repository.outcomes.byTicket) {
+    return (repository.outcomes.byTicket.get(ticketId) ?? []).map((entry) => entry.document);
+  }
+  const document = repository.outcomes.documents.get(ticketId)?.document;
+  return document ? [document] : [];
+}
+
+export function currentOutcome(repository, ticket) {
+  const contract = activeContract(ticket);
+  if (!contract) return null;
+  return outcomesForTicket(repository, ticket.ticket_id)
+    .find((outcome) => outcomeBindsContract(outcome, contract)) ?? null;
 }
 
 const ROOM_FILE = "room.yaml";
@@ -1162,7 +1902,7 @@ export function loadRepository(repo, overrides = {}) {
   }
   const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
-  const outcomes = loadMap(yamlFiles(paths.outcomes), "ticket_id", validateOutcome, "Outcome");
+  const outcomes = loadOutcomes(paths.outcomes);
   for (const document of overrides.contexts ?? []) {
     contexts.documents.set(document.context_id, { document, path: `<candidate:${document.context_id}>` });
   }
@@ -1173,7 +1913,14 @@ export function loadRepository(repo, overrides = {}) {
     evidence.documents.set(document.evidence_id, { document, path: `<candidate:${document.evidence_id}>` });
   }
   for (const document of overrides.outcomes ?? []) {
-    outcomes.documents.set(document.ticket_id, { document, path: `<candidate:${document.ticket_id}>` });
+    const key = `${document.ticket_id}:${document.outcome_id}`;
+    const entry = { document, path: `<candidate:${key}>` };
+    outcomes.history.set(key, entry);
+    const entries = (outcomes.byTicket.get(document.ticket_id) ?? [])
+      .filter((item) => item.document.outcome_id !== document.outcome_id);
+    entries.push(entry);
+    outcomes.byTicket.set(document.ticket_id, entries);
+    outcomes.documents.set(document.ticket_id, entry);
   }
   const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
   for (const { document, path } of contexts.documents.values()) {
@@ -1206,18 +1953,49 @@ export function loadRepository(repo, overrides = {}) {
       add(errors, path, `Evidence references missing Ticket: ${document.ticket_id}`);
       continue;
     }
-    const acceptance = new Set(ticket.acceptance.map((item) => item.acceptance_id));
-    for (const id of document.acceptance_ids) {
-      if (!acceptance.has(id)) add(errors, path, `Evidence references missing acceptance: ${id}`);
+    if (document.binding_state === "legacy-pending-reconstruction") {
+      if (ticket.revision_state !== "legacy-pending-reconstruction"
+        || !ticket.provenance_refs.includes(PROOF_REVISION_PENDING_REF)) {
+        add(errors, path, "Pending Evidence requires the owning Ticket's matching semantic-pending ref");
+      }
+      continue;
+    }
+    if (document.binding_state === "legacy-unresolved") continue;
+    if (document.binding_state !== "bound" || !Array.isArray(document.acceptance_revisions)) continue;
+    const acceptance = new Map(ticket.acceptance.map((item) => [acceptanceRevisionKey(item), item]));
+    for (const reference of document.acceptance_revisions) {
+      const item = acceptance.get(acceptanceRevisionKey(reference));
+      if (!item) add(errors, path, `Evidence references missing Acceptance revision: ${acceptanceRevisionKey(reference)}`);
+      else if (item.identity !== reference.identity) add(errors, path, `Evidence identity does not match Acceptance revision: ${acceptanceRevisionKey(reference)}`);
     }
   }
-  for (const { document, path } of outcomes.documents.values()) {
+  const outcomeContracts = new Set();
+  for (const { document, path } of outcomes.history.values()) {
     const ticket = tickets.documents.get(document.ticket_id)?.document;
     if (!ticket) {
       add(errors, path, `Outcome references missing Ticket: ${document.ticket_id}`);
       continue;
     }
-    const acceptance = new Set(ticket.acceptance.map((item) => item.acceptance_id));
+    if (document.binding_state === "legacy-pending-reconstruction") {
+      if (ticket.revision_state !== "legacy-pending-reconstruction"
+        || !ticket.provenance_refs.includes(PROOF_REVISION_PENDING_REF)) {
+        add(errors, path, "Pending Outcome requires the owning Ticket's matching semantic-pending ref");
+      }
+      continue;
+    }
+    if (document.binding_state === "legacy-unresolved") continue;
+    if (document.binding_state !== "bound" || !document.contract_revision
+      || !Array.isArray(ticket.contract_revisions)) continue;
+    const contract = ticket.contract_revisions.find((item) =>
+      item.revision === document.contract_revision.revision);
+    if (!contract || contract.identity !== document.contract_revision.identity) {
+      add(errors, path, `Outcome references missing or mismatched Contract revision: v${document.contract_revision.revision}`);
+      continue;
+    }
+    const outcomeContractKey = `${document.ticket_id}@${document.contract_revision.revision}`;
+    if (outcomeContracts.has(outcomeContractKey)) add(errors, path, `Only one Outcome may adjudicate ${outcomeContractKey}`);
+    outcomeContracts.add(outcomeContractKey);
+    const acceptance = new Set(contract.acceptance_revisions.map((item) => item.acceptance_id));
     const accepted = new Set(document.accepted_acceptance_ids);
     const unresolved = new Set(document.unresolved_acceptance_ids);
     for (const id of accepted) if (!acceptance.has(id)) add(errors, path, `Outcome accepts missing acceptance: ${id}`);
@@ -1241,10 +2019,30 @@ export function loadRepository(repo, overrides = {}) {
       if (supportingEvidence.length === 0) {
         add(errors, path, `Accepted criterion has no referenced Evidence: ${id}`);
       }
-      const criterion = ticket.acceptance.find((item) => item.acceptance_id === id);
+      const contractReference = contract.acceptance_revisions.find((item) => item.acceptance_id === id);
+      const criterion = ticket.acceptance.find((item) =>
+        item.acceptance_id === contractReference?.acceptance_id
+        && item.revision === contractReference?.revision);
+      const exactSupportingEvidence = supportingEvidence.filter((supporting) => {
+        const reference = evidenceBoundReferenceMap(supporting).get(id);
+        return reference
+          && reference.revision === contractReference?.revision
+          && reference.identity === contractReference?.identity;
+      });
+      // Native closeout is born under the revision-aware contract, so every
+      // support it selects must be exact. Reconstructed closeout preserves its
+      // immutable legacy evidence_ids even when they include older supporting
+      // material; those refs stay readable but do not become revision credit.
+      if (document.binding_origin === "native") {
+        for (const supporting of supportingEvidence) {
+          if (!exactSupportingEvidence.includes(supporting)) {
+            add(errors, path, `Referenced Evidence does not bind accepted revision: ${id}`);
+          }
+        }
+      }
       if ((criterion?.authority ?? "agent") === "human"
-        && !supportingEvidence.some((item) => (item.origin ?? "agent") === "human")) {
-        add(errors, path, `Human-authority criterion has no referenced human-origin Evidence: ${id}`);
+        && !exactSupportingEvidence.some((item) => (item.origin ?? "agent") === "human")) {
+        add(errors, path, `Human-authority criterion has no exact referenced human-origin Evidence: ${id}`);
       }
     }
   }
@@ -1357,11 +2155,14 @@ function contextOperation(operation, repo, input, options = {}) {
 }
 
 export function ticketStatus(repository, ticket) {
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
+  const outcome = currentOutcome(repository, ticket);
   if (outcome?.status === "successful") return "DONE";
   const blocking = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
+    .filter((id) => {
+      const prerequisite = repository.tickets.documents.get(id)?.document;
+      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
+    });
   if (blocking.length > 0) return "BLOCKED";
   // A draft can never become READY: it surfaces as REFINE until planning
   // rewrites its acceptance for real and marks the Ticket firm.
@@ -1377,8 +2178,19 @@ function evidenceOrigin(evidence) {
 }
 
 export function ticketNextAction(repository, ticket) {
-  const acceptanceIds = ticket.acceptance.map((criterion) => criterion.acceptance_id);
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  if (ticket.revision_state === "legacy-pending-reconstruction") {
+    return {
+      action: "WAIT",
+      reason: "semantic_migration_pending",
+      detail: "Legacy proof revision reconstruction must finish in this worktree before revision-bound Ticket work continues.",
+      acceptance_ids: ticket.acceptance.map((criterion) => criterion.acceptance_id),
+      blocking_ticket_ids: [],
+    };
+  }
+  const currentAcceptance = activeAcceptance(ticket);
+  const acceptanceIds = currentAcceptance.map((criterion) => criterion.acceptance_id);
+  const activeReferences = activeAcceptanceReferenceMap(ticket);
+  const outcome = currentOutcome(repository, ticket);
   if (outcome?.status === "successful") {
     return {
       action: "DONE",
@@ -1400,7 +2212,10 @@ export function ticketNextAction(repository, ticket) {
 
   const blockingTicketIds = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful")
+    .filter((id) => {
+      const prerequisite = repository.tickets.documents.get(id)?.document;
+      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
+    })
     .sort();
   if (blockingTicketIds.length > 0) {
     return {
@@ -1423,12 +2238,20 @@ export function ticketNextAction(repository, ticket) {
   }
 
   const ticketEvidence = documents(repository.evidence.documents)
-    .filter((evidence) => evidence.ticket_id === ticket.ticket_id);
-  const evidencedIds = new Set(ticketEvidence.flatMap((evidence) => evidence.acceptance_ids));
+    .filter((evidence) => evidence.ticket_id === ticket.ticket_id && evidence.binding_state === "bound");
+  const coversActive = (evidence, acceptanceId) => {
+    const expected = activeReferences.get(acceptanceId);
+    const actual = evidenceBoundReferenceMap(evidence).get(acceptanceId);
+    return expected && actual
+      && expected.revision === actual.revision
+      && expected.identity === actual.identity;
+  };
+  const evidencedIds = new Set(acceptanceIds.filter((acceptanceId) =>
+    ticketEvidence.some((evidence) => coversActive(evidence, acceptanceId))));
   const humanEvidencedIds = new Set(ticketEvidence
     .filter((evidence) => evidenceOrigin(evidence) === "human")
-    .flatMap((evidence) => evidence.acceptance_ids));
-  const missingHumanIds = ticket.acceptance
+    .flatMap((evidence) => evidence.acceptance_ids.filter((acceptanceId) => coversActive(evidence, acceptanceId))));
+  const missingHumanIds = currentAcceptance
     .filter((criterion) => acceptanceAuthority(criterion) === "human"
       && !humanEvidencedIds.has(criterion.acceptance_id))
     .map((criterion) => criterion.acceptance_id);
@@ -1442,7 +2265,7 @@ export function ticketNextAction(repository, ticket) {
     };
   }
 
-  const missingEvidenceIds = ticket.acceptance
+  const missingEvidenceIds = currentAcceptance
     .filter((criterion) => !evidencedIds.has(criterion.acceptance_id))
     .map((criterion) => criterion.acceptance_id);
   if (missingEvidenceIds.length === 0) {
@@ -1465,7 +2288,7 @@ export function ticketNextAction(repository, ticket) {
 
 export function ticketArchived(repository, ticket) {
   if (!ticket) return false;
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
+  const outcome = currentOutcome(repository, ticket);
   return outcome?.status === "successful"
     && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
 }
@@ -1483,6 +2306,7 @@ export function candidateDependencyAdvice(currentRepository, candidateRepository
       if (existingEdges.has(ticketDependencyKey(relation))) return;
       const target = candidateRepository.tickets.documents.get(relation.target_ticket_id)?.document;
       if (!target || ticketStatus(candidateRepository, target) !== "DONE") return;
+      const targetOutcome = currentOutcome(candidateRepository, target);
       advice.push({
         code: DEPENDENCY_HYGIENE.candidate_done_dependency.advice_code,
         level: DEPENDENCY_HYGIENE.candidate_done_dependency.level,
@@ -1495,7 +2319,9 @@ export function candidateDependencyAdvice(currentRepository, candidateRepository
         message: DEPENDENCY_HYGIENE.candidate_done_dependency.instruction,
         suggested_context_refs: [
           `.vibehub/tickets/${relation.target_ticket_id}.yaml`,
-          `.vibehub/outcomes/${relation.target_ticket_id}.yaml`,
+          targetOutcome?.binding_state === "bound"
+            ? `.vibehub/outcomes/${relation.target_ticket_id}/${targetOutcome.outcome_id}.yaml`
+            : `.vibehub/outcomes/${relation.target_ticket_id}.yaml`,
         ],
       });
     });
@@ -1626,7 +2452,122 @@ export function projectTicketQuery(repository, options = {}) {
   return { filters, tickets, relations, stubs };
 }
 
+function immutableAcceptanceRevision(item) {
+  return {
+    acceptance_id: item.acceptance_id,
+    revision: item.revision,
+    identity: item.identity,
+    criterion: item.criterion,
+    authority: item.authority ?? "agent",
+    derived_from: item.derived_from ?? [],
+  };
+}
+
+function validateTicketMutation(existing, candidate, path = "ticket") {
+  const errors = [];
+  if (!existing) return errors;
+  if (existing.revision_state === "legacy-pending-reconstruction") {
+    add(errors, path, "legacy-pending Ticket must finish project migrate-proof-revisions before ticket apply");
+    return errors;
+  }
+  if (candidate.revision_state !== "bound") {
+    add(errors, `${path}.revision_state`, "ordinary ticket apply cannot create a legacy migration state");
+    return errors;
+  }
+  const candidateAcceptance = new Map(candidate.acceptance.map((item) => [acceptanceRevisionKey(item), item]));
+  for (const prior of existing.acceptance) {
+    const current = candidateAcceptance.get(acceptanceRevisionKey(prior));
+    if (!current) {
+      add(errors, `${path}.acceptance`, `cannot delete historical Acceptance revision ${acceptanceRevisionKey(prior)}`);
+    } else if (JSON.stringify(stable(immutableAcceptanceRevision(current)))
+      !== JSON.stringify(stable(immutableAcceptanceRevision(prior)))) {
+      add(errors, `${path}.acceptance`, `cannot mutate immutable Acceptance revision ${acceptanceRevisionKey(prior)}; append a revision instead`);
+    }
+  }
+  const priorContracts = new Map(existing.contract_revisions.map((item) => [item.revision, item]));
+  const candidateContracts = new Map(candidate.contract_revisions.map((item) => [item.revision, item]));
+  for (const [revision, prior] of priorContracts) {
+    const current = candidateContracts.get(revision);
+    if (!current) add(errors, `${path}.contract_revisions`, `cannot delete historical Contract revision v${revision}`);
+    else if (JSON.stringify(stable(current)) !== JSON.stringify(stable(prior))) {
+      add(errors, `${path}.contract_revisions`, `cannot mutate immutable Contract revision v${revision}; append a revision instead`);
+    }
+  }
+  if (candidate.active_contract_revision < existing.active_contract_revision
+    || candidate.active_contract_revision > existing.active_contract_revision + 1) {
+    add(errors, `${path}.active_contract_revision`, "one ticket apply may retain the active Contract or append exactly its next revision");
+  }
+  const acceptanceGroups = new Map();
+  for (const item of candidate.acceptance) {
+    const items = acceptanceGroups.get(item.acceptance_id) ?? [];
+    items.push(item);
+    acceptanceGroups.set(item.acceptance_id, items);
+  }
+  for (const [acceptanceId, items] of acceptanceGroups) {
+    const seenSemantics = new Set();
+    for (const item of items) {
+      const semantic = semanticDigest({
+        acceptance_id: acceptanceId,
+        criterion: item.criterion,
+        authority: item.authority ?? "agent",
+        derived_from: item.derived_from ?? [],
+      });
+      if (seenSemantics.has(semantic)) {
+        add(errors, `${path}.acceptance`, `${acceptanceId} repeats identical contract semantics; presentation-only edits must not append a revision`);
+      }
+      seenSemantics.add(semantic);
+    }
+  }
+  for (let index = 1; index < candidate.contract_revisions.length; index += 1) {
+    if (contractMembershipKey(candidate.contract_revisions[index - 1].acceptance_revisions)
+      === contractMembershipKey(candidate.contract_revisions[index].acceptance_revisions)) {
+      add(errors, `${path}.contract_revisions[${index}]`, "must change exact Acceptance revision membership from the preceding Contract revision");
+    }
+  }
+  return errors;
+}
+
 function ticketOperation(operation, repo, input, options = {}) {
+  if (operation === "revise") {
+    assertCurrentProjectFormat(repo);
+    if (typeof input.ticket_id !== "string" || !ID.test(input.ticket_id)) {
+      throw new VibeHubError("invalid_input", "ticket revise needs a valid ticket_id");
+    }
+    if (typeof input.validation !== "object" || input.validation === null
+      || typeof input.validation.independent !== "boolean") {
+      throw new VibeHubError("missing_validation_declaration", "ticket revise needs the same validation declaration as ticket apply");
+    }
+    const currentRepository = loadRepository(repo);
+    assertValid(currentRepository.errors);
+    const existing = currentRepository.tickets.documents.get(input.ticket_id)?.document;
+    if (!existing) throw new VibeHubError("not_found", `Ticket not found: ${input.ticket_id}`);
+    let candidate;
+    try {
+      candidate = appendTicketContractRevision(existing, input.mutation ?? {});
+    } catch (error) {
+      throw new VibeHubError("invalid_input", error instanceof Error ? error.message : String(error));
+    }
+    const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
+    candidate.provenance_refs = [
+      ...(candidate.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:")),
+      validationRef,
+    ];
+    const errors = [
+      ...validateTicket(candidate, "ticket"),
+      ...validateTicketMutation(existing, candidate, "ticket"),
+    ];
+    assertValid(errors, "Ticket revision is invalid");
+    const repository = loadRepository(repo, { tickets: [candidate] });
+    assertValid(repository.errors);
+    const path = join(repository.paths.tickets, `${candidate.ticket_id}.yaml`);
+    writeDocument(path, candidate);
+    return {
+      status: "written",
+      ticket_id: candidate.ticket_id,
+      active_contract_revision: candidate.active_contract_revision,
+      path,
+    };
+  }
   if (operation === "apply") {
     assertCurrentProjectFormat(repo);
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
@@ -1653,6 +2594,11 @@ function ticketOperation(operation, repo, input, options = {}) {
     assertValid(errors, "Ticket candidate is invalid");
     const currentRepository = loadRepository(repo);
     assertValid(currentRepository.errors);
+    for (const [index, ticket] of input.tickets.entries()) {
+      const existing = currentRepository.tickets.documents.get(ticket.ticket_id)?.document;
+      errors.push(...validateTicketMutation(existing, ticket, `tickets[${index}]`));
+    }
+    assertValid(errors, "Ticket candidate violates append-only revision history");
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
@@ -1678,6 +2624,9 @@ function ticketOperation(operation, repo, input, options = {}) {
   }
   if (operation === "evidence") {
     assertCurrentProjectFormat(repo);
+    if (input.binding_state !== "bound" || input.binding_origin !== "native") {
+      throw new VibeHubError("invalid_input", "ordinary ticket evidence must be a native exact revision binding");
+    }
     const errors = validateEvidence(input);
     assertValid(errors, "Evidence document is invalid");
     const repository = loadRepository(repo, { evidence: [input] });
@@ -1694,11 +2643,19 @@ function ticketOperation(operation, repo, input, options = {}) {
         `ticket closeout needs an independence declaration: {"independence":{"source":"<${[...INDEPENDENCE_SOURCES].join("|")}>","note":"..."}}. The closeout Agent must be independent from the executor; if no independent source is available, stop and report that rather than adjudicating your own work.`,
       );
     }
+    if (input.binding_state !== "bound" || input.binding_origin !== "native") {
+      throw new VibeHubError("invalid_input", "ordinary ticket closeout must be a native exact Contract revision binding");
+    }
     const errors = validateOutcome(input);
     assertValid(errors, "Outcome document is invalid");
+    const currentRepository = loadRepository(repo);
+    assertValid(currentRepository.errors);
+    if (currentRepository.outcomes.history.has(`${input.ticket_id}:${input.outcome_id}`)) {
+      throw new VibeHubError("invalid_state", `Outcome already exists for ${input.ticket_id} ${input.outcome_id}`);
+    }
     const repository = loadRepository(repo, { outcomes: [input] });
     assertValid(repository.errors);
-    const path = join(repository.paths.outcomes, `${input.ticket_id}.yaml`);
+    const path = join(repository.paths.outcomes, input.ticket_id, `${input.outcome_id}.yaml`);
     writeDocument(path, input);
     return { status: "written", ticket_id: input.ticket_id, outcome_status: input.status, path };
   }
@@ -1709,7 +2666,7 @@ function ticketOperation(operation, repo, input, options = {}) {
       valid: true,
       ticket_count: repository.tickets.documents.size,
       evidence_count: repository.evidence.documents.size,
-      outcome_count: repository.outcomes.documents.size,
+      outcome_count: outcomeDocuments(repository).length,
     };
   }
   if (operation === "get") {
@@ -1724,7 +2681,8 @@ function ticketOperation(operation, repo, input, options = {}) {
       status: ticketStatus(repository, item),
       next_action: ticketNextAction(repository, item),
       evidence: ticketEvidence,
-      outcome: repository.outcomes.documents.get(input.ticket_id)?.document ?? null,
+      outcome: currentOutcome(repository, item),
+      outcome_history: outcomesForTicket(repository, input.ticket_id),
     };
   }
   if (operation === "graph" || operation === "frontier") {
@@ -1738,8 +2696,12 @@ function ticketOperation(operation, repo, input, options = {}) {
       archived: ticketArchived(repository, ticket),
       blocking_ticket_ids: ticket.relations
         .map((relation) => relation.target_ticket_id)
-        .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful"),
-      outcome: repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null,
+        .filter((id) => {
+          const prerequisite = repository.tickets.documents.get(id)?.document;
+          return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
+        }),
+      outcome: currentOutcome(repository, ticket),
+      outcome_history: outcomesForTicket(repository, ticket.ticket_id),
     }));
     if (operation === "frontier") {
       const byAction = (action) => items
@@ -1905,6 +2867,7 @@ function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
   if (operation === "migrate-mechanical") return migrateMechanical(repo);
+  if (operation === "migrate-proof-revisions") return migrateProofRevisions(repo);
   if (operation === "validate") {
     const compatibility = assertCurrentProjectFormat(repo);
     const repository = loadRepository(repo);
@@ -1916,7 +2879,7 @@ function projectOperation(operation, repo) {
       contexts: repository.contexts.documents.size,
       tickets: repository.tickets.documents.size,
       evidence: repository.evidence.documents.size,
-      outcomes: repository.outcomes.documents.size,
+      outcomes: outcomeDocuments(repository).length,
     };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported project operation: ${operation}`);

@@ -24,6 +24,8 @@ Read `../vibehub-core/contracts/ticket-next-action.md`. Routine execution starts
 input or independent closeout.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
 UI launch mechanics.
+Read `../vibehub-core/contracts/revision-identity.md`. Evidence is proof for
+the exact active Acceptance revision, not for its logical ID in the abstract.
 
 ## Workflow
 
@@ -65,6 +67,11 @@ UI launch mechanics.
    ```text
    node ../vibehub-core/scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
    ```
+
+   A native Evidence document uses schema 2, `binding_state: bound`,
+   `binding_origin: native`, and copies each exact `acceptance_revisions`
+   reference from the current Ticket. Never copy an old revision forward or
+   emit either legacy migration state from this workflow.
 
 5. Read the exact Ticket back after Evidence is appended. If its host-derived
    `next_action.action` is `CLOSE_OUT`, hand the exact Ticket, current

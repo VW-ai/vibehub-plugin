@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "query-room-scope",
-      "criterion": "vh context query --room <path> returns only Context from that room's subtree including sub-rooms, errors on a missing room, and node --test covers both."
-    },
-    {
       "acceptance_id": "discovery-single-sourced",
-      "criterion": "The ticket lifecycle contract gains an execution-discovers-work event owned by vibehub-ticket-plan, the plan skill states the transition once, ticket-run hands discovered independently schedulable work to planning without restating the rule, and the lifecycle ownership test passes."
+      "criterion": "The ticket lifecycle contract gains an execution-discovers-work event owned by vibehub-ticket-plan, the plan skill states the transition once, ticket-run hands discovered independently schedulable work to planning without restating the rule, and the lifecycle ownership test passes.",
+      "identity": "sha256:4ef75e2bb157e680b71d957cb59718e0d652057743aebe00bfa61140bd03c06b",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "settlement-owned-moment",
-      "criterion": "ticket-run and ticket-closeout instruct delegating durable cross-ticket facts to the ingest skill into the room the ticket entered, in judgment-first wording with no background capture or new mechanics."
+      "acceptance_id": "query-room-scope",
+      "criterion": "vh context query --room <path> returns only Context from that room's subtree including sub-rooms, errors on a missing room, and node --test covers both.",
+      "identity": "sha256:994b7c038609d1e5d1173858ca1bd7467687380e2d4a581f8d6d9e62a13b998b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "retrieval-suite-green",
-      "criterion": "The full node --test suite and the plugin artifact verification pass."
+      "criterion": "The full node --test suite and the plugin artifact verification pass.",
+      "identity": "sha256:fa0b95024afd024436bc564a7c038c092c4397e335489ec5cdfd710b699977a8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "settlement-owned-moment",
+      "criterion": "ticket-run and ticket-closeout instruct delegating durable cross-ticket facts to the ingest skill into the room the ticket entered, in judgment-first wording with no background capture or new mechanics.",
+      "identity": "sha256:277ab38c6cfcdd461aab0f76072482e4f3e23bf5356f4e79ec4b19dce59b929b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Systematic transition logic lives only in the lifecycle contract and its owner skill; no skill restates another skill's transition.",
     "Skill additions stay to a few judgment-first lines; deterministic behavior goes in vh.mjs.",
@@ -35,6 +48,34 @@
     {
       "purpose": "Single home of lifecycle transitions being extended.",
       "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "discovery-single-sourced",
+          "identity": "sha256:4ef75e2bb157e680b71d957cb59718e0d652057743aebe00bfa61140bd03c06b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-room-scope",
+          "identity": "sha256:994b7c038609d1e5d1173858ca1bd7467687380e2d4a581f8d6d9e62a13b998b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retrieval-suite-green",
+          "identity": "sha256:fa0b95024afd024436bc564a7c038c092c4397e335489ec5cdfd710b699977a8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "settlement-owned-moment",
+          "identity": "sha256:277ab38c6cfcdd461aab0f76072482e4f3e23bf5356f4e79ec4b19dce59b929b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a48fd017a3f133ba01ff51ccb339cc735646f76941f2fdee40e6ac0f73e63b44",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -59,6 +100,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-room-retrieval-and-discovery"
 }

@@ -7,6 +7,40 @@
     "relations-and-provenance-have-visual-language",
     "read-only-boundary-remains-light"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "identity": "sha256:f24a32ae1d33610fad6dbf97d6e24e4f85efa472ec4b3cdaf4259b1bbb98e630",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "identity": "sha256:af2074788c31d95d195032e22dac58546a596795446fda2e2c82ce4dfbf8b0bb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "source-actions-are-mechanical-and-honest",
+      "identity": "sha256:14131af07ac05b0d6cf1c6c886ae2e4ef6ec690b913fa0d5f989a145bd47c4ca",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "identity": "sha256:43abad3fdc65d5e170fc24cd32c6d35d2f2d8278c6fa86a7508ab939c2993eea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "identity": "sha256:b5fe59bca4c77fc35364d18b648067726153146f05d9da62651db5ba85a92e84",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "actionable-static-graph-engineering",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T19:53:12.000Z",
@@ -22,7 +56,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "At commits 54e0592 and 55bf753, the freshly validated projection exposes one typed Agent payload per Git source, Ticket, canonical Context, source ref, Evidence, and Outcome; compact common copy icons; typed/countable Evidence references; expandable exact canonical Context; commit-pinned GitHub and local VS Code links; directional dependency objects; typed provenance; and a compact source dock. Real-browser review exercised the actual repository at desktop and 390x720, including Source Dock, Context expansion, long-proof progressive disclosure, copy confirmation, and narrow full-screen Inspector. npm test passed 9 of 9, full artifact verification passed 9 of 9 at 32 files and 223662 bytes, runtime logs were empty, and the host remains GET/HEAD-only, schema-validating, dependency-free, database/cache/daemon-free, and without opener or write endpoints.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "regression-suite-proves-identity-and-rollback-boundaries"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "regression-suite-proves-identity-and-rollback-boundaries",
+      "identity": "sha256:e8c28dfa2dd79418d3b4e4e66c43f6c50617ea38fc128a174d81e771bb1f7273",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "full-suite-and-artifact-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:14:04Z",
+  "refs": [
+    "test/revision-contract.test.mjs",
+    "test/proof-revision-migration.test.mjs",
+    "test/upgrade.test.mjs",
+    "test/skill-contracts.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:npm-test-191-tests-184-pass-zero-fail-seven-sandbox-skips",
+    "command:verify-artifact-67-files-3299557-bytes"
+  ],
+  "schema_version": 2,
+  "summary": "The complete repository suite passed 191 tests with 184 passes, zero failures, and seven sandbox-only loopback skips. A separate unrestricted artifact verification exercised the actual read-only loopback host and passed with a deterministic allowlisted 67-file, 3,299,557-byte artifact. Focused suites cover identity boundaries, lineage, multiple revisions, human authority, Git reconstruction ambiguity, idempotence, rollback, lifecycle projection, installed-host parity, and deterministic reproduction.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

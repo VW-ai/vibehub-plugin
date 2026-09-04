@@ -15,7 +15,7 @@ import { root, run, tempRepo } from "./helpers.mjs";
 const marker = {
   schema_version: 1,
   kind: "vibehub_project",
-  format_version: 3,
+  format_version: 4,
 };
 
 function markerPath(repo) {
@@ -26,7 +26,7 @@ test("project init writes the canonical format marker and compatibility is curre
   const repo = tempRepo("project-format-current");
   const initialized = run(repo, "project", "init");
   assert.equal(initialized.status, 0, initialized.stdout);
-  assert.equal(initialized.envelope.data.format_version, 3);
+  assert.equal(initialized.envelope.data.format_version, 4);
   assert.deepEqual(JSON.parse(readFileSync(markerPath(repo), "utf8")), marker);
 
   const compatibility = run(repo, "project", "compatibility");
@@ -37,9 +37,9 @@ test("project init writes the canonical format marker and compatibility is curre
       current: compatibility.envelope.data.current_format,
       target: compatibility.envelope.data.target_format,
     },
-    { state: "CURRENT", current: 3, target: 3 },
+    { state: "CURRENT", current: 4, target: 4 },
   );
-  assert.equal(run(repo, "project", "validate").envelope.data.format_version, 3);
+  assert.equal(run(repo, "project", "validate").envelope.data.format_version, 4);
 });
 
 test("unversioned 0.4 and 0.5 shapes require migration and every write gate refuses", () => {
@@ -91,26 +91,26 @@ test("malformed and unsupported-newer format markers fail read-only without muta
 
   const newer = tempRepo("project-format-newer");
   assert.equal(run(newer, "project", "init").status, 0);
-  const newerSource = `${JSON.stringify({ ...marker, format_version: 4 }, null, 2)}\n`;
+  const newerSource = `${JSON.stringify({ ...marker, format_version: 5 }, null, 2)}\n`;
   writeFileSync(markerPath(newer), newerSource);
   const compatibility = run(newer, "project", "compatibility");
   assert.equal(compatibility.status, 0);
   assert.equal(compatibility.envelope.data.state, "UNSUPPORTED_NEWER");
-  assert.equal(compatibility.envelope.data.current_format, 4);
-  assert.equal(compatibility.envelope.data.target_format, 3);
+  assert.equal(compatibility.envelope.data.current_format, 5);
+  assert.equal(compatibility.envelope.data.target_format, 4);
   const attemptedWrite = run(newer, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [] });
   assert.equal(attemptedWrite.envelope.error.code, "format_mismatch");
   assert.equal(readFileSync(markerPath(newer), "utf8"), newerSource);
 });
 
-test("an older format-2 helper rejects a format-3 project as unsupported newer", () => {
+test("an older format-3 helper rejects a format-4 project as unsupported newer", () => {
   const repo = tempRepo("project-format-old-helper");
   assert.equal(run(repo, "project", "init").status, 0);
   const oldCore = join(repo, "old-vibehub-core");
   cpSync(join(root, "skills", "vibehub-core"), oldCore, { recursive: true });
   const versionsPath = join(oldCore, "contracts", "versions.json");
   const versions = JSON.parse(readFileSync(versionsPath, "utf8"));
-  versions.project_format = 2;
+  versions.project_format = 3;
   writeFileSync(versionsPath, `${JSON.stringify(versions, null, 2)}\n`);
 
   const result = spawnSync(process.execPath, [
@@ -120,6 +120,6 @@ test("an older format-2 helper rejects a format-3 project as unsupported newer",
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.state, "UNSUPPORTED_NEWER");
-  assert.equal(envelope.data.current_format, 3);
-  assert.equal(envelope.data.target_format, 2);
+  assert.equal(envelope.data.current_format, 4);
+  assert.equal(envelope.data.target_format, 3);
 });

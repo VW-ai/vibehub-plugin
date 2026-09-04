@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "embedded-workbench-is-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "embedded-workbench-is-verified",
+      "identity": "sha256:205846ea04b834d60b5968d6902b72573acb6927324acd19d8c324d66c10b5e7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-workbench-scene-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +23,7 @@
     "artifact:54-files-568449-bytes",
     "validation:canonical-project-pass"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh verification passes for the static Ticket showcase: site ESLint, Vinext static production export, all eight rendered content and boundary contracts, the complete repository suite at 81 of 81, and the dependency-free Plugin artifact check at 54 files and 568449 bytes. The contracts require the one-statement arrival, first-screen real Ticket Graph, familiar request-to-Ticket composition, static Request/Context/Ticket/Evidence/Outcome explanation, complete typed Workbench semantics, responsive stacking, keyboard and clipboard access, fine-pointer hover gating, reduced-motion and forced-colors safeguards, and the absence of walkthrough controls or a parallel lifecycle state machine. Hosting remains a static Cloudflare-ready export and Plugin runtime boundaries are unchanged.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "canonical-cycle-is-visually-proven",
+      "criterion": "One coherent scenario visually demonstrates a human Request and existing long-term Context shaping one central Ticket, the Ticket producing acceptance-linked Evidence, an independent Outcome, and durable learning returning to Context; Request, Context, Evidence, and Outcome are visibly distinct object types rather than additional Tickets, every label matches current canonical semantics, and no generated placeholder such as signing, immutable attestation, priority, analytics, pricing, or account behavior is presented as product capability.",
+      "identity": "sha256:64fd7aabae46a9f411e370ce35729b1db7298ddc1bd15f26ad73ad8fd1d90474",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "causal-canvas-is-the-site-grammar",
-      "criterion": "The public site is composed as one responsive, content-first causal narrative: normal vertical scrolling leads from the product promise through the Ticket cycle, use cases, and documentation while the graph advances toward the lower right; no horizontal canvas travel, browser frame, iframe, or webpage-inside-webpage presentation contains the graph."
+      "criterion": "The public site is composed as one responsive, content-first causal narrative: normal vertical scrolling leads from the product promise through the Ticket cycle, use cases, and documentation while the graph advances toward the lower right; no horizontal canvas travel, browser frame, iframe, or webpage-inside-webpage presentation contains the graph.",
+      "identity": "sha256:60c76fe25b44d7464300cf9b6ea24cd85c915102712a610a643facabe49d7671",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "first-viewport-communicates-and-invites",
-      "criterion": "At a 1440px desktop viewport the first view presents the VibeHub identity, one concise product promise, the exact entry 'Start this with VibeHub.', an immediately legible causal Ticket path, and honest install/GitHub actions without requiring a visitor to scroll or decode schema terminology."
-    },
-    {
-      "acceptance_id": "canonical-cycle-is-visually-proven",
-      "criterion": "One coherent scenario visually demonstrates a human Request and existing long-term Context shaping one central Ticket, the Ticket producing acceptance-linked Evidence, an independent Outcome, and durable learning returning to Context; Request, Context, Evidence, and Outcome are visibly distinct object types rather than additional Tickets, every label matches current canonical semantics, and no generated placeholder such as signing, immutable attestation, priority, analytics, pricing, or account behavior is presented as product capability."
+      "criterion": "At a 1440px desktop viewport the first view presents the VibeHub identity, one concise product promise, the exact entry 'Start this with VibeHub.', an immediately legible causal Ticket path, and honest install/GitHub actions without requiring a visitor to scroll or decode schema terminology.",
+      "identity": "sha256:ff220ee87f5795f48417e26c21b2f801944aedaa0b23b8e6138e46d364ce34bb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "interaction-remains-spatial-and-accessible",
-      "criterion": "Pointer, keyboard, touch, narrow viewport, reduced-motion, and high-contrast behavior preserve causal orientation: visitors can move among graph regions, focus or select meaningful objects, and reveal progressive detail without trapping scrolling, hiding primary content, or relying on motion or color alone."
-    },
-    {
-      "acceptance_id": "visual-language-is-public-grade",
-      "criterion": "The site reaches the selected Causal Canvas direction with cool-neutral matte space, precise system and mono typography, restrained semantic color, deliberate Ticket shapes, icons, connector hierarchy, and generous whitespace; it avoids generic SaaS navigation, decorative card grids, gradient spectacle, warm editorial styling, and dense dashboard chrome."
+      "criterion": "Pointer, keyboard, touch, narrow viewport, reduced-motion, and high-contrast behavior preserve causal orientation: visitors can move among graph regions, focus or select meaningful objects, and reveal progressive detail without trapping scrolling, hiding primary content, or relying on motion or color alone.",
+      "identity": "sha256:6fc8991915af7a3903104035779351889081dd806e882293fbc5cc25fd5223aa",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "static-build-is-isolated-and-verifiable",
-      "criterion": "The complete website produces a documented Cloudflare-compatible static production build that the owner can deploy through an existing service; it remains isolated from the installed Plugin runtime and release artifact, uses no database, account system, hidden product state, or new VibeHub lifecycle, and repository plus Plugin artifact verification continue to pass."
+      "criterion": "The complete website produces a documented Cloudflare-compatible static production build that the owner can deploy through an existing service; it remains isolated from the installed Plugin runtime and release artifact, uses no database, account system, hidden product state, or new VibeHub lifecycle, and repository plus Plugin artifact verification continue to pass.",
+      "identity": "sha256:2d33b071d9eed92eec7daf2c6d98a182c0f6aeabf34b9b019d1d6648b054c18d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "visual-language-is-public-grade",
+      "criterion": "The site reaches the selected Causal Canvas direction with cool-neutral matte space, precise system and mono typography, restrained semantic color, deliberate Ticket shapes, icons, connector hierarchy, and generous whitespace; it avoids generic SaaS navigation, decorative card grids, gradient spectacle, warm editorial styling, and dense dashboard chrome.",
+      "identity": "sha256:500a5b6c52f2dee941ce3afa653e8b09eb824bab73fdc5a4016b9f5604aa30de",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Ship one coherent public-site deliverable; do not split design, implementation, animation, documentation, or deployment into ceremonial Tickets.",
     "Do not change the installed local Graph UI in this Ticket; record transferable design improvements only after the website proves them.",
@@ -96,6 +115,44 @@
       "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-cycle-is-visually-proven",
+          "identity": "sha256:64fd7aabae46a9f411e370ce35729b1db7298ddc1bd15f26ad73ad8fd1d90474",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "causal-canvas-is-the-site-grammar",
+          "identity": "sha256:60c76fe25b44d7464300cf9b6ea24cd85c915102712a610a643facabe49d7671",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "first-viewport-communicates-and-invites",
+          "identity": "sha256:ff220ee87f5795f48417e26c21b2f801944aedaa0b23b8e6138e46d364ce34bb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "interaction-remains-spatial-and-accessible",
+          "identity": "sha256:6fc8991915af7a3903104035779351889081dd806e882293fbc5cc25fd5223aa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "static-build-is-isolated-and-verifiable",
+          "identity": "sha256:2d33b071d9eed92eec7daf2c6d98a182c0f6aeabf34b9b019d1d6648b054c18d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-language-is-public-grade",
+          "identity": "sha256:500a5b6c52f2dee941ce3afa653e8b09eb824bab73fdc5a4016b9f5604aa30de",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:32166572b5d238f1b2a8de0ab5320998b72e42f1a2486fc6cf973d06450d42c4",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "kind": "pull_request",
@@ -113,6 +170,7 @@
     "context:constraint-ui-quiet-intelligence-standard"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-launch-public-causal-canvas-site"
 }

@@ -101,7 +101,7 @@ test("delivery schema requires an explicit array and enforces discriminated stat
   legacy.schema_version = 1;
   const rejectedLegacy = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [legacy] });
   assert.notEqual(rejectedLegacy.status, 0);
-  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 2/u);
+  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 3/u);
   const missing = ticket("missing-deliveries");
   delete missing.deliveries;
   assert.notEqual(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [missing] }).status, 0);
@@ -185,10 +185,18 @@ test("archive state table stays orthogonal to Outcome status, revert, and reopen
   ];
   cases.forEach(([status, deliveries, expected], index) => {
     const id = `case-${index}`;
+    const ticketDocument = { ...ticket(id), deliveries };
+    const contract = ticketDocument.contract_revisions[0];
     const repository = {
-      outcomes: { documents: new Map([[id, { document: { status } }]]) },
+      outcomes: { documents: new Map([[id, { document: {
+        ticket_id: id,
+        outcome_id: "contract-v1",
+        binding_state: "bound",
+        contract_revision: { revision: 1, identity: contract.identity },
+        status,
+      } }]]) },
     };
-    assert.equal(ticketArchived(repository, { ticket_id: id, deliveries }), expected);
+    assert.equal(ticketArchived(repository, ticketDocument), expected);
   });
   const reopened = ticket("reopened-fix");
   reopened.provenance_refs = ["reopens:old-history"];
@@ -216,7 +224,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
     recorded_at: at,
   });
   assert.notEqual(badEvidence.status, 0);
-  assert.match(JSON.stringify(badEvidence.envelope.error.details), /missing acceptance/);
+  assert.match(JSON.stringify(badEvidence.envelope.error.details), /acceptance_revisions|missing acceptance/);
 
   const evidence = run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -279,7 +287,7 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
 
   const contextOnly = ticket("context-only-consumer");
   contextOnly.context_refs = [{
-    ref: ".vibehub/outcomes/completed-baseline.yaml",
+    ref: ".vibehub/outcomes/completed-baseline/contract-v1.yaml",
     purpose: "Completed implementation baseline, not an execution unlock.",
   }];
   const contextApply = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [contextOnly] });
@@ -303,7 +311,7 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
     message: "Require an explicit causal rationale and review whether the completed target is still an exact input. Keep a justified historical dependency; otherwise replace the edge with an exact Ticket, Outcome, Evidence, Context, or source context_ref.",
     suggested_context_refs: [
       ".vibehub/tickets/completed-baseline.yaml",
-      ".vibehub/outcomes/completed-baseline.yaml",
+      ".vibehub/outcomes/completed-baseline/contract-v1.yaml",
     ],
   }]);
   assert.equal(

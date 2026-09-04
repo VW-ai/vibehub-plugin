@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "quiet-ui-integrated",
-      "criterion": "The shared Ticket review assets deliver the A · Quiet Workbench update with top-to-bottom causal flow, quiet cool-neutral styling, responsive keyboard-accessible graph and progressive inspector behavior, honest empty ImplementationPresence, persistent source truth, and no style selector."
-    },
-    {
       "acceptance_id": "current-main-ui-contracts-preserved",
-      "criterion": "The refreshed assets preserve current main's human-attention states, human acceptance-authority rendering, READY-gated Agent handoff, Rooms-facing context-card affordances, and direct Git-YAML read-only behavior without semantic inference."
-    },
-    {
-      "acceptance_id": "retained-host-git-is-safe",
-      "criterion": "Every Git command issued by the retained shared Node UI host disables repository-configured core.fsmonitor; a regression test opens and projects a repository with a malicious fsmonitor command and proves that command is never executed."
+      "criterion": "The refreshed assets preserve current main's human-attention states, human acceptance-authority rendering, READY-gated Agent handoff, Rooms-facing context-card affordances, and direct Git-YAML read-only behavior without semantic inference.",
+      "identity": "sha256:3f52bb7785a80b0a3570be7a9a5e7a5f03c0ea3737b9fe7ee16be796d5c93bbf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "desktop-and-runtime-scope-excluded",
-      "criterion": "The final tracked tree contains no macOS Desktop app or app bundle, desktop deep-link or repository-switch product path, desktop-only tests, new user-owned foreground vh-workbench launcher, or session-watch behavior; README and current design documentation do not claim those rejected capabilities ship."
+      "criterion": "The final tracked tree contains no macOS Desktop app or app bundle, desktop deep-link or repository-switch product path, desktop-only tests, new user-owned foreground vh-workbench launcher, or session-watch behavior; README and current design documentation do not claim those rejected capabilities ship.",
+      "identity": "sha256:389dfd3655b6296c4635bb191a0a21f0a509268d115993d044d7359e3108606f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "history-preserved-by-append",
-      "criterion": "A non-canonical .vibehub/history/github-pr-18 snapshot preserves byte-identical copies of the 10 Ticket, 28 Evidence, and 7 Outcome blobs added by PR #18 between merge-base c17e973b3784005f5c0d8baa37b2bd6262d97280 and PR head 0c21858ca1a4dd1537e75a335f124548a44d3587, with a manifest mapping every original path to its archived path, SHA-256 digest, merge-base, and PR head; the rejected records are not loaded as active canonical work, and the later UI-only decision and delivery are represented by newly appended canonical Ticket, Evidence, and Outcome documents."
+      "criterion": "A non-canonical .vibehub/history/github-pr-18 snapshot preserves byte-identical copies of the 10 Ticket, 28 Evidence, and 7 Outcome blobs added by PR #18 between merge-base c17e973b3784005f5c0d8baa37b2bd6262d97280 and PR head 0c21858ca1a4dd1537e75a335f124548a44d3587, with a manifest mapping every original path to its archived path, SHA-256 digest, merge-base, and PR head; the rejected records are not loaded as active canonical work, and the later UI-only decision and delivery are represented by newly appended canonical Ticket, Evidence, and Outcome documents.",
+      "identity": "sha256:d2912531dfac665b66dc9e5a8f372cc28e0b18175f17b3786bd0c31117f00bd7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "quiet-ui-integrated",
+      "criterion": "The shared Ticket review assets deliver the A · Quiet Workbench update with top-to-bottom causal flow, quiet cool-neutral styling, responsive keyboard-accessible graph and progressive inspector behavior, honest empty ImplementationPresence, persistent source truth, and no style selector.",
+      "identity": "sha256:ebb74c9fe8a7a7061a611be552930485d0ad62f24e6e3d0feb56da799d02a5f0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "retained-host-git-is-safe",
+      "criterion": "Every Git command issued by the retained shared Node UI host disables repository-configured core.fsmonitor; a regression test opens and projects a repository with a malicious fsmonitor command and proves that command is never executed.",
+      "identity": "sha256:e3885994677d177044d3586c3d7858d721b8052f4af842afeb437b4f3103c6b3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "ui-verification-passes",
-      "criterion": "Focused UI tests cover top-to-bottom layout, source truth, honest presence, human attention, acceptance authority, accessibility, read-only behavior, and responsive assets; project validation, full npm verification, and plugin artifact verification pass."
+      "criterion": "Focused UI tests cover top-to-bottom layout, source truth, honest presence, human attention, acceptance authority, accessibility, read-only behavior, and responsive assets; project validation, full npm verification, and plugin artifact verification pass.",
+      "identity": "sha256:cedc4ad355bf86ecf85818fd1320b6fc179ea534228ab0102c67c601ee9559ce",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Current main is the semantic and contract baseline; never resolve conflicts by choosing the PR side wholesale.",
     "Do not discard or retroactively edit earlier Ticket, Evidence, or Outcome records: preserve exact originals in the PR snapshot and append the later business decision and delivery to the canonical graph.",
@@ -53,7 +72,45 @@
     },
     {
       "purpose": "Successful owner scope decision that makes this delivery acceptance executable.",
-      "ref": ".vibehub/outcomes/ticket-decide-pr18-ui-only-scope.yaml"
+      "ref": ".vibehub/outcomes/ticket-decide-pr18-ui-only-scope/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "current-main-ui-contracts-preserved",
+          "identity": "sha256:3f52bb7785a80b0a3570be7a9a5e7a5f03c0ea3737b9fe7ee16be796d5c93bbf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "desktop-and-runtime-scope-excluded",
+          "identity": "sha256:389dfd3655b6296c4635bb191a0a21f0a509268d115993d044d7359e3108606f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "history-preserved-by-append",
+          "identity": "sha256:d2912531dfac665b66dc9e5a8f372cc28e0b18175f17b3786bd0c31117f00bd7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quiet-ui-integrated",
+          "identity": "sha256:ebb74c9fe8a7a7061a611be552930485d0ad62f24e6e3d0feb56da799d02a5f0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retained-host-git-is-safe",
+          "identity": "sha256:e3885994677d177044d3586c3d7858d721b8052f4af842afeb437b4f3103c6b3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ui-verification-passes",
+          "identity": "sha256:cedc4ad355bf86ecf85818fd1320b6fc179ea534228ab0102c67c601ee9559ce",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:581a72dd4bc0ca17329097c9f1c61d8680e2f90ec6698023ddbc5b3684f61553",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -83,6 +140,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

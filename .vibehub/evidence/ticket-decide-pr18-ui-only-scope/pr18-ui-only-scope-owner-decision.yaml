@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "ui-only-scope-chosen"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ui-only-scope-chosen",
+      "identity": "sha256:d1b388fe2084942d36d918e85b7931041237dd26387c545ce852dabb2a62b802",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "pr18-ui-only-scope-owner-decision",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -11,7 +20,7 @@
     "github-pr:VW-ai/vibehub-plugin#18",
     "commit:0c21858ca1a4dd1537e75a335f124548a44d3587"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The repository owner explicitly limited the expected PR #18 delivery to UI upgrade and update. The macOS Desktop product version is not accepted for this delivery. The owner also explicitly required that earlier desktop, deep-link, switch, and dogfood Ticket, Evidence, and Outcome records not be deleted; the later business disposition must be represented by appended Tickets. This records the owner's own product decision, not an Agent inference.",
   "ticket_id": "ticket-decide-pr18-ui-only-scope"
 }

@@ -2,21 +2,34 @@
   "acceptance": [
     {
       "acceptance_id": "coldstart-skill",
-      "criterion": "A distill skill builds the initial rooms/ tree from the repository; interrupting it mid-run and re-invoking continues from recorded per-room progress instead of restarting."
-    },
-    {
-      "acceptance_id": "ticket-plan-integration",
-      "criterion": "vibehub-ticket-plan runs vh drift before planning; rooms the ticket enters are reconciled and aligned in the same start, unrelated drifted rooms only receive the stale write-back."
-    },
-    {
-      "acceptance_id": "trust-layering",
-      "criterion": "Distill-produced documents carry distilled provenance, and the documented conflict rule makes human-ingested context win over distilled content."
+      "criterion": "A distill skill builds the initial rooms/ tree from the repository; interrupting it mid-run and re-invoking continues from recorded per-room progress instead of restarting.",
+      "identity": "sha256:63dad4d56bee5233178568fc97b8055e8dd58d80ef81132f51b6fcafe1b9b4ee",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "perception-one-line",
-      "criterion": "A normal ticket start on an already-distilled repository surfaces alignment as a single report line (e.g. Aligned 2 rooms, 3 files drifted); only COLD_START is allowed to be a perceptible multi-step experience."
+      "criterion": "A normal ticket start on an already-distilled repository surfaces alignment as a single report line (e.g. Aligned 2 rooms, 3 files drifted); only COLD_START is allowed to be a perceptible multi-step experience.",
+      "identity": "sha256:173f4a7584ae6886c9e9ac853fad2e73472fb70c04c38ffcb9fed26e5714b0f7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-plan-integration",
+      "criterion": "vibehub-ticket-plan runs vh drift before planning; rooms the ticket enters are reconciled and aligned in the same start, unrelated drifted rooms only receive the stale write-back.",
+      "identity": "sha256:b55bdab30d7a28269ae1263afbff61324ab77ba366736808a9ccbb9ca1f71e49",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "trust-layering",
+      "criterion": "Distill-produced documents carry distilled provenance, and the documented conflict rule makes human-ingested context win over distilled content.",
+      "identity": "sha256:a63fb41bf5721f3c363f92457e34cc207c2c91cfb1d1f7d600cd2c5ebd5e4c02",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "No background capture, daemons, hooks cadence, or hidden state; distill runs only inside explicit skill workflows.",
     "Update distill cost must be proportional to the rooms the ticket enters, never to whole-project drift debt.",
@@ -31,6 +44,34 @@
     {
       "purpose": "Mechanical check contract the workflow consumes.",
       "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "coldstart-skill",
+          "identity": "sha256:63dad4d56bee5233178568fc97b8055e8dd58d80ef81132f51b6fcafe1b9b4ee",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "perception-one-line",
+          "identity": "sha256:173f4a7584ae6886c9e9ac853fad2e73472fb70c04c38ffcb9fed26e5714b0f7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-plan-integration",
+          "identity": "sha256:b55bdab30d7a28269ae1263afbff61324ab77ba366736808a9ccbb9ca1f71e49",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "trust-layering",
+          "identity": "sha256:a63fb41bf5721f3c363f92457e34cc207c2c91cfb1d1f7d600cd2c5ebd5e4c02",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:bf0ee32ec8bb8812cb57b0c7dc15f9a2f12ea562a123d252c4b820137f977f6a",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -60,6 +101,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-ambient-distill-workflow"
 }

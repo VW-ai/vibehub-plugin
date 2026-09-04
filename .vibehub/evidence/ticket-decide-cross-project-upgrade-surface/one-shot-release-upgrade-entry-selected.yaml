@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "invocation-shapes-are-compared-and-one-is-selected"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "invocation-shapes-are-compared-and-one-is-selected",
+      "identity": "sha256:70ffa29e78453e14d0af6e6db3e2013f486cb4fe5a31d86d0932e53480dd5b68",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "one-shot-release-upgrade-entry-selected",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +25,7 @@
     "https://docs.npmjs.com/cli/v11/commands/npx/",
     "https://docs.npmjs.com/cli/v10/using-npm/package-spec/"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Revised after two independent challenges: docs/proposals/cross-project-upgrade-surface.md compares a one-shot GitHub Release package with an installed vibehub-core entry across first install, subsequent update, Codex/Claude availability, version identity, network/cache, permissions, failure recovery, release boundary, and cost. It corrects the false global-path assumption using the checked-in skills.sh rehearsal: default installs landed project-locally under ./.agents/skills and ./.claude/skills, so an installed machine-wide entry would require an installation-project lookup, implicit scan, or new mandatory -g contract. It also rejects the mismatched `npx skills update` plus floating `releases/latest` recipe. The supported first-install and update flow repeats one immutable release tag in a direct tagged Skill install and in the versioned vibehub-upgrade.tgz URL; the tarball self-checks and prints its package/tag/commit/engine/registry identity. Thus the Skill text and migrator come from one selected release rather than independently floating revisions. The dependency-free npm-layout asset has one bin, is not registry-published or globally installed, and accepts explicit --root values. Official skills.sh source behavior plus npm remote-tarball and single-bin behavior support the invocation. The rejected installed shape saves one asset but costs a global-install migration or locator/ambiguity protocol.",
   "ticket_id": "ticket-decide-cross-project-upgrade-surface"
 }

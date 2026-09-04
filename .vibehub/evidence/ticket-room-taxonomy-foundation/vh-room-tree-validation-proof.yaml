@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "vh-room-validation"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "vh-room-validation",
+      "identity": "sha256:db47e5e1b34ab38b5e09d84807a97e85a896ff048cbfa9492cd38ca4df94864d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "vh-room-tree-validation-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-03T23:00:44.000Z",
@@ -10,7 +19,7 @@
     "skills/scripts/vh.mjs",
     "test/room.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vh.mjs loadRooms walks nested rooms/ trees enforcing room.yaml presence per directory, kebab-case slug rules, room_id equal to directory name, and no stray documents directly under rooms/; room-held context entries load into the shared context map and resolve in context query. node --test suite passes 22/22 including five new room tests.",
   "ticket_id": "ticket-room-taxonomy-foundation"
 }

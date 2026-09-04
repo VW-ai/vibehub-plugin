@@ -1,0 +1,37 @@
+{
+  "accepted_acceptance_ids": [
+    "migration-entries-declare-both-halves",
+    "mechanical-half-runs-on-its-own",
+    "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
+    "unblocking-is-separated-from-enriching",
+    "semantic-steps-carry-authoring-guidance",
+    "back-fill-guidance-is-proven-on-a-real-field",
+    "migrate-skill-covers-only-judgment",
+    "real-projects-rehearsed",
+    "classification-is-a-release-obligation"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-03T02:54:48Z",
+  "contract_revision": {
+    "identity": "sha256:15462cc597989ba17d6e2af476f970daf895ea3befb545518f6179289597abc8",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "mechanical-migration-engine-and-isolation-proof",
+    "migrate-skill-mechanical-semantic-boundary",
+    "migration-halves-and-guidance-contract",
+    "real-stale-project-copy-rehearsals"
+  ],
+  "independence": {
+    "note": "A fresh subagent independently inspected the Ticket, complete diff, all four Evidence records, source and tests, reproduced the later-session behavior, and reran targeted and full verification.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout verified that all migration entries declare mechanical and semantic halves, the single-worktree engine performs only declared mechanical changes with rollback and no Git orchestration, structurally current projects retain complete later-session semantic guidance, semantic authoring rules are durable and exercised on real disposable rehearsals, and release checks enforce the contract. Targeted tests passed 12 of 12 and the full verification suite passed 148 of 148 with the 65-file artifact verified.",
+  "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic",
+  "unresolved_acceptance_ids": []
+}

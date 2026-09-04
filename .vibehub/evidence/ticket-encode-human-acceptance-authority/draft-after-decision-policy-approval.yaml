@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "decision-boundary-policy-approved"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "decision-boundary-policy-approved",
+      "identity": "sha256:a07b7163f91ce6c5b9eb3b93511b35208d360b7b2685ce53997324acda272ed8",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "draft-after-decision-policy-approval",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -10,7 +19,7 @@
     "conversation:2026-08-10-owner-corrected-human-gated-downstream-to-draft",
     "conversation:2026-08-04-fuzzy-draft-tickets"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner clarified that work behind a blocking decision often cannot yet be planned precisely and should use a draft-like state. This repeats the earlier approved rolling-wave rule: direction-known but acceptance-unknown downstream Tickets remain maturity: draft, become REFINE after the blocker succeeds, and are firmed by Ticket Plan only from the newly available decision.",
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

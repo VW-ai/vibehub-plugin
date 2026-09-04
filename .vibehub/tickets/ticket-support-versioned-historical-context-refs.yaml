@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "versioned-ref-has-one-canonical-shape",
-      "criterion": "Ticket context_refs accept the canonical form commit:<40-hex-sha>:<repo-relative-path> in addition to existing current-tree paths; the grammar rejects abbreviated or moving revisions, empty or absolute paths, traversal, malformed separators, and non-file Git objects, and one shared parser/resolver owns the rule rather than duplicating it across commands."
-    },
-    {
       "acceptance_id": "exact-historical-content-is-readable",
-      "criterion": "The engine exposes an Agent-readable operation that resolves either context_ref form and returns the cited source plus its identity; for a versioned ref it reads the exact blob at the declared commit even when the path is deleted or has different current content, and it returns a machine-readable error for a missing commit, missing path, directory, symlink, or submodule."
-    },
-    {
-      "acceptance_id": "resolution-never-mutates-worktrees",
-      "criterion": "Resolving and validating a versioned ref uses Git object access only and never checks out a commit, changes HEAD or index state, creates or edits a working-tree file, or depends on which branch another worktree has checked out; tests exercise the operation from a dirty worktree and prove its status and bytes are unchanged."
-    },
-    {
-      "acceptance_id": "ticket-consumers-use-the-same-resolver",
-      "criterion": "Planning, execution, validation, query, and review guidance that asks an Agent to consume Ticket context_refs points to the same engine resolution behavior, so a versioned ref is usable Context rather than merely a string that passes project validation; contract tests fail if Skill guidance names a different syntax or bypasses the resolver."
-    },
-    {
-      "acceptance_id": "marketplace-workarounds-become-readable-history-without-guessing",
-      "criterion": "For each of the ten deleted-path provenance workarounds present across six marketplace-retirement-affected Tickets at this replan snapshot, reviewable Evidence identifies whether Git history establishes the exact commit/blob that informed the Ticket rather than merely any commit containing the path. Every established case becomes a versioned context_ref and resolves to those exact historical bytes without restoring the retired file; every ambiguous case remains an explicit unresolved provenance note instead of being guessed, and project validation passes in either case."
+      "criterion": "The engine exposes an Agent-readable operation that resolves either context_ref form and returns the cited source plus its identity; for a versioned ref it reads the exact blob at the declared commit even when the path is deleted or has different current content, and it returns a machine-readable error for a missing commit, missing path, directory, symlink, or submodule.",
+      "identity": "sha256:aa0e2e66d71eb6a74e65dc3ba246ee870bc65ee62fe7a506f14f9d44fbfe49ed",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "format-2-to-3-ships-its-migration-contract",
-      "criterion": "The release advances project format 2 to format 3 while keeping Ticket document schema at 2, and the versions and migrations references advance together. The migration declares as mechanical that ordinary current-tree refs stay unchanged, validation runs, and the project marker rises; it declares historical deleted-path-to-commit selection semantic with guidance requiring exact Git evidence and unresolved handling. Fixtures prove the mechanical upgrade, the semantic boundary, and rejection by an older-format compatibility check rather than accidental forward compatibility."
+      "criterion": "The release advances project format 2 to format 3 while keeping Ticket document schema at 2, and the versions and migrations references advance together. The migration declares as mechanical that ordinary current-tree refs stay unchanged, validation runs, and the project marker rises; it declares historical deleted-path-to-commit selection semantic with guidance requiring exact Git evidence and unresolved handling. Fixtures prove the mechanical upgrade, the semantic boundary, and rejection by an older-format compatibility check rather than accidental forward compatibility.",
+      "identity": "sha256:36f68d372f873b5fe1308da96c93b3d74fb33072ef280784d38f95c126df2363",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "marketplace-workarounds-become-readable-history-without-guessing",
+      "criterion": "For each of the ten deleted-path provenance workarounds present across six marketplace-retirement-affected Tickets at this replan snapshot, reviewable Evidence identifies whether Git history establishes the exact commit/blob that informed the Ticket rather than merely any commit containing the path. Every established case becomes a versioned context_ref and resolves to those exact historical bytes without restoring the retired file; every ambiguous case remains an explicit unresolved provenance note instead of being guessed, and project validation passes in either case.",
+      "identity": "sha256:cbdfeb7e6a4f952b271c5f2aeaf87c0bcbe7ba4d602bec7985cbe2d031044289",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resolution-never-mutates-worktrees",
+      "criterion": "Resolving and validating a versioned ref uses Git object access only and never checks out a commit, changes HEAD or index state, creates or edits a working-tree file, or depends on which branch another worktree has checked out; tests exercise the operation from a dirty worktree and prove its status and bytes are unchanged.",
+      "identity": "sha256:ef93bd1a4f883b085b494f8ea0ac3ea87d84b1ead64d3237f1116a0850e30318",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-consumers-use-the-same-resolver",
+      "criterion": "Planning, execution, validation, query, and review guidance that asks an Agent to consume Ticket context_refs points to the same engine resolution behavior, so a versioned ref is usable Context rather than merely a string that passes project validation; contract tests fail if Skill guidance names a different syntax or bypasses the resolver.",
+      "identity": "sha256:8e2a491d77664960e064519c41962f5e38107e8696c0ef7a1428fe86e36ea279",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "versioned-ref-has-one-canonical-shape",
+      "criterion": "Ticket context_refs accept the canonical form commit:<40-hex-sha>:<repo-relative-path> in addition to existing current-tree paths; the grammar rejects abbreviated or moving revisions, empty or absolute paths, traversal, malformed separators, and non-file Git objects, and one shared parser/resolver owns the rule rather than duplicating it across commands.",
+      "identity": "sha256:4c28059ac7edd57765269987d46fac13d915c076515b955646d43ba8b348e804",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Git remains the only historical content store; do not copy deleted source bodies into Tickets, add an archive directory, database, cache, hosted service, or hidden state.",
     "A versioned ref must name a full commit object present in the repository and a regular blob path at that commit; branches, tags, abbreviated SHAs, external URLs, and filesystem paths outside the repository are not equivalent identities.",
@@ -100,6 +119,44 @@
       "ref": "skills/vibehub-ticket-review/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exact-historical-content-is-readable",
+          "identity": "sha256:aa0e2e66d71eb6a74e65dc3ba246ee870bc65ee62fe7a506f14f9d44fbfe49ed",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "format-2-to-3-ships-its-migration-contract",
+          "identity": "sha256:36f68d372f873b5fe1308da96c93b3d74fb33072ef280784d38f95c126df2363",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "marketplace-workarounds-become-readable-history-without-guessing",
+          "identity": "sha256:cbdfeb7e6a4f952b271c5f2aeaf87c0bcbe7ba4d602bec7985cbe2d031044289",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resolution-never-mutates-worktrees",
+          "identity": "sha256:ef93bd1a4f883b085b494f8ea0ac3ea87d84b1ead64d3237f1116a0850e30318",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-consumers-use-the-same-resolver",
+          "identity": "sha256:8e2a491d77664960e064519c41962f5e38107e8696c0ef7a1428fe86e36ea279",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "versioned-ref-has-one-canonical-shape",
+          "identity": "sha256:4c28059ac7edd57765269987d46fac13d915c076515b955646d43ba8b348e804",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cd514d48153ad726252b51cf97a3514343baf0ab5c8facd6cfced5c487ebab58",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -120,6 +177,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-support-versioned-historical-context-refs"
 }

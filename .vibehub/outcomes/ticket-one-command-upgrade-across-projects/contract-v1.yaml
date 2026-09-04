@@ -1,0 +1,35 @@
+{
+  "accepted_acceptance_ids": [
+    "release-paired-one-shot-package-is-verifiable",
+    "discovery-is-explicit-bounded-and-worktree-complete",
+    "classification-and-preview-use-the-shared-migration-contract",
+    "one-safe-worktree-produces-one-preverified-local-commit",
+    "every-non-success-proves-byte-and-git-invariance",
+    "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
+    "architecture-docs-and-artifact-enforce-the-narrow-exception"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-03T04:41:24Z",
+  "contract_revision": {
+    "identity": "sha256:8bc60802d302296a2e9e6005378ebe7eb12b325f59315d821b0bbedb1afcdaf2",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "bounded-discovery-classification-and-report-proof",
+    "preverified-cas-and-recovery-proof",
+    "release-paired-one-shot-package-proof",
+    "upgrade-boundary-docs-and-full-suite-proof"
+  ],
+  "independence": {
+    "note": "A fresh subagent independently inspected the exact Ticket, all four Evidence records, prerequisite Outcomes and owner decision, proposal, current implementation, tests, and complete working-tree diff; reproduced the pre-discovery release identity behavior; challenged Git hook, signer, fsmonitor, CAS, recovery, and failure-injection behavior; and reran the full project verification suite.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout verified the immutable release-paired one-shot package and pre-discovery identity output; bounded registered-worktree discovery and shared migration classification; one preverified local commit per safe worktree through an isolated terminal CAS; byte, index, HEAD, branch, refs, and commit-count invariance with retryable recovery for every non-success path; exhaustive semantic-aware reporting; and the exact architecture boundary, documentation, artifact allowlist, and full regression suite.",
+  "ticket_id": "ticket-one-command-upgrade-across-projects",
+  "unresolved_acceptance_ids": []
+}

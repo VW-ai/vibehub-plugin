@@ -1,46 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket.v2.json",
+  "$id": "https://vibehub.dev/schemas/ticket.v3.json",
   "title": "VibeHub Ticket",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "ticket_id", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
+  "required": ["schema_version", "kind", "ticket_id", "revision_state", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
   "properties": {
-    "schema_version": { "const": 2 },
+    "schema_version": { "const": 3 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
-    "maturity": {
-      "type": "string",
-      "enum": ["firm", "draft"],
-      "default": "firm",
-      "description": "Planning maturity. New or rewritten Tickets state firm or draft explicitly; omission remains legacy-compatible firm."
-    },
-    "outcome": { "$ref": "#/$defs/text" },
-    "deliveries": {
-      "type": "array",
-      "default": [],
-      "items": { "$ref": "#/$defs/delivery" }
-    },
-    "context": { "$ref": "#/$defs/text" },
-    "acceptance": {
+    "revision_state": { "enum": ["bound", "legacy-pending-reconstruction"] },
+    "active_contract_revision": { "$ref": "#/$defs/revision" },
+    "contract_revisions": {
       "type": "array",
       "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["acceptance_id", "criterion"],
-        "properties": {
-          "acceptance_id": { "$ref": "#/$defs/id" },
-          "criterion": { "$ref": "#/$defs/text" },
-          "authority": {
-            "type": "string",
-            "enum": ["agent", "human"],
-            "default": "agent",
-            "description": "Who may judge this criterion. Omission means agent authority."
-          }
-        }
-      }
+      "items": { "$ref": "#/$defs/contract_revision" }
     },
+    "maturity": { "enum": ["firm", "draft"], "default": "firm" },
+    "outcome": { "$ref": "#/$defs/text" },
+    "deliveries": { "type": "array", "default": [], "items": { "$ref": "#/$defs/delivery" } },
+    "context": { "$ref": "#/$defs/text" },
+    "acceptance": { "type": "array", "minItems": 1 },
     "constraints": { "type": "array", "items": { "$ref": "#/$defs/text" } },
     "context_refs": {
       "type": "array",
@@ -51,7 +31,7 @@
         "properties": {
           "ref": {
             "$ref": "#/$defs/text",
-            "description": "A current repository-relative regular-file path or commit:<40-lowercase-hex>:<repo-relative-regular-blob-path>."
+            "description": "Current repository path or immutable commit:<40-lowercase-hex>:<repo-relative-path> reference resolved by the shared context resolver."
           },
           "purpose": { "$ref": "#/$defs/text" }
         }
@@ -72,9 +52,87 @@
     },
     "provenance_refs": { "type": "array", "items": { "$ref": "#/$defs/text" } }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "revision_state": { "const": "bound" } } },
+      "then": {
+        "required": ["active_contract_revision", "contract_revisions"],
+        "properties": { "acceptance": { "items": { "$ref": "#/$defs/acceptance_revision" } } }
+      },
+      "else": {
+        "not": { "anyOf": [{ "required": ["active_contract_revision"] }, { "required": ["contract_revisions"] }] },
+        "properties": { "acceptance": { "items": { "$ref": "#/$defs/legacy_acceptance" } } }
+      }
+    }
+  ],
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "identity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "acceptance_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "revision", "identity"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "revision": { "$ref": "#/$defs/revision" },
+        "identity": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "lineage_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "revision"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "label": { "$ref": "#/$defs/text" },
+        "description": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acceptance_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "revision", "identity", "criterion", "state"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "revision": { "$ref": "#/$defs/revision" },
+        "identity": { "$ref": "#/$defs/identity" },
+        "criterion": { "$ref": "#/$defs/text" },
+        "authority": { "enum": ["agent", "human"], "default": "agent" },
+        "state": { "enum": ["active", "retired"] },
+        "derived_from": { "type": "array", "items": { "$ref": "#/$defs/lineage_ref" }, "uniqueItems": true },
+        "presentation": { "$ref": "#/$defs/presentation" }
+      }
+    },
+    "legacy_acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "criterion"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "criterion": { "$ref": "#/$defs/text" },
+        "authority": { "enum": ["agent", "human"], "default": "agent" }
+      }
+    },
+    "contract_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "identity", "acceptance_revisions"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "identity": { "$ref": "#/$defs/identity" },
+        "acceptance_revisions": { "type": "array", "items": { "$ref": "#/$defs/acceptance_ref" }, "uniqueItems": true }
+      }
+    },
     "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "commit_ref": { "type": "string", "pattern": "^commit:[0-9a-f]{40}$" },
     "pull_request_ref": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*$" },
@@ -91,22 +149,7 @@
             "delivered_at": { "type": "string", "format": "date-time" },
             "delivered_commit": { "$ref": "#/$defs/commit" },
             "reverted_by": { "$ref": "#/$defs/commit_ref" }
-          },
-          "allOf": [
-            {
-              "if": { "properties": { "state": { "const": "delivered" } } },
-              "then": { "required": ["delivered_at", "delivered_commit"] },
-              "else": {
-                "not": {
-                  "anyOf": [
-                    { "required": ["delivered_at"] },
-                    { "required": ["delivered_commit"] },
-                    { "required": ["reverted_by"] }
-                  ]
-                }
-              }
-            }
-          ]
+          }
         },
         {
           "type": "object",

@@ -13,6 +13,9 @@ the files below as `../vibehub-core/...`.
 
 - `scripts/vh.mjs` — dependency-free helper for Ticket, Evidence, Outcome,
   Context, Room, and project-format operations.
+- `scripts/revision-contract.mjs` — canonical serialization, identity, initial
+  materialization, and append-only Acceptance/Contract mutation helpers.
+- `contracts/revision-identity.md` — human-readable semantic identity contract.
 - `scripts/vh-ui.mjs` — read-only loopback host for the local graph UI
   (assets live in `../vibehub-ticket-review/assets`).
 - `contracts/` — JSON Schemas and written contracts the Skills cite.

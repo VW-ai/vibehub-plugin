@@ -1,0 +1,32 @@
+{
+  "accepted_acceptance_ids": [
+    "invocation-shapes-are-compared-and-one-is-selected",
+    "replacement-boundary-is-exact-and-testable",
+    "unsafe-predicate-is-exact-and-conservative",
+    "owner-selects-explicit-upgrade-behavior"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-09-03T03:34:32Z",
+  "contract_revision": {
+    "identity": "sha256:334fc93e2ebde2cd2f778286f0021635eb1b5e3781de98207dc852e51241399b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "one-shot-release-upgrade-entry-selected",
+    "exact-upgrade-boundary-and-enforcement-plan",
+    "conservative-worktree-safety-state-machine",
+    "owner-selects-explicit-upgrade-worktree-behavior"
+  ],
+  "independence": {
+    "note": "A fresh subagent independently inspected the exact Ticket, all four Evidence records, proposal, current constraints and working-tree state, verified the reference-transaction hook isolation behavior in a disposable Git repository, and reran relevant validation and tests.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout verified a complete release-paired one-shot upgrade contract using the same immutable tag for tagged Skill installation and the versioned upgrade asset; an exact narrow architecture-boundary replacement with mechanical enforcement obligations; a conservative per-worktree state machine whose preverified temporary-index commit becomes successful only through an isolated terminal update-ref CAS after exact bytes, index-tree, and status checks; and faithful human Evidence for registered-worktree scope, separate local commits, reporting, no push, and later semantic migration.",
+  "ticket_id": "ticket-decide-cross-project-upgrade-surface",
+  "unresolved_acceptance_ids": []
+}

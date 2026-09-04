@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "connectors-use-rendered-card-geometry",
-      "criterion": "Every dependency path is computed from the current rendered source and target card bounds inside the graph map; the fixed path, arrow, and handle coordinates are removed."
+      "acceptance_id": "connector-fix-is-production-verified",
+      "criterion": "Focused geometry contracts, lint, production build, rendered contracts, release preflight, browser checks at the owner's wide screenshot class and standard desktop width, production deployment, and canonical-domain verification pass.",
+      "identity": "sha256:2b9614158f8bba7d94eb258aab902f9dc74d3ede3909ba3e11150330d98d7b2f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "connectors-stay-attached-through-layout-change",
-      "criterion": "Initial render, wide desktop, Inspector width, browser resize, and canvas pan keep each path attached from the source card's right aperture to the target card boundary without visible floating segments or card overlap."
+      "criterion": "Initial render, wide desktop, Inspector width, browser resize, and canvas pan keep each path attached from the source card's right aperture to the target card boundary without visible floating segments or card overlap.",
+      "identity": "sha256:46d2639a1240261b6c09730163c549aedffcebd2ae4f2c50f217b961173bb0d1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "connectors-use-rendered-card-geometry",
+      "criterion": "Every dependency path is computed from the current rendered source and target card bounds inside the graph map; the fixed path, arrow, and handle coordinates are removed.",
+      "identity": "sha256:fbb8dc29edd91903d169c10200dd3a36981d265d68a0791f6e4a8c9602b3d886",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "graph-language-and-interaction-remain-intact",
-      "criterion": "The Workbench card language, routed curves, arrowheads, control knots, causal-cone focus, Ticket selection, Rooms, Inspector lenses, mobile stacked fallback, and accessible labels remain intact."
-    },
-    {
-      "acceptance_id": "connector-fix-is-production-verified",
-      "criterion": "Focused geometry contracts, lint, production build, rendered contracts, release preflight, browser checks at the owner's wide screenshot class and standard desktop width, production deployment, and canonical-domain verification pass."
+      "criterion": "The Workbench card language, routed curves, arrowheads, control knots, causal-cone focus, Ticket selection, Rooms, Inspector lenses, mobile stacked fallback, and accessible labels remain intact.",
+      "identity": "sha256:0404510eebe13556d8f6ba561631afbe7b7a08a3551bf568243222e20ba500e9",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Fix the shared public TicketView graph renderer rather than tuning one page or one screenshot.",
     "Do not alter the canonical plugin Workbench or change the website narrative and card visual design.",
@@ -46,6 +59,34 @@
       "ref": "site/release/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "connector-fix-is-production-verified",
+          "identity": "sha256:2b9614158f8bba7d94eb258aab902f9dc74d3ede3909ba3e11150330d98d7b2f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "connectors-stay-attached-through-layout-change",
+          "identity": "sha256:46d2639a1240261b6c09730163c549aedffcebd2ae4f2c50f217b961173bb0d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "connectors-use-rendered-card-geometry",
+          "identity": "sha256:fbb8dc29edd91903d169c10200dd3a36981d265d68a0791f6e4a8c9602b3d886",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-language-and-interaction-remain-intact",
+          "identity": "sha256:0404510eebe13556d8f6ba561631afbe7b7a08a3551bf568243222e20ba500e9",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4cf107558cc97f1cacdea154d183b063aef13173bd14e1e7b05ff71fdba3d1ad",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -55,6 +96,7 @@
     "image:screenshot-2026-08-20-10-37-08-am"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-public-graph-connector-alignment"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "projection-and-migration-are-regression-proven"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "projection-and-migration-are-regression-proven",
+      "identity": "sha256:8003aed2ee860af7b2f1952627031779f02fd9984b7bfdd4a7cebd2211933956",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "current-scope-migration-regression-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-20T00:22:02Z",
@@ -13,7 +22,7 @@
     "test/ticket.test.mjs",
     "test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The complete repository suite passed 101 of 101 tests, including legacy-to-current migration, required delivery structure, actionable current scope, progressive history, shared Web projection, and real loopback UI behavior. The installed Plugin artifact smoke check passed with a dependency-free 55-file artifact, including the compact runtime version contract, and verified that unrelated DONE history is absent from current but present in all scope.",
   "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
 }

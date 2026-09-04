@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+      "criterion": "A reviewer can focus one closeout-ready Ticket and can obtain a bounded list of all closeout-ready Tickets without mixing READY execution, REFINE, BLOCKED, or unrelated repositories; no automatic batch acceptance or cross-task browser discovery is introduced.",
+      "identity": "sha256:f3785e8ab5077ea938b9d56829ddc5a541a0b9b565c7a769edde6b805202bf05",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "graph-and-overview-surface-closeout-work",
-      "criterion": "Tickets whose next_action is CLOSE_OUT receive a restrained non-color REVIEW or CLOSE OUT presentation distinct from READY, Overview reports a dedicated closeout count and queue, and cards never show Start or ordinary Agent execution as the primary action for that state."
+      "criterion": "Tickets whose next_action is CLOSE_OUT receive a restrained non-color REVIEW or CLOSE OUT presentation distinct from READY, Overview reports a dedicated closeout count and queue, and cards never show Start or ordinary Agent execution as the primary action for that state.",
+      "identity": "sha256:a0ad144611cff06d919c88e3595eded15c2aec67978b8c2fcc1e2e68b3c5ba79",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "inspector-explains-proof-versus-judgment",
-      "criterion": "Execution, Contract, and Log surfaces clearly state Evidence coverage, authority satisfaction, Outcome pending, and why independent adjudication is next; each acceptance remains inspectable and human-origin gaps route to NEEDS YOU rather than closeout."
-    },
-    {
-      "acceptance_id": "read-only-closeout-handoff-is-complete",
-      "criterion": "The current read-only Workbench provides one explicit Close out with Agent handoff containing the exact Ticket ID, source, current Acceptance, Evidence, authority, diff or Git refs, and independent-closeout instruction; it performs no hidden write, and an official DSH command may later invoke the same payload without posing as a model turn."
-    },
-    {
-      "acceptance_id": "skills-route-complete-evidence-to-closeout",
-      "criterion": "Ticket Run, Review, and lifecycle routing consume next_action so a fully evidenced Ticket is handed to an independent closeout Agent instead of executed again; missing permission, human judgment, or failed Evidence remains explicit and cannot be bypassed by the handoff."
-    },
-    {
-      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
-      "criterion": "A reviewer can focus one closeout-ready Ticket and can obtain a bounded list of all closeout-ready Tickets without mixing READY execution, REFINE, BLOCKED, or unrelated repositories; no automatic batch acceptance or cross-task browser discovery is introduced."
+      "criterion": "Execution, Contract, and Log surfaces clearly state Evidence coverage, authority satisfaction, Outcome pending, and why independent adjudication is next; each acceptance remains inspectable and human-origin gaps route to NEEDS YOU rather than closeout.",
+      "identity": "sha256:3fe32138216dd3d977eb285c4eb81e64941250d271e2be2e8fc8dd712576e240",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "interaction-regressions-pass",
-      "criterion": "Real and fixture graphs cover zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete authority-satisfying Evidence, successful Outcome, and non-success Outcome across desktop, narrow, keyboard, reduced-motion, focused-link, and exact-source flows; complete repository and artifact verification pass."
+      "criterion": "Real and fixture graphs cover zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete authority-satisfying Evidence, successful Outcome, and non-success Outcome across desktop, narrow, keyboard, reduced-motion, focused-link, and exact-source flows; complete repository and artifact verification pass.",
+      "identity": "sha256:101796a50c9c6f950969d4b1a19f564688df7b7ade0da3d83f1e7f10a25709b5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "read-only-closeout-handoff-is-complete",
+      "criterion": "The current read-only Workbench provides one explicit Close out with Agent handoff containing the exact Ticket ID, source, current Acceptance, Evidence, authority, diff or Git refs, and independent-closeout instruction; it performs no hidden write, and an official DSH command may later invoke the same payload without posing as a model turn.",
+      "identity": "sha256:16b7b90ac0f6e61676bc6969d06e8c9ffbdd1aa86f32487c1c80a5e366d5f5cc",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "skills-route-complete-evidence-to-closeout",
+      "criterion": "Ticket Run, Review, and lifecycle routing consume next_action so a fully evidenced Ticket is handed to an independent closeout Agent instead of executed again; missing permission, human judgment, or failed Evidence remains explicit and cannot be bypassed by the handoff.",
+      "identity": "sha256:8f1fe6d5e523a8a4e15195ba717392710a8bd111fcc0094739bfc9b182f77c8f",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Independent closeout remains a separate Agent judgment; do not let the executor or browser certify its own work.",
     "Do not make the read-only local Workbench writable or add hidden durable UI state.",
@@ -50,6 +69,44 @@
       "ref": "skills/vibehub-ticket-closeout/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+          "identity": "sha256:f3785e8ab5077ea938b9d56829ddc5a541a0b9b565c7a769edde6b805202bf05",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-and-overview-surface-closeout-work",
+          "identity": "sha256:a0ad144611cff06d919c88e3595eded15c2aec67978b8c2fcc1e2e68b3c5ba79",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "inspector-explains-proof-versus-judgment",
+          "identity": "sha256:3fe32138216dd3d977eb285c4eb81e64941250d271e2be2e8fc8dd712576e240",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "interaction-regressions-pass",
+          "identity": "sha256:101796a50c9c6f950969d4b1a19f564688df7b7ade0da3d83f1e7f10a25709b5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "read-only-closeout-handoff-is-complete",
+          "identity": "sha256:16b7b90ac0f6e61676bc6969d06e8c9ffbdd1aa86f32487c1c80a5e366d5f5cc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-route-complete-evidence-to-closeout",
+          "identity": "sha256:8f1fe6d5e523a8a4e15195ba717392710a8bd111fcc0094739bfc9b182f77c8f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:73308554c79c33adb96af33aa470b1a0761f00c86815a1a36c2e38ed9cbc73b3",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -65,6 +122,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-closeout-first-class-handoff"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "two-part-structure-is-scannable"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "two-part-structure-is-scannable",
+      "identity": "sha256:4aeb19b968b84b0579f7a17b6a22ff4102b8ec592aa638abbc8ac6d51b94f9e9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "two-part-layout-62-lines",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T06:57:00Z",
@@ -10,7 +19,7 @@
     "README.md",
     "docs/INSTALL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Top part: logo, tagline, Install, entry line, three-item What you get, one hero screenshot. Lower part: How it works (loop sentence plus four steps), See what matters now (two Workbench screenshots), Work with your team on GitHub, Learn more. Upgrades text moved to docs/INSTALL.md with skills update added; README is 62 lines under the raised 90-line budget.",
   "ticket_id": "ticket-readme-install-first-two-part-story"
 }

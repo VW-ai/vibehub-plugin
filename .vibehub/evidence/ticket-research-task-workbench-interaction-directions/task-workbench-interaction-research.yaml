@@ -6,6 +6,35 @@
     "recommendation-is-decision-ready",
     "research-board-is-usable"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "research-corpus-is-source-backed",
+      "identity": "sha256:87f7717c9df20fa49a2f58f45f9b7b0a6cbe0fd21be657b813828343c9477e01",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "scenario-pattern-map-is-complete",
+      "identity": "sha256:dc86c1355f05cef68fb71d45411be08c4b564332d0d3f3577431b0a6a7457c60",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "directions-are-interaction-architectures",
+      "identity": "sha256:3c383bf292e3a703f825ea17b83d4292e8f0a73cad0251df3a44fa465963c215",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "identity": "sha256:13f95b4aa49390fbc3fcff94e29b8500810b184e1c79b29d0c031c64a353f9f1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "research-board-is-usable",
+      "identity": "sha256:b79d330e856598ce7f837b0f01d35492c7f416c00cc555d6b5fe695611ad355e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "task-workbench-interaction-research",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -23,7 +52,7 @@
     "source-probe:9-of-9-at-deepseek-harness-rc8",
     "source:packages-client-ui-theme-theme-runtime-register-and-override-tokens"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The checked-in study extracts interaction decisions and failure modes from eight official product sources, maps them to the complete Task-first VibeHub loop, and compares Focus Route, Spatial Lens, and Live Split against the same graph, Task, Run, attention, Chat, and review states. The local research board was exercised in the Codex in-app browser across all three spatial models and all four lifecycle phases with no browser warnings or errors. It recommends Focus Route while retaining exact graph restoration and a spatial transition. A fresh source probe against DeepSeek Harness rc.8 commit 141eb6fef83422698aef7a981029e843e8161534 passed the existing nine extension seams and additionally confirmed official composable Theme Runtime token overrides; the report explicitly keeps rc.8 runtime boot unverified and relies on the prior rc.7 live-profile proof for runtime feasibility.",
   "ticket_id": "ticket-research-task-workbench-interaction-directions"
 }

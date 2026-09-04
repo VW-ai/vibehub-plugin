@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "research-corpus-is-source-backed",
-      "criterion": "A checked-in study uses current primary or official sources for at least eight relevant products spanning agent execution, personal task management, dense work management, command interaction, project workspaces, and branchable Chat; every reference records the exact interaction pattern worth borrowing and the failure mode VibeHub must avoid instead of copying a visual style wholesale."
-    },
-    {
-      "acceptance_id": "scenario-pattern-map-is-complete",
-      "criterion": "The study maps research findings to the complete VibeHub loop: first frame, fast Task creation, graph scanning and causal focus, entering one Task, autonomous Run observation, exact human attention, Chat steering, branch/compare/bring-back, Context activation, Evidence review, closeout, and return to the graph."
-    },
-    {
       "acceptance_id": "directions-are-interaction-architectures",
-      "criterion": "A locally reviewable board compares three or fewer coherent interaction architectures using the same representative Tasks and lifecycle states; each direction specifies spatial model, navigation, Task-to-Session relationship, dominant surface by phase, graph continuity, narrow-layout behavior, and DSH Slot/theme composition, without presenting a style picker or paper/editorial aesthetic."
+      "criterion": "A locally reviewable board compares three or fewer coherent interaction architectures using the same representative Tasks and lifecycle states; each direction specifies spatial model, navigation, Task-to-Session relationship, dominant surface by phase, graph continuity, narrow-layout behavior, and DSH Slot/theme composition, without presenting a style picker or paper/editorial aesthetic.",
+      "identity": "sha256:3c383bf292e3a703f825ea17b83d4292e8f0a73cad0251df3a44fa465963c215",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "recommendation-is-decision-ready",
-      "criterion": "The research recommends one base direction with explicit reasons, tradeoffs, rejected alternatives, and the smallest remaining owner choices; it distinguishes what can be built through additive DSH Slots and Theme APIs from what would require replacing a single-owner shell surface."
+      "criterion": "The research recommends one base direction with explicit reasons, tradeoffs, rejected alternatives, and the smallest remaining owner choices; it distinguishes what can be built through additive DSH Slots and Theme APIs from what would require replacing a single-owner shell surface.",
+      "identity": "sha256:13f95b4aa49390fbc3fcff94e29b8500810b184e1c79b29d0c031c64a353f9f1",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "research-board-is-usable",
-      "criterion": "A local browser review surface presents real source references, concise pattern cards, and clickable low-fidelity walkthroughs for the candidate directions at desktop and narrow widths, with no claim of final visual design or production backend behavior."
+      "criterion": "A local browser review surface presents real source references, concise pattern cards, and clickable low-fidelity walkthroughs for the candidate directions at desktop and narrow widths, with no claim of final visual design or production backend behavior.",
+      "identity": "sha256:b79d330e856598ce7f837b0f01d35492c7f416c00cc555d6b5fe695611ad355e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "research-corpus-is-source-backed",
+      "criterion": "A checked-in study uses current primary or official sources for at least eight relevant products spanning agent execution, personal task management, dense work management, command interaction, project workspaces, and branchable Chat; every reference records the exact interaction pattern worth borrowing and the failure mode VibeHub must avoid instead of copying a visual style wholesale.",
+      "identity": "sha256:87f7717c9df20fa49a2f58f45f9b7b0a6cbe0fd21be657b813828343c9477e01",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scenario-pattern-map-is-complete",
+      "criterion": "The study maps research findings to the complete VibeHub loop: first frame, fast Task creation, graph scanning and causal focus, entering one Task, autonomous Run observation, exact human attention, Chat steering, branch/compare/bring-back, Context activation, Evidence review, closeout, and return to the graph.",
+      "identity": "sha256:dc86c1355f05cef68fb71d45411be08c4b564332d0d3f3577431b0a6a7457c60",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Task, not Chat, remains the primary durable and user-facing unit; Chat is an unconstrained exploration and steering surface around Tasks.",
     "The Ticket Graph remains the home model for committed work; research may vary how it transitions into one Task but may not replace it with a flat chat history, Kanban clone, or generic dashboard.",
@@ -51,6 +67,39 @@
       "ref": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "directions-are-interaction-architectures",
+          "identity": "sha256:3c383bf292e3a703f825ea17b83d4292e8f0a73cad0251df3a44fa465963c215",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommendation-is-decision-ready",
+          "identity": "sha256:13f95b4aa49390fbc3fcff94e29b8500810b184e1c79b29d0c031c64a353f9f1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "research-board-is-usable",
+          "identity": "sha256:b79d330e856598ce7f837b0f01d35492c7f416c00cc555d6b5fe695611ad355e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "research-corpus-is-source-backed",
+          "identity": "sha256:87f7717c9df20fa49a2f58f45f9b7b0a6cbe0fd21be657b813828343c9477e01",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scenario-pattern-map-is-complete",
+          "identity": "sha256:dc86c1355f05cef68fb71d45411be08c4b564332d0d3f3577431b0a6a7457c60",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:826c037a17df5531cbcddcb1f0ce6f0ee4e7fa2183ebe3b129b7f2b10e065b85",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -60,6 +109,7 @@
     "conversation:2026-08-19-owner-requires-whole-dsh-reskin"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-research-task-workbench-interaction-directions"
 }

@@ -1,15 +1,21 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
       "acceptance_id": "rooms-proposal-is-reviewable",
-      "criterion": "A checked-in Rooms Workbench UI/UX proposal shows tree placement, per-room drift-state rendering, room detail with Context entries and consuming Tickets, and representative focused and empty states clearly enough for the owner to choose a direction."
+      "criterion": "A checked-in Rooms Workbench UI/UX proposal shows tree placement, per-room drift-state rendering, room detail with Context entries and consuming Tickets, and representative focused and empty states clearly enough for the owner to choose a direction.",
+      "identity": "sha256:5d4554ee019568c4e0eaa0ca2b15e11d18883bdf58d76e55e48e3d3f28878508",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "rooms-proposal-respects-contracts",
-      "criterion": "The proposal preserves the causal Ticket graph, derives Room information mechanically from canonical documents, and applies the quiet-intelligence standard with FRESH state kept quiet and exceptional drift rendered in situ."
+      "criterion": "The proposal preserves the causal Ticket graph, derives Room information mechanically from canonical documents, and applies the quiet-intelligence standard with FRESH state kept quiet and exceptional drift rendered in situ.",
+      "identity": "sha256:ddd3f4ff6ed9bdd88aec4c6bb3b2e9ca68a248c03268b0a8c145b56a41c8ced0",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Produce a reviewable proposal only; do not implement the Rooms surface in this Ticket.",
     "Do not re-cluster or re-layout the causal Ticket graph by room.",
@@ -34,6 +40,33 @@
       "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "rooms-proposal-is-reviewable",
+          "identity": "sha256:5d4554ee019568c4e0eaa0ca2b15e11d18883bdf58d76e55e48e3d3f28878508",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-proposal-respects-contracts",
+          "identity": "sha256:ddd3f4ff6ed9bdd88aec4c6bb3b2e9ca68a248c03268b0a8c145b56a41c8ced0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c9f892ae8685d45a908aab6a949c113932926b80804e4514544a132884112ff9",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A concrete, contract-grounded Rooms Workbench proposal is ready for an explicit owner decision.",
@@ -54,6 +87,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prepare-rooms-workbench-proposal"
 }

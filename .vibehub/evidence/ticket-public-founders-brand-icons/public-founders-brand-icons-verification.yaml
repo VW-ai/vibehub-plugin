@@ -5,6 +5,30 @@
     "identity-and-symbols-fit-the-formal-shell",
     "public-identity-change-is-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "founders-are-two-real-people",
+      "identity": "sha256:66435183b5ac36f3375bdf1af0f442e8f24e700e3b7f3f0b313ad6366fa2012f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "actions-have-distinct-brand-symbols",
+      "identity": "sha256:7571a10bf3a2331eb8ba54e13a4d3ab5aa8435bd94a3d2a64cb09fcebe713f37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "identity-and-symbols-fit-the-formal-shell",
+      "identity": "sha256:d392621667fd8b60014dcea75783d33d4104c31c423901075afd0beb55d269bb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-identity-change-is-verified",
+      "identity": "sha256:b288168aa94def3c49dfb8bed839f30f00a4a4d6bcc1cbb15abfaa76c3d220ee",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-founders-brand-icons-verification",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T22:32:48Z",
@@ -21,7 +45,7 @@
     "browser:http://localhost:3000/@390x844",
     "conversation:2026-08-09-public-founders-browser-verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh verification passes: ESLint, Vinext static production export, seven rendered product-contract tests, canonical project and Ticket validation, the full repository suite at 43/43, and Plugin artifact verification at 51 files and 361397 bytes. The first browser pass exposed a local Vinext image-optimizer overlay for the new assets; marking these already-optimized static images unoptimized removed the route entirely. A fresh 1440x1000 browser pass then showed both 302.5px founder rows, all three loaded action symbols, a visible composer, and zero horizontal overflow. At 390x844 both 154.5px founder rows, all four Website/LinkedIn links, the complete suggested request and composer remain visible with document width equal to viewport width. Codex and Claude install buttons each produced their specific copied feedback, the supported dark-mode request still reached the three-option human-decision boundary, Overview restored the founder entrance, and browser warnings/errors were empty. The temporary viewport override was reset and the localhost entrance was left open.",
   "ticket_id": "ticket-public-founders-brand-icons"
 }

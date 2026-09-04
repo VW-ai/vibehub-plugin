@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "unsafe-predicate-is-exact-and-conservative"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
+      "identity": "sha256:6f47fcceebe426bc907017e0976fee461b5f8d3b916a26070423c52303daf376",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "conservative-worktree-safety-state-machine",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +22,7 @@
     "skills/vibehub-core/scripts/vh.mjs",
     "https://git-scm.com/docs/githooks#_reference_transaction"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The revised five-phase state machine fixes both challenged commit-boundary rounds. Discovery, preflight, and twice-identical disposable engine preview retain the conservative registered/reachable/writable, named non-unborn branch, no Git operation, completely clean status, complete mechanical chain, same-HEAD declared-path-only CURRENT/valid/writable result, and explicit semantic-pending rules. Before materialization, a temporary Git index builds an exact future tree and unsigned commit with hash-object/write-tree/commit-tree; its parent, path set, and blobs are verified while HEAD, real index, worktree, and refs are unchanged. After installing only preverified bytes/index entries, the final pre-CAS gate requires declared bytes/types equal preview, the real index write-tree equals the prepared tree, and porcelain is exactly the expected staged-only declared set with no unstaged or undeclared change. The sole terminal CAS is `git -c core.hooksPath=<new-controlled-empty-dir> update-ref <branch> <commit> <old-head>`: the override explicitly blocks Git's reference-transaction hook, and hostile reference-transaction plus signer sentinels must prove neither executes. git commit, repository hooks, signing helpers, stash, reset, checkout, clean, and push are never invoked. Any pre-CAS failure restores retained bytes and exact index entries and proves baseline HEAD/index/status/digests; restoration failure aborts as recovery_failed. CAS success is always migrated and cannot be relabeled non-success. Tests inject every pre-CAS edge. Current/unaffected are no-op, malformed/newer unsupported, every other enumerated failure pending, and only migrated advances one named worktree branch by one local commit.",
   "ticket_id": "ticket-decide-cross-project-upgrade-surface"
 }

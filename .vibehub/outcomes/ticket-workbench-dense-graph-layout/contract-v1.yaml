@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "dense-fixtures-cover-real-failure-shapes",
+    "cards-and-routes-remain-legible",
+    "crossings-and-congestion-are-materially-reduced",
+    "causal-focus-scales-with-layout",
+    "dense-layout-verifies-in-browser"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-12T23:55:50Z",
+  "contract_revision": {
+    "identity": "sha256:4baba9b4fc4348b091135ddfd941c6ee33ed4c0fd7b57adae9b06135c62202d2",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "dense-layout-fixtures-metrics-and-browser-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria after reading the Ticket, prerequisite successful Outcome and Evidence, commits 74a5d65, 7050983, and 309c968, the full implementation diff, current source, tests, design authority, and canonical Evidence. dense-fixtures-cover-real-failure-shapes: the two deterministic fixtures contain 42 and 36 Tickets and mechanically cover a ten-sibling rank, a hub with five prerequisites and five unlocks, multi-rank edges, all five operational states, and all four human-attention states in both orientations. cards-and-routes-remain-legible: fresh layout tests prove stable positions and routes, no card overlap, no ordinary route through an unrelated card interior, and bounded distinct source and target ports; live initial 0.64 focus views kept card text and explicit states readable with all Tickets and relations present. crossings-and-congestion-are-materially-reduced: the exact checked-in comparison reread v0.7.0 for top-to-bottom and prerequisite commit edf4140 for left-to-right at 1440x960 and 1180x820; crossings fell 1060 to 564 (46.79 percent) and coincident segment length 44635.59 to 263.19 (99.41 percent), while every fixture-orientation-viewport comparison stayed within the five-percent non-regression bound. causal-focus-scales-with-layout: mandated in-app Browser review rendered 45 Tickets and 42 relations; selecting the dense Ticket preserved its complete 12-node and 12-relation transitive cone while 33 nodes and 30 relations receded. All 42 relation hit targets and minimap routes remained present; relation Inspector selection, minimap recentering, direct pan, zoom, and orientation-aware ArrowLeft and ArrowUp traversal were independently exercised in both orientations. dense-layout-verifies-in-browser: both directions passed at 1440x960, 1180x820, and 390x844 with document width equal to viewport width, usable Inspector selection, readable cards, 44x44 narrow controls, clean browser logs, and Exact Git source reporting the clean current checkout at 309c968. The implementation remains one dependency-free layout algorithm, adds only its packaged static script to the existing asset allowlist rather than an API/server endpoint, and adds no framework, graph dependency, worker, cache, service, alternate graph source, or semantic Ticket state. Independent npm run verify passed 56/56 with the 54-file, 673758-byte artifact; project and Ticket validation passed, git diff check was clean, and all four Rooms were FRESH.",
+  "ticket_id": "ticket-workbench-dense-graph-layout",
+  "unresolved_acceptance_ids": []
+}

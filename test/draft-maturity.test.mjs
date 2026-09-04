@@ -74,8 +74,16 @@ test("a draft behind a human blocker surfaces as REFINE, never READY, and firms 
     "a draft must never enter the READY frontier",
   );
 
-  const firmed = { ...ticket("frontend", ["blocker"]), maturity: "firm" };
-  firmed.acceptance = [{ acceptance_id: "interaction-approved", criterion: "The approved interaction design is implemented." }];
+  assert.equal(run(repo, "ticket", "revise", {
+    ticket_id: "frontend",
+    validation: { independent: false, note: "test fixture" },
+    mutation: {
+      retire_acceptance_ids: ["works"],
+      acceptance_changes: [{ acceptance_id: "interaction-approved", criterion: "The approved interaction design is implemented." }],
+    },
+  }).status, 0);
+  const firmed = run(repo, "ticket", "get", { ticket_id: "frontend" }).envelope.data.ticket;
+  firmed.maturity = "firm";
   assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [firmed] }).status, 0);
   assert.equal(statusOf(repo, "frontend"), "READY");
   assert.equal(

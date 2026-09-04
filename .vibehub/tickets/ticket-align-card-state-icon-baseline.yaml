@@ -1,14 +1,21 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "card-phase-icon-baseline-is-corrected",
-      "criterion": "Every lower-right card phase icon uses the phase row's native inline-flex center alignment with no independent vertical transform, while corner-signal and legend icons retain their existing geometry."
+      "acceptance_id": "alignment-regression-is-verified",
+      "criterion": "Focused contract tests and browser review at wide and narrow proposal viewports confirm the phase icon/label pair remains legible and aligned without changing card dimensions, signal placement, accessibility, or responsive behavior.",
+      "identity": "sha256:a2c5f85a6f45143ab0a74e913203a69d36afbf18da954be8ac3b15ef8709560b",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "alignment-regression-is-verified",
-      "criterion": "Focused contract tests and browser review at wide and narrow proposal viewports confirm the phase icon/label pair remains legible and aligned without changing card dimensions, signal placement, accessibility, or responsive behavior."
+      "acceptance_id": "card-phase-icon-baseline-is-corrected",
+      "criterion": "Every lower-right card phase icon uses the phase row's native inline-flex center alignment with no independent vertical transform, while corner-signal and legend icons retain their existing geometry.",
+      "identity": "sha256:50ec2f1da0578102888a4f44e56d96e5ab9243f729ec8e71bed22f83741b4cb4",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep the lower-right card phase icon on native flex centering; do not add an independent optical offset or shift corner-signal icons, the top phase legend, live presence, card geometry, or phase semantics.",
     "Keep icon and text as separate non-color carriers of the same state.",
@@ -26,7 +33,25 @@
     },
     {
       "purpose": "Accepted proposal baseline this follow-up visual correction must preserve.",
-      "ref": ".vibehub/outcomes/ticket-propose-card-corner-signal-contract.yaml"
+      "ref": ".vibehub/outcomes/ticket-propose-card-corner-signal-contract/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "alignment-regression-is-verified",
+          "identity": "sha256:a2c5f85a6f45143ab0a74e913203a69d36afbf18da954be8ac3b15ef8709560b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "card-phase-icon-baseline-is-corrected",
+          "identity": "sha256:50ec2f1da0578102888a4f44e56d96e5ab9243f729ec8e71bed22f83741b4cb4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ff6b94721068aef20d68780e750606785c18710c0648125fdcb20d4a490031df",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -38,6 +63,7 @@
     "conversation:2026-08-20-owner-rejects-one-pixel-optical-offset"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-align-card-state-icon-baseline"
 }

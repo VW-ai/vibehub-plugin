@@ -1,31 +1,50 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "release-candidate-verified",
+      "criterion": "node scripts/verify-release-version.mjs --tag v0.7.0, npm run verify, npm run build, project validation, Ticket validation, git diff --check, and Room drift with every Room FRESH all pass; a real-browser wide/narrow smoke still renders the curated graph.",
+      "identity": "sha256:c5bf9bb13f96c9301f51ee96ab6072b1d755859f296faf050002b5d3480c119c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "release-scope-authorized",
       "authority": "human",
-      "criterion": "Human-origin Evidence records the owner's explicit decision to merge the current curated Victor Web UI before attempting the larger redesign, preserve its functionality, and publish a new release afterward."
+      "criterion": "Human-origin Evidence records the owner's explicit decision to merge the current curated Victor Web UI before attempting the larger redesign, preserve its functionality, and publish a new release afterward.",
+      "identity": "sha256:498253db061a499b8285865515f2223c9f125112e0a7c9c7dcaed0ad54a28c4b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "remote-main-and-pr15-aligned",
-      "criterion": "A fresh origin fetch proves current origin/main is an ancestor of the release branch; an implementation and Context audit proves PR #15's acceptance-authority schema/contract, human-attention projection, human-origin Evidence, explicit maturity/REFINE behavior, and READY-only stateless handoff remain intact after the Victor UI conflict resolution."
-    },
-    {
-      "acceptance_id": "v070-semver-classification",
-      "criterion": "A release-scope audit proves the current published identity and latest tag are v0.6.0, the curated change adds user-visible shared Web UI functionality, and it changes no plugin entrypoint, canonical-data/project format, installation path, or GitHub-only release surface incompatibly; therefore the observable next Semantic Version is the backward-compatible minor release v0.7.0."
-    },
-    {
-      "acceptance_id": "v070-identity-and-changelog",
-      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both .claude-plugin/marketplace.json version fields state 0.7.0; CHANGELOG.md has a dated 0.7.0 entry accurately covering the shared Quiet Workbench graph/Inspector upgrade, preserved human-authority behavior, Desktop/runtime exclusion, historical PR snapshot, and retained-host fsmonitor safety fix."
-    },
-    {
-      "acceptance_id": "release-candidate-verified",
-      "criterion": "node scripts/verify-release-version.mjs --tag v0.7.0, npm run verify, npm run build, project validation, Ticket validation, git diff --check, and Room drift with every Room FRESH all pass; a real-browser wide/narrow smoke still renders the curated graph."
+      "criterion": "A fresh origin fetch proves current origin/main is an ancestor of the release branch; an implementation and Context audit proves PR #15's acceptance-authority schema/contract, human-attention projection, human-origin Evidence, explicit maturity/REFINE behavior, and READY-only stateless handoff remain intact after the Victor UI conflict resolution.",
+      "identity": "sha256:bdca1c6356f41f7d173791512e22d60bcac3b97ef3622fb378fb39453d09a533",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "replacement-pr-ready",
-      "criterion": "The clean branch contains latest origin/main plus the independently accepted UI-only curation and bounded v0.7.0 preparation records, introduces no rejected Desktop/runtime path, and is ready for a replacement PR to main whose summary states it supersedes PR #18 and includes the successful preparation Outcome and Evidence."
+      "criterion": "The clean branch contains latest origin/main plus the independently accepted UI-only curation and bounded v0.7.0 preparation records, introduces no rejected Desktop/runtime path, and is ready for a replacement PR to main whose summary states it supersedes PR #18 and includes the successful preparation Outcome and Evidence.",
+      "identity": "sha256:f5ac4bbf4585de1e2fcf35e2a68c47477f4b0ffcce4e4e1963277d75ee6ee384",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v070-identity-and-changelog",
+      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both .claude-plugin/marketplace.json version fields state 0.7.0; CHANGELOG.md has a dated 0.7.0 entry accurately covering the shared Quiet Workbench graph/Inspector upgrade, preserved human-authority behavior, Desktop/runtime exclusion, historical PR snapshot, and retained-host fsmonitor safety fix.",
+      "identity": "sha256:126f73d72ac2de2311915f734ae5299a50984f827e1f4065b51253f54f84330f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v070-semver-classification",
+      "criterion": "A release-scope audit proves the current published identity and latest tag are v0.6.0, the curated change adds user-visible shared Web UI functionality, and it changes no plugin entrypoint, canonical-data/project format, installation path, or GitHub-only release surface incompatibly; therefore the observable next Semantic Version is the backward-compatible minor release v0.7.0.",
+      "identity": "sha256:9ff58dc3d3ed7fd5d5a8d04201c74e9e1b0041d8370648cce468567cb07fc958",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not implement the proposed Codex-like visual redesign, layout toggle, overview redesign, or graph algorithm work in this release candidate; plan those as later work.",
     "Do not restore apps/workbench, vibehub:// Desktop deep links, repository switching, vh-workbench launcher, session-watch, or Desktop packaging.",
@@ -54,15 +73,53 @@
     },
     {
       "purpose": "Successful independent closeout for the exact UI-only feature being released.",
-      "ref": ".vibehub/outcomes/ticket-curate-pr18-ui-only.yaml"
+      "ref": ".vibehub/outcomes/ticket-curate-pr18-ui-only/contract-v1.yaml"
     },
     {
       "purpose": "Completed PR #15 behavior whose semantic and UI projection must remain intact.",
-      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
+      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority/contract-v1.yaml"
     },
     {
       "purpose": "Completed explicit maturity and REFINE behavior retained from PR #15.",
-      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "release-candidate-verified",
+          "identity": "sha256:c5bf9bb13f96c9301f51ee96ab6072b1d755859f296faf050002b5d3480c119c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-scope-authorized",
+          "identity": "sha256:498253db061a499b8285865515f2223c9f125112e0a7c9c7dcaed0ad54a28c4b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "remote-main-and-pr15-aligned",
+          "identity": "sha256:bdca1c6356f41f7d173791512e22d60bcac3b97ef3622fb378fb39453d09a533",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "replacement-pr-ready",
+          "identity": "sha256:f5ac4bbf4585de1e2fcf35e2a68c47477f4b0ffcce4e4e1963277d75ee6ee384",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v070-identity-and-changelog",
+          "identity": "sha256:126f73d72ac2de2311915f734ae5299a50984f827e1f4065b51253f54f84330f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v070-semver-classification",
+          "identity": "sha256:9ff58dc3d3ed7fd5d5a8d04201c74e9e1b0041d8370648cce468567cb07fc958",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d495c970fe07ea6f004225775b41bbd14471d2c987593ab8b9d865a6205a94c6",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -91,6 +148,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

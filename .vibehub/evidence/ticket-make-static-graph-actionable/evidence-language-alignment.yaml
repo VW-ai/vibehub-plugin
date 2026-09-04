@@ -3,6 +3,20 @@
     "evidence-references-are-typed-and-compact",
     "visual-polish-strengthens-not-obscures"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "identity": "sha256:af2074788c31d95d195032e22dac58546a596795446fda2e2c82ce4dfbf8b0bb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "identity": "sha256:797fb839ed91c2e61c02ce288b08edc8a7d6bf7b34c017bf4d6db36c91475562",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-language-alignment",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T21:20:57.000Z",
@@ -15,7 +29,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood identified the Contract rule sentence as unnecessary explanatory UI and chose Evidence as the clearer name for the former Proof interface. Commit 285da82 removes the repeated explanation, renames the visible tab to Evidence, aligns the Execution metric and empty/loading states to Evidence, and retains Evidence & Outcome as the page heading so independent Outcome authority stays explicit without extra prose. A real-browser audit confirmed the exact Execution, Contract, Evidence tab set, the concise Definition of Done brief, absence of the removed sentence, and empty runtime logs. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237162 bytes. Final owner approval of the overall visual direction remains protected.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "issue-content-is-readable-and-linked"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "issue-content-is-readable-and-linked",
+      "identity": "sha256:7a2f89c61506b376243ac91f2ee8e17592325ec77388cc736db8fa95cff69368",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "issue-body-rendering-contract",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-22T09:15:35Z",
@@ -10,7 +19,7 @@
     "scripts/sync-github-issues.mjs",
     "test/sync-github-issues.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "renderIssueBody emits: hidden ticket-id marker; a header quote with Ticket id, status, next action, and maturity; Outcome; Acceptance as a GitHub task list checked from accepted_acceptance_ids with human-authority criteria marked; Constraints; Dependencies as Blocked by #N lines resolved via the marker map with rationale; Context refs as blob/main links (conversation and commit refs as code); Deliveries; the Outcome record; and a footer linking the Ticket file and stating the read-only rule. Labels are state: <done|ready|close-out|needs-human|blocked|refine|replan> and maturity: <firm|draft>. Evidence renders as one comment each in recorded_at order with its own marker, acceptance ids, summary, and refs. Verified by test assertions and by rendering ticket-bind-proof-to-acceptance-revision and ticket-release-v050 locally.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

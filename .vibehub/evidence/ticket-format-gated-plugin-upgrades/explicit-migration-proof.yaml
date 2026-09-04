@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "explicit-reviewable-migration"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "explicit-reviewable-migration",
+      "identity": "sha256:28e8e6c30a5191a6d8ac365df972bad2035f02263ab8b996cc702a27b5d232d3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "explicit-migration-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-05T00:07:02Z",
@@ -12,7 +21,7 @@
     "test/migration.test.mjs",
     "docs/INSTALL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The migrate Skill consumes compatibility preflight, uses the single registry for 0.4 and unversioned 0.5 paths, previews checked-in paths, requires the explicit write boundary, and verifies CURRENT, validate, and drift afterward.",
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

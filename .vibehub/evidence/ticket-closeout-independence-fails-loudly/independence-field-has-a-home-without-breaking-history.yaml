@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "declaration-has-a-defined-home"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "declaration-has-a-defined-home",
+      "identity": "sha256:f85211092a3f39c504c49e7aa350bcb8f68ffbd37e6bad391f73568fae025fbb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "independence-field-has-a-home-without-breaking-history",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +21,7 @@
     "test/skill-contracts.test.mjs",
     "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "outcome.schema.json gains an explicit independence object with a required source enum and an optional free-text note, deliberately absent from the schema's required list. Read tolerance and write strictness are separated on purpose: validateOutcome accepts a document without the field so the 89 Outcomes written before this contract remain valid and readable, while the ticket closeout write path requires it. Confirmed by project validate on the real repository after the change: valid true, outcomes 89, no document rejected. The field is documented in the schema as a self-declared provenance claim the engine records and never verifies. The contract test asserts the schema enum equals the engine's INDEPENDENCE_SOURCES set and that independence is not in required.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

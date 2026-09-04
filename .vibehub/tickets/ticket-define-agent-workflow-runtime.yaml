@@ -1,47 +1,78 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "strict-versioned-contracts",
-      "criterion": "Checked-in versioned strict contracts plus representative valid and invalid JSON-compatible YAML fixtures define AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt, and dependency-free validation deterministically accepts and rejects those fixtures."
-    },
-    {
       "acceptance_id": "acp-first-execution-boundary",
-      "criterion": "The contracts define ACP as the default execution protocol and acpx as the preferred first but replaceable headless client/runtime facade, with representative launch-profile fixtures for codex-acp and claude-agent-acp. Bespoke transports are permitted only when a documented capability spike identifies a concrete ACP/acpx gap; ACP sessions, events, and facade state never become VibeHub semantic truth."
-    },
-    {
-      "acceptance_id": "upstream-version-license-provenance",
-      "criterion": "Every ACP, acpx, codex-acp, or claude-agent-acp dependency or copied implementation is pinned to an exact tested version or commit and records its source URL, license, required notices, and any local patch; upgrades are explicit compatibility changes."
+      "criterion": "The contracts define ACP as the default execution protocol and acpx as the preferred first but replaceable headless client/runtime facade, with representative launch-profile fixtures for codex-acp and claude-agent-acp. Bespoke transports are permitted only when a documented capability spike identifies a concrete ACP/acpx gap; ACP sessions, events, and facade state never become VibeHub semantic truth.",
+      "identity": "sha256:f94847240c54758c61c0b14b9f97f94a4f1c4085055f4ac080a8b3005025b8ae",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "agent-profile-semantics",
-      "criterion": "AgentProfile identifies a runtime or harness adapter, model selector, and prompt policy; native/default means using the runtime's native behavior with no VibeHub prompt overlay, append is represented explicitly, and profiles contain no OAuth credential, access token, secret, live session identity, or mutable execution state."
-    },
-    {
-      "acceptance_id": "workflow-role-semantics",
-      "criterion": "WorkflowProfile is a reusable versioned method that maps planning, execution, closeout, and learn roles to AgentProfile references without embedding provider or model choices in the Ticket schema; closeout requires an executor-distinct Agent or session, and learn produces a governed provenance-bearing writeback proposal rather than silently mutating Context."
+      "criterion": "AgentProfile identifies a runtime or harness adapter, model selector, and prompt policy; native/default means using the runtime's native behavior with no VibeHub prompt overlay, append is represented explicitly, and profiles contain no OAuth credential, access token, secret, live session identity, or mutable execution state.",
+      "identity": "sha256:3f17b6506b7dad5638c9b813433585ca98ff3086247c4c166db300098f9d3455",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "binding-and-receipt-semantics",
-      "criterion": "RunBinding binds the exact Ticket revision, WorkflowProfile version, AgentProfile version, ContextBinding or equivalent exact context digest, repository/worktree/source identity, and attempt identity; ExecutionReceipt records the resolved runtime adapter and version, resolved model, prompt mode, digest of every VibeHub-owned prompt overlay, and result references while live process, heartbeat, approval, and resume state remain local runtime coordination."
-    },
-    {
-      "acceptance_id": "local-auth-boundary",
-      "criterion": "The V1 launch-profile contracts require reuse of the user's already authenticated local Codex and Claude Code subscriptions without API keys or a second provider login; credentials are neither imported into VibeHub documents nor copied through ContextBinding, events, Evidence, receipts, logs, or Git, and unavailable local authentication is surfaced as an explicit attention condition."
+      "criterion": "RunBinding binds the exact Ticket revision, WorkflowProfile version, AgentProfile version, ContextBinding or equivalent exact context digest, repository/worktree/source identity, and attempt identity; ExecutionReceipt records the resolved runtime adapter and version, resolved model, prompt mode, digest of every VibeHub-owned prompt overlay, and result references while live process, heartbeat, approval, and resume state remain local runtime coordination.",
+      "identity": "sha256:4281ee45949f153ae7021660de10a8f33d1bcdaf44578cc558004ba26bc868fe",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "canonical-lifecycle-preserved",
-      "criterion": "The contracts and tests demonstrate that Run events, ACP session events, acpx state, and ExecutionReceipt do not determine Ticket readiness or completion, executor output does not self-certify acceptance, only independently adjudicated Outcome completes a Ticket, and semantic completion remains reconstructable from Git-native Ticket, Context, Evidence, and Outcome after all daemon or local runtime state is lost."
+      "criterion": "The contracts and tests demonstrate that Run events, ACP session events, acpx state, and ExecutionReceipt do not determine Ticket readiness or completion, executor output does not self-certify acceptance, only independently adjudicated Outcome completes a Ticket, and semantic completion remains reconstructable from Git-native Ticket, Context, Evidence, and Outcome after all daemon or local runtime state is lost.",
+      "identity": "sha256:b4553b2c0b23a589316194c26ae227b940e695f7c48edc2f119a6c6244a80c28",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "existing-authority-reconciled",
-      "criterion": "The resulting design explicitly records whether it fits, amends, or supersedes decision-speed-first-skill-plugin; it resolves the Workflow/Plan/Ticket/Run distinction without treating historical META as hidden authority and does not introduce a provider marketplace, general-purpose workflow engine, second Ticket lifecycle, or second canonical datastore."
+      "criterion": "The resulting design explicitly records whether it fits, amends, or supersedes decision-speed-first-skill-plugin; it resolves the Workflow/Plan/Ticket/Run distinction without treating historical META as hidden authority and does not introduce a provider marketplace, general-purpose workflow engine, second Ticket lifecycle, or second canonical datastore.",
+      "identity": "sha256:33ee091606055ae99e4853dfa579c653e149a399e3919b50ac248f83f2b18966",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-auth-boundary",
+      "criterion": "The V1 launch-profile contracts require reuse of the user's already authenticated local Codex and Claude Code subscriptions without API keys or a second provider login; credentials are neither imported into VibeHub documents nor copied through ContextBinding, events, Evidence, receipts, logs, or Git, and unavailable local authentication is surfaced as an explicit attention condition.",
+      "identity": "sha256:5f93b4e5c1ae65c78face963704620084c990a7ffd1d2db74981f8a72ed1a5cf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-ratifies-contract-boundary",
       "authority": "human",
-      "criterion": "The repository owner explicitly accepts AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt as the minimal abstraction boundary and accepts the documented treatment of local authentication, native/default prompting, independent closeout, and governed writeback."
+      "criterion": "The repository owner explicitly accepts AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt as the minimal abstraction boundary and accepts the documented treatment of local authentication, native/default prompting, independent closeout, and governed writeback.",
+      "identity": "sha256:6735ca4b66eb0024abed4ce7ead414812a6cb81ad22a5e4d418286ae10bc6ae4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "strict-versioned-contracts",
+      "criterion": "Checked-in versioned strict contracts plus representative valid and invalid JSON-compatible YAML fixtures define AgentProfile, WorkflowProfile, and RunBinding/ExecutionReceipt, and dependency-free validation deterministically accepts and rejects those fixtures.",
+      "identity": "sha256:a603e0e756e4c9f3410d4f34e13585f8ee5a85fd361967292af53bb38a267af4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "upstream-version-license-provenance",
+      "criterion": "Every ACP, acpx, codex-acp, or claude-agent-acp dependency or copied implementation is pinned to an exact tested version or commit and records its source URL, license, required notices, and any local patch; upgrades are explicit compatibility changes.",
+      "identity": "sha256:6197d1cfbfc717b8f99a562b03cbd276d2f4c3731cc4f13842f38924f6f0a7de",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "workflow-role-semantics",
+      "criterion": "WorkflowProfile is a reusable versioned method that maps planning, execution, closeout, and learn roles to AgentProfile references without embedding provider or model choices in the Ticket schema; closeout requires an executor-distinct Agent or session, and learn produces a governed provenance-bearing writeback proposal rather than silently mutating Context.",
+      "identity": "sha256:a4d88191d0195ea4d3cc1fa05eb17d83f1466410a1ac2d7fed33ba13cc87bfb5",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not implement or require a Desktop wrapper, daemon, DSH package, Codex adapter, Claude Code adapter, or OAuth login flow in this Ticket.",
     "Do not invent a bespoke Agent transport before a documented capability spike proves a concrete ACP/acpx gap; prefer existing ACP launch profiles and adapters.",
@@ -96,6 +127,64 @@
       "ref": "docs/SPEED_FIRST_CLEANUP.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "acp-first-execution-boundary",
+          "identity": "sha256:f94847240c54758c61c0b14b9f97f94a4f1c4085055f4ac080a8b3005025b8ae",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "agent-profile-semantics",
+          "identity": "sha256:3f17b6506b7dad5638c9b813433585ca98ff3086247c4c166db300098f9d3455",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "binding-and-receipt-semantics",
+          "identity": "sha256:4281ee45949f153ae7021660de10a8f33d1bcdaf44578cc558004ba26bc868fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-lifecycle-preserved",
+          "identity": "sha256:b4553b2c0b23a589316194c26ae227b940e695f7c48edc2f119a6c6244a80c28",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "existing-authority-reconciled",
+          "identity": "sha256:33ee091606055ae99e4853dfa579c653e149a399e3919b50ac248f83f2b18966",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-auth-boundary",
+          "identity": "sha256:5f93b4e5c1ae65c78face963704620084c990a7ffd1d2db74981f8a72ed1a5cf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-ratifies-contract-boundary",
+          "identity": "sha256:6735ca4b66eb0024abed4ce7ead414812a6cb81ad22a5e4d418286ae10bc6ae4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "strict-versioned-contracts",
+          "identity": "sha256:a603e0e756e4c9f3410d4f34e13585f8ee5a85fd361967292af53bb38a267af4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "upstream-version-license-provenance",
+          "identity": "sha256:6197d1cfbfc717b8f99a562b03cbd276d2f4c3731cc4f13842f38924f6f0a7de",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workflow-role-semantics",
+          "identity": "sha256:a4d88191d0195ea4d3cc1fa05eb17d83f1466410a1ac2d7fed33ba13cc87bfb5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:62a3a50cba581d897ed3b94fbb1d98827688e2ced84d150d3ae5b0e8dad93bff",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -106,6 +195,7 @@
     "context:decision-acp-first-local-agent-runtime"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-define-agent-workflow-runtime"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "mechanical-boundary-remains-light"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "mechanical-boundary-remains-light",
+      "identity": "sha256:9d8177699da56c915d96eb58f033e596b805bc00d3f69bf34fc759ad4eb7c73b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "lightweight-ui-boundary-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T08:26:06Z",
@@ -14,7 +23,7 @@
     "skills/scripts/vh-ui.mjs",
     "test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Project and Ticket validation passed with six Context items, five Tickets, nineteen prior Evidence documents, and four Outcomes before this Evidence write. `npm run verify` passed all 8 tests and the clean dependency-free artifact check at 32 files and 173,250 bytes. Tests continue to prove fresh schema-validated Context, Ticket, Evidence, and Outcome projection, invalid-document rejection, unchanged canonical bytes after UI reads, loopback bearer authorization, restrictive headers, GET/HEAD-only routes, POST rejection, no database/cache/write route, narrow launcher flags, and zero package dependencies. The rebuild changes only static HTML/CSS/JS projection and documentation.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

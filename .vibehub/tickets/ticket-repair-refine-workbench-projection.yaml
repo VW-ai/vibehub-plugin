@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-is-first-class-in-workbench",
-      "criterion": "An unlocked maturity: draft Ticket is projected as REFINE on its graph card, minimap, Inspector execution signal, graph summary or overview, and accessibility label with a textual state plus a non-color-only semantic treatment; it is never rendered as an unknown or unprojected Ticket."
-    },
-    {
-      "acceptance_id": "refine-remains-non-executable",
-      "criterion": "REFINE remains excluded from the READY frontier, causal sorting treats it as a known lifecycle state, and Copy for Agent names the exact REFINE state and instructs Ticket review/refinement rather than ticket-run."
-    },
-    {
       "acceptance_id": "browser-regression-catches-refine-omission",
-      "criterion": "A browser-executed or equivalently behavior-level UI regression fixture contains an unlocked draft Ticket and proves its rendered card, summary, Inspector, and copied handoff observe REFINE; the check would fail if REFINE were removed from the browser state whitelist, rather than merely asserting that the server JSON contains REFINE or that a source string exists."
+      "criterion": "A browser-executed or equivalently behavior-level UI regression fixture contains an unlocked draft Ticket and proves its rendered card, summary, Inspector, and copied handoff observe REFINE; the check would fail if REFINE were removed from the browser state whitelist, rather than merely asserting that the server JSON contains REFINE or that a source string exists.",
+      "identity": "sha256:696a63a09d152e2e0394f1621f6d140be3518c408a291ec1db9cdfe98e630bee",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "pr15-authority-contract-stays-intact",
-      "criterion": "Existing tests and a representative UI fixture continue to prove per-criterion human authority, human-origin Evidence, UPCOMING/PENDING/RECORDED/COMPLETE attention, exact human-boundary Agent payloads, and the distinction between human attention and operational state."
+      "criterion": "Existing tests and a representative UI fixture continue to prove per-criterion human authority, human-origin Evidence, UPCOMING/PENDING/RECORDED/COMPLETE attention, exact human-boundary Agent payloads, and the distinction between human attention and operational state.",
+      "identity": "sha256:d1114aae3e58d0a05b3d93e23f9429f11139bd7c9c21107b596737ae4da1a537",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "refine-is-first-class-in-workbench",
+      "criterion": "An unlocked maturity: draft Ticket is projected as REFINE on its graph card, minimap, Inspector execution signal, graph summary or overview, and accessibility label with a textual state plus a non-color-only semantic treatment; it is never rendered as an unknown or unprojected Ticket.",
+      "identity": "sha256:4518787bb4c22319b544a40d24ce3e7ec0044e875b0ff1816f690cc723125759",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "refine-remains-non-executable",
+      "criterion": "REFINE remains excluded from the READY frontier, causal sorting treats it as a known lifecycle state, and Copy for Agent names the exact REFINE state and instructs Ticket review/refinement rather than ticket-run.",
+      "identity": "sha256:9f47348ca678f9f1b18216e6fe010df52915fc0098cc11afe0720a90335f8b75",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "refine-repair-verifies-cleanly",
-      "criterion": "Project and Ticket validation, the full node test suite, Plugin artifact verification, and wide plus narrow real-browser smoke pass without adding a service, dependency, writable route, Desktop runtime, or new lifecycle state."
+      "criterion": "Project and Ticket validation, the full node test suite, Plugin artifact verification, and wide plus narrow real-browser smoke pass without adding a service, dependency, writable route, Desktop runtime, or new lifecycle state.",
+      "identity": "sha256:84e0a3679a9809e7a93ea4fbdba0aa7dbf8c3e789fa28bcfe28f9a0642c27356",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change ticketStatus, firm/draft meaning, dependency unlocking, or READY/BLOCKED/REFINE/DONE/DEVIATED semantics.",
     "Do not redesign the Workbench shell, graph direction, palette, or dense-layout algorithm in this compatibility repair.",
@@ -49,6 +65,39 @@
       "ref": "test/ui-host.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "browser-regression-catches-refine-omission",
+          "identity": "sha256:696a63a09d152e2e0394f1621f6d140be3518c408a291ec1db9cdfe98e630bee",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "pr15-authority-contract-stays-intact",
+          "identity": "sha256:d1114aae3e58d0a05b3d93e23f9429f11139bd7c9c21107b596737ae4da1a537",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-is-first-class-in-workbench",
+          "identity": "sha256:4518787bb4c22319b544a40d24ce3e7ec0044e875b0ff1816f690cc723125759",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-remains-non-executable",
+          "identity": "sha256:9f47348ca678f9f1b18216e6fe010df52915fc0098cc11afe0720a90335f8b75",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-repair-verifies-cleanly",
+          "identity": "sha256:84e0a3679a9809e7a93ea4fbdba0aa7dbf8c3e789fa28bcfe28f9a0642c27356",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1aef4671ba3b2853770d372cda43f8b183219e7dfc078ae5d9e7fc2c51e0a1e2",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-12T04:17:49.000Z",
@@ -73,6 +122,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-repair-refine-workbench-projection"
 }

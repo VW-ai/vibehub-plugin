@@ -4,6 +4,25 @@
     "loopback-host-serves-favicon-exactly",
     "installed-artifacts-and-regressions-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "workbench-declares-canonical-favicon",
+      "identity": "sha256:fe2cf3f843fd0e0894e2aac4256454a76132472c19d352ef76b97d8820a74fdb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "loopback-host-serves-favicon-exactly",
+      "identity": "sha256:314c7317c02593760345cce13beb09d80f4e45f29a3cc25548d7a369431e57df",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "installed-artifacts-and-regressions-pass",
+      "identity": "sha256:f4593ccdb160794e17fd91b5b38f73cbd65f9a318e7fe33e9fbd0bb182281102",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "workbench-favicon-source-installed-host-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -21,7 +40,7 @@
     "command:npm-run-verify-118-of-118",
     "command:verify-plugin-artifact-58-files-608379-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Workbench now declares `<link rel=\"icon\" type=\"image/svg+xml\" href=\"/vibehub-mark.svg\">` and ships a byte-for-byte copy of assets/brand/vibehub-mark.svg in its local asset directory. The loopback allowlist serves that absolute path with HTTP 200 and exact image/svg+xml bytes for GET and HEAD while POST remains read-only 405, preserving the bearer-fragment model and adding no redirect or external dependency. Focused source-host plus fresh Codex and Claude marketplace-host verification passed 11/11 and proved identical canonical bytes and content type across both installed hosts. Complete repository verification passed 118/118; installed artifact verification fetched the icon from the built host and reported 58 files and 608379 bytes. Ticket and project validation pass, all four Rooms are FRESH after aligning Workbench, and no public-site file changed.",
   "ticket_id": "ticket-add-workbench-favicon"
 }

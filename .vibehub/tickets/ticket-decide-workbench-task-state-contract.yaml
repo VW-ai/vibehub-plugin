@@ -3,9 +3,13 @@
     {
       "acceptance_id": "owner-selects-primary-and-substate-contract",
       "authority": "human",
-      "criterion": "The owner explicitly accepts or corrects the proposal's four primary phase derivation and precedence, RUNNING and closeout relationship, upper-right substate taxonomy and priority, short user-facing language, and restrained visual encoding, with human-origin Evidence pointing to the reviewed artifact and decision."
+      "criterion": "The owner explicitly accepts or corrects the proposal's four primary phase derivation and precedence, RUNNING and closeout relationship, upper-right substate taxonomy and priority, short user-facing language, and restrained visual encoding, with human-origin Evidence pointing to the reviewed artifact and decision.",
+      "identity": "sha256:4c5a4d2e676328393d322c287b0df7591a0a46119a7dba1fdd3aa7f86ff78d68",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not infer acceptance from the owner's earlier examples; they explicitly requested semantic validation before implementation.",
     "Do not accept Agent-origin Evidence for this protected product-language and interaction decision.",
@@ -16,6 +20,19 @@
     {
       "purpose": "The decision-ready proposal this Human criterion reviews.",
       "ref": ".vibehub/tickets/ticket-propose-card-corner-signal-contract.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "owner-selects-primary-and-substate-contract",
+          "identity": "sha256:4c5a4d2e676328393d322c287b0df7591a0a46119a7dba1fdd3aa7f86ff78d68",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ba3b7bae0470cc07573b7111744ea4666318dfbfb562dbaf6c1367a2124181a6",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -32,6 +49,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-workbench-task-state-contract"
 }

@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "gate-suite-green",
+      "criterion": "The skill-contracts tests stay green over the new text and the full node --test suite plus artifact verification pass.",
+      "identity": "sha256:8ec4131ef00d737eceb7e64da777da13a3845da85bef5b34776082d3524838ea",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "pr-drift-gate",
-      "criterion": "vibehub-pr's preparation step runs room drift and states the gate: rooms this branch entered must be FRESH, drift:-prefixed stale marks may ship as recorded debt, and an unexplained DRIFTED room blocks the PR handoff until aligned or honestly marked."
+      "criterion": "vibehub-pr's preparation step runs room drift and states the gate: rooms this branch entered must be FRESH, drift:-prefixed stale marks may ship as recorded debt, and an unexplained DRIFTED room blocks the PR handoff until aligned or honestly marked.",
+      "identity": "sha256:07324930f54651d243e037b5a75d6f19decf34f3ec61192b49b4377bfa1f15f5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "room-aware-summary",
-      "criterion": "The PR summary instruction leads with contract and shared-reference diffs and lists the rooms the branch entered with their knowledge changes, alongside the existing outcome, evidence, tests, and known-gaps items."
-    },
-    {
-      "acceptance_id": "gate-suite-green",
-      "criterion": "The skill-contracts tests stay green over the new text and the full node --test suite plus artifact verification pass."
+      "criterion": "The PR summary instruction leads with contract and shared-reference diffs and lists the rooms the branch entered with their knowledge changes, alongside the existing outcome, evidence, tests, and known-gaps items.",
+      "identity": "sha256:1473f027d8184a97b7dc4529f91e3254f367bf342b30ab979561c4eb7cc91ae5",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Judgment-first prose only: no new vh commands, flags, or mechanics.",
     "The gate reuses drift semantics as recorded; no restatement of drift states or origin rules beyond the existing pointers.",
@@ -31,6 +41,29 @@
     {
       "purpose": "Align-on-use policy the gate completes.",
       "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "gate-suite-green",
+          "identity": "sha256:8ec4131ef00d737eceb7e64da777da13a3845da85bef5b34776082d3524838ea",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "pr-drift-gate",
+          "identity": "sha256:07324930f54651d243e037b5a75d6f19decf34f3ec61192b49b4377bfa1f15f5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "room-aware-summary",
+          "identity": "sha256:1473f027d8184a97b7dc4529f91e3254f367bf342b30ab979561c4eb7cc91ae5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:55905017a700ebcc4c3fa3c1a2a82bd7135d14e819a288a226bee6761b18d034",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -55,6 +88,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-pr-room-aware-gate"
 }

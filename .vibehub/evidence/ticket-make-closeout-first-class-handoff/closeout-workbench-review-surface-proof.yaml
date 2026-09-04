@@ -5,6 +5,30 @@
     "batch-and-single-ticket-review-remain-bounded",
     "interaction-regressions-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-and-overview-surface-closeout-work",
+      "identity": "sha256:a0ad144611cff06d919c88e3595eded15c2aec67978b8c2fcc1e2e68b3c5ba79",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "inspector-explains-proof-versus-judgment",
+      "identity": "sha256:3fe32138216dd3d977eb285c4eb81e64941250d271e2be2e8fc8dd712576e240",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+      "identity": "sha256:f3785e8ab5077ea938b9d56829ddc5a541a0b9b565c7a769edde6b805202bf05",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "interaction-regressions-pass",
+      "identity": "sha256:101796a50c9c6f950969d4b1a19f564688df7b7ade0da3d83f1e7f10a25709b5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "closeout-workbench-review-surface-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -21,7 +45,7 @@
     "command:visual-system-contract-8-of-8",
     "command:npm-run-verify-118-of-118"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production graph consumes host-derived CLOSE_OUT as a non-color next-action layer: cards and minimap use a neutral dashed REVIEW treatment instead of executable READY copy, the canvas summary separates READY from CLOSE OUT, and Overview exposes a repository- and scope-bounded Independent closeout count and keyboard-reachable queue that opens one Ticket's Log without any batch acceptance. Execution, Contract, and Log each show authority-satisfying coverage, Outcome pending, and the Evidence-versus-independent-judgment boundary while keeping every acceptance inspectable and NEEDS_HUMAN separate. The UI regression corpus projects zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete human Evidence, successful Outcome, and failed Outcome; focused Workbench/lifecycle/host/model tests passed 21 of 21, the visual-system contract passed 8 of 8 including narrow, keyboard-target, and reduced-motion rules, and complete verification passed 118 of 118.",
   "ticket_id": "ticket-make-closeout-first-class-handoff"
 }

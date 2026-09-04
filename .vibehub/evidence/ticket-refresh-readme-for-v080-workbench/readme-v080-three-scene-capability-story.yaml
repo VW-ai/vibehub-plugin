@@ -4,6 +4,25 @@
     "user-scenario-is-clear-and-compact",
     "readme-surface-stays-focused-and-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "identity": "sha256:8c664b4a3c5284421965b124f19e2d2ff60cb850681945cfb802dfdaf5910992",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "identity": "sha256:04eb678e3abb4eb922d062cbf0064b426034192d58fe136a680210c0a2102645",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "identity": "sha256:3be01534c3bf7ec9ad6145c5dd93469e129878d17d6905634d50a6c844d2d934",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-v080-three-scene-capability-story",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "artifact:54-files-568449-bytes",
     "room:product-fresh"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README now uses exactly three repository-local, optimized, authentic v0.8 Workbench captures as a capability sequence rather than a UI gallery. The 1280x720 current-work canvas shows DONE/READY/REFINE, a selected READY Ticket, its direct causal position, archived boundary, minimap, and clean exact-main Git source. The new 1180x820 proof view focuses the completed integration Ticket's Log and visibly reports 5 Evidence, Outcome recorded, and 6 of 6 criteria with the causal graph still present. The new 390x844 narrow view shows the on-demand canonical Room tree with product selected, FRESH state, 17 Context, 23 consuming Tickets, Drift, and the related-Tickets action over the still-visible graph. Browser measurements confirmed the narrow page was 390/390 with no horizontal overflow; proof and Room passes had no console warnings or errors. Adjacent README copy explains the corresponding user jobs: orient current work, inspect Contract/Evidence/Outcome, and bring repository context in on demand. README remains 59 wc lines / 60 split lines, contains the canonical entry exactly once, and all five referenced local assets plus documentation links exist. Focused release tests passed 4/4, full npm run verify passed 81/81 with the 54-file artifact, project/Ticket validation and diff checks passed, and all four Rooms are FRESH after product alignment.",
   "ticket_id": "ticket-refresh-readme-for-v080-workbench"
 }

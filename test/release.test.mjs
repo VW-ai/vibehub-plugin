@@ -122,8 +122,8 @@ test("the canonical entry routes through existing Setup and Ticket Plan", () => 
 
 test("release is GitHub-only, reproducible, and documented", () => {
   const changelog = read("CHANGELOG.md");
+  assert.match(changelog, /## Unreleased/u);
   assert.match(changelog, /## 0\.8\.0 — 2026-08-13/u);
-  assert.doesNotMatch(changelog, /## Unreleased/u);
 
   const workflow = read(".github/workflows/release.yml");
   for (const required of [

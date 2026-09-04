@@ -4,6 +4,25 @@
     "classification-and-preview-use-the-shared-migration-contract",
     "multi-project-report-is-exhaustive-retryable-and-semantic-aware"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "discovery-is-explicit-bounded-and-worktree-complete",
+      "identity": "sha256:a1252281720959c9f455755a1d420e45a78daf4e6893edc037d529570880ea84",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "classification-and-preview-use-the-shared-migration-contract",
+      "identity": "sha256:8cea78c927f5f8b3f1b11338a4ffcd23841ebc9611000dd6bf4fa59446fbb9ac",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
+      "identity": "sha256:edf43b40b5d5778b5a4428f72026b2e1f7df10e736c5258c372589c87b744781",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "bounded-discovery-classification-and-report-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-03T04:30:39Z",
@@ -13,7 +32,7 @@
     "skills/vibehub-core/scripts/vh.mjs",
     "skills/vibehub-migrate/references/migrations.json"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The coordinator realpath-normalizes only explicit non-symlink roots, skips .git/.vibehub and directory symlinks, discovers Git repositories through a .vibehub candidate, deduplicates common Git directories, and fans out only through git worktree list --porcelain. Every coordinator Git subprocess disables repository-configured fsmonitor before read-only preflight. It invokes the packaged sibling vh.mjs for compatibility, validation of CURRENT data, twice-identical disposable migrate-mechanical previews, and post-preview validation, while carrying no migration action table. The mixed real-Git fixture proves main plus a registered sibling outside the root each get distinct local commits; dirty and prunable registered siblings are unchanged and reported; an unregistered branch, an ordinary project outside the root, and that project's symlink inside the root are unchanged. A second fixture proves valid current, schema-invalid current, unaffected, unsupported-newer, and semantic-first classification with zero commits: schema-invalid format-2 data is unsupported with validation_error, never current. Reports include repository/path/branch, old/new HEAD, format, state/reason/diagnostic, migration IDs, commit ID, and semantic pending refs; rerun changes migrated worktrees to current and remains idempotent.",
   "ticket_id": "ticket-one-command-upgrade-across-projects"
 }

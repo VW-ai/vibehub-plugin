@@ -5,6 +5,30 @@
     "graph-language-and-interaction-remain-intact",
     "connector-fix-is-production-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "connectors-use-rendered-card-geometry",
+      "identity": "sha256:fbb8dc29edd91903d169c10200dd3a36981d265d68a0791f6e4a8c9602b3d886",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "connectors-stay-attached-through-layout-change",
+      "identity": "sha256:46d2639a1240261b6c09730163c549aedffcebd2ae4f2c50f217b961173bb0d1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-language-and-interaction-remain-intact",
+      "identity": "sha256:0404510eebe13556d8f6ba561631afbe7b7a08a3551bf568243222e20ba500e9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "connector-fix-is-production-verified",
+      "identity": "sha256:2b9614158f8bba7d94eb258aab902f9dc74d3ede3909ba3e11150330d98d7b2f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-graph-rendered-geometry-production",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +43,7 @@
     "command:node-site-release-verify-vibehub-icu",
     "command:browser-live-expanded-graph-attachment-check"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Sites version 3 deployed the exact connector-fix commit to the existing public VibeHub project. The immutable URL and vibehub.icu both returned HTTPS 200; the custom domain, provider, and SSL remained active. On the live canonical site with the first Inspector closed, the graph map expanded to about 733px and direct DOM measurement confirmed all three source and target endpoints remained attached within 0.1px. A live screenshot showed the routed paths continuously connecting VH-201 and VH-202 into VH-204 and VH-204 into VH-205 with the existing arrow and control-knot language.",
   "ticket_id": "ticket-fix-public-graph-connector-alignment"
 }

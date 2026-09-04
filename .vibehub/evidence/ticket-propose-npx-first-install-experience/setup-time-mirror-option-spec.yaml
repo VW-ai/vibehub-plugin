@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "setup-offers-github-mirror-as-one-time-option"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "setup-offers-github-mirror-as-one-time-option",
+      "identity": "sha256:a9bfddd62ee73a0245fa1d818f0ebb51b5928be994d8d84e9e06bacd50c00e01",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "setup-time-mirror-option-spec",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T01:54:19Z",
@@ -9,7 +18,7 @@
     "docs/proposals/npx-first-install-experience.md",
     ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The proposal specifies the setup-time option: detect a github.com origin remote, ask once, copy exactly .github/workflows/sync-issues.yml and scripts/sync-github-issues.mjs from templates in the installed skill tree with the helper import rewritten, record the copy as setup Evidence, and state that no Skill, instruction block, or hook asks an Agent to run or check the sync afterwards.",
   "ticket_id": "ticket-propose-npx-first-install-experience"
 }

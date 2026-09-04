@@ -1,23 +1,36 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "native-dependencies-are-projected-idempotently",
-      "criterion": "The sync script projects every Ticket depends_on relation as a native GitHub blocked_by relationship between the two mirrored Issues, adds missing ones, removes stale ones whose blocker is itself a mirrored Ticket Issue, leaves relationships to non-mirrored Issues alone, and a second run against an unchanged repository plans zero dependency writes; fixture tests cover add, remove, keep-foreign, and no-op, and the dry-run output lists each dependency write."
+      "acceptance_id": "github-view-comparison-is-decision-ready",
+      "criterion": "A short checked-in comparison under docs/ evaluates at least three ways to follow the Ticket graph on GitHub (the Issues list with label filters, a Projects board or roadmap fed by the mirror, and the per-Issue sidebar), states for each what the sync provides automatically, what needs one-time human setup, and what it cannot show, and names one recommended default with its exact URL or setup steps.",
+      "identity": "sha256:c46f9c30fae25fc2bdbc26c7aa8b3357bce60a7931d710655aa4bfd2981e393f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "live-relationships-render-natively",
-      "criterion": "After a live run, every open mirrored Issue with Ticket dependencies shows them in the sidebar Relationships section and gh issue view prints matching Blocked by rows; the transcript and at least one Issue URL are recorded as Evidence."
+      "criterion": "After a live run, every open mirrored Issue with Ticket dependencies shows them in the sidebar Relationships section and gh issue view prints matching Blocked by rows; the transcript and at least one Issue URL are recorded as Evidence.",
+      "identity": "sha256:9c2221fc5d7b7cd2901fcdb3283515f342d35f91fc2707dd0b9d2faa52ffa0c8",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "github-view-comparison-is-decision-ready",
-      "criterion": "A short checked-in comparison under docs/ evaluates at least three ways to follow the Ticket graph on GitHub (the Issues list with label filters, a Projects board or roadmap fed by the mirror, and the per-Issue sidebar), states for each what the sync provides automatically, what needs one-time human setup, and what it cannot show, and names one recommended default with its exact URL or setup steps."
+      "acceptance_id": "native-dependencies-are-projected-idempotently",
+      "criterion": "The sync script projects every Ticket depends_on relation as a native GitHub blocked_by relationship between the two mirrored Issues, adds missing ones, removes stale ones whose blocker is itself a mirrored Ticket Issue, leaves relationships to non-mirrored Issues alone, and a second run against an unchanged repository plans zero dependency writes; fixture tests cover add, remove, keep-foreign, and no-op, and the dry-run output lists each dependency write.",
+      "identity": "sha256:4a003ab1bc0a357e86d35870282ee407789899c8868b28ad3663b7fd9b3ad435",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-picks-github-view",
       "authority": "human",
-      "criterion": "The owner reads the comparison and explicitly chooses the recommended default view (or another option); the choice is recorded as human-origin Evidence and linked from the README installation section."
+      "criterion": "The owner reads the comparison and explicitly chooses the recommended default view (or another option); the choice is recorded as human-origin Evidence and linked from the README installation section.",
+      "identity": "sha256:5a9c74cd12959dd72cfc6beb209601c691790af95fdead559168e209f56b3ace",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Relations flow one way from Ticket depends_on to GitHub; never read GitHub relationships back into .vibehub documents.",
     "The Actions workflow keeps issues:write and contents:read only; any view that needs a Project or a PAT is documented as one-time human setup, not automated in CI.",
@@ -42,6 +55,34 @@
       "ref": ".github/workflows/sync-issues.yml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "github-view-comparison-is-decision-ready",
+          "identity": "sha256:c46f9c30fae25fc2bdbc26c7aa8b3357bce60a7931d710655aa4bfd2981e393f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-relationships-render-natively",
+          "identity": "sha256:9c2221fc5d7b7cd2901fcdb3283515f342d35f91fc2707dd0b9d2faa52ffa0c8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "native-dependencies-are-projected-idempotently",
+          "identity": "sha256:4a003ab1bc0a357e86d35870282ee407789899c8868b28ad3663b7fd9b3ad435",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-picks-github-view",
+          "identity": "sha256:5a9c74cd12959dd72cfc6beb209601c691790af95fdead559168e209f56b3ace",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:05fb817f4be0018c9a3a1959caa79f1957cf74441c37bfefc4f18c6a9eaa59d7",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -56,6 +97,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-native-issue-dependencies-and-github-view"
 }

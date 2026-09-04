@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "owner-records-the-policy"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "owner-records-the-policy",
+      "identity": "sha256:121525f6cb0ebdac650354a8c594b556e892d2157aabf3e97d38a1b636b88a29",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "owner-chooses-bump-plus-prerelease",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -11,7 +20,7 @@
     "docs/proposals/release-version-identity.md",
     ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner chose options A and B together and added a third rule of their own. Stated verbatim: 改了就得升版本合理吧，这个配合上pre-release，同时我们可以不强制你非要更新啊，但是如果更新了那我们就要主动帮用户handle 原本的数据的重构的工作. The three rules were restated back to the owner in full — a shipped change cannot land under an already-published version; main carries a pre-release identity so the cost does not fall on each commit; updating is never forced but an update that is taken carries the user's data restructure — and the owner confirmed the restatement verbatim (你关于版本策略都理解对了) before it was recorded. Rejected: declaring no version at all, because a public version number is worth keeping. Recorded as decision-release-version-identity-policy in .vibehub/rooms/product. One sub-question was deliberately not answered and is left to the cross-project upgrade Ticket: whether the restructure is offered at the next session in an affected project, or driven across the machine at update time.",
   "ticket_id": "ticket-decide-release-version-policy"
 }

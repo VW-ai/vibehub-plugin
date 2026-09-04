@@ -3,6 +3,20 @@
     "current-plugin-loop-inventoried",
     "observed-and-speculative-gaps-separated"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "current-plugin-loop-inventoried",
+      "identity": "sha256:a03aeeb614ce1932f0aac19bf820c1882c4b8b1305c3f1e52cb01fcef14c28fb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "observed-and-speculative-gaps-separated",
+      "identity": "sha256:d7768196f3d01aa2ee876c57dff21e8c9fbbcc1d773739bf57d98fab83bfefac",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "plugin-loop-and-gap-audit",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T08:27:48Z",
@@ -17,7 +31,7 @@
     "skills/vibehub-ticket-closeout/SKILL.md",
     "test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Repository audit maps the installed journey as one prompt -> setup/compatibility -> Room-aware planning -> READY execution -> acceptance-linked Evidence -> separate-Agent Outcome -> read-only graph/Contract/Log review. `npm run verify` passed all 43 tests outside the restricted sandbox, confirming the mechanics are healthy. The strongest observed gap is that the public lifecycle promises to stop at exact protected human boundaries while the Ticket schema has no authority field, the UI projection reports authority unavailable, acceptance rows only know evidence/outcome state, and attention styling currently reflects unresolved Outcome rather than a canonical human decision boundary. A second observed maintenance gap is the stale flat `.vibehub/context/` layout in docs/CONCEPT.md despite the current Room-only contract. Project playbooks, cross-repository actions, consumer interaction, and hosted coordination remain directionally attractive but are speculative until real repeated-use friction demonstrates their smallest useful shape.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

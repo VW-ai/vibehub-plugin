@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "favicon-change-is-production-ready",
+      "criterion": "Site lint, production build, rendered contracts, release preflight, focused favicon regression tests, and canonical VibeHub validation pass without changing the visible header mark or other site content.",
+      "identity": "sha256:b1287860138e55162afe0f796046bb75fa0910fe050baa3a2503b40292fab741",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "favicon-is-current-mark-at-new-url",
-      "criterion": "The favicon asset served by the build is byte-identical to site/public/vibehub-mark.svg, uses a new stable URL that does not reuse /favicon.svg, and the obsolete public favicon asset is removed."
+      "criterion": "The favicon asset served by the build is byte-identical to site/public/vibehub-mark.svg, uses a new stable URL that does not reuse /favicon.svg, and the obsolete public favicon asset is removed.",
+      "identity": "sha256:266423114630279e31accfabfbb7f492cc5f20a96790823ff8426107ed21e8e2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "metadata-and-artifact-use-only-new-favicon",
-      "criterion": "Site metadata points both icon and shortcut icon at the new SVG favicon URL; the rendered HTML and dist artifact contain that asset and contain no /favicon.svg reference."
-    },
-    {
-      "acceptance_id": "favicon-change-is-production-ready",
-      "criterion": "Site lint, production build, rendered contracts, release preflight, focused favicon regression tests, and canonical VibeHub validation pass without changing the visible header mark or other site content."
+      "criterion": "Site metadata points both icon and shortcut icon at the new SVG favicon URL; the rendered HTML and dist artifact contain that asset and contain no /favicon.svg reference.",
+      "identity": "sha256:e9e6af2aaf48c258f8632b00fb1a16267e6f40ca7b64f21f3b4cebabf8b2db4b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Reuse the exact checked-in VibeHub mark; do not invent or redraw a new favicon.",
     "Do not change the visible VibeHub header logo, wordmark, palette, or page content.",
@@ -37,6 +47,29 @@
       "ref": "site/release/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "favicon-change-is-production-ready",
+          "identity": "sha256:b1287860138e55162afe0f796046bb75fa0910fe050baa3a2503b40292fab741",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "favicon-is-current-mark-at-new-url",
+          "identity": "sha256:266423114630279e31accfabfbb7f492cc5f20a96790823ff8426107ed21e8e2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "metadata-and-artifact-use-only-new-favicon",
+          "identity": "sha256:e9e6af2aaf48c258f8632b00fb1a16267e6f40ca7b64f21f3b4cebabf8b2db4b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:213e8cd9e471f972884dd3e4f35bc39888982199507ce9554dc4f1bb7de40b23",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -45,6 +78,7 @@
     "conversation:2026-08-20-refresh-vibehub-public-favicon"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-refresh-public-site-favicon"
 }

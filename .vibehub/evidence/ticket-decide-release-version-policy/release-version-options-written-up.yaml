@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "options-are-laid-out-with-consequences"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "options-are-laid-out-with-consequences",
+      "identity": "sha256:63751df5cf4d2673697cb34e7813dc7abb398253d7e957b67f1dc5535302ba06",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "release-version-options-written-up",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -10,7 +19,7 @@
     "docs/proposals/release-version-identity.md",
     "conversation:2026-09-01-packaging-and-release-integrity"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "docs/proposals/release-version-identity.md states the observed failure and its confirmed mechanism (the declared version is the host cache key, resolving marketplace entry version, else plugin.json version, else commit SHA), then lays out all three candidate policies — bump-per-shipped-change, pre-release identity on main, and declaring no version at all — each with its consequences for the release pipeline, for a contributor landing a change, for what a host concludes from equal version strings, and for already-published v0.x tags. The three options were also put to the owner in conversation before the choice was made; this document is the reviewable record of them. HONEST LIMITATION: the owner chose before this document existed, so it records the options faithfully rather than having been the artifact the owner read.",
   "ticket_id": "ticket-decide-release-version-policy"
 }

@@ -4,6 +4,25 @@
     "actions-have-distinct-brand-symbols",
     "identity-and-symbols-fit-the-formal-shell"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "founders-are-two-real-people",
+      "identity": "sha256:66435183b5ac36f3375bdf1af0f442e8f24e700e3b7f3f0b313ad6366fa2012f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "actions-have-distinct-brand-symbols",
+      "identity": "sha256:7571a10bf3a2331eb8ba54e13a4d3ab5aa8435bd94a3d2a64cb09fcebe713f37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "identity-and-symbols-fit-the-formal-shell",
+      "identity": "sha256:d392621667fd8b60014dcea75783d33d4104c31c423901075afd0beb55d269bb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-founders-brand-icons-implementation",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T22:32:48Z",
@@ -20,7 +39,7 @@
     "public-site:https://www.victorz.studio/work",
     "public-profile:https://www.linkedin.com/in/zhang-victor-2032151aa/"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The former expandable founder premise and placeholder note are gone. The initial Coding Agent message now has one restrained, non-expandable two-founder strip containing only local images, public names, personal-site links, and LinkedIn links for Wayne Wang | 王宇轩 and Chenyang Zhang (Victor). The display facts and image sources are published by their own public profiles: Wayne's personal site supplies his headshot and Victor's personal site supplies his identity plus the GitHub and LinkedIn endpoints used to resolve his public portrait and profile. Install for Codex, Install for Claude Code, the arrival GitHub source action, and the masthead GitHub link now use distinct local symbols while retaining their existing copy, external-link, and feedback mechanics. All five new assets are local static files; already-compressed images bypass the unnecessary Vinext optimizer route.",
   "ticket_id": "ticket-public-founders-brand-icons"
 }

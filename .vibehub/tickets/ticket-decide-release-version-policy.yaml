@@ -2,14 +2,21 @@
   "acceptance": [
     {
       "acceptance_id": "options-are-laid-out-with-consequences",
-      "criterion": "Each candidate policy is written out with its concrete consequences for the release pipeline, for a contributor landing a change to shipped content, for what a host concludes from two equal version strings, and for already-published v0.x tags; at minimum the bump-per-shipped-change, distinguishable-pre-release-identity, and content-addressed-distribution options are covered, and each is judged against the observed 143-commit failure."
+      "criterion": "Each candidate policy is written out with its concrete consequences for the release pipeline, for a contributor landing a change to shipped content, for what a host concludes from two equal version strings, and for already-published v0.x tags; at minimum the bump-per-shipped-change, distinguishable-pre-release-identity, and content-addressed-distribution options are covered, and each is judged against the observed 143-commit failure.",
+      "identity": "sha256:63751df5cf4d2673697cb34e7813dc7abb398253d7e957b67f1dc5535302ba06",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-records-the-policy",
       "authority": "human",
-      "criterion": "The owner explicitly chooses one policy, having seen the options and their consequences, and the choice with its reasoning is recorded as a decision Context in .vibehub/rooms/product referencing human-origin Evidence."
+      "criterion": "The owner explicitly chooses one policy, having seen the options and their consequences, and the choice with its reasoning is recorded as a decision Context in .vibehub/rooms/product referencing human-origin Evidence.",
+      "identity": "sha256:121525f6cb0ebdac650354a8c594b556e892d2157aabf3e97d38a1b636b88a29",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket decides and records; it does not implement the enforcement.",
     "Do not rewrite or retag published v0.x releases to fit a new scheme.",
@@ -40,6 +47,24 @@
       "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "options-are-laid-out-with-consequences",
+          "identity": "sha256:63751df5cf4d2673697cb34e7813dc7abb398253d7e957b67f1dc5535302ba06",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-records-the-policy",
+          "identity": "sha256:121525f6cb0ebdac650354a8c594b556e892d2157aabf3e97d38a1b636b88a29",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e86fbc6dbe31fc5699e80ee5b0d9784bdd9b6528f78f077695c5618c2a55e0cc",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -49,6 +74,7 @@
     "https://github.com/VW-ai/vibehub-plugin/issues/128"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-release-version-policy"
 }

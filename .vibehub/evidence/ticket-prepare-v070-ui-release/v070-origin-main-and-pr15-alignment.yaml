@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "remote-main-and-pr15-aligned"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "remote-main-and-pr15-aligned",
+      "identity": "sha256:bdca1c6356f41f7d173791512e22d60bcac3b97ef3622fb378fb39453d09a533",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v070-origin-main-and-pr15-alignment",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +26,7 @@
     "test:human-attention-projection-distinguishes-upcoming-pending-recorded-complete",
     "test:copy-for-agent-is-ready-only"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A fresh origin fetch left origin/main at 0b5585c and git merge-base --is-ancestor origin/main HEAD returned success. The branch is a direct extension of main's PR #15 and v0.6.0 closeout: acceptance-authority contracts and schemas are unchanged, the retained host changes only add fsmonitor hardening, and the full suite passes human-origin Evidence enforcement, firm/draft REFINE behavior, human-attention projection, and READY-only stateless handoff assertions after the Victor UI merge.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

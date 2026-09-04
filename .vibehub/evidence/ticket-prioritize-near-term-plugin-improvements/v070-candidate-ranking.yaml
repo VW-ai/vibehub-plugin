@@ -3,6 +3,20 @@
     "candidates-ranked",
     "next-slice-recommended"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "candidates-ranked",
+      "identity": "sha256:f1c2d293895448acf47e67722ec06f331dce5152d9d033cc01400bc494841e1a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "next-slice-recommended",
+      "identity": "sha256:d8fd05a0a534c6a93647ce9be366063b527cbf11ceb2dd4e8096f43f60356132",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v070-candidate-ranking",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +34,7 @@
     "conversation:2026-08-11-canvas-first-overview-direction",
     "conversation:2026-08-11-owner-identifies-dense-graph-layout-as-scaling-gap"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Five bounded candidates were ranked on immediate user value / repeated-use leverage / strategic fit / tractability (higher is easier) / evidence strength, each out of 5. (1) Canvas-first overview: 5/5/5/4/5. It directly removes permanent rail and duplicate empty-presence chrome, grows the default drawable canvas by a mechanically required 20%, completes focused local links, and preserves Victor's causal cone and Inspector. (2) Historical Ticket archive/query contract refinement: 5/5/5/2/5. The 31-DONE-of-44 graph proves current-panel overload, but lifecycle/schema/query edge cases make implementation too large to precede the shell slice. (3) Direction plus dense-layout chain: 4/5/4/2/5. It addresses explicit owner feedback and current top-to-bottom-only geometry, but must follow the canvas URL/shell foundation and is intentionally split into two Tickets. (4) Codex-like visual proposal and owner decision: 4/4/4/3/5. Demand is explicit, but production styling should follow a stable shell and dense geometry; proposal work may begin once the shell baseline is concrete, while implementation stays gated by human Evidence. (5) Rooms Workbench proposal: 3/4/4/3/4. Valuable for Context discovery and drift, but larger and less immediate than removing current graph friction. The recommended smallest next implementation slice is the existing firm READY ticket-workbench-canvas-first-overview exactly as written: canvas becomes dominant; overview answers only READY/human-attention/deviation/source truth; empty presence consumes no space; Ticket/lens focus becomes honest URL state; Victor interactions stay intact; fixed desktop/narrow browser and DOM measurements verify the gain. It should precede layout/dense work because they share shell and focus state, precede production visual styling because styling an unstable shell creates rework, precede archive implementation because archive semantics are still REFINE, and precede Rooms because Rooms introduces a separate proposal and human decision boundary.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

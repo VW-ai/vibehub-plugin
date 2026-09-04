@@ -3,9 +3,13 @@
     {
       "acceptance_id": "legacy-proof-transition-policy-decided",
       "authority": "human",
-      "criterion": "The owner explicitly selects the append-only Acceptance and Contract revision policy defined by the canonical Context and policy document: stable logical Acceptance IDs; monotonic immutable revisions for semantic changes; new IDs for independently passable obligations; derived_from lineage for split or merge; retirement without deletion when an obligation no longer applies; exact Evidence-to-Acceptance-revision and Outcome-to-Contract-revision binding; historical success preserved only for its bound revision; Git reconstruction of legacy v1 bindings; and legacy-unresolved only for missing or ambiguous history."
+      "criterion": "The owner explicitly selects the append-only Acceptance and Contract revision policy defined by the canonical Context and policy document: stable logical Acceptance IDs; monotonic immutable revisions for semantic changes; new IDs for independently passable obligations; derived_from lineage for split or merge; retirement without deletion when an obligation no longer applies; exact Evidence-to-Acceptance-revision and Outcome-to-Contract-revision binding; historical success preserved only for its bound revision; Git reconstruction of legacy v1 bindings; and legacy-unresolved only for missing or ambiguous history.",
+      "identity": "sha256:fbaceff89413eb1674cfe646e1ebabdaa96e36cbaabb9a18cb06690627d59abe",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket records the protected human policy decision only; it does not implement schemas or migrate the repository.",
     "Agent Evidence, inferred preference, or silence cannot satisfy the human-authority criterion.",
@@ -31,6 +35,19 @@
       "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "legacy-proof-transition-policy-decided",
+          "identity": "sha256:fbaceff89413eb1674cfe646e1ebabdaa96e36cbaabb9a18cb06690627d59abe",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0fc3d8558864f163a5127afa4447fb2684f84273222ebec5c7cd6b1fe8681468",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -47,6 +64,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-legacy-proof-revision-policy"
 }

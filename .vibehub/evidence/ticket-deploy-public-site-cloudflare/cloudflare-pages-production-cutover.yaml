@@ -4,6 +4,25 @@
     "canonical-apex-is-served-by-pages",
     "cloudflare-migration-is-regression-proven"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "existing-pages-project-is-reused",
+      "identity": "sha256:bfa9691a2c13176fcdf5749623767dd054d54930ac603ef1effcc28a9ebe2299",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "canonical-apex-is-served-by-pages",
+      "identity": "sha256:a8c0af68fda32679f57a3443648589de8865beac051d698250b4dce514376b92",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "cloudflare-migration-is-regression-proven",
+      "identity": "sha256:50b64b374666f0dc674751a1a4a24558bee13c67e80964d1ffa73c757ec918b4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "cloudflare-pages-production-cutover",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -22,7 +41,7 @@
     "command:node-site-release-scripts-release-mjs-verify-apex",
     "command:node-site-release-scripts-release-mjs-verify-www"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Read-only account inventory confirmed the pre-existing vibehub-website-v1 Pages project in the authorized Cloudflare account. Its main production branch received the exact clean commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77 at immutable deployment c07ad72e.vibehub-website-v1.pages.dev, which returned HTTPS 200 for the canonical page, robots.txt, sitemap.xml, Open Graph image, and favicon before DNS changed. The existing inactive vibehub.icu Pages domain was reactivated. After exact read-only DNS inspection, only the two temporary apex A origin records were removed and one proxied apex CNAME to vibehub-website-v1.pages.dev was added; the redirect-only www record and every TXT record, including the Search Console ownership proof, remained. Cloudflare then reported vibehub.icu Active with SSL enabled. The canonical production verifier passed all content checks and both HTTP and HTTPS www probes returned direct 301 responses preserving the test path and query.",
   "ticket_id": "ticket-deploy-public-site-cloudflare"
 }

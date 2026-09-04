@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "arrival-is-one-coding-agent-conversation",
-      "criterion": "At 1440px desktop and 390px mobile widths the initial viewport contains one centered, generic Coding Agent conversation with no visible right-hand workspace; its first VibeHub message plainly states what the product does, exposes truthful Codex and Claude Code installation actions, GitHub source access, a founder-premise entry, and a strongly suggested dark-mode request without requiring scrolling or prior product knowledge."
-    },
-    {
-      "acceptance_id": "development-request-opens-contextual-view",
-      "criterion": "Submitting the supported dark-mode request by pointer or keyboard keeps Chat visible, reveals the right-hand View, creates one persistent Ticket, and progresses deterministically to a human-decision boundary without fake token streaming, a network request, an iframe, or a claim that arbitrary prompts are being executed."
-    },
-    {
-      "acceptance_id": "human-choice-drives-live-app",
-      "criterion": "At the human boundary the Agent offers multiple readable dark-palette choices, clearly waits for the visitor, and applies the selected palette immediately to the embedded localhost task app; the chosen value remains visibly selected and execution does not reach a successful Outcome before that explicit choice."
+      "acceptance_id": "agent-first-site-is-accessible-and-verifiable",
+      "criterion": "The static site remains readable and operable on desktop and narrow mobile without page-level horizontal overflow; focus, labels, status announcements, copy feedback, reduced motion, fine-pointer hover gating, external links, and touch targets remain usable; rendered assertions, lint, production build, desktop/mobile browser inspection, canonical project and Ticket validation, and Plugin artifact verification pass.",
+      "identity": "sha256:c566602a426e25cf1cbe5922c2a425af56fe3e1ed1e8babc4e911a8fcf0b849c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "app-and-ticket-views-share-one-cycle",
-      "criterion": "After development begins the right-hand surface provides keyboard- and pointer-reachable App and Ticket views, automatically presents the useful view for the current stage, and the Ticket view visibly connects Request, Context, the one Ticket, Human decision, acceptance-linked Evidence, independent Outcome, and returned durable learning without exposing raw schema JSON."
+      "criterion": "After development begins the right-hand surface provides keyboard- and pointer-reachable App and Ticket views, automatically presents the useful view for the current stage, and the Ticket view visibly connects Request, Context, the one Ticket, Human decision, acceptance-linked Evidence, independent Outcome, and returned durable learning without exposing raw schema JSON.",
+      "identity": "sha256:66a48e8d406d2c67a55949bb538bd5ac4c44cada55f0b0552cf45ab75064d01f",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "agent-first-site-is-accessible-and-verifiable",
-      "criterion": "The static site remains readable and operable on desktop and narrow mobile without page-level horizontal overflow; focus, labels, status announcements, copy feedback, reduced motion, fine-pointer hover gating, external links, and touch targets remain usable; rendered assertions, lint, production build, desktop/mobile browser inspection, canonical project and Ticket validation, and Plugin artifact verification pass."
+      "acceptance_id": "arrival-is-one-coding-agent-conversation",
+      "criterion": "At 1440px desktop and 390px mobile widths the initial viewport contains one centered, generic Coding Agent conversation with no visible right-hand workspace; its first VibeHub message plainly states what the product does, exposes truthful Codex and Claude Code installation actions, GitHub source access, a founder-premise entry, and a strongly suggested dark-mode request without requiring scrolling or prior product knowledge.",
+      "identity": "sha256:0c80d64f7304b498869201ae069535bc5604d43cb42f418c15b2d999f0dcaffc",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "development-request-opens-contextual-view",
+      "criterion": "Submitting the supported dark-mode request by pointer or keyboard keeps Chat visible, reveals the right-hand View, creates one persistent Ticket, and progresses deterministically to a human-decision boundary without fake token streaming, a network request, an iframe, or a claim that arbitrary prompts are being executed.",
+      "identity": "sha256:e25406efa8c7bfe38fcd56957431a5a47ee9e2b88c44d4ec60822e6d63a74146",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "human-choice-drives-live-app",
+      "criterion": "At the human boundary the Agent offers multiple readable dark-palette choices, clearly waits for the visitor, and applies the selected palette immediately to the embedded localhost task app; the chosen value remains visibly selected and execution does not reach a successful Outcome before that explicit choice.",
+      "identity": "sha256:e41cc75f98f210702b95be4882b8e873f3721f2e530349c81690b38310cfa19d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use Coding Agent as the primary product surface and identity; do not brand the shell as Codex or Claude Code, and mention those hosts only where installation truth requires them.",
     "The initial state is conversation-only. Do not keep the previous Ticket Shelf, open book, graph, localhost preview, or a conventional marketing dashboard visible before the visitor starts development.",
@@ -34,7 +50,7 @@
   "context_refs": [
     {
       "purpose": "Successful prior public-site implementation being deliberately reframed rather than reopened.",
-      "ref": ".vibehub/outcomes/ticket-restore-public-hero-ticket-graph.yaml"
+      "ref": ".vibehub/outcomes/ticket-restore-public-hero-ticket-graph/contract-v1.yaml"
     },
     {
       "purpose": "Binding visual, accessibility, and interaction-quality standard.",
@@ -61,6 +77,39 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "agent-first-site-is-accessible-and-verifiable",
+          "identity": "sha256:c566602a426e25cf1cbe5922c2a425af56fe3e1ed1e8babc4e911a8fcf0b849c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "app-and-ticket-views-share-one-cycle",
+          "identity": "sha256:66a48e8d406d2c67a55949bb538bd5ac4c44cada55f0b0552cf45ab75064d01f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "arrival-is-one-coding-agent-conversation",
+          "identity": "sha256:0c80d64f7304b498869201ae069535bc5604d43cb42f418c15b2d999f0dcaffc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "development-request-opens-contextual-view",
+          "identity": "sha256:e25406efa8c7bfe38fcd56957431a5a47ee9e2b88c44d4ec60822e6d63a74146",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-choice-drives-live-app",
+          "identity": "sha256:e41cc75f98f210702b95be4882b8e873f3721f2e530349c81690b38310cfa19d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c4088bf5ec59d8a94d4752d80fce89c0a93c5279ea2bf2670ea2da097613eef8",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "kind": "pull_request",
@@ -80,6 +129,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-coding-agent-first-public-site"
 }

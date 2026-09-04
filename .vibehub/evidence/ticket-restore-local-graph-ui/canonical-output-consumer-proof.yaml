@@ -3,6 +3,20 @@
     "canonical-output-is-mechanical",
     "skill-and-artifact-work-cleanly"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canonical-output-is-mechanical",
+      "identity": "sha256:d686b025b9cb8af98cf8b2ae8939fd98c91e4225711f462660d581ea8013cc6f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "skill-and-artifact-work-cleanly",
+      "identity": "sha256:ca2af9b7c043a398e4617209b6809e351501476490973fec3cfcbdda1861c765",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "canonical-output-consumer-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T08:15:00Z",
@@ -19,7 +33,7 @@
     "/private/tmp/vibehub-ui-claude-20260802",
     "/private/tmp/vibehub-ui-codex-20260802"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The UI fixture now contains valid Context, Ticket, Evidence, and Outcome documents and projects them using the same shared repository loader and validation used by the bundled helper. A UI-specific negative test corrupts a canonical Ticket and observes `validation_error` before projection. The host/API test snapshots every `.vibehub` byte before UI reads and confirms the files are unchanged after graph, inspector, trace, and asset interactions. `npm run verify` passed 8/8 tests and produced a 32-file, 168,644-byte clean artifact; fresh Claude and Codex marketplace artifacts also built offline.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

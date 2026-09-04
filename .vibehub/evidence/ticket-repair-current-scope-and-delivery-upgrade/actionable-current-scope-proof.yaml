@@ -3,6 +3,20 @@
     "current-scope-is-actionable",
     "all-and-delivery-history-remain-truthful"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "current-scope-is-actionable",
+      "identity": "sha256:a4509139f1156ee6506f57cdfab9105cf2b5a8686186dc1d50e72212cc3214a9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "all-and-delivery-history-remain-truthful",
+      "identity": "sha256:08b165ec35a296830fad89cb07f5643c10716e9f19b8a9ecfd39e9de1678842d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "actionable-current-scope-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-20T00:22:02Z",
@@ -14,7 +28,7 @@
     "command:vh-ticket-graph-current:11-visible-1-done-boundary",
     "command:vh-ticket-graph-all:54-visible"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The shared projection now seeds current scope from non-DONE Tickets, retains only directly adjacent DONE boundaries, and traverses DONE history independently of delivery metadata. On the real repository, current fell from 47 visible Tickets with 38 DONE to 11 visible Tickets: 10 open and one direct archived causal boundary; all scope remains complete at 54 Tickets and exact delivery/archive semantics remain separate.",
   "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
 }

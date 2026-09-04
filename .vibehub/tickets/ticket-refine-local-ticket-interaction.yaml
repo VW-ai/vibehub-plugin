@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "default-view-orients-immediately",
-      "criterion": "The first real-browser view makes the exact project/worktree source, causal direction, executable frontier, and any blocker or deviation immediately distinguishable without opening the Inspector, reading raw schema terms, or scanning a dashboard legend."
-    },
-    {
-      "acceptance_id": "selection-is-one-execution-lens",
-      "criterion": "Selecting a Ticket produces one stable visual focus rather than competing frames or layout movement: the graph keeps the Ticket's causal position visible while the first Inspector view answers intended outcome, current state and why, direct prerequisites/unlocks, and proof availability before secondary details."
+      "criterion": "The first real-browser view makes the exact project/worktree source, causal direction, executable frontier, and any blocker or deviation immediately distinguishable without opening the Inspector, reading raw schema terms, or scanning a dashboard legend.",
+      "identity": "sha256:131e13ecfd2f706ef71bd099ac98e2bccf0ec971f3569570177817bef3b3fa25",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "detail-is-progressive-and-task-ordered",
-      "criterion": "From the selected Ticket, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and Git trace are reachable in a task-oriented order with no important fact more than one further disclosure away and no unsupported action implied."
-    },
-    {
-      "acceptance_id": "navigation-feels-fluid-and-predictable",
-      "criterion": "Mouse, keyboard, pan, zoom, fit, minimap, Ticket/relation selection, close/back, refresh, and narrow-screen Inspector behavior work as one predictable model over representative multiple-root, fork, join, blocked, completed, and deviated topology, with stable layout, visible focus, no transient duplicate selection affordance, and reduced-motion support."
+      "criterion": "From the selected Ticket, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and Git trace are reachable in a task-oriented order with no important fact more than one further disclosure away and no unsupported action implied.",
+      "identity": "sha256:e3163acd87a4d23fc9fc87917468473c790e37d72c4253f47ac2cf69836ed3b4",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "lightweight-boundary-survives",
-      "criterion": "The verified clean Plugin remains dependency-free and read-only with one ephemeral loopback host per exact worktree, fresh schema-validated Git-YAML projection, expiring fragment bearer, restrictive headers, and no database, cache, daemon, branch aggregation, hidden state, semantic inference, or write route."
+      "criterion": "The verified clean Plugin remains dependency-free and read-only with one ephemeral loopback host per exact worktree, fresh schema-validated Git-YAML projection, expiring fragment bearer, restrictive headers, and no database, cache, daemon, branch aggregation, hidden state, semantic inference, or write route.",
+      "identity": "sha256:5f4563152296141c53f51335d74fa9d78483050a8763ade3a3f702446dc6aae5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "navigation-feels-fluid-and-predictable",
+      "criterion": "Mouse, keyboard, pan, zoom, fit, minimap, Ticket/relation selection, close/back, refresh, and narrow-screen Inspector behavior work as one predictable model over representative multiple-root, fork, join, blocked, completed, and deviated topology, with stable layout, visible focus, no transient duplicate selection affordance, and reduced-motion support.",
+      "identity": "sha256:44ffb62ae1996255ce28fafd87e3fdaef8a9f57edb8308dd5c8a0c5124a0a107",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-approves-daily-interaction-direction",
-      "criterion": "After at least one rapid real-browser feedback loop on the actual repository, the owner explicitly confirms that the interaction direction is worth using during normal Ticket-driven development; automated checks and an Agent cannot substitute for this judgment."
+      "criterion": "After at least one rapid real-browser feedback loop on the actual repository, the owner explicitly confirms that the interaction direction is worth using during normal Ticket-driven development; automated checks and an Agent cannot substitute for this judgment.",
+      "identity": "sha256:bb827219d16faf752a98d544923a45357e32752c09b50d98ce8a251637ee15ee",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "selection-is-one-execution-lens",
+      "criterion": "Selecting a Ticket produces one stable visual focus rather than competing frames or layout movement: the graph keeps the Ticket's causal position visible while the first Inspector view answers intended outcome, current state and why, direct prerequisites/unlocks, and proof availability before secondary details.",
+      "identity": "sha256:4f6d86309889f691b10fa9c0a9109a5a8f22d16e1b49e2a6ef1c8292b29e7f68",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Treat the current surface as a product baseline, not a DOM or CSS compatibility contract; replace weak interaction and presentation directly.",
     "Optimize for rapid real-browser iteration with the owner and delete rejected experiments instead of building compatibility or abstraction layers.",
@@ -64,6 +83,44 @@
       "ref": "skills/vibehub-ticket-review/assets/app.js"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "default-view-orients-immediately",
+          "identity": "sha256:131e13ecfd2f706ef71bd099ac98e2bccf0ec971f3569570177817bef3b3fa25",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "detail-is-progressive-and-task-ordered",
+          "identity": "sha256:e3163acd87a4d23fc9fc87917468473c790e37d72c4253f47ac2cf69836ed3b4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "lightweight-boundary-survives",
+          "identity": "sha256:5f4563152296141c53f51335d74fa9d78483050a8763ade3a3f702446dc6aae5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "navigation-feels-fluid-and-predictable",
+          "identity": "sha256:44ffb62ae1996255ce28fafd87e3fdaef8a9f57edb8308dd5c8a0c5124a0a107",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-approves-daily-interaction-direction",
+          "identity": "sha256:bb827219d16faf752a98d544923a45357e32752c09b50d98ce8a251637ee15ee",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selection-is-one-execution-lens",
+          "identity": "sha256:4f6d86309889f691b10fa9c0a9109a5a8f22d16e1b49e2a6ef1c8292b29e7f68",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ebc1d8da31180c9e4452ac85959bbf2b3ad5604ad12f4d893ae67da3c92d2b05",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -88,6 +145,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-refine-local-ticket-interaction"
 }

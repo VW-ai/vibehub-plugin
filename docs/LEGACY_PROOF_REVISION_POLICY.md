@@ -214,7 +214,11 @@ database, ledger service, or hidden signature authority.
   revision identities while excluding the mutable active selector.
 - Unrelated Ticket context, constraints, relations, deliveries, formatting,
   and presentation copy do not create semantic revisions.
-- Human authority still requires referenced human-origin Evidence.
+- Native Outcome support must bind the exact Acceptance revision. Reconstructed
+  Outcomes retain immutable legacy `evidence_ids` even when a reference points
+  to older proof; such references stay readable but grant no revision credit.
+  Human authority still requires at least one referenced human-origin Evidence
+  bound to the exact accepted revision.
 - Migration is one explicit project-format step shared by source, Codex, and
   Claude artifacts; there is no compatibility daemon or hidden cache.
 - Rollback changes the active format interpretation, never deletes proof,

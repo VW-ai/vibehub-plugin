@@ -18,6 +18,11 @@ infer or remove authority from criterion wording.
 Read `../vibehub-core/contracts/dependency-hygiene.json` and use its exact classification
 when reviewing proposed dependency edges. It is advice about planning truth,
 not another schema gate.
+Read `../vibehub-core/contracts/revision-identity.md`. For an existing Ticket,
+verify the candidate preserves every immutable historical Acceptance and
+Contract revision, advances revisions monotonically, uses new logical IDs for
+separately passable obligations, and does not manufacture lineage or a
+semantic revision for presentation-only copy.
 This Skill owns `validation-needs-human`; an unapplied candidate cannot be
 projected as canonical UI state.
 

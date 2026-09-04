@@ -16,6 +16,12 @@ calling Ticket Skill.
 Read `../vibehub-core/contracts/ticket-next-action.md`. Present the host-derived next action
 beside operational state and human attention; never infer it again from UI
 copy, Evidence counts, or browser state.
+Read `../vibehub-core/contracts/revision-identity.md`. Present the active
+Contract revision separately from historical Outcomes; show each Acceptance's
+logical ID, revision, active/retired state and `derived_from` lineage, plus
+Evidence binding origin. A `legacy-unresolved` record must show its reason and
+attempted provenance as repair guidance, never as globally failed or stale
+proof.
 
 ## Local graph UI
 

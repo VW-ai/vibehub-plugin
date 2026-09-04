@@ -5,6 +5,30 @@
     "directions-and-narrow-layout-regressions-pass",
     "quiet-accessible-visual-contract-is-preserved"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "archived-stub-is-legible-in-real-graph",
+      "identity": "sha256:5d66ddac0ee46398dcf19098080b7a927345173cb8c1e5fdb2accf79e876aa47",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "archive-expansion-remains-exact-and-operable",
+      "identity": "sha256:59adc1cb068c67a1a80bec94386cd8fd9f9e50597ef25672e0b56b9219144c92",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "directions-and-narrow-layout-regressions-pass",
+      "identity": "sha256:b9942f3deeaa8cd9b184bbc1c28bfcdb2b19ab5bc4df9f58b810cc9b270e1cb8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+      "identity": "sha256:ca0159a387761ecd0f55e2e2251113d8bec70494dae9b68623abd5e2b0b9a5a4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "archived-stub-integrated-browser-matrix",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-20T20:35:10Z",
@@ -16,7 +40,7 @@
     "test/ui-visual-system.test.mjs",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Direct integrated-main browser inspection on the authorized read-only loopback Workbench confirmed all three real archived boundaries render as opaque two-line controls with complete counts and upstream/downstream labels outside the primary causal lane in both LTR and TTB. At an explicit 760x900 viewport the document measured clientWidth=scrollWidth=760 and clientHeight=scrollHeight=900. Keyboard Enter on the 18-Ticket upstream stub added exactly history=ticket-rooms-into-workbench, revealed that canonical Ticket, replaced the boundary with the next 17-Ticket stub, and moved focus to the revealed archived Ticket. Normal viewport was restored after the check; no browser or repository state became authoritative.",
   "ticket_id": "ticket-fix-archived-stub-label-visibility"
 }
