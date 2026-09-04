@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "engine-requires-a-declared-independence-source",
-      "criterion": "node vh.mjs ticket closeout rejects an Outcome whose input does not declare an independence source drawn from a closed set covering a subagent with no execution context, a separate session started from the handoff, and a different human; the rejection is a machine-readable error envelope, writes nothing under .vibehub/outcomes, and leaves the Ticket's next_action at CLOSE_OUT, proven by a test that asserts no file appears."
+      "acceptance_id": "closeout-skill-matches-the-engine",
+      "criterion": "skills/vibehub-ticket-closeout/SKILL.md names the same closed set of independence sources, instructs the Agent to declare which was used, and instructs it to halt and report what is missing rather than proceed when none is available; test/skill-contracts.test.mjs asserts that the sources named in the Skill are exactly those the engine accepts.",
+      "identity": "sha256:6000afc0017e469440d606c289595d4e6bf114e60f0bcd4108263bd2ac5ef8f0",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "declaration-has-a-defined-home",
-      "criterion": "The declaration is carried by an explicit field whose addition to outcome.schema.json is made deliberately, with the schema's compatibility handling stated, rather than smuggled into summary free text; existing Outcomes without the field remain valid and readable."
+      "criterion": "The declaration is carried by an explicit field whose addition to outcome.schema.json is made deliberately, with the schema's compatibility handling stated, rather than smuggled into summary free text; existing Outcomes without the field remain valid and readable.",
+      "identity": "sha256:f85211092a3f39c504c49e7aa350bcb8f68ffbd37e6bad391f73568fae025fbb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "engine-requires-a-declared-independence-source",
+      "criterion": "node vh.mjs ticket closeout rejects an Outcome whose input does not declare an independence source drawn from a closed set covering a subagent with no execution context, a separate session started from the handoff, and a different human; the rejection is a machine-readable error envelope, writes nothing under .vibehub/outcomes, and leaves the Ticket's next_action at CLOSE_OUT, proven by a test that asserts no file appears.",
+      "identity": "sha256:aeafb6f8f5069db91f30b409b3ff8efb6df7e8aae90cee868cbeb2c3537c9afe",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "the-record-shows-who-judged",
-      "criterion": "A reader of a checked-in Outcome, and the Workbench projection of it, can see the declared independence source without reconstructing the session. The criterion is presence and readability only: because the engine must not verify the claim, an executor that declares a source it did not use produces an Outcome that is not mechanically distinguishable, and the gain is that silence becomes a false statement in a reviewable Git document rather than an absence."
-    },
-    {
-      "acceptance_id": "closeout-skill-matches-the-engine",
-      "criterion": "skills/vibehub-ticket-closeout/SKILL.md names the same closed set of independence sources, instructs the Agent to declare which was used, and instructs it to halt and report what is missing rather than proceed when none is available; test/skill-contracts.test.mjs asserts that the sources named in the Skill are exactly those the engine accepts."
+      "criterion": "A reader of a checked-in Outcome, and the Workbench projection of it, can see the declared independence source without reconstructing the session. The criterion is presence and readability only: because the engine must not verify the claim, an executor that declares a source it did not use produces an Outcome that is not mechanically distinguishable, and the gain is that silence becomes a false statement in a reviewable Git document rather than an absence.",
+      "identity": "sha256:4c05c3359f29c2def48c98cd0e0d0850859cfc70cd9b8f7d763ab3adff758656",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "validate-path-states-the-skip",
-      "criterion": "The same engine seam covers the validation path: node vh.mjs ticket apply requires its input to declare whether an independent Agent validated the candidate, so an unrecorded skip is rejected rather than merely undetected; a test asserts that an input omitting the declaration writes no Ticket. If the executor concludes this seam is wrong for apply, the Outcome must state why the asymmetry with closeout is acceptable rather than leaving the validation path on an honor system by default."
+      "criterion": "The same engine seam covers the validation path: node vh.mjs ticket apply requires its input to declare whether an independent Agent validated the candidate, so an unrecorded skip is rejected rather than merely undetected; a test asserts that an input omitting the declaration writes no Ticket. If the executor concludes this seam is wrong for apply, the Outcome must state why the asymmetry with closeout is acceptable rather than leaving the validation path on an honor system by default.",
+      "identity": "sha256:a1a197a34e1faebdf746f6ad571701232acb1fde202eb70fc3da697eeb7dd969",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not require a specific host mechanism; subagent, separate session, and second human all remain valid independence sources, and the engine checks only that one is declared.",
     "The declaration is a lightweight provenance claim in a Git document, exactly as acceptance-authority.md frames provenance; do not build an identity, permission, approval, or attestation system, and do not attempt to verify the claim's truth.",
@@ -59,6 +75,39 @@
       "ref": "test/skill-contracts.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "closeout-skill-matches-the-engine",
+          "identity": "sha256:6000afc0017e469440d606c289595d4e6bf114e60f0bcd4108263bd2ac5ef8f0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "declaration-has-a-defined-home",
+          "identity": "sha256:f85211092a3f39c504c49e7aa350bcb8f68ffbd37e6bad391f73568fae025fbb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "engine-requires-a-declared-independence-source",
+          "identity": "sha256:aeafb6f8f5069db91f30b409b3ff8efb6df7e8aae90cee868cbeb2c3537c9afe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "the-record-shows-who-judged",
+          "identity": "sha256:4c05c3359f29c2def48c98cd0e0d0850859cfc70cd9b8f7d763ab3adff758656",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "validate-path-states-the-skip",
+          "identity": "sha256:a1a197a34e1faebdf746f6ad571701232acb1fde202eb70fc3da697eeb7dd969",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fe72b767241e46eb4de8077bcc16c1c3ae74fc01f95869a9501c17e205282e59",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -68,6 +117,7 @@
     "https://github.com/VW-ai/vibehub-plugin/issues/130"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

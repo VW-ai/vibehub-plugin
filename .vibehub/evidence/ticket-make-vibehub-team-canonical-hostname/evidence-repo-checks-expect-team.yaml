@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "team-is-the-only-canonical-url"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "team-is-the-only-canonical-url",
+      "identity": "sha256:be0967b98700a47635d4b29419be807675541123a7132698fd85111b36701cf5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-repo-checks-expect-team",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T09:09:16Z",
@@ -11,7 +20,7 @@
     "scripts/verify-plugin-artifact.mjs",
     "command:npm test"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Closeout rejection addressed: test/site-release-workflow.test.mjs, test/release.test.mjs, test/host-marketplaces.test.mjs, and scripts/verify-plugin-artifact.mjs now expect https://vibehub.team as the single canonical link; root npm test 143 pass 0 fail and node scripts/verify-plugin-artifact.mjs ok at commit 2958c91221efd7e96ea805179613a06c92170e03.",
   "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
 }

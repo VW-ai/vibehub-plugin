@@ -1,38 +1,63 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "one-copy-handoff-per-object",
-      "criterion": "The selected Ticket and each Evidence or Outcome object expose one clearly prioritized common-copy-icon action that copies a coherent Agent-ready payload containing typed identity, useful summary, and exact references; users are not forced to copy fields or indistinguishable references one by one."
-    },
-    {
-      "acceptance_id": "evidence-references-are-typed-and-compact",
-      "criterion": "Each Evidence card presents a compact reference overview with meaningful types and labels such as commit, test, file, browser, conversation, or URL, a visible count, one copy-all action, and optional individual compact controls; the current wall of repeated large 'Evidence reference' buttons is gone and Outcome remains visually distinct."
-    },
-    {
       "acceptance_id": "bound-context-is-inspectable",
-      "criterion": "A bound canonical VibeHub Context object can expand inline to show its exact validated type, state, summary, detail, source, Evidence, and relations; ordinary document and source-code refs remain honest path objects with copy/open affordances and never pretend unprojected content exists."
-    },
-    {
-      "acceptance_id": "source-actions-are-mechanical-and-honest",
-      "criterion": "The VibeHub/project/worktree area opens a compact source surface showing exact worktree, branch, commit, and dirty state plus copy-path and copy-for-Agent actions; well-formed local paths and recognized Git remotes may produce editor or GitHub links mechanically, while unavailable actions are omitted or explained without a writable host endpoint."
-    },
-    {
-      "acceptance_id": "relations-and-provenance-have-visual-language",
-      "criterion": "Dependency rationale is rendered as a directional relation object and provenance as typed source tokens or a compact source ledger rather than undifferentiated disclosure text, while every exact raw ref remains reachable and copyable."
+      "criterion": "A bound canonical VibeHub Context object can expand inline to show its exact validated type, state, summary, detail, source, Evidence, and relations; ordinary document and source-code refs remain honest path objects with copy/open affordances and never pretend unprojected content exists.",
+      "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "dense-causal-position-remains-readable",
-      "criterion": "In a real-browser fixture with at least five direct prerequisites and five direct unlocks including completed, blocked, and deviated paths, the selected Ticket's causal lens prioritizes blockers and executable consequences, communicates totals, offers one route to the complete set or focused graph cone, and never overflows into an unreadable row of tiny cards."
+      "criterion": "In a real-browser fixture with at least five direct prerequisites and five direct unlocks including completed, blocked, and deviated paths, the selected Ticket's causal lens prioritizes blockers and executable consequences, communicates totals, offers one route to the complete set or focused graph cone, and never overflows into an unreadable row of tiny cards.",
+      "identity": "sha256:9fa186ee518f6f138870e397c9f55ee12021e3d2660b811cf676526db781de86",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "visual-polish-strengthens-not-obscures",
-      "criterion": "Desktop, normal Codex width, and 390px narrow review show a more authored VibeHub atmosphere, clearer object shapes, restrained background or proof accents, compact standard icons, and deliberate hover/focus feedback without weakening three-second orientation, state contrast, reduced motion, or the quiet-intelligence standard; the owner approves the resulting direction."
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "criterion": "Each Evidence card presents a compact reference overview with meaningful types and labels such as commit, test, file, browser, conversation, or URL, a visible count, one copy-all action, and optional individual compact controls; the current wall of repeated large 'Evidence reference' buttons is gone and Outcome remains visually distinct.",
+      "identity": "sha256:af2074788c31d95d195032e22dac58546a596795446fda2e2c82ce4dfbf8b0bb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "criterion": "The selected Ticket and each Evidence or Outcome object expose one clearly prioritized common-copy-icon action that copies a coherent Agent-ready payload containing typed identity, useful summary, and exact references; users are not forced to copy fields or indistinguishable references one by one.",
+      "identity": "sha256:f24a32ae1d33610fad6dbf97d6e24e4f85efa472ec4b3cdaf4259b1bbb98e630",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "read-only-boundary-remains-light",
-      "criterion": "The clean Plugin remains dependency-free and mechanically derived from freshly validated Git-YAML with the existing ephemeral loopback bearer boundary, no database, cache, daemon, semantic inference, server-side file opener, write route, or hidden durable state."
+      "criterion": "The clean Plugin remains dependency-free and mechanically derived from freshly validated Git-YAML with the existing ephemeral loopback bearer boundary, no database, cache, daemon, semantic inference, server-side file opener, write route, or hidden durable state.",
+      "identity": "sha256:b5fe59bca4c77fc35364d18b648067726153146f05d9da62651db5ba85a92e84",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "criterion": "Dependency rationale is rendered as a directional relation object and provenance as typed source tokens or a compact source ledger rather than undifferentiated disclosure text, while every exact raw ref remains reachable and copyable.",
+      "identity": "sha256:43abad3fdc65d5e170fc24cd32c6d35d2f2d8278c6fa86a7508ab939c2993eea",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "source-actions-are-mechanical-and-honest",
+      "criterion": "The VibeHub/project/worktree area opens a compact source surface showing exact worktree, branch, commit, and dirty state plus copy-path and copy-for-Agent actions; well-formed local paths and recognized Git remotes may produce editor or GitHub links mechanically, while unavailable actions are omitted or explained without a writable host endpoint.",
+      "identity": "sha256:14131af07ac05b0d6cf1c6c886ae2e4ef6ec690b913fa0d5f989a145bd47c4ca",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "criterion": "Desktop, normal Codex width, and 390px narrow review show a more authored VibeHub atmosphere, clearer object shapes, restrained background or proof accents, compact standard icons, and deliberate hover/focus feedback without weakening three-second orientation, state contrast, reduced motion, or the quiet-intelligence standard; the owner approves the resulting direction.",
+      "identity": "sha256:797fb839ed91c2e61c02ce288b08edc8a7d6bf7b34c017bf4d6db36c91475562",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Move quickly and replace weak presentation directly; do not preserve current DOM, CSS, or generic button compatibility.",
     "Use one coherent copy-for-Agent payload per visible object and common compact icons; do not create a copy button beside every line of text.",
@@ -58,7 +83,7 @@
     },
     {
       "purpose": "Successful baseline and owner-approved interaction direction that this Ticket deepens.",
-      "ref": ".vibehub/outcomes/ticket-refine-local-ticket-interaction.yaml"
+      "ref": ".vibehub/outcomes/ticket-refine-local-ticket-interaction/contract-v1.yaml"
     },
     {
       "purpose": "Current product and interaction design authority.",
@@ -75,6 +100,54 @@
     {
       "purpose": "Current quiet-intelligence visual system and responsive behavior.",
       "ref": "skills/vibehub-ticket-review/assets/app.css"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bound-context-is-inspectable",
+          "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dense-causal-position-remains-readable",
+          "identity": "sha256:9fa186ee518f6f138870e397c9f55ee12021e3d2660b811cf676526db781de86",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "evidence-references-are-typed-and-compact",
+          "identity": "sha256:af2074788c31d95d195032e22dac58546a596795446fda2e2c82ce4dfbf8b0bb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-copy-handoff-per-object",
+          "identity": "sha256:f24a32ae1d33610fad6dbf97d6e24e4f85efa472ec4b3cdaf4259b1bbb98e630",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "read-only-boundary-remains-light",
+          "identity": "sha256:b5fe59bca4c77fc35364d18b648067726153146f05d9da62651db5ba85a92e84",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "relations-and-provenance-have-visual-language",
+          "identity": "sha256:43abad3fdc65d5e170fc24cd32c6d35d2f2d8278c6fa86a7508ab939c2993eea",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "source-actions-are-mechanical-and-honest",
+          "identity": "sha256:14131af07ac05b0d6cf1c6c886ae2e4ef6ec690b913fa0d5f989a145bd47c4ca",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-polish-strengthens-not-obscures",
+          "identity": "sha256:797fb839ed91c2e61c02ce288b08edc8a7d6bf7b34c017bf4d6db36c91475562",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:65b0b588ed5f3b2c792198a62fd1dd9df76b8aeaa159d3480b717ce1feac231a",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -101,6 +174,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-static-graph-actionable"
 }

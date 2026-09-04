@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "dependency-versus-context-rule-is-explicit",
-      "criterion": "The planning contract defines depends_on as a direct independently schedulable prerequisite whose successful Outcome supplies a required input or unlock, while completed product authority, implementation baseline, design constraint, and historical precedent belong in context_refs unless exact causal history is itself required."
-    },
-    {
-      "acceptance_id": "planner-checks-current-prerequisite-state",
-      "criterion": "Ticket Plan reads each proposed dependency's current Ticket and Outcome and requires an explicit causal rationale before adding a dependency on DONE work; obvious builds-on, preserves, follows, or reference-only cases are rewritten to exact Context, Outcome, Evidence, or source refs."
-    },
-    {
-      "acceptance_id": "validation-emits-nonblocking-structured-advice",
-      "criterion": "A shared planning-validation path emits deterministic nonblocking advice for newly proposed DONE dependencies, naming the edge and suggesting context_refs, while allowing an independently justified historical causal dependency without changing canonical schema validity or rejecting existing repositories."
+      "criterion": "The planning contract defines depends_on as a direct independently schedulable prerequisite whose successful Outcome supplies a required input or unlock, while completed product authority, implementation baseline, design constraint, and historical precedent belong in context_refs unless exact causal history is itself required.",
+      "identity": "sha256:d1722868ec62daabc015feac901a79893b6a8c4afed0a0aad6482f3f83b8a253",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "graph-hygiene-improves-without-history-loss",
-      "criterion": "Fixtures prove reference-only DONE edges no longer enter new plans or create unnecessary Current boundaries and archived stubs, while legitimate fork, join, release, migration, and consumed-artifact dependencies remain exact and inspectable in All/history."
+      "criterion": "Fixtures prove reference-only DONE edges no longer enter new plans or create unnecessary Current boundaries and archived stubs, while legitimate fork, join, release, migration, and consumed-artifact dependencies remain exact and inspectable in All/history.",
+      "identity": "sha256:8f2fe468bf9ce24b6217113b617208a2da0fabe66d612e20d25e51811f9a319f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "planner-checks-current-prerequisite-state",
+      "criterion": "Ticket Plan reads each proposed dependency's current Ticket and Outcome and requires an explicit causal rationale before adding a dependency on DONE work; obvious builds-on, preserves, follows, or reference-only cases are rewritten to exact Context, Outcome, Evidence, or source refs.",
+      "identity": "sha256:bb2861a208a58a682ebcf2c37b908ba598655d7a5507e8e600139dee0247b1d5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "skills-and-tests-share-one-rule",
-      "criterion": "Ticket Plan, Ticket Validate, lifecycle references, tests, and Agent guidance state the rule once without semantic duplication, and complete project, Ticket, graph, installed-artifact, and cross-host Skill contract verification pass."
+      "criterion": "Ticket Plan, Ticket Validate, lifecycle references, tests, and Agent guidance state the rule once without semantic duplication, and complete project, Ticket, graph, installed-artifact, and cross-host Skill contract verification pass.",
+      "identity": "sha256:941b15c31ecbd1392c761904c5aa246da922ccb50c283772ed62954259b3ad2a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "validation-emits-nonblocking-structured-advice",
+      "criterion": "A shared planning-validation path emits deterministic nonblocking advice for newly proposed DONE dependencies, naming the edge and suggesting context_refs, while allowing an independently justified historical causal dependency without changing canonical schema validity or rejecting existing repositories.",
+      "identity": "sha256:88f7994d98f0dab852adf3ab8067f5dfb92d8fe6582d2d2577ffed956bf3ea34",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not delete or rewrite existing historical dependencies solely to make the Current graph smaller.",
     "Do not make every dependency on a DONE Ticket invalid; completed prerequisites may remain genuine causal inputs.",
@@ -43,7 +59,40 @@
     },
     {
       "purpose": "Completed baseline correctly consumed through Context reference by the new UI repair.",
-      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
+      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "dependency-versus-context-rule-is-explicit",
+          "identity": "sha256:d1722868ec62daabc015feac901a79893b6a8c4afed0a0aad6482f3f83b8a253",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-hygiene-improves-without-history-loss",
+          "identity": "sha256:8f2fe468bf9ce24b6217113b617208a2da0fabe66d612e20d25e51811f9a319f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "planner-checks-current-prerequisite-state",
+          "identity": "sha256:bb2861a208a58a682ebcf2c37b908ba598655d7a5507e8e600139dee0247b1d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-and-tests-share-one-rule",
+          "identity": "sha256:941b15c31ecbd1392c761904c5aa246da922ccb50c283772ed62954259b3ad2a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "validation-emits-nonblocking-structured-advice",
+          "identity": "sha256:88f7994d98f0dab852adf3ab8067f5dfb92d8fe6582d2d2577ffed956bf3ea34",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e323dd37a6146e5edb1953cea89cf38bb7df3698e19d052d11b07b47833a471f",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -55,6 +104,7 @@
     "validation:ticket-fix-archived-stub-label-visibility"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-tighten-completed-dependency-hygiene"
 }

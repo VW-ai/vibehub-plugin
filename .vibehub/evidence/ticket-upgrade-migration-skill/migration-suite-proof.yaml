@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "migration-suite-green"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "migration-suite-green",
+      "identity": "sha256:07e2647bd9dca58a9383e76408c9b7ce49d20fdb83220ea396c10ddccf15ba6f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "migration-suite-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T03:49:15.000Z",
@@ -9,7 +18,7 @@
     "commit:b7abb52",
     "test/migration.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Full node --test suite passes 39/39 and the plugin artifact builds and verifies cleanly with the new skill bundled (50 files); the knowledge room now anchors skills/vibehub-migrate/ and all four rooms report FRESH after realignment.",
   "ticket_id": "ticket-upgrade-migration-skill"
 }

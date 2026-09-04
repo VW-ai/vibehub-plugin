@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
+import { materializeInitialTicket } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 
 const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-verify-"));
 const artifact = join(temp, "plugin");
@@ -49,6 +50,7 @@ try {
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket-run/SKILL.md",
     "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/revision-contract.mjs",
     "skills/vibehub-core/scripts/vh-ui.mjs",
     "skills/vibehub-ticket-review/assets/index.html",
     "skills/vibehub-ticket-review/assets/app.css",
@@ -64,6 +66,8 @@ try {
     "skills/vibehub-core/contracts/context.schema.json",
     "skills/vibehub-core/contracts/ticket.schema.json",
     "skills/vibehub-core/contracts/evidence.schema.json",
+    "skills/vibehub-core/contracts/outcome.schema.json",
+    "skills/vibehub-core/contracts/revision-identity.md",
     "skills/vibehub-core/contracts/acceptance-authority.md",
     "skills/vibehub-core/contracts/dependency-hygiene.json",
     "skills/vibehub-core/contracts/ticket-next-action.md",
@@ -184,8 +188,8 @@ try {
   }, ["--room", "product"]);
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
-  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
-      schema_version: 2,
+  const entryTicket = materializeInitialTicket({
+      schema_version: 3,
       kind: "ticket",
       ticket_id: "ticket-build-entry-fixture",
       outcome: "The concrete entry fixture produces one executable checked-in Ticket.",
@@ -199,7 +203,8 @@ try {
       context_refs: [],
       relations: [],
       provenance_refs: ["prompt:Start-this-with-VibeHub"],
-    }],
+    });
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [entryTicket],
   });
   const frontier = invoke(helper, "ticket", "frontier");
   if (frontier.data.count !== 1
@@ -207,11 +212,14 @@ try {
     throw new Error("canonical entry scenario did not reach a READY Ticket");
   }
   invoke(helper, "ticket", "evidence", {
-    schema_version: 1,
+    schema_version: 2,
     kind: "ticket_evidence",
     evidence_id: "entry-human-proof",
     ticket_id: "ticket-build-entry-fixture",
     acceptance_ids: ["entry-reaches-ready-ticket"],
+    binding_state: "bound",
+    binding_origin: "native",
+    acceptance_revisions: entryTicket.contract_revisions[0].acceptance_revisions,
     summary: "The human explicitly confirmed the clean entry fixture.",
     refs: ["conversation:artifact-verification-human-input"],
     origin: "human",
@@ -224,8 +232,12 @@ try {
     throw new Error("installed next-action projection did not route complete Evidence to closeout");
   }
   invoke(helper, "ticket", "closeout", {
-    schema_version: 1,
+    schema_version: 2,
     kind: "ticket_outcome",
+    outcome_id: "contract-v1",
+    binding_state: "bound",
+    binding_origin: "native",
+    contract_revision: { revision: 1, identity: entryTicket.contract_revisions[0].identity },
     independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-build-entry-fixture",
     status: "successful",
@@ -235,8 +247,8 @@ try {
     summary: "The installed artifact completed the executable entry Ticket.",
     closed_at: "2026-08-09T08:01:00.000Z",
   });
-  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [{
-      schema_version: 2,
+  const humanTicket = materializeInitialTicket({
+      schema_version: 3,
       kind: "ticket",
       ticket_id: "ticket-human-authority-fixture",
       outcome: "The installed projection preserves criterion-level human authority.",
@@ -251,22 +263,30 @@ try {
       context_refs: [],
       relations: [],
       provenance_refs: ["test:installed-human-authority"],
-    }],
+    });
+  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [humanTicket],
   });
   invoke(helper, "ticket", "evidence", {
-    schema_version: 1,
+    schema_version: 2,
     kind: "ticket_evidence",
     evidence_id: "installed-human-authority-proof",
     ticket_id: "ticket-human-authority-fixture",
     acceptance_ids: ["owner-confirms-authority"],
+    binding_state: "bound",
+    binding_origin: "native",
+    acceptance_revisions: humanTicket.contract_revisions[0].acceptance_revisions,
     summary: "The human explicitly confirmed the protected fixture.",
     refs: ["conversation:artifact-verification-human-authority"],
     origin: "human",
     recorded_at: "2026-08-09T08:02:00.000Z",
   });
   invoke(helper, "ticket", "closeout", {
-    schema_version: 1,
+    schema_version: 2,
     kind: "ticket_outcome",
+    outcome_id: "contract-v1",
+    binding_state: "bound",
+    binding_origin: "native",
+    contract_revision: { revision: 1, identity: humanTicket.contract_revisions[0].identity },
     independence: { source: "subagent", note: "artifact verification fixture" },
     ticket_id: "ticket-human-authority-fixture",
     status: "successful",
@@ -390,6 +410,12 @@ try {
     ...stats,
   })}\n`);
 } finally {
-  if (uiHost) await uiHost.close();
+  if (uiHost) {
+    try {
+      await uiHost.close();
+    } catch (error) {
+      if (error?.code !== "ERR_SERVER_NOT_RUNNING") throw error;
+    }
+  }
   rmSync(temp, { recursive: true, force: true });
 }

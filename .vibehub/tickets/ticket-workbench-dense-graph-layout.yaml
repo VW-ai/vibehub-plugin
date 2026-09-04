@@ -1,27 +1,42 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
-      "acceptance_id": "dense-fixtures-cover-real-failure-shapes",
-      "criterion": "Deterministic fixtures cover at least 35 Tickets, a layer with at least 10 siblings, one Ticket with at least five prerequisites and five unlocks, long edges spanning multiple ranks, and mixed DONE/READY/BLOCKED/REFINE/DEVIATED plus human-attention states in both orientations."
-    },
-    {
       "acceptance_id": "cards-and-routes-remain-legible",
-      "criterion": "In every dense fixture, cards do not overlap, ordinary relation paths do not cross card interiors, source and target ports remain distinguishable, labels remain readable at the initial fit, and stable inputs produce stable positions and routes across refreshes."
-    },
-    {
-      "acceptance_id": "crossings-and-congestion-are-materially-reduced",
-      "criterion": "At fixed 1440x960 and 1180x820 viewports, a checked-in mechanical comparison uses tagged v0.7.0 as the top-to-bottom baseline and the verified commit recorded by the prerequisite layout-direction Outcome as the left-to-right baseline; across the fixed dense fixtures, aggregate edge crossings fall by at least 30% and aggregate coincident orthogonal-segment length falls by at least 25%, with neither metric regressing by more than 5% in any individual fixture and without hiding Tickets or relations."
+      "criterion": "In every dense fixture, cards do not overlap, ordinary relation paths do not cross card interiors, source and target ports remain distinguishable, labels remain readable at the initial fit, and stable inputs produce stable positions and routes across refreshes.",
+      "identity": "sha256:71645cdddaf1c2d7b57c0068b25f7e06f24e3c31cccf24d19e0cde1a294c9f60",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "causal-focus-scales-with-layout",
-      "criterion": "Selecting a Ticket still preserves and emphasizes its complete transitive upstream and downstream cone while unrelated nodes and edges recede; relation hit targets, minimap recentering, pan/zoom, Inspector selection, and keyboard traversal remain usable in both orientations."
+      "criterion": "Selecting a Ticket still preserves and emphasizes its complete transitive upstream and downstream cone while unrelated nodes and edges recede; relation hit targets, minimap recentering, pan/zoom, Inspector selection, and keyboard traversal remain usable in both orientations.",
+      "identity": "sha256:15e8bb9cb9c797edea81d3ccfa0d1c85ad1e879df86d889b196791e0525c8e54",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "crossings-and-congestion-are-materially-reduced",
+      "criterion": "At fixed 1440x960 and 1180x820 viewports, a checked-in mechanical comparison uses tagged v0.7.0 as the top-to-bottom baseline and the verified commit recorded by the prerequisite layout-direction Outcome as the left-to-right baseline; across the fixed dense fixtures, aggregate edge crossings fall by at least 30% and aggregate coincident orthogonal-segment length falls by at least 25%, with neither metric regressing by more than 5% in any individual fixture and without hiding Tickets or relations.",
+      "identity": "sha256:efa4e13a5b40aa992c893c5c566b68b7fc4dba40115374cb3f267c6f007c6b6f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "dense-fixtures-cover-real-failure-shapes",
+      "criterion": "Deterministic fixtures cover at least 35 Tickets, a layer with at least 10 siblings, one Ticket with at least five prerequisites and five unlocks, long edges spanning multiple ranks, and mixed DONE/READY/BLOCKED/REFINE/DEVIATED plus human-attention states in both orientations.",
+      "identity": "sha256:d1fc03e135d56173e9e3391fd3fcaf344009841fa65b9f75e106f2c5c2de8905",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "dense-layout-verifies-in-browser",
-      "criterion": "Behavior-level geometry tests plus desktop, normal Codex-width, and 390px real-browser review pass for both directions with no new frontend dependency, worker, cache, server endpoint, or semantic graph state."
+      "criterion": "Behavior-level geometry tests plus desktop, normal Codex-width, and 390px real-browser review pass for both directions with no new frontend dependency, worker, cache, server endpoint, or semantic graph state.",
+      "identity": "sha256:d31f87fd33c40e925a4b8b6f38e410dccd11256ecdb4386df1652f7434d10178",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Optimize deterministic geometry only; do not hide canonical Tickets or relations to make screenshots look cleaner.",
     "Do not add a frontend framework, graph library dependency, worker service, persistent cache, or alternate graph source.",
@@ -43,6 +58,48 @@
       "ref": ".vibehub/tickets/ticket-make-static-graph-actionable.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cards-and-routes-remain-legible",
+          "identity": "sha256:71645cdddaf1c2d7b57c0068b25f7e06f24e3c31cccf24d19e0cde1a294c9f60",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "causal-focus-scales-with-layout",
+          "identity": "sha256:15e8bb9cb9c797edea81d3ccfa0d1c85ad1e879df86d889b196791e0525c8e54",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "crossings-and-congestion-are-materially-reduced",
+          "identity": "sha256:efa4e13a5b40aa992c893c5c566b68b7fc4dba40115374cb3f267c6f007c6b6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dense-fixtures-cover-real-failure-shapes",
+          "identity": "sha256:d1fc03e135d56173e9e3391fd3fcaf344009841fa65b9f75e106f2c5c2de8905",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dense-layout-verifies-in-browser",
+          "identity": "sha256:d31f87fd33c40e925a4b8b6f38e410dccd11256ecdb4386df1652f7434d10178",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4baba9b4fc4348b091135ddfd941c6ee33ed4c0fd7b57adae9b06135c62202d2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Large Ticket graphs remain readable and stable in either direction through improved rank ordering, spacing, ports, and edge routing without weakening causal focus.",
@@ -56,6 +113,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-workbench-dense-graph-layout"
 }

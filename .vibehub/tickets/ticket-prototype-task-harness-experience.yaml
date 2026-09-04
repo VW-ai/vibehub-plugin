@@ -1,34 +1,105 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "near-and-far-scenarios-are-explicit",
-      "criterion": "A checked-in product-logic contract defines think-first and act-first entry, the complete single-Project graph-to-Task loop, and the deferred multi-Project, personal Context, team, and native-wrapper directions without presenting those deferred capabilities as implemented."
-    },
-    {
-      "acceptance_id": "clickable-core-loop-prototype",
-      "criterion": "A locally runnable low-fidelity browser prototype lets a reviewer traverse normal Chat, explicit Fork, branch graph, Compare, Bring Back, scoped Context, Task craft, Start, execution attention, Evidence review, closeout, and return to the Ticket Graph without backend services."
-    },
-    {
-      "acceptance_id": "whole-application-product-identity",
-      "criterion": "The prototype establishes the product hierarchy rather than final styling: the Ticket Graph is the application home, Task Workspace is the focused execution Context Space, Chat remains an open exploration and steering surface, and graph navigation does not collapse into flat session history or a generic dashboard."
-    },
-    {
-      "acceptance_id": "ticket-context-annotation-language",
-      "criterion": "The prototype distinguishes Branch, Context, Reference, Task, Run, human attention, and Evidence across Chat, Graph, and Task Workspace without turning conversation into a form, implying automatic capture, or conflating Ticket state with trusted Run presence."
-    },
-    {
-      "acceptance_id": "execution-is-strongly-perceptible",
-      "criterion": "Execution presence follows the user through the low-fidelity loop and distinguishes queued, running, waiting-for-human, failed, evidence-producing, and completed states; it disappears when no trusted Run exists and anchors each attention request to its owning step."
+      "acceptance_id": "browser-first-app-like-shell",
+      "criterion": "The prototype is usable as a local Safari application at desktop and narrow widths with stable navigation, keyboard reachability, intentional focus and transition behavior, and a clean future desktop-wrapper seam; no major stock DSH shell is accepted merely because it already works.",
+      "identity": "sha256:c4fdaf935c373f7d3c015f51c4090c0156fc091a37f7f2b871a832b6ce1ce694",
+      "revision": 1,
+      "state": "retired"
     },
     {
       "acceptance_id": "browser-first-app-like-shell",
-      "criterion": "The disposable prototype runs locally in a browser at desktop and narrow widths with stable navigation, keyboard reachability, reduced-motion behavior, and no durable browser state or backend claim; it is explicitly a browser-first review artifact rather than a finished desktop application."
+      "criterion": "The disposable prototype runs locally in a browser at desktop and narrow widths with stable navigation, keyboard reachability, reduced-motion behavior, and no durable browser state or backend claim; it is explicitly a browser-first review artifact rather than a finished desktop application.",
+      "identity": "sha256:d76249fd03cc74ea4e341c57098f80a893996c462aa8e1ae89501118eec8fa25",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "clickable-core-loop-prototype",
+      "criterion": "A locally runnable high-fidelity browser prototype lets a reviewer traverse capture or normal Chat, explicit fork, branch graph, Compare, Bring Back, scoped Context, Ticket craft, Start, execution attention, and Evidence inside one continuous whole-application shell without backend services.",
+      "identity": "sha256:4d0106ec5cdf0a54811228e99844ffb8e18dba8827c2c4401a7bfccee47603ee",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "clickable-core-loop-prototype",
+      "criterion": "A locally runnable low-fidelity browser prototype lets a reviewer traverse normal Chat, explicit Fork, branch graph, Compare, Bring Back, scoped Context, Task craft, Start, execution attention, Evidence review, closeout, and return to the Ticket Graph without backend services.",
+      "identity": "sha256:ab18b39a7beb83b8650d85d9c89a30600177bb5a0506f5d9dd6531df1f0304e0",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "execution-is-strongly-perceptible",
+      "criterion": "Trusted execution presence follows the user across the application and distinguishes queued, running, waiting-for-human, failed, evidence-producing, and completed states; it disappears when no trusted Run exists, never infers activity from Ticket state, and anchors each attention request to its owning step.",
+      "identity": "sha256:fa1e6f6a64b892ea228cdfb493daf695f9cdbf2c7edc619b3dc34d2fe85f4c4c",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "execution-is-strongly-perceptible",
+      "criterion": "Execution presence follows the user through the low-fidelity loop and distinguishes queued, running, waiting-for-human, failed, evidence-producing, and completed states; it disappears when no trusted Run exists and anchors each attention request to its owning step.",
+      "identity": "sha256:47611579be4f10359d54129c3ed7ed131742ba6c2ce2236f2c9e40cfcc72853e",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "near-and-far-scenarios-are-explicit",
+      "criterion": "A checked-in product contract defines the two near-term entry paths (think-first and act-first), the complete single-Workspace loop, the longer-term multi-Workspace direction, and how all of them inhabit one coherent application rather than a set of DSH feature panels.",
+      "identity": "sha256:d4ec68f93cddc54da2ae7112b26a29a5eacd22d3ee2b9e2028c48e3d9c313bb1",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "near-and-far-scenarios-are-explicit",
+      "criterion": "A checked-in product-logic contract defines think-first and act-first entry, the complete single-Project graph-to-Task loop, and the deferred multi-Project, personal Context, team, and native-wrapper directions without presenting those deferred capabilities as implemented.",
+      "identity": "sha256:cc1e36dec9f3ca596ff04b819b0968c5d5255979fe1af2fa4345369b0b237433",
+      "revision": 2,
+      "state": "active"
     },
     {
       "acceptance_id": "review-pack-is-decision-ready",
-      "criterion": "A concise review guide makes the owner judge the product hierarchy, Graph-to-Task transition, Chat and branch behavior, Context control, Task craft, execution presence, attention, Evidence, responsive behavior, and known low-fidelity limits."
+      "criterion": "A concise review guide makes the owner judge application identity, global information architecture, Chat quality, branch return and comparison, Context control, Ticket craft, execution presence, engine settings, responsive behavior, and the difference from both stock DSH and the rejected additive Spike.",
+      "identity": "sha256:b8aaf00a5c91795a635eaa075297d468bdb732a8894bb70231d950afd30e7bd9",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "review-pack-is-decision-ready",
+      "criterion": "A concise review guide makes the owner judge the product hierarchy, Graph-to-Task transition, Chat and branch behavior, Context control, Task craft, execution presence, attention, Evidence, responsive behavior, and known low-fidelity limits.",
+      "identity": "sha256:751ed9fcafe1b85775b526659f253109770e6db195cfd94036beabd7e7954ac5",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-context-annotation-language",
+      "criterion": "The prototype defines one restrained, application-wide visual grammar for Branch, Context, Reference, Ticket, Run, attention, and Evidence that stays legible in Chat, Graph, inspector, command surfaces, and narrow layouts without turning conversation into a form or implying automatic capture.",
+      "identity": "sha256:90afb55b3d60fd9b92dd4174542890bf9bd28141b214cd4278b5dfd51f72ccea",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "ticket-context-annotation-language",
+      "criterion": "The prototype distinguishes Branch, Context, Reference, Task, Run, human attention, and Evidence across Chat, Graph, and Task Workspace without turning conversation into a form, implying automatic capture, or conflating Ticket state with trusted Run presence.",
+      "identity": "sha256:02618306f7ed262d53dbf7f147b45ced2d8a5414a01624535c05369aec139772",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "whole-application-product-identity",
+      "criterion": "The replacement prototype owns the first frame, global navigation, Workspace and Session presentation, Chat header and composer, contextual inspector, empty and onboarding states, settings or engine entry, typography, motion, density, and responsive behavior; direct comparison with stock DSH and the additive Spike makes it credible that a user experiences a completely different application rather than a themed plugin distribution.",
+      "identity": "sha256:dafaf23665fa5c78288bc8fb622a0927714a98fa09a262bbe5c67307325efd23",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "whole-application-product-identity",
+      "criterion": "The prototype establishes the product hierarchy rather than final styling: the Ticket Graph is the application home, Task Workspace is the focused execution Context Space, Chat remains an open exploration and steering surface, and graph navigation does not collapse into flat session history or a generic dashboard.",
+      "identity": "sha256:ae5932ba947e72d305d1f78318b30a363234a6de05ecb3b4f4bb57ebe405189a",
+      "revision": 2,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not treat these prototype visuals, typography, layouts, or mocked state as production authority.",
     "Do not constrain normal Agent Chat with a bespoke semantic workflow or require users to learn Skill names.",
@@ -55,6 +126,49 @@
       "ref": ".vibehub/tickets/ticket-research-task-workbench-interaction-directions.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "browser-first-app-like-shell",
+          "identity": "sha256:d76249fd03cc74ea4e341c57098f80a893996c462aa8e1ae89501118eec8fa25",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "clickable-core-loop-prototype",
+          "identity": "sha256:ab18b39a7beb83b8650d85d9c89a30600177bb5a0506f5d9dd6531df1f0304e0",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "execution-is-strongly-perceptible",
+          "identity": "sha256:47611579be4f10359d54129c3ed7ed131742ba6c2ce2236f2c9e40cfcc72853e",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "near-and-far-scenarios-are-explicit",
+          "identity": "sha256:cc1e36dec9f3ca596ff04b819b0968c5d5255979fe1af2fa4345369b0b237433",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "review-pack-is-decision-ready",
+          "identity": "sha256:751ed9fcafe1b85775b526659f253109770e6db195cfd94036beabd7e7954ac5",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ticket-context-annotation-language",
+          "identity": "sha256:02618306f7ed262d53dbf7f147b45ced2d8a5414a01624535c05369aec139772",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "whole-application-product-identity",
+          "identity": "sha256:ae5932ba947e72d305d1f78318b30a363234a6de05ecb3b4f4bb57ebe405189a",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:7c71ceecb9bdca1a2ff82a99e7aa3de4942af343b6b3ed2c4ee9c8f9da14a766",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -65,6 +179,7 @@
     "conversation:2026-08-20-human-and-agent-led-context-spaces"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prototype-task-harness-experience"
 }

@@ -19,5 +19,6 @@ jobs:
         with:
           node-version: 24
           package-manager-cache: false
+      - run: node scripts/verify-release-version.mjs --check-shipped-content
       - run: npm test
       - run: npm run verify:artifact

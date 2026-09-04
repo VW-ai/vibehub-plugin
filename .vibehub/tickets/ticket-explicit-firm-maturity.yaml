@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "explicit-maturity-verifies-cleanly",
+      "criterion": "Project and Ticket validation, the complete node test suite, and the Codex/Claude-compatible Plugin artifact verification pass with all entered Rooms FRESH.",
+      "identity": "sha256:9eaaf2071272aa2b39959933b9541cac479e1a63579759283f0cb0d016c34bed",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "firm-and-draft-are-canonical",
-      "criterion": "The Ticket schema and deterministic validator accept maturity: firm and maturity: draft, reject unknown values, and continue interpreting omitted maturity as firm so existing repositories require no migration."
+      "criterion": "The Ticket schema and deterministic validator accept maturity: firm and maturity: draft, reject unknown values, and continue interpreting omitted maturity as firm so existing repositories require no migration.",
+      "identity": "sha256:b32121a29a3dceea92e39da139518d515af7d16362b624e07bd8b29d7a124350",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "planning-writes-maturity-explicitly",
-      "criterion": "Ticket Plan instructs new and rewritten Tickets to state firm or draft explicitly, and refinement changes the same Ticket from draft to firm instead of deleting the field."
+      "criterion": "Ticket Plan instructs new and rewritten Tickets to state firm or draft explicitly, and refinement changes the same Ticket from draft to firm instead of deleting the field.",
+      "identity": "sha256:15b1532a60af002a1265c12e30d7d29bb0a9935c2714e304e9d8672f41e47319",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "rolling-wave-behavior-is-preserved",
-      "criterion": "Tests prove explicit firm and legacy omission both reach READY, draft remains REFINE after a human blocker succeeds, and firming the same Ticket makes it READY; the Rooms proposal, decision, and downstream implementation graph uses firm, firm, and draft respectively."
-    },
-    {
-      "acceptance_id": "explicit-maturity-verifies-cleanly",
-      "criterion": "Project and Ticket validation, the complete node test suite, and the Codex/Claude-compatible Plugin artifact verification pass with all entered Rooms FRESH."
+      "criterion": "Tests prove explicit firm and legacy omission both reach READY, draft remains REFINE after a human blocker succeeds, and firming the same Ticket makes it READY; the Rooms proposal, decision, and downstream implementation graph uses firm, firm, and draft respectively.",
+      "identity": "sha256:67a2d767777f59d200ffb54e5c188afcee2ed4441d4d0a804c5520067cb22d84",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not make maturity required in schema version 1; omitted maturity remains a compatibility input interpreted as firm.",
     "Do not rewrite every historical Ticket merely to materialize the default.",
@@ -45,6 +58,34 @@
       "ref": "test/draft-maturity.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explicit-maturity-verifies-cleanly",
+          "identity": "sha256:9eaaf2071272aa2b39959933b9541cac479e1a63579759283f0cb0d016c34bed",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "firm-and-draft-are-canonical",
+          "identity": "sha256:b32121a29a3dceea92e39da139518d515af7d16362b624e07bd8b29d7a124350",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "planning-writes-maturity-explicitly",
+          "identity": "sha256:15b1532a60af002a1265c12e30d7d29bb0a9935c2714e304e9d8672f41e47319",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rolling-wave-behavior-is-preserved",
+          "identity": "sha256:67a2d767777f59d200ffb54e5c188afcee2ed4441d4d0a804c5520067cb22d84",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7513f4cefba9d830c87411d1d23a8b589a04f950765f8902607cb445431b79cc",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-11T05:48:43.000Z",
@@ -68,6 +109,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-explicit-firm-maturity"
 }

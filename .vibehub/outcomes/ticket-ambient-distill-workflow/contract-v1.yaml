@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "coldstart-skill",
+    "ticket-plan-integration",
+    "trust-layering",
+    "perception-one-line"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-04T00:00:00.000Z",
+  "contract_revision": {
+    "identity": "sha256:bf0ee32ec8bb8812cb57b0c7dc15f9a2f12ea562a123d252c4b820137f977f6a",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "coldstart-resume-proof",
+    "ticket-plan-drift-step-proof",
+    "trust-layering-proof",
+    "one-line-perception-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout reproduced every claim. coldstart-skill: skills/vibehub-distill/SKILL.md owns COLD_START and uses the room align stamp as the only resume marker; replayed in a scratch git repo with parser and renderer rooms — empty tree reports cold_start:true, aligning only parser then re-running vh room drift reports parser FRESH and renderer UNKNOWN (never aligned), exactly the remaining work, with no separate progress state (coldstart-resume-proof). ticket-plan-integration: skills/vibehub-ticket-plan/SKILL.md step 2 runs room drift before planning, routes cold_start:true through vibehub-distill, reconciles only rooms the deliverable enters by re-reading exactly the changed/added/deleted files drift lists then room align, and marks unrelated drifted rooms room stale with a reason — matching the align-on-use policy in decision-ambient-two-mode-distill; npm test passes 28/28 including the release guard (ticket-plan-drift-step-proof). trust-layering: distill step 4 documents the distill: source ref as the lower-trust layer, human-ingested Context winning every conflict with the conflict recorded rather than overwritten, and PR review on Git as the only activation gate; the context schema accepts free-text source refs so the convention is representable (trust-layering-proof). perception-one-line: a normal start costs one deterministic drift call (measured 0.27s here) surfaced as a single instructed line, the distill report is capped at one line per room plus totals, and only COLD_START may be perceptible (one-line-perception-proof). Constraints hold: commit ca3e391 touches only two SKILL.md files and an agents manifest — no hooks, daemons, or background capture; alignment cost is scoped to entered rooms; semantic judgment stays in the skills while drift/align/stale stay deterministic in vh.mjs. Noted, not blocking: current drift shows the ticket-lifecycle room DRIFTED by this ticket's own edit to vibehub-ticket-plan/SKILL.md (the evidence snapshot predates it); align-on-use defers that to the next ticket start, and the distill guardrail against aligning WARNING rooms duplicates a check vh.mjs already enforces mechanically.",
+  "ticket_id": "ticket-ambient-distill-workflow",
+  "unresolved_acceptance_ids": []
+}

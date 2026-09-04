@@ -7,6 +7,40 @@
     "query-focus-is-explicit-accessible-and-copyable",
     "archive-query-is-regression-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "archive-and-delivery-membership-are-canonical",
+      "identity": "sha256:b247083dbc8c93dbd1ec7b9eca8e39236c6a266a94d723a88d9cde4f26f9a689",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "history-edge-cases-stay-truthful",
+      "identity": "sha256:4917494355c655f3a4d1b05584a84d20458c555bb49ef8e69d5e5390f2973cfd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "one-query-model-serves-cli-json-and-web",
+      "identity": "sha256:eaa17b7d7350373335654a61f56a4a65aa58dc67d6aad21feacad2c0f2661155",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "filtered-graphs-preserve-causal-truth",
+      "identity": "sha256:1c647d292dd3098ddf7fcf5badd2b878ba400f498465f1f78701a2793ddc45eb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "query-focus-is-explicit-accessible-and-copyable",
+      "identity": "sha256:8ea1d90f257881f7aee1e8c3d31f71b21dec7d727ad38fbffb732224849f1898",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "archive-query-is-regression-verified",
+      "identity": "sha256:a384fe62c8d806b5238e83791b9f4481abe335671556e117487767ea18b1e3bd",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "archive-query-contract-cli-and-browser-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -23,7 +57,7 @@
     "browser:one-hop-expansion-preserves-card-coordinates-ticket-log-lens-direction-and-copyable-url",
     "room:all-four-rooms-fresh-at-a8331ac"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commits f59a1b2 and 73a6385 add the optional discriminated Ticket deliveries array, the derived successful-plus-delivered archive predicate, one exported current/all/delivery/repeated-Room query projection shared by CLI JSON and Web, deterministic endpoint-visible relations, progressive archived boundary cards and one-hop stubs, explicit URL filters, and aligned Product, Ticket Lifecycle, and Workbench Room contracts. State-table and schema tests cover omitted legacy deliveries, proposed/abandoned/unmerged pull requests, delivered pull requests and cherry-picks, failed/partial/deviated Outcomes, multiple memberships, revert preservation, and reopen provenance. Full verification passes 62/62 plus the dependency-free 54-file, 698815-byte artifact. A real Codex in-app-browser fixture proves the default current view contains three current Tickets plus one textual/dashed ARCHIVED boundary and one keyboard-focusable upstream stub; Enter reveals old-foundation, removes the exhausted stub, records history=old-foundation, and preserves every prior card coordinate, selected current-web-work Ticket, Log lens, and direction. All history contains five Tickets and no stubs; exact pull request delivery returns the two archived members; product/web returns four, knowledge returns two, and repeated normalized Rooms return their five-Ticket union. Invalid scope, delivery, Room, and history values render Ticket graph unavailable with zero Ticket cards rather than broadening. Copy focused link reports success and the live URL preserves scope, sorted repeated filters, history, selected Ticket, Log lens, direction, and the 64-character bearer fragment without persistent browser state. At 1440x960, 1180x820, and 390x844, both left-to-right and top-to-bottom views retain four current nodes, one archived boundary, and one stub without document overflow or console warnings/errors; the narrow history target is 44.8px high after the browser-found c2bf1a4 fix and all graph controls are 44x44. The complete plugin remains Git-native and read-only, with all four Rooms FRESH at a8331ac.",
   "ticket_id": "ticket-queryable-archived-ticket-history"
 }

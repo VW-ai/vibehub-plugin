@@ -1,0 +1,19 @@
+{
+  "commit": "59de368c8a420d2913a6aa7a9d35cf7f52a7e569",
+  "evidence_classes": [
+    { "reconstructable": true, "contract_drifted": false, "count": 283 },
+    { "reconstructable": true, "contract_drifted": true, "count": 24 }
+  ],
+  "outcome_classes": [
+    { "reconstructable": true, "contract_drifted": false, "count": 93 },
+    {
+      "reconstructable": true,
+      "contract_drifted": true,
+      "count": 2,
+      "ticket_ids": [
+        "ticket-deploy-public-site-cloudflare",
+        "ticket-encode-human-acceptance-authority"
+      ]
+    }
+  ]
+}

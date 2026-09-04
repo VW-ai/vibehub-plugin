@@ -1,98 +1,68 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket-outcome.v1.json",
+  "$id": "https://vibehub.dev/schemas/ticket-outcome.v2.json",
   "title": "VibeHub Ticket Outcome",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "kind",
-    "ticket_id",
-    "status",
-    "accepted_acceptance_ids",
-    "unresolved_acceptance_ids",
-    "evidence_ids",
-    "summary",
-    "closed_at"
-  ],
+  "required": ["schema_version", "kind", "outcome_id", "ticket_id", "binding_state", "status", "accepted_acceptance_ids", "unresolved_acceptance_ids", "evidence_ids", "summary", "closed_at"],
   "properties": {
-    "schema_version": {
-      "const": 1
-    },
-    "kind": {
-      "const": "ticket_outcome"
-    },
-    "ticket_id": {
-      "$ref": "#/$defs/id"
-    },
-    "status": {
-      "enum": [
-        "successful",
-        "partial",
-        "failed",
-        "deviated"
-      ]
-    },
-    "accepted_acceptance_ids": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/id"
-      }
-    },
-    "unresolved_acceptance_ids": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/id"
-      }
-    },
-    "evidence_ids": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/id"
-      }
-    },
-    "summary": {
-      "$ref": "#/$defs/text"
-    },
-    "closed_at": {
-      "type": "string",
-      "format": "date-time"
-    },
+    "schema_version": { "const": 2 },
+    "kind": { "const": "ticket_outcome" },
+    "outcome_id": { "$ref": "#/$defs/id" },
+    "ticket_id": { "$ref": "#/$defs/id" },
+    "binding_state": { "enum": ["bound", "legacy-pending-reconstruction", "legacy-unresolved"] },
+    "binding_origin": { "enum": ["native", "reconstructed"] },
+    "contract_revision": { "$ref": "#/$defs/contract_ref" },
+    "unresolved": { "$ref": "#/$defs/unresolved" },
+    "status": { "enum": ["successful", "partial", "failed", "deviated"] },
+    "accepted_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "unresolved_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "evidence_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "summary": { "$ref": "#/$defs/text" },
+    "closed_at": { "type": "string", "format": "date-time" },
     "independence": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "source"
-      ],
-      "description": "How the adjudicating Agent obtained independence from the executor. Optional in the schema so Outcomes written before this contract existed stay valid and readable; required by `ticket closeout` when writing a new Outcome. A self-declared provenance claim: the engine records it and never verifies it.",
+      "required": ["source"],
       "properties": {
-        "source": {
-          "enum": [
-            "subagent",
-            "separate_session",
-            "different_human"
-          ],
-          "description": "subagent: a fresh Agent with no execution context. separate_session: a session started from the copied handoff. different_human: a person other than the one who ran the work."
-        },
-        "note": {
-          "$ref": "#/$defs/text",
-          "description": "How that source was obtained, in one readable sentence."
-        }
+        "source": { "enum": ["subagent", "separate_session", "different_human"] },
+        "note": { "$ref": "#/$defs/text" }
       }
     }
   },
-  "$defs": {
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+  "allOf": [
+    {
+      "if": { "properties": { "binding_state": { "const": "bound" } } },
+      "then": { "required": ["binding_origin", "contract_revision"], "not": { "required": ["unresolved"] } },
+      "else": { "not": { "anyOf": [{ "required": ["binding_origin"] }, { "required": ["contract_revision"] }] } }
     },
-    "text": {
-      "type": "string",
-      "minLength": 1,
-      "pattern": "\\S"
+    {
+      "if": { "properties": { "binding_state": { "const": "legacy-unresolved" } } },
+      "then": { "required": ["unresolved"] },
+      "else": { "not": { "required": ["unresolved"] } }
+    }
+  ],
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "identity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "contract_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "identity"],
+      "properties": {
+        "revision": { "type": "integer", "minimum": 1 },
+        "identity": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "unresolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "attempted_refs"],
+      "properties": {
+        "reason": { "enum": ["missing-history", "ambiguous-history"] },
+        "attempted_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } }
+      }
     }
   }
 }

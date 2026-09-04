@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "drift-four-states",
-      "criterion": "vh drift reports COLD_START for a missing rooms/ tree and otherwise classifies every room FRESH, DRIFTED (with exact changed/added/deleted file lists), STALE (with reason), or UNKNOWN, plus the old-checkout WARNING."
+      "acceptance_id": "atomic-align",
+      "criterion": "vh align resolves anchors, records per-file blob hashes, last_aligned_commit, and checked_at in one atomic write, and clears the stale flag; a partial alignment state is impossible.",
+      "identity": "sha256:48bc5a944431eb9796dc1eba2edc264cda3f0055b6bf75bf2e6c52a6d9f1e832",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "audited-edge-tests",
-      "criterion": "node --test covers: rename out of an anchor dir still flags the source room; untracked files in new nested directories are detected; change-then-revert reports FRESH; old checkout yields WARNING not DRIFTED; anchor glob src/auth does not match src/authx."
+      "criterion": "node --test covers: rename out of an anchor dir still flags the source room; untracked files in new nested directories are detected; change-then-revert reports FRESH; old checkout yields WARNING not DRIFTED; anchor glob src/auth does not match src/authx.",
+      "identity": "sha256:df4f9da3513ce4eb467beefa86dc12355a204784bb577d799ae38049e8efbad3",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "atomic-align",
-      "criterion": "vh align resolves anchors, records per-file blob hashes, last_aligned_commit, and checked_at in one atomic write, and clears the stale flag; a partial alignment state is impossible."
+      "acceptance_id": "drift-four-states",
+      "criterion": "vh drift reports COLD_START for a missing rooms/ tree and otherwise classifies every room FRESH, DRIFTED (with exact changed/added/deleted file lists), STALE (with reason), or UNKNOWN, plus the old-checkout WARNING.",
+      "identity": "sha256:5b7ea43c410df5fd50fabcc9528659e2235e39ecc04cb473c29419c3558002a2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "stale-writeback",
-      "criterion": "A single vh command marks a drifted room stale with a reason (the deferred, align-on-use path), and vh drift surfaces manually marked stale rooms even when hashes match."
+      "criterion": "A single vh command marks a drifted room stale with a reason (the deferred, align-on-use path), and vh drift surfaces manually marked stale rooms even when hashes match.",
+      "identity": "sha256:482b4928d83aa4f31e17555fe5b65cc6df91281569cf52527dd273fc97d67e67",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Pure deterministic script: no agent calls, no network, no token spend; runs in milliseconds on this repository.",
     "Only filter-clean git blob hashes are compared; raw working-tree file contents are never hashed directly.",
@@ -31,6 +44,34 @@
     {
       "purpose": "room.yaml shape and anchor semantics the commands operate on.",
       "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "atomic-align",
+          "identity": "sha256:48bc5a944431eb9796dc1eba2edc264cda3f0055b6bf75bf2e6c52a6d9f1e832",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audited-edge-tests",
+          "identity": "sha256:df4f9da3513ce4eb467beefa86dc12355a204784bb577d799ae38049e8efbad3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "drift-four-states",
+          "identity": "sha256:5b7ea43c410df5fd50fabcc9528659e2235e39ecc04cb473c29419c3558002a2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stale-writeback",
+          "identity": "sha256:482b4928d83aa4f31e17555fe5b65cc6df91281569cf52527dd273fc97d67e67",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:984ae7f25038afe9c7f3c1565140aae666298a45d173e12ae3b8e50fbd9a6688",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -55,6 +96,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-drift-check-mechanical"
 }

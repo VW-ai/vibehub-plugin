@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "research-corpus-is-source-backed",
+    "scenario-pattern-map-is-complete",
+    "directions-are-interaction-architectures",
+    "recommendation-is-decision-ready",
+    "research-board-is-usable"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T19:01:05Z",
+  "contract_revision": {
+    "identity": "sha256:826c037a17df5531cbcddcb1f0ce6f0ee4e7fa2183ebe3b129b7f2b10e065b85",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "task-workbench-interaction-research"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. The checked-in study extracts concrete interaction patterns and failure modes from eight official product sources, maps them across the complete Task-first first-frame-to-return loop, and compares exactly three coherent spatial architectures against the same representative lifecycle. The responsive local board makes those directions reviewable rather than presenting a style picker, and the report recommends Focus Route with explicit tradeoffs, rejected alternatives, remaining owner choices, and a source-backed DSH Slot and Theme composition boundary. Existing focused tests and browser Evidence support the board without claiming final visual design or production integration.",
+  "ticket_id": "ticket-research-task-workbench-interaction-directions",
+  "unresolved_acceptance_ids": []
+}

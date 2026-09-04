@@ -1,34 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "upstream-baseline-is-pinned",
-      "criterion": "The exploration records an exact DeepSeek Harness release or commit, the supported runtime requirements, and primary-source links for every relied-on Bundle, Profile, Cordis, Session, command, and Web UI contract; all runnable spike code uses that pinned baseline."
+      "acceptance_id": "architecture-recommendation-is-decision-ready",
+      "criterion": "A checked-in feasibility report scores each product-critical seam as proven, conditional, unsupported, or unstable and recommends an exact initial composition, compatibility adapter boundary, repository package shape, smoke-test set, and stop conditions before implementation.",
+      "identity": "sha256:8e121c6af6d55dc1b82e0ef880205c59914b3f425f6fb4b1c7cf64de0ee3d087",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "bundle-profile-boot-spike",
-      "criterion": "A reproducible local spike installs or links a VibeHub-owned Bundle into a named Profile and boots a local browser surface without vendoring or modifying the DeepSeek Harness repository."
-    },
-    {
-      "acceptance_id": "ui-extension-seams-proven",
-      "criterion": "Runnable code and source references establish whether VibeHub can add or replace the required root layout, navigation, Chat actions, branch graph surface, Ticket surface, and execution surface; every unsupported or unstable seam is called out explicitly with a fallback."
-    },
-    {
-      "acceptance_id": "session-and-branch-model-proven",
-      "criterion": "A spike inspects or exercises durable session events, fork or resume identity, transcript projection, and branch comparison inputs, then documents the minimum VibeHub-owned projection needed for Fork, Compare, and Bring Back without inventing an automatic semantic graph."
+      "criterion": "A reproducible local spike installs or links a VibeHub-owned Bundle into a named Profile and boots a local browser surface without vendoring or modifying the DeepSeek Harness repository.",
+      "identity": "sha256:803d359dbcfe33b1e8433a2811106064a0b1c5ffe3358eaa4a9febbe4299c4bb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "commands-and-executor-boundary-proven",
-      "criterion": "A minimal command and execution spike demonstrates how an explicit UI action can invoke VibeHub behavior without posing as a user model turn, and how queued, running, tool, approval, waiting, failed, completed, and Evidence events would map from a replaceable executor such as Codex."
+      "criterion": "A minimal command and execution spike demonstrates how an explicit UI action can invoke VibeHub behavior without posing as a user model turn, and how queued, running, tool, approval, waiting, failed, completed, and Evidence events would map from a replaceable executor such as Codex.",
+      "identity": "sha256:653b314a6c8bdd0d4d54f5d46beeff0e2f47eac36678174d49ec1ce2affbbe9b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "local-browser-lifecycle-proven",
-      "criterion": "The spike documents and exercises the local host lifecycle needed for an app-like Safari experience, including start, authorized access, refresh or resume, shutdown, and the boundary between browser mode and a possible later desktop wrapper."
+      "criterion": "The spike documents and exercises the local host lifecycle needed for an app-like Safari experience, including start, authorized access, refresh or resume, shutdown, and the boundary between browser mode and a possible later desktop wrapper.",
+      "identity": "sha256:5a60ce55dbbf586bd924d1762b5e784486405330c6218a98e20ec93d62d085c4",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "architecture-recommendation-is-decision-ready",
-      "criterion": "A checked-in feasibility report scores each product-critical seam as proven, conditional, unsupported, or unstable and recommends an exact initial composition, compatibility adapter boundary, repository package shape, smoke-test set, and stop conditions before implementation."
+      "acceptance_id": "session-and-branch-model-proven",
+      "criterion": "A spike inspects or exercises durable session events, fork or resume identity, transcript projection, and branch comparison inputs, then documents the minimum VibeHub-owned projection needed for Fork, Compare, and Bring Back without inventing an automatic semantic graph.",
+      "identity": "sha256:348f14bc83f6dc43778c80138df1a6aef546d854f5a315b4dcd534330577bef6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ui-extension-seams-proven",
+      "criterion": "Runnable code and source references establish whether VibeHub can add or replace the required root layout, navigation, Chat actions, branch graph surface, Ticket surface, and execution surface; every unsupported or unstable seam is called out explicitly with a fallback.",
+      "identity": "sha256:96c189ff0328f006c101fc07927a67565032ec947a1f915a607de4b29e65ad9a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "upstream-baseline-is-pinned",
+      "criterion": "The exploration records an exact DeepSeek Harness release or commit, the supported runtime requirements, and primary-source links for every relied-on Bundle, Profile, Cordis, Session, command, and Web UI contract; all runnable spike code uses that pinned baseline.",
+      "identity": "sha256:941f79e4d4604b8f62dcc44bf7fff25c87e99e0d037841d431d8176f2cec2881",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not fork, vendor, or patch DeepSeek Harness upstream as the default solution.",
     "Keep spike artifacts isolated and disposable; do not migrate the current VibeHub architecture during exploration.",
@@ -55,6 +77,49 @@
       "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "architecture-recommendation-is-decision-ready",
+          "identity": "sha256:8e121c6af6d55dc1b82e0ef880205c59914b3f425f6fb4b1c7cf64de0ee3d087",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "bundle-profile-boot-spike",
+          "identity": "sha256:803d359dbcfe33b1e8433a2811106064a0b1c5ffe3358eaa4a9febbe4299c4bb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "commands-and-executor-boundary-proven",
+          "identity": "sha256:653b314a6c8bdd0d4d54f5d46beeff0e2f47eac36678174d49ec1ce2affbbe9b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-browser-lifecycle-proven",
+          "identity": "sha256:5a60ce55dbbf586bd924d1762b5e784486405330c6218a98e20ec93d62d085c4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-and-branch-model-proven",
+          "identity": "sha256:348f14bc83f6dc43778c80138df1a6aef546d854f5a315b4dcd534330577bef6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ui-extension-seams-proven",
+          "identity": "sha256:96c189ff0328f006c101fc07927a67565032ec947a1f915a607de4b29e65ad9a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "upstream-baseline-is-pinned",
+          "identity": "sha256:941f79e4d4604b8f62dcc44bf7fff25c87e99e0d037841d431d8176f2cec2881",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f353dd1177452f0ea2b2122925250c45d1b9d36396f4ce49691ba5933b0a4351",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -64,6 +129,7 @@
     "conversation:2026-08-17-start-deepseek-harness-exploration"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-spike-deepseek-harness-foundations"
 }

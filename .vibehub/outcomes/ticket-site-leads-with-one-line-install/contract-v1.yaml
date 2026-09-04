@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "primary-install-action-is-skills-sh",
+    "agent-brief-matches-readme-order",
+    "site-tests-and-build-pass",
+    "visual-check-at-two-widths"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-23T05:30:00Z",
+  "contract_revision": {
+    "identity": "sha256:6233074b5ff5a88303b139629b9d643de9d00b74fa3a8cecaa72f5d7e93f8ced",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "primary-install-action-implemented",
+    "agent-brief-reordered",
+    "site-lint-build-tests",
+    "screenshots-desktop-and-390"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication at HEAD cd73d2e against base 52376d4. Diff site/app/page.tsx: SKILLS_INSTALL = npx skills add VW-ai/vibehub-plugin rendered first as the full-width install-primary action in InstallActions (hero and footer) with the note 'One line for Claude Code, Codex, Cursor, and any skills-capable agent', plus a utility-primary button first in the header; Codex and Claude Code marketplace actions remain secondary; CODEX_INSTALL now carries both marketplace lines. SITE_AGENT_BRIEF opens with the skills.sh command and Select all hint, lists Codex and Claude Code marketplace commands as alternatives, keeps 'Start this with VibeHub', and states Tickets mirror one-way to GitHub Issues when the project opts in during setup. Re-ran in site/: npm run lint clean; NEXT_PUBLIC_SITE_URL=https://vibehub.icu npm test (the release.mjs invocation) 9/9 pass after static build; confirmed in tests/rendered-html.test.mjs line 260 that the canonical-link test requires that env var, so the unset-env failure is pre-existing and unrelated. Viewed both checked-in PNGs: at 1280 the header shows npx skills add, Codex, Claude, GitHub, Copy for Agent and the hero shows the primary command row above three secondary actions with no overflow; at 390 the actions stack in one column with the primary first, header and hero intact, the workbench horizontal bleed being the pre-existing canvas behaviour. Constraints held: git diff 52376d4..HEAD -- README.md empty; nothing under site/release changed or invoked; no deploy or Cloudflare action; site changes limited to page.tsx install surface and brief, globals.css, and rendered-html.test.mjs.",
+  "ticket_id": "ticket-site-leads-with-one-line-install",
+  "unresolved_acceptance_ids": []
+}

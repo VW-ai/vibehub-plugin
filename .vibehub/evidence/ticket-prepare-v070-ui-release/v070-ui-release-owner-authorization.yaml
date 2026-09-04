@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "release-scope-authorized"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "release-scope-authorized",
+      "identity": "sha256:498253db061a499b8285865515f2223c9f125112e0a7c9c7dcaed0ad54a28c4b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v070-ui-release-owner-authorization",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -11,7 +20,7 @@
     "branch:codex/pr18-ui-curation",
     "commit:ad21554"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The repository owner explicitly chose to merge the current curated Victor Web UI before attempting the broader interaction and visual redesign, stated that Victor's Web functionality should be preserved, and required a new release after the merge.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

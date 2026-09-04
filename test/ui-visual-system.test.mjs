@@ -37,6 +37,18 @@ test("production graph keeps four phases, one substate slot, archive, and live i
   assert.match(css, /@keyframes ticket-live-pulse/u);
 });
 
+test("Workbench visibly separates active revision proof from retired history", () => {
+  assert.match(script, /`Active Contract v\$\{activeContractRevision\.revision\}`/u);
+  assert.match(script, /`\$\{humanizeIdentifier\(item\.acceptanceId\)\} · v\$\{item\.revision \|\| 1\}`/u);
+  assert.match(script, /item\.state === "retired"[\s\S]*"Retired history"/u);
+  assert.match(script, /`Derived from \$\{item\.derivedFrom/u);
+  assert.match(script, /actual\.revision === expected\.revision && actual\.identity === expected\.identity/u);
+  assert.match(script, /record\.contractRevision\?\.revision === target\.activeContractRevision\?\.revision[\s\S]*record\.contractRevision\?\.identity === target\.activeContractRevision\?\.identity/u);
+  assert.match(script, /`\$\{outcomes\.length\} historical Outcome/u);
+  assert.match(script, /`Contract v\$\{record\.contractRevision\.revision\}`/u);
+  assert.match(script, /`\$\{record\.bindingOrigin\} binding`/u);
+});
+
 test("archived history stubs remain legible, anchored, and keyboard explicit", () => {
   assert.match(script, /graphLayoutModel\.historyStubGeometry/u);
   assert.match(script, /class: "history-stub-link"/u);

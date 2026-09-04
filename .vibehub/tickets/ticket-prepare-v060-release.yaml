@@ -1,26 +1,39 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "release-scope-authorized",
-      "authority": "human",
-      "criterion": "Human-origin Evidence records the owner's explicit choice of version 0.6.0, required release scope, authorization to open the release MR, and instruction to publish only after that MR merges."
+      "acceptance_id": "release-candidate-verified",
+      "authority": "agent",
+      "criterion": "node scripts/verify-release-version.mjs --tag v0.6.0, npm run verify, npm run build, project validation, Ticket validation, Room drift with every Room FRESH, and git diff --check all pass; clean host-marketplace coverage proves the built plugin supports both Codex and Claude Code.",
+      "identity": "sha256:721d7cf49dd5d2ffdc7aab468c311272583ede767ea0357178c4f14d69836691",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "release-identity-and-changelog",
       "authority": "agent",
-      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both version fields in .claude-plugin/marketplace.json state 0.6.0; CHANGELOG.md has a dated 0.6.0 section covering per-acceptance Agent/human decision authority, human-origin Evidence enforcement, Workbench human-attention states, firm/draft maturity and REFINE behavior, stateless repository-level Agent handoff, and the proposal to human decision to downstream refinement graph boundary."
-    },
-    {
-      "acceptance_id": "release-candidate-verified",
-      "authority": "agent",
-      "criterion": "node scripts/verify-release-version.mjs --tag v0.6.0, npm run verify, npm run build, project validation, Ticket validation, Room drift with every Room FRESH, and git diff --check all pass; clean host-marketplace coverage proves the built plugin supports both Codex and Claude Code."
+      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both version fields in .claude-plugin/marketplace.json state 0.6.0; CHANGELOG.md has a dated 0.6.0 section covering per-acceptance Agent/human decision authority, human-origin Evidence enforcement, Workbench human-attention states, firm/draft maturity and REFINE behavior, stateless repository-level Agent handoff, and the proposal to human decision to downstream refinement graph boundary.",
+      "identity": "sha256:e8165f92c806e7e049577cf9133731e5b9ff491d0e8ad83f8a7954ad0d936c0d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "release-pr-ready",
       "authority": "agent",
-      "criterion": "The release branch is based on main commit cbd41a10cbd2caa4d008ac1ad495154ee9f4140a, contains only the bounded v0.6.0 release preparation plus its VibeHub Ticket records, introduces no updater or runtime machinery, and is ready for a PR to main carrying the successful Outcome and acceptance-linked Evidence."
+      "criterion": "The release branch is based on main commit cbd41a10cbd2caa4d008ac1ad495154ee9f4140a, contains only the bounded v0.6.0 release preparation plus its VibeHub Ticket records, introduces no updater or runtime machinery, and is ready for a PR to main carrying the successful Outcome and acceptance-linked Evidence.",
+      "identity": "sha256:54c8f5e23c327faa9387ee10d4343118b2de283d522bcc638eeb72c3ad4659e3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-scope-authorized",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records the owner's explicit choice of version 0.6.0, required release scope, authorization to open the release MR, and instruction to publish only after that MR merges.",
+      "identity": "sha256:9f16e8c2534ca419c4ecd2b4aa06f968546cbcee67a6a1b0f522a848527aa1e0",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Follow docs/RELEASE.md exactly; npm is not a release or installation surface.",
     "Support both Codex and Claude Code and keep all five release identity fields consistent.",
@@ -44,15 +57,43 @@
     },
     {
       "purpose": "Completed feature set and Evidence behind the v0.6.0 human-decision boundary release.",
-      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
+      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority/contract-v1.yaml"
     },
     {
       "purpose": "Completed explicit maturity and REFINE behavior included in the release.",
-      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity/contract-v1.yaml"
     },
     {
       "purpose": "Exact pre-retirement cross-host marketplace test used by the v0.6 release proof.",
       "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:test/host-marketplaces.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "release-candidate-verified",
+          "identity": "sha256:721d7cf49dd5d2ffdc7aab468c311272583ede767ea0357178c4f14d69836691",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-identity-and-changelog",
+          "identity": "sha256:e8165f92c806e7e049577cf9133731e5b9ff491d0e8ad83f8a7954ad0d936c0d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-pr-ready",
+          "identity": "sha256:54c8f5e23c327faa9387ee10d4343118b2de283d522bcc638eeb72c3ad4659e3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-scope-authorized",
+          "identity": "sha256:9f16e8c2534ca419c4ecd2b4aa06f968546cbcee67a6a1b0f522a848527aa1e0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6a559b8f26100a974f7ebfda1f9dd0bf94a7d8563a9239e0b5ce3213fe4f4499",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -84,6 +125,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prepare-v060-release"
 }

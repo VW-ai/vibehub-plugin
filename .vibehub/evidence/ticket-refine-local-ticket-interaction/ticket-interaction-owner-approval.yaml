@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "owner-approves-daily-interaction-direction"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "owner-approves-daily-interaction-direction",
+      "identity": "sha256:bb827219d16faf752a98d544923a45357e32752c09b50d98ce8a251637ee15ee",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ticket-interaction-owner-approval",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T09:56:34Z",
@@ -9,7 +18,7 @@
     "conversation:2026-08-02-owner-approves-daily-interaction-direction",
     "git:963ce10"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After reviewing the real graph, Ticket Inspector, Contract, and Proof surfaces, the repository owner explicitly judged the current UI and overall interaction logic very good and confirmed that continuing in this direction is sound. The owner especially endorsed Evidence & Outcome, while identifying copy/open handoffs, richer Context inspection, compact Evidence references, stronger Git integration, denser causal-position behavior, human-required Ticket semantics, and additional visual refinement as follow-up opportunities rather than blockers to this interaction direction.",
   "ticket_id": "ticket-refine-local-ticket-interaction"
 }

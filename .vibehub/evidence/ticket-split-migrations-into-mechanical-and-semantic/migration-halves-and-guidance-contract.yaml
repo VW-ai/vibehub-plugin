@@ -4,6 +4,25 @@
     "semantic-steps-carry-authoring-guidance",
     "classification-is-a-release-obligation"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "migration-entries-declare-both-halves",
+      "identity": "sha256:9d9c8c24db3f8750006cd7bc81aec7273f1513e93fc4cb925f16dae3defb4b34",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "semantic-steps-carry-authoring-guidance",
+      "identity": "sha256:f39d14ffd86ecb43938c88e043341a3292baab32039a59ad19d1670af4c0f03e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "classification-is-a-release-obligation",
+      "identity": "sha256:5bf0b5070301158af40ef8c28744195f9a2785a258fc6354e2bb083690d7fc8b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "migration-halves-and-guidance-contract",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +32,7 @@
     "docs/RELEASE.md",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "migrations.json schema v2 classifies all three existing transitions step by step. 0.4-unversioned to 0.5-unversioned has no mechanical action: Room topology, lowest-owning placement, and the destination-dependent Ticket ref rewrite all require the same reviewed placement judgment, so code refuses the whole step until that judgment exists. 0.5-unversioned to format 1 has one deterministic marker write and no semantic step. Format 1 to 2 mechanically raises Ticket schema 1 to 2, defaults deliveries to [], adds a durable per-Ticket migration-pending provenance ref, and advances the project marker; exact delivery classification remains semantic because only reviewable Git/PR/cherry-pick history can establish it. Every semantic step declares purpose, derivation sources, the good-value rule, forbidden shortcuts, and instructions. RELEASE.md makes both halves a same-change data-layer release obligation, and the contract test loops over every entry and semantic step so an omitted classification or guidance field fails.",
   "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }

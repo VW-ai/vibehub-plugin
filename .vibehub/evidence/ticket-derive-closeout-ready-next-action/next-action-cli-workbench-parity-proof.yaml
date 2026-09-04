@@ -3,6 +3,20 @@
     "projection-is-shared-by-cli-and-workbench",
     "runtime-presence-and-human-attention-remain-orthogonal"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+      "identity": "sha256:c7e2479ff278f60b8f05e2aba5439c4199e28db69646ac907e340486e6f7689e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+      "identity": "sha256:98de53b65c6a23994bbea3506e43d734ddc7ca463c039ad7177ab64f68a01748",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "next-action-cli-workbench-parity-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +30,7 @@
     "test/ui-model.test.mjs",
     "command:npm-run-verify-110-of-110"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "ticket get, graph, and frontier now call the same exported ticketNextAction implementation. The read-only host maps that exact result into the Workbench nextAction capability and Ticket Context package; the browser presentation model consumes it for accessible copy, Inspector routing, and Copy for Agent instead of re-inferring from READY, Evidence counts, runtime presence, or local state. Operational state and human attention remain independent capabilities.",
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

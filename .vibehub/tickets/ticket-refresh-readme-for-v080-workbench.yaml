@@ -1,22 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "readme-shows-current-workbench",
-      "criterion": "README uses a bounded set of three authentic v0.8 Workbench captures at meaningfully different viewports: a wide current-work causal canvas, a medium focused Ticket proof/history view, and a real narrow Rooms/context view. Each capture has accurate alt text, an adjacent user-job caption, a repository-local optimized asset, and readable content at its intended GitHub display size; together they explain capabilities rather than merely showing visual polish."
-    },
-    {
-      "acceptance_id": "user-scenario-is-clear-and-compact",
-      "criterion": "The visual sequence and compact prose explain that the user describes work and invokes the one canonical entry, while VibeHub plans Git-native Tickets, shows current causal work and human boundaries, exposes one Ticket's Contract, Evidence, and Outcome, scopes context with Rooms or history on demand, and preserves the cycle as ordinary Git files. It does not become an exhaustive feature list or duplicate linked design docs."
-    },
-    {
       "acceptance_id": "installation-and-upgrade-copy-is-current",
-      "criterion": "Codex and Claude Code installation and upgrade instructions remain executable and match the current host commands, including marketplace refresh plus plugin refresh/reinstall behavior and the need to start a new Codex task or restart/reload Claude after updates; the README does not imply background self-update or project-data mutation."
+      "criterion": "Codex and Claude Code installation and upgrade instructions remain executable and match the current host commands, including marketplace refresh plus plugin refresh/reinstall behavior and the need to start a new Codex task or restart/reload Claude after updates; the README does not imply background self-update or project-data mutation.",
+      "identity": "sha256:fddf5d867b1343aaaa49d0e93f890a5d89fdfe528f49a18e1783e2102d067d73",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "criterion": "The README hero uses a newly captured current-main Workbench image that visibly represents the v0.8 canvas-first experience rather than the v0.7 top-to-bottom screenshot; the image is readable on GitHub, has accurate alt text, and the referenced asset exists in the repository.",
+      "identity": "sha256:b16e9cf73333599aeeefc965c30237c8ed21a88716752a4ac1121eb72f5094fb",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "criterion": "README uses a bounded set of three authentic v0.8 Workbench captures at meaningfully different viewports: a wide current-work causal canvas, a medium focused Ticket proof/history view, and a real narrow Rooms/context view. Each capture has accurate alt text, an adjacent user-job caption, a repository-local optimized asset, and readable content at its intended GitHub display size; together they explain capabilities rather than merely showing visual polish.",
+      "identity": "sha256:8c664b4a3c5284421965b124f19e2d2ff60cb850681945cfb802dfdaf5910992",
+      "revision": 2,
+      "state": "active"
     },
     {
       "acceptance_id": "readme-surface-stays-focused-and-verified",
-      "criterion": "README remains dark-mode safe, keeps exactly one `Start this with VibeHub.` entry, stays at or below the existing 60-line product-surface guard, names no rejected Desktop/runtime capability, all README links and image targets exist, image files are reasonably optimized, the release/readme tests and full verification pass, and the product Room is FRESH after alignment."
+      "criterion": "README remains dark-mode safe, keeps exactly one `Start this with VibeHub.` entry, stays at or below the existing 60-line product-surface guard, names no rejected Desktop/runtime capability, all README links and image targets exist, the release/readme tests and full verification pass, and the product Room is FRESH after alignment.",
+      "identity": "sha256:3a4ca32bdad27d33112622aab02a1bd7c70103e19ffbd198d1c4a5afb5ca6a94",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "criterion": "README remains dark-mode safe, keeps exactly one `Start this with VibeHub.` entry, stays at or below the existing 60-line product-surface guard, names no rejected Desktop/runtime capability, all README links and image targets exist, image files are reasonably optimized, the release/readme tests and full verification pass, and the product Room is FRESH after alignment.",
+      "identity": "sha256:3be01534c3bf7ec9ad6145c5dd93469e129878d17d6905634d50a6c844d2d934",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "criterion": "Immediately after the hero, a compact user-oriented explanation says that the user describes work and invokes the one canonical entry, while VibeHub plans Git-native Tickets, shows current causal work and human boundaries, lets the user inspect Rooms and history on demand, records Evidence, and closes through an independent Outcome. It does not become an exhaustive feature list or duplicate linked design docs.",
+      "identity": "sha256:691727c58f5d37d021fb3d8298865c6920dd27b031f3779825a515a52cbf7f97",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "criterion": "The visual sequence and compact prose explain that the user describes work and invokes the one canonical entry, while VibeHub plans Git-native Tickets, shows current causal work and human boundaries, exposes one Ticket's Contract, Evidence, and Outcome, scopes context with Rooms or history on demand, and preserves the cycle as ordinary Git files. It does not become an exhaustive feature list or duplicate linked design docs.",
+      "identity": "sha256:04eb678e3abb4eb922d062cbf0064b426034192d58fe136a680210c0a2102645",
+      "revision": 2,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep README as the smallest useful product entry; detailed lifecycle, schema, query, coexistence, and release documentation stays behind links.",
     "Every screenshot must explain a distinct user job and be paired with compact capability copy; do not create an unlabeled UI gallery or repeat the same state at several widths.",
@@ -28,7 +62,7 @@
   "context_refs": [
     {
       "purpose": "Successful integrated v0.8 Workbench behavior and boundary being documented.",
-      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr.yaml"
+      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr/contract-v1.yaml"
     },
     {
       "purpose": "Current production interaction and read-only visual contract.",
@@ -41,6 +75,34 @@
     {
       "purpose": "Existing mechanical guard for the focused README product surface.",
       "ref": "test/release.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "installation-and-upgrade-copy-is-current",
+          "identity": "sha256:fddf5d867b1343aaaa49d0e93f890a5d89fdfe528f49a18e1783e2102d067d73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-shows-current-workbench",
+          "identity": "sha256:8c664b4a3c5284421965b124f19e2d2ff60cb850681945cfb802dfdaf5910992",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "readme-surface-stays-focused-and-verified",
+          "identity": "sha256:3be01534c3bf7ec9ad6145c5dd93469e129878d17d6905634d50a6c844d2d934",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "user-scenario-is-clear-and-compact",
+          "identity": "sha256:04eb678e3abb4eb922d062cbf0064b426034192d58fe136a680210c0a2102645",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:915b545e98d6a480ea9661cb889f59ded1ec4a654b955ff4ac74d73b3e18324a",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -67,6 +129,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-refresh-readme-for-v080-workbench"
 }

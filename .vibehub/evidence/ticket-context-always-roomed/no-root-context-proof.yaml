@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "no-root-context-loading"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "no-root-context-loading",
+      "identity": "sha256:73be29b0778cf9414c7b699596e6bb3bba46e972292156c8efc7e9ab16f04b27",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "no-root-context-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T00:20:51.000Z",
@@ -11,7 +20,7 @@
     "test/context.test.mjs",
     "scripts/verify-plugin-artifact.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "loadRepository reads Context only from the Room tree, project init no longer creates a context/ directory, and a populated legacy .vibehub/context/ fails project validate with the migration message; the clean-install verification script exercises the roomed path end to end. Covered by the new legacy-directory test in context.test.mjs; suite passes 29/29.",
   "ticket_id": "ticket-context-always-roomed"
 }

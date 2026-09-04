@@ -3,6 +3,20 @@
     "back-fill-guidance-is-proven-on-a-real-field",
     "real-projects-rehearsed"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "back-fill-guidance-is-proven-on-a-real-field",
+      "identity": "sha256:233dcf8c3c6b6ecb33e5323abf638f7017ee7ca5a29d52f087483fe452077dfd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "real-projects-rehearsed",
+      "identity": "sha256:98c34e16b90a714a9b8dc5bab527eeca92016fa7bd393f25a5384aed3734cd0b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "real-stale-project-copy-rehearsals",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +28,7 @@
     "commit:df317d2fa41f56064c2348b198e99ec0269846a9",
     "rehearsal:/private/tmp/vibehub-real-rehearsal.thUsTr"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Full disposable filesystem copies under /private/tmp/vibehub-real-rehearsal.thUsTr exercised the two real stale projects without passing either original path to a write operation. The Undercurrent copy started at format 1; the engine changed exactly six Ticket files plus version.yaml, reached CURRENT format 2, and project validate passed with 5 Rooms, 23 Contexts, 6 Tickets, and 17 Evidence records. All six Tickets were writable yet explicitly pending delivery classification. The nomi copy started at 0.4-unversioned; the engine correctly returned semantic_required for design-room-tree-and-place-contexts, reported no applied migration and changed_paths [], left no marker, and remained MIGRATION_REQUIRED. For semantic exercise, provide-historical-high-fluency-writing-samples was audited using the declared delivery guidance and exact Undercurrent history. History showed only commit df317d2fa41f56064c2348b198e99ec0269846a9 introducing the Ticket and no Outcome or authoritative merged PR/cherry-pick delivery; the Agent therefore kept deliveries empty, declined to invent canonical ref/timestamp/delivered commit, removed only that Ticket's pending ref, and the copy still validated. Any Agent reads the same purpose, derivation sources, good-value rule, forbidden shortcuts, and instructions from the same versioned migration step, rather than receiving executor-private criteria.",
   "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }

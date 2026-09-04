@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "authorized-link-is-portable",
+    "flat-workbench-replaces-nested-shells",
+    "design-language-is-coherent",
+    "normal-browser-entry-is-obvious",
+    "canonical-readonly-boundary-survives"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-02T07:49:14Z",
+  "contract_revision": {
+    "identity": "sha256:50dad1e2cc3b33726e7722cd97b21eac3d13bf5baecf83a930a6c176fc32a511",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "portable-authorized-link-proof",
+    "flat-workbench-design-proof",
+    "normal-browser-entry-proof",
+    "workbench-readonly-boundary-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. The client retains the bearer fragment, never scrubs browser history, copies the complete location URL with clipboard fallback, and supplies explicit bare-origin recovery guidance; recorded real-browser proof shows the same authorized URL loading the four-Ticket graph in a second tab. The obsolete surface, signal, and sheet DOM/CSS are deleted in favor of one full-window toolbar, graph canvas, and bounded inspector, with desktop and narrow screenshots demonstrating a coherent VibeHub hierarchy and deliberate full-screen narrow inspector state. A fresh default launch invoked the system-browser path and returned opened:true with the complete fragment URL, while docs preserve --no-open for Agent/testing use. Project and Ticket validation passed, npm verification passed all 8 tests plus the clean installed artifact check (32 files, 167469 bytes), both offline marketplace builds passed, dependencies remain zero, and the schema-validated fresh Git-YAML, loopback, expiring bearer, restrictive-header, GET/HEAD-only, no-write/no-hidden-state boundary remains intact.",
+  "ticket_id": "ticket-rebuild-local-graph-workbench",
+  "unresolved_acceptance_ids": []
+}

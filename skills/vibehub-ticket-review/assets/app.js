@@ -1084,6 +1084,8 @@
       contractSummary: contract.summary,
       proofSummary: proof.summary,
       acceptanceCount: (contextPackage.acceptance || []).length,
+      activeAcceptanceCount: (contextPackage.acceptance || []).filter((item) => item.state === "active").length,
+      activeContractRevision: contextPackage.activeContractRevision || null,
       nextAction,
     };
   }
@@ -1792,7 +1794,7 @@
     const relations = contextPackage.relations || [];
     const provenanceRefs =
       contextPackage.provenanceRefs || ticket.provenanceRefs || [];
-    const summary = contractBrief(acceptance);
+    const summary = contractBrief(acceptance, contextPackage.activeContractRevision);
     panel.append(summary);
     const review = closeoutReviewBrief(contextPackage, nextAction);
     if (review) panel.append(review);
@@ -1862,9 +1864,10 @@
     return { panel, acceptanceRail, summary };
   }
 
-  function contractBrief(acceptance) {
-    const acceptanceCount = acceptance.length;
-    const humanCount = acceptance.filter(
+  function contractBrief(acceptance, activeContractRevision) {
+    const active = acceptance.filter((item) => item.state === "active");
+    const acceptanceCount = active.length;
+    const humanCount = active.filter(
       (item) => item.authority === "human",
     ).length;
     const brief = document.createElement("div");
@@ -1875,7 +1878,9 @@
     const copy = document.createElement("div");
     copy.className = "contract-brief-copy";
     const eyebrow = document.createElement("span");
-    eyebrow.textContent = "Definition of done";
+    eyebrow.textContent = activeContractRevision
+      ? `Active Contract v${activeContractRevision.revision}`
+      : "Definition of done";
     const title = document.createElement("strong");
     title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`
       + (humanCount ? ` · ${humanCount} require human authority` : "");
@@ -1954,16 +1959,21 @@
         authority === "human" ? "authority-human" : "",
       );
       row.dataset.acceptanceId = item.acceptanceId;
+      row.dataset.acceptanceRevision = String(item.revision || 1);
+      row.dataset.acceptanceIdentity = item.identity || "";
+      row.dataset.acceptanceState = item.state || "active";
       row.dataset.authority = authority;
       const summary = document.createElement("summary");
       const marker = document.createElement("span");
       marker.className = "acceptance-marker";
       marker.setAttribute("aria-hidden", "true");
       const title = document.createElement("strong");
-      title.textContent = humanizeIdentifier(item.acceptanceId);
+      title.textContent = `${humanizeIdentifier(item.acceptanceId)} · v${item.revision || 1}`;
       const status = document.createElement("span");
       status.className = "acceptance-status";
-      status.textContent = authority === "human"
+      status.textContent = item.state === "retired"
+        ? "Retired history"
+        : authority === "human"
         ? "Human evidence pending"
         : "Awaiting evidence";
       const meta = document.createElement("span");
@@ -1979,6 +1989,14 @@
       const criterion = document.createElement("p");
       criterion.textContent = item.criterion;
       row.append(summary, criterion);
+      if (item.derivedFrom?.length) {
+        const lineage = document.createElement("p");
+        lineage.className = "acceptance-lineage";
+        lineage.textContent = `Derived from ${item.derivedFrom
+          .map((reference) => `${reference.acceptance_id} v${reference.revision}`)
+          .join(", ")}`;
+        row.append(lineage);
+      }
       rail.append(row);
     }
     return rail;
@@ -2277,16 +2295,29 @@
   function updateTicketProof(target, records) {
     const evidence = records.filter((record) => record.kind === "evidence");
     const outcomes = records.filter((record) => record.kind === "outcome");
-    const evidenced = new Set(evidence.flatMap(
-      (record) => record.acceptanceIds || [],
-    ));
+    const activeRows = [...target.acceptanceRail.querySelectorAll('[data-acceptance-state="active"]')];
+    const activeRefs = new Map(activeRows.map((row) => [row.dataset.acceptanceId, {
+      revision: Number(row.dataset.acceptanceRevision),
+      identity: row.dataset.acceptanceIdentity,
+    }]));
+    const evidenceCoversCurrent = (record, acceptanceId) => {
+      const expected = activeRefs.get(acceptanceId);
+      const actual = (record.acceptanceRevisions || []).find((item) => item.acceptance_id === acceptanceId);
+      return record.bindingState === "bound" && expected && actual
+        && actual.revision === expected.revision && actual.identity === expected.identity;
+    };
+    const evidenced = new Set(evidence.flatMap((record) =>
+      (record.acceptanceIds || []).filter((id) => evidenceCoversCurrent(record, id))));
     const humanEvidenced = new Set(evidence
       .filter((record) => record.origin === "human")
-      .flatMap((record) => record.acceptanceIds || []));
-    const accepted = new Set(outcomes.flatMap(
+      .flatMap((record) => (record.acceptanceIds || []).filter((id) => evidenceCoversCurrent(record, id))));
+    const currentOutcomes = outcomes.filter((record) => record.bindingState === "bound"
+      && record.contractRevision?.revision === target.activeContractRevision?.revision
+      && record.contractRevision?.identity === target.activeContractRevision?.identity);
+    const accepted = new Set(currentOutcomes.flatMap(
       (record) => record.acceptedAcceptanceIds || [],
     ));
-    const unresolved = new Set(outcomes.flatMap(
+    const unresolved = new Set(currentOutcomes.flatMap(
       (record) => record.unresolvedAcceptanceIds || [],
     ));
 
@@ -2296,37 +2327,41 @@
     const contractValue = contractStatus.querySelector("strong");
     const contractDetail = contractStatus.querySelector("span");
     contractStatus.classList.remove("is-complete", "has-attention");
-    if (outcomes.length) {
+    if (currentOutcomes.length) {
       contractValue.textContent = unresolved.size
         ? `${accepted.size} accepted · ${unresolved.size} unresolved`
-        : `${accepted.size} / ${target.acceptanceCount} accepted`;
+        : `${accepted.size} / ${target.activeAcceptanceCount} accepted`;
       contractDetail.textContent = "Independent Outcome recorded";
       contractStatus.classList.add(
         unresolved.size ? "has-attention" : "is-complete",
       );
     } else {
-      contractValue.textContent = `${evidenced.size} / ${target.acceptanceCount} evidenced`;
+      contractValue.textContent = `${evidenced.size} / ${target.activeAcceptanceCount} evidenced`;
       contractDetail.textContent = target.nextAction?.action === "CLOSE_OUT"
         ? "Authority satisfied · independent Outcome pending"
         : "Independent Outcome pending";
     }
 
     const metric = elements.inspectorContent.querySelector(".proof-metric strong");
-    if (metric) metric.textContent = `${evidenced.size} / ${target.acceptanceCount}`;
+    if (metric) metric.textContent = `${evidenced.size} / ${target.activeAcceptanceCount}`;
     const label = target.proofSummary.querySelector("strong");
     const detail = target.proofSummary.querySelector("span");
     if (!records.length) {
       label.textContent = "No Evidence recorded yet";
-      detail.textContent = `${target.acceptanceCount} criteria await acceptance-linked Evidence.`;
+      detail.textContent = `${target.activeAcceptanceCount} active criteria await revision-bound Evidence.`;
     } else {
-      label.textContent = `${evidence.length} Evidence · ${outcomes.length ? "Outcome recorded" : "Outcome pending"}`;
+      label.textContent = `${evidence.length} Evidence · ${currentOutcomes.length ? "current Outcome recorded" : `${outcomes.length} historical Outcome${outcomes.length === 1 ? "" : "s"}`}`;
       detail.textContent = target.nextAction?.action === "CLOSE_OUT"
-        ? `${evidenced.size} of ${target.acceptanceCount} criteria are authority-satisfied; independent adjudication is next.`
-        : `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
+        ? `${evidenced.size} of ${target.activeAcceptanceCount} active criteria are authority-satisfied; independent adjudication is next.`
+        : `${evidenced.size} of ${target.activeAcceptanceCount} active criteria have exact-revision Evidence.`;
     }
 
     target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
       const id = row.dataset.acceptanceId;
+      if (row.dataset.acceptanceState === "retired") {
+        row.querySelector(".acceptance-status").textContent = "Retired history";
+        return;
+      }
       const human = row.dataset.authority === "human";
       const status = row.querySelector(".acceptance-status");
       row.classList.remove(
@@ -2394,6 +2429,8 @@
       meta.textContent = [
         record.subkind || record.kind,
         record.status || "recorded",
+        record.contractRevision ? `Contract v${record.contractRevision.revision}` : null,
+        record.bindingOrigin ? `${record.bindingOrigin} binding` : record.bindingState,
         record.kind === "evidence" ? `${record.origin || "agent"} origin` : null,
         formatInstant(record.occurredAt),
       ].filter(Boolean).join(" · ");

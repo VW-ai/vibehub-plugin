@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "verified-feature-pr-is-merged",
-      "criterion": "The focused v0.8.0 Web Workbench PR merges with successful required checks, and fetched origin/main contains the exact integration Outcome, its acceptance-linked Evidence, and all constituent successful Outcomes without unrelated Desktop or runtime surfaces."
-    },
-    {
       "acceptance_id": "delivery-membership-is-made-authoritative",
-      "criterion": "After GitHub reports the merge, every constituent Ticket named by the integration Ticket's exact closed-set rule changes its matching canonical pull_request delivery entry from proposed to delivered with the exact GitHub mergedAt timestamp and 40-hex merge commit; a bounded follow-up Git change containing those facts is merged before release tagging, while historical and future non-constituent Tickets are untouched."
-    },
-    {
-      "acceptance_id": "v080-tags-the-final-main-commit",
-      "criterion": "After fetching and fast-forwarding local main, lightweight tag v0.8.0 points exactly to the final origin/main commit that contains the authoritative delivered membership change and is pushed to origin; no feature-branch-only commit is tagged."
+      "criterion": "After GitHub reports the merge, every constituent Ticket named by the integration Ticket's exact closed-set rule changes its matching canonical pull_request delivery entry from proposed to delivered with the exact GitHub mergedAt timestamp and 40-hex merge commit; a bounded follow-up Git change containing those facts is merged before release tagging, while historical and future non-constituent Tickets are untouched.",
+      "identity": "sha256:64ca9aafc19a3e5aceba1537bc98023af975cf95eb051ee31cf96e0d5b47ffb5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "v080-github-release-is-verified",
-      "criterion": "The Release VibeHub workflow for the exact v0.8.0 tag completes successfully; GitHub Release v0.8.0 is published as neither draft nor prerelease; vibehub-plugin-0.8.0.tar.gz and vibehub-plugin-0.8.0.tar.gz.sha256 both exist; and a fresh local download passes SHA-256 verification and archive readability checks."
+      "criterion": "The Release VibeHub workflow for the exact v0.8.0 tag completes successfully; GitHub Release v0.8.0 is published as neither draft nor prerelease; vibehub-plugin-0.8.0.tar.gz and vibehub-plugin-0.8.0.tar.gz.sha256 both exist; and a fresh local download passes SHA-256 verification and archive readability checks.",
+      "identity": "sha256:339d66b548de270c85e0e5844d4cff8457925e71f73aa4771d9d64d657a86d08",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v080-tags-the-final-main-commit",
+      "criterion": "After fetching and fast-forwarding local main, lightweight tag v0.8.0 points exactly to the final origin/main commit that contains the authoritative delivered membership change and is pushed to origin; no feature-branch-only commit is tagged.",
+      "identity": "sha256:6aa6f3c89f351e5f3db25894da3d82949d87fe853ee9db09d284d5e1d2be06b1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verified-feature-pr-is-merged",
+      "criterion": "The focused v0.8.0 Web Workbench PR merges with successful required checks, and fetched origin/main contains the exact integration Outcome, its acceptance-linked Evidence, and all constituent successful Outcomes without unrelated Desktop or runtime surfaces.",
+      "identity": "sha256:860de54f79c36ae587030da71c1eb426dbc8b81aae527eb9740bb4c1feade48b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Never tag or publish from the feature branch; tag only the final exact origin/main commit after authoritative delivery metadata is merged.",
     "Do not create the GitHub Release manually; wait for the tag-triggered Release VibeHub workflow.",
@@ -35,6 +48,34 @@
       "ref": ".github/workflows/release.yml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "delivery-membership-is-made-authoritative",
+          "identity": "sha256:64ca9aafc19a3e5aceba1537bc98023af975cf95eb051ee31cf96e0d5b47ffb5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v080-github-release-is-verified",
+          "identity": "sha256:339d66b548de270c85e0e5844d4cff8457925e71f73aa4771d9d64d657a86d08",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v080-tags-the-final-main-commit",
+          "identity": "sha256:6aa6f3c89f351e5f3db25894da3d82949d87fe853ee9db09d284d5e1d2be06b1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verified-feature-pr-is-merged",
+          "identity": "sha256:860de54f79c36ae587030da71c1eb426dbc8b81aae527eb9740bb4c1feade48b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c055e0109394f7eab603d3d8c8ab3cac87fc25ccf97294634dc5995c42ec3603",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -50,6 +91,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-publish-v080-workbench-release"
 }

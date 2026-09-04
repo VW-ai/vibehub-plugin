@@ -4,6 +4,25 @@
     "candidates-ranked",
     "next-slice-recommended"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "open-graph-reconciled",
+      "identity": "sha256:8889ba57c36b6c40dc729a9c359a7bca850a532d25296b9c6b1cd7d4aed65cea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "candidates-ranked",
+      "identity": "sha256:f1c2d293895448acf47e67722ec06f331dce5152d9d033cc01400bc494841e1a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "next-slice-recommended",
+      "identity": "sha256:d8fd05a0a534c6a93647ce9be366063b527cbf11ceb2dd4e8096f43f60356132",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "near-term-candidate-ranking",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T08:27:48Z",
@@ -16,7 +35,7 @@
     ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml",
     ".vibehub/rooms/product/decision-project-playbook-context-guides-tickets.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Five candidates were ranked on immediate user value / repeated-use leverage / strategic fit / implementation tractability / evidence strength (5 is strongest): (1) canonical human-authority acceptance and visible attention state, 5/5/5/3/5, DO NEXT via existing READY ticket-encode-human-acceptance-authority; (2) Room tree and drift in Workbench, 3/3/4/2/4, DO LATER via existing READY ticket-rooms-into-workbench because it is a larger owner-gated information surface rather than the missing execution transition; (3) project-playbook-aware planning, 4/5/5/3/2, REFINE only after repeated project dogfood shows what is not already covered by Room Context, AGENTS.md, and context_refs; (4) invisible Git/cross-repository actions, 4/4/5/2/2, keep existing ticket-invisible-git-cross-repo-actions in REFINE until a real workflow supplies value and friction; (5) helper CLI/modularity, 2/3/2/2/2, keep existing ticket-vibehub-cli in REFINE/deferred because verification passes and no measured command pain justifies a new public surface. The smallest coherent next slice is the existing human-authority Ticket: optional per-acceptance authority with Agent default, Skill preservation, human-origin Evidence requirement, mechanical UI state, exact Copy-for-Agent handoff, and no change to dependency semantics or service boundary. It should precede Rooms because it closes a missing loop transition; precede playbooks/cross-repo because those lack observed shape; and precede CLI because CLI work does not change the user's coordination outcome.",
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

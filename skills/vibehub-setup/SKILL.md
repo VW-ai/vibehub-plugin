@@ -45,13 +45,14 @@ deliverable continues without another user command.
 6. Optional, asked once: if `git remote get-url origin` points at
    `github.com`, ask the user whether to mirror Tickets to GitHub Issues
    (one workflow plus a small script; runs only in GitHub Actions on push to
-   `main`; nothing for an Agent to run or check). On yes, copy these five
+   `main`; nothing for an Agent to run or check). On yes, copy these six
    files and nothing else, then record the copy as setup Evidence:
 
    ```text
    ../vibehub-core/templates/github/sync-issues.yml        → .github/workflows/sync-issues.yml
    ../vibehub-core/templates/github/sync-github-issues.mjs → scripts/vibehub/sync-github-issues.mjs
    ../vibehub-core/scripts/vh.mjs                          → scripts/vibehub/scripts/vh.mjs
+   ../vibehub-core/scripts/revision-contract.mjs           → scripts/vibehub/scripts/revision-contract.mjs
    ../vibehub-core/contracts/versions.json                 → scripts/vibehub/contracts/versions.json
    ../vibehub-core/contracts/dependency-hygiene.json       → scripts/vibehub/contracts/dependency-hygiene.json
    ```

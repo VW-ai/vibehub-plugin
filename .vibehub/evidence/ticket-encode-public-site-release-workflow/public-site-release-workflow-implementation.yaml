@@ -4,6 +4,25 @@
     "release-checks-are-mechanical",
     "human-entry-is-short-and-truthful"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "repo-local-release-skill-is-complete",
+      "identity": "sha256:f0a6225e71b66a233eb8432788c6e4b90e3ce328891d4c403bf9bf36b977eb0d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "release-checks-are-mechanical",
+      "identity": "sha256:33b970b9d38c7bb8887d764b73f5bc2f923cdeb477dcaddf1050deb3a5614ccb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "human-entry-is-short-and-truthful",
+      "identity": "sha256:1ba83f41efbde41a1ee8fcab78ddbff1febbd61c6a5f837384635896eae1edae",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-site-release-workflow-implementation",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "AGENTS.md",
     "test/site-release-workflow.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The repository now contains a VibeHub-specific public-site release Skill at site/release/SKILL.md, a dependency-free release checker, short npm entry points, an AGENTS route, and a narrowed human README. The Skill reuses the checked-in Sites project, protects DNS and custom-domain replacement behind explicit human authority, covers prepare/publish/verify/rollback/evidence/stop behavior, and remains outside the public Plugin skills directory and artifact path.",
   "ticket_id": "ticket-encode-public-site-release-workflow"
 }

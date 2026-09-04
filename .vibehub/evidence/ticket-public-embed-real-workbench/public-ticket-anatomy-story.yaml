@@ -4,6 +4,25 @@
     "public-fixture-is-honest-and-lightweight",
     "workbench-embedding-preserves-product-quality"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "git-and-github-stay-below-product-value",
+      "identity": "sha256:80a03db5e7a4ba078f67166a92f566652ce8de8070aac82f05f7f526f2c7cd72",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-ticket-anatomy-story",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +35,7 @@
     "build:site-static-production-export",
     "preview:http://localhost:3000"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The second public screen now answers What is a Ticket? instead of mapping fragments of a long request. A concrete VH-204 anatomy surface makes Work, Dependencies, Bound Context, and Acceptance visible as four distinct parts, then names the resulting object Agent-executable. The adjacent faithful Workbench opens the same selected Ticket on Contract so the anatomy maps to real Acceptance and Bound Context UI rather than a marketing-only abstraction. The hero leads with Stop managing chats. Manage the work. and Turn every coding request into a Ticket with your context; Git and GitHub appear only in the later ownership and implementation section. The change removes the old request-mapping component and its motion without adding a dependency or second lifecycle.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

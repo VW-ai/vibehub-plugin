@@ -6,6 +6,35 @@
     "motion-is-fluid-restrained-and-interruptible",
     "responsive-accessible-static-site-is-verifiable"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "first-view-explains-and-installs",
+      "identity": "sha256:262d419eb769812f1729b18f670537285173827fab62cef44f62fe92a94b904e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-shelf-is-the-site-navigation",
+      "identity": "sha256:2c0cce98f00b9fd17aa4b1c62906bfefb27e4c200d9e10e771bcef4520195b9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "opened-ticket-is-physical-and-readable",
+      "identity": "sha256:168a28bf9fe2509799857f99fd305e2b1eb3562866ebc9127b53f590c61c93fd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
+      "identity": "sha256:6b0a6aa9bc9c9aec822897d9882582cfadc10ce8ab34d7545b6b13d272a68c7f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "responsive-accessible-static-site-is-verifiable",
+      "identity": "sha256:b4a5215f91d78a5e46d3800508cef744829bc0c65d07e1c8a95f5056462812d6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ticket-shelf-browser-and-build-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T08:39:10Z",
@@ -21,7 +50,7 @@
     "browser:http://localhost:3000/#product@390x844",
     "conversation:2026-08-09-ticket-shelf-browser-verification"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Independent browser checks at 1440x1000 and 390x844 confirmed Product is the default first view, all required actions are visible, the Ticket graph and open-slot connector are legible, and document scrollWidth equals clientWidth at both widths. Pointer activation changed Workflow and the URL to #workflow; browser Back restored #product; explicit keyboard Enter opened Documentation at #documentation; the fixed mobile shelf exposes a horizontal snap rail; Copy for Agent produced the complete 2317-character brief containing the exact Codex install and canonical entry; and the browser console had no errors or warnings. Site lint, four rendered-contract tests, static production build, canonical project/Ticket validation, and the 51-file Plugin artifact verification all passed. The fresh Web Interface Guidelines audit led to a skip link, visible focus, balanced headings, touch-action, safe-area handling, and motion/accessibility guardrails with no remaining material finding.",
   "ticket_id": "ticket-restore-public-hero-ticket-graph"
 }

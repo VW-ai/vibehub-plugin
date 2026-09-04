@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "migrations-reference-owned",
-      "criterion": "A versioned migrations reference exists under the new skill, states the 0.4-to-0.5 step once (room tree via distill, entries moved per placement rule, context_refs rewritten, validation and drift green afterwards), and the skill-contracts tests assert its presence and structure."
-    },
-    {
       "acceptance_id": "migrate-skill-judgment-first",
-      "criterion": "skills/vibehub-migrate/SKILL.md is short and judgment-first: it detects the project's shape, applies only the applicable steps from the reference as reviewable Git changes, triggers only on the legacy validation error or an explicit upgrade request, and points at (never restates) the placement and boundary references."
+      "criterion": "skills/vibehub-migrate/SKILL.md is short and judgment-first: it detects the project's shape, applies only the applicable steps from the reference as reviewable Git changes, triggers only on the legacy validation error or an explicit upgrade request, and points at (never restates) the placement and boundary references.",
+      "identity": "sha256:ff088fc24d8f2bbb171ad05c74bc9f0fb95833c269d753657dbd231b92fa203d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "migration-rehearsed",
-      "criterion": "A scripted rehearsal proves the 0.4-to-0.5 path: a scratch repo with a 0.4-style flat context layer fails validate, and after following the migration step mechanically (rooms created, entries moved, refs rewritten) the same repo passes project validate; covered by node --test."
+      "criterion": "A scripted rehearsal proves the 0.4-to-0.5 path: a scratch repo with a 0.4-style flat context layer fails validate, and after following the migration step mechanically (rooms created, entries moved, refs rewritten) the same repo passes project validate; covered by node --test.",
+      "identity": "sha256:1b0eb897cf7e90535881b654afc7e998901138446d07e49ab05bca782e40b1fe",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "migration-suite-green",
-      "criterion": "The full node --test suite and the plugin artifact verification pass with the new skill bundled."
+      "criterion": "The full node --test suite and the plugin artifact verification pass with the new skill bundled.",
+      "identity": "sha256:07e2647bd9dca58a9383e76408c9b7ce49d20fdb83220ea396c10ddccf15ba6f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "migrations-reference-owned",
+      "criterion": "A versioned migrations reference exists under the new skill, states the 0.4-to-0.5 step once (room tree via distill, entries moved per placement rule, context_refs rewritten, validation and drift green afterwards), and the skill-contracts tests assert its presence and structure.",
+      "identity": "sha256:a72183c59e42f51f9cbf37056aa8b80c85c3ad8462a5f06fb1f58523903d9be6",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "No forward-compatibility shims, dual read paths, or background conversion anywhere.",
     "The migrations reference is the single source; the skill and other documents point at it.",
@@ -37,6 +50,34 @@
       "ref": ".vibehub/rooms/knowledge/decision-context-always-roomed.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "migrate-skill-judgment-first",
+          "identity": "sha256:ff088fc24d8f2bbb171ad05c74bc9f0fb95833c269d753657dbd231b92fa203d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migration-rehearsed",
+          "identity": "sha256:1b0eb897cf7e90535881b654afc7e998901138446d07e49ab05bca782e40b1fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migration-suite-green",
+          "identity": "sha256:07e2647bd9dca58a9383e76408c9b7ce49d20fdb83220ea396c10ddccf15ba6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migrations-reference-owned",
+          "identity": "sha256:a72183c59e42f51f9cbf37056aa8b80c85c3ad8462a5f06fb1f58523903d9be6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a3e9f1ecf0847c14bf507452653854bf0a7a60b8a4f8dacac82b6183426bef6b",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-04T04:12:16.000Z",
@@ -53,6 +94,7 @@
     "task:5c6d85a3a430d2dc5308f35e5d0e5115"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-upgrade-migration-skill"
 }

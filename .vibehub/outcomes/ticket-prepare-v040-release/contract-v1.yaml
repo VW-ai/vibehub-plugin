@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "readme-leads-with-product-and-visual",
+    "readme-teaches-the-real-workflow",
+    "v040-identity-is-consistent",
+    "github-release-is-small-and-reproducible",
+    "release-procedure-is-explicit",
+    "release-candidate-is-merge-ready"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-02T22:55:52Z",
+  "contract_revision": {
+    "identity": "sha256:e5098e85cd729fc47cfcb042cb5f45ba2c116c5868e0720eb85b0d4fc38ed403",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "release-readme-and-lifecycle-story",
+    "v040-github-release-mechanics",
+    "main-pr-release-readiness"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria. README leads with checked-in VibeHub brand and graph assets, teaches the proactive Plan→Execution, quiet Run, protected human boundary→Contract, and Closeout→Log lifecycle, and keeps explicit review/launcher use as fallback while preserving independent Outcome and explicit durable Context capture. Package, Codex, Claude, and marketplace identities all validate at 0.4.0; the dated Changelog records the Skill-first break. The compact tag-only workflow verifies identity and the complete suite, builds the dependency-free plugin, emits an archive with a basename-only SHA-256 record that verifies directly beside the download, and creates only a GitHub Release without npm, CLI, MCP, runtime, native, matrix, or marketplace publication machinery. Release documentation requires merge to main, tag the exact main commit, publish from the tag workflow, then verify the Release, and explicitly excludes npm. After a fresh fetch, origin/main@63043ad is the exact merge base and ancestor with left/right 0/48, the worktree is clean, diff validation passes, project and Ticket validation pass, all 16 tests pass, and clean artifact verification reports exactly 40 files and 324497 bytes. The release story honestly leaves ticket-encode-human-acceptance-authority open and unexecuted.",
+  "ticket_id": "ticket-prepare-v040-release",
+  "unresolved_acceptance_ids": []
+}

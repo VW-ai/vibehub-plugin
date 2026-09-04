@@ -4,6 +4,25 @@
     "readme-copy-matches-current-product",
     "readme-render-and-artifact-parity-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "identity": "sha256:100a29d550eb7997dc12b0ed480727066fa269697f41fc3f8c62c9e238929939",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-product",
+      "identity": "sha256:99a928715ff40d550943e537f0365cd4c44a529056ec50f461e370ecdffd8df9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-render-and-artifact-parity-pass",
+      "identity": "sha256:bac0a61d9d4319a8649746018a5da6b66b280f6e90d826c5110255d8c7ff0952",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-installed-artifact-parity-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +36,7 @@
     "artifact:fresh-codex-claude-62-files-2828307-bytes",
     ".vibehub/rooms/product/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Automated release tests parse the Retina capture manifest, verify the PNG signature, exact IHDR dimensions and SHA-256 for all three README images, require all four current phases and the progressively disclosed Recommended action copy, reject JPEG Workbench references, and preserve the at-most-60-line surface plus single canonical invocation and installation/release contracts. Plugin packaging includes the three PNGs and manifest. Installed-artifact verification parses Markdown and HTML README image references and fails if any relative target is missing. Full repository verification passes 131/131, and a fresh Codex/Claude-parity installed artifact passes its real read-only loopback checks at 62 files and 2,828,307 bytes. Product Room alignment is refreshed to the exact README/docs asset state; Ticket and project validation remain valid.",
   "ticket_id": "ticket-refresh-readme-workbench-screenshots"
 }

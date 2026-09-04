@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "owner-accepts-the-product-feel"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "owner-accepts-the-product-feel",
+      "identity": "sha256:c03da9359ff112544d51ee883af1c826aa82f521fb786cba1b071f02b6eb0cb2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "owner-accepts-public-site-product-feel",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -9,7 +18,7 @@
   "refs": [
     "conversation:2026-08-19-owner-accepts-public-site-and-authorizes-publish"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After inspecting the retained localhost preview with the real Ticket file and Room/Context source story, the owner said ‘我感觉不错’ and explicitly approved proceeding with the closeout, commit, and push workflow.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

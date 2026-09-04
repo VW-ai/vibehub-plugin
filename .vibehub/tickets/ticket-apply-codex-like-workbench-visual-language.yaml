@@ -1,23 +1,35 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
-      "acceptance_id": "production-visual-system-matches-owner-direction",
-      "criterion": "The production Workbench translates the current approved Codex-like proposal into one dependency-free token and component system: one global system-monospace stack; quiet neutral canvas, panel, border, radius, and elevation tokens; compact 16px stroke-SVG icons with no emoji; restrained whole-card surfaces plus icon-and-text labels for the operational DONE, READY, BLOCKED, REFINE, and DEVIATED axis; a separate derived ARCHIVED delivery/history boundary treatment; an independent icon-and-text human-attention treatment for UPCOMING, PENDING/NEEDS YOU, RECORDED, and COMPLETE; neutral hover and selection; and colored icon-bearing operational and attention counts that serve as the compact canvas/Overview legend without redundant explanatory copy."
+      "acceptance_id": "overview-and-progressive-detail-stay-quiet",
+      "criterion": "Overview is closed by default and opens on demand as compact counts plus clearly separated Ticket-state and human-attention legends; the full-bleed graph remains the primary object; Inspector remains progressive detail on the right and becomes a bottom sheet on narrow screens; proposal/decision scaffolding, the empty no-Active-Run explanation, Execution flow, Proven left/executable right, and copy already communicated by hierarchy or interaction are absent from production.",
+      "identity": "sha256:ea9d9fa75a6eaa1b8d2115a53e40841f57b7775d9a6bc64ec862706173be604a",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "production-capabilities-and-truth-remain-intact",
-      "criterion": "The restyled production surface retains the complete causal graph, selected upstream/downstream cone, both layout directions, dense non-overlapping routes, minimap/pan/zoom, current/all/delivery/Room query state, progressive archived-hop expansion, Execution/Contract/Log Inspector lenses, exact Git source, focused-link restoration, and READY-only Agent handoff; REFINE remains non-executable, human attention remains independent of operational state, and the UI never reports an Active Run without a trusted presence source."
+      "criterion": "The restyled production surface retains the complete causal graph, selected upstream/downstream cone, both layout directions, dense non-overlapping routes, minimap/pan/zoom, current/all/delivery/Room query state, progressive archived-hop expansion, Execution/Contract/Log Inspector lenses, exact Git source, focused-link restoration, and READY-only Agent handoff; REFINE remains non-executable, human attention remains independent of operational state, and the UI never reports an Active Run without a trusted presence source.",
+      "identity": "sha256:53a665ed28b67adc32aaeb8c83a2e05d8e44b22669d989a645641cdb960e48eb",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "overview-and-progressive-detail-stay-quiet",
-      "criterion": "Overview is closed by default and opens on demand as compact counts plus clearly separated Ticket-state and human-attention legends; the full-bleed graph remains the primary object; Inspector remains progressive detail on the right and becomes a bottom sheet on narrow screens; proposal/decision scaffolding, the empty no-Active-Run explanation, Execution flow, Proven left/executable right, and copy already communicated by hierarchy or interaction are absent from production."
+      "acceptance_id": "production-visual-system-matches-owner-direction",
+      "criterion": "The production Workbench translates the current approved Codex-like proposal into one dependency-free token and component system: one global system-monospace stack; quiet neutral canvas, panel, border, radius, and elevation tokens; compact 16px stroke-SVG icons with no emoji; restrained whole-card surfaces plus icon-and-text labels for the operational DONE, READY, BLOCKED, REFINE, and DEVIATED axis; a separate derived ARCHIVED delivery/history boundary treatment; an independent icon-and-text human-attention treatment for UPCOMING, PENDING/NEEDS YOU, RECORDED, and COMPLETE; neutral hover and selection; and colored icon-bearing operational and attention counts that serve as the compact canvas/Overview legend without redundant explanatory copy.",
+      "identity": "sha256:2b4ba6b33a26c845894b9cb986169863d4080d947f7b620edd6eb6f7096bcbc2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "visual-accessibility-and-regression-proof-pass",
-      "criterion": "Automated token/state/contrast/reduced-motion tests and a real-browser pass at 1440x960, 1180x820, and 390x844 verify both layout directions, every operational and human-attention coexistence treatment, keyboard-visible focus, readable non-color state labels, at least 44px narrow targets, Inspector/Overview open and closed states, complete selected cones, no horizontal document overflow, and no console warnings or errors; full project/Ticket validation, Rooms freshness, the complete test suite, and the installed Plugin artifact also pass."
+      "criterion": "Automated token/state/contrast/reduced-motion tests and a real-browser pass at 1440x960, 1180x820, and 390x844 verify both layout directions, every operational and human-attention coexistence treatment, keyboard-visible focus, readable non-color state labels, at least 44px narrow targets, Inspector/Overview open and closed states, complete selected cones, no horizontal document overflow, and no console warnings or errors; full project/Ticket validation, Rooms freshness, the complete test suite, and the installed Plugin artifact also pass.",
+      "identity": "sha256:a158fcd8e2f59f360825758c3c36a4ec4697d6f3b5de195973f0e7edf5002ad9",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Preserve the dependency-free read-only loopback Workbench and canonical validated-document boundary; add no network font, third-party UI runtime, persistence, writable route, Desktop application, or parallel state model.",
     "The approved whole-card operational state must remain visually and semantically distinct from human authority/evidence attention, and neither axis may rely on color alone.",
@@ -36,7 +48,7 @@
     },
     {
       "purpose": "Independent successful Outcome for the protected visual-direction decision.",
-      "ref": ".vibehub/outcomes/ticket-decide-codex-like-workbench-visual-language.yaml"
+      "ref": ".vibehub/outcomes/ticket-decide-codex-like-workbench-visual-language/contract-v1.yaml"
     },
     {
       "purpose": "Latest explicit owner refinements shared by the approved Rooms and visual surfaces, including monospace, SVG, minimal copy, neutral row action, and counts-as-legend.",
@@ -49,6 +61,43 @@
     {
       "purpose": "Current production behavior and source-truth baseline that styling must preserve.",
       "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "overview-and-progressive-detail-stay-quiet",
+          "identity": "sha256:ea9d9fa75a6eaa1b8d2115a53e40841f57b7775d9a6bc64ec862706173be604a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-capabilities-and-truth-remain-intact",
+          "identity": "sha256:53a665ed28b67adc32aaeb8c83a2e05d8e44b22669d989a645641cdb960e48eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-visual-system-matches-owner-direction",
+          "identity": "sha256:2b4ba6b33a26c845894b9cb986169863d4080d947f7b620edd6eb6f7096bcbc2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-accessibility-and-regression-proof-pass",
+          "identity": "sha256:a158fcd8e2f59f360825758c3c36a4ec4697d6f3b5de195973f0e7edf5002ad9",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:9f11337b6145f2a27f4a7559b97c3154f314a3241377b0949f6a94b72d391ad6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
     }
   ],
   "kind": "ticket",
@@ -76,6 +125,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-apply-codex-like-workbench-visual-language"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "the-record-shows-who-judged"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "the-record-shows-who-judged",
+      "identity": "sha256:4c05c3359f29c2def48c98cd0e0d0850859cfc70cd9b8f7d763ab3adff758656",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "declaration-is-readable-and-projected",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +21,7 @@
     "skills/vibehub-ticket-closeout/SKILL.md",
     "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A checked-in Outcome carries independence as an ordinary field, so a reader of the YAML sees the declared source directly. The Workbench needs no separate change because vh-ui.mjs projects the whole Outcome document as outcomeRecord: outcome rather than an allowlist of fields; test/skill-contracts.test.mjs 'the declared independence source reaches a reader and the Workbench' asserts that structural property, so a later refactor to field-picking would fail the suite. Recorded honestly and deliberately not overclaimed: because the engine must not verify the claim, an executor that declares a source it did not use produces an Outcome that is not mechanically distinguishable from a legitimate one. What the change buys is that silence becomes a false statement in a reviewable Git document instead of an absence nobody can see. The contract test also asserts the Skill states plainly that the declaration is unverified, so no reader mistakes it for proof.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

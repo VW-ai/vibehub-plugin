@@ -3,6 +3,20 @@
     "interaction-remains-spatial-and-accessible",
     "visual-language-is-public-grade"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "interaction-remains-spatial-and-accessible",
+      "identity": "sha256:6fc8991915af7a3903104035779351889081dd806e882293fbc5cc25fd5223aa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "visual-language-is-public-grade",
+      "identity": "sha256:500a5b6c52f2dee941ce3afa653e8b09eb824bab73fdc5a4016b9f5604aa30de",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-site-interaction-and-visual",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-05T08:23:49Z",
@@ -13,7 +27,7 @@
     "browser:http://localhost:3000/#product desktop-1440x900 and mobile-390x844",
     "command:site/npm-run-lint"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Desktop and narrow browser checks confirm content remains readable without selection or horizontal travel; keyboard focus, optional detail, reduced-motion, forced-color, one deliberate Ticket shape, distinct surrounding object shapes, connector hierarchy, and restrained semantic color are implemented in the public surface.",
   "ticket_id": "ticket-launch-public-causal-canvas-site"
 }

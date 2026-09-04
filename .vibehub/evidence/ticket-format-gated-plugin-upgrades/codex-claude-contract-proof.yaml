@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "codex-claude-update-contracts"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "codex-claude-update-contracts",
+      "identity": "sha256:4e78996f143930624a22660f8adee5cfc5297d5f581cfa85e566ae382f5e492d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "codex-claude-contract-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-05T00:07:02Z",
@@ -12,7 +21,7 @@
     "scripts/build-codex-marketplace.mjs",
     "scripts/build-claude-marketplace.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Installation guidance separates host bundle refresh from repository migration, documents Claude Code auto-update/reload and Codex explicit marketplace refresh/new-session behavior, and the host artifact test proves identical versions, Skills, schemas, and migration registry bytes.",
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

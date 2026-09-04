@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "ui-only-scope-chosen"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-11T22:17:09Z",
+  "contract_revision": {
+    "identity": "sha256:03f338792f7c39809fe9f9dbfbd27f1e5010e266157dff02caa236285a079762",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "pr18-ui-only-scope-owner-decision"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Accepted the repository owner's explicit UI-only disposition for PR #18: retain the shared Ticket-graph UI upgrade, exclude the macOS Desktop product version and its entry points from the replacement delivery, and preserve earlier PR Ticket, Evidence, and Outcome records through append-only follow-up Tickets. This Outcome records the scope decision only and does not certify implementation.",
+  "ticket_id": "ticket-decide-pr18-ui-only-scope",
+  "unresolved_acceptance_ids": []
+}

@@ -5,6 +5,30 @@
     "public-shell-is-truthful-and-clear",
     "graph-refinement-is-regression-checked"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "public-cards-match-workbench-grammar",
+      "identity": "sha256:0cebec06277f51d2a57964acac836b1de9f88fbc8630c6470b13c4f2e01274d6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-links-match-workbench-grammar",
+      "identity": "sha256:e3119bb9eed5cfe287a50bb7f2f67ce8db4cf5eb7e10887a0162f38bfe51647f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-shell-is-truthful-and-clear",
+      "identity": "sha256:cf579abc7b502937d04c2fd11d144e31af65cec37fcee4ad95730d2e4d55e927",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-refinement-is-regression-checked",
+      "identity": "sha256:0f049e6a6a4f9a1d41d3c51e3b85c95927d337d2bfe785eddb58ae91348f9773",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-graph-production-deployment-v2",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +43,7 @@
     "command:node-site-release-verify-vibehub-icu",
     "command:live-html-workbench-label-contract"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Sites version 2 deployed the exact validated commit to the existing public VibeHub project. The immutable deployment succeeded, the vibehub.icu custom domain remained active with active provider and SSL status, and HTTPS verification returned 200 for both URLs. The live canonical HTML contains Ticket Workbench and Dark mode feature, contains no Vibe task app or GUIDED FIXTURE label, and references the new favicon path.",
   "ticket_id": "ticket-align-public-graph-with-real-workbench"
 }

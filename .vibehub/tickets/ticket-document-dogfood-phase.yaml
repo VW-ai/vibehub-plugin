@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "phase-is-explicit",
-      "criterion": "README states near the product introduction that architecture construction is complete, the current phase is real-use dogfooding, and speculative parity or pre-emptive capability work is out of scope."
+      "acceptance_id": "existing-contract-remains-consistent",
+      "criterion": "README remains consistent with the Skill-first Git-YAML architecture, retains the no-CLI/MCP/runtime and no-persistent-cache contract, and repository validation plus artifact verification still pass.",
+      "identity": "sha256:d2f2d85e86d90e16bf295f3ffbbfa77a9694c53f06b0ddc031a64aaefff3d9a7",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "feedback-loop-is-actionable",
-      "criterion": "README gives a concise workflow in which real development uses Ticket, Evidence, and independent Outcome; explicit durable decisions become Context; and observed friction or missing capability becomes a focused Ticket rather than an up-front framework."
+      "criterion": "README gives a concise workflow in which real development uses Ticket, Evidence, and independent Outcome; explicit durable decisions become Context; and observed friction or missing capability becomes a focused Ticket rather than an up-front framework.",
+      "identity": "sha256:4ce32979c7b43fabe6ce919222dc03fc2650dc8efe7355333027442026dff681",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "existing-contract-remains-consistent",
-      "criterion": "README remains consistent with the Skill-first Git-YAML architecture, retains the no-CLI/MCP/runtime and no-persistent-cache contract, and repository validation plus artifact verification still pass."
+      "acceptance_id": "phase-is-explicit",
+      "criterion": "README states near the product introduction that architecture construction is complete, the current phase is real-use dogfooding, and speculative parity or pre-emptive capability work is out of scope.",
+      "identity": "sha256:e9bf6defc89838366bdeef2a663d3ad78af6c990c8bec695cb3387cc7aa9845d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep the README concise and user-facing.",
     "Do not add a dogfood subsystem, lifecycle state, telemetry framework, or speculative roadmap.",
@@ -33,6 +43,29 @@
       "ref": "README.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "existing-contract-remains-consistent",
+          "identity": "sha256:d2f2d85e86d90e16bf295f3ffbbfa77a9694c53f06b0ddc031a64aaefff3d9a7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "feedback-loop-is-actionable",
+          "identity": "sha256:4ce32979c7b43fabe6ce919222dc03fc2650dc8efe7355333027442026dff681",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "phase-is-explicit",
+          "identity": "sha256:e9bf6defc89838366bdeef2a663d3ad78af6c990c8bec695cb3387cc7aa9845d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:861f5cc53cc5de423291346a5303873963429a10067c493e66ea2b032372eda2",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -50,6 +83,7 @@
     "context:decision-dogfood-only-phase"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-document-dogfood-phase"
 }

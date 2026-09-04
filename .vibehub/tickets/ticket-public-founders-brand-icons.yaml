@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "founders-are-two-real-people",
-      "criterion": "The initial public conversation replaces the expandable premise/disclaimer with one non-expandable two-person founder strip; each founder has a real image, public display name, personal-site link, and LinkedIn link, and no biography, quote, role, metric, placeholder, or invented identity is shown."
+      "acceptance_id": "actions-have-distinct-brand-symbols",
+      "criterion": "Install for Codex, Install for Claude Code, and GitHub each show a distinct recognizable brand symbol from an existing asset source, with useful accessible labeling, while the two copy actions and external GitHub link retain their exact existing behavior and feedback.",
+      "identity": "sha256:7571a10bf3a2331eb8ba54e13a4d3ab5aa8435bd94a3d2a64cb09fcebe713f37",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "actions-have-distinct-brand-symbols",
-      "criterion": "Install for Codex, Install for Claude Code, and GitHub each show a distinct recognizable brand symbol from an existing asset source, with useful accessible labeling, while the two copy actions and external GitHub link retain their exact existing behavior and feedback."
+      "acceptance_id": "founders-are-two-real-people",
+      "criterion": "The initial public conversation replaces the expandable premise/disclaimer with one non-expandable two-person founder strip; each founder has a real image, public display name, personal-site link, and LinkedIn link, and no biography, quote, role, metric, placeholder, or invented identity is shown.",
+      "identity": "sha256:66435183b5ac36f3375bdf1af0f442e8f24e700e3b7f3f0b313ad6366fa2012f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "identity-and-symbols-fit-the-formal-shell",
-      "criterion": "The founder strip and action symbols remain legible, restrained, and keyboard/pointer accessible within the existing formal quiet-intelligence visual system at desktop and 390px mobile widths, without overflow, new navigation, runtime network image requests, or hiding the suggested development request."
+      "criterion": "The founder strip and action symbols remain legible, restrained, and keyboard/pointer accessible within the existing formal quiet-intelligence visual system at desktop and 390px mobile widths, without overflow, new navigation, runtime network image requests, or hiding the suggested development request.",
+      "identity": "sha256:d392621667fd8b60014dcea75783d33d4104c31c423901075afd0beb55d269bb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "public-identity-change-is-verified",
-      "criterion": "Rendered assertions, lint, static production build, desktop/mobile browser inspection, canonical VibeHub validation, and Plugin artifact verification pass after the identity and icon change."
+      "criterion": "Rendered assertions, lint, static production build, desktop/mobile browser inspection, canonical VibeHub validation, and Plugin artifact verification pass after the identity and icon change.",
+      "identity": "sha256:b288168aa94def3c49dfb8bed839f30f00a4a4d6bcc1cbb15abfaa76c3d220ee",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Display exactly two founders and only their image, name, personal website, and LinkedIn; do not add biographies, titles, quotes, GitHub profiles, contact details, founder narrative, or an expandable disclosure.",
     "Do not guess public identity data. Use the owner's verified LinkedIn, personal site, and published headshot; use Victor's personal site's published identity and LinkedIn plus his current public GitHub profile photo.",
@@ -28,7 +41,7 @@
   "context_refs": [
     {
       "purpose": "Successful formal Coding-Agent-first shell this focused refinement preserves.",
-      "ref": ".vibehub/outcomes/ticket-formal-public-agent-entry.yaml"
+      "ref": ".vibehub/outcomes/ticket-formal-public-agent-entry/contract-v1.yaml"
     },
     {
       "purpose": "Binding visual quality, accessibility, honesty, and restrained interaction standard.",
@@ -45,6 +58,34 @@
     {
       "purpose": "Static rendered contract that must reject the former founder placeholder and assert the new identities and symbols.",
       "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "actions-have-distinct-brand-symbols",
+          "identity": "sha256:7571a10bf3a2331eb8ba54e13a4d3ab5aa8435bd94a3d2a64cb09fcebe713f37",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "founders-are-two-real-people",
+          "identity": "sha256:66435183b5ac36f3375bdf1af0f442e8f24e700e3b7f3f0b313ad6366fa2012f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "identity-and-symbols-fit-the-formal-shell",
+          "identity": "sha256:d392621667fd8b60014dcea75783d33d4104c31c423901075afd0beb55d269bb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-identity-change-is-verified",
+          "identity": "sha256:b288168aa94def3c49dfb8bed839f30f00a4a4d6bcc1cbb15abfaa76c3d220ee",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ccf6d610cf15672501514728a7c8d8618c5dc978f37a5c8b8c5e87a3cb105574",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -69,6 +110,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-public-founders-brand-icons"
 }

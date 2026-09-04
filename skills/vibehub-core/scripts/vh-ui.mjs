@@ -7,8 +7,11 @@ import { basename, dirname, isAbsolute, join, relative, resolve } from "node:pat
 import { fileURLToPath } from "node:url";
 import {
   assertValid,
+  currentOutcome,
   documents,
   loadRepository,
+  outcomeDocuments,
+  outcomesForTicket,
   projectRoomDrift,
   projectTicketQuery,
   resolveTicketContextRef,
@@ -16,6 +19,12 @@ import {
   ticketNextAction,
   ticketStatus,
 } from "./vh.mjs";
+import {
+  activeAcceptance,
+  activeAcceptanceReferenceMap,
+  activeContract,
+  evidenceBoundReferenceMap,
+} from "./revision-contract.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const HOST_SCHEMA_VERSION = 1;
@@ -203,25 +212,34 @@ function outcomeState(outcome) {
   return outcome.status === "successful" ? "DONE" : "DEVIATED";
 }
 
+function outcomePath(outcome) {
+  return outcome?.binding_state === "bound"
+    ? `.vibehub/outcomes/${outcome.ticket_id}/${outcome.outcome_id}.yaml`
+    : `.vibehub/outcomes/${outcome.ticket_id}.yaml`;
+}
+
 function operationalState(repository, ticket, outcome) {
   const label = outcomeState(outcome) ?? ticketStatus(repository, ticket);
   if (label === "DONE") {
     return {
       label,
       detail: "Every acceptance criterion was independently accepted.",
-      references: [{ ref: `.vibehub/outcomes/${ticket.ticket_id}.yaml`, label: "Outcome" }],
+      references: [{ ref: outcomePath(outcome), label: "Outcome" }],
     };
   }
   if (label === "DEVIATED") {
     return {
       label,
       detail: `The independent Outcome is ${outcome.status}; this Ticket does not unlock dependents.`,
-      references: [{ ref: `.vibehub/outcomes/${ticket.ticket_id}.yaml`, label: outcome.status }],
+      references: [{ ref: outcomePath(outcome), label: outcome.status }],
     };
   }
   const blockers = ticket.relations
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
+    .filter((id) => {
+      const prerequisite = repository.tickets.documents.get(id)?.document;
+      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
+    });
   if (label === "BLOCKED") {
     return {
       label,
@@ -303,16 +321,22 @@ function handoffInstruction(ticketId, nextAction) {
 }
 
 function humanAttentionState(repository, ticket, outcome) {
-  const humanCriteria = ticket.acceptance.filter(
+  const humanCriteria = activeAcceptance(ticket).filter(
     (criterion) => acceptanceAuthority(criterion) === "human",
   );
   const humanEvidence = documents(repository.evidence.documents).filter(
     (evidence) => evidence.ticket_id === ticket.ticket_id
       && evidenceOrigin(evidence) === "human",
   );
-  const recordedIds = new Set(humanEvidence.flatMap(
-    (evidence) => evidence.acceptance_ids,
-  ));
+  const activeRefs = activeAcceptanceReferenceMap(ticket);
+  const recordedIds = new Set(humanEvidence.flatMap((evidence) => {
+    const bound = evidenceBoundReferenceMap(evidence);
+    return evidence.acceptance_ids.filter((id) => {
+      const current = activeRefs.get(id);
+      const reference = bound.get(id);
+      return current && reference?.revision === current.revision && reference.identity === current.identity;
+    });
+  }));
   const criteria = humanCriteria.map((criterion) => ({
     acceptanceId: criterion.acceptance_id,
     criterion: criterion.criterion,
@@ -382,7 +406,7 @@ function projectGraph(repository, queryOptions = {}) {
     counts.get(relation.prerequisiteTicketId).dependents += 1;
   }
   const tickets = ticketDocuments.map((ticket) => {
-    const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+    const outcome = currentOutcome(repository, ticket);
     const attention = humanAttentionState(repository, ticket, outcome);
     const nextAction = projectedNextAction(repository, ticket);
     return {
@@ -500,13 +524,18 @@ function canonicalContextFromRef(repository, reference) {
   };
 }
 
-function ticketContextPackage(ticket, relations, repository, source) {
-  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+export function ticketContextPackage(ticket, relations, repository, source) {
+  const outcome = currentOutcome(repository, ticket);
+  const outcomeHistory = outcomesForTicket(repository, ticket.ticket_id);
+  const contract = activeContract(ticket);
   const evidence = documents(repository.evidence.documents)
     .filter((item) => item.ticket_id === ticket.ticket_id)
     .map((item) => ({
       evidenceId: item.evidence_id,
       acceptanceIds: item.acceptance_ids,
+      acceptanceRevisions: item.acceptance_revisions ?? [],
+      bindingState: item.binding_state,
+      bindingOrigin: item.binding_origin ?? null,
       origin: evidenceOrigin(item),
       summary: item.summary,
       refs: item.refs,
@@ -518,6 +547,11 @@ function ticketContextPackage(ticket, relations, repository, source) {
   const nextAction = projectedNextAction(repository, ticket);
   const acceptance = ticket.acceptance.map((item) => ({
     acceptanceId: item.acceptance_id,
+    revision: item.revision,
+    identity: item.identity,
+    state: item.state,
+    derivedFrom: item.derived_from ?? [],
+    presentation: item.presentation ?? null,
     criterion: item.criterion,
     authority: acceptanceAuthority(item),
   }));
@@ -541,6 +575,10 @@ function ticketContextPackage(ticket, relations, repository, source) {
     handoff: handoffInstruction(ticket.ticket_id, nextAction),
     outcome: ticket.outcome,
     outcomeRecord: outcome,
+    outcomeHistory,
+    activeContractRevision: contract
+      ? { revision: contract.revision, identity: contract.identity }
+      : null,
     context: ticket.context,
     acceptance: ticket.acceptance.map((item) => ({
       ...item,
@@ -558,7 +596,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
       evidenceRefs: evidence.map(({ evidenceId }) =>
         `.vibehub/evidence/${ticket.ticket_id}/${evidenceId}.yaml`),
       outcomeRef: outcome
-        ? `.vibehub/outcomes/${ticket.ticket_id}.yaml`
+        ? outcomePath(outcome)
         : null,
       commit: source.resolvedCommit,
       semanticDirty: source.semanticDirty,
@@ -570,6 +608,10 @@ function ticketContextPackage(ticket, relations, repository, source) {
     operationalState: operational,
     nextAction,
     outcome: ticket.outcome,
+    activeContractRevision: contract
+      ? { revision: contract.revision, identity: contract.identity }
+      : null,
+    outcomeHistory,
     context: ticket.context,
     acceptance,
     evidence,
@@ -595,16 +637,29 @@ function evidenceTrace(evidence, source) {
     subkind: "acceptance",
     status: "recorded",
     acceptanceIds: evidence.acceptance_ids,
+    acceptanceRevisions: evidence.acceptance_revisions ?? [],
+    bindingState: evidence.binding_state,
+    bindingOrigin: evidence.binding_origin ?? null,
+    unresolved: evidence.unresolved ?? null,
     origin: evidenceOrigin(evidence),
     occurredAt: evidence.recorded_at,
     summary: evidence.summary,
-    body: `Acceptance: ${evidence.acceptance_ids.join(", ")}`,
-    targets: evidence.refs.map((ref) => typedReference(source, ref)),
+    body: [
+      `Acceptance: ${evidence.acceptance_ids.join(", ")}`,
+      evidence.unresolved
+        ? `Binding unresolved: ${evidence.unresolved.reason}. Inspect attempted provenance and repair or record the missing history.`
+        : null,
+    ].filter(Boolean).join("\n"),
+    targets: [...evidence.refs, ...(evidence.unresolved?.attempted_refs ?? [])]
+      .map((ref) => typedReference(source, ref)),
     agentPayload: {
       kind: "vibehub_ticket_evidence",
       evidenceId: evidence.evidence_id,
       ticketId: evidence.ticket_id,
       acceptanceIds: evidence.acceptance_ids,
+      acceptanceRevisions: evidence.acceptance_revisions ?? [],
+      bindingState: evidence.binding_state,
+      bindingOrigin: evidence.binding_origin ?? null,
       origin: evidenceOrigin(evidence),
       summary: evidence.summary,
       refs: evidence.refs,
@@ -614,11 +669,16 @@ function evidenceTrace(evidence, source) {
 }
 
 function outcomeTrace(outcome, source) {
-  const outcomeRef = `.vibehub/outcomes/${outcome.ticket_id}.yaml`;
+  const outcomeRef = outcomePath(outcome);
   return {
     kind: "outcome",
     subkind: outcome.status,
     status: outcome.status,
+    outcomeId: outcome.outcome_id,
+    contractRevision: outcome.contract_revision ?? null,
+    bindingState: outcome.binding_state,
+    bindingOrigin: outcome.binding_origin ?? null,
+    unresolved: outcome.unresolved ?? null,
     acceptedAcceptanceIds: outcome.accepted_acceptance_ids,
     unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
     occurredAt: outcome.closed_at,
@@ -633,15 +693,22 @@ function outcomeTrace(outcome, source) {
       outcome.independence
         ? `Independence: ${outcome.independence.source} (declared, unverified)`
         : "Independence: not declared",
-    ].join("\n"),
+      outcome.unresolved
+        ? `Binding unresolved: ${outcome.unresolved.reason}. Inspect attempted provenance before relying on this judgment.`
+        : null,
+    ].filter(Boolean).join("\n"),
     targets: [{
       ...typedReference(source, outcomeRef),
       label: "Canonical Outcome",
-    }],
+    }, ...(outcome.unresolved?.attempted_refs ?? []).map((ref) => typedReference(source, ref))],
     agentPayload: {
       kind: "vibehub_ticket_outcome",
       ticketId: outcome.ticket_id,
       status: outcome.status,
+      outcomeId: outcome.outcome_id,
+      contractRevision: outcome.contract_revision ?? null,
+      bindingState: outcome.binding_state,
+      bindingOrigin: outcome.binding_origin ?? null,
       acceptedAcceptanceIds: outcome.accepted_acceptance_ids,
       unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
       evidenceIds: outcome.evidence_ids,
@@ -658,7 +725,7 @@ export function traceRecords(repository, source, ticketId = null) {
   const evidence = documents(repository.evidence.documents)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
     .map((item) => evidenceTrace(item, source));
-  const outcomes = documents(repository.outcomes.documents)
+  const outcomes = outcomeDocuments(repository)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
     .map((item) => outcomeTrace(item, source));
   return [...evidence, ...outcomes].sort((left, right) =>
@@ -673,7 +740,7 @@ export function buildUiSnapshot(repoRoot, queryOptions = {}) {
   const contexts = documents(repository.contexts.documents);
   const rawTickets = documents(repository.tickets.documents);
   const rawEvidence = documents(repository.evidence.documents);
-  const rawOutcomes = documents(repository.outcomes.documents);
+  const rawOutcomes = outcomeDocuments(repository);
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
   const graph = projectGraph(repository, queryOptions);

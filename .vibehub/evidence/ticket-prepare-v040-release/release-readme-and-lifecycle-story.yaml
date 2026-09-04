@@ -3,6 +3,20 @@
     "readme-leads-with-product-and-visual",
     "readme-teaches-the-real-workflow"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-leads-with-product-and-visual",
+      "identity": "sha256:64690910e3c06dc3c2305cc7124944b66ccb6209a21c8db5c9fe72deae78b091",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-teaches-the-real-workflow",
+      "identity": "sha256:2891a43ac3187d59b558bc9786199aeb2a2f0a70f0cd17354dd4d94e536e73dc",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "release-readme-and-lifecycle-story",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T22:50:23.000Z",
@@ -14,7 +28,7 @@
     "test:release-readme-proactive-presentation",
     "conversation:2026-08-02-owner-requests-main-merge-and-formal-release"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit ecb811a replaces the dogfood-era text wall with a product-led README: checked-in VibeHub brand, the approved local graph visual, an immediate Ticket/Context distinction, and the Plan→Execution, quiet Run, human-boundary→Contract, Closeout→Log lifecycle. Explicit review and the launcher remain fallback paths; independent Outcome and explicit durable Context capture remain clear. Automated tests resolve every local README asset/link and reject the former ask-the-Agent-to-open instruction.",
   "ticket_id": "ticket-prepare-v040-release"
 }

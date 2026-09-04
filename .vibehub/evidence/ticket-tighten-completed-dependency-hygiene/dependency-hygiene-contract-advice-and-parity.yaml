@@ -6,6 +6,35 @@
     "graph-hygiene-improves-without-history-loss",
     "skills-and-tests-share-one-rule"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "dependency-versus-context-rule-is-explicit",
+      "identity": "sha256:d1722868ec62daabc015feac901a79893b6a8c4afed0a0aad6482f3f83b8a253",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "planner-checks-current-prerequisite-state",
+      "identity": "sha256:bb2861a208a58a682ebcf2c37b908ba598655d7a5507e8e600139dee0247b1d5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "validation-emits-nonblocking-structured-advice",
+      "identity": "sha256:88f7994d98f0dab852adf3ab8067f5dfb92d8fe6582d2d2577ffed956bf3ea34",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-hygiene-improves-without-history-loss",
+      "identity": "sha256:8f2fe468bf9ce24b6217113b617208a2da0fabe66d612e20d25e51811f9a319f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "skills-and-tests-share-one-rule",
+      "identity": "sha256:941b15c31ecbd1392c761904c5aa246da922ccb50c283772ed62954259b3ad2a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "dependency-hygiene-contract-advice-and-parity",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -23,7 +52,7 @@
     "scripts/verify-plugin-artifact.mjs",
     "command:npm-run-verify-108-of-108-2026-08-20"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "A single checked-in dependency-hygiene contract now defines depends_on versus context_refs and historical preservation. Ticket Plan reads each proposed target and resolves DONE edges semantically; Ticket Validate reports the same advisory boundary without treating DONE dependencies as invalid. The dependency-free helper emits sorted completed-dependency-review advice only for newly proposed edges to successful targets, leaves writes and existing edges untouched, and suggests exact Ticket and Outcome context refs. Fixtures prove context-only baselines create no boundary, repeated historical edges are not re-warned, active dependencies retain normal blocking, and legitimate fork, join, release, migration, and consumed-artifact edges remain exact. Fresh full verification passed 108/108 tests, the 56-file installed artifact, read-only loopback UI, and identical Codex and Claude Code marketplace behavior; project and Ticket validation passed and all Rooms are FRESH.",
   "ticket_id": "ticket-tighten-completed-dependency-hygiene"
 }

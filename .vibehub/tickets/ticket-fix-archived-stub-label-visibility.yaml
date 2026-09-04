@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "archived-stub-is-legible-in-real-graph",
-      "criterion": "A deterministic fixture reproduces the current left-to-right archived boundary and the production graph renders the complete hidden-count label and affordance without connector, card, viewport, mask, or clipping overlap at the real graph scale; the label remains distinguishable from an archived Ticket card and from ordinary relation copy."
+      "acceptance_id": "archive-expansion-remains-exact-and-operable",
+      "criterion": "Pointer and keyboard activation of the repaired stub reveal the exact next archived Ticket IDs from the canonical projection, preserve or intentionally restore graph focus and URL state, and never infer, duplicate, or silently omit archived relations.",
+      "identity": "sha256:59adc1cb068c67a1a80bec94386cd8fd9f9e50597ef25672e0b56b9219144c92",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "archive-expansion-remains-exact-and-operable",
-      "criterion": "Pointer and keyboard activation of the repaired stub reveal the exact next archived Ticket IDs from the canonical projection, preserve or intentionally restore graph focus and URL state, and never infer, duplicate, or silently omit archived relations."
+      "acceptance_id": "archived-stub-is-legible-in-real-graph",
+      "criterion": "A deterministic fixture reproduces the current left-to-right archived boundary and the production graph renders the complete hidden-count label and affordance without connector, card, viewport, mask, or clipping overlap at the real graph scale; the label remains distinguishable from an archived Ticket card and from ordinary relation copy.",
+      "identity": "sha256:5d66ddac0ee46398dcf19098080b7a927345173cb8c1e5fdb2accf79e876aa47",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "directions-and-narrow-layout-regressions-pass",
-      "criterion": "Focused browser and automated regression cover left-to-right, top-to-bottom, normal desktop, and narrow layouts, including a stub adjacent to selected, dimmed, and long-copy cards; labels, hit targets, connectors, and the Inspector remain usable with no horizontal document overflow."
+      "criterion": "Focused browser and automated regression cover left-to-right, top-to-bottom, normal desktop, and narrow layouts, including a stub adjacent to selected, dimmed, and long-copy cards; labels, hit targets, connectors, and the Inspector remain usable with no horizontal document overflow.",
+      "identity": "sha256:b9942f3deeaa8cd9b184bbc1c28bfcdb2b19ab5bc4df9f58b810cc9b270e1cb8",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
-      "criterion": "The repair uses the approved quiet Workbench tokens and non-color semantics, exposes an accurate accessible name and visible keyboard focus, respects reduced motion, and changes no Ticket, Evidence, Outcome, delivery, archive, or query source-of-truth semantics."
+      "criterion": "The repair uses the approved quiet Workbench tokens and non-color semantics, exposes an accurate accessible name and visible keyboard focus, respects reduced motion, and changes no Ticket, Evidence, Outcome, delivery, archive, or query source-of-truth semantics.",
+      "identity": "sha256:ca0159a387761ecd0f55e2e2251113d8bec70494dae9b68623abd5e2b0b9a5a4",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Fix the production archived-stub component or its graph geometry; do not hide the defect by removing archived boundaries, changing the default query, or forcing all history open.",
     "Do not use a hover-only label, color-only meaning, tiny target, or free-floating overlay that loses its causal anchor.",
@@ -27,7 +40,7 @@
   "context_refs": [
     {
       "purpose": "Canonical archive/query and progressive hidden-history behavior that the visual repair must preserve.",
-      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
+      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history/contract-v1.yaml"
     },
     {
       "purpose": "Binding graph readability, accessibility, causal focus, and restrained visual constraints.",
@@ -36,6 +49,34 @@
     {
       "purpose": "Current production graph interaction and read-only Workbench boundary.",
       "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "archive-expansion-remains-exact-and-operable",
+          "identity": "sha256:59adc1cb068c67a1a80bec94386cd8fd9f9e50597ef25672e0b56b9219144c92",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "archived-stub-is-legible-in-real-graph",
+          "identity": "sha256:5d66ddac0ee46398dcf19098080b7a927345173cb8c1e5fdb2accf79e876aa47",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "directions-and-narrow-layout-regressions-pass",
+          "identity": "sha256:b9942f3deeaa8cd9b184bbc1c28bfcdb2b19ab5bc4df9f58b810cc9b270e1cb8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+          "identity": "sha256:ca0159a387761ecd0f55e2e2251113d8bec70494dae9b68623abd5e2b0b9a5a4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b3ffd8bb4d60faf2e0e4bf4542864754b449e950af137c7bfaf8c71d75558313",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -47,6 +88,7 @@
     "screenshot:2026-08-20-ticket-graph-archived-stub"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-fix-archived-stub-label-visibility"
 }

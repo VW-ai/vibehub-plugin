@@ -5,6 +5,30 @@
     "public-fixture-is-honest-and-lightweight",
     "workbench-embedding-preserves-product-quality"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ticket-is-an-agent-executable-object",
+      "identity": "sha256:93df717fb3c2f97c9f91b8ea8fab2d63954203b4c7d22419fc8a7eca4211250c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-explain-context-without-a-second-topology",
+      "identity": "sha256:ddbbb9a64e97fd7a780904f2703250535a9af83ed85651a1aae08483bd2fbbc3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-real-ticket-room-files",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +42,7 @@
     "command:node skills/scripts/vh.mjs project validate --repo . (valid)",
     "command:git diff --check (passed)"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public story now pairs a complete schema-valid persistent-dark-mode Ticket file with the corresponding selected Workbench Ticket, then pairs schema-valid Product Room, Decision, Constraint, and Contract files with a concise capture-to-Room-to-Ticket-to-return lifecycle and the real Rooms Workbench. The source viewers use the same deterministic typed fixture, remain browser-only, and add no backend, persistence, or parallel execution model. Static production build and all eight rendered-content contracts pass; site lint, canonical VibeHub project validation, and diff whitespace checks also pass.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "card-phase-icon-baseline-is-corrected",
+    "alignment-regression-is-verified"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T23:41:04Z",
+  "contract_revision": {
+    "identity": "sha256:ff6b94721068aef20d68780e750606785c18710c0648125fdcb20d4a490031df",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "card-phase-native-centering-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout at exact branch HEAD 09b828a accepts both proposal-only criteria. Commit 0dd18fb introduced a 1px phase-icon transform, and owner-corrected commit bcc9f50 explicitly removed it, rewrote the current Ticket contract to native centering, replaced the obsolete optical-offset Evidence, and is an ancestor of HEAD. Direct source and diff inspection confirms the phase row remains `display:inline-flex` with `align-items:center`, its 14px SVG has no independent transform, corner-signal and contract-strip icons retain their own geometry, and no later commit changed the proposal CSS, markup, or focused test. The lower-right icon and textual phase remain separate non-color carriers; card dimensions, upper-right signal, four-phase legend, live presence, wide/narrow layout, keyboard behavior, reduced motion, and production Workbench files remain outside the correction. Independent focused tests passed 8/8. Full repository verification with local loopback enabled passed 131/131, including the real read-only host and Codex/Claude marketplace parity; fresh artifact verification passed at 62 files and 2,828,446 bytes. Ticket and project validation pass and all four Rooms are FRESH. Existing recorded wide/narrow browser refs remain supporting Evidence; this adjudication relies on independently inspected source, diffs, and reproduced tests rather than the executor summary, and does not claim a new browser capture from the isolated environment.",
+  "ticket_id": "ticket-align-card-state-icon-baseline",
+  "unresolved_acceptance_ids": []
+}

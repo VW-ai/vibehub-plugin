@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "workbench-polish-regressions-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "workbench-polish-regressions-pass",
+      "identity": "sha256:b24c5720ffd796e78d3aed31d98e80e32fd7e69e60892ade04eaddefe0aabc93",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "workbench-polish-source-installed-regression-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +26,7 @@
     "test/ui-model.test.mjs",
     "scripts/verify-plugin-artifact.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Focused Workbench source/host/model tests pass 27/27 with real loopback binding, including label-relative phase geometry, one on-demand action detail, assistive association, exact payload routing, four-phase/substate truth, narrow-sheet and reduced-motion contracts. Full repository verification passes 130/130. A fresh installed plugin artifact passes read-only loopback verification and Codex/Claude marketplace parity at 58 files and 604390 bytes. Real wide browser review exercised current DRAFT, READY, RUNNING, DONE cards plus the proposal-only archived candidate in current scope, the focused execution panel, pointer hover, keyboard focus, and console logs. A same-origin read-only review proxy then rendered the exact production host inside a real 390x844 iframe; the complete narrow bottom-sheet layout, Recommended action, four metrics, graph controls, source dock, and truncation remained readable with zero console errors. Production semantics, graph topology, canonical payloads, and read-only boundaries remain unchanged.",
   "ticket_id": "ticket-polish-workbench-state-action-affordances"
 }

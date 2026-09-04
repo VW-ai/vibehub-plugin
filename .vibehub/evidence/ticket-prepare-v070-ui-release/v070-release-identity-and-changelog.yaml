@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "v070-identity-and-changelog"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "v070-identity-and-changelog",
+      "identity": "sha256:126f73d72ac2de2311915f734ae5299a50984f827e1f4065b51253f54f84330f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v070-release-identity-and-changelog",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +24,7 @@
     "CHANGELOG.md",
     "test/release.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "All five release identity fields now state 0.7.0, and the dated 0.7.0 changelog accurately records the shared Quiet Workbench graph/Inspector upgrade, preserved v0.6.0 human-authority and handoff behavior, excluded Desktop/runtime scope, byte-stable non-canonical PR ledger snapshot, and retained-host core.fsmonitor safety fix.",
   "ticket_id": "ticket-prepare-v070-ui-release"
 }

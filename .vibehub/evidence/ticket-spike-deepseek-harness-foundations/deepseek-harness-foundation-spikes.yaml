@@ -8,6 +8,45 @@
     "local-browser-lifecycle-proven",
     "architecture-recommendation-is-decision-ready"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "upstream-baseline-is-pinned",
+      "identity": "sha256:941f79e4d4604b8f62dcc44bf7fff25c87e99e0d037841d431d8176f2cec2881",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "bundle-profile-boot-spike",
+      "identity": "sha256:803d359dbcfe33b1e8433a2811106064a0b1c5ffe3358eaa4a9febbe4299c4bb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ui-extension-seams-proven",
+      "identity": "sha256:96c189ff0328f006c101fc07927a67565032ec947a1f915a607de4b29e65ad9a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "session-and-branch-model-proven",
+      "identity": "sha256:348f14bc83f6dc43778c80138df1a6aef546d854f5a315b4dcd534330577bef6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "commands-and-executor-boundary-proven",
+      "identity": "sha256:653b314a6c8bdd0d4d54f5d46beeff0e2f47eac36678174d49ec1ce2affbbe9b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "local-browser-lifecycle-proven",
+      "identity": "sha256:5a60ce55dbbf586bd924d1762b5e784486405330c6218a98e20ec93d62d085c4",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "architecture-recommendation-is-decision-ready",
+      "identity": "sha256:8e121c6af6d55dc1b82e0ef880205c59914b3f425f6fb4b1c7cf64de0ee3d087",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "deepseek-harness-foundation-spikes",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -36,7 +75,7 @@
     "test:npm-test-87-of-87",
     "room:product-aligned-2026-08-17"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The Spike pins official DeepSeek Harness commit 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca and published @deepseek-ai/dsh 0.1.0-rc.7, including Node and pnpm requirements. A deterministic source probe passed nine exact contracts: Bundle/Profile, root layout, conversation extension slots, custom Conversation nodes, Session fork, no-model-turn commands, durable event feed, local Web composition, and the limits of the shipped Codex provider. The out-of-tree dsh-vibehub-foundation-spike Bundle was installed through the official pinned CLI into an isolated Web Profile; the generated composition ordered dsh-base, dsh-web-app, then the VibeHub Bundle. The real Profile booted on 127.0.0.1:31807 and advertised the VibeHub browser module in its official client manifest. In the running official UI, the Bundle rendered Context inside the native composer, Graph and Run as conversation view tabs, and execution state through shell.overlay. A clearly labelled no-model assistant fixture exposed the VibeHub Fork action; clicking it called ctx.sessions.fork and created and selected a real child Session in the official sidebar. The host command path still runs without a model turn. A restart test also exposed that an unknown custom event without schema registration or ignorable metadata makes DSH reject restored history; the Spike now marks its transitional event ignorable, and the report requires production Run events to register their replay contract before writing. The feasibility report retains product-owned Compare and Bring Back semantics, the Codex App Server adapter boundary, monorepo package shape, upgrade smoke tests, and explicit stop conditions. DSH's shipped subagent-codex remains final-text-only and insufficient for progress, approval, resume, or persistent execution.",
   "ticket_id": "ticket-spike-deepseek-harness-foundations"
 }

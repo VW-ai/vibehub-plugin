@@ -4,6 +4,25 @@
     "public-fixture-is-honest-and-lightweight",
     "workbench-embedding-preserves-product-quality"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+      "identity": "sha256:c3367f50bf7d7bc3cb0ef75dad3fb975c059f9ecdbbd0fa53358115a6e2b656d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-static-ticket-showcase-implementation",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +33,7 @@
     "file:site/tests/rendered-html.test.mjs",
     "preview:http://localhost:3000"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public site now uses a concise product-showcase hierarchy instead of a walkthrough. The first composition pairs one plain-language product statement, neutral and truthful Codex and Claude Code installation, GitHub, Copy for Agent, and the concrete request Add dark mode to this task app with the existing high-fidelity Ticket Graph and open Inspector. The request card is an honest three-part reference—Request, the human request, and the exact Start this with VibeHub phrase—with no fake attached state or send affordance. The page directly reuses the typed five-Ticket fixture, causal cone, Rooms, Execution, Contract, Log, acceptance, Evidence, Outcome, human-attention, and returned-Context surfaces. One compact static diagram explains Request plus Context to one Ticket, work to Evidence, independent Outcome, and durable Context; a second real Workbench scene shows the completed Log. All Phase, stage-rail, Back and Next, palette, App, Activity, timer, autoplay, arbitrary-prompt, and fake-agent code paths were removed. The site adds no backend, model call, persistence, iframe, new dependency, runtime, or second lifecycle.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

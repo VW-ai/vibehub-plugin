@@ -10,6 +10,55 @@
     "public-fixture-is-honest-and-lightweight",
     "workbench-embedding-preserves-product-quality"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "dark-canvas-clarifies-the-product",
+      "identity": "sha256:ef4d4fc0ad33ff50a3840f24edc3d8a86ac40cfe9e4c45ad13af6a62537e1ba3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "first-message-is-one-authentic-composer",
+      "identity": "sha256:3d22bfc3e2742d0bee7a13d7ad71df7c078da2d1f9ee4afdc8318cdc8fde912e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "persistent-header-keeps-real-entry-points",
+      "identity": "sha256:80c7d423ac0eabb17b96aa5b4730ba9bb9f8c74294f06484eefbb6a27a855bd8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+      "identity": "sha256:c3367f50bf7d7bc3cb0ef75dad3fb975c059f9ecdbbd0fa53358115a6e2b656d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-explain-context-without-a-second-topology",
+      "identity": "sha256:ddbbb9a64e97fd7a780904f2703250535a9af83ed85651a1aae08483bd2fbbc3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "evidence-and-outcome-explain-trust",
+      "identity": "sha256:4fdfcaf6bbacb3ad51df1accc177e29c23eec9e5e1aad39003ddc3c170906173",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-is-explanatory-and-disposable",
+      "identity": "sha256:2e1cddd3ecf784cc36dfb97510383a6d302281eff14617de07fcfa7617ba194b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-dark-storytelling-implementation",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +69,7 @@
     "file:site/tests/rendered-html.test.mjs",
     "preview:http://localhost:3000"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public site now uses a near-black deep-graphite canvas while preserving the faithful light Workbench as the dominant product object. The hero request is one authentic coding-agent composer message with a restrained caret, and the sticky header keeps only VibeHub home, truthful Codex and Claude install actions, GitHub, and Copy for Agent. Three vertical product sections reuse the same typed Workbench to explain request-to-Ticket causality, Room-owned Context, and acceptance-linked Evidence plus independent Outcome. Exact request phrases are statically tagged to the Tickets they caused; only those tags receive a one-time transform-and-opacity entrance, with a complete reduced-motion presentation. Optional desktop graph panning remains disposable browser view state. No backend, model call, persistence, video, iframe, analytics, motion dependency, or second lifecycle was added.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

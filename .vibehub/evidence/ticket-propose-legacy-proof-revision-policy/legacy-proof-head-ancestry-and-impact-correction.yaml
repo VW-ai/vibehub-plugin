@@ -4,6 +4,25 @@
     "repository-truth-impact-is-quantified",
     "git-reconstruction-limits-are-proven"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "legacy-proof-corpus-is-audited",
+      "identity": "sha256:ac527cf5cda4e27e29669eb9a20d09dbd1921c7ddd1d4b93a268b8eb3fa9406a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "repository-truth-impact-is-quantified",
+      "identity": "sha256:4c3f0e4ed6834a1369d071db9db91fcb83911495f64949d30739fc7af908dfd8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "git-reconstruction-limits-are-proven",
+      "identity": "sha256:09b650accb5c9e2761a7a2174847900fe65c4768a76293643e515d3f9f1b15c6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "legacy-proof-head-ancestry-and-impact-correction",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-20T20:40:04Z",
@@ -17,7 +36,7 @@
     "commit:cdeac6b57dcab02e97f243d392f818afaad973c5",
     "rejected-non-ancestor:24b3d6d9df041a94ef3cb74468be9528b0214747"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The corrected audit follows only current HEAD ancestry and has a regression fixture proving an unrelated newer branch addition cannot be selected. At HEAD 175e83a it reconstructs 210/210 Evidence and 61/61 Outcomes, identifies 19 Evidence and one successful Outcome with later contract drift, and mechanically quantifies for all-stale, grandfather, and reconstruction policies: DONE, archive, human authority, CLOSE_OUT, Current/All graph size, successful prerequisite edges, open dependent unlock, project-format/schema changes, two installed host artifacts, migration, and rollback. The earlier non-ancestor 24b3d6d example is preserved as the exact diagnosed failure; cdeac6b is the truthful current-ancestry addition.",
   "ticket_id": "ticket-propose-legacy-proof-revision-policy"
 }

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.9.0 — 2026-09-04
+
+- Make Acceptance and complete Ticket contracts append-only, monotonically
+  revisioned semantic objects with deterministic identities and explicit
+  retirement/`derived_from` lineage.
+- Bind Evidence to exact Acceptance revisions and each Outcome to one exact
+  Contract revision, preserving old success as queryable history without
+  letting it close a later active contract.
+- Advance projects to format 4 with a deterministic pending mechanical shape
+  and a current-HEAD Git reconstruction step; unresolved history is explicit,
+  while ordinary contract drift becomes old plus new revisions.
+- Show active revisions, retired history, lineage, binding origin, and current
+  versus historical Outcome coverage in the Workbench.
+- Reject shipped-content changes that reuse the latest reachable published
+  version, using the artifact builder's allowlist as the single CI boundary;
+  prepare this format change as v0.9.0 while keeping the content-addressed npx
+  update path free of a redundant staleness command.
+
 ## 0.8.0 — 2026-08-13
 
 - Turn the shared Ticket graph into a canvas-first Web Workbench with explicit

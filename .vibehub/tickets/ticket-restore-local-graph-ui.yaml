@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "canonical-output-is-mechanical",
+      "criterion": "Schema-valid canonical Context, Ticket, Evidence, and Outcome documents produced by an Agent are sufficient input for UI and lightweight CLI consumers: valid fixtures project without semantic services, invalid documents fail visibly before projection, and disposable selection/pan/zoom/layout state never becomes durable truth.",
+      "identity": "sha256:d686b025b9cb8af98cf8b2ae8939fd98c91e4225711f462660d581ea8013cc6f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "graph-experience-restored",
-      "criterion": "The local browser UI renders the current directed Ticket dependency graph with READY/BLOCKED/DONE and non-success Outcome states, selectable nodes and edges, pan/zoom, fit, minimap navigation, causal-cone highlighting, responsive layout, empty/loading/error states, and the established visual design selectively recovered from commit 9dee0f0."
+      "criterion": "The local browser UI renders the current directed Ticket dependency graph with READY/BLOCKED/DONE and non-success Outcome states, selectable nodes and edges, pan/zoom, fit, minimap navigation, causal-cone highlighting, responsive layout, empty/loading/error states, and the established visual design selectively recovered from commit 9dee0f0.",
+      "identity": "sha256:6fa2dd79551b2026990bc57aab4403be1b0c0f6930da473a8ed793710439cb4f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "inspector-reads-current-yaml",
-      "criterion": "Selecting the graph or a Ticket/edge shows current outcome, context, acceptance, constraints, Context references, provenance, dependencies, acceptance-linked Evidence, and Outcome directly projected from the exact checkout's `.vibehub` YAML; refresh rereads disk and no database, persistent cache, compiled Context copy, or second truth exists."
+      "criterion": "Selecting the graph or a Ticket/edge shows current outcome, context, acceptance, constraints, Context references, provenance, dependencies, acceptance-linked Evidence, and Outcome directly projected from the exact checkout's `.vibehub` YAML; refresh rereads disk and no database, persistent cache, compiled Context copy, or second truth exists.",
+      "identity": "sha256:36d147b1e0a43e1577b80b5f6895b9dd02ce93486034da769d3a6f3e4533fb32",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "launcher-is-narrow-and-safe",
-      "criterion": "A dependency-free Node launcher included in the plugin accepts only repository/port/open/json-style UI flags, binds to loopback on an ephemeral port by default, uses a random short-lived bearer URL and restrictive security headers, opens or prints the URL, shuts down cleanly, and neither installs a global executable nor starts a daemon or writable server."
-    },
-    {
-      "acceptance_id": "skill-and-artifact-work-cleanly",
-      "criterion": "`$vibehub-ticket-review` teaches the Agent to launch or converse over the same graph, and clean Claude/Codex marketplace artifacts contain the UI assets and launcher, can open a temporary Git-YAML project, and pass automated host/API plus browser-surface verification without package installation or native build."
+      "criterion": "A dependency-free Node launcher included in the plugin accepts only repository/port/open/json-style UI flags, binds to loopback on an ephemeral port by default, uses a random short-lived bearer URL and restrictive security headers, opens or prints the URL, shuts down cleanly, and neither installs a global executable nor starts a daemon or writable server.",
+      "identity": "sha256:85439fda90c4bc2df626e0843a28b472df99b319e332ca785e3b1d64c6d366c2",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "legacy-bulk-remains-absent",
-      "criterion": "The implementation does not restore packages/core, packages/cli, packages/mcp, pnpm workspace metadata, SQLite/better-sqlite3, MCP, hooks, generic dispatcher, lease/heartbeat coordination, ContextBinding, Decision attestation/trust store, writable review endpoints, or any hidden lifecycle state; closeout reports final source and artifact footprint."
+      "criterion": "The implementation does not restore packages/core, packages/cli, packages/mcp, pnpm workspace metadata, SQLite/better-sqlite3, MCP, hooks, generic dispatcher, lease/heartbeat coordination, ContextBinding, Decision attestation/trust store, writable review endpoints, or any hidden lifecycle state; closeout reports final source and artifact footprint.",
+      "identity": "sha256:c90be757c9bdbd729cba2a65dae7aa724deeceda9247fd9eacce90475e1f758e",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "canonical-output-is-mechanical",
-      "criterion": "Schema-valid canonical Context, Ticket, Evidence, and Outcome documents produced by an Agent are sufficient input for UI and lightweight CLI consumers: valid fixtures project without semantic services, invalid documents fail visibly before projection, and disposable selection/pan/zoom/layout state never becomes durable truth."
+      "acceptance_id": "skill-and-artifact-work-cleanly",
+      "criterion": "`$vibehub-ticket-review` teaches the Agent to launch or converse over the same graph, and clean Claude/Codex marketplace artifacts contain the UI assets and launcher, can open a temporary Git-YAML project, and pass automated host/API plus browser-surface verification without package installation or native build.",
+      "identity": "sha256:ca2af9b7c043a398e4617209b6809e351501476490973fec3cfcbdda1861c765",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Favor selective recovery of the proven HTML/CSS/graph interactions over a visual redesign.",
     "Write a new small direct-YAML projection and host rather than adapting the old runtime stack.",
@@ -61,6 +80,44 @@
       "ref": "scripts/build-plugin-artifact.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-output-is-mechanical",
+          "identity": "sha256:d686b025b9cb8af98cf8b2ae8939fd98c91e4225711f462660d581ea8013cc6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-experience-restored",
+          "identity": "sha256:6fa2dd79551b2026990bc57aab4403be1b0c0f6930da473a8ed793710439cb4f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "inspector-reads-current-yaml",
+          "identity": "sha256:36d147b1e0a43e1577b80b5f6895b9dd02ce93486034da769d3a6f3e4533fb32",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "launcher-is-narrow-and-safe",
+          "identity": "sha256:85439fda90c4bc2df626e0843a28b472df99b319e332ca785e3b1d64c6d366c2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "legacy-bulk-remains-absent",
+          "identity": "sha256:c90be757c9bdbd729cba2a65dae7aa724deeceda9247fd9eacce90475e1f758e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skill-and-artifact-work-cleanly",
+          "identity": "sha256:ca2af9b7c043a398e4617209b6809e351501476490973fec3cfcbdda1861c765",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e96b7ca79303482bd5e8adf8d01e7c4649b03158cb65cb3eab26a799aa92d319",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -80,6 +137,7 @@
     "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-restore-local-graph-ui"
 }

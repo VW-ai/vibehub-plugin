@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "owner-approves-design-direction"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "owner-approves-design-direction",
+      "identity": "sha256:1a81c243e97e208f614ddac676c84d997ae6905b4b593b7b40ce2ffe3a651338",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "owner-quiet-ui-direction-approval",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T08:41:56Z",
@@ -9,7 +18,7 @@
     "conversation:2026-08-02-current-ui-is-clear-enough-baseline",
     "commit:cfb68cf5"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After dogfooding the corrected real local graph surface, the repository owner said the current UI now feels acceptable and clear enough to use as the baseline, then explicitly moved the product discussion to making the Ticket interaction experience even better through rapid human-led frontend iteration. This resolves approval of the restored quiet-intelligence direction without claiming the interaction design is finished.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

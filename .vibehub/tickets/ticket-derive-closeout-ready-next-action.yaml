@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
-      "criterion": "One documented and mechanically tested derivation covers draft contract refinement, unresolved direct dependencies, missing reachable human-origin Evidence, ordinary execution, every current criterion having authority-satisfying Evidence with no Outcome, successful Outcome, and partial, failed, or deviated Outcome; it produces distinct next actions such as REFINE, WAIT, NEEDS_HUMAN, EXECUTE, CLOSE_OUT, DONE, and REPLAN without treating raw Evidence count as acceptance."
-    },
-    {
-      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
-      "criterion": "The canonical host-side projection exposes next_action plus a stable reason and relevant acceptance IDs from one implementation consumed by ticket get, graph, frontier, and the Web Workbench model; the browser does not re-infer lifecycle semantics from copy, counts, or local state."
-    },
-    {
       "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
-      "criterion": "The Agent-facing frontier deterministically separates ready-to-execute Tickets from ready-to-closeout, needs-human, and needs-replan work while retaining a machine-readable compatibility path for existing callers; a 6/6-Evidence Ticket with no Outcome appears only in ready-to-closeout and never in ready-to-execute."
+      "criterion": "The Agent-facing frontier deterministically separates ready-to-execute Tickets from ready-to-closeout, needs-human, and needs-replan work while retaining a machine-readable compatibility path for existing callers; a 6/6-Evidence Ticket with no Outcome appears only in ready-to-closeout and never in ready-to-execute.",
+      "identity": "sha256:179c9c759f752f84de2d51e47f92b6a85a2d9ffdf9966d02d31b5eaccc39897c",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
-      "criterion": "Trusted Run presence and the existing human-attention projection remain separate axes: a running Session does not rewrite Git-native next_action, missing human authority cannot be hidden by Agent Evidence, and next_action supplies routing without inventing a Run lease, heartbeat, or persistent dispatcher."
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "criterion": "One documented and mechanically tested derivation covers draft contract refinement, unresolved direct dependencies, missing reachable human-origin Evidence, ordinary execution, every current criterion having authority-satisfying Evidence with no Outcome, successful Outcome, and partial, failed, or deviated Outcome; it produces distinct next actions such as REFINE, WAIT, NEEDS_HUMAN, EXECUTE, CLOSE_OUT, DONE, and REPLAN without treating raw Evidence count as acceptance.",
+      "identity": "sha256:e9535bec0538426699fe4a5691620c75784d70cd9c098f7a69b797bc09dd415d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
-      "criterion": "Full Evidence coverage may derive CLOSE_OUT but never writes or implies a successful Outcome, DONE, archive membership, or dependent unlock; regression proves only an independently recorded successful Outcome changes those canonical facts."
+      "criterion": "Full Evidence coverage may derive CLOSE_OUT but never writes or implies a successful Outcome, DONE, archive membership, or dependent unlock; regression proves only an independently recorded successful Outcome changes those canonical facts.",
+      "identity": "sha256:99caf432f51c0bfbfd98eae20b28c893eb5048759b7364f5385ccc49d9f56d6a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+      "criterion": "The canonical host-side projection exposes next_action plus a stable reason and relevant acceptance IDs from one implementation consumed by ticket get, graph, frontier, and the Web Workbench model; the browser does not re-infer lifecycle semantics from copy, counts, or local state.",
+      "identity": "sha256:c7e2479ff278f60b8f05e2aba5439c4199e28db69646ac907e340486e6f7689e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "real-regression-corpus-covers-observed-gaps",
-      "criterion": "Fixtures reproduce the observed v0.8 publication, 6/6 dogfood repair, human-authority, non-success Outcome, ordinary READY, and a mixed Ticket whose Agent criteria and human-authority criteria are simultaneously incomplete; precedence is deterministic, and project, Ticket, CLI JSON, current/all graph, Workbench host, and installed-artifact verification pass without changing read-only Web or Git-native source-of-truth boundaries."
+      "criterion": "Fixtures reproduce the observed v0.8 publication, 6/6 dogfood repair, human-authority, non-success Outcome, ordinary READY, and a mixed Ticket whose Agent criteria and human-authority criteria are simultaneously incomplete; precedence is deterministic, and project, Ticket, CLI JSON, current/all graph, Workbench host, and installed-artifact verification pass without changing read-only Web or Git-native source-of-truth boundaries.",
+      "identity": "sha256:9e2bf498b6731140355b0bbb53d0c919a20ae87a80aca4f41926a038a7333e12",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+      "criterion": "Trusted Run presence and the existing human-attention projection remain separate axes: a running Session does not rewrite Git-native next_action, missing human authority cannot be hidden by Agent Evidence, and next_action supplies routing without inventing a Run lease, heartbeat, or persistent dispatcher.",
+      "identity": "sha256:98de53b65c6a23994bbea3506e43d734ddc7ca463c039ad7177ab64f68a01748",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not add a persisted status or second lifecycle; next_action is derived from canonical Ticket, Evidence, Outcome, authority, maturity, and dependencies.",
     "Do not auto-create an Outcome, auto-accept Evidence, or let the executor certify its own success.",
@@ -54,6 +73,44 @@
       "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+          "identity": "sha256:179c9c759f752f84de2d51e47f92b6a85a2d9ffdf9966d02d31b5eaccc39897c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+          "identity": "sha256:e9535bec0538426699fe4a5691620c75784d70cd9c098f7a69b797bc09dd415d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+          "identity": "sha256:99caf432f51c0bfbfd98eae20b28c893eb5048759b7364f5385ccc49d9f56d6a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+          "identity": "sha256:c7e2479ff278f60b8f05e2aba5439c4199e28db69646ac907e340486e6f7689e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "real-regression-corpus-covers-observed-gaps",
+          "identity": "sha256:9e2bf498b6731140355b0bbb53d0c919a20ae87a80aca4f41926a038a7333e12",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+          "identity": "sha256:98de53b65c6a23994bbea3506e43d734ddc7ca463c039ad7177ab64f68a01748",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8885bedb274be108391486fdd411f94f459db6e3ccb91644b311e72514c3136d",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -64,6 +121,7 @@
     "dogfood:ticket-publish-v080-workbench-release-completed-externally-without-outcome"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

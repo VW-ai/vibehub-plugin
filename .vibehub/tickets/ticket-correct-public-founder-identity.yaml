@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "founder-names-are-exact",
-      "criterion": "The rendered founder surface displays exactly Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬; Chenyang Zhang and incorrect Chinese-name variants are absent from visible copy, image alt text, and accessible link labels."
+      "acceptance_id": "founder-correction-is-verified",
+      "criterion": "Site lint, static production build, rendered content contracts, full repository verification, canonical VibeHub validation, and unchanged Plugin artifact verification pass with the corrected names.",
+      "identity": "sha256:728634c41d0b0066652180b3991f170d6287b1e92729ebca44cf53e2590d953b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "founder-links-and-layout-are-preserved",
-      "criterion": "Both existing portraits, personal websites, LinkedIn destinations, compact non-expandable presentation, responsive layout, and keyboard accessibility remain unchanged apart from the corrected identity text."
+      "criterion": "Both existing portraits, personal websites, LinkedIn destinations, compact non-expandable presentation, responsive layout, and keyboard accessibility remain unchanged apart from the corrected identity text.",
+      "identity": "sha256:c380e7860b157e737a0d75f3d363de87eb7499b8b4024d0a2519ae4e8b05c667",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "founder-correction-is-verified",
-      "criterion": "Site lint, static production build, rendered content contracts, full repository verification, canonical VibeHub validation, and unchanged Plugin artifact verification pass with the corrected names."
+      "acceptance_id": "founder-names-are-exact",
+      "criterion": "The rendered founder surface displays exactly Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬; Chenyang Zhang and incorrect Chinese-name variants are absent from visible copy, image alt text, and accessible link labels.",
+      "identity": "sha256:0b19d913073257e72805e9464eee4925640bec1902e56cdea94ad06d3d56140b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not invent biographies, titles, quotes, or additional identity details.",
     "Do not change founder URLs or portraits unless an existing link is mechanically broken.",
@@ -22,7 +32,7 @@
   "context_refs": [
     {
       "purpose": "Accepted public-site baseline this correction preserves.",
-      "ref": ".vibehub/outcomes/ticket-public-embed-real-workbench.yaml"
+      "ref": ".vibehub/outcomes/ticket-public-embed-real-workbench/contract-v1.yaml"
     },
     {
       "purpose": "Founder identity rendering surface.",
@@ -31,6 +41,29 @@
     {
       "purpose": "Static identity and asset contracts to update.",
       "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "founder-correction-is-verified",
+          "identity": "sha256:728634c41d0b0066652180b3991f170d6287b1e92729ebca44cf53e2590d953b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "founder-links-and-layout-are-preserved",
+          "identity": "sha256:c380e7860b157e737a0d75f3d363de87eb7499b8b4024d0a2519ae4e8b05c667",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "founder-names-are-exact",
+          "identity": "sha256:0b19d913073257e72805e9464eee4925640bec1902e56cdea94ad06d3d56140b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f9eb1e787da0fab6c18b6146a21d9389ac950e86353a4156b36538aea9b395cf",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -53,6 +86,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-correct-public-founder-identity"
 }

@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "current-scope-is-actionable",
-      "criterion": "The shared current-scope projection used by CLI JSON and Workbench seeds visibility from READY, REFINE, and BLOCKED Tickets, includes only the minimum directly adjacent DONE causal boundary needed to explain those open Tickets, preserves explicit one-hop history expansion, and no longer treats an unrelated DONE Ticket as current merely because deliveries is omitted or empty."
+      "acceptance_id": "all-and-delivery-history-remain-truthful",
+      "criterion": "All scope still returns every canonical Ticket, exact delivery and Room filters retain their existing deterministic semantics, archive remains derived from successful Outcome plus exact delivered membership, and current filtering never deletes, moves, unarchives, or falsifies historical Tickets and relations.",
+      "identity": "sha256:08b165ec35a296830fad89cb07f5643c10716e9f19b8a9ecfd39e9de1678842d",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "all-and-delivery-history-remain-truthful",
-      "criterion": "All scope still returns every canonical Ticket, exact delivery and Room filters retain their existing deterministic semantics, archive remains derived from successful Outcome plus exact delivered membership, and current filtering never deletes, moves, unarchives, or falsifies historical Tickets and relations."
+      "acceptance_id": "current-scope-is-actionable",
+      "criterion": "The shared current-scope projection used by CLI JSON and Workbench seeds visibility from READY, REFINE, and BLOCKED Tickets, includes only the minimum directly adjacent DONE causal boundary needed to explain those open Tickets, preserves explicit one-hop history expansion, and no longer treats an unrelated DONE Ticket as current merely because deliveries is omitted or empty.",
+      "identity": "sha256:a4509139f1156ee6506f57cdfab9105cf2b5a8686186dc1d50e72212cc3214a9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "delivery-audit-is-a-versioned-migration",
-      "criterion": "The current project format advances by one version and the single migrations reference defines the complete prior-format upgrade: preview legacy Tickets, add an explicit deliveries array, backfill pull-request or cherry-pick delivery only from exact authoritative refs, timestamps, and commits, preserve an empty array when delivery is absent or unprovable, then update the format marker and validate; compatibility gates old-format writes until this explicit reviewable migration is applied."
-    },
-    {
-      "acceptance_id": "repository-history-is-audited",
-      "criterion": "Every canonical Ticket in this repository has an explicit deliveries array after a reviewable audit; previously delivered Tickets receive exact evidence-backed membership where it can be proven from repository or GitHub history, unproven cases remain empty without inference, and the repository format marker records the completed migration."
+      "criterion": "The current project format advances by one version and the single migrations reference defines the complete prior-format upgrade: preview legacy Tickets, add an explicit deliveries array, backfill pull-request or cherry-pick delivery only from exact authoritative refs, timestamps, and commits, preserve an empty array when delivery is absent or unprovable, then update the format marker and validate; compatibility gates old-format writes until this explicit reviewable migration is applied.",
+      "identity": "sha256:7d7e27d6d341208b10855c260ad7ad192b6050909d01d80e0023db6d43edb1d6",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "projection-and-migration-are-regression-proven",
-      "criterion": "Focused fixtures prove the current graph stays small with many legacy DONE Tickets, direct causal DONE boundaries and progressive history remain correct, the prior-format-to-current migration succeeds, compatibility/write gates behave honestly, the real repository validates, and the complete test plus plugin-artifact verification suite passes."
+      "criterion": "Focused fixtures prove the current graph stays small with many legacy DONE Tickets, direct causal DONE boundaries and progressive history remain correct, the prior-format-to-current migration succeeds, compatibility/write gates behave honestly, the real repository validates, and the complete test plus plugin-artifact verification suite passes.",
+      "identity": "sha256:8003aed2ee860af7b2f1952627031779f02fd9984b7bfdd4a7cebd2211933956",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "repository-history-is-audited",
+      "criterion": "Every canonical Ticket in this repository has an explicit deliveries array after a reviewable audit; previously delivered Tickets receive exact evidence-backed membership where it can be proven from repository or GitHub history, unproven cases remain empty without inference, and the repository format marker records the completed migration.",
+      "identity": "sha256:2408bde1c51c305ed525ce4b57bdc3a4a2277875e811a7ec805feaf3d39617d8",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "schema-evolution-gate-is-mechanical",
-      "criterion": "Ticket documents advance from schema v1 to v2 as part of project format 1 to 2; the migration registry declares that document transition in machine-readable form, rewrites both schema_version and deliveries before advancing the project marker, and regression tests mechanically bind the current project format, current Ticket schema, migration target, and every canonical repository Ticket so this contract change cannot remain silently compatible."
+      "criterion": "Ticket documents advance from schema v1 to v2 as part of project format 1 to 2; the migration registry declares that document transition in machine-readable form, rewrites both schema_version and deliveries before advancing the project marker, and regression tests mechanically bind the current project format, current Ticket schema, migration target, and every canonical repository Ticket so this contract change cannot remain silently compatible.",
+      "identity": "sha256:3d63b92ac231647c2d2bfe4935d56eeab9488339ed2ce5b6077e60e4ca513251",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not infer delivery from Ticket status, branch names, filenames, prose, or an arbitrary current PR; a delivered entry requires an exact canonical PR or commit reference, delivered timestamp, and 40-hex commit.",
     "Do not hide READY, REFINE, or BLOCKED work, and do not make delivery/archive state another operational Ticket lifecycle.",
@@ -55,6 +74,44 @@
       "ref": "skills/vibehub-migrate/references/migrations.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "all-and-delivery-history-remain-truthful",
+          "identity": "sha256:08b165ec35a296830fad89cb07f5643c10716e9f19b8a9ecfd39e9de1678842d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-scope-is-actionable",
+          "identity": "sha256:a4509139f1156ee6506f57cdfab9105cf2b5a8686186dc1d50e72212cc3214a9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-audit-is-a-versioned-migration",
+          "identity": "sha256:7d7e27d6d341208b10855c260ad7ad192b6050909d01d80e0023db6d43edb1d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "projection-and-migration-are-regression-proven",
+          "identity": "sha256:8003aed2ee860af7b2f1952627031779f02fd9984b7bfdd4a7cebd2211933956",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repository-history-is-audited",
+          "identity": "sha256:2408bde1c51c305ed525ce4b57bdc3a4a2277875e811a7ec805feaf3d39617d8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "schema-evolution-gate-is-mechanical",
+          "identity": "sha256:3d63b92ac231647c2d2bfe4935d56eeab9488339ed2ce5b6077e60e4ca513251",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:887e2ef0dbce1c7befec7a06f7e8dce87b7df195625faa3ee306c73902c531bc",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -65,6 +122,7 @@
     "context:decision-agent-driven-upgrade-migration"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
 }

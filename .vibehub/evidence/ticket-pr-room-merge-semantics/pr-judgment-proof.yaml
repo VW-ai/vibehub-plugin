@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "pr-merge-judgment"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "pr-merge-judgment",
+      "identity": "sha256:0dc41be2d05eb9cc0ea9b4ba18961f23d0c99ae9fdc35b83555194daaa99ba26",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "pr-judgment-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T02:27:08.000Z",
@@ -10,7 +19,7 @@
     "skills/vibehub-pr/SKILL.md",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vibehub-pr gained one judgment-first step: after a merge, run room drift against the merged tree and realign entered rooms rather than hand-picking a side's stamps; same-slug room.yaml conflicts are boundary decisions; stale marks follow their origin per the governance pointer. The existing no-second-merge-protocol guardrail stands unchanged, and the skill-contracts tests weld the new room drift citation and pass.",
   "ticket_id": "ticket-pr-room-merge-semantics"
 }

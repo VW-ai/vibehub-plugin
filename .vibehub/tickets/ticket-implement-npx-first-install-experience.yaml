@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "core-folder-carries-helper-and-contracts",
-      "criterion": "skills/vibehub-core/ exists with a SKILL.md whose frontmatter description states it is the shared helper and contracts for the other VibeHub Skills and is not invoked directly, plus scripts/vh.mjs, scripts/vh-ui.mjs, contracts/*, and templates/github/; skills/scripts/ and skills/contracts/ no longer exist."
-    },
-    {
       "acceptance_id": "all-live-references-repointed",
-      "criterion": "No file under skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md, or the plugin manifests references ../scripts/, ../contracts/, skills/scripts, or skills/contracts; ticket-lifecycle.json planning_contracts points at the new contracts path and verify-plugin-artifact asserts that; the whole test suite passes."
+      "criterion": "No file under skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md, or the plugin manifests references ../scripts/, ../contracts/, skills/scripts, or skills/contracts; ticket-lifecycle.json planning_contracts points at the new contracts path and verify-plugin-artifact asserts that; the whole test suite passes.",
+      "identity": "sha256:2f10734e760887558e4fad31a2cfa014baefe20c5139720b1aaf3ba463a9a49d",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "skills-sh-install-works-end-to-end",
-      "criterion": "In a scratch project, npx skills add of this repository (local path or branch) for both claude-code and codex targets copies twelve folders including vibehub-core, and running the installed helper through the copied path (for example .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/vh.mjs project validate against a fixture repository) succeeds; the transcript is checked in as Evidence."
-    },
-    {
-      "acceptance_id": "marketplace-bundles-ship-the-same-layout",
-      "criterion": "npm run build produces an artifact containing skills/vibehub-core/scripts/vh.mjs and contracts, verify-plugin-artifact passes with its required-file list updated, and the host-marketplace and release tests pass unchanged in intent."
-    },
-    {
-      "acceptance_id": "setup-offers-github-mirror-once",
-      "criterion": "vibehub-setup SKILL.md gains one optional step after project validation: when git remote origin is on github.com, ask once whether to mirror Tickets to GitHub Issues; on yes copy exactly five files from skills/vibehub-core into the project (.github/workflows/sync-issues.yml, scripts/vibehub/sync-github-issues.mjs, scripts/vibehub/scripts/vh.mjs, scripts/vibehub/contracts/versions.json, scripts/vibehub/contracts/dependency-hygiene.json) so the workflow runs in a clean Actions checkout because vh.mjs loads those two contract files at import time, record the copy as setup Evidence, and add no instruction, hook, or Skill text that asks an Agent to run or check the sync; tests prove the template script equals its source except for the import path and a version header, that the workflow template equals its source except for the script path, and that the five-file copy computes a projection in a scratch project with no plugin installed."
+      "acceptance_id": "core-folder-carries-helper-and-contracts",
+      "criterion": "skills/vibehub-core/ exists with a SKILL.md whose frontmatter description states it is the shared helper and contracts for the other VibeHub Skills and is not invoked directly, plus scripts/vh.mjs, scripts/vh-ui.mjs, contracts/*, and templates/github/; skills/scripts/ and skills/contracts/ no longer exist.",
+      "identity": "sha256:b8ea681f629c9c8823ccee936e7e858cdfce752d1027aa75f1fa76009b459db9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "install-docs-lead-with-one-line",
-      "criterion": "README Installation shows npx skills add VW-ai/vibehub-plugin first with the marketplace commands retained, stays within its 60-line test budget, and docs/INSTALL.md describes the skills.sh path, the vibehub-core folder, the install-all caveat for partial installs, and the setup-time mirror option."
+      "criterion": "README Installation shows npx skills add VW-ai/vibehub-plugin first with the marketplace commands retained, stays within its 60-line test budget, and docs/INSTALL.md describes the skills.sh path, the vibehub-core folder, the install-all caveat for partial installs, and the setup-time mirror option.",
+      "identity": "sha256:6b8f7351723d1739a4da471c97ac6d74ba4d028888e5dcc40022a436fe35724f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "marketplace-bundles-ship-the-same-layout",
+      "criterion": "npm run build produces an artifact containing skills/vibehub-core/scripts/vh.mjs and contracts, verify-plugin-artifact passes with its required-file list updated, and the host-marketplace and release tests pass unchanged in intent.",
+      "identity": "sha256:b8d9710f09ca43f0853919859c2e583432559f80e9c0476dfb01deddd0ece512",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-offers-github-mirror-once",
+      "criterion": "vibehub-setup SKILL.md gains one optional step after project validation: when git remote origin is on github.com, ask once whether to mirror Tickets to GitHub Issues; on yes copy exactly five files from skills/vibehub-core into the project (.github/workflows/sync-issues.yml, scripts/vibehub/sync-github-issues.mjs, scripts/vibehub/scripts/vh.mjs, scripts/vibehub/contracts/versions.json, scripts/vibehub/contracts/dependency-hygiene.json) so the workflow runs in a clean Actions checkout because vh.mjs loads those two contract files at import time, record the copy as setup Evidence, and add no instruction, hook, or Skill text that asks an Agent to run or check the sync; tests prove the template script equals its source except for the import path and a version header, that the workflow template equals its source except for the script path, and that the five-file copy computes a projection in a scratch project with no plugin installed.",
+      "identity": "sha256:add059cf286b2613e80c8c4575f6cf0288f78eead4f6ea6b534f8b9ea70925c4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "skills-sh-install-works-end-to-end",
+      "criterion": "In a scratch project, npx skills add of this repository (local path or branch) for both claude-code and codex targets copies twelve folders including vibehub-core, and running the installed helper through the copied path (for example .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/vh.mjs project validate against a fixture repository) succeeds; the transcript is checked in as Evidence.",
+      "identity": "sha256:56421417bc1fff1b3e1ca207aea6a931934d2a85ebe2ecd2a697b6d296b23e14",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not publish to npm or add a CLI, daemon, MCP server, or background process.",
     "Historical records keep their meaning: META/, docs/proposals/, docs/SPEED_FIRST_CLEANUP.md, Evidence, Outcomes, and Context prose are not rewritten; the only change allowed in checked-in .vibehub documents is updating file-path context_refs that point at the moved helper or contracts, because the validator requires every context_ref to be readable and a compatibility shim at the old path is rejected by product decisions.",
@@ -39,7 +58,7 @@
     },
     {
       "purpose": "The owner's decision this implements.",
-      "ref": ".vibehub/outcomes/ticket-decide-npx-first-install-experience.yaml"
+      "ref": ".vibehub/outcomes/ticket-decide-npx-first-install-experience/contract-v1.yaml"
     },
     {
       "purpose": "Setup flow gaining the optional mirror step.",
@@ -66,6 +85,44 @@
       "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "all-live-references-repointed",
+          "identity": "sha256:2f10734e760887558e4fad31a2cfa014baefe20c5139720b1aaf3ba463a9a49d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "core-folder-carries-helper-and-contracts",
+          "identity": "sha256:b8ea681f629c9c8823ccee936e7e858cdfce752d1027aa75f1fa76009b459db9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "install-docs-lead-with-one-line",
+          "identity": "sha256:6b8f7351723d1739a4da471c97ac6d74ba4d028888e5dcc40022a436fe35724f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "marketplace-bundles-ship-the-same-layout",
+          "identity": "sha256:b8d9710f09ca43f0853919859c2e583432559f80e9c0476dfb01deddd0ece512",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-offers-github-mirror-once",
+          "identity": "sha256:add059cf286b2613e80c8c4575f6cf0288f78eead4f6ea6b534f8b9ea70925c4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-sh-install-works-end-to-end",
+          "identity": "sha256:56421417bc1fff1b3e1ca207aea6a931934d2a85ebe2ecd2a697b6d296b23e14",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4efb2ad95be081915434cad08a9867f09a2b82550d0445c60b99e5ddba9fd7c6",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -80,6 +137,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

@@ -1,22 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "existing-pages-project-is-reused",
-      "criterion": "Read-only Cloudflare inventory proves that vibehub-website-v1 is the pre-existing project in the selected account, its current main production deployment identifies source commit 4d628ba and an immutable Pages URL, the repository pins the complete 40-hex source commit, and the immutable URL passes the canonical homepage, robots.txt, sitemap.xml, and static-asset verifier."
+      "acceptance_id": "canonical-apex-is-served-by-pages",
+      "criterion": "The supported Cloudflare Pages custom-domain flow binds vibehub.icu to vibehub-website-v1, replaces only the exact preflighted obsolete apex origin records required for that binding, reaches active domain and certificate state, and serves the verified Pages deployment at https://vibehub.icu without changing the retained Google verification TXT record or the working www redirect contract.",
+      "identity": "sha256:a8c0af68fda32679f57a3443648589de8865beac051d698250b4dce514376b92",
+      "revision": 1,
+      "state": "retired"
     },
     {
       "acceptance_id": "canonical-apex-is-served-by-pages",
-      "criterion": "Current Cloudflare inventory lists vibehub.icu on vibehub-website-v1, public TLS and canonical production probes succeed, the retained Search Console TXT proof remains present, and the existing www contract permanently redirects the equivalent path and query to the apex without serving a duplicate site."
-    },
-    {
-      "acceptance_id": "repository-release-path-is-cloudflare-only",
-      "criterion": "The repository-local release Skill, script, npm entry points, README, tests, and hosting metadata name the existing Cloudflare Pages project and exact-build Direct Upload workflow; the obsolete OpenAI Sites project ID, connector, source credential, archive, save-version, deployment polling, .openai/hosting.json, and Sites-specific production path are removed without adding a second release system."
+      "criterion": "Current Cloudflare inventory lists vibehub.icu on vibehub-website-v1, public TLS and canonical production probes succeed, the retained Search Console TXT proof remains present, and the existing www contract permanently redirects the equivalent path and query to the apex without serving a duplicate site.",
+      "identity": "sha256:4918384af07260241eb7c088828195c08cb6d0bc27d4f7c3386103eb06cf04c0",
+      "revision": 2,
+      "state": "active"
     },
     {
       "acceptance_id": "cloudflare-migration-is-regression-proven",
-      "criterion": "Focused release-workflow contracts, lint, deterministic static build, rendered metadata tests, complete release preflight, immutable Pages deployment verification, current Pages project and apex-domain inventory, www path/query redirect verification, and canonical production verification all pass, with acceptance-linked non-secret Evidence for the project, deployment, source commit, domain, TLS, and production content."
+      "criterion": "Focused release-workflow contracts, lint, deterministic static build, rendered metadata tests, complete release preflight, exact Pages deployment verification, apex DNS and custom-domain verification, www path/query redirect verification, and canonical production verification all pass, and acceptance-linked Evidence records non-secret project, deployment, commit, DNS transition, domain, and certificate facts.",
+      "identity": "sha256:50b64b374666f0dc674751a1a4a24558bee13c67e80964d1ffa73c757ec918b4",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "cloudflare-migration-is-regression-proven",
+      "criterion": "Focused release-workflow contracts, lint, deterministic static build, rendered metadata tests, complete release preflight, immutable Pages deployment verification, current Pages project and apex-domain inventory, www path/query redirect verification, and canonical production verification all pass, with acceptance-linked non-secret Evidence for the project, deployment, source commit, domain, TLS, and production content.",
+      "identity": "sha256:858a51a456eb046471e4c4ce3788d36b3163c6f7b4f9a255f45358aeb7a793d7",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "existing-pages-project-is-reused",
+      "criterion": "Read-only Cloudflare inventory proves that vibehub-website-v1 is the existing project in the selected account; the exact committed static build is deployed to its main production branch with its full commit hash attached, and the immutable Pages deployment URL passes the canonical homepage, robots.txt, sitemap.xml, and static-asset verification before apex DNS changes.",
+      "identity": "sha256:bfa9691a2c13176fcdf5749623767dd054d54930ac603ef1effcc28a9ebe2299",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "existing-pages-project-is-reused",
+      "criterion": "Read-only Cloudflare inventory proves that vibehub-website-v1 is the pre-existing project in the selected account, its current main production deployment identifies source commit 4d628ba and an immutable Pages URL, the repository pins the complete 40-hex source commit, and the immutable URL passes the canonical homepage, robots.txt, sitemap.xml, and static-asset verifier.",
+      "identity": "sha256:036b4d52ed150ac4b09dd78e6e770590623e0f72c7d94bedf4c474b3dd721737",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "repository-release-path-is-cloudflare-only",
+      "criterion": "The repository-local release Skill, script, npm entry points, README, tests, and hosting metadata name the existing Cloudflare Pages project and exact-build Direct Upload workflow; the obsolete OpenAI Sites project ID, connector, source credential, archive, save-version, deployment polling, .openai/hosting.json, and Sites-specific production path are removed without adding a second release system.",
+      "identity": "sha256:9707a06335674b8898c8780ab1eeba8ca9ed93c8000bc4b96d23df015a4404a7",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 2,
   "constraints": [
     "Reuse Cloudflare account 72091e7e079e357ced7f9603c03a926e and existing Pages project vibehub-website-v1; do not create another Pages, Workers, Sites, or hosting project.",
     "The repository release workflow must deploy an exact clean commit, return an immutable Pages URL, and require immutable verification before any future canonical-domain cutover.",
@@ -49,7 +83,7 @@
     },
     {
       "purpose": "Successful prior release contract explicitly superseded by the owner's hosting consolidation decision.",
-      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow.yaml"
+      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow/contract-v1.yaml"
     },
     {
       "purpose": "Human authority for the selected account, canonical apex hostname, and replacement boundary.",
@@ -57,7 +91,61 @@
     },
     {
       "purpose": "First independent closeout that identified the historical-audit-only gap refined here.",
-      "ref": ".vibehub/outcomes/ticket-deploy-public-site-cloudflare.yaml"
+      "ref": ".vibehub/outcomes/ticket-deploy-public-site-cloudflare/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-apex-is-served-by-pages",
+          "identity": "sha256:a8c0af68fda32679f57a3443648589de8865beac051d698250b4dce514376b92",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "cloudflare-migration-is-regression-proven",
+          "identity": "sha256:50b64b374666f0dc674751a1a4a24558bee13c67e80964d1ffa73c757ec918b4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "existing-pages-project-is-reused",
+          "identity": "sha256:bfa9691a2c13176fcdf5749623767dd054d54930ac603ef1effcc28a9ebe2299",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repository-release-path-is-cloudflare-only",
+          "identity": "sha256:9707a06335674b8898c8780ab1eeba8ca9ed93c8000bc4b96d23df015a4404a7",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5b14954274cb745bbc9404a7c3d40527de4484f33dd5a4b6771367aef3e9d9ef",
+      "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-apex-is-served-by-pages",
+          "identity": "sha256:4918384af07260241eb7c088828195c08cb6d0bc27d4f7c3386103eb06cf04c0",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "cloudflare-migration-is-regression-proven",
+          "identity": "sha256:858a51a456eb046471e4c4ce3788d36b3163c6f7b4f9a255f45358aeb7a793d7",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "existing-pages-project-is-reused",
+          "identity": "sha256:036b4d52ed150ac4b09dd78e6e770590623e0f72c7d94bedf4c474b3dd721737",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "repository-release-path-is-cloudflare-only",
+          "identity": "sha256:9707a06335674b8898c8780ab1eeba8ca9ed93c8000bc4b96d23df015a4404a7",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1282fcc121ae800a724a327eb1fcb598ed3e13f47b00d1ed617e423bfdc0dbba",
+      "revision": 2
     }
   ],
   "deliveries": [
@@ -94,6 +182,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-deploy-public-site-cloudflare"
 }

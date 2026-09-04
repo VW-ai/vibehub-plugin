@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "legacy-proof-corpus-is-audited",
-      "criterion": "A reproducible audit inventories current and historical Evidence and Outcomes, the Acceptance revisions they can and cannot be associated with, successful DONE and archive impact, authority-sensitive proof, and cases where Git history is incomplete or ambiguous; counts and representative exact-source examples are recorded."
-    },
-    {
-      "acceptance_id": "three-transition-policies-are-compared",
-      "criterion": "The proposal compares at minimum: marking all legacy proof unbound or stale, grandfathering existing successful Outcomes, and reconstructing contract identity from Git where possible with an explicit unresolved fallback; each policy states its source-of-truth assumptions rather than presenting migration convenience as truth."
-    },
-    {
-      "acceptance_id": "repository-truth-impact-is-quantified",
-      "criterion": "For every policy, the proposal quantifies or mechanically estimates effects on current DONE, archive membership, dependent unlock, CLOSE_OUT projection, human-authority satisfaction, current/all graph, and installed-artifact compatibility, including the consequence of rolling the policy back."
+      "acceptance_id": "downstream-boundary-is-explicit",
+      "criterion": "The proposal maps the chosen policy dimensions to future Ticket, Evidence, Outcome, project-format, migration, validation, projection, Workbench, host parity, and test responsibilities while making no production schema or repository-truth mutation itself.",
+      "identity": "sha256:ca8868cccd7e9947d950d67efd514df391e69e39535fc8af6c78b4cd53da3840",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "git-reconstruction-limits-are-proven",
-      "criterion": "A bounded prototype tests whether exact historical criterion text, authority, membership, Evidence creation point, and adjudicated Outcome contract can be reconstructed from repository history, and reports ambiguous or impossible cases without fabricating identity or rewriting proof."
+      "criterion": "A bounded prototype tests whether exact historical criterion text, authority, membership, Evidence creation point, and adjudicated Outcome contract can be reconstructed from repository history, and reports ambiguous or impossible cases without fabricating identity or rewriting proof.",
+      "identity": "sha256:09b650accb5c9e2761a7a2174847900fe65c4768a76293643e515d3f9f1b15c6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "legacy-proof-corpus-is-audited",
+      "criterion": "A reproducible audit inventories current and historical Evidence and Outcomes, the Acceptance revisions they can and cannot be associated with, successful DONE and archive impact, authority-sensitive proof, and cases where Git history is incomplete or ambiguous; counts and representative exact-source examples are recorded.",
+      "identity": "sha256:ac527cf5cda4e27e29669eb9a20d09dbd1921c7ddd1d4b93a268b8eb3fa9406a",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "recommendation-is-decision-ready",
-      "criterion": "The proposal recommends one exact policy or explicitly defined hybrid, explains why alternatives were rejected, defines unresolved-case handling, migration and rollback invariants, and presents the owner with a concrete protected choice rather than an implementation-shaped default."
+      "criterion": "The proposal recommends one exact policy or explicitly defined hybrid, explains why alternatives were rejected, defines unresolved-case handling, migration and rollback invariants, and presents the owner with a concrete protected choice rather than an implementation-shaped default.",
+      "identity": "sha256:6674dcd567f56d3aebdeb4913ae948b369dfdc13b809cded09a1d2c6d83d0498",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "downstream-boundary-is-explicit",
-      "criterion": "The proposal maps the chosen policy dimensions to future Ticket, Evidence, Outcome, project-format, migration, validation, projection, Workbench, host parity, and test responsibilities while making no production schema or repository-truth mutation itself."
+      "acceptance_id": "repository-truth-impact-is-quantified",
+      "criterion": "For every policy, the proposal quantifies or mechanically estimates effects on current DONE, archive membership, dependent unlock, CLOSE_OUT projection, human-authority satisfaction, current/all graph, and installed-artifact compatibility, including the consequence of rolling the policy back.",
+      "identity": "sha256:4c3f0e4ed6834a1369d071db9db91fcb83911495f64949d30739fc7af908dfd8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "three-transition-policies-are-compared",
+      "criterion": "The proposal compares at minimum: marking all legacy proof unbound or stale, grandfathering existing successful Outcomes, and reconstructing contract identity from Git where possible with an explicit unresolved fallback; each policy states its source-of-truth assumptions rather than presenting migration convenience as truth.",
+      "identity": "sha256:2eae41c3c6a365cb2d4d8dd8da2d8b921751617b6ee8f52a91ced590e4899128",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket produces a policy proposal and bounded audit only; do not change canonical schemas, migrations, Evidence, Outcomes, DONE, or archive truth.",
     "Do not silently rebind historical proof to current criterion text or infer owner intent from implementation convenience.",
@@ -54,6 +73,44 @@
       "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "downstream-boundary-is-explicit",
+          "identity": "sha256:ca8868cccd7e9947d950d67efd514df391e69e39535fc8af6c78b4cd53da3840",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "git-reconstruction-limits-are-proven",
+          "identity": "sha256:09b650accb5c9e2761a7a2174847900fe65c4768a76293643e515d3f9f1b15c6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "legacy-proof-corpus-is-audited",
+          "identity": "sha256:ac527cf5cda4e27e29669eb9a20d09dbd1921c7ddd1d4b93a268b8eb3fa9406a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommendation-is-decision-ready",
+          "identity": "sha256:6674dcd567f56d3aebdeb4913ae948b369dfdc13b809cded09a1d2c6d83d0498",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repository-truth-impact-is-quantified",
+          "identity": "sha256:4c3f0e4ed6834a1369d071db9db91fcb83911495f64949d30739fc7af908dfd8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "three-transition-policies-are-compared",
+          "identity": "sha256:2eae41c3c6a365cb2d4d8dd8da2d8b921751617b6ee8f52a91ced590e4899128",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4dc9068f8fa3cac8379ec670ea04ab12d9300b2eb3f66cb8ff9659b1d7055ac4",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -63,6 +120,7 @@
     "validation:legacy-proof-migration-requires-human-policy"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-propose-legacy-proof-revision-policy"
 }

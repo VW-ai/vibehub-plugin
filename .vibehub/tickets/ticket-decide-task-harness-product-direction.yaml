@@ -3,19 +3,37 @@
     {
       "acceptance_id": "core-loop-direction-decided",
       "authority": "human",
-      "criterion": "The owner explicitly accepts Task as the durable work unit and the Ticket Graph as the first frame, with entering a Task entering its Context Space, normal Chat and explicit Fork, Compare, Bring Back for exploration, scoped Context activation, Task creation or conversion, Start, autonomous execution, precise human attention, Evidence review, closeout, and return."
+      "criterion": "The owner explicitly accepts Task as the durable work unit and the Ticket Graph as the first frame, with entering a Task entering its Context Space, normal Chat and explicit Fork, Compare, Bring Back for exploration, scoped Context activation, Task creation or conversion, Start, autonomous execution, precise human attention, Evidence review, closeout, and return.",
+      "identity": "sha256:f0b78b1f4daee2e65a8493a199b5d3d01038e0ea37d95bfd0a547532e2813622",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "information-language-decided",
       "authority": "human",
-      "criterion": "The owner explicitly accepts one Work Graph with Task nodes and lighter Chat meta nodes, Human-led versus Agent-led Context Spaces, Project-owned or standalone Tasks, topology-derived visual clusters instead of canonical High-Level or Subtask entities, and Context-anchored intervention with approval kept distinct from ordinary input."
+      "criterion": "The owner explicitly accepts one Work Graph with Task nodes and lighter Chat meta nodes, Human-led versus Agent-led Context Spaces, Project-owned or standalone Tasks, topology-derived visual clusters instead of canonical High-Level or Subtask entities, and Context-anchored intervention with approval kept distinct from ordinary input.",
+      "identity": "sha256:0ae13bf5a5095bae91b2122ce348f7f05e573a0a7828e8ab71b751a96d67e7f3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "initial-shell-and-dsh-direction-decided",
       "authority": "human",
-      "criterion": "The owner explicitly chooses a non-invasive DeepSeek Harness Plugin: preserve DSH runtime and ecosystem, add one or two VibeHub Graph or Task pages plus additive Chat actions and Theme integration, perform a substantial coherent reskin where needed, and avoid an upstream fork, executor-specific coupling, or wholesale replacement-shell architecture for V1."
+      "criterion": "The owner explicitly decides whether V1 should present a completely VibeHub-owned browser application while retaining DSH as the underlying runtime and extension substrate, including whether the proposed global information architecture and replacement-shell boundary feel right.",
+      "identity": "sha256:2e5b36cdeeea136130ebcf9d090ceb8b499bad82d8c7b05890435355373e5dfb",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "initial-shell-and-dsh-direction-decided",
+      "authority": "human",
+      "criterion": "The owner explicitly chooses a non-invasive DeepSeek Harness Plugin: preserve DSH runtime and ecosystem, add one or two VibeHub Graph or Task pages plus additive Chat actions and Theme integration, perform a substantial coherent reskin where needed, and avoid an upstream fork, executor-specific coupling, or wholesale replacement-shell architecture for V1.",
+      "identity": "sha256:8e42f75ee073cb42e9fbf86a6f9763568476bfc175e8fa51c3f2cecf21fa5bfd",
+      "revision": 2,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This decision accepts the product and composition direction, not the current prototype's visual design or a complete high-fidelity interaction specification.",
     "Do not bind VibeHub Tasks to DSH Agent Team tasks, another Plugin's task model, Codex internals, or any one executor implementation.",
@@ -49,6 +67,29 @@
       "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "core-loop-direction-decided",
+          "identity": "sha256:f0b78b1f4daee2e65a8493a199b5d3d01038e0ea37d95bfd0a547532e2813622",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "information-language-decided",
+          "identity": "sha256:0ae13bf5a5095bae91b2122ce348f7f05e573a0a7828e8ab71b751a96d67e7f3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "initial-shell-and-dsh-direction-decided",
+          "identity": "sha256:8e42f75ee073cb42e9fbf86a6f9763568476bfc175e8fa51c3f2cecf21fa5bfd",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:bb56e386f32a2e078d957b7aa7cad1e4f2a3600394d2701fdceff491d01df749",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -60,6 +101,7 @@
     "conversation:2026-08-20-topology-derived-task-clusters"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-task-harness-product-direction"
 }

@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "all-redirect-hosts-are-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "all-redirect-hosts-are-verified",
+      "identity": "sha256:f44037bf327f30acf5ab4f5fd4e0eb4fd158706346414d042d7b657fcf0f6989",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-redirect-hosts-verified-2026-08-23",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T09:54:22Z",
@@ -11,7 +20,7 @@
     "https://vibehub.team",
     "https://github.com/VW-ai/vibehub-plugin/pull/123"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Cloudflare redirect wiring completed 2026-08-23 via cloudflare-api MCP (account 72091e7e079e357ced7f9603c03a926e). Zone vibehub.team: added proxied CNAME www -> vibehub.team; Redirect Rule 'Redirect www.vibehub.team to canonical apex' (http.host eq \"www.vibehub.team\" -> concat(\"https://vibehub.team\", http.request.uri.path), 301, preserve query). Zone vibehub.icu: existing apex CNAME / www A / TXT records untouched; Redirect Rule replaced with 'Redirect all vibehub.icu traffic to vibehub.team' (all incoming requests, same target, 301, preserve query). Zone vibehub.systems: existing apex CNAME -> vibehub-website-v1.pages.dev kept (the planned A @ 192.0.2.1 was skipped because apex already has a proxied CNAME that triggers rules); added proxied CNAME www -> vibehub.systems; Redirect Rule 'Redirect all vibehub.systems traffic to vibehub.team' (all incoming requests, 301, preserve query). No custom domains changed. Verification: `npm run release:verify` -> {ok:true, final_url https://vibehub.team/, status 200, robots/sitemap/og/favicon 200}. `npm run release:verify-redirects` -> ok:true; all 10 checks (http+https for www.vibehub.team, vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems) returned 301 with location https://vibehub.team/domain-discovery-check?source=vibehub (path and query preserved).",
   "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
 }

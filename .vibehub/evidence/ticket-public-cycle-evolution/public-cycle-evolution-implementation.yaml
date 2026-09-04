@@ -5,6 +5,30 @@
     "motion-explains-without-obstructing",
     "reduced-motion-preserves-the-sequence"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "identity": "sha256:50e9879be6aaaa53ce5f9ce64c46f272414c119a90d9eec78bae3a8b39cf54bf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-projects-progressive-causality",
+      "identity": "sha256:27215c8a3e7bb117ced5982a0f37363fe41e9e6e83d82cebba631f81077e207e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-explains-without-obstructing",
+      "identity": "sha256:23ec3d9c70c1ab81de5584e1dead4eee15d77f944ea707af83c2e3ddbd6e8830",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "reduced-motion-preserves-the-sequence",
+      "identity": "sha256:3e6abe6710a6c7f0a4c4211b623c62c1a17144122ea42c547b38291f817a2d4c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-cycle-evolution-implementation",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T22:48:46Z",
@@ -12,7 +36,7 @@
     "file:site/app/page.tsx",
     "file:site/app/globals.css"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public walkthrough now exposes one causal evolution rather than jumping from human choice to completion. Choosing a palette still changes the App immediately; after 520ms the View returns to the Ticket while Evidence is the mechanically projected current stage, and only at 1680ms does successful Outcome and returned Context appear. Request, Context, Ticket, Human, Evidence, Outcome, and all four edges derive future/current/done presentation directly from the existing Phase. A compact 01 Ticket / 02 Human / 03 Evidence / 04 Outcome marker names the current lifecycle without creating another progress state. Graph nodes, edges, workspace entry, and returned Context use the existing motion tokens with transform/opacity transitions under 300ms; controls remain immediate. Reduced-motion removes spatial travel while retaining semantic state opacity and color, and the existing narrow-layout graph remains vertically reachable.",
   "ticket_id": "ticket-public-cycle-evolution"
 }
