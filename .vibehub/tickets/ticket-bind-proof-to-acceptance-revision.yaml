@@ -1,56 +1,114 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-after-proof-policy-and-next-action",
-      "criterion": "After both direct prerequisites have successful Outcomes, replan this same Ticket to firm with exact acceptance for contract identity, Evidence and Outcome binding, selected legacy migration and unresolved fallback, closed-contract mutation, stale-proof projection, CLOSE_OUT and DONE behavior, Workbench explanation, host parity, rollback, and complete regression coverage derived from the chosen policy and shared next_action contract."
+      "acceptance_id": "acceptance-and-contract-revisions-are-canonical-data",
+      "criterion": "The versioned Ticket schema and shared validator represent every Acceptance with a stable logical acceptance_id, positive monotonic revision, immutable deterministic identity over logical ID, revision, criterion, explicit/default authority and immutable lineage, active or retired selection outside that identity, optional exact derived_from revision refs, and explicitly non-contract presentation data; they enforce unique (acceptance_id, revision) pairs, valid lineage, no revision gaps or identity collisions, and at most one active revision per logical ID. The stable ticket_id similarly owns positive monotonic complete Contract revisions whose immutable identities bind the exact Acceptance-revision identities, with active Contract selection outside historical identity; documented canonical serialization proves unrelated Ticket metadata, formatting, ordering, selectors, and presentation-only edits do not mutate historical semantic identities."
+    },
+    {
+      "acceptance_id": "semantic-mutation-appends-and-preserves-lineage",
+      "criterion": "Ticket planning and apply behavior reject in-place mutation or deletion of any revision that already has Evidence or an Outcome and provide one canonical append path whose fixtures prove: strengthening, correcting, or redefining the same responsibility creates the next revision under the same acceptance_id; a separately passable responsibility starts a new ID at v1; split and merge retire predecessors and create new IDs with exact derived_from lineage; no-longer-applicable obligations retire without deletion or fabricated lineage; and display-only copy changes use non-contract presentation data without creating a new revision."
+    },
+    {
+      "acceptance_id": "evidence-and-outcomes-bind-exact-revisions",
+      "criterion": "The atomically versioned Evidence schema requires every native or reconstructed bound record to carry exact Acceptance revision refs and immutable identities plus binding origin, and the atomically versioned Outcome schema requires every bound record to carry the exact complete Contract revision and identity it adjudicates. The only unbound alternatives are: migration-created legacy-pending-reconstruction, which preserves the complete old payload and is valid only with the owning Ticket's matching semantic-pending ref; and semantic-migration-created legacy-unresolved, which preserves the payload plus a machine-readable missing-or-ambiguous-history diagnostic and attempted provenance after the pending ref is cleared. Neither may be emitted by ordinary evidence or closeout writers or satisfy coverage, authority, DONE, archive, or dependency unlock; engine validation otherwise rejects missing, mismatched, nonexistent, retired-as-current, silently rebound, or tampered identities, preserves human-origin authority semantics, and keeps all historical proof readable."
+    },
+    {
+      "acceptance_id": "legacy-proof-migration-reconstructs-history",
+      "criterion": "A declared project-format migration separates deterministic document/schema materialization from a semantic step with complete Git-history authoring guidance. The mechanical half dry-runs before writing and converts every legacy Ticket, Evidence, and Outcome into an explicit legacy-pending-reconstruction representation without inventing a revision or changing its asserted payload, reaches valid writable CURRENT with a durable per-Ticket pending ref, and makes revision-bound Ticket mutation, Evidence, closeout, and lifecycle credit wait on that ref while unrelated valid project work remains writable. The semantic half uses only each proof file's first appearance on the current HEAD ancestry to replace pending shapes with legacy v1 Acceptance and Contract bindings, appends the current contract as a later active revision only when semantic drift exists, marks origin reconstructed, emits legacy-unresolved only for demonstrably missing or ambiguous history, removes the pending ref only after that Ticket is complete, and is idempotent with identical identities, lineage, active selections, pending guidance, and unresolved reports on rerun."
+    },
+    {
+      "acceptance_id": "current-repository-migration-preserves-historical-truth",
+      "criterion": "A pinned regression fixture reproduces the policy audit at snapshot 59de368c8a420d2913a6aa7a9d35cf7f52a7e569—307 Evidence and 95 Outcomes reconstructable with zero legacy-unresolved, including 24 Evidence and the two named successful Outcomes whose contracts later drifted. Dogfooding processes every legacy document present at the actual migration commit, including the post-snapshot decision Evidence and Outcome, derives rather than hardcodes its corpus totals, preserves each old Outcome as successful for its old Contract revision, materializes later active revisions where required, and records reviewable migration Evidence without deleting historical files or falsely treating an old Outcome as adjudication of a newer contract."
+    },
+    {
+      "acceptance_id": "projection-uses-only-active-contract-coverage",
+      "criterion": "The shared next_action derivation, Ticket get/graph/frontier queries, dependency unlock, DONE and archive projection count Evidence and Outcomes only when their exact bound revisions cover the active Contract revision; fixtures prove historical success stays queryable but does not close or unlock a newer active revision, unchanged migrated contracts retain their correct lifecycle truth, a new active revision routes through existing EXECUTE, NEEDS_HUMAN, CLOSE_OUT, and DONE behavior, and legacy-unresolved remains an explained proof-binding condition rather than a new Ticket status."
+    },
+    {
+      "acceptance_id": "workbench-explains-revision-history",
+      "criterion": "Workbench uses the same host projection to show the active Contract revision, each Acceptance's logical ID and revision, active or retired state, derived_from lineage, Evidence binding and origin, historical versus current Outcome coverage, and actionable legacy-unresolved detail; representative UI tests prove a user can distinguish old successful history from work required on the active revision without reading raw YAML or seeing historical proof labelled globally failed or stale."
+    },
+    {
+      "acceptance_id": "migration-and-host-artifacts-stay-atomic",
+      "criterion": "Versions, all three document schemas, engine, migration registry, migration Skill guidance, upgrade package, Codex and Claude installed Plugin artifacts, Workbench host, and user/maintainer documentation advance as one format change; clean old-format fixtures and safe registered-worktree upgrade fixtures prove the mechanical half reaches valid writable CURRENT state with explicit legacy-pending-reconstruction documents and semantic refs, ordinary writers cannot create pending shapes or attach revision-bound work to their Ticket, unsafe worktrees remain unchanged and reported, semantic reconstruction runs only in the opened worktree under Agent review, no command pushes, and rollback preserves every prior revision and proof file."
+    },
+    {
+      "acceptance_id": "regression-suite-proves-identity-and-rollback-boundaries",
+      "criterion": "Focused and full verification cover stable serialization, criterion and authority changes, non-contract copy changes, Acceptance membership and ordering, new ID versus new revision, split/merge lineage, retirement, closed-revision mutation rejection, native and reconstructed proof, multiple historical revisions, missing and ambiguous Git history, idempotent migration, rollback, human authority, current projection, archive and dependency unlock, CLI/Workbench parity, installed-host parity, and deterministic artifact reproduction, with the complete repository suite passing."
     }
   ],
   "constraints": [
-    "Do not execute this Ticket while draft or infer the protected legacy policy before human Evidence exists.",
-    "Do not delete or rewrite historical Evidence or Outcome to make it match a newer contract.",
-    "Do not use timestamps, Git commit identity, filenames, or mutable repository position as acceptance semantic identity.",
-    "Do not invalidate unchanged criteria because unrelated Ticket context, constraints, relations, deliveries, or copy changed.",
-    "Do not add a database, ledger service, hidden cache, signature authority, or compatibility shim outside an explicit project migration."
+    "Implement the selected semantic policy exactly; do not collapse revision history back into a current-or-stale boolean.",
+    "Never delete, change the asserted semantic payload of, or silently rebind a historical Acceptance revision, Contract revision, Evidence record, or Outcome; the explicit migration may enrich legacy documents with pending then exact binding metadata without altering their original assertion or judgment.",
+    "Do not use Git commit identity, filename, timestamp, array position, or mutable repository position as semantic identity.",
+    "Unrelated Ticket context, constraints, relations, deliveries, formatting, provenance, and presentation-only copy must not change Acceptance or Contract identity.",
+    "legacy-unresolved is only for missing or ambiguous reconstruction; a reconstructable Outcome for an older Contract revision remains historically successful even when a later revision is active.",
+    "Human-authority Acceptances still require human-origin Evidence bound to their exact revision.",
+    "Keep the existing Ticket lifecycle and shared next_action contract; do not invent a revision-specific Ticket status.",
+    "The migration must declare a deterministic mechanical half and separately guided semantic Git-history half, remain idempotent, and preserve rollback through Git.",
+    "legacy-pending-reconstruction is an explicit temporary migration shape, not a successful binding, stale proof, or legacy-unresolved result; ordinary Ticket, Evidence, and Outcome writers may not create it, and revision-bound work on that Ticket remains blocked until the semantic step resolves it.",
+    "Do not add a database, ledger service, daemon, hidden cache, signature authority, runtime compatibility shim, automatic push, stash, reset, or cross-worktree semantic mutation."
   ],
-  "context": "The direction is known but the implementation contract is intentionally not firm. Acceptance identity must be deterministic and future proof must not silently rebind, yet the legacy transition policy changes schema, migration, DONE, archive, unlock, projection, and rollback behavior. Wait for both the owner policy decision and the shared next-action contract, then replan this same Ticket into an executable implementation without smuggling a migration default into today's draft.",
+  "context": "The owner selected an append-only semantic model. One logical Acceptance keeps its acceptance_id while strengthening, correction, or redefinition appends a monotonic revision; an independently passable obligation gets a new ID; split or merge creates new IDs with derived_from lineage from retired predecessors; and an obligation that no longer applies is retired without deletion. Contract revisions bind exact Acceptance-revision membership. Evidence remains valid for its exact Acceptance revision and Outcome remains successful for its exact complete Contract revision, while a later active Contract revision needs new adjudication. Presentation-only copy is non-contract data. Legacy proof is reconstructed from first appearance on current Git ancestry; ordinary contract drift creates old and new revisions, while legacy-unresolved is reserved for missing or ambiguous history. The existing upgrade contract requires a valid CURRENT project after the deterministic mechanical commit but defers Git-history judgment to an Agent in each worktree, so the new schemas need one explicit legacy-pending-reconstruction shape: it preserves unversioned historical payloads without assigning a false revision, cannot be created by ordinary writers or count as current proof, and must be resolved by the declared semantic step before revision-bound Ticket work continues.",
   "context_refs": [
     {
-      "purpose": "Git-native schema and explicit migration boundary the implementation must preserve.",
-      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+      "purpose": "Canonical semantic authority for logical IDs, revisions, lineage, retirement, proof binding, and legacy reconstruction.",
+      "ref": ".vibehub/rooms/product/decision-acceptance-contracts-use-append-only-revisions.yaml"
     },
     {
-      "purpose": "Authority for versioned, reviewable in-place restructuring rather than compatibility shims.",
-      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+      "purpose": "Independent successful adjudication of the protected owner policy that unlocks implementation.",
+      "ref": ".vibehub/outcomes/ticket-decide-legacy-proof-revision-policy.yaml"
     },
     {
-      "purpose": "Authority separating Acceptance-linked Evidence and independent Outcome.",
-      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+      "purpose": "Audited corpus, exact selected rules, migration invariants, and implementation boundary.",
+      "ref": "docs/LEGACY_PROOF_REVISION_POLICY.md"
     },
     {
-      "purpose": "Current Evidence contract whose future revision depends on the policy decision.",
+      "purpose": "Successful shared lifecycle projection that active-revision coverage must extend without creating a parallel status.",
+      "ref": ".vibehub/outcomes/ticket-derive-closeout-ready-next-action.yaml"
+    },
+    {
+      "purpose": "Current authority for automatic mechanical migration commits in safe registered worktrees, exact skip reporting, no push, and later Agent-owned semantic steps.",
+      "ref": ".vibehub/rooms/product/decision-explicit-upgrade-migrates-safe-worktrees.yaml"
+    },
+    {
+      "purpose": "Current Ticket and Acceptance schema baseline to version atomically.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Current Evidence schema baseline to version atomically.",
       "ref": "skills/vibehub-core/contracts/evidence.schema.json"
     },
     {
-      "purpose": "Current Outcome contract whose future revision depends on the policy decision.",
+      "purpose": "Current Outcome schema baseline to version atomically.",
       "ref": "skills/vibehub-core/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "Single-source mechanical and semantic migration registry that must carry the complete new format transition.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Reproducible first-appearance audit and policy-impact baseline to turn into migration fixtures and verification.",
+      "ref": "scripts/audit-legacy-proof.mjs"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Evidence and Outcomes are mechanically bound to the exact Acceptance semantics they evaluated, so Ticket replanning cannot silently reuse stale proof or preserve DONE after the contract meaning changes.",
+  "maturity": "firm",
+  "outcome": "Acceptance and complete Ticket contracts have append-only immutable revisions, Evidence and Outcomes bind to the exact revision they evaluated, and deterministic migration preserves legacy proof as historical truth without silently closing newer active contracts.",
   "provenance_refs": [
     "conversation:2026-08-20-acceptance-rewrite-can-reuse-stale-evidence",
-    "dogfood:prototype-and-product-direction-ticket-replanning"
+    "conversation:2026-09-04-versioned-acceptance-lineage",
+    "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Implementation acceptance and migration truth cannot be firm until the owner chooses the legacy proof transition policy.",
+      "rationale": "Its successful human-authority Outcome selects the exact semantic and legacy transition policy implemented here.",
       "target_ticket_id": "ticket-decide-legacy-proof-revision-policy",
       "type": "depends_on"
     },
     {
-      "rationale": "Stale proof and revised Outcomes must integrate with the canonical CLOSE_OUT and DONE projection rather than invent a parallel lifecycle.",
+      "rationale": "Its successful Outcome is the shared lifecycle projection that revision-aware coverage, closeout, DONE, and dependency unlock must extend rather than replace.",
       "target_ticket_id": "ticket-derive-closeout-ready-next-action",
       "type": "depends_on"
     }

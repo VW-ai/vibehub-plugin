@@ -3,35 +3,46 @@
     {
       "acceptance_id": "legacy-proof-transition-policy-decided",
       "authority": "human",
-      "criterion": "After reviewing the completed proposal, the owner explicitly selects mark-all-stale, grandfather-successful-Outcomes, Git reconstruction with unresolved fallback, or an exact hybrid defined by the proposal, and accepts its stated effects on current DONE, archive membership, dependent unlock, human-authority satisfaction, migration, rollback, and unresolved cases."
+      "criterion": "The owner explicitly selects the append-only Acceptance and Contract revision policy defined by the canonical Context and policy document: stable logical Acceptance IDs; monotonic immutable revisions for semantic changes; new IDs for independently passable obligations; derived_from lineage for split or merge; retirement without deletion when an obligation no longer applies; exact Evidence-to-Acceptance-revision and Outcome-to-Contract-revision binding; historical success preserved only for its bound revision; Git reconstruction of legacy v1 bindings; and legacy-unresolved only for missing or ambiguous history."
     }
   ],
   "constraints": [
-    "This Ticket records the protected human policy decision only; it does not implement or migrate the repository.",
+    "This Ticket records the protected human policy decision only; it does not implement schemas or migrate the repository.",
     "Agent Evidence, inferred preference, or silence cannot satisfy the human-authority criterion.",
-    "The decision must cite the completed proposal and name the selected policy exactly."
+    "The decision must preserve historical Evidence and Outcomes against their exact bound revisions rather than rewrite, delete, globally stale, or silently rebind them.",
+    "legacy-unresolved is reserved for missing or ambiguous historical reconstruction, not ordinary drift between an old successful Contract revision and a newer active revision."
   ],
-  "context": "Acceptance contract binding protects future proof, but the legacy corpus has no intrinsic contract identity. The choice between invalidating, grandfathering, or reconstructing old proof changes current DONE truth and therefore cannot be inferred by an Agent or hidden inside a migration. Review the completed policy proposal and record one explicit owner decision before implementation is made firm.",
+  "context": "The owner selected the exact policy after reviewing the legacy audit and correcting its semantic framing: proof is not globally current or stale. Each Evidence and Outcome stays valid for the immutable Acceptance or complete Contract revision it evaluated. The implementation must append revisions for semantic changes, preserve lineage and retired obligations, reconstruct legacy bindings from Git, and reserve legacy-unresolved for missing or ambiguous history.",
   "context_refs": [
     {
-      "purpose": "Authority requiring explicit review of migration truth and consequences.",
+      "purpose": "Canonical owner decision defining logical Acceptance identity, immutable revisions, lineage, proof binding, and legacy reconstruction.",
+      "ref": ".vibehub/rooms/product/decision-acceptance-contracts-use-append-only-revisions.yaml"
+    },
+    {
+      "purpose": "Current audited corpus, rejected alternatives, selected migration policy, operational effects, and downstream implementation boundary.",
+      "ref": "docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "purpose": "Authority requiring explicit, reviewable, atomic migration rather than runtime compatibility shims.",
       "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
     },
     {
-      "purpose": "Canonical requirement for human-origin Evidence on protected policy choice.",
+      "purpose": "Canonical requirement for human-origin Evidence on this protected product decision.",
       "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner explicitly chooses the repository-truth policy for transitioning legacy Evidence and Outcomes to acceptance contract revisions.",
+  "outcome": "The owner explicitly adopts the append-only Acceptance and Contract revision policy for transitioning legacy Evidence and Outcomes.",
   "provenance_refs": [
-    "conversation:2026-08-20-legacy-proof-policy-must-not-be-inferred"
+    "conversation:2026-08-20-legacy-proof-policy-must-not-be-inferred",
+    "conversation:2026-09-04-versioned-acceptance-lineage",
+    "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "The owner needs a verified corpus audit and explicit policy comparison before making the protected migration decision.",
+      "rationale": "The completed audit and proposal provide the corpus facts, migration alternatives, and effects the owner reviewed before selecting this policy.",
       "target_ticket_id": "ticket-propose-legacy-proof-revision-policy",
       "type": "depends_on"
     }

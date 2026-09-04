@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "legacy-proof-transition-policy-decided"
+  ],
+  "evidence_id": "owner-selects-append-only-acceptance-revisions",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-04T19:11:46Z",
+  "refs": [
+    "conversation:2026-09-04-versioned-acceptance-lineage",
+    ".vibehub/rooms/product/decision-acceptance-contracts-use-append-only-revisions.yaml",
+    "docs/LEGACY_PROOF_REVISION_POLICY.md"
+  ],
+  "schema_version": 1,
+  "summary": "The owner explicitly selected the append/mutate model for Acceptance contracts: the same responsibility keeps one logical Acceptance and gains v1, v2, and later revisions; a separately passable obligation gets a new Acceptance ID; split or merge creates new Acceptances linked from retired predecessors; no-longer-applicable obligations are retired rather than deleted; and display-only wording changes stay outside the criterion. The owner also accepted exact revision binding for Evidence and Outcomes, retention of historical success for the old Contract revision, Git reconstruction for legacy bindings, and required the complete rule set to be persisted in VibeHub's canonical semantic structure before work proceeds.",
+  "ticket_id": "ticket-decide-legacy-proof-revision-policy"
+}

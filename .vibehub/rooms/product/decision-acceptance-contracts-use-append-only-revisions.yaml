@@ -1,0 +1,44 @@
+{
+  "context_id": "decision-acceptance-contracts-use-append-only-revisions",
+  "detail": "An Acceptance keeps a stable logical acceptance_id across semantic evolution and has a human-readable monotonic revision. Its deterministic immutable identity commits the logical ID, revision, criterion, authority, and immutable lineage; mutable active or retired selection and non-contract presentation data are excluded so retirement cannot change the identity to which proof is bound. Strengthening, correcting, or redefining the same responsibility appends the next revision of that logical Acceptance. A separately passable or fail-able responsibility gets a new acceptance_id at v1. Splitting or merging retires the replaced revisions, creates new logical Acceptances, and records explicit derived_from lineage; an obligation that no longer applies is retired, never deleted. Pure display-copy changes belong outside the criterion and do not create a semantic revision. A Ticket keeps its stable ticket_id while each complete Contract has a human-readable monotonic revision and deterministic immutable identity over the exact set of Acceptance revision identities it contains; the active Contract selection is mutable projection state and is not part of a historical Contract identity. Evidence binds one exact Acceptance revision and Outcome binds one exact complete Contract revision, so neither silently rebinds when a newer revision becomes active. A historical successful Outcome remains successful for its bound Contract revision; a later active Contract revision is open until independently adjudicated. Closed revisions and their proof are immutable. Legacy migration reconstructs v1 bindings from each proof document's first appearance on the current Git ancestry, appends a later active revision when the current semantic contract drifted, and uses legacy-unresolved only when history is missing or ambiguous. Git provenance stays inspectable but commit identity, filename, timestamp, and mutable repository position are not semantic identity.",
+  "evidence": [
+    {
+      "note": "The owner explicitly chose append-only versioned Acceptance semantics, separate IDs for independent obligations, lineage-preserving split and retirement, and required the complete mapping to be persisted in the semantic structure.",
+      "ref": "conversation:2026-09-04-versioned-acceptance-lineage"
+    },
+    {
+      "note": "The selected policy records the exact identity, lineage, proof binding, legacy reconstruction, projection, and rollback rules.",
+      "ref": "docs/LEGACY_PROOF_REVISION_POLICY.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-mediates-intent-context-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-04T19:06:08Z",
+    "quote": "同一个合同的话，同合同，新版本",
+    "ref": "conversation:2026-09-04-versioned-acceptance-lineage"
+  },
+  "state": "active",
+  "summary": "Acceptance obligations and complete Ticket contracts evolve through append-only immutable revisions, while Evidence and Outcomes remain bound to the exact historical revision they evaluated",
+  "tags": [
+    "acceptance",
+    "contract",
+    "evidence",
+    "lineage",
+    "migration",
+    "outcome",
+    "revisions",
+    "ticket"
+  ],
+  "type": "decision"
+}
