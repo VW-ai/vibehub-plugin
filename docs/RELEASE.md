@@ -34,6 +34,21 @@ for that exact asset, not a registry release or global installation surface.
 
 Never create the final tag or GitHub Release from a feature branch.
 
+The per-push Verify workflow runs
+`verify-release-version.mjs --check-shipped-content`. That maintainer-side
+check imports `PLUGIN_PATHS` from the artifact builder as its only definition
+of shipped content and compares the tree with the latest reachable stable
+release tag. Changed shipped content may not retain that published version. A
+greater prerelease identity keeps an `Unreleased` section between releases; a
+greater stable identity is accepted only when its dated changelog entry is
+finalized for a release PR.
+
+There is intentionally no installed staleness command. The supported
+`npx skills` path detects changes by content hash or an unconditional refetch,
+independently of this human-facing release version. The gate protects truthful
+release and migration metadata; the release-paired upgrader remains
+responsible for restructuring project data when a user chooses to update.
+
 ## Data-layer changes
 
 Any release that changes the project format or a persisted document schema must

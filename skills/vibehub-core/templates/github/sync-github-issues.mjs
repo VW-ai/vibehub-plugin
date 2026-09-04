@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VibeHub template · plugin 0.8.0 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
+// VibeHub template · plugin 0.9.0 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
 // One-way projection of VibeHub Tickets onto GitHub Issues.
 //
 // Git is the source of truth. This script reads .vibehub/tickets, outcomes,

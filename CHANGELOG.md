@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0 — 2026-09-04
 
 - Make Acceptance and complete Ticket contracts append-only, monotonically
   revisioned semantic objects with deterministic identities and explicit
@@ -13,6 +13,10 @@
   while ordinary contract drift becomes old plus new revisions.
 - Show active revisions, retired history, lineage, binding origin, and current
   versus historical Outcome coverage in the Workbench.
+- Reject shipped-content changes that reuse the latest reachable published
+  version, using the artifact builder's allowlist as the single CI boundary;
+  prepare this format change as v0.9.0 while keeping the content-addressed npx
+  update path free of a redundant staleness command.
 
 ## 0.8.0 — 2026-08-13
 

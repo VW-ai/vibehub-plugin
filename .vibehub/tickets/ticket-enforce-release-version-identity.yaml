@@ -5,33 +5,88 @@
       "criterion": "Once the version policy has a successful Outcome, replan this same Ticket to firm with exact acceptance for the CI gate and what triggers it, where the shipped-content definition is read from, whether and where a user-runnable staleness check ships, the extension to verify-release-version.mjs, and a rehearsal proving the observed 143-commit silent-staleness case no longer reproduces.",
       "identity": "sha256:292f9dcdded4c48d589072c38055df58b71f56a23bdc7cee325715f2a360c38a",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "shipped-content-version-gate",
+      "criterion": "The per-push and pull-request Verify workflow runs a dependency-free maintainer check that imports the exact PLUGIN_PATHS allowlist from build-plugin-artifact.mjs as its sole definition of shipped content, discovers the latest reachable stable vX.Y.Z release tag, and fails when any allowed artifact path differs while package.json and the retained Claude plugin manifest still declare that published version. A changed tree may carry a greater pre-release identity with an Unreleased changelog, while a greater stable identity is accepted only as an explicitly prepared release with a finalized dated changelog; malformed, mismatched, reused, or non-monotonic identities fail with actionable diagnostics.",
+      "identity": "sha256:5f552d48a93eb69c0c0865363248dfb389eaf20e1a9fb97a9ba981a6ecb598df",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-identity-contract-remains-single-source",
+      "criterion": "verify-release-version.mjs retains package/private/dependency and manifest agreement plus exact release-tag agreement, exposes the shipped-content check through one documented CLI flag, and shares version parsing and comparison between CI and tag verification without introducing a second artifact allowlist, runtime dependency, service, cache, or host-specific branch.",
+      "identity": "sha256:341afbbb185e81662122440851d084d2218a41c321bbc933bdb816476639806b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "surviving-update-path-needs-no-staleness-command",
+      "criterion": "Maintainer and user documentation state that the supported npx skills update path detects content changes independently of the declared version, so this enforcement protects truthful release and migration metadata rather than repairing the retired marketplace failure. No redundant user-runnable staleness command is added; the check remains maintainer-side under scripts/, while an update that is taken still carries the existing release-paired project migration.",
+      "identity": "sha256:82111b05e6021a774d2f2977177d8391975bea3a5e667e834157f21eff0c142c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "observed-silent-staleness-regression-is-blocked",
+      "criterion": "A Git-backed regression tags a 0.8.0 artifact baseline, makes 143 subsequent shipped-content commits without moving the declared version, and proves the new check rejects that exact silent-staleness shape. Companion cases prove non-shipped changes do not trigger a bump, a greater prerelease plus Unreleased is accepted, an unfinalized stable release is rejected, and a finalized monotonic stable release is accepted.",
+      "identity": "sha256:91041455aab3e1f27aa0f8fcbba7af6b0d0a2b6438a65680dfe198346e1359b9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v090-release-candidate-is-prepared",
+      "criterion": "This pull request advances package.json and the retained Claude plugin manifest together from 0.8.0 to 0.9.0, finalizes the existing revision-contract changelog entry as 0.9.0 with its release date, passes the shipped-content/version check against v0.8.0, and leaves the verified merge commit ready for the documented post-merge v0.9.0 tag and GitHub Release workflow; no tag or Release is created from the feature branch.",
+      "identity": "sha256:bc8a582b3a164642c6da483a01e9212f12b0c7ce4e12f4ff8014e955351b68e5",
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Do not execute before the policy decision has a successful Outcome; the enforcement must implement the recorded policy rather than assume one.",
     "Do not add runtime dependencies, a service, or per-install telemetry; identity must be derivable from the published source and the installed artifact alone.",
     "Do not weaken the existing multi-manifest and tag agreement.",
     "Any user-facing check must ship inside the artifact allowlist or be declared maintainer-side only."
   ],
-  "context": "Direction only; the enforcement cannot be specified before the policy exists. Two facts already bound it. First, whatever gate lands must key off scripts/build-plugin-artifact.mjs's allowlist for what counts as shipped content rather than inventing a second list. Second, a staleness check that a user can run has to ship: PLUGIN_PATHS does not include scripts/, so a check placed there never reaches an installed user, and the refinement must either place it under skills/vibehub-core/scripts/ or state plainly that it is maintainer-side only. The decision this Ticket depends on determines which of these is even needed: a content-addressed distribution policy makes the CI bump gate unnecessary, while a bump-per-change policy makes it the whole deliverable. One input changed materially after this Ticket was planned. finding-npx-updates-by-content-not-by-version establishes that skills.sh never reads a declared version and updates by content hash or unconditional re-fetch, so once marketplace distribution is retired the silent-staleness failure this Ticket was written against cannot occur on the surviving path. Refinement must therefore start by asking whether a CI bump gate is still warranted at all, and if so on what grounds — release metadata that a human reads, and a version a migration entry can be keyed to, rather than protecting a user from running stale code. A staleness check that a user runs is likely to be unnecessary outright.",
+  "context": "The owner selected bump-per-shipped-change plus distinguishable prerelease identity and has now explicitly requested that the format-4 Acceptance/Evidence/Outcome change become a new release in PR #134. The surviving npx skills path updates by content rather than declared version, so the original marketplace staleness mechanism is retired; enforcement remains necessary for truthful human-facing release metadata and for the versioned migration package. The smallest coherent implementation exports the existing build allowlist, compares the current tree with the latest reachable stable release tag in Verify CI, validates monotonic SemVer and changelog state, prepares 0.9.0 in this PR, and keeps actual tag/Release creation after merge on main.",
   "context_refs": [
     {
-      "purpose": "Establishes that the failure this Ticket was written against cannot occur on the surviving install path, which refinement must weigh before choosing a mechanism.",
+      "purpose": "Human-authority decision selecting shipped-change movement plus prerelease identity and update-owned migration.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "Establishes why no installed staleness checker is needed on the surviving update path.",
       "ref": ".vibehub/rooms/product/finding-npx-updates-by-content-not-by-version.yaml"
     },
     {
-      "purpose": "The check this Ticket extends.",
+      "purpose": "Independent successful adjudication of the governing release-version policy.",
+      "ref": ".vibehub/outcomes/ticket-decide-release-version-policy/contract-v1.yaml"
+    },
+    {
+      "purpose": "Concrete A+B policy consequences and the observed 143-commit failure to rehearse.",
+      "ref": "docs/proposals/release-version-identity.md"
+    },
+    {
+      "purpose": "Canonical release identity checker this Ticket extends.",
       "ref": "scripts/verify-release-version.mjs"
     },
     {
-      "purpose": "Per-push verification a bump gate would join.",
+      "purpose": "Single source of shipped-content truth.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Per-push and pull-request enforcement surface.",
       "ref": ".github/workflows/verify.yml"
     },
     {
-      "purpose": "Both the definition of shipped content and the allowlist that decides whether a check can reach an installed user.",
-      "ref": "scripts/build-plugin-artifact.mjs"
+      "purpose": "Maintainer release procedure and post-merge tag boundary.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Successful implementation Outcome for the format-4 change being prepared as v0.9.0.",
+      "ref": ".vibehub/outcomes/ticket-bind-proof-to-acceptance-revision/contract-v3.yaml"
     }
   ],
   "contract_revisions": [
@@ -45,15 +100,47 @@
       ],
       "identity": "sha256:f457c95b7e95f253d66ec7e8b31db1f20615422eb1a114fd371ce8cc83195d9a",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "observed-silent-staleness-regression-is-blocked",
+          "identity": "sha256:91041455aab3e1f27aa0f8fcbba7af6b0d0a2b6438a65680dfe198346e1359b9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-identity-contract-remains-single-source",
+          "identity": "sha256:341afbbb185e81662122440851d084d2218a41c321bbc933bdb816476639806b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "shipped-content-version-gate",
+          "identity": "sha256:5f552d48a93eb69c0c0865363248dfb389eaf20e1a9fb97a9ba981a6ecb598df",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surviving-update-path-needs-no-staleness-command",
+          "identity": "sha256:82111b05e6021a774d2f2977177d8391975bea3a5e667e834157f21eff0c142c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v090-release-candidate-is-prepared",
+          "identity": "sha256:bc8a582b3a164642c6da483a01e9212f12b0c7ce4e12f4ff8014e955351b68e5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:aed83edd309c0b9d74742d862f1f89e6e9b9e0f7eec640d69f68a3d0a178b6bd",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The recorded version policy is enforced by the pipeline rather than by discipline, so shipped content cannot accumulate under an already-published version and an install that is behind is reported as behind.",
+  "maturity": "firm",
+  "outcome": "Shipped VibeHub content cannot remain under the latest published version: CI derives the artifact boundary from one allowlist, accepts honest prerelease or prepared-release identities, and this format-4 change is prepared as v0.9.0 without adding a redundant user staleness checker to the content-addressed npx update path.",
   "provenance_refs": [
     "conversation:2026-09-01-packaging-and-release-integrity",
-    "https://github.com/VW-ai/vibehub-plugin/issues/128"
+    "https://github.com/VW-ai/vibehub-plugin/issues/128",
+    "plan-validation:independent"
   ],
   "relations": [
     {
