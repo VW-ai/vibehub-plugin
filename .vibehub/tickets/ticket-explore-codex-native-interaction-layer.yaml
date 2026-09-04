@@ -2,7 +2,10 @@
   "acceptance": [
     {
       "acceptance_id": "refine-codex-native-exploration-contract",
-      "criterion": "Before execution, refine this same Ticket to maturity firm with independently checkable acceptance for a pinned Codex and Dashi reference baseline; the one-click current-Workspace browser-panel hypothesis and meaningful alternatives; the smallest injected control and host-bridge boundary; repository, Project, Workspace, Ticket, and thread identity mapping; short-lived local authorization; browser-panel lifecycle and responsive behavior; DOM compatibility, security, rollback, and stop conditions; native Task launch and ACP/acpx Run boundaries; explicit exclusions from taskboard or Gantt parity; and a decision-ready treatment of the existing DeepSeek Harness host direction."
+      "criterion": "Before execution, refine this same Ticket to maturity firm with independently checkable acceptance for a pinned Codex and Dashi reference baseline; the one-click current-Workspace browser-panel hypothesis and meaningful alternatives; the smallest injected control and host-bridge boundary; repository, Project, Workspace, Ticket, and thread identity mapping; short-lived local authorization; browser-panel lifecycle and responsive behavior; DOM compatibility, security, rollback, and stop conditions; native Task launch and ACP/acpx Run boundaries; explicit exclusions from taskboard or Gantt parity; and a decision-ready treatment of the existing DeepSeek Harness host direction.",
+      "revision": 1,
+      "state": "active",
+      "identity": "sha256:aba9eeea127ab0225e67a171f434195b4311184310fab8ecb9b6cf38d6e3b4f4"
     }
   ],
   "constraints": [
@@ -52,6 +55,21 @@
     "plan-validation:independent"
   ],
   "relations": [],
-  "schema_version": 2,
-  "ticket_id": "ticket-explore-codex-native-interaction-layer"
+  "schema_version": 3,
+  "ticket_id": "ticket-explore-codex-native-interaction-layer",
+  "revision_state": "bound",
+  "active_contract_revision": 1,
+  "contract_revisions": [
+    {
+      "revision": 1,
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "refine-codex-native-exploration-contract",
+          "revision": 1,
+          "identity": "sha256:aba9eeea127ab0225e67a171f434195b4311184310fab8ecb9b6cf38d6e3b4f4"
+        }
+      ],
+      "identity": "sha256:95aef540c6cfe5b4f46fe7d1d2eddc0492219b921937d15b70bde46995e9e523"
+    }
+  ]
 }
