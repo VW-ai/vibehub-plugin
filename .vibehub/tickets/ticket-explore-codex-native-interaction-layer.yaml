@@ -1,0 +1,57 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-codex-native-exploration-contract",
+      "criterion": "Before execution, refine this same Ticket to maturity firm with independently checkable acceptance for a pinned Codex and Dashi reference baseline; the one-click current-Workspace browser-panel hypothesis and meaningful alternatives; the smallest injected control and host-bridge boundary; repository, Project, Workspace, Ticket, and thread identity mapping; short-lived local authorization; browser-panel lifecycle and responsive behavior; DOM compatibility, security, rollback, and stop conditions; native Task launch and ACP/acpx Run boundaries; explicit exclusions from taskboard or Gantt parity; and a decision-ready treatment of the existing DeepSeek Harness host direction."
+    }
+  ],
+  "constraints": [
+    "Do not execute implementation work while this Ticket remains draft; refine the same Ticket rather than creating an undocumented parallel plan.",
+    "Preserve checked-in Git-native Ticket, Context, Evidence, and Outcome as semantic truth; do not introduce SQLite, a second lifecycle, hidden persistent state, or a required always-on daemon.",
+    "Learn from Dashi Taskboard's integration path without cloning its visual product or source. Any later source reuse must be explicit, minimal, pinned, and compliant with its Apache-2.0 license and notices.",
+    "Treat Codex DOM, data attributes, deep links, Electron bridges, browser-panel events, and CDP behavior as compatibility surfaces to isolate and test, not as stable public contracts.",
+    "Do not patch Codex application bundles or user data files, and require every experimental integration to fail closed and leave ordinary Codex use intact.",
+    "Do not add Kanban, Gantt, organization workflow, analytics, or Linear/Jira parity to this exploration unless evidence shows one is necessary to validate the Codex-native interaction thesis.",
+    "Do not silently supersede the active DeepSeek Harness host decision; the refined work must state whether Codex is an additional surface, a new preferred host, or evidence for a later protected product decision.",
+    "Keep executor integration behind the selected ACP/acpx boundary and do not infer trusted Run or attention state from DOM animation or browser state."
+  ],
+  "context": "The owner has selected entering the Codex interaction domain as a promising product direction, while explicitly stating that the concrete interactions are not yet clear enough to implement. The opportunity is not to reproduce Dashi Taskboard or add another generic dashboard; it is to let small VibeHub affordances appear in Codex and open the current Project or Workspace's existing Workbench in the right browser panel, keeping Codex conversation and VibeHub work context together. A current hypothesis is thin injection and a thick browser panel: inject only a launcher or compact contextual signal, keep Graph, Ticket, Room, Context, Evidence, Outcome, and next-action UI in the repository-scoped Workbench, and bridge deliberate actions back to native Codex tasks. Exploration must determine the exact interaction set, stable-enough integration seams, authentication and lifecycle, Task-to-thread identity, failure behavior, and whether this Codex-first direction coexists with, amends, or supersedes the active DeepSeek Harness host decision. This Ticket is intentionally draft so those choices can be reasoned through without manufacturing implementation acceptance.",
+  "context_refs": [
+    {
+      "purpose": "Human-origin product intent selecting Codex-native interaction as the direction while preserving unresolved design and host-strategy questions.",
+      "ref": ".vibehub/rooms/product/intent-codex-native-interaction-layer.yaml"
+    },
+    {
+      "purpose": "Authority for reusing the existing repository-scoped Workbench and a narrow optional loopback launcher while Git remains truth.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Existing non-invasive interaction boundary whose official-surface preference must be reconciled explicitly with any DOM-injection experiment.",
+      "ref": ".vibehub/rooms/product/decision-native-chat-with-additive-task-actions.yaml"
+    },
+    {
+      "purpose": "Active host and composition direction that Codex-native exploration may inform but must not silently replace.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Selected replaceable execution protocol and local authentication boundary for later Task launch, observation, and resume behavior.",
+      "ref": ".vibehub/rooms/product/decision-acp-first-local-agent-runtime.yaml"
+    },
+    {
+      "purpose": "Current ephemeral loopback Workbench lifecycle, short-lived bearer URL, read-only projection, and no-hidden-state contract available for reuse.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A decision-ready Codex-native interaction direction defines how VibeHub can become a contextual work layer inside Codex, identifies the smallest valuable integration slice, and makes the product, security, compatibility, and host-strategy boundaries explicit before implementation begins.",
+  "provenance_refs": [
+    "conversation:2026-09-04-codex-native-interaction-direction",
+    "https://github.com/chuspeeism/dashi-taskboard/tree/2a6970a2f4334da65a1979b7f9a834f0d18ce84e",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-explore-codex-native-interaction-layer"
+}
