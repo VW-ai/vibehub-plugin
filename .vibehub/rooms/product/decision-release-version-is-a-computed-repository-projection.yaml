@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-release-version-is-a-computed-repository-projection",
+  "detail": "Release identity has one semantic input and one mechanical result. Each unreleased shipped change records an explicit release impact of none, patch, minor, or major; the impact is a reviewable judgment and must not be guessed from a file diff. The next stable version is calculated from the highest reachable stable release tag plus the highest impact among the unreleased changes included by the current Git history. A development worktree may project the resulting target as a prerelease identity, but it does not independently reserve or publish that stable version. package.json and the retained Claude plugin manifest are synchronized materializations of the calculation rather than separate authorities. At publication time the calculation is repeated against the exact latest main commit, and only that commit may acquire the unique matching stable tag. This means concurrent worktrees can target the same future release without either owning it; after one release lands, any remaining work recalculates from the new stable baseline.",
+  "evidence": [
+    {
+      "note": "The owner proposed computed versions, accepted the concrete tag-plus-release-impact formula, unique main publication, and requested that the work be planned.",
+      "ref": "conversation:2026-09-04-computed-release-version"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-release-and-update-experience-is-the-mainline",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-04T23:12:59Z",
+    "quote": "感觉version是不是应该也是算出来的",
+    "ref": "conversation:2026-09-04-computed-release-version"
+  },
+  "state": "active",
+  "summary": "A VibeHub version is computed from repository release state; worktrees declare semantic release impact, not independent final version numbers",
+  "tags": [
+    "release",
+    "versioning",
+    "semver",
+    "worktree",
+    "concurrency"
+  ],
+  "type": "decision"
+}

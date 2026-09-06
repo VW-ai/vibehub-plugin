@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-release-approval-atomically-advances-main-and-tag",
+  "detail": "The owner chose the technically strict publication boundary after the ordinary merge-then-tag race was demonstrated. A calculated release candidate is still presented as a reviewable pull request, but the final authorization is one explicit Release operation rather than an ordinary GitHub Merge followed later by tagging. That operation must compare the current protected main ref with the candidate's recorded expected base, and in one actual atomic Git transaction advance main to the reviewed prepared commit and create v<computed-version> at exactly that same commit. A concurrent main change rejects both updates together. The operation then publishes the verified GitHub Release from the already-created tag in the same trusted workflow. Review remains separate from publication; the operation must not auto-approve, silently merge, force refs, or weaken the computed-version contract.",
+  "evidence": [
+    {
+      "note": "The owner explicitly confirmed the recommended choice after being presented with atomic human-approved merge-and-tag versus a server-enforced main freeze.",
+      "ref": "conversation:2026-09-04-atomic-release-authorization"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-release-version-is-a-computed-repository-projection",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-05T00:28:26Z",
+    "quote": "ok",
+    "ref": "conversation:2026-09-04-atomic-release-authorization"
+  },
+  "state": "active",
+  "summary": "After review, one explicit human-approved Release operation atomically advances main and creates the matching stable tag",
+  "tags": [
+    "release",
+    "atomicity",
+    "git",
+    "authorization",
+    "concurrency"
+  ],
+  "type": "decision"
+}

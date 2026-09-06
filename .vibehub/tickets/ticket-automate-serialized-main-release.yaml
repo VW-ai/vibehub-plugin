@@ -1,0 +1,180 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-preparation-has-one-git-reservation",
+      "criterion": "A maintainer-triggered preparation workflow runs only from the repository's default branch, uses the same repository-wide release concurrency group as publication with queue: max and no in-progress cancellation, fetches complete history and tags, computes the version without a free-form version input, and atomically reserves refs/heads/release-reservations/v<computed-version> at the exact invoking main SHA through GitHub's absent-only create-ref API. A 422 contention response is followed by an exact read and state comparison, never treated as ownership merely because a normal push reports Everything up-to-date. The winner creates release/v<computed-version> from that base, records the computed plan and release date, invokes prepare, commits only declared release metadata and plan inputs, and advances the candidate ref exactly once by compare-and-swap to the prepared commit. Different stable versions use different immutable reservation refs, so a completed release never blocks the next one.",
+      "identity": "sha256:afbf7c28bfe2b7f23e37f59945f0a1044a7a02a587892411f51d67434dee18fe",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-pr-is-recomputed-against-current-main",
+      "criterion": "The prepared PR records its base main SHA, reservation ref and SHA, computed plan, explicit release date, and prepared commit, and states visibly that it is review-only until the explicit Release operation rather than an ordinary Merge. Its required Verify run recalculates against current main using those recorded inputs and checks the candidate is a single commit descending from the expected base whose changed paths are exactly the calculator-owned package manifest, retained Claude plugin manifest, matching CHANGELOG, and documented checked-in release-plan path. Any intervening main change, new stable tag, changed release-impact set, stale base, extra changed path, or manually edited version projection makes the candidate fail with actionable regenerate-or-explicitly-abandon guidance; an unchanged candidate produces the exact same stable version, changelog, package manifest, plugin manifest, and plan bytes. No feature worktree, differently named branch, unreserved candidate, unreviewed PR, or ordinary PR merge is treated as release authorization.",
+      "identity": "sha256:388ed3c59c498aa9aff075aab494f49df3fd2f761e899202d8f2fa03ed042143",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "approved-release-atomically-advances-main-and-tag",
+      "criterion": "One explicit maintainer Release operation, protected by the repository's production-release approval boundary and the shared queue: max concurrency group, resolves the sole reviewed release PR without accepting a free-form version or commit. It verifies required CI and review state, exact reservation and candidate refs, expected base equals current remote main, prepared commit descends from that base with exactly the declared release-plan allowlist, computed stable plan, and absent matching stable tag. From recorded immutable inputs including prepared commit, plan digest, approval operation identity, tagger identity and tagger timestamp, it reproducibly constructs one operation-bound annotated tag object that peels to the prepared commit and reuses the same object on retry. It then performs one actual atomic Git push whose transmitted updates advance refs/heads/main from the expected base to the prepared commit and create refs/tags/v<computed-version> at that annotated tag object. Concurrent main movement or any independently created same-name tag rejects the entire transaction, including when that tag peels to the same prepared commit; the workflow never force-updates, separately merges, creates a lightweight stable tag, tags an ancestor, or treats PR review alone as publication.",
+      "identity": "sha256:f3b5007cfe657935e931d58a8718bfc9493d6a5c6f28b5f851f601c6edf5072e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "atomic-release-publishes-in-the-same-trusted-workflow",
+      "criterion": "Before the atomic ref transaction the trusted Release job restores the recorded plan and release date, reruns calculator and identity checks, runs full verification, and builds the deterministic plugin plus release-paired upgrader from the prepared commit. After the atomic main-and-tag update succeeds, the same authenticated job creates the GitHub Release with the plugin archive, upgrader, and both SHA-256 files. It does not depend on the GITHUB_TOKEN-created tag push triggering another workflow, and a repair dispatch can resume Release creation only from the recorded plan whose tag and main both already point to that prepared commit.",
+      "identity": "sha256:745909cad517416fd114315a4319aa8d26b149ce1eba286b1253bc74f950203a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "tag-and-release-state-machine-is-idempotent",
+      "criterion": "Preparation, atomic integration, and publication each implement a documented idempotent state table. Reservation-only at the recorded base resumes candidate materialization; prepared branch without a PR opens it; matching open PR reports it; a closed-unintegrated PR is reopened only when its base and plan remain current, otherwise it requires an explicit maintainer abandon operation naming expected reservation and candidate SHAs before those version-scoped refs may be deleted; an ordinary merged PR is rejected as a protocol violation; and a reservation consumed by a newer stable tag is terminal and never publishes. Before atomic integration, unchanged main plus absent tag may proceed; changed main or an existing tag fails without ref mutation. After an atomic success, main at the prepared commit plus the stable ref at the recorded annotated tag object, peeling to that commit, with a missing Release resumes asset publication from the recorded plan; a complete matching Release succeeds as a verified no-op. Split main/tag identity, a tag at any other ref object even when it peels to the same commit, Release pointing elsewhere, incomplete prior stable Release, or mismatched assets/checksums fails without moving or deleting release truth. Normal retries reconstruct the exact recorded tag object and never force, move, or delete refs; no path blindly treats every existing ref or PR as healthy.",
+      "identity": "sha256:ea06f413b5da2cbec0e996ec311998ebd7a20ca0c3a7fa7cfdc44b43fa6fdae9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "privileged-release-surface-is-minimal",
+      "criterion": "Preparation, atomic integration, and publication declare least-privilege job-scoped permissions, never use pull_request_target or privileged workflow_run checkout, never execute an unreviewed PR head with a write token, and validate all derived tag and branch values before shell or API use. The write-capable Release job uses the repository's explicit production-release approval boundary and a narrowly documented branch-rules exception sufficient only for the reviewed atomic main-and-tag update; missing permission fails before mutation. Credentials and hidden coordination files stay out of Git; all allowed coordination state is reviewable and limited to the declared version-scoped reservation and candidate refs, release PR, recorded plan, stable tag, and GitHub Release. The GITHUB_TOKEN recursion limitation and approval path are explicit rather than hidden behind a PAT or GitHub App dependency.",
+      "identity": "sha256:57533bf26b30b961240a25c99338854c1cc7702cc34cb1376b5e268502562b34",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-races-and-retries-are-rehearsed",
+      "criterion": "Tests or a faithful local Git/remote harness cover two worktrees racing the same version-scoped absent-only reservation, two versions proving the prior reservation does not block the next, every preparation crash boundary from reservation-only through prepared-without-PR, closed or stale PR and explicit expected-SHA abandonment, queue: max retaining concurrent Release operations, concurrent main advancement before the atomic push, concurrent creation of the same tag at both a different commit and a different tag object peeling to the prepared commit, failure before the atomic transaction, failure after atomic main-and-tag success but before Release creation, ordinary PR merge as a protocol violation, split or mismatched main/tag states, and a completed repair rerun. Packet-level or equivalent assertions prove both main and annotated-tag updates are transmitted in the atomic request. The stale or losing atomic transaction must update neither main nor tag and return deterministic regenerate guidance; exactly one approved candidate advances main and creates its operation-bound tag, no feature-branch or ancestor commit is published, later work recalculates from the new stable baseline, and every partial path has one deterministic next action.",
+      "identity": "sha256:d1f647feaacdc6e3746e25a0138333500c98947f08c72c1a4640662749171f1c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "manual-fallback-and-v090-transition-remain-auditable",
+      "criterion": "docs/RELEASE.md describes computed versions, preparation, review-only release PRs, the explicit approved atomic main-and-tag operation, branch-rules and production-release approval setup, every repair and abandonment path, and verification of tag, commit, archives, checksums, and upgrader identity. It also states the bootstrap boundary honestly: PR #134 remains released through the existing manual merge-then-tag procedure because the new trusted workflow is not available on main until its implementation ships; the first later release prepared under the new protocol uses the atomic lane, and no automation retroactively claims v0.9.0.",
+      "identity": "sha256:f4e0c29358ee7c43a708e9ea30eb91c8bb85481287c9ae81dfee7bafd8303176",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Human review plus explicit approval of the protected Release operation is the publication authorization; do not use the ordinary PR Merge operation, auto-approve, or publish from review state alone.",
+    "Never force-push or move/delete a reservation, candidate branch, stable tag, or published Release as part of normal or retry behavior; deletion is allowed only for an unmerged abandoned version through the explicit expected-SHA maintainer operation, never for a stable tag or Release.",
+    "Do not use a PAT, GitHub App, hidden lock, external database, registry, queue service, or long-lived secret to manufacture serialization.",
+    "Do not publish from a feature branch, pull-request head, synthetic PR merge ref, stale main SHA, dirty tree, or a version supplied as free-form workflow input.",
+    "Preserve the existing deterministic plugin archive, checksums, release-paired data upgrader, and GitHub-only distribution surface."
+  ],
+  "context": "Once version identity is calculated, automation must still prevent two concurrent worktrees from claiming the same stable publication. The owner selected the strict boundary after the ordinary merge-then-tag race was demonstrated: a release candidate is reviewed as a PR, but one explicit human-approved Release operation performs the final main advance and stable tag creation together rather than using the ordinary Merge button and tagging later. A default-branch preparation workflow first uses GitHub's absent-only create-ref API to reserve refs/heads/release-reservations/v<computed-version> at the exact main SHA, then creates the version-scoped release/v<computed-version> candidate, invokes the calculator with a recorded release date to materialize one stable plan, and opens one reviewable PR. The reservation is immutable; the candidate branch may advance exactly once from its recorded base to its prepared commit through compare-and-swap. After CI and review, a protected Release job verifies the PR, expected base, prepared commit and current main, constructs one reproducible operation-bound annotated tag object that peels to the prepared commit, then uses one real atomic Git push to advance main from expected base to prepared commit and create v<computed-version> at that exact tag object. Because both ref updates carry new object IDs, a concurrent main advance or independently created same-name tag rejects both updates together, including when the competing tag peels to the same commit. Retry reconstructs the same annotated tag object from recorded inputs. The same trusted workflow publishes the GitHub Release without expecting the GITHUB_TOKEN-created tag event to trigger another workflow. Explicit preparation, atomic integration, and publication state tables make crashes resumable. PR #134 remains the manual bootstrap release; this lane governs later releases after its implementation reaches main.",
+  "context_refs": [
+    {
+      "purpose": "Owner authority that release impact is semantic input while version identity is a computed repository projection.",
+      "ref": ".vibehub/rooms/product/decision-release-version-is-a-computed-repository-projection.yaml"
+    },
+    {
+      "purpose": "Existing policy requiring shipped changes to move identity and main-between-releases to remain distinguishable from the latest stable release.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "Successful baseline that already provides SemVer parsing, reachable-tag selection, one shipped-content allowlist, and stale-identity regression coverage.",
+      "ref": ".vibehub/outcomes/ticket-enforce-release-version-identity/contract-v2.yaml"
+    },
+    {
+      "purpose": "Current dependency-free release identity engine to evolve into verification of computed plans and materialized projections.",
+      "ref": "scripts/verify-release-version.mjs"
+    },
+    {
+      "purpose": "Canonical PLUGIN_PATHS boundary and artifact builder that release calculation must reuse rather than duplicate.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Current manual prepare, tag, publish, checksum, and data-upgrader procedure to preserve or automate explicitly.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Existing tag-triggered build and GitHub Release implementation to convert into a single trusted main-publication state machine.",
+      "ref": ".github/workflows/release.yml"
+    },
+    {
+      "purpose": "Current push and pull-request verification surface where computed-plan and synthetic-merge checks must become required.",
+      "ref": ".github/workflows/verify.yml"
+    },
+    {
+      "purpose": "Existing deterministic release-paired upgrader and identity inputs that automated publication must preserve.",
+      "ref": "scripts/build-upgrade-package.mjs"
+    },
+    {
+      "purpose": "Owner authority selecting a reviewed candidate followed by one explicit atomic main-and-tag Release operation instead of ordinary merge then later tagging.",
+      "ref": ".vibehub/rooms/product/decision-release-approval-atomically-advances-main-and-tag.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "approved-release-atomically-advances-main-and-tag",
+          "identity": "sha256:f3b5007cfe657935e931d58a8718bfc9493d6a5c6f28b5f851f601c6edf5072e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "atomic-release-publishes-in-the-same-trusted-workflow",
+          "identity": "sha256:745909cad517416fd114315a4319aa8d26b149ce1eba286b1253bc74f950203a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "manual-fallback-and-v090-transition-remain-auditable",
+          "identity": "sha256:f4e0c29358ee7c43a708e9ea30eb91c8bb85481287c9ae81dfee7bafd8303176",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "privileged-release-surface-is-minimal",
+          "identity": "sha256:57533bf26b30b961240a25c99338854c1cc7702cc34cb1376b5e268502562b34",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-pr-is-recomputed-against-current-main",
+          "identity": "sha256:388ed3c59c498aa9aff075aab494f49df3fd2f761e899202d8f2fa03ed042143",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-preparation-has-one-git-reservation",
+          "identity": "sha256:afbf7c28bfe2b7f23e37f59945f0a1044a7a02a587892411f51d67434dee18fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-races-and-retries-are-rehearsed",
+          "identity": "sha256:d1f647feaacdc6e3746e25a0138333500c98947f08c72c1a4640662749171f1c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tag-and-release-state-machine-is-idempotent",
+          "identity": "sha256:ea06f413b5da2cbec0e996ec311998ebd7a20ca0c3a7fa7cfdc44b43fa6fdae9",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e32e3a7c86699c7c6309a5484fa015fd4f7d8a80cab29eeab49d051a446cbca5",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "One Git-native release lane serializes preparation and turns an explicitly approved, freshly computed stable candidate into one atomic main advance plus matching tag and exactly one reproducible GitHub Release, with safe collision, partial-failure, and retry behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-04-computed-release-version",
+    "https://github.com/VW-ai/vibehub-plugin/pull/134",
+    "https://docs.github.com/en/actions/concepts/security/github_token",
+    "https://docs.github.com/en/actions/reference/security/secure-use",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The serialized preparation and publication lane consumes the calculator's exact version plan, materializer, impact contract, and reproducibility guarantees; it cannot safely reserve or publish a version before those exist.",
+      "target_ticket_id": "ticket-compute-release-version-from-impact",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-automate-serialized-main-release"
+}
