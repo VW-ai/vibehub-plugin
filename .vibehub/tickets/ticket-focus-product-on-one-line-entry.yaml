@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "hero-is-dark-mode-safe-and-immediate",
-      "criterion": "The README hero uses checked-in light/dark wordmark variants through a GitHub-compatible picture element, remains legible on black and white backgrounds, and makes the product's single core idea understandable before the graph image or secondary detail."
+      "acceptance_id": "details-move-without-truth-loss",
+      "criterion": "Secondary Ticket/Context semantics, lifecycle, canonical files, lightweight architecture, explicit capture behavior, and fallback commands live in one linked concept document or existing focused docs; README stays product-facing and compact while every local link and dark/light asset resolves in both the repository and clean plugin artifact.",
+      "identity": "sha256:9b325b08bf477b767b5c49c6487b52b21d4c40a7feeac2ce308ca559624143fd",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "three-lines-carry-the-product",
-      "criterion": "The README has one concise sentence for what VibeHub does, one visibly dominant natural-language instruction exactly 'Start this with VibeHub.' for how to use it, and one concise comparison explaining that memory tools preserve conversation while VibeHub makes the development cycle itself durable; redundant taglines, lifecycle tables, and repeated explanations are removed."
+      "acceptance_id": "hero-is-dark-mode-safe-and-immediate",
+      "criterion": "The README hero uses checked-in light/dark wordmark variants through a GitHub-compatible picture element, remains legible on black and white backgrounds, and makes the product's single core idea understandable before the graph image or secondary detail.",
+      "identity": "sha256:bd0ce72c9fcead2df932c2df7bf4d34712a3009a16f7735d3ebc93f5417f5803",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "one-entry-is-product-truth",
-      "criterion": "The Codex plugin exposes exactly one default prompt, 'Start this with VibeHub.'; the existing Ticket Plan Skill canonically owns that entry, requires the existing Setup Skill first when `.vibehub/` is absent, and then continues the normal Ticket lifecycle for the concrete deliverable. A clean-installed-plugin scenario using that exact entry proves setup and Ticket application reach a READY executable Ticket without requiring Skill/UI commands or adding an orchestration Skill, router, service, or runtime."
-    },
-    {
-      "acceptance_id": "details-move-without-truth-loss",
-      "criterion": "Secondary Ticket/Context semantics, lifecycle, canonical files, lightweight architecture, explicit capture behavior, and fallback commands live in one linked concept document or existing focused docs; README stays product-facing and compact while every local link and dark/light asset resolves in both the repository and clean plugin artifact."
+      "criterion": "The Codex plugin exposes exactly one default prompt, 'Start this with VibeHub.'; the existing Ticket Plan Skill canonically owns that entry, requires the existing Setup Skill first when `.vibehub/` is absent, and then continues the normal Ticket lifecycle for the concrete deliverable. A clean-installed-plugin scenario using that exact entry proves setup and Ticket application reach a READY executable Ticket without requiring Skill/UI commands or adding an orchestration Skill, router, service, or runtime.",
+      "identity": "sha256:cd29c1453ba6329501430c67b0fb619596c86f871aff77bf90276d1e3fa53b07",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "release-pr-remains-verified",
-      "criterion": "README-specific tests enforce the one-line entry and absence of the removed lifecycle table, full project and plugin verification pass, and PR #11 is updated with the refinement without changing the 0.4.0 GitHub-only release boundary or executing unrelated READY Tickets."
+      "criterion": "README-specific tests enforce the one-line entry and absence of the removed lifecycle table, full project and plugin verification pass, and PR #11 is updated with the refinement without changing the 0.4.0 GitHub-only release boundary or executing unrelated READY Tickets.",
+      "identity": "sha256:7f378530b3f6003b6a2c6ac0c651cd5c9f1db275baabc748e98cd6bc067f5a5d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "three-lines-carry-the-product",
+      "criterion": "The README has one concise sentence for what VibeHub does, one visibly dominant natural-language instruction exactly 'Start this with VibeHub.' for how to use it, and one concise comparison explaining that memory tools preserve conversation while VibeHub makes the development cycle itself durable; redundant taglines, lifecycle tables, and repeated explanations are removed.",
+      "identity": "sha256:d491b96ec9a30b6bce5c44cabf1df4d1a8021c1ea5eaf8c921c65243d5808a84",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Prefer deletion and direct language; do not replace the old README with another taxonomy, feature grid, framework, or long workflow explanation.",
     "Keep the approved local graph image as the primary product visual, but let the product sentence and single entry precede it.",
@@ -37,7 +53,7 @@
     },
     {
       "purpose": "Successful release-candidate baseline being refined before merge.",
-      "ref": ".vibehub/outcomes/ticket-prepare-v040-release.yaml"
+      "ref": ".vibehub/outcomes/ticket-prepare-v040-release/contract-v1.yaml"
     },
     {
       "purpose": "Public surface to collapse around the one-line principle.",
@@ -76,6 +92,39 @@
       "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.codex-plugin/plugin.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "details-move-without-truth-loss",
+          "identity": "sha256:9b325b08bf477b767b5c49c6487b52b21d4c40a7feeac2ce308ca559624143fd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "hero-is-dark-mode-safe-and-immediate",
+          "identity": "sha256:bd0ce72c9fcead2df932c2df7bf4d34712a3009a16f7735d3ebc93f5417f5803",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-entry-is-product-truth",
+          "identity": "sha256:cd29c1453ba6329501430c67b0fb619596c86f871aff77bf90276d1e3fa53b07",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-pr-remains-verified",
+          "identity": "sha256:7f378530b3f6003b6a2c6ac0c651cd5c9f1db275baabc748e98cd6bc067f5a5d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "three-lines-carry-the-product",
+          "identity": "sha256:d491b96ec9a30b6bce5c44cabf1df4d1a8021c1ea5eaf8c921c65243d5808a84",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4cd98abe5c1e7b8f888cccdac417022aaaf52c664cd3f63f13b417bdbf72fc7c",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -99,6 +148,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-focus-product-on-one-line-entry"
 }

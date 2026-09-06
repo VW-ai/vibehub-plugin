@@ -7,6 +7,40 @@
     "victor-interactions-are-preserved",
     "canvas-shell-is-responsive-and-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canvas-is-default-primary-surface",
+      "identity": "sha256:95c2a264e413a7ecdc8f7ebb664dd078b6da296327eae2ba9f869796c1313a2c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "overview-has-one-operational-purpose",
+      "identity": "sha256:6838e5f1735d6e62e76b56a0c55fe26fe78c83b6c7579cd196c07e56191149df",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "empty-presence-does-not-occupy-shell",
+      "identity": "sha256:cfffc7dfa92f1c5c1d20b36b20c45b9720db67ceaad2a610719a7775fad3c8bd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "focused-local-link-is-complete-and-honest",
+      "identity": "sha256:63b2bc278324b8e9449fdd37b2035060b24ebff87ee2d1cdcc8761f9b394f95d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "victor-interactions-are-preserved",
+      "identity": "sha256:b6916d513cf10c758b2bf1f0063abf4dc12bdbfa5446af260c0ab5f49285ca9b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "canvas-shell-is-responsive-and-verified",
+      "identity": "sha256:d1aee64a564e191a593fcea5d5e438962f4f51d4d99b8f26a2104581b68a4cf1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "canvas-first-overview-implementation-and-browser-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -22,7 +56,7 @@
     "browser:on-demand-overview-wide-and-narrow-keyboard-focus",
     "room:product-and-workbench-fresh-at-9d70122"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 9d70122 makes the causal graph the default full-width Workbench surface, removes the permanent overview rail and both empty Implementing surfaces, and adds an on-demand operational Overview limited to READY frontier, pending and upcoming human boundaries, deviations, REFINE count, and exact VibeHub source dirtiness. The retained production graph still exposes causal-cone selection, relation controls, minimap, pan/zoom, progressive Execution/Contract/Log Inspector, exact source, and READY-gated Agent handoff. Ticket selection and lens changes now replace only explicit ticket/view query state while preserving the 64-character bearer fragment; opening the resulting URL in a second tab on the same live host restored the selected Ticket and Log lens, and copy feedback says the link is valid only while that local host runs. Full verification passed 51/51 tests and the 53-file, 659222-byte installed artifact. Real-browser DOM comparison against tag v0.7.0 measured the 1440x960 canvas growing from 1208x800 (966400 px2) to 1440x854 (1229760 px2), +27.3%, and the 1180x820 canvas from 972x660 (641520 px2) to 1180x714 (842520 px2), +31.3%. At 390x844 the canvas, full-screen Inspector, and 370px on-demand Overview had no horizontal overflow; graph controls, Inspector tabs and close button, Overview items and close button, Copy, and source details were at least 44px. Keyboard Enter opened the Ticket, Escape returned focus from Overview, and the reduced-motion media rule remains mechanically verified. Product and Workbench Rooms were aligned to the implementation commit and all four Rooms report FRESH.",
   "ticket_id": "ticket-workbench-canvas-first-overview"
 }

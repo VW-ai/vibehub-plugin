@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "current-plugin-loop-inventoried",
-      "criterion": "The current installed Plugin journey is mapped from entry and setup through Ticket planning, execution, Evidence, independent Outcome, and review, with concrete repository references and the most consequential user-facing friction or missing transitions identified."
-    },
-    {
-      "acceptance_id": "open-graph-reconciled",
-      "criterion": "Every existing non-DONE Ticket is judged against the near-term solo/small-team Plugin wedge and classified as do next, do later, refine from evidence, or defer, with a concise rationale and no silent duplication."
-    },
-    {
-      "acceptance_id": "observed-and-speculative-gaps-separated",
-      "criterion": "Candidate improvements clearly distinguish gaps supported by current code, README promises, prior Evidence/Outcomes, or demonstrated dogfood friction from attractive but speculative future capabilities."
-    },
-    {
       "acceptance_id": "candidates-ranked",
-      "criterion": "Three to five bounded Plugin improvement candidates are ranked using explicit dimensions covering immediate user value, repeated-use leverage, strategic fit, implementation size or risk, and strength of evidence."
+      "criterion": "Three to five bounded Plugin improvement candidates are ranked using explicit dimensions covering immediate user value, repeated-use leverage, strategic fit, implementation size or risk, and strength of evidence.",
+      "identity": "sha256:f1c2d293895448acf47e67722ec06f331dce5152d9d033cc01400bc494841e1a",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "next-slice-recommended",
-      "criterion": "One smallest next implementation slice is recommended with a concrete outcome, proposed acceptance boundaries, major constraints, expected user-visible change, and an explicit explanation of why the other candidates should not precede it."
+      "acceptance_id": "current-plugin-loop-inventoried",
+      "criterion": "The current installed Plugin journey is mapped from entry and setup through Ticket planning, execution, Evidence, independent Outcome, and review, with concrete repository references and the most consequential user-facing friction or missing transitions identified.",
+      "identity": "sha256:a03aeeb614ce1932f0aac19bf820c1882c4b8b1305c3f1e52cb01fcef14c28fb",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "hosted-service-deferred-cleanly",
-      "criterion": "The report records only Plugin seams whose validation may later inform a private hosted Context and Ticket service; storage, accounts, synchronization, Cloud architecture, and deployment remain outside this Ticket and are not smuggled into the recommendation."
+      "criterion": "The report records only Plugin seams whose validation may later inform a private hosted Context and Ticket service; storage, accounts, synchronization, Cloud architecture, and deployment remain outside this Ticket and are not smuggled into the recommendation.",
+      "identity": "sha256:2f858b7ed9b8e7f7c5c9751403fa6bf0de5bb3f72b3f4639b2fcc5cfd3be81eb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "next-slice-recommended",
+      "criterion": "One smallest next implementation slice is recommended with a concrete outcome, proposed acceptance boundaries, major constraints, expected user-visible change, and an explicit explanation of why the other candidates should not precede it.",
+      "identity": "sha256:d8fd05a0a534c6a93647ce9be366063b527cbf11ceb2dd4e8096f43f60356132",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "observed-and-speculative-gaps-separated",
+      "criterion": "Candidate improvements clearly distinguish gaps supported by current code, README promises, prior Evidence/Outcomes, or demonstrated dogfood friction from attractive but speculative future capabilities.",
+      "identity": "sha256:d7768196f3d01aa2ee876c57dff21e8c9fbbcc1d773739bf57d98fab83bfefac",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "open-graph-reconciled",
+      "criterion": "Every existing non-DONE Ticket is judged against the near-term solo/small-team Plugin wedge and classified as do next, do later, refine from evidence, or defer, with a concise rationale and no silent duplication.",
+      "identity": "sha256:8889ba57c36b6c40dc729a9c359a7bca850a532d25296b9c6b1cd7d4aed65cea",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This is a read-only product and implementation audit except for VibeHub Ticket, Evidence, and Outcome artifacts; it does not implement a Plugin feature.",
     "Do not recommend Linear parity, organization-scale roadmap tooling, or broad collaboration infrastructure merely because those capabilities exist elsewhere.",
@@ -76,6 +95,44 @@
       "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "candidates-ranked",
+          "identity": "sha256:f1c2d293895448acf47e67722ec06f331dce5152d9d033cc01400bc494841e1a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-plugin-loop-inventoried",
+          "identity": "sha256:a03aeeb614ce1932f0aac19bf820c1882c4b8b1305c3f1e52cb01fcef14c28fb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "hosted-service-deferred-cleanly",
+          "identity": "sha256:2f858b7ed9b8e7f7c5c9751403fa6bf0de5bb3f72b3f4639b2fcc5cfd3be81eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "next-slice-recommended",
+          "identity": "sha256:d8fd05a0a534c6a93647ce9be366063b527cbf11ceb2dd4e8096f43f60356132",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "observed-and-speculative-gaps-separated",
+          "identity": "sha256:d7768196f3d01aa2ee876c57dff21e8c9fbbcc1d773739bf57d98fab83bfefac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "open-graph-reconciled",
+          "identity": "sha256:8889ba57c36b6c40dc729a9c359a7bca850a532d25296b9c6b1cd7d4aed65cea",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:37bf47d4ffbc71a7caaf55f471adca07e1d4bc9c492da8b9cbd5170f04bb0d17",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-13T18:27:34.000Z",
@@ -92,6 +149,7 @@
     "context:decision-plugin-wedge-solo-small-team-coordination"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

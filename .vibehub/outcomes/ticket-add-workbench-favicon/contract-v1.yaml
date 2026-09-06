@@ -1,0 +1,24 @@
+{
+  "accepted_acceptance_ids": [
+    "workbench-declares-canonical-favicon",
+    "loopback-host-serves-favicon-exactly",
+    "installed-artifacts-and-regressions-pass"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T21:40:33Z",
+  "contract_revision": {
+    "identity": "sha256:9cb23120e5bc94f2d0fbeec5ab4b8b3563579ecfd3e7d14d38a4aae3ab64f1f7",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "workbench-favicon-source-installed-host-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three criteria at exact implementation commit 4a85b86. Direct source inspection confirmed the production HTML declares `<link rel=\"icon\" type=\"image/svg+xml\" href=\"/vibehub-mark.svg\">`, the absolute path is independent of focused/query URLs and bearer fragments, and the Workbench favicon is a byte-for-byte 587-byte copy of the canonical brand mark with SHA-256 605928d8ddd8ac9c220644b1d9c7c17c4b16962db070a5c673ad075449edcf6a. The host asset allowlist maps only that path to image/svg+xml; its global method gate preserves GET/HEAD and rejects POST with 405 read_only, with no redirect or external dependency. Independent fresh Codex and Claude marketplace builds contained identical canonical and Workbench SVG bytes and the same HTML declaration; explicit requests to both installed hosts returned GET 200, HEAD 200, exact image/svg+xml, redirected false, 587 bytes, and POST 405 read_only. Focused source/installed host tests passed 2/2; complete repository verification passed 126/126 and installed-artifact verification passed at 58 files and 608379 bytes. The implementation diff contains no public-site file, project and Ticket validation pass, and all Rooms are FRESH. No production graph, API projection, source truth, public site, or writable route changed.",
+  "ticket_id": "ticket-add-workbench-favicon",
+  "unresolved_acceptance_ids": []
+}

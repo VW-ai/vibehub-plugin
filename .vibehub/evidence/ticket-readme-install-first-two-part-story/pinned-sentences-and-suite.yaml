@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "core-value-sentences-survive"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "core-value-sentences-survive",
+      "identity": "sha256:e83a24fedb64820eb1cd070cdf6a774969a9a8e88902b9ffafb92c265d10478d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "pinned-sentences-and-suite",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T06:57:00Z",
@@ -9,7 +18,7 @@
     "commit:88ec41b",
     "test/release.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "All pinned phrases remain (tagline, value line, entry line once, Memory-tools line, loop sentence, DRAFT/READY/RUNNING/DONE, Recommended action stays primary, both marketplace commands, exactly one vibehub.icu href); npm test 143/143 and verify:artifact ok.",
   "ticket_id": "ticket-readme-install-first-two-part-story"
 }

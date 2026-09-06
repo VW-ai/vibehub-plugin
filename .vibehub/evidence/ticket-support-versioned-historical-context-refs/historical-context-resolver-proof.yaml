@@ -5,6 +5,30 @@
     "resolution-never-mutates-worktrees",
     "ticket-consumers-use-the-same-resolver"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "versioned-ref-has-one-canonical-shape",
+      "identity": "sha256:4c28059ac7edd57765269987d46fac13d915c076515b955646d43ba8b348e804",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exact-historical-content-is-readable",
+      "identity": "sha256:aa0e2e66d71eb6a74e65dc3ba246ee870bc65ee62fe7a506f14f9d44fbfe49ed",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "resolution-never-mutates-worktrees",
+      "identity": "sha256:ef93bd1a4f883b085b494f8ea0ac3ea87d84b1ead64d3237f1116a0850e30318",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-consumers-use-the-same-resolver",
+      "identity": "sha256:8e2a491d77664960e064519c41962f5e38107e8696c0ef7a1428fe86e36ea279",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "historical-context-resolver-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-03T05:57:34Z",
@@ -20,7 +44,7 @@
     "command:node --test test/ui-host.test.mjs",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 89a2e557925de26bbd6aab0d79aee2967b2ae143 adds one parser and resolver for current paths and canonical commit:<40-lowercase-hex>:<repo-relative-path> refs. The resolver rejects moving or malformed identities and non-regular Git objects, returns source bytes plus commit/path/blob or WORKTREE/path/blob identity, and reads historical blobs through Git object commands with repository fsmonitor disabled. Focused tests prove exact deleted and divergent-current bytes, machine-readable missing/object errors, unchanged dirty worktree HEAD/index/status/bytes, identical resolution from sibling worktrees on different branches, object-aware Ticket validation, UI/Agent handoff identity, and one resolver command across planning, run, validation, query, and review Skills. The repository-wide npm run verify passed 187/187 with zero skipped.",
   "ticket_id": "ticket-support-versioned-historical-context-refs"
 }

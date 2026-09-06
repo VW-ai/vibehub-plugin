@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "atomic-align"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "atomic-align",
+      "identity": "sha256:48bc5a944431eb9796dc1eba2edc264cda3f0055b6bf75bf2e6c52a6d9f1e832",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "atomic-align-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-03T23:09:19.000Z",
@@ -10,7 +19,7 @@
     "skills/scripts/vh.mjs",
     ".vibehub/rooms/ticket-lifecycle/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vh room align resolves anchors against the snapshot, records per-file filter-clean blob hashes with last_aligned_commit and checked_at in a single writeDocument (temp file plus rename, so a partial alignment state cannot exist on disk), and clears the stale flag with its reason in the same write. Aligning the three dogfood rooms recorded 6, 6, and 12 anchored files and project validate accepts the written alignment blocks.",
   "ticket_id": "ticket-drift-check-mechanical"
 }

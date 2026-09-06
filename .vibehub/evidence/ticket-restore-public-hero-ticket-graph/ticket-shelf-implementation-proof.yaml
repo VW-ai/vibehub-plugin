@@ -5,6 +5,30 @@
     "opened-ticket-is-physical-and-readable",
     "motion-is-fluid-restrained-and-interruptible"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "first-view-explains-and-installs",
+      "identity": "sha256:262d419eb769812f1729b18f670537285173827fab62cef44f62fe92a94b904e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-shelf-is-the-site-navigation",
+      "identity": "sha256:2c0cce98f00b9fd17aa4b1c62906bfefb27e4c200d9e10e771bcef4520195b9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "opened-ticket-is-physical-and-readable",
+      "identity": "sha256:168a28bf9fe2509799857f99fd305e2b1eb3562866ebc9127b53f590c61c93fd",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
+      "identity": "sha256:6b0a6aa9bc9c9aec822897d9882582cfadc10ce8ab34d7545b6b13d272a68c7f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ticket-shelf-implementation-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T08:39:10Z",
@@ -15,7 +39,7 @@
     "context:.vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml",
     "context:.vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public page now renders one physical two-page Ticket over a persistent five-module Ticket Shelf. Product opens by default with the exact promise, one-Ticket explanation, canonical entry, truthful Codex and Claude Code actions, Copy for Agent, and GitHub. The shelf preserves the selected Ticket as a dashed OPEN origin with a connector to the expanded dossier. Product, Workflow, Documentation, and Founder render distinct linearly readable page structures. The Product page keeps Request and Context semantically separate from the single Ticket, then shows Evidence and independent Outcome. Pointer switching uses an origin-measured, cancellable WAAPI transform/opacity animation; keyboard and narrow layouts switch immediately; hover is fine-pointer-gated and reduced motion is honored.",
   "ticket_id": "ticket-restore-public-hero-ticket-graph"
 }

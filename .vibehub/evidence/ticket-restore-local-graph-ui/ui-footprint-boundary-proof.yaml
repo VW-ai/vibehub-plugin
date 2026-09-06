@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "legacy-bulk-remains-absent"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "legacy-bulk-remains-absent",
+      "identity": "sha256:c90be757c9bdbd729cba2a65dae7aa724deeceda9247fd9eacce90475e1f758e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ui-footprint-boundary-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T07:18:44Z",
@@ -12,7 +21,7 @@
     "skills/vibehub-ticket-review/assets/app.js",
     "scripts/verify-plugin-artifact.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Final production scripts are 6 dependency-free MJS files / 1,716 lines versus 5 / 1,086 immediately after cleanup. Selectively recovered UI assets are 3 files / 3,075 lines / 81,011 bytes, with 699 lines of old write/Decision client code removed. The plugin artifact grows from the cleanup baseline 28 files / 65,042 bytes to 32 / 168,012 bytes. External production and development dependencies remain zero; packages, runtime, hooks, MCP config, SQLite, dispatcher, leases, ContextBinding, attestation, writable routes, and hidden state remain absent.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

@@ -2,21 +2,34 @@
   "acceptance": [
     {
       "acceptance_id": "anchor-overlap-detected",
-      "criterion": "Repository validation reports an explicit error when two rooms where neither is an ancestor of the other have overlapping anchors, while parent and child rooms may nest territory legitimately; node --test covers both the overlap and the legitimate nesting."
-    },
-    {
-      "acceptance_id": "stale-origin-in-contract",
-      "criterion": "knowledge-governance.json states the two stale origins once (drift: prefix mechanical and recomputable, unprefixed semantic and preserved), the ticket-plan deferred write-back instruction adopts the drift: prefix, and vh room drift reports for a STALE room whether its anchors currently match the recorded hashes; node --test covers the report."
-    },
-    {
-      "acceptance_id": "pr-merge-judgment",
-      "criterion": "vibehub-pr states in a few judgment-first lines that post-merge alignment is recomputed via drift against the merged tree and never hand-picked, that same-slug room conflicts are boundary decisions, and that unprefixed stale marks survive merges; the skill-contracts tests stay green over the new text."
+      "criterion": "Repository validation reports an explicit error when two rooms where neither is an ancestor of the other have overlapping anchors, while parent and child rooms may nest territory legitimately; node --test covers both the overlap and the legitimate nesting.",
+      "identity": "sha256:b28a9063400d3f1b03af853a90083e4314cd54ab50d5cc2a17cdd02fa268fa2e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "merge-suite-green",
-      "criterion": "The full node --test suite and the plugin artifact verification pass."
+      "criterion": "The full node --test suite and the plugin artifact verification pass.",
+      "identity": "sha256:48d405309a0bb6488e6642696c19e7ac53231082f47b72055fe4c1f33d00698f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "pr-merge-judgment",
+      "criterion": "vibehub-pr states in a few judgment-first lines that post-merge alignment is recomputed via drift against the merged tree and never hand-picked, that same-slug room conflicts are boundary decisions, and that unprefixed stale marks survive merges; the skill-contracts tests stay green over the new text.",
+      "identity": "sha256:0dc41be2d05eb9cc0ea9b4ba18961f23d0c99ae9fdc35b83555194daaa99ba26",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "stale-origin-in-contract",
+      "criterion": "knowledge-governance.json states the two stale origins once (drift: prefix mechanical and recomputable, unprefixed semantic and preserved), the ticket-plan deferred write-back instruction adopts the drift: prefix, and vh room drift reports for a STALE room whether its anchors currently match the recorded hashes; node --test covers the report.",
+      "identity": "sha256:2ddc8f43a7f926bb492186eb267d1ad6ee00348b3d127d6a164d562cf2d4f8fb",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Detection only: no automated room fusion, split, or merge machinery.",
     "Derived state is never merged by hand; recomputation is the only resolution for alignment blocks and drift:-prefixed marks.",
@@ -42,6 +55,34 @@
       "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "anchor-overlap-detected",
+          "identity": "sha256:b28a9063400d3f1b03af853a90083e4314cd54ab50d5cc2a17cdd02fa268fa2e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "merge-suite-green",
+          "identity": "sha256:48d405309a0bb6488e6642696c19e7ac53231082f47b72055fe4c1f33d00698f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "pr-merge-judgment",
+          "identity": "sha256:0dc41be2d05eb9cc0ea9b4ba18961f23d0c99ae9fdc35b83555194daaa99ba26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stale-origin-in-contract",
+          "identity": "sha256:2ddc8f43a7f926bb492186eb267d1ad6ee00348b3d127d6a164d562cf2d4f8fb",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f22fdaa9903b6d75a81a9f1112ab435a189281625e07e498400a98e74ef37493",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-04T03:35:11.000Z",
@@ -64,6 +105,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-pr-room-merge-semantics"
 }

@@ -1,0 +1,61 @@
+{
+  "acceptance_ids": [
+    "shipped-content-version-gate",
+    "release-identity-contract-remains-single-source",
+    "surviving-update-path-needs-no-staleness-command",
+    "observed-silent-staleness-regression-is-blocked",
+    "v090-release-candidate-is-prepared"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "shipped-content-version-gate",
+      "identity": "sha256:5f552d48a93eb69c0c0865363248dfb389eaf20e1a9fb97a9ba981a6ecb598df",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "release-identity-contract-remains-single-source",
+      "identity": "sha256:341afbbb185e81662122440851d084d2218a41c321bbc933bdb816476639806b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "surviving-update-path-needs-no-staleness-command",
+      "identity": "sha256:82111b05e6021a774d2f2977177d8391975bea3a5e667e834157f21eff0c142c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "observed-silent-staleness-regression-is-blocked",
+      "identity": "sha256:91041455aab3e1f27aa0f8fcbba7af6b0d0a2b6438a65680dfe198346e1359b9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "v090-release-candidate-is-prepared",
+      "identity": "sha256:bc8a582b3a164642c6da483a01e9212f12b0c7ce4e12f4ff8014e955351b68e5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "v090-release-identity-gate-and-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T21:32:47.000Z",
+  "refs": [
+    "scripts/verify-release-version.mjs",
+    "scripts/build-plugin-artifact.mjs",
+    ".github/workflows/verify.yml",
+    "test/release.test.mjs",
+    "test/install-templates.test.mjs",
+    "docs/RELEASE.md",
+    "docs/INSTALL.md",
+    "CHANGELOG.md",
+    "package.json",
+    ".claude-plugin/plugin.json",
+    "command:npm test (196 tests; 189 pass; 0 fail; 7 sandbox-only skips)",
+    "command:npm run verify:artifact (67 files; 3302127 bytes)",
+    "command:node scripts/verify-release-version.mjs --check-shipped-content",
+    "command:node scripts/verify-release-version.mjs --tag v0.9.0"
+  ],
+  "schema_version": 2,
+  "summary": "The verifier now imports the build artifact's exported PLUGIN_PATHS allowlist, finds the latest reachable stable release tag, parses and compares SemVer without dependencies, and enforces changed-content, prerelease, stable-release, manifest, tag, and changelog invariants from one implementation. Verify CI runs the gate after full-history checkout and before tests. The Git-backed regression reproduces 143 shipped-content commits under 0.8.0 and proves rejection, while covering unrelated changes, unreachable and prerelease tags, malformed and non-monotonic versions, accepted prerelease state, finalized stable state, and the first stale shipped change after v0.9.0. INSTALL and RELEASE document why the content-addressed npx updater needs no user staleness command and how migration remains release-paired. package.json, the Claude manifest, template header, and dated changelog consistently prepare 0.9.0 without creating its tag. The full suite passed 196 tests with 189 pass, 0 fail, and 7 sandbox-only socket skips; the built artifact independently verified 67 files and 3,302,127 bytes.",
+  "ticket_id": "ticket-enforce-release-version-identity"
+}

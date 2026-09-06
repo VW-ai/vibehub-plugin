@@ -1,0 +1,34 @@
+{
+  "accepted_acceptance_ids": [
+    "acceptance-and-contract-revisions-are-canonical-data",
+    "current-repository-migration-preserves-historical-truth",
+    "evidence-and-outcomes-bind-exact-revisions",
+    "legacy-proof-migration-reconstructs-history",
+    "migration-and-host-artifacts-stay-atomic",
+    "projection-uses-only-active-contract-coverage",
+    "regression-suite-proves-identity-and-rollback-boundaries",
+    "semantic-mutation-appends-and-preserves-lineage",
+    "workbench-explains-revision-history"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-04T20:59:38Z",
+  "contract_revision": {
+    "identity": "sha256:7d99a367ae95b6676e0e1cd5370a61157bb340d5ed633ca9749729fab1f62e1a",
+    "revision": 3
+  },
+  "evidence_ids": [
+    "contract-v3-complete-exact-proof"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout Agent with no executor or prior closeout context; adjudicated Contract v3 from the repository Ticket, Contract-v1/v2 Outcomes, schemas, code, exact Evidence, diff, independently rerun tests, corpus audit, and unrestricted artifact verification.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v3",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent Contract-v3 closeout accepted all nine active Acceptance revisions. The dedicated replacement Evidence exactly matches the complete active Contract-v3 revision set and avoids stale grouped-proof reuse. Independent validation reproduced canonical revision identities and append-only mutation, current-HEAD legacy reconstruction with zero unresolved records across 314 Evidence and 98 historical Outcomes, rejection of stale reconstructed human proof with byte-identical migration rollback, active-Contract-only lifecycle projection, and production Workbench revision/history presentation. Project validation passed for 105 Tickets; the complete suite passed 195 tests with 188 passes, zero failures, and seven sandbox-only loopback skips; unrestricted artifact verification passed at 67 files and 3,300,616 bytes; and git diff --check passed.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision",
+  "unresolved_acceptance_ids": []
+}

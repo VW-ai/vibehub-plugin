@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "shipped-content-version-gate",
+    "release-identity-contract-remains-single-source",
+    "surviving-update-path-needs-no-staleness-command",
+    "observed-silent-staleness-regression-is-blocked",
+    "v090-release-candidate-is-prepared"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-04T21:37:23Z",
+  "contract_revision": {
+    "identity": "sha256:aed83edd309c0b9d74742d862f1f89e6e9b9e0f7eec640d69f68a3d0a178b6bd",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "v090-release-identity-gate-and-regression"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; read the current Ticket, exact Contract and Acceptance identities, native Evidence, governing Context and dependency Outcome, full git diff, implementation, CI, tests, documentation, tags, validation, and reran focused, full-suite, gate, tag, and artifact checks without relying on the executor summary.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication of Contract v2 accepted all five active criteria. shipped-content-version-gate: the push/PR Verify workflow uses a full-history checkout and runs the dependency-free --check-shipped-content entry before tests; that implementation imports the artifact builder's exported PLUGIN_PATHS, selects the latest reachable stable tag, rejects stale, malformed, mismatched, and non-monotonic identities, and enforces prerelease versus finalized stable changelog state. release-identity-contract-remains-single-source: package privacy/dependency checks, package/Claude-manifest agreement, exact tag agreement, parsing, comparison, and shipped-content enforcement remain in verify-release-version.mjs with no duplicate allowlist or new dependency/service/cache/host branch. surviving-update-path-needs-no-staleness-command: INSTALL and RELEASE explicitly document content-hash or unconditional-refetch update detection, intentionally add no installed staleness command, keep the gate maintainer-side, and retain release-paired project migration responsibility. observed-silent-staleness-regression-is-blocked: the Git-backed test creates exactly 143 shipped-content commits after v0.8.0 and proves rejection, while independently covering non-shipped change, unreachable stable and reachable prerelease tags, malformed/non-monotonic/mismatched versions, accepted prerelease plus Unreleased, rejected unfinalized stable, accepted finalized stable, and the first stale shipped change after v0.9.0. v090-release-candidate-is-prepared: package.json and the retained Claude manifest both declare 0.9.0, CHANGELOG has a dated 0.9.0 section and no Unreleased section, the live gate reports shipped content changed from reachable v0.8.0 with stable 0.9.0, exact v0.9.0 tag verification passes, and no v0.9.0 tag exists on the feature branch. Independent reruns passed the focused release/template tests 11/11, the complete suite 196 tests with 189 pass, 0 fail, and 7 sandbox-only loopback skips, and artifact verification 67 files / 3,302,127 bytes. No criterion remains unresolved.",
+  "ticket_id": "ticket-enforce-release-version-identity",
+  "unresolved_acceptance_ids": []
+}

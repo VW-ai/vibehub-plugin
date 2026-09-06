@@ -2,11 +2,11 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "809e2df357eac65b5c265cda620e1b386999a359",
+        "blob": "af55cb0000e43d2b84601bb724ddfb4139a7c488",
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "a9a22e59cc1ee10bf93b134b64cf528aab0b493a",
+        "blob": "959f08806dedab81fde9e623e92f9fc7d8040b91",
         "path": "README.md"
       },
       {
@@ -50,11 +50,11 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "354c3941c092aae5ab0e5563e35da1733615f1d7",
+        "blob": "3b1a2e70e0459dc07936ac0398c890c5d10743bd",
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "a2e46e8fe8e88bcf6ee50ed2e5f6859776cf9a39",
+        "blob": "a76765e7ccf8edc8f04bf6894a81ce86d5d973a2",
         "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
       },
       {
@@ -62,7 +62,7 @@
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
-        "blob": "5e89c920081613ed98986d63d67fe0164a66732f",
+        "blob": "7442405c0be2963782b2967f2d8c25575aa25141",
         "path": "docs/RELEASE.md"
       },
       {
@@ -194,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-03T05:22:16.832Z",
-    "last_aligned_commit": "33de83c2526258a48340863ab752d45ff7b56140"
+    "checked_at": "2026-09-04T21:31:51.903Z",
+    "last_aligned_commit": "fe9180a4df2c3f8b69117e1c91e2e544ab425d10"
   },
   "anchors": [
     "CHANGELOG.md",

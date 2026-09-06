@@ -55,8 +55,10 @@ function invokeUpgrade(bin, roots = [], env = {}) {
 function initializeLegacyRepo(path) {
   mkdirSync(path, { recursive: true });
   assert.equal(run(path, "project", "init").status, 0);
-  const legacy = ticket("legacy-work");
+  const current = ticket("legacy-work");
+  const { revision_state, active_contract_revision, contract_revisions, ...legacy } = current;
   legacy.schema_version = 1;
+  legacy.acceptance = current.acceptance.map(({ identity, revision, state, derived_from, presentation, ...item }) => item);
   delete legacy.deliveries;
   writeFileSync(join(path, ".vibehub", "tickets", "legacy-work.yaml"), `${JSON.stringify(legacy, null, 2)}\n`);
   writeFileSync(join(path, ".vibehub", "version.yaml"), `${JSON.stringify({
@@ -240,6 +242,7 @@ test("bounded discovery migrates each safe registered worktree once and reports 
     assert.equal(run(path, "project", "validate").status, 0);
     assert.deepEqual(item.semantic_pending_refs, [
       "migration-pending:format-1-to-format-2:classify-delivery-membership",
+      "migration-pending:format-3-to-format-4:reconstruct-proof-revisions",
     ]);
   }
   assert.deepEqual(snapshot(dirtySibling), dirtyBefore);
@@ -412,7 +415,7 @@ for (const stage of [
       assert.equal(printed.commit, RELEASE_COMMIT);
       assert.match(printed.engine_sha256, /^[0-9a-f]{64}$/u);
       assert.match(printed.migrations_sha256, /^[0-9a-f]{64}$/u);
-      assert.equal(Object.keys(printed.contract_sha256).length, 10);
+      assert.equal(Object.keys(printed.contract_sha256).length, 11);
     }
     assert.deepEqual(snapshot(repo), before);
   });

@@ -1,22 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "www-permanently-redirects-to-canonical-apex",
-      "criterion": "Public DNS resolves www.vibehub.icu through Cloudflare and every HTTP or HTTPS request to www.vibehub.icu redirects permanently to the equivalent https://vibehub.icu path and query without serving a duplicate site."
-    },
-    {
       "acceptance_id": "canonical-discovery-metadata-is-consistent",
-      "criterion": "The production homepage emits a self-referential https://vibehub.icu/ canonical link, robots.txt allows public crawling and names the canonical sitemap, and sitemap.xml contains only fully qualified canonical production URLs."
-    },
-    {
-      "acceptance_id": "search-console-discovery-is-configured",
-      "criterion": "The vibehub.icu Domain Property is verified in Google Search Console, the canonical sitemap is submitted, and the homepage is requested for recrawl; timestamped non-secret Evidence records the exact property, Google account label, DNS verification method and record presence, sitemap status, and recrawl acknowledgement without committing credentials or verification values."
+      "criterion": "The production homepage emits a self-referential https://vibehub.icu/ canonical link, robots.txt allows public crawling and names the canonical sitemap, and sitemap.xml contains only fully qualified canonical production URLs.",
+      "identity": "sha256:74baa239d92ad637a513425eb8d4c840b6bf2a313117018a80152c07ba974aec",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "domain-discovery-is-production-verified",
-      "criterion": "Focused metadata contracts, lint, static production build, release preflight, exact Cloudflare Pages source deployment, DNS resolution, redirect path and query preservation, canonical HTTPS content, robots.txt, sitemap.xml, and canonical-domain checks pass in production."
+      "criterion": "Focused metadata contracts, lint, static production build, release preflight, exact source deployment, DNS resolution, redirect path and query preservation, canonical HTTPS content, robots.txt, sitemap.xml, and canonical-domain checks pass in production.",
+      "identity": "sha256:e6783042afa8841d546413bc3870b2fd3e4ef1f6f555b7b10c6a7822853336cd",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "domain-discovery-is-production-verified",
+      "criterion": "Focused metadata contracts, lint, static production build, release preflight, exact Cloudflare Pages source deployment, DNS resolution, redirect path and query preservation, canonical HTTPS content, robots.txt, sitemap.xml, and canonical-domain checks pass in production.",
+      "identity": "sha256:fbdad96ccd20dfc9ae364a6c190b6b4059634ed5efc62c21c06f5fe3f268d6dc",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "search-console-discovery-is-configured",
+      "criterion": "The vibehub.icu Domain Property is verified in Google Search Console, the canonical sitemap is submitted, and the homepage is requested for recrawl; timestamped non-secret Evidence records the exact property, Google account label, DNS verification method and record presence, sitemap status, and recrawl acknowledgement without committing credentials or verification values.",
+      "identity": "sha256:ba219eddcfe7a76b2060da904bdb55ddca39c8414546cd96f53d4e562c6c23f7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "www-permanently-redirects-to-canonical-apex",
+      "criterion": "Public DNS resolves www.vibehub.icu through Cloudflare and every HTTP or HTTPS request to www.vibehub.icu redirects permanently to the equivalent https://vibehub.icu path and query without serving a duplicate site.",
+      "identity": "sha256:3229bd8886f76de6d7990f8073584c07ceeea7aabc6160dc45e02298d888a37d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep https://vibehub.icu as the single canonical public hostname; www is redirect-only.",
     "Use the existing vibehub-website-v1 Cloudflare Pages project as the only production host; do not preserve the Sites release dependency or maintain two publication paths.",
@@ -44,7 +64,7 @@
     },
     {
       "purpose": "Successful Cloudflare Pages deployment Outcome that unlocks production discovery closeout.",
-      "ref": ".vibehub/outcomes/ticket-deploy-public-site-cloudflare.yaml"
+      "ref": ".vibehub/outcomes/ticket-deploy-public-site-cloudflare/contract-v1.yaml"
     },
     {
       "purpose": "Non-secret ownership verification facts for the retained Search Console proof.",
@@ -57,6 +77,34 @@
     {
       "purpose": "Human-origin decision establishing the selected account and canonical apex hostname.",
       "ref": ".vibehub/evidence/ticket-decide-public-site-cloudflare-hostname/vibehub-icu-hostname-and-replacement-decision.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-discovery-metadata-is-consistent",
+          "identity": "sha256:74baa239d92ad637a513425eb8d4c840b6bf2a313117018a80152c07ba974aec",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "domain-discovery-is-production-verified",
+          "identity": "sha256:fbdad96ccd20dfc9ae364a6c190b6b4059634ed5efc62c21c06f5fe3f268d6dc",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "search-console-discovery-is-configured",
+          "identity": "sha256:ba219eddcfe7a76b2060da904bdb55ddca39c8414546cd96f53d4e562c6c23f7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "www-permanently-redirects-to-canonical-apex",
+          "identity": "sha256:3229bd8886f76de6d7990f8073584c07ceeea7aabc6160dc45e02298d888a37d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f09b2b08bc36fff4f27e48c72447a23f1501d85cabf899869b90a9741d9fe5a3",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -86,6 +134,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

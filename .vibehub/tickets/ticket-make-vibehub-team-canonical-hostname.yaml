@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "team-is-the-only-canonical-url",
-      "criterion": "release.mjs, SKILL.md, package.json release scripts, README.md, robots.txt, sitemap.xml, and the product Room intent name https://vibehub.team as canonical; no vibehub.icu reference remains except as a documented redirect-only host."
-    },
-    {
       "acceptance_id": "all-redirect-hosts-are-verified",
-      "criterion": "A single verify-redirects command (replacing verify-www) checks http and https for vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems, and www.vibehub.team, requiring a 301/308 to https://vibehub.team with the exact path and query preserved, and the build-artifact sitemap check rejects every redirect-only hostname."
-    },
-    {
-      "acceptance_id": "preflight-passes-locally",
-      "criterion": "node site/release/scripts/release.mjs preflight succeeds with NEXT_PUBLIC_SITE_URL=https://vibehub.team, and site/tests pass."
+      "criterion": "A single verify-redirects command (replacing verify-www) checks http and https for vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems, and www.vibehub.team, requiring a 301/308 to https://vibehub.team with the exact path and query preserved, and the build-artifact sitemap check rejects every redirect-only hostname.",
+      "identity": "sha256:f44037bf327f30acf5ab4f5fd4e0eb4fd158706346414d042d7b657fcf0f6989",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-dns-steps-are-explicit",
-      "criterion": "SKILL.md states that DNS, Pages custom-domain binding, and redirect rules for the three domains are owner-performed Cloudflare actions, lists the exact read-only inspection and verification commands the Agent runs afterwards, and keeps the existing stop conditions."
+      "criterion": "SKILL.md states that DNS, Pages custom-domain binding, and redirect rules for the three domains are owner-performed Cloudflare actions, lists the exact read-only inspection and verification commands the Agent runs afterwards, and keeps the existing stop conditions.",
+      "identity": "sha256:fb8325b58d9e70a23feba99f38c0802a3d4d321b60a675aefcfabbbdeded5d53",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "preflight-passes-locally",
+      "criterion": "node site/release/scripts/release.mjs preflight succeeds with NEXT_PUBLIC_SITE_URL=https://vibehub.team, and site/tests pass.",
+      "identity": "sha256:6a65ff7fbc8ea144fa4c3b5b43f163b9e15c2975cec53d92b6158283bf2be577",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "team-is-the-only-canonical-url",
+      "criterion": "release.mjs, SKILL.md, package.json release scripts, README.md, robots.txt, sitemap.xml, and the product Room intent name https://vibehub.team as canonical; no vibehub.icu reference remains except as a documented redirect-only host.",
+      "identity": "sha256:be0967b98700a47635d4b29419be807675541123a7132698fd85111b36701cf5",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not create a second Pages project, Worker, CI deploy job, or change DNS from code.",
     "Do not perform the production deploy or any Cloudflare mutation inside this Ticket.",
@@ -45,6 +58,34 @@
       "ref": ".vibehub/tickets/ticket-complete-public-domain-discovery.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "all-redirect-hosts-are-verified",
+          "identity": "sha256:f44037bf327f30acf5ab4f5fd4e0eb4fd158706346414d042d7b657fcf0f6989",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-dns-steps-are-explicit",
+          "identity": "sha256:fb8325b58d9e70a23feba99f38c0802a3d4d321b60a675aefcfabbbdeded5d53",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "preflight-passes-locally",
+          "identity": "sha256:6a65ff7fbc8ea144fa4c3b5b43f163b9e15c2975cec53d92b6158283bf2be577",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "team-is-the-only-canonical-url",
+          "identity": "sha256:be0967b98700a47635d4b29419be807675541123a7132698fd85111b36701cf5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:9a64cf9c81a9a8c69265220c206e3ffeec3e184a62569679302a50d8346af3a3",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -53,6 +94,7 @@
     "conversation:2026-08-23-owner-chooses-vibehub-team-canonical"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
 }

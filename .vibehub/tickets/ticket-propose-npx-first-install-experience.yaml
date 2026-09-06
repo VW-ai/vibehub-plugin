@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "skills-sh-breakage-is-reproduced-and-recorded",
-      "criterion": "A checked-in transcript reproduces npx skills add VW-ai/vibehub-plugin into a scratch project for at least Claude Code and Codex targets, lists which files were copied, and proves that the copied Skills cannot reach skills/scripts/vh.mjs or skills/contracts."
-    },
-    {
       "acceptance_id": "install-paths-are-compared-empirically",
-      "criterion": "A proposal under docs/proposals/ compares at least three install and init paths (skills.sh-compatible layout, npx-published CLI used by Skills and humans, marketplace-only), each with exact commands a user types, what lands on disk per host, how the shared helper and contracts stay reachable, version-skew and upgrade behavior, offline and network requirements, and conformance with decision-speed-first-skill-plugin; every claim about a tool's behavior is backed by a run, a doc link, or marked as untested."
-    },
-    {
-      "acceptance_id": "setup-offers-github-mirror-as-one-time-option",
-      "criterion": "The proposal specifies how project setup (vibehub-setup and any npx init) detects a GitHub remote and offers to drop the Issues mirror workflow and script into the project once, with the exact files copied, what is asked of the user, and an explicit statement that no Skill or instruction asks an Agent to run the sync afterwards."
+      "criterion": "A proposal under docs/proposals/ compares at least three install and init paths (skills.sh-compatible layout, npx-published CLI used by Skills and humans, marketplace-only), each with exact commands a user types, what lands on disk per host, how the shared helper and contracts stay reachable, version-skew and upgrade behavior, offline and network requirements, and conformance with decision-speed-first-skill-plugin; every claim about a tool's behavior is backed by a run, a doc link, or marked as untested.",
+      "identity": "sha256:e35eabecc9b1c1687374492aa6d0d8aa1403b51f39febcc8906cc1a5409a1b04",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "recommendation-is-decision-ready",
-      "criterion": "The proposal ends with one recommended path, its cost in files and release steps, what it deliberately does not do, and the exact question the owner must answer, so that the owner can decide without reading the comparison twice."
+      "criterion": "The proposal ends with one recommended path, its cost in files and release steps, what it deliberately does not do, and the exact question the owner must answer, so that the owner can decide without reading the comparison twice.",
+      "identity": "sha256:052b20b0cc45a84a5a482873c37833a1f408713e5fb4bd7e220f932001a70b39",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-offers-github-mirror-as-one-time-option",
+      "criterion": "The proposal specifies how project setup (vibehub-setup and any npx init) detects a GitHub remote and offers to drop the Issues mirror workflow and script into the project once, with the exact files copied, what is asked of the user, and an explicit statement that no Skill or instruction asks an Agent to run the sync afterwards.",
+      "identity": "sha256:a9bfddd62ee73a0245fa1d818f0ebb51b5928be994d8d84e9e06bacd50c00e01",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "skills-sh-breakage-is-reproduced-and-recorded",
+      "criterion": "A checked-in transcript reproduces npx skills add VW-ai/vibehub-plugin into a scratch project for at least Claude Code and Codex targets, lists which files were copied, and proves that the copied Skills cannot reach skills/scripts/vh.mjs or skills/contracts.",
+      "identity": "sha256:77bdd2769d4a9bd7533453767fc927d04212e67e5f2a73686d0a691033e8e536",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change README, docs/INSTALL.md, manifests, or skill text in this Ticket; it produces a proposal only.",
     "Do not publish anything to npm or any registry.",
@@ -57,6 +70,34 @@
       "ref": ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "install-paths-are-compared-empirically",
+          "identity": "sha256:e35eabecc9b1c1687374492aa6d0d8aa1403b51f39febcc8906cc1a5409a1b04",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommendation-is-decision-ready",
+          "identity": "sha256:052b20b0cc45a84a5a482873c37833a1f408713e5fb4bd7e220f932001a70b39",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-offers-github-mirror-as-one-time-option",
+          "identity": "sha256:a9bfddd62ee73a0245fa1d818f0ebb51b5928be994d8d84e9e06bacd50c00e01",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-sh-breakage-is-reproduced-and-recorded",
+          "identity": "sha256:77bdd2769d4a9bd7533453767fc927d04212e67e5f2a73686d0a691033e8e536",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:2257bca36de214a1439cd8555ed0b1467f3457ad0aea25068adb47407aec8da5",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -65,6 +106,7 @@
     "conversation:2026-08-22-tickets-as-github-issues"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-propose-npx-first-install-experience"
 }

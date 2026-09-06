@@ -23,6 +23,7 @@ const CONTRACTS = UPGRADE_CONTRACT_PATHS.map((path) => path.slice("vibehub-core/
 const RELEASE_FILES = [
   ["scripts/vibehub-upgrade.mjs", "bin/vibehub-upgrade.mjs"],
   ["skills/vibehub-core/scripts/vh.mjs", "vibehub-core/scripts/vh.mjs"],
+  ["skills/vibehub-core/scripts/revision-contract.mjs", "vibehub-core/scripts/revision-contract.mjs"],
   ...CONTRACTS.map((name) => [
     `skills/vibehub-core/contracts/${name}`,
     `vibehub-core/contracts/${name}`,

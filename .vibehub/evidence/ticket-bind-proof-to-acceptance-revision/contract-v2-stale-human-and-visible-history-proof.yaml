@@ -1,0 +1,44 @@
+{
+  "acceptance_ids": [
+    "evidence-and-outcomes-bind-exact-revisions",
+    "regression-suite-proves-identity-and-rollback-boundaries",
+    "workbench-explains-revision-history"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "evidence-and-outcomes-bind-exact-revisions",
+      "identity": "sha256:5b7f7382d8e53700fecba086387ca5fcdf0b17e22b7192954ddd132c2ad5a525",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "regression-suite-proves-identity-and-rollback-boundaries",
+      "identity": "sha256:b8e82f7b943cb561cb942b252d5d7fc2842ba225ec7088912dad82a7deab650b",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "workbench-explains-revision-history",
+      "identity": "sha256:c22666a9d50ae840eaad2c657469260d3012a100c4f3e0f9beedf7d7f86aa6b8",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "contract-v2-stale-human-and-visible-history-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:38:04Z",
+  "refs": [
+    ".vibehub/outcomes/ticket-bind-proof-to-acceptance-revision/contract-v1.yaml",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/revision-identity.md",
+    "test/proof-revision-migration.test.mjs",
+    "test/legacy-proof-audit.test.mjs",
+    "test/ui-visual-system.test.mjs",
+    "command:npm-test-194-tests-187-pass-zero-fail-seven-sandbox-skips",
+    "command:verify-artifact-67-files-3300616-bytes",
+    "plan-validation:independent-contract-v2"
+  ],
+  "schema_version": 2,
+  "summary": "After Contract-v1's independent partial Outcome exposed a stale-human-proof hole, the validator now keeps native closeout strictly exact, preserves immutable mismatched refs on reconstructed Outcomes without granting coverage, and requires exact human-origin Evidence for every accepted human revision in both origins. An adversarial Git migration fixture proves v1 approval cannot close strengthened v2 and that failure rolls back to byte-identical pending state; a current-corpus fixture proves valid reconstructed history with older immutable refs remains readable and valid. The production Workbench test asserts the visible active Contract, Acceptance revision, retirement, lineage, current-proof filter, historical Outcome, and binding-origin distinctions. The corrected full suite passed 194 tests with 187 passes, zero failures, and seven sandbox-only socket skips; unrestricted artifact verification passed at 67 files and 3,300,616 bytes.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

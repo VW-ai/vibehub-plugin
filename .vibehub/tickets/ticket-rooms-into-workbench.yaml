@@ -1,27 +1,42 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
-      "acceptance_id": "rooms-projection-is-canonical-and-shared",
-      "criterion": "The production host/model mechanically projects the canonical Room directory-containment tree, each Room's boundary and anchors, Context in the selected Room subtree, and consuming Tickets derived from context_refs from validated repository documents; one shared read-only host-side drift projection combines canonical room.yaml alignment data with the current Git snapshot/status and old-checkout direction to produce exact FRESH, DRIFTED, WARNING/OLD CHECKOUT, STALE, and COLD_START semantics; Room filtering reuses the shared one-or-many-Room projectTicketQuery composition with current/all and delivery filters, invalid Room values fail visibly, and the browser only renders that projection without owning a Room/drift index or performing semantic inference."
-    },
-    {
-      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
-      "criterion": "A compact Rooms control opens no panel by default, reports only a quiet count while closed, and toggles an ARIA-synchronized canonical tree in a floating desktop/normal-width surface or a narrow bottom sheet that leaves the causal graph visible; there is no permanent navigation rail, selecting the current Room again enters the no-selection state, and all visible narrow controls measure at least 44x44px."
-    },
-    {
       "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
-      "criterion": "Selecting a Room exposes its exact name, boundary, Context, consuming Tickets, and drift evidence through progressive Context/Tickets/Drift views; Show related Tickets is a neutral row-level action that applies the canonical filter, only recedes or removes nonmatches, preserves every retained Ticket x/y and every causal relation whose endpoints remain visible, retains canonical archived-boundary and expandable-stub semantics without re-clustering or re-ranking, and Clear restores the prior query, graph positions, selected Ticket, Inspector lens, layout direction, pan, and zoom."
-    },
-    {
-      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
-      "criterion": "The Rooms production surface consumes the shared production token/component system established by ticket-apply-codex-like-workbench-visual-language: the same global system-monospace stack, quiet neutral surfaces, compact 16px stroke-SVG icons without emoji, non-color drift labels, restrained exception emphasis, minimal nonredundant copy, and colored icon-and-text READY, REFINE, and NEEDS YOU counts as the compact local legend; redundant labels and slogans including Knowledge spaces, Selected Room, Execution flow, and Proven left/executable right are absent."
+      "criterion": "Selecting a Room exposes its exact name, boundary, Context, consuming Tickets, and drift evidence through progressive Context/Tickets/Drift views; Show related Tickets is a neutral row-level action that applies the canonical filter, only recedes or removes nonmatches, preserves every retained Ticket x/y and every causal relation whose endpoints remain visible, retains canonical archived-boundary and expandable-stub semantics without re-clustering or re-ranking, and Clear restores the prior query, graph positions, selected Ticket, Inspector lens, layout direction, pan, and zoom.",
+      "identity": "sha256:ca311c2e0c8a1ab4dcfe4cf75044e72cb73540c8d8344ab602eb83a579241527",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "rooms-production-journeys-and-boundary-pass",
-      "criterion": "Automated fixture/model/host tests and a clean real-browser pass at 1440x960, 1180x820, and 390x844 verify panel close/reopen and ARIA state, tree containment, every drift presentation, focused and no-selection detail, Context/Tickets/Drift tabs, Room filter/clear with bit-identical retained Ticket rectangles in both layout directions, current/all/delivery filter intersections, keyboard-visible focus, no horizontal overflow, no console warnings or errors, and unchanged read-only/no-persistence behavior; full project/Ticket validation, Rooms freshness, the complete test suite, and installed Plugin artifact pass."
+      "criterion": "Automated fixture/model/host tests and a clean real-browser pass at 1440x960, 1180x820, and 390x844 verify panel close/reopen and ARIA state, tree containment, every drift presentation, focused and no-selection detail, Context/Tickets/Drift tabs, Room filter/clear with bit-identical retained Ticket rectangles in both layout directions, current/all/delivery filter intersections, keyboard-visible focus, no horizontal overflow, no console warnings or errors, and unchanged read-only/no-persistence behavior; full project/Ticket validation, Rooms freshness, the complete test suite, and installed Plugin artifact pass.",
+      "identity": "sha256:f9a8c56e1ca119cd9115e9c7c82f4c92c88a0c16f7aac6de2aa734ee252d75a3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rooms-projection-is-canonical-and-shared",
+      "criterion": "The production host/model mechanically projects the canonical Room directory-containment tree, each Room's boundary and anchors, Context in the selected Room subtree, and consuming Tickets derived from context_refs from validated repository documents; one shared read-only host-side drift projection combines canonical room.yaml alignment data with the current Git snapshot/status and old-checkout direction to produce exact FRESH, DRIFTED, WARNING/OLD CHECKOUT, STALE, and COLD_START semantics; Room filtering reuses the shared one-or-many-Room projectTicketQuery composition with current/all and delivery filters, invalid Room values fail visibly, and the browser only renders that projection without owning a Room/drift index or performing semantic inference.",
+      "identity": "sha256:6457127a7f5db69fd64e851c04bdd2dc8da36a21f8e4f915491cf67e32a88b3b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "criterion": "A compact Rooms control opens no panel by default, reports only a quiet count while closed, and toggles an ARIA-synchronized canonical tree in a floating desktop/normal-width surface or a narrow bottom sheet that leaves the causal graph visible; there is no permanent navigation rail, selecting the current Room again enters the no-selection state, and all visible narrow controls measure at least 44x44px.",
+      "identity": "sha256:d960ac6563cb33835996f9fe2f6e38af9f147dff3c04e0b7a0a1811e38615063",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+      "criterion": "The Rooms production surface consumes the shared production token/component system established by ticket-apply-codex-like-workbench-visual-language: the same global system-monospace stack, quiet neutral surfaces, compact 16px stroke-SVG icons without emoji, non-color drift labels, restrained exception emphasis, minimal nonredundant copy, and colored icon-and-text READY, REFINE, and NEEDS YOU counts as the compact local legend; redundant labels and slogans including Knowledge spaces, Selected Room, Execution flow, and Proven left/executable right are absent.",
+      "identity": "sha256:c94e575ce0d71995c902d92dfc402d6f769bc04a5b100229682f1e8b8e689075",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The causal Ticket graph is never re-clustered, re-ranked, or re-laid-out by Room; Room is an optional knowledge/query lens over the causal graph, not a second topology.",
     "Room knowledge and containment are mechanically projected from canonical validated documents and shared query functions; drift is computed once on the read-only host from room.yaml alignment plus the current Git snapshot/status and old-checkout direction; the browser renders this projection, performs no semantic inference, and owns no durable Room state.",
@@ -40,7 +55,7 @@
     },
     {
       "purpose": "Independent successful Outcome for the protected Rooms-direction decision.",
-      "ref": ".vibehub/outcomes/ticket-decide-rooms-workbench-direction.yaml"
+      "ref": ".vibehub/outcomes/ticket-decide-rooms-workbench-direction/contract-v1.yaml"
     },
     {
       "purpose": "Faithful human-origin record of the approved direction and exact later interface refinements.",
@@ -57,6 +72,48 @@
     {
       "purpose": "Exact Room drift state and snapshot-hash semantics.",
       "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
+          "identity": "sha256:ca311c2e0c8a1ab4dcfe4cf75044e72cb73540c8d8344ab602eb83a579241527",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+          "identity": "sha256:f9a8c56e1ca119cd9115e9c7c82f4c92c88a0c16f7aac6de2aa734ee252d75a3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-projection-is-canonical-and-shared",
+          "identity": "sha256:6457127a7f5db69fd64e851c04bdd2dc8da36a21f8e4f915491cf67e32a88b3b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+          "identity": "sha256:d960ac6563cb33835996f9fe2f6e38af9f147dff3c04e0b7a0a1811e38615063",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+          "identity": "sha256:c94e575ce0d71995c902d92dfc402d6f769bc04a5b100229682f1e8b8e689075",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c7fe66a369cd1385047b35e7c1a38c072710ce5d9bf2e388f76e95f3adc7967e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
     }
   ],
   "kind": "ticket",
@@ -84,6 +141,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-rooms-into-workbench"
 }

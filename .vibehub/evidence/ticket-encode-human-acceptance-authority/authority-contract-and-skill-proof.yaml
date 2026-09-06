@@ -3,6 +3,20 @@
     "human-authority-is-canonical-and-backward-compatible",
     "ticket-skills-protect-human-boundaries"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
+      "identity": "sha256:7075af085a7709a36458184646ef3e893f7884b7fd7bf07cba40e7fbd74e3a30",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-skills-protect-human-boundaries",
+      "identity": "sha256:1d0e4fe7d006b8a41d27d0fe5a7243b5d202bfc5dffa8271fc4087d150aa3a6f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "authority-contract-and-skill-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T08:48:21Z",
@@ -18,7 +32,7 @@
     "test/ticket.test.mjs",
     "test/skill-contracts.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The Ticket schema and validator now accept optional per-criterion authority values `agent` and `human`, default omission to Agent semantics, and reject unknown values. Evidence has the matching optional origin claim with Agent default. The shared acceptance-authority contract is the single semantic source for planning, validation, execution, and closeout: Agents cannot invent human origin, and successful closeout mechanically rejects a human-authority criterion unless its referenced Evidence includes `origin: human`. Existing schema-valid documents remain valid, and tests prove Human authority does not alter READY or dependency unlock semantics.",
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

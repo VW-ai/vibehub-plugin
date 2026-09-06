@@ -5,6 +5,30 @@
     "batch-and-single-ticket-review-remain-bounded",
     "interaction-regressions-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "read-only-closeout-handoff-is-complete",
+      "identity": "sha256:16b7b90ac0f6e61676bc6969d06e8c9ffbdd1aa86f32487c1c80a5e366d5f5cc",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "skills-route-complete-evidence-to-closeout",
+      "identity": "sha256:8f1fe6d5e523a8a4e15195ba717392710a8bd111fcc0094739bfc9b182f77c8f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+      "identity": "sha256:f3785e8ab5077ea938b9d56829ddc5a541a0b9b565c7a769edde6b805202bf05",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "interaction-regressions-pass",
+      "identity": "sha256:101796a50c9c6f950969d4b1a19f564688df7b7ade0da3d83f1e7f10a25709b5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "closeout-handoff-and-routing-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -20,7 +44,7 @@
     "command:verify-plugin-artifact-57-files-607662-bytes",
     "command:npm-run-verify-118-of-118"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The read-only host now emits one complete vibehub_ticket_handoff containing exact Ticket ID and canonical Ticket ref, current Acceptance with explicit authority, complete Evidence records and refs, Outcome record or pending null, Context and constraints, direct relations, provenance, exact worktree/branch/commit/dirty paths, review input refs, and a machine-readable CLOSE_OUT route with the independent-closeout instruction. The browser copies that host payload and has no write route; the same typed handoff can be invoked later by an official DSH no-model-turn command without binding this Plugin to another task system. Ticket Run rereads next_action after Evidence, Review exposes only ready_to_closeout for bounded review, and the shared lifecycle maps EXECUTE to Run and CLOSE_OUT to a separate independent closeout owner. Artifact verification passed for the installed Plugin with 57 files and 607662 bytes, including the routing contract, queue, complete payload, and read-only loopback host.",
   "ticket_id": "ticket-make-closeout-first-class-handoff"
 }

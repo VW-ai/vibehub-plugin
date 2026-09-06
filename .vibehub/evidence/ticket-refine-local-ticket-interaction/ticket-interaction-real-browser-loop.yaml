@@ -5,6 +5,30 @@
     "detail-is-progressive-and-task-ordered",
     "navigation-feels-fluid-and-predictable"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "default-view-orients-immediately",
+      "identity": "sha256:131e13ecfd2f706ef71bd099ac98e2bccf0ec971f3569570177817bef3b3fa25",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "selection-is-one-execution-lens",
+      "identity": "sha256:4f6d86309889f691b10fa9c0a9109a5a8f22d16e1b49e2a6ef1c8292b29e7f68",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "detail-is-progressive-and-task-ordered",
+      "identity": "sha256:e3163acd87a4d23fc9fc87917468473c790e37d72c4253f47ac2cf69836ed3b4",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "navigation-feels-fluid-and-predictable",
+      "identity": "sha256:44ffb62ae1996255ce28fafd87e3fdaef8a9f57edb8308dd5c8a0c5124a0a107",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ticket-interaction-real-browser-loop",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T09:37:57Z",
@@ -15,7 +39,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "browser:actual-repository-desktop-1280x900-and-narrow-390x720"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit fbdf901 was exercised against the actual six-Ticket repository at 1280x900, the normal Codex browser width, and 390x720. The settled default view exposed the exact vibehub-plugin worktree, branch and commit, one READY frontier, causal direction, direct relations, DONE state, minimap and controls without a legend. Selecting the READY Ticket kept its SVG node inside the resized desktop canvas and opened one Execution lens with state, completed prerequisites, zero blockers, direct unlocks and proof coverage. Contract exposed acceptance, guardrails, bounded Context and audit disclosures; Proof mechanically reflected structured Evidence and Outcome arrays, including seven Accepted criteria on a completed Ticket. Arrow-key tab navigation, full-screen narrow Inspector, close/back focus restoration and semantic state color were observed. Dogfood also found and fixed the prior false DONE blocker count and the programmatic heading focus frame.",
   "ticket_id": "ticket-refine-local-ticket-interaction"
 }

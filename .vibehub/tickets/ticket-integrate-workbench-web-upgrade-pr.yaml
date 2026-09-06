@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "one-pr-contains-the-complete-web-upgrade",
-      "criterion": "One reviewable branch and pull request contains the successful canvas shell, layout direction, dense graph, canonical archive/query, selected Codex-like visual system, and selected Rooms surface Outcomes, with each constituent Ticket retaining separate acceptance-linked Evidence, Outcome, and bounded commits. The constituent set is exactly the transitive dependency closure rooted at this Ticket minus `ticket-publish-v070-ui-release` itself and minus every dependency whose successful Outcome already exists in the tagged v0.7.0 tree; after the PR URL exists, every remaining Ticket in that closed set records the exact canonical pull_request delivery entry as proposed on this branch."
+      "acceptance_id": "combined-workbench-journeys-pass",
+      "criterion": "A single clean-host browser pass verifies current and all-history graphs, per-PR and one-or-many-Room queries, archived-hop expansion, both layout directions, Overview, Room detail, causal focus, Inspector lenses, exact source, focused-link restoration, human-attention states, keyboard access, reduced motion, 1440x960, 1180x820, and 390x844 without horizontal overflow or stale cross-feature state.",
+      "identity": "sha256:19c74ce8592959a2d1e4aaad8ff00014fbaac933c22602d8c72d1bdf9467a6f9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "main-and-pr15-contracts-are-reconciled",
-      "criterion": "The branch is updated against the latest remote main before handoff; semantic and code conflicts with the PR #15 authority/human-attention contracts and the v0.7.0 Web baseline are resolved explicitly, and no accepted human-origin Evidence rule, REFINE behavior, causal-cone interaction, exact Git source, or READY-gated handoff regresses."
+      "criterion": "The branch is updated against the latest remote main before handoff; semantic and code conflicts with the PR #15 authority/human-attention contracts and the v0.7.0 Web baseline are resolved explicitly, and no accepted human-origin Evidence rule, REFINE behavior, causal-cone interaction, exact Git source, or READY-gated handoff regresses.",
+      "identity": "sha256:ba242705599cd6d553ebb8b2f9be9333e67768a9df0865a163f070d87e8b4da7",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "combined-workbench-journeys-pass",
-      "criterion": "A single clean-host browser pass verifies current and all-history graphs, per-PR and one-or-many-Room queries, archived-hop expansion, both layout directions, Overview, Room detail, causal focus, Inspector lenses, exact source, focused-link restoration, human-attention states, keyboard access, reduced motion, 1440x960, 1180x820, and 390x844 without horizontal overflow or stale cross-feature state."
+      "acceptance_id": "one-pr-contains-the-complete-web-upgrade",
+      "criterion": "One reviewable branch and pull request contains the successful canvas shell, layout direction, dense graph, canonical archive/query, selected Codex-like visual system, and selected Rooms surface Outcomes, with each constituent Ticket retaining separate acceptance-linked Evidence, Outcome, and bounded commits. The constituent set is exactly the transitive dependency closure rooted at this Ticket minus `ticket-publish-v070-ui-release` itself and minus every dependency whose successful Outcome already exists in the tagged v0.7.0 tree; after the PR URL exists, every remaining Ticket in that closed set records the exact canonical pull_request delivery entry as proposed on this branch.",
+      "identity": "sha256:f6365a81fad0b959afa08fca7500190cccc93b45c692009eb4da9a42a587bae5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
-      "criterion": "Project and every Ticket validate, the full test suite and installed Plugin artifact pass from a clean checkout, all entered Rooms are FRESH, and the final diff adds no Desktop application, repository switcher, launcher runtime, session watcher, database, daemon, persistent browser store, hidden cache, or writable Workbench route."
-    },
-    {
-      "acceptance_id": "v080-release-candidate-identity-is-in-pr",
-      "criterion": "package.json, the Codex and Claude plugin manifests, the Claude marketplace manifest, release verification tests, and the top Changelog entry all agree on feature release 0.8.0 dated 2026-08-13. The Changelog names the concentrated Web Workbench improvements, the optional deliveries compatibility model, preserved PR #15 authority/REFINE semantics, and the intentionally absent Desktop runtime; clean verification and artifact build pass without changing the GitHub-only release mechanism or data format version."
+      "criterion": "Project and every Ticket validate, the full test suite and installed Plugin artifact pass from a clean checkout, all entered Rooms are FRESH, and the final diff adds no Desktop application, repository switcher, launcher runtime, session watcher, database, daemon, persistent browser store, hidden cache, or writable Workbench route.",
+      "identity": "sha256:732944c987230899a03b9b8262056cf0684b813c942bd10d4f863fe8933b142b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "pr-handoff-is-reviewable",
-      "criterion": "The final PR description names the Web-only scope, constituent Ticket Outcomes, user-visible changes, archive/query schema compatibility implications, browser evidence, test results, known limitations, and v0.8.0 release recommendation; the branch is clean and contains no unrelated work before PR creation or update. Its own proposed delivery entries remain current during review and may change to delivered—and therefore become archived—only in a later Git change after the external merge is authoritative and its exact merge commit and time are known."
+      "criterion": "The final PR description names the Web-only scope, constituent Ticket Outcomes, user-visible changes, archive/query schema compatibility implications, browser evidence, test results, known limitations, and v0.8.0 release recommendation; the branch is clean and contains no unrelated work before PR creation or update. Its own proposed delivery entries remain current during review and may change to delivered—and therefore become archived—only in a later Git change after the external merge is authoritative and its exact merge commit and time are known.",
+      "identity": "sha256:c54c2e1eef964dcb7070660cc8730e223ccf1ba9fafca6a9c91b2861f5d20ef5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v080-release-candidate-identity-is-in-pr",
+      "criterion": "package.json, the Codex and Claude plugin manifests, the Claude marketplace manifest, release verification tests, and the top Changelog entry all agree on feature release 0.8.0 dated 2026-08-13. The Changelog names the concentrated Web Workbench improvements, the optional deliveries compatibility model, preserved PR #15 authority/REFINE semantics, and the intentionally absent Desktop runtime; clean verification and artifact build pass without changing the GitHub-only release mechanism or data format version.",
+      "identity": "sha256:7fb6c92e1e979540a92f6010b48ddc1f665bb9e1b80d0f31d0d77c16465bfc62",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This is one Web interaction, query, and aesthetic upgrade PR; do not split its planned constituent Tickets across separate feature PRs unless the owner changes the delivery decision.",
     "One PR does not collapse Ticket lifecycle boundaries: every constituent Ticket still requires its own Evidence, independent closeout, Outcome, and reviewable commit history.",
@@ -54,6 +73,44 @@
       "ref": "docs/RELEASE.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "combined-workbench-journeys-pass",
+          "identity": "sha256:19c74ce8592959a2d1e4aaad8ff00014fbaac933c22602d8c72d1bdf9467a6f9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "main-and-pr15-contracts-are-reconciled",
+          "identity": "sha256:ba242705599cd6d553ebb8b2f9be9333e67768a9df0865a163f070d87e8b4da7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-pr-contains-the-complete-web-upgrade",
+          "identity": "sha256:f6365a81fad0b959afa08fca7500190cccc93b45c692009eb4da9a42a587bae5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+          "identity": "sha256:732944c987230899a03b9b8262056cf0684b813c942bd10d4f863fe8933b142b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "pr-handoff-is-reviewable",
+          "identity": "sha256:c54c2e1eef964dcb7070660cc8730e223ccf1ba9fafca6a9c91b2861f5d20ef5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v080-release-candidate-identity-is-in-pr",
+          "identity": "sha256:7fb6c92e1e979540a92f6010b48ddc1f665bb9e1b80d0f31d0d77c16465bfc62",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5e56351a5cb36ffa3c948011a1ce1edc919681fa4abaab92705ab73bc6736e3b",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-13T18:27:34.000Z",
@@ -78,6 +135,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

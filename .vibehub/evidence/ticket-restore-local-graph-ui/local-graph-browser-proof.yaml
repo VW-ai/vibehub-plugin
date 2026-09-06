@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "graph-experience-restored"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-experience-restored",
+      "identity": "sha256:6fa2dd79551b2026990bc57aab4403be1b0c0f6930da473a8ed793710439cb4f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "local-graph-browser-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T07:18:44Z",
@@ -12,7 +21,7 @@
     "skills/vibehub-ticket-review/assets/app.js",
     "test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The selectively recovered UI rendered the repository's Ticket cards and READY/DONE states in a real in-app browser with the established visual design, minimap, inspector, source status, and responsive canvas. Ticket selection loaded its full inspector; the Zoom control changed the SVG world transform and the browser reported no warning or error logs. Automated fixtures also projected READY, BLOCKED, DONE, and DEVIATED nodes plus two direct dependency edges.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

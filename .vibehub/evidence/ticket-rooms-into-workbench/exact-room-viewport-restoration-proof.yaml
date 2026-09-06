@@ -3,6 +3,20 @@
     "room-detail-and-filter-preserve-causal-layout",
     "rooms-production-journeys-and-boundary-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
+      "identity": "sha256:ca311c2e0c8a1ab4dcfe4cf75044e72cb73540c8d8344ab602eb83a579241527",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "identity": "sha256:f9a8c56e1ca119cd9115e9c7c82f4c92c88a0c16f7aac6de2aa734ee252d75a3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "exact-room-viewport-restoration-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-13T05:27:00.000Z",
@@ -11,7 +25,7 @@
     "commit:d935731",
     "test/ui-rooms.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The second independent browser retry confirmed that query union, selected Ticket, Contract lens, direction, and graph relations restored, but found selectTicket's deferred revealTicket frame overwrote the saved pan after Clear. The repair now waits through that deferred render and then reapplies the exact saved panX, panY, and scale, so client rectangles can restore bit-identically rather than merely retaining internal graph coordinates. Focused Rooms/UI-host tests pass 12/12 and Workbench Room alignment is FRESH; independent browser closeout must reproduce the exact failed pan+zoom journey before acceptance.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

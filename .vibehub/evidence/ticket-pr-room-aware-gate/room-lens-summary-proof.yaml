@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "room-aware-summary"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "room-aware-summary",
+      "identity": "sha256:1473f027d8184a97b7dc4529f91e3254f367bf342b30ab979561c4eb7cc91ae5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "room-lens-summary-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T02:39:09.000Z",
@@ -9,7 +18,7 @@
     "commit:5055155",
     "skills/vibehub-pr/SKILL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The PR summary instruction now reads through the Room lens: contract and shared-reference diffs lead because their blast radius exceeds prose, followed by the rooms the branch entered with their knowledge changes, then the existing outcome, evidence, tests, and known-gaps items.",
   "ticket_id": "ticket-pr-room-aware-gate"
 }

@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "repo-local-release-skill-is-complete",
-      "criterion": "A concise repository-local VibeHub public-site release Skill defines triggers, exact preflight, Sites version and deployment flow, custom-domain conflict guardrails, production verification, evidence recording, rollback behavior, and stop conditions; it is not included in the distributable VibeHub Plugin skills directory."
-    },
-    {
-      "acceptance_id": "release-checks-are-mechanical",
-      "criterion": "A dependency-free bundled script validates the checked-in Sites project identity and canonical production metadata, runs or composes the existing site lint/build/rendered-contract checks with NEXT_PUBLIC_SITE_URL=https://vibehub.icu, and verifies a deployed URL by HTTPS status, title, canonical metadata, and one stable product marker with actionable failures."
+      "acceptance_id": "current-production-path-is-proven",
+      "criterion": "The Skill passes the standard Skill validator, the release script passes its local configuration and production-build path, the existing rendered site contracts pass, the script verifies the live vibehub.icu deployment, and canonical VibeHub project and Ticket validation remain green.",
+      "identity": "sha256:c52315c3d60a24213695f3878481692cec94f2d5f6e94c6f79d28a6a78f215c1",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "human-entry-is-short-and-truthful",
-      "criterion": "site/README.md names vibehub.icu, points maintainers to the repository-local release Skill, distinguishes checked-in configuration from credentials and live DNS state, and gives a short manual verification command without duplicating the full workflow."
+      "criterion": "site/README.md names vibehub.icu, points maintainers to the repository-local release Skill, distinguishes checked-in configuration from credentials and live DNS state, and gives a short manual verification command without duplicating the full workflow.",
+      "identity": "sha256:1ba83f41efbde41a1ee8fcab78ddbff1febbd61c6a5f837384635896eae1edae",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "current-production-path-is-proven",
-      "criterion": "The Skill passes the standard Skill validator, the release script passes its local configuration and production-build path, the existing rendered site contracts pass, the script verifies the live vibehub.icu deployment, and canonical VibeHub project and Ticket validation remain green."
+      "acceptance_id": "release-checks-are-mechanical",
+      "criterion": "A dependency-free bundled script validates the checked-in Sites project identity and canonical production metadata, runs or composes the existing site lint/build/rendered-contract checks with NEXT_PUBLIC_SITE_URL=https://vibehub.icu, and verifies a deployed URL by HTTPS status, title, canonical metadata, and one stable product marker with actionable failures.",
+      "identity": "sha256:33b970b9d38c7bb8887d764b73f5bc2f923cdeb477dcaddf1050deb3a5614ccb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "repo-local-release-skill-is-complete",
+      "criterion": "A concise repository-local VibeHub public-site release Skill defines triggers, exact preflight, Sites version and deployment flow, custom-domain conflict guardrails, production verification, evidence recording, rollback behavior, and stop conditions; it is not included in the distributable VibeHub Plugin skills directory.",
+      "identity": "sha256:f0a6225e71b66a233eb8432788c6e4b90e3ce328891d4c403bf9bf36b977eb0d",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep Cloudflare credentials, temporary deployment credentials, DNS verification values, and transient provider state out of Git.",
     "Reuse the exact project_id already stored in site/.openai/hosting.json; never create a second Sites project for this site.",
@@ -32,11 +45,39 @@
     },
     {
       "purpose": "Accepted Outcome preserving the historical Sites release identity and proof after its checked-in metadata was superseded.",
-      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow.yaml"
+      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow/contract-v1.yaml"
     },
     {
       "purpose": "Current human-facing build and deployment instructions to narrow and correct.",
       "ref": "site/README.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "current-production-path-is-proven",
+          "identity": "sha256:c52315c3d60a24213695f3878481692cec94f2d5f6e94c6f79d28a6a78f215c1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-entry-is-short-and-truthful",
+          "identity": "sha256:1ba83f41efbde41a1ee8fcab78ddbff1febbd61c6a5f837384635896eae1edae",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-checks-are-mechanical",
+          "identity": "sha256:33b970b9d38c7bb8887d764b73f5bc2f923cdeb477dcaddf1050deb3a5614ccb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repo-local-release-skill-is-complete",
+          "identity": "sha256:f0a6225e71b66a233eb8432788c6e4b90e3ce328891d4c403bf9bf36b977eb0d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:55bd9ef74cb590d743dddb191df77a4494c7ca64cb98f392726399811956904c",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -48,6 +89,7 @@
     "context:intent-reproducible-public-site-release"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-encode-public-site-release-workflow"
 }

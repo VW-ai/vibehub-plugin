@@ -5,6 +5,30 @@
     "rooms-use-the-owner-selected-interface-language",
     "rooms-production-journeys-and-boundary-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "rooms-projection-is-canonical-and-shared",
+      "identity": "sha256:6457127a7f5db69fd64e851c04bdd2dc8da36a21f8e4f915491cf67e32a88b3b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "identity": "sha256:d960ac6563cb33835996f9fe2f6e38af9f147dff3c04e0b7a0a1811e38615063",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+      "identity": "sha256:c94e575ce0d71995c902d92dfc402d6f769bc04a5b100229682f1e8b8e689075",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "identity": "sha256:f9a8c56e1ca119cd9115e9c7c82f4c92c88a0c16f7aac6de2aa734ee252d75a3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "canonical-room-state-presentation-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-13T05:45:00.000Z",
@@ -14,7 +38,7 @@
     "docs/proposals/rooms-workbench/contract.json",
     "test/ui-rooms.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Contract audit found that production used one generic drift icon and raw WARNING/COLD_START labels. A shared ROOM_STATE_PRESENTATION map now renders the exact approved FRESH/check, DRIFTED/diff, OLD CHECKOUT/history, STALE/alert-circle, and ROOMS NOT INITIALIZED/snowflake language in tree, detail header, Drift rows, and true zero-Room empty state. Flat DOM treeitems expose canonical directory depth through aria-level. Focused host tests pass 13/13, fresh full verify passes 78/78, the artifact verifies at 54 files / 718834 bytes, and Workbench Room is FRESH. Independent closeout must exercise the state fixture and hierarchy semantics before acceptance.",
   "ticket_id": "ticket-rooms-into-workbench"
 }

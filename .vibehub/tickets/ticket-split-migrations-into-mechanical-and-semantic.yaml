@@ -1,42 +1,70 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "migration-entries-declare-both-halves",
-      "criterion": "Every entry in skills/vibehub-migrate/references/migrations.json separates its deterministic steps from those requiring Agent judgment, in a shape the engine can read rather than prose a reader must interpret; the existing 0.4-to-0.5, 0.5-unversioned-to-format-1, and format-1-to-format-2 entries are each classified, and the classification is defended in the Evidence step by step rather than asserted."
-    },
-    {
-      "acceptance_id": "mechanical-half-runs-on-its-own",
-      "criterion": "The engine can execute the declared mechanical steps for a project's applicable migrations with no Agent judgment, producing an ordinary reviewable Git change; run against a fixture at format 1, it yields a project where project compatibility returns CURRENT and project validate passes, and run against a fixture whose migration has no mechanical steps it makes no change and says so."
-    },
-    {
-      "acceptance_id": "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
-      "criterion": "A behavioural fixture invokes the mechanical engine operation with an exact --repo worktree while the same repository has a sibling worktree, then proves only migration-declared paths in the passed worktree changed; sibling bytes and status, both worktree HEADs, refs, and commit count remain unchanged; no project or worktree discovery occurs; and no commit or push is attempted."
-    },
-    {
-      "acceptance_id": "unblocking-is-separated-from-enriching",
-      "criterion": "After the mechanical half runs, the project is writable, and the remaining semantic work is recorded as work still to be done rather than silently lost — a reader of the project can tell that, for example, deliveries arrays are empty pending classification rather than genuinely empty."
-    },
-    {
-      "acceptance_id": "semantic-steps-carry-authoring-guidance",
-      "criterion": "Every step declared semantic carries the guidance an Agent needs to author the value: what the field is for, which existing material the value is derived from, what distinguishes a good value from a plausible one, and what must not be used as a shortcut. The format-1-to-format-2 delivery-membership rule is expressed in that shape rather than left as prose, and a check fails when a semantic step ships without guidance."
-    },
-    {
       "acceptance_id": "back-fill-guidance-is-proven-on-a-real-field",
-      "criterion": "The guidance is exercised rather than only written: an Agent back-fills the declared semantic values for at least one migration step on a disposable copy of a real project, and the Evidence shows what it produced, which values it declined to invent, and that a second Agent given the same guidance and the same documents would have had the same instructions to follow."
-    },
-    {
-      "acceptance_id": "migrate-skill-covers-only-judgment",
-      "criterion": "skills/vibehub-migrate/SKILL.md instructs the Agent to run the mechanical half through the engine and to spend its own reasoning only on the declared semantic steps, and test/skill-contracts.test.mjs asserts that the Skill's cited engine command exists and that the Skill no longer restates mechanical steps the reference owns."
-    },
-    {
-      "acceptance_id": "real-projects-rehearsed",
-      "criterion": "The path is rehearsed on disposable copies of the two real stale projects on this machine — Undercurrent at format 1 and nomi at 0.4-unversioned — and the Evidence records, for each, what the mechanical half completed unaided, what it correctly refused to guess, and whether the project became writable; no write touches the originals."
+      "criterion": "The guidance is exercised rather than only written: an Agent back-fills the declared semantic values for at least one migration step on a disposable copy of a real project, and the Evidence shows what it produced, which values it declined to invent, and that a second Agent given the same guidance and the same documents would have had the same instructions to follow.",
+      "identity": "sha256:233dcf8c3c6b6ecb33e5323abf638f7017ee7ca5a29d52f087483fe452077dfd",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "classification-is-a-release-obligation",
-      "criterion": "docs/RELEASE.md requires a data-layer change to ship its migration entry with both halves declared, and a check fails when a migrations entry is added or changed without the classification, so the obligation is enforced rather than remembered."
+      "criterion": "docs/RELEASE.md requires a data-layer change to ship its migration entry with both halves declared, and a check fails when a migrations entry is added or changed without the classification, so the obligation is enforced rather than remembered.",
+      "identity": "sha256:5bf0b5070301158af40ef8c28744195f9a2785a258fc6354e2bb083690d7fc8b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "mechanical-half-runs-on-its-own",
+      "criterion": "The engine can execute the declared mechanical steps for a project's applicable migrations with no Agent judgment, producing an ordinary reviewable Git change; run against a fixture at format 1, it yields a project where project compatibility returns CURRENT and project validate passes, and run against a fixture whose migration has no mechanical steps it makes no change and says so.",
+      "identity": "sha256:7c7cb33a5ae57059a993ae7eef073065229f9e6428153569d2f7ad9bfbb99a46",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
+      "criterion": "A behavioural fixture invokes the mechanical engine operation with an exact --repo worktree while the same repository has a sibling worktree, then proves only migration-declared paths in the passed worktree changed; sibling bytes and status, both worktree HEADs, refs, and commit count remain unchanged; no project or worktree discovery occurs; and no commit or push is attempted.",
+      "identity": "sha256:c2a4c884cad186bb39dab201758b828be7456b76c39045bcfccfeab12b9b1809",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "migrate-skill-covers-only-judgment",
+      "criterion": "skills/vibehub-migrate/SKILL.md instructs the Agent to run the mechanical half through the engine and to spend its own reasoning only on the declared semantic steps, and test/skill-contracts.test.mjs asserts that the Skill's cited engine command exists and that the Skill no longer restates mechanical steps the reference owns.",
+      "identity": "sha256:2514a11cfd7627f8fd09bc2a6efe65e3525a18c233cc1c301052af2dc6dc777b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "migration-entries-declare-both-halves",
+      "criterion": "Every entry in skills/vibehub-migrate/references/migrations.json separates its deterministic steps from those requiring Agent judgment, in a shape the engine can read rather than prose a reader must interpret; the existing 0.4-to-0.5, 0.5-unversioned-to-format-1, and format-1-to-format-2 entries are each classified, and the classification is defended in the Evidence step by step rather than asserted.",
+      "identity": "sha256:9d9c8c24db3f8750006cd7bc81aec7273f1513e93fc4cb925f16dae3defb4b34",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "real-projects-rehearsed",
+      "criterion": "The path is rehearsed on disposable copies of the two real stale projects on this machine — Undercurrent at format 1 and nomi at 0.4-unversioned — and the Evidence records, for each, what the mechanical half completed unaided, what it correctly refused to guess, and whether the project became writable; no write touches the originals.",
+      "identity": "sha256:98c34e16b90a714a9b8dc5bab527eeca92016fa7bd393f25a5384aed3734cd0b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-steps-carry-authoring-guidance",
+      "criterion": "Every step declared semantic carries the guidance an Agent needs to author the value: what the field is for, which existing material the value is derived from, what distinguishes a good value from a plausible one, and what must not be used as a shortcut. The format-1-to-format-2 delivery-membership rule is expressed in that shape rather than left as prose, and a check fails when a semantic step ships without guidance.",
+      "identity": "sha256:f39d14ffd86ecb43938c88e043341a3292baab32039a59ad19d1670af4c0f03e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "unblocking-is-separated-from-enriching",
+      "criterion": "After the mechanical half runs, the project is writable, and the remaining semantic work is recorded as work still to be done rather than silently lost — a reader of the project can tell that, for example, deliveries arrays are empty pending classification rather than genuinely empty.",
+      "identity": "sha256:e511de41b64e095135c4a7ecbf1dd1b53ac69da7831df6d9613e2ab9d14510a1",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not add forward-compatibility shims or dual read paths; this splits how a migration is executed, not whether the data layer stays clean.",
     "Do not let the mechanical half infer anything the reference marks as judgment; where an authoritative value cannot be established it writes the entry's declared empty or default value and says so.",
@@ -85,6 +113,59 @@
       "ref": "test/skill-contracts.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "back-fill-guidance-is-proven-on-a-real-field",
+          "identity": "sha256:233dcf8c3c6b6ecb33e5323abf638f7017ee7ca5a29d52f087483fe452077dfd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "classification-is-a-release-obligation",
+          "identity": "sha256:5bf0b5070301158af40ef8c28744195f9a2785a258fc6354e2bb083690d7fc8b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "mechanical-half-runs-on-its-own",
+          "identity": "sha256:7c7cb33a5ae57059a993ae7eef073065229f9e6428153569d2f7ad9bfbb99a46",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
+          "identity": "sha256:c2a4c884cad186bb39dab201758b828be7456b76c39045bcfccfeab12b9b1809",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migrate-skill-covers-only-judgment",
+          "identity": "sha256:2514a11cfd7627f8fd09bc2a6efe65e3525a18c233cc1c301052af2dc6dc777b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migration-entries-declare-both-halves",
+          "identity": "sha256:9d9c8c24db3f8750006cd7bc81aec7273f1513e93fc4cb925f16dae3defb4b34",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "real-projects-rehearsed",
+          "identity": "sha256:98c34e16b90a714a9b8dc5bab527eeca92016fa7bd393f25a5384aed3734cd0b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-steps-carry-authoring-guidance",
+          "identity": "sha256:f39d14ffd86ecb43938c88e043341a3292baab32039a59ad19d1670af4c0f03e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "unblocking-is-separated-from-enriching",
+          "identity": "sha256:e511de41b64e095135c4a7ecbf1dd1b53ac69da7831df6d9613e2ab9d14510a1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:15462cc597989ba17d6e2af476f970daf895ea3befb545518f6179289597abc8",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -95,6 +176,7 @@
     "plan-validation:independent"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }

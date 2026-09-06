@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "lifecycle-contract-is-single-and-testable",
-      "criterion": "One concise bundled lifecycle reference names every supported presentation event, its sole owning Skill, continuation behavior, human-boundary behavior, target graph surface, and fallback; deterministic tests reject duplicate event ownership, unknown Skills or surfaces, and contradictory continue-versus-wait semantics."
-    },
-    {
-      "acceptance_id": "ticket-skills-have-narrow-ownership",
-      "criterion": "Ticket Plan, Validate, Run, Closeout, PR, and Review read the shared lifecycle contract and contain only their transition-specific instructions: applying a graph presents it without adding an approval gate, ordinary READY execution stays quiet, protected human attention presents Contract and waits, closeout presents Log, PR review presents the branch graph, and Ticket Review alone owns launch/focus mechanics."
-    },
-    {
       "acceptance_id": "focused-review-links-are-mechanical",
-      "criterion": "The dependency-free launcher accepts optional validated Ticket and Execution/Contract/Log focus inputs, emits them in the authorized URL without weakening the fragment bearer, and the read-only UI mechanically selects the requested existing Ticket and view while ignoring no canonical data and exposing no write action."
+      "criterion": "The dependency-free launcher accepts optional validated Ticket and Execution/Contract/Log focus inputs, emits them in the authorized URL without weakening the fragment bearer, and the read-only UI mechanically selects the requested existing Ticket and view while ignoring no canonical data and exposing no write action.",
+      "identity": "sha256:a6e1481618e189f7ccd475aef86ac35eee7c46758cecbe4a083cc6a67bff248d",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "presentation-reuses-current-task-resources",
-      "criterion": "Ticket Review instructs the Agent to reuse a still-live host URL and browser tab within the current task, refreshing and refocusing it instead of opening repeated ports or tabs; when no live resource is known it starts the normal ephemeral host, and no cross-task registry, daemon, PID file, persistent cache, or hidden state is introduced."
-    },
-    {
-      "acceptance_id": "prompt-behavior-has-scenario-coverage",
-      "criterion": "Automated tests cover the central lifecycle and prompt integration plus focused launcher behavior for planned graph presentation, quiet execution, protected human attention, closeout Log, PR review, explicit fallback, invalid focus values, and an already-running current-task resource policy without coupling tests to incidental wording."
+      "acceptance_id": "lifecycle-contract-is-single-and-testable",
+      "criterion": "One concise bundled lifecycle reference names every supported presentation event, its sole owning Skill, continuation behavior, human-boundary behavior, target graph surface, and fallback; deterministic tests reject duplicate event ownership, unknown Skills or surfaces, and contradictory continue-versus-wait semantics.",
+      "identity": "sha256:0aae3ab6667e07b05e56a328c0a7ebee461b57b6a21379e0d6f5e498e8a839b5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "plugin-remains-lightweight",
-      "criterion": "Project validation, the full test suite, and clean artifact verification pass with the existing Git-YAML truth, read-only loopback bearer boundary, zero package dependencies, and no hook cadence, generic dispatcher, prompt engine, service registry, database, or durable UI state."
+      "criterion": "Project validation, the full test suite, and clean artifact verification pass with the existing Git-YAML truth, read-only loopback bearer boundary, zero package dependencies, and no hook cadence, generic dispatcher, prompt engine, service registry, database, or durable UI state.",
+      "identity": "sha256:7c4f59b286bfea4a646a2060168c2fc349d8dc9d05bff2876cbf8b56b4c97782",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "presentation-reuses-current-task-resources",
+      "criterion": "Ticket Review instructs the Agent to reuse a still-live host URL and browser tab within the current task, refreshing and refocusing it instead of opening repeated ports or tabs; when no live resource is known it starts the normal ephemeral host, and no cross-task registry, daemon, PID file, persistent cache, or hidden state is introduced.",
+      "identity": "sha256:e96a0f93b3058372063678504a44af90152c557b29a9dce0695c357490ffb160",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "prompt-behavior-has-scenario-coverage",
+      "criterion": "Automated tests cover the central lifecycle and prompt integration plus focused launcher behavior for planned graph presentation, quiet execution, protected human attention, closeout Log, PR review, explicit fallback, invalid focus values, and an already-running current-task resource policy without coupling tests to incidental wording.",
+      "identity": "sha256:0688dd87915ab1b6008f0d56f7dc7944bae11e299f5a9433044be8e4331bedb0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-skills-have-narrow-ownership",
+      "criterion": "Ticket Plan, Validate, Run, Closeout, PR, and Review read the shared lifecycle contract and contain only their transition-specific instructions: applying a graph presents it without adding an approval gate, ordinary READY execution stays quiet, protected human attention presents Contract and waits, closeout presents Log, PR review presents the branch graph, and Ticket Review alone owns launch/focus mechanics.",
+      "identity": "sha256:12850db72e22f9adbb80b8289a38a24939c054bf1cb57959f896ca43393878bd",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Move quickly and replace duplicated prompt logic directly; do not build a general Prompt framework or compatibility layer.",
     "Keep the shared lifecycle reference short enough to read whenever a Ticket Skill triggers; detailed prose and duplicated policy are defects.",
@@ -85,6 +104,44 @@
       "ref": "test/ui-host.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "focused-review-links-are-mechanical",
+          "identity": "sha256:a6e1481618e189f7ccd475aef86ac35eee7c46758cecbe4a083cc6a67bff248d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "lifecycle-contract-is-single-and-testable",
+          "identity": "sha256:0aae3ab6667e07b05e56a328c0a7ebee461b57b6a21379e0d6f5e498e8a839b5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "plugin-remains-lightweight",
+          "identity": "sha256:7c4f59b286bfea4a646a2060168c2fc349d8dc9d05bff2876cbf8b56b4c97782",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "presentation-reuses-current-task-resources",
+          "identity": "sha256:e96a0f93b3058372063678504a44af90152c557b29a9dce0695c357490ffb160",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "prompt-behavior-has-scenario-coverage",
+          "identity": "sha256:0688dd87915ab1b6008f0d56f7dc7944bae11e299f5a9433044be8e4331bedb0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-skills-have-narrow-ownership",
+          "identity": "sha256:12850db72e22f9adbb80b8289a38a24939c054bf1cb57959f896ca43393878bd",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e3e512049d0221a76717561d2c86c5bf0745360db546f17c841f88a865427b11",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -108,6 +165,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-make-workflow-present-itself"
 }

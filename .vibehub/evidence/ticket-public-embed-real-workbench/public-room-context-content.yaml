@@ -3,6 +3,20 @@
     "public-fixture-is-honest-and-lightweight",
     "workbench-embedding-preserves-product-quality"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-room-context-content",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "build:site-static-production-export",
     "preview:http://localhost:3000"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public Room browser now exposes real typed Context instead of one abstract summary. Product and Interface Rooms each show deterministic Decision, Constraint, Contract, and Reference entries with concrete titles, readable content, provenance labels, and the exact Ticket IDs that consume each entry. The Room still describes a Context boundary rather than a second work graph; selecting a consuming Ticket returns to the existing canonical Ticket graph and Inspector. The hero also adds the concise brand line Stop managing chats. Manage the work. without replacing the concrete product explanation.",
   "ticket_id": "ticket-public-embed-real-workbench"
 }

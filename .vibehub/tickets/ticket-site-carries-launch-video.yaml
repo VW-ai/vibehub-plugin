@@ -2,9 +2,13 @@
   "acceptance": [
     {
       "acceptance_id": "placement-decided",
-      "criterion": "Direction only: the owner has decided where (or whether) the video sits relative to the live Workbench and which headline the site carries; real acceptance is rewritten at REFINE."
+      "criterion": "Direction only: the owner has decided where (or whether) the video sits relative to the live Workbench and which headline the site carries; real acceptance is rewritten at REFINE.",
+      "identity": "sha256:be3ac5c9b43ca0c87ed22e37c3d2fd8fb3523b575e6559fa44092bf095a5d1ee",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not weaken the site tests in site/tests/rendered-html.test.mjs to fit a video block.",
     "Keep one tagline across site and videos.",
@@ -29,6 +33,19 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "placement-decided",
+          "identity": "sha256:be3ac5c9b43ca0c87ed22e37c3d2fd8fb3523b575e6559fa44092bf095a5d1ee",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:2179bb87cca057f7530741cf2704f4afc00f5626c31d1a299b18137a3a88c05b",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
@@ -37,6 +54,7 @@
     "conversation:2026-08-23-site-video-placement"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-site-carries-launch-video"
 }

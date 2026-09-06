@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "validate-path-states-the-skip"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "validate-path-states-the-skip",
+      "identity": "sha256:a1a197a34e1faebdf746f6ad571701232acb1fde202eb70fc3da697eeb7dd969",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "recorded-ref-namespace-no-longer-destroys-history",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +21,7 @@
     "skills/vibehub-ticket-plan/SKILL.md",
     "commit:79650be324d2dd742fc2c744e2919306a31fad0a"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "SUPERSEDES the namespace detail in apply-records-whether-validation-happened, which named validation:independent and validation:none — refs the engine no longer writes. The bare validation: namespace was already in use in two checked-in Tickets (ticket-tighten-completed-dependency-hygiene and ticket-propose-legacy-proof-revision-policy) to name the Ticket that validated a claim, and the recorder stripped every ref with that prefix, so any re-apply through the normal update path would have erased that history with no warning in the success envelope. This was shipped by the executor and found by independent adjudication, not by the executor. The prefix is now plan-validation:, collision-free repo-wide, and the recorder strips only its own namespace. Reproduced on a disposable copy: re-applying ticket-tighten-completed-dependency-hygiene unchanged preserves validation:ticket-fix-archived-stub-label-visibility verbatim and appends plan-validation:independent. A contract test now asserts an existing validation: ref survives recording, and that a rerun leaves exactly one plan-validation ref. The written document is also validated in the shape it is written in, not only as the caller supplied it.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

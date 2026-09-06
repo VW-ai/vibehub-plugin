@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "closeout-skill-matches-the-engine"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "closeout-skill-matches-the-engine",
+      "identity": "sha256:6000afc0017e469440d606c289595d4e6bf114e60f0bcd4108263bd2ac5ef8f0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "fixes-landed-after-the-fourth-adjudication",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +22,7 @@
     ".vibehub/rooms/product/decision-release-and-update-experience-is-the-mainline.yaml",
     "commit:bbf050ff4658a9f5726892a3af32579af16474f9"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Trail note so the standing partial Outcome is not misread. That Outcome (fourth adjudication) left closeout-skill-matches-the-engine unresolved on two grounds: a false sentence in skills/vibehub-ticket-closeout/SKILL.md claiming the contract tests catch a source named outside the declared list, and two schema assertions deleted by an earlier commit and replaced with nothing, which let the outcome.schema.json enum drift unguarded. Both were fixed afterwards in 88d6589 and recorded in schema-guard-restored-and-skill-claim-corrected, with five mutations checked and caught. Those fixes have NOT been independently adjudicated: the owner chose to stop here rather than spend a fifth round on a Ticket their own scope decision classes as a side fix. The verdict is deliberately left as the adjudicator wrote it; an executor must not upgrade its own Outcome. What a later reader should do is re-adjudicate from the current state, not assume either that the Outcome is current or that the fixes are verified. The engine gate itself was accepted by all four adjudications and is not in question.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

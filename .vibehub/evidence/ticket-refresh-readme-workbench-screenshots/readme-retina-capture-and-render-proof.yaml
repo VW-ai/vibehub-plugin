@@ -4,6 +4,25 @@
     "readme-copy-matches-current-product",
     "readme-render-and-artifact-parity-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "identity": "sha256:100a29d550eb7997dc12b0ed480727066fa269697f41fc3f8c62c9e238929939",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-product",
+      "identity": "sha256:99a928715ff40d550943e537f0365cd4c44a529056ec50f461e370ecdffd8df9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-render-and-artifact-parity-pass",
+      "identity": "sha256:bac0a61d9d4319a8649746018a5da6b66b280f6e90d826c5110255d8c7ff0952",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-retina-capture-and-render-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "browser:http-127-0-0-1-61079-narrow-readme-review",
     "browser:readme-preview-console-zero-errors"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The root README now embeds three lossless PNG captures from the exact clean production Workbench commit 55c52b49b9d7caffe0ce5c048529269dbfdb9261. The controlled DPR=2 capture path produced 2560x1440 pixels from a 1280x720 desktop graph, 2360x1640 from a 1180x820 focused Ticket action view, and 780x1688 from a real 390x844 narrow Rooms view; no 1x result was resized. The checked-in manifest records source commit, CSS viewport, DPR, output dimensions, paths, SHA-256 hashes, and the lossless/no-resize contract. Original-detail inspection confirmed crisp text and graph lines, useful crops, no browser chrome or transient tooltip, and no sensitive token; the narrow image was assembled only from native 2x slices without resizing. A GitHub-like README preview loaded every image at desktop and 390px article widths without broken assets, overflow, or console errors. Surrounding copy now names DRAFT, READY, RUNNING, and DONE and presents Recommended action as primary with explanation on demand, while preserving Evidence/Outcome inspection and making no native DSH invocation claim.",
   "ticket_id": "ticket-refresh-readme-workbench-screenshots"
 }

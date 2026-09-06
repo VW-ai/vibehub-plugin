@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "retained-host-git-is-safe"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "retained-host-git-is-safe",
+      "identity": "sha256:e3885994677d177044d3586c3d7858d721b8052f4af842afeb437b4f3103c6b3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "pr18-retained-host-fsmonitor-safe",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +20,7 @@
     "test/ui-host.test.mjs",
     "test:read-only-projection-disables-repository-configured-fsmonitor-hooks"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Every Git subprocess in the retained UI host now overrides core.fsmonitor=false, and the regression proves a repository hook that executes under ordinary git status is not executed by UI projection.",
   "ticket_id": "ticket-curate-pr18-ui-only"
 }

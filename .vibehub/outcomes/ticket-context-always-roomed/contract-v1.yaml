@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "put-requires-room",
+    "no-root-context-loading",
+    "dogfood-product-room",
+    "skills-teach-placement",
+    "ui-context-refs-roomed"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-04T00:25:17.000Z",
+  "contract_revision": {
+    "identity": "sha256:80efc174aeb82094507f06b354b26acbfb7a964f2f788bba26318848dd93bea9",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "put-requires-room-proof",
+    "no-root-context-proof",
+    "dogfood-product-room-proof",
+    "skills-docs-sweep-proof",
+    "ui-roomed-refs-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently verified at commit ba0b30a: context put without --room fails with the placement message and a valid roomed put succeeds (reproduced in a scratch repo); project init creates no context/ directory and a populated legacy .vibehub/context/ fails project validate with the migration error (reproduced); .vibehub/context/ is gone from this repo and the three product-wide entries live in .vibehub/rooms/product/ with room.yaml, project validate reporting rooms:4 contexts:10 with zero errors; ingest and query skills state the lowest-owning-room / lowest-common-ancestor / create-the-missing-room judgment and CLAUDE.md, AGENTS.md, docs/INSTALL.md are swept; vh-ui.mjs canonicalContextFromRef resolves roomed refs with owning-room attribution, excludes room.yaml from context cards, and ui-host.test.mjs asserts canonicalContext.room; npm test passes 29/29 and verify:artifact passes. Two record defects noted for follow-up, neither affecting delivered behavior: the ba0b30a sweep blanket-replaced .vibehub/context/ with .vibehub/rooms/product/ inside this ticket's own acceptance, context, and outcome text, corrupting the historical criteria wording (the governing decision file preserves the correct semantics); docs/SPEED_FIRST_CLEANUP.md line 44 still names the pre-migration path of decision-speed-first-skill-plugin.yaml in a past-tense sentence.",
+  "ticket_id": "ticket-context-always-roomed",
+  "unresolved_acceptance_ids": []
+}

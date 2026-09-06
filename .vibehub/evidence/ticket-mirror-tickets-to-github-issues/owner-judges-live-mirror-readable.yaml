@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "live-mirror-looks-good-on-github"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "live-mirror-looks-good-on-github",
+      "identity": "sha256:b6bd4f8f269e5285f4880aec9aef4778b9679b97b2bc25cb172f75da413bf306",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "owner-judges-live-mirror-readable",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -13,7 +22,7 @@
     "https://github.com/VW-ai/vibehub-plugin/issues/95",
     ".vibehub/evidence/ticket-mirror-tickets-to-github-issues/live-run-2026-08-22.txt"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After the live run created 87 Issues on VW-ai/vibehub-plugin (407 follow-up operations, 0 failures, immediate dry-run rerun planned 0 operations), the owner reviewed the Issues list, open Issue #69 with five Evidence comments, blocked Issue #35 with resolved Blocked-by numbers, and closed Issue #95, and said in conversation: 我觉得可以 — the mirror is readable and worth keeping. The owner also asked for native GitHub issue dependencies and a recommended GitHub view as follow-up work.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

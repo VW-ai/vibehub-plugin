@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 3,
+  "current_format": 4,
   "migrations": [
     {
       "migration_id": "0-4-unversioned-to-0-5-unversioned",
@@ -157,6 +157,77 @@
               "Audit every deleted-path provenance entry against the Ticket's exact Git history and record reviewable Evidence for the selection or ambiguity.",
               "For an established case, add commit:<40-hex>:<repo-relative-path> to context_refs, verify it with context resolve, and remove only the matching deleted-path provenance entry.",
               "For an ambiguous case, retain a deleted-path provenance note that explicitly says selection remains unresolved, then validate the project."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "migration_id": "format-3-to-format-4",
+      "from": "format-3",
+      "to": "format-4",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 2,
+          "to": 3
+        },
+        "evidence": {
+          "from": 1,
+          "to": 2
+        },
+        "outcome": {
+          "from": 1,
+          "to": 2
+        }
+      },
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 3 and target_format 4 after Acceptance and complete Ticket contracts became append-only revisions with exact Evidence and Outcome bindings.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/tickets/*.yaml",
+          ".vibehub/evidence/**/*.yaml",
+          ".vibehub/outcomes/*.yaml",
+          ".vibehub/outcomes/**/*.yaml",
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "upgrade-proof-revision-schemas",
+            "ticket_from": 2,
+            "ticket_to": 3,
+            "evidence_from": 1,
+            "evidence_to": 2,
+            "outcome_from": 1,
+            "outcome_to": 2,
+            "pending_semantic_ref": "migration-pending:format-3-to-format-4:reconstruct-proof-revisions"
+          },
+          {
+            "type": "write-project-format",
+            "format_version": 4
+          }
+        ]
+      },
+      "semantic": {
+        "steps": [
+          {
+            "step_id": "reconstruct-proof-revisions",
+            "pending_ref": "migration-pending:format-3-to-format-4:reconstruct-proof-revisions",
+            "purpose": "Turn explicit legacy-pending payloads into immutable Acceptance and Contract revisions, then bind every historical Evidence and Outcome to exactly what it evaluated without silently rebinding proof to current wording.",
+            "derives_from": [
+              "Each legacy Evidence or Outcome file's first addition commit on the current HEAD ancestry.",
+              "The owning Ticket document at that exact commit and the pending Ticket's current legacy Acceptance payload.",
+              "The append-only identity, lineage, retirement, and projection rules in decision-acceptance-contracts-use-append-only-revisions."
+            ],
+            "good_value": "Every reconstructable proof record is bound with origin reconstructed to a deterministic immutable revision; distinct historical semantics receive chronological v1, v2, and later labels; the current semantic contract is the active latest revision; and only genuinely missing or ambiguous history becomes legacy-unresolved with attempted provenance recorded.",
+            "forbidden_shortcuts": [
+              "Do not bind every old proof to the current Ticket, treat ordinary drift as unresolved, or relabel an old successful Outcome as failed or stale.",
+              "Do not use git log --all, another worktree's branch, timestamps, filenames, array position, or mutable repository position as semantic identity.",
+              "Do not change the asserted Evidence summary, refs, origin, Acceptance IDs, Outcome judgment, accepted IDs, unresolved IDs, Evidence IDs, independence, or timestamps.",
+              "Do not remove the per-Ticket pending ref until every legacy proof for that Ticket is either exactly bound or explicitly unresolved."
+            ],
+            "instructions": [
+              "Run the shared project migrate-proof-revisions operation inside the exact worktree after reviewing its pending-step guidance; it reads Git history but never checks out another revision or mutates another worktree.",
+              "Review the returned bound and unresolved counts plus changed paths, inspect every unresolved diagnostic, and keep the migration diff as the review and rollback boundary.",
+              "Validate the project, Ticket graph, active lifecycle projection, and Room drift after reconstruction; then commit the semantic migration locally without pushing."
             ]
           }
         ]

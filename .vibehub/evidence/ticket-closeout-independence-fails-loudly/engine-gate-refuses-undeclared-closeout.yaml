@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "engine-requires-a-declared-independence-source"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "engine-requires-a-declared-independence-source",
+      "identity": "sha256:aeafb6f8f5069db91f30b409b3ff8efb6df7e8aae90cee868cbeb2c3537c9afe",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "engine-gate-refuses-undeclared-closeout",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -11,7 +20,7 @@
     "test/skill-contracts.test.mjs",
     "commit:a34058c8fbd4f0c66c2737638ede7312140cf3da"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "node vh.mjs ticket closeout now rejects an Outcome whose input carries no independence declaration, before validation and before any write. Probed on a disposable copy: the envelope is {\"ok\":false,\"error\":{\"code\":\"missing_independence\",...}}, naming the closed set subagent|separate_session|different_human and instructing the Agent to stop rather than adjudicate its own work; no file appeared under .vibehub/outcomes. A source outside the set is rejected separately as outcome.independence.source must be one of subagent, separate_session, different_human. A correctly declared Outcome passes the gate and proceeds to the pre-existing repository validation, which then rejected the probe for omitting acceptance ids — proving the new gate neither swallows nor replaces the checks already there. test/skill-contracts.test.mjs 'closeout without a declared independence source writes no Outcome' asserts the error code, the absence of the Outcome file, that the Ticket still routes EXECUTE rather than adjudicated, and the invalid-source rejection.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

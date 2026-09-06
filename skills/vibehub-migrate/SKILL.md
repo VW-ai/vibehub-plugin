@@ -57,6 +57,15 @@ actions. This Skill supplies only the judgment named by declared semantic steps.
    a pending marker only when its semantic audit is actually complete, then
    rerun the mechanical operation if the migration path had paused for that
    judgment.
+   For `reconstruct-proof-revisions`, run the declared engine operation in the
+   opened worktree after reviewing its current-HEAD-only Git-history boundary:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs project migrate-proof-revisions --repo <root>
+   ```
+
+   Review its exact bound and `legacy-unresolved` report. It reconstructs; it
+   does not guess, push, or mutate another worktree.
 5. Prove `project compatibility` is `CURRENT`, `project validate` passes, and
    `room drift` is honest
    about anything the migration could not settle. Leave the diff to normal

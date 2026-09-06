@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tempRepo } from "./helpers.mjs";
+import { materializeInitialTicket } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 import {
   computeProjection, humanizeTicketId, markerValue, planSync, planUpdates, planDependencies,
   TICKET_MARKER, EVIDENCE_MARKER,
@@ -11,35 +12,40 @@ import {
 const GITHUB = "acme/demo";
 
 function ticket(id, extra = {}) {
-  return {
-    schema_version: 2, kind: "ticket", ticket_id: id, maturity: "firm",
+  return materializeInitialTicket({
+    schema_version: 3, kind: "ticket", ticket_id: id, maturity: "firm",
     outcome: `Outcome of ${id}`, deliveries: [], context: "ctx",
     acceptance: [{ acceptance_id: "a1", criterion: "first" }, { acceptance_id: "a2", criterion: "second", authority: "human" }],
     constraints: ["no write-back"], context_refs: [{ ref: "README.md", purpose: "readme" }],
     relations: [], provenance_refs: ["conversation:test"], ...extra,
-  };
+  });
 }
 
 function fixtureRepo() {
   const repo = tempRepo("sync-issues");
   for (const d of ["tickets", "outcomes", "evidence/ticket-done", "rooms"]) mkdirSync(join(repo, ".vibehub", d), { recursive: true });
-  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 3 }));
+  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 4 }));
   writeFileSync(join(repo, "README.md"), "# demo\n");
-  writeFileSync(join(repo, ".vibehub", "tickets", "ticket-done.yaml"), JSON.stringify(ticket("ticket-done")));
+  const doneTicket = ticket("ticket-done");
+  writeFileSync(join(repo, ".vibehub", "tickets", "ticket-done.yaml"), JSON.stringify(doneTicket));
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-open.yaml"), JSON.stringify(ticket("ticket-open", {
     relations: [{ type: "depends_on", target_ticket_id: "ticket-done", rationale: "needs it" }],
   })));
-  writeFileSync(join(repo, ".vibehub", "outcomes", "ticket-done.yaml"), JSON.stringify({
-    schema_version: 1, kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" }, ticket_id: "ticket-done", status: "successful",
+  mkdirSync(join(repo, ".vibehub", "outcomes", "ticket-done"), { recursive: true });
+  writeFileSync(join(repo, ".vibehub", "outcomes", "ticket-done", "contract-v1.yaml"), JSON.stringify({
+    schema_version: 2, kind: "ticket_outcome", outcome_id: "contract-v1", binding_state: "bound", binding_origin: "native",
+    contract_revision: { revision: 1, identity: doneTicket.contract_revisions[0].identity }, independence: { source: "subagent", note: "test fixture" }, ticket_id: "ticket-done", status: "successful",
     accepted_acceptance_ids: ["a1", "a2"], unresolved_acceptance_ids: [], evidence_ids: ["proof-one", "owner-signoff"],
     summary: "All good.", closed_at: "2026-08-01T00:00:00Z",
   }));
   writeFileSync(join(repo, ".vibehub", "evidence", "ticket-done", "proof-one.yaml"), JSON.stringify({
-    schema_version: 1, kind: "ticket_evidence", evidence_id: "proof-one", ticket_id: "ticket-done",
+    schema_version: 2, kind: "ticket_evidence", binding_state: "bound", binding_origin: "native", evidence_id: "proof-one", ticket_id: "ticket-done",
+    acceptance_revisions: [doneTicket.contract_revisions[0].acceptance_revisions[0]],
     acceptance_ids: ["a1"], summary: "It works.", refs: ["commit:abc1234"], recorded_at: "2026-07-31T00:00:00Z",
   }));
   writeFileSync(join(repo, ".vibehub", "evidence", "ticket-done", "owner-signoff.yaml"), JSON.stringify({
-    schema_version: 1, kind: "ticket_evidence", evidence_id: "owner-signoff", ticket_id: "ticket-done", origin: "human",
+    schema_version: 2, kind: "ticket_evidence", binding_state: "bound", binding_origin: "native", evidence_id: "owner-signoff", ticket_id: "ticket-done", origin: "human",
+    acceptance_revisions: [doneTicket.contract_revisions[0].acceptance_revisions[1]],
     acceptance_ids: ["a2"], summary: "Owner approved.", refs: ["conversation:2026-07-31-signoff"], recorded_at: "2026-07-31T01:00:00Z",
   }));
   return repo;

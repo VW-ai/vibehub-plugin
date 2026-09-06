@@ -1,27 +1,42 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
-      "acceptance_id": "layout-authority-is-amended",
-      "criterion": "The active Workbench Context and local graph design document replace the mandatory top-to-bottom rule with one shared causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit supported choice, while causal direction and Ticket semantics are unchanged."
-    },
-    {
       "acceptance_id": "both-directions-are-real-layouts",
-      "criterion": "An accessible graph control switches the same complete graph between left-to-right and top-to-bottom layouts; node ranks, relation ports, arrow direction, minimap geometry, pan/zoom framing, and keyboard causal navigation all agree with the selected orientation."
-    },
-    {
-      "acceptance_id": "direction-state-is-explicit-and-copyable",
-      "criterion": "The current direction is represented in explicit URL focus state or an equally inspectable non-hidden mechanism, Copy link restores it in the same live local session, invalid values fall back safely, and no localStorage, sessionStorage, account preference, or parallel durable state is added."
-    },
-    {
-      "acceptance_id": "focus-and-attention-survive-direction-change",
-      "criterion": "Switching direction preserves the selected Ticket, complete upstream/downstream causal cone, Inspector lens, human-attention accents, operational labels including REFINE, and source truth without a page reload."
+      "criterion": "An accessible graph control switches the same complete graph between left-to-right and top-to-bottom layouts; node ranks, relation ports, arrow direction, minimap geometry, pan/zoom framing, and keyboard causal navigation all agree with the selected orientation.",
+      "identity": "sha256:c369bb919dbfea3f9ab6ad33797b7654b4f033703954f9abb07f53cf43d3d68b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "direction-choice-is-behavior-tested",
-      "criterion": "Behavior-level tests and real-browser wide plus narrow fixtures exercise both orientations, causal keyboard movement, copied focus restoration, and reduced motion; the full suite and Plugin artifact verification pass."
+      "criterion": "Behavior-level tests and real-browser wide plus narrow fixtures exercise both orientations, causal keyboard movement, copied focus restoration, and reduced motion; the full suite and Plugin artifact verification pass.",
+      "identity": "sha256:386b9aba2ea6fa6c8b4497b40f7547204699502ca092667f190a844924fbb5ba",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "direction-state-is-explicit-and-copyable",
+      "criterion": "The current direction is represented in explicit URL focus state or an equally inspectable non-hidden mechanism, Copy link restores it in the same live local session, invalid values fall back safely, and no localStorage, sessionStorage, account preference, or parallel durable state is added.",
+      "identity": "sha256:70150e2aad27cce358a96b0af8a82a2fe6998e6110be8f7dfc31e6732db198f4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "focus-and-attention-survive-direction-change",
+      "criterion": "Switching direction preserves the selected Ticket, complete upstream/downstream causal cone, Inspector lens, human-attention accents, operational labels including REFINE, and source truth without a page reload.",
+      "identity": "sha256:244f44d8fcb42975fe14e66f627499ee2b336dbd56aac55e24146dbc085f1d6d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "layout-authority-is-amended",
+      "criterion": "The active Workbench Context and local graph design document replace the mandatory top-to-bottom rule with one shared causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit supported choice, while causal direction and Ticket semantics are unchanged.",
+      "identity": "sha256:81c821f42e093023d5043474b00f9a73757c1c5e5aa96ed4abc0799d431f584b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not create a general theme/style laboratory or persist preferences in hidden browser storage.",
     "Do not fork the graph data model, Ticket semantics, Inspector, or frontend assets by orientation.",
@@ -43,6 +58,48 @@
       "ref": "skills/vibehub-ticket-review/assets/app.js"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "both-directions-are-real-layouts",
+          "identity": "sha256:c369bb919dbfea3f9ab6ad33797b7654b4f033703954f9abb07f53cf43d3d68b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "direction-choice-is-behavior-tested",
+          "identity": "sha256:386b9aba2ea6fa6c8b4497b40f7547204699502ca092667f190a844924fbb5ba",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "direction-state-is-explicit-and-copyable",
+          "identity": "sha256:70150e2aad27cce358a96b0af8a82a2fe6998e6110be8f7dfc31e6732db198f4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "focus-and-attention-survive-direction-change",
+          "identity": "sha256:244f44d8fcb42975fe14e66f627499ee2b336dbd56aac55e24146dbc085f1d6d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "layout-authority-is-amended",
+          "identity": "sha256:81c821f42e093023d5043474b00f9a73757c1c5e5aa96ed4abc0799d431f584b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:603357e890d4a79cd5424c2850924efb2b007125b411afa8585bfaf145855e1c",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The causal Ticket graph supports explicit left-to-right and top-to-bottom layouts, defaults to left-to-right on desktop, and keeps direction in honest copyable Web focus state.",
@@ -56,6 +113,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-workbench-layout-direction-choice"
 }

@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "card-visual-change-is-minimal-and-live-is-honest",
+      "criterion": "Production cards keep their existing size, copy, aperture, relation metadata, selection, and topology, remove the top solid/dashed phase accent from the rendered anatomy and phase grammar, distinguish READY from RUNNING through readable text/icon and restrained non-identical treatment, and show a reduced-motion-safe live effect only for unexpired trusted execute or closeout runtime presence. The current host explicitly exposes runtime as unavailable rather than fabricating a live card; deterministic fixtures prove the optional available path and expiry fallback.",
+      "identity": "sha256:a1e25e6a2fcb9aab765e7b5cc6b32dfc3e205904c37275428d2a3d4332f52205",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "four-phase-presentation-is-derived-once",
-      "criterion": "One shared Workbench model deterministically projects exactly four human-facing phases without changing raw host facts: DONE next_action becomes DONE; REPLAN, WAIT, and REFINE become DRAFT; EXECUTE and NEEDS_HUMAN become READY; CLOSE_OUT becomes RUNNING with an explicit verifying stage; trusted active execute runtime may promote EXECUTE to RUNNING, while stale, absent, planning-only, completed, or failed runtime cannot. Graph cards, minimap, overview, focused panel, narratives, and accessible names consume that projection rather than independently remapping canonical labels; copied Agent payloads deliberately do not carry browser-owned presentation metadata."
+      "criterion": "One shared Workbench model deterministically projects exactly four human-facing phases without changing raw host facts: DONE next_action becomes DONE; REPLAN, WAIT, and REFINE become DRAFT; EXECUTE and NEEDS_HUMAN become READY; CLOSE_OUT becomes RUNNING with an explicit verifying stage; trusted active execute runtime may promote EXECUTE to RUNNING, while stale, absent, planning-only, completed, or failed runtime cannot. Graph cards, minimap, overview, focused panel, narratives, and accessible names consume that projection rather than independently remapping canonical labels; copied Agent payloads deliberately do not carry browser-owned presentation metadata.",
+      "identity": "sha256:4830142a708fbb7e8d195f9dc593a0b5871fd44bd408e6a5ff3aa6e02fabe6b5",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "one-upper-right-substate-is-truthful",
-      "criterion": "Every Ticket card renders at most one textual/icon upper-right substate in the existing badge position with deterministic priority DEVIATED over BLOCKED over NEEDS YOU over VERIFYING over WAITING over empty. REPLAN maps to DRAFT+DEVIATED, WAIT to DRAFT+BLOCKED, NEEDS_HUMAN to READY+NEEDS YOU, CLOSE_OUT to RUNNING+VERIFYING, and trusted runtime waiting_human or waiting_tool may supply NEEDS YOU or WAITING only when a higher-priority canonical condition is absent. READY and RUNNING never coexist with BLOCKED or DEVIATED, and live presence remains a separate fact rather than consuming the slot."
-    },
-    {
-      "acceptance_id": "card-visual-change-is-minimal-and-live-is-honest",
-      "criterion": "Production cards keep their existing size, copy, aperture, relation metadata, selection, and topology, remove the top solid/dashed phase accent from the rendered anatomy and phase grammar, distinguish READY from RUNNING through readable text/icon and restrained non-identical treatment, and show a reduced-motion-safe live effect only for unexpired trusted execute or closeout runtime presence. The current host explicitly exposes runtime as unavailable rather than fabricating a live card; deterministic fixtures prove the optional available path and expiry fallback."
-    },
-    {
-      "acceptance_id": "recommended-action-dominates-the-focused-panel",
-      "criterion": "The Execution panel begins with a clearly labelled Recommended action surface whose short action title, explanation, and primary CTA are the strongest hierarchy. In this Plugin the CTA copies the exact context-aware host-owned Agent handoff for EXECUTE, REFINE, REPLAN, WAIT, NEEDS_HUMAN, CLOSE_OUT, or DONE without injecting browser-owned phase or substate metadata; CLOSE_OUT still requires an independent Agent and no CTA writes repository state. Existing causal, Context, Contract, Log, Evidence, source, and Inspector-lens content remains available but visually subordinate and materially unchanged."
+      "criterion": "Every Ticket card renders at most one textual/icon upper-right substate in the existing badge position with deterministic priority DEVIATED over BLOCKED over NEEDS YOU over VERIFYING over WAITING over empty. REPLAN maps to DRAFT+DEVIATED, WAIT to DRAFT+BLOCKED, NEEDS_HUMAN to READY+NEEDS YOU, CLOSE_OUT to RUNNING+VERIFYING, and trusted runtime waiting_human or waiting_tool may supply NEEDS YOU or WAITING only when a higher-priority canonical condition is absent. READY and RUNNING never coexist with BLOCKED or DEVIATED, and live presence remains a separate fact rather than consuming the slot.",
+      "identity": "sha256:bb55f73017dd262439f4a237f78c649081b20ed6611fd7a279efe8dfd403f94b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "production-and-installed-regressions-pass",
-      "criterion": "Focused model, host, visual-system, layout, accessibility, and lifecycle tests cover the full canonical action matrix, optional trusted/stale runtime, substate priority, zero-or-one slot, action payload integrity, no top accent, distinct READY/RUNNING, wide and narrow keyboard interaction, reduced motion, archive/history/source truth, and no write routes. Fresh browser review of the real Workbench plus full repository verification and fresh Codex/Claude installed-artifact parity pass."
+      "criterion": "Focused model, host, visual-system, layout, accessibility, and lifecycle tests cover the full canonical action matrix, optional trusted/stale runtime, substate priority, zero-or-one slot, action payload integrity, no top accent, distinct READY/RUNNING, wide and narrow keyboard interaction, reduced motion, archive/history/source truth, and no write routes. Fresh browser review of the real Workbench plus full repository verification and fresh Codex/Claude installed-artifact parity pass.",
+      "identity": "sha256:81dd416b312d48f3ab0470c2d382ec89d8438974d41da3938012a656907ffc8c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "recommended-action-dominates-the-focused-panel",
+      "criterion": "The Execution panel begins with a clearly labelled Recommended action surface whose short action title, explanation, and primary CTA are the strongest hierarchy. In this Plugin the CTA copies the exact context-aware host-owned Agent handoff for EXECUTE, REFINE, REPLAN, WAIT, NEEDS_HUMAN, CLOSE_OUT, or DONE without injecting browser-owned phase or substate metadata; CLOSE_OUT still requires an independent Agent and no CTA writes repository state. Existing causal, Context, Contract, Log, Evidence, source, and Inspector-lens content remains available but visually subordinate and materially unchanged.",
+      "identity": "sha256:e2a20c696eaed39c1f1ce7aca2325d154ca07bde742fe74419d61dd4a99f74ad",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change canonical Ticket status, next_action, authority, Evidence, Outcome, archive, delivery, dependency, or unlock semantics; DRAFT, RUNNING, substate, and live are presentation projections only.",
     "Do not retain or add card-top solid/dashed phase accents as a primary visual language, and do not import the proposal board's shell or decorative presentation into production.",
@@ -64,6 +80,39 @@
       "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "card-visual-change-is-minimal-and-live-is-honest",
+          "identity": "sha256:a1e25e6a2fcb9aab765e7b5cc6b32dfc3e205904c37275428d2a3d4332f52205",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "four-phase-presentation-is-derived-once",
+          "identity": "sha256:4830142a708fbb7e8d195f9dc593a0b5871fd44bd408e6a5ff3aa6e02fabe6b5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-upper-right-substate-is-truthful",
+          "identity": "sha256:bb55f73017dd262439f4a237f78c649081b20ed6611fd7a279efe8dfd403f94b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-and-installed-regressions-pass",
+          "identity": "sha256:81dd416b312d48f3ab0470c2d382ec89d8438974d41da3938012a656907ffc8c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommended-action-dominates-the-focused-panel",
+          "identity": "sha256:e2a20c696eaed39c1f1ce7aca2325d154ca07bde742fe74419d61dd4a99f74ad",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3414e4ca7301a4f6c7048b94cd3f30c19cac0a45229e3f09422e33bcb8c15656",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -79,6 +128,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-simplify-workbench-primary-state-language"
 }

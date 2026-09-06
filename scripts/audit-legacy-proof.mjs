@@ -4,6 +4,7 @@ import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertValid,
+  currentOutcome,
   documents,
   loadRepository,
   projectTicketQuery,
@@ -11,6 +12,7 @@ import {
   ticketNextAction,
   ticketStatus,
 } from "../skills/vibehub-core/scripts/vh.mjs";
+import { activeAcceptanceReferenceMap, activeContract } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 
 function git(repo, args, { allowFailure = false } = {}) {
   const result = spawnSync("git", ["-C", repo, ...args], {
@@ -73,10 +75,41 @@ function documentAt(repo, commit, path) {
 function reconstruct(repository, repo, entry, kind) {
   const document = entry.document;
   const path = relative(repo, entry.path);
+  const currentTicket = repository.tickets.documents.get(document.ticket_id)?.document ?? null;
+  if (document.binding_state === "bound" && currentTicket?.revision_state === "bound") {
+    const activeReferences = activeAcceptanceReferenceMap(currentTicket);
+    const boundReferences = kind === "evidence" ? document.acceptance_revisions : [];
+    const contract = kind === "outcome"
+      ? currentTicket.contract_revisions.find((item) =>
+        item.revision === document.contract_revision?.revision
+        && item.identity === document.contract_revision?.identity)
+      : null;
+    const active = activeContract(currentTicket);
+    const drifted = kind === "evidence"
+      ? currentTicket.contract_revisions.length > 1 || boundReferences.some((reference) => {
+        const selected = activeReferences.get(reference.acceptance_id);
+        return !selected || selected.revision !== reference.revision || selected.identity !== reference.identity;
+      })
+      : !contract || active?.revision !== contract.revision || active?.identity !== contract.identity;
+    return {
+      kind,
+      id: kind === "evidence" ? document.evidence_id : `${document.ticket_id}:${document.outcome_id}`,
+      ticket_id: document.ticket_id,
+      path,
+      added_commit: null,
+      reconstructable_from_first_git_appearance: document.binding_origin === "reconstructed" || document.binding_origin === "native",
+      unresolved_reasons: [],
+      missing_historical_acceptance_ids: [],
+      changed_current_acceptance_ids: drifted
+        ? (kind === "evidence" ? document.acceptance_ids : [...document.accepted_acceptance_ids, ...document.unresolved_acceptance_ids])
+        : [],
+      ticket_contract_drifted_since_addition: drifted,
+      binding_origin: document.binding_origin,
+    };
+  }
   const addedCommit = firstCurrentAddition(repo, path);
   const ticketPath = `.vibehub/tickets/${document.ticket_id}.yaml`;
   const historicalTicket = documentAt(repo, addedCommit, ticketPath);
-  const currentTicket = repository.tickets.documents.get(document.ticket_id)?.document ?? null;
   const referencedIds = kind === "evidence"
     ? document.acceptance_ids
     : [...document.accepted_acceptance_ids, ...document.unresolved_acceptance_ids];
@@ -143,7 +176,8 @@ function policyRepository(repository, retainedOutcomeIds, retainedEvidenceIds) {
 
 function satisfiedHumanCriteria(repository, humanCriteria) {
   return humanCriteria.filter(({ ticket_id: ticketId, acceptance_id: acceptanceId }) => {
-    const outcome = repository.outcomes.documents.get(ticketId)?.document;
+    const ticket = repository.tickets.documents.get(ticketId)?.document;
+    const outcome = ticket ? currentOutcome(repository, ticket) : null;
     if (outcome?.status !== "successful" || !outcome.accepted_acceptance_ids.includes(acceptanceId)) return false;
     return outcome.evidence_ids.some((evidenceId) => {
       const item = repository.evidence.documents.get(evidenceId)?.document;
@@ -181,11 +215,15 @@ export function auditLegacyProof(repo) {
   assertValid(repository.errors);
   const tickets = documents(repository.tickets.documents);
   const evidence = [...repository.evidence.documents.values()];
-  const outcomes = [...repository.outcomes.documents.values()];
+  const outcomes = repository.outcomes.history
+    ? [...repository.outcomes.history.values()]
+    : [...repository.outcomes.documents.values()];
   const evidenceAudit = evidence.map((entry) => reconstruct(repository, repo, entry, "evidence"));
   const outcomeAudit = outcomes.map((entry) => reconstruct(repository, repo, entry, "outcome"));
   const successfulOutcomes = outcomes.filter((entry) => entry.document.status === "successful");
-  const currentSuccessfulIds = new Set(successfulOutcomes.map((entry) => entry.document.ticket_id));
+  const currentSuccessfulIds = new Set(tickets
+    .filter((ticket) => currentOutcome(repository, ticket)?.status === "successful")
+    .map((ticket) => ticket.ticket_id));
   const reconstructableSuccessfulIds = new Set(successfulOutcomes
     .filter((entry) => {
       const audit = outcomeAudit.find((item) => item.ticket_id === entry.document.ticket_id);
@@ -200,7 +238,7 @@ export function auditLegacyProof(repo) {
       && item.changed_current_acceptance_ids.length === 0)
     .map((item) => item.id));
   const humanCriteria = tickets.flatMap((ticket) => ticket.acceptance
-    .filter((item) => (item.authority ?? "agent") === "human")
+    .filter((item) => item.state !== "retired" && (item.authority ?? "agent") === "human")
     .map((item) => ({ ticket_id: ticket.ticket_id, acceptance_id: item.acceptance_id })));
   const currentHumanSatisfied = satisfiedHumanCriteria(repository, humanCriteria);
   const head = git(repo, ["rev-parse", "HEAD"]).stdout.trim();

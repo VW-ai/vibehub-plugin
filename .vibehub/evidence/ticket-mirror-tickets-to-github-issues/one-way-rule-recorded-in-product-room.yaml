@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "one-way-projection-rule-is-recorded"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "one-way-projection-rule-is-recorded",
+      "identity": "sha256:4ca0de956b910886d9e764d97e86a0d3d6cc776a41c8d0ffa3bb9139f7cdaaf0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "one-way-rule-recorded-in-product-room",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-22T09:15:35Z",
@@ -9,7 +18,7 @@
     "commit:dd64bef3b9b30727cbfdbd0c23756b04fb36466c",
     ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "decision-github-issues-are-a-read-only-ticket-projection is recorded as an active decision in the product room: Issues mirror the Ticket graph one way from main, Git stays the source of truth, nothing is read back, human Issue comments are discussion rather than durable Context, outside-filed Issues become Tickets only through deliberate planning citing the Issue URL, and no Agent is asked to run or babysit the sync. It relates to decision-external-work-systems-compose-into-personal-tickets and room drift remains FRESH.",
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

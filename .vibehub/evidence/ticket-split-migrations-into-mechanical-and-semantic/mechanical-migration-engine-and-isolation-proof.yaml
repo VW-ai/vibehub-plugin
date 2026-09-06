@@ -4,6 +4,25 @@
     "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
     "unblocking-is-separated-from-enriching"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "mechanical-half-runs-on-its-own",
+      "identity": "sha256:7c7cb33a5ae57059a993ae7eef073065229f9e6428153569d2f7ad9bfbb99a46",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "mechanical-operation-is-one-worktree-and-no-git-orchestrator",
+      "identity": "sha256:c2a4c884cad186bb39dab201758b828be7456b76c39045bcfccfeab12b9b1809",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "unblocking-is-separated-from-enriching",
+      "identity": "sha256:e511de41b64e095135c4a7ecbf1dd1b53ac69da7831df6d9613e2ab9d14510a1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "mechanical-migration-engine-and-isolation-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -14,7 +33,7 @@
     "test/migration.test.mjs",
     "test-run:node --test test/migration.test.mjs test/skill-contracts.test.mjs:12-of-12"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The project migrate-mechanical operation reads migrations.json, permits only declared action types and paths, and runs without Git discovery or mutation. The format-1 fixture reaches CURRENT format 2 and passes project validate while each mechanically empty deliveries array is distinguishable from an audited empty value by migration-pending:format-1-to-format-2:classify-delivery-membership. A separate fresh engine invocation on that now-CURRENT project returns current_with_semantic_pending, no changed paths, the pending ref, and the matching complete semantic-step guidance, so later sessions do not lose the enrichment handoff. The 0.4 semantic-only fixture reports semantic_required with changed_paths [], writes no marker, and preserves exact Context and Ticket bytes. A real Git repository fixture with a registered sibling worktree proves only the passed worktree's declared Ticket and version paths change; sibling tracked bytes and status, both HEADs, all refs, and commit count remain identical. A failed post-write validation restores every original byte.",
   "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }

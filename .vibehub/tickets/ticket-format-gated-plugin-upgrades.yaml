@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "project-format-contract",
-      "criterion": "A single owned project-format contract defines a monotonic integer data format independently from plugin SemVer; project init writes the canonical .vibehub version document, this repository dogfoods it, and project validate rejects malformed or unsupported-newer markers without changing repository files."
+      "acceptance_id": "codex-claude-update-contracts",
+      "criterion": "Codex and Claude Code installation/upgrade guidance clearly separates bundle refresh from repository migration: Claude Code documents its host auto-update/reload path, Codex documents its currently available marketplace refresh plus new-session activation without claiming unsupported automation, and both built marketplace artifacts expose the same plugin version, skills, format contract, and migration registry.",
+      "identity": "sha256:4e78996f143930624a22660f8adee5cfc5297d5f581cfa85e566ae382f5e492d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "compatibility-preflight-and-write-gate",
-      "criterion": "A read-only deterministic project compatibility operation distinguishes CURRENT, MIGRATION_REQUIRED (including recognizable unversioned 0.4/0.5 layouts), and UNSUPPORTED_NEWER with machine-readable current/target information; every Context, Room, Ticket, Evidence, Outcome, and alignment write refuses to run unless the project format is CURRENT, covered by node --test."
-    },
-    {
-      "acceptance_id": "explicit-reviewable-migration",
-      "criterion": "The migrate skill and its single-source registry consume compatibility preflight, select the applicable path, preview affected checked-in files before mutation, require the explicit migration boundary, and prove the resulting format with project validate and room drift; no migration runs during plugin installation, marketplace refresh, validation, query, UI launch, or other background/read-only activity."
-    },
-    {
-      "acceptance_id": "codex-claude-update-contracts",
-      "criterion": "Codex and Claude Code installation/upgrade guidance clearly separates bundle refresh from repository migration: Claude Code documents its host auto-update/reload path, Codex documents its currently available marketplace refresh plus new-session activation without claiming unsupported automation, and both built marketplace artifacts expose the same plugin version, skills, format contract, and migration registry."
+      "criterion": "A read-only deterministic project compatibility operation distinguishes CURRENT, MIGRATION_REQUIRED (including recognizable unversioned 0.4/0.5 layouts), and UNSUPPORTED_NEWER with machine-readable current/target information; every Context, Room, Ticket, Evidence, Outcome, and alignment write refuses to run unless the project format is CURRENT, covered by node --test.",
+      "identity": "sha256:85dce641d60353d9929423f4c649a407afdd1770e4ea7d775bc223a0d35ae079",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "cross-host-clean-install-proof",
-      "criterion": "Automated tests build fresh Codex and Claude Code marketplace artifacts, invoke the installed helper from each artifact against versioned-current, migration-required, and unsupported-newer fixtures, and prove identical compatibility/write-gate behavior; the full test suite, artifact verification, and both marketplace builders pass."
+      "criterion": "Automated tests build fresh Codex and Claude Code marketplace artifacts, invoke the installed helper from each artifact against versioned-current, migration-required, and unsupported-newer fixtures, and prove identical compatibility/write-gate behavior; the full test suite, artifact verification, and both marketplace builders pass.",
+      "identity": "sha256:94edac5cdd93002a699018236849722bccf1354a91c2b14106d1a1ecd6f45979",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explicit-reviewable-migration",
+      "criterion": "The migrate skill and its single-source registry consume compatibility preflight, select the applicable path, preview affected checked-in files before mutation, require the explicit migration boundary, and prove the resulting format with project validate and room drift; no migration runs during plugin installation, marketplace refresh, validation, query, UI launch, or other background/read-only activity.",
+      "identity": "sha256:28e8e6c30a5191a6d8ac365df972bad2035f02263ab8b996cc702a27b5d232d3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "project-format-contract",
+      "criterion": "A single owned project-format contract defines a monotonic integer data format independently from plugin SemVer; project init writes the canonical .vibehub version document, this repository dogfoods it, and project validate rejects malformed or unsupported-newer markers without changing repository files.",
+      "identity": "sha256:32ce4ffefd080b9aeb491f5d0dbe7a463d699944da7f7fa3e8e47cde25845df6",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "No plugin-owned daemon, scheduled updater, hook cadence, MCP service, hidden state, remote-code loader, or self-modifying bootstrap is introduced.",
     "Plugin SemVer and repository data-format version remain separate; refreshing plugin code never writes a user's repository.",
@@ -47,6 +63,39 @@
       "ref": "docs/INSTALL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "codex-claude-update-contracts",
+          "identity": "sha256:4e78996f143930624a22660f8adee5cfc5297d5f581cfa85e566ae382f5e492d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compatibility-preflight-and-write-gate",
+          "identity": "sha256:85dce641d60353d9929423f4c649a407afdd1770e4ea7d775bc223a0d35ae079",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "cross-host-clean-install-proof",
+          "identity": "sha256:94edac5cdd93002a699018236849722bccf1354a91c2b14106d1a1ecd6f45979",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "explicit-reviewable-migration",
+          "identity": "sha256:28e8e6c30a5191a6d8ac365df972bad2035f02263ab8b996cc702a27b5d232d3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "project-format-contract",
+          "identity": "sha256:32ce4ffefd080b9aeb491f5d0dbe7a463d699944da7f7fa3e8e47cde25845df6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:dcd880d15c0f37dd164cd5d2b432f89b282fe2fe0e4cbc78c4dd9c81706bcdc6",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-05T00:39:25.000Z",
@@ -68,6 +117,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

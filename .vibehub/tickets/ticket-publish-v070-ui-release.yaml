@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "release-pr-merged",
-      "criterion": "The verified v0.7.0 replacement PR, including the successful REFINE Workbench projection repair, is merged into main, and updated origin/main contains the UI curation, release-preparation, and compatibility-repair Outcomes with their acceptance-linked Evidence."
-    },
-    {
-      "acceptance_id": "tagged-merged-main",
-      "criterion": "After fast-forwarding local main, lightweight tag v0.7.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged."
-    },
-    {
       "acceptance_id": "github-release-verified",
-      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.7.0 points to the tagged main commit; vibehub-plugin-0.7.0.tar.gz and vibehub-plugin-0.7.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes."
+      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.7.0 points to the tagged main commit; vibehub-plugin-0.7.0.tar.gz and vibehub-plugin-0.7.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes.",
+      "identity": "sha256:7d6fa1689e25c9159c5366e3fec359e963c2607382a5226b015ee0ce2927c12e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-pr-merged",
+      "criterion": "The verified v0.7.0 replacement PR, including the successful REFINE Workbench projection repair, is merged into main, and updated origin/main contains the UI curation, release-preparation, and compatibility-repair Outcomes with their acceptance-linked Evidence.",
+      "identity": "sha256:14a13b5cd349d0fe9e1663d3103cae9fc8ee0ee87c75befa11e20df81c0c94bd",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "superseded-pr-retired",
-      "criterion": "Original PR #18 is closed without merge with a concise explanation and link to the merged curated replacement, preserving its review history while making the shipping path unambiguous."
+      "criterion": "Original PR #18 is closed without merge with a concise explanation and link to the merged curated replacement, preserving its review history while making the shipping path unambiguous.",
+      "identity": "sha256:57dc2c1316e0bb9b6622aab306afd696f937a6d112cdfde2c386736f1c2a91e8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "tagged-merged-main",
+      "criterion": "After fast-forwarding local main, lightweight tag v0.7.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged.",
+      "identity": "sha256:fa691c65ff8aea928c21e940ac8ab8ff7d33ac86d2763093b76f68e9eefa7fcc",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Never tag or publish from the feature/release branch; tag only the exact merged main commit.",
     "Do not create the GitHub Release manually; wait for the tag-triggered workflow.",
@@ -33,6 +46,34 @@
     {
       "purpose": "Tag-triggered workflow that verifies, builds, checksums, and creates the GitHub Release.",
       "ref": ".github/workflows/release.yml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "github-release-verified",
+          "identity": "sha256:7d6fa1689e25c9159c5366e3fec359e963c2607382a5226b015ee0ce2927c12e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-pr-merged",
+          "identity": "sha256:14a13b5cd349d0fe9e1663d3103cae9fc8ee0ee87c75befa11e20df81c0c94bd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "superseded-pr-retired",
+          "identity": "sha256:57dc2c1316e0bb9b6622aab306afd696f937a6d112cdfde2c386736f1c2a91e8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tagged-merged-main",
+          "identity": "sha256:fa691c65ff8aea928c21e940ac8ab8ff7d33ac86d2763093b76f68e9eefa7fcc",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8d9553260093bc6837f8b3ac1ffbc49dd83bb72d26e4a55d2ee5ac531fd3f1df",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -60,6 +101,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-publish-v070-ui-release"
 }

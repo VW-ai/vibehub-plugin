@@ -2,9 +2,13 @@
   "acceptance": [
     {
       "acceptance_id": "refine-from-first-real-workflow",
-      "criterion": "Placeholder: after one real cross-repository or non-software workflow exposes concrete user value and friction, refine this Ticket in place into independently checkable UX, authority, repository lifecycle, portability, failure-recovery, and verification criteria; until then it remains REFINE and creates no repository or delegated permission."
+      "criterion": "Placeholder: after one real cross-repository or non-software workflow exposes concrete user value and friction, refine this Ticket in place into independently checkable UX, authority, repository lifecycle, portability, failure-recovery, and verification criteria; until then it remains REFINE and creates no repository or delegated permission.",
+      "identity": "sha256:6c8c0faf33710dbefc9534e593ffc544eff0e6ed6675e2549688ae20ff952da1",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Git invisibility initially means hiding mechanics, not removing the current Git-native source of truth; replacing Git is a separate future product and architecture decision.",
     "No background repository may make durable resources or authority invisible: creation, access, inspection, export, deletion, and revocation boundaries must remain understandable to the user.",
@@ -27,6 +31,19 @@
       "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "refine-from-first-real-workflow",
+          "identity": "sha256:6c8c0faf33710dbefc9534e593ffc544eff0e6ed6675e2549688ae20ff952da1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:85524b4fb5041f2522b5261cd9cc86cbcb3d5617046192b327bf1b694df7f8c7",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
@@ -36,6 +53,7 @@
     "context:intent-context-compounding-action-system"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-invisible-git-cross-repo-actions"
 }

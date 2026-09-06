@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "production-and-installed-regressions-pass"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-and-installed-regressions-pass",
+      "identity": "sha256:81dd416b312d48f3ab0470c2d382ec89d8438974d41da3938012a656907ffc8c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "workbench-state-browser-and-installed-regression-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +26,7 @@
     "command:ticket-and-project-validation-pass",
     "browser:http://127.0.0.1:56224-default-and-390x844"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The focused production corpus covers every canonical next action, deterministic phase/substate precedence, trusted and stale runtime cases, zero-or-one slot, no rendered top accent, distinct READY/RUNNING treatment, exact host-payload reuse, runtime-unavailable host truth, narrow action visibility, keyboard/focus and reduced-motion contracts, archive/history behavior, and read-only routes. The complete repository test run passed 129 of 129. A fresh installed-artifact build then passed its read-only loopback checks with identical Codex/Claude packaging at 58 files and 603720 bytes. Real in-app browser review of the exact source host found no console errors and confirmed the current Graph plus focused Ticket panel at default and 390x844 viewports.",
   "ticket_id": "ticket-simplify-workbench-primary-state-language"
 }

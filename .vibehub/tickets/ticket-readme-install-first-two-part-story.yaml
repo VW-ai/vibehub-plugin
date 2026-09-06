@@ -1,27 +1,43 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "install-is-above-the-fold",
-      "criterion": "The npx skills add VW-ai/vibehub-plugin command and the Start this with VibeHub entry line appear before the first screenshot and before any explanatory paragraph longer than two lines; the marketplace commands stay as a one-line alternative; a test asserts the install command's index precedes the first image's index."
-    },
-    {
-      "acceptance_id": "two-part-structure-is-scannable",
-      "criterion": "The top part (logo, tagline, install, entry line, a three-item what-you-get list, one hero image) fits in roughly one screen; the lower part carries How it works, the Workbench, and a GitHub collaboration section; Upgrades moves to docs/INSTALL.md with a one-line pointer; total README length stays within a raised test budget of 90 lines."
+      "acceptance_id": "core-value-sentences-survive",
+      "criterion": "Every sentence and phrase the release test pins today remains present exactly once where it says once (tagline, one-line value, entry line, Memory-tools line, the loop sentence, the four phases, Recommended action, both marketplace commands, a single vibehub.icu href) and the release and README tests pass after the budget and ordering assertions are updated.",
+      "identity": "sha256:e83a24fedb64820eb1cd070cdf6a774969a9a8e88902b9ffafb92c265d10478d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "github-collaboration-is-shown-not-told",
-      "criterion": "A section shows the Issues mirror with at least one checked-in screenshot captured from the live VW-ai/vibehub-plugin Issues (list or an Issue with the native Blocked-by pill), explains in two or three sentences that Tickets on main mirror one-way to Issues with acceptance checklists, Evidence comments, and native dependencies, and links docs/GITHUB_ISSUES.md; screenshots are PNG and registered in the capture manifest with source URL and date."
+      "criterion": "A section shows the Issues mirror with at least one checked-in screenshot captured from the live VW-ai/vibehub-plugin Issues (list or an Issue with the native Blocked-by pill), explains in two or three sentences that Tickets on main mirror one-way to Issues with acceptance checklists, Evidence comments, and native dependencies, and links docs/GITHUB_ISSUES.md; screenshots are PNG and registered in the capture manifest with source URL and date.",
+      "identity": "sha256:085fdeb57ed9ea028bb2c83b050f74210f6dcdd5caec481eb9ffac5a99a7e31f",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "core-value-sentences-survive",
-      "criterion": "Every sentence and phrase the release test pins today remains present exactly once where it says once (tagline, one-line value, entry line, Memory-tools line, the loop sentence, the four phases, Recommended action, both marketplace commands, a single vibehub.icu href) and the release and README tests pass after the budget and ordering assertions are updated."
+      "acceptance_id": "install-is-above-the-fold",
+      "criterion": "The npx skills add VW-ai/vibehub-plugin command and the Start this with VibeHub entry line appear before the first screenshot and before any explanatory paragraph longer than two lines; the marketplace commands stay as a one-line alternative; a test asserts the install command's index precedes the first image's index.",
+      "identity": "sha256:b7f06fa72705c6067b84c77481b6bce1e4e20901bcb96a65895ef7c5fd33d95a",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-judges-readme",
       "authority": "human",
-      "criterion": "The owner reads the rendered README on GitHub and explicitly judges that it is scannable, leads with install, shows the new capabilities, and keeps the core value."
+      "criterion": "The owner reads the rendered README on GitHub and explicitly judges that it is scannable, leads with install, shows the new capabilities, and keeps the core value.",
+      "identity": "sha256:99378d47980fa06f40763494a2b50ac03cd901a0c67097687eb6e23d8b97fcb5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "two-part-structure-is-scannable",
+      "criterion": "The top part (logo, tagline, install, entry line, a three-item what-you-get list, one hero image) fits in roughly one screen; the lower part carries How it works, the Workbench, and a GitHub collaboration section; Upgrades moves to docs/INSTALL.md with a one-line pointer; total README length stays within a raised test budget of 90 lines.",
+      "identity": "sha256:4aeb19b968b84b0579f7a17b6a22ff4102b8ec592aa638abbc8ac6d51b94f9e9",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change the site in this Ticket.",
     "Keep the existing brand assets and the three Workbench screenshots; add, do not replace, capture-manifest entries.",
@@ -58,6 +74,39 @@
       "ref": ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "core-value-sentences-survive",
+          "identity": "sha256:e83a24fedb64820eb1cd070cdf6a774969a9a8e88902b9ffafb92c265d10478d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "github-collaboration-is-shown-not-told",
+          "identity": "sha256:085fdeb57ed9ea028bb2c83b050f74210f6dcdd5caec481eb9ffac5a99a7e31f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "install-is-above-the-fold",
+          "identity": "sha256:b7f06fa72705c6067b84c77481b6bce1e4e20901bcb96a65895ef7c5fd33d95a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-judges-readme",
+          "identity": "sha256:99378d47980fa06f40763494a2b50ac03cd901a0c67097687eb6e23d8b97fcb5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "two-part-structure-is-scannable",
+          "identity": "sha256:4aeb19b968b84b0579f7a17b6a22ff4102b8ec592aa638abbc8ac6d51b94f9e9",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5c145d3df800585f07e6de4c93191bdd048ec19da3a10fcfbc523f62d0c66786",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -66,6 +115,7 @@
     "conversation:2026-08-23-readme-refresh"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-readme-install-first-two-part-story"
 }

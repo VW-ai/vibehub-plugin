@@ -1,43 +1,93 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
-      "criterion": "The Ticket contract has a minimal optional structured way to mark an acceptance criterion as requiring human authority, existing Ticket documents remain valid with Agent authority as the documented default, and schema plus validator tests reject unknown authority values."
-    },
-    {
-      "acceptance_id": "ticket-skills-protect-human-boundaries",
-      "criterion": "Ticket planning, validation, execution, and independent closeout instructions consistently preserve human-authority criteria, forbid an Agent from substituting its own judgment, and require explicit human-origin Evidence before successful closeout without introducing a lease, approval service, or attestation stack."
-    },
-    {
-      "acceptance_id": "ui-projects-human-attention-mechanically",
-      "criterion": "The mechanical UI projection exposes the count and Evidence state of human-authority criteria, and Ticket nodes plus the Execution/Contract lens use a restrained but unmistakable badge, aperture, shape, or semantic accent to distinguish human attention from READY/BLOCKED/DONE/DEVIATED without parsing criterion text."
-    },
-    {
-      "acceptance_id": "human-attention-state-is-honest",
-      "criterion": "Representative Tickets show distinct states for a future human boundary, human Evidence pending, human Evidence recorded, and successful Outcome; the UI never labels an Agent-authored assertion as human approval and never treats a human badge as a dependency blocker."
-    },
-    {
       "acceptance_id": "agent-handoff-names-the-boundary",
-      "criterion": "Copy-for-Agent payloads and Ticket review output identify the exact human-authority acceptance IDs and criteria so an Agent can ask for the decision precisely rather than sending a generic review request."
+      "criterion": "Copy-for-Agent payloads and Ticket review output identify the exact human-authority acceptance IDs and criteria so an Agent can ask for the decision precisely rather than sending a generic review request.",
+      "identity": "sha256:a724627f35592519f6999d582124d3e0940e572cab49a9517b172786ce4b0dd4",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "authority-feature-remains-lightweight",
-      "criterion": "Fresh validation, Ticket execution, Evidence, Outcome, UI projection, and clean Plugin verification pass with no service, account system, permission engine, database, hidden decision state, or breaking rewrite of existing canonical documents."
+      "criterion": "Fresh validation, Ticket execution, Evidence, Outcome, UI projection, and clean Plugin verification pass with no service, account system, permission engine, database, hidden decision state, or breaking rewrite of existing canonical documents.",
+      "identity": "sha256:07c1b7ef80315a84c1ce32bf71252e45bbff4c1928260ff83ecb2f6ba8f42f2d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "decision-boundary-policy-approved",
       "authority": "human",
-      "criterion": "The owner explicitly approves the policy that authority names the decision owner, a human decision that gates independently schedulable downstream work becomes a Ticket-graph boundary, acceptance-unknown downstream work remains draft until that decision, and a terminal human sign-off may remain inside the delivery Ticket."
+      "criterion": "The owner explicitly approves the policy that authority names the decision owner, a human decision that gates independently schedulable downstream work becomes a Ticket-graph boundary, and a terminal human sign-off may remain inside the delivery Ticket.",
+      "identity": "sha256:660372d6a2a9a300d102b082f0578fb99819ee73f8f723df8baed9923dcf82b3",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "decision-boundary-policy-approved",
+      "authority": "human",
+      "criterion": "The owner explicitly approves the policy that authority names the decision owner, a human decision that gates independently schedulable downstream work becomes a Ticket-graph boundary, acceptance-unknown downstream work remains draft until that decision, and a terminal human sign-off may remain inside the delivery Ticket.",
+      "identity": "sha256:a07b7163f91ce6c5b9eb3b93511b35208d360b7b2685ce53997324acda272ed8",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "human-attention-state-is-honest",
+      "criterion": "Representative Tickets show distinct states for a future human boundary, human Evidence pending, human Evidence recorded, and successful Outcome; the UI never labels an Agent-authored assertion as human approval and never treats a human badge as a dependency blocker.",
+      "identity": "sha256:c20cf898dbe62fe4cd1512ed5d6867b6472c82c21da33e4537c0c6a2f889b716",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
+      "criterion": "The Ticket contract has a minimal optional structured way to mark an acceptance criterion as requiring human authority, existing Ticket documents remain valid with Agent authority as the documented default, and schema plus validator tests reject unknown authority values.",
+      "identity": "sha256:7075af085a7709a36458184646ef3e893f7884b7fd7bf07cba40e7fbd74e3a30",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "plan-and-run-handle-human-decisions",
-      "criterion": "Ticket Plan identifies known human decision boundaries, while a newly discovered human decision causes the checked-in graph to be replanned before execution crosses it: the same or a later Agent either revises the current Ticket or creates the smallest new decision Ticket with direct dependencies; no automatic session handoff, Event, or second execution package is introduced."
+      "criterion": "Ticket Plan identifies known human decision boundaries and Ticket Run sends a newly discovered human decision back to planning, where the planner either revises the current Ticket or creates the smallest new decision Ticket with direct dependencies; no Event or second execution package is introduced.",
+      "identity": "sha256:a7a3420d40b6a10480c1f367b80bc17fd8871deb182c7be1d080daf58a331353",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "plan-and-run-handle-human-decisions",
+      "criterion": "Ticket Plan identifies known human decision boundaries, while a newly discovered human decision causes the checked-in graph to be replanned before execution crosses it: the same or a later Agent either revises the current Ticket or creates the smallest new decision Ticket with direct dependencies; no automatic session handoff, Event, or second execution package is introduced.",
+      "identity": "sha256:62a40745d1a8a60b99fc1bc8eb5248c5687d27985f82558d4edbed0caf480949",
+      "revision": 2,
+      "state": "active"
     },
     {
       "acceptance_id": "rooms-flow-proves-graph-boundary",
-      "criterion": "The existing Rooms Workbench work is replanned as proposal, human decision, and draft implementation Tickets so the graph keeps the decision UPCOMING until its proposal prerequisite succeeds, makes it PENDING only when the decision Ticket is READY, and moves implementation from BLOCKED to REFINE — never directly to READY — after the human decision is independently accepted."
+      "criterion": "The existing Rooms Workbench work is replanned as proposal, human decision, and implementation Tickets so the graph mechanically keeps the decision UPCOMING until its proposal prerequisite succeeds, makes it PENDING only when the decision Ticket is READY, and blocks implementation until human-origin Evidence is independently accepted.",
+      "identity": "sha256:1372dc4188ef05b1d2806007b57a6a685dae4eaaf0d92f03ae8b64f068812d92",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "rooms-flow-proves-graph-boundary",
+      "criterion": "The existing Rooms Workbench work is replanned as proposal, human decision, and draft implementation Tickets so the graph keeps the decision UPCOMING until its proposal prerequisite succeeds, makes it PENDING only when the decision Ticket is READY, and moves implementation from BLOCKED to REFINE — never directly to READY — after the human decision is independently accepted.",
+      "identity": "sha256:851e19d05c246bf6fff579d89d844a9f7182c9f01925ed85d6bb4f367977e70f",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-skills-protect-human-boundaries",
+      "criterion": "Ticket planning, validation, execution, and independent closeout instructions consistently preserve human-authority criteria, forbid an Agent from substituting its own judgment, and require explicit human-origin Evidence before successful closeout without introducing a lease, approval service, or attestation stack.",
+      "identity": "sha256:1d0e4fe7d006b8a41d27d0fe5a7243b5d202bfc5dffa8271fc4087d150aa3a6f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ui-projects-human-attention-mechanically",
+      "criterion": "The mechanical UI projection exposes the count and Evidence state of human-authority criteria, and Ticket nodes plus the Execution/Contract lens use a restrained but unmistakable badge, aperture, shape, or semantic accent to distinguish human attention from READY/BLOCKED/DONE/DEVIATED without parsing criterion text.",
+      "identity": "sha256:0eb203961606780c70e930e5c7d83aa4420942e3886ce32e4141ef1bdb60a1c2",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 2,
   "constraints": [
     "Model authority per acceptance criterion rather than labeling an entire Ticket human when only one boundary may require human judgment.",
     "Authority names the criterion's decision owner, not the Agent or person performing the implementation.",
@@ -85,6 +135,110 @@
       "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "agent-handoff-names-the-boundary",
+          "identity": "sha256:a724627f35592519f6999d582124d3e0940e572cab49a9517b172786ce4b0dd4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "authority-feature-remains-lightweight",
+          "identity": "sha256:07c1b7ef80315a84c1ce32bf71252e45bbff4c1928260ff83ecb2f6ba8f42f2d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "decision-boundary-policy-approved",
+          "identity": "sha256:660372d6a2a9a300d102b082f0578fb99819ee73f8f723df8baed9923dcf82b3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-attention-state-is-honest",
+          "identity": "sha256:c20cf898dbe62fe4cd1512ed5d6867b6472c82c21da33e4537c0c6a2f889b716",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
+          "identity": "sha256:7075af085a7709a36458184646ef3e893f7884b7fd7bf07cba40e7fbd74e3a30",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "plan-and-run-handle-human-decisions",
+          "identity": "sha256:a7a3420d40b6a10480c1f367b80bc17fd8871deb182c7be1d080daf58a331353",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-flow-proves-graph-boundary",
+          "identity": "sha256:1372dc4188ef05b1d2806007b57a6a685dae4eaaf0d92f03ae8b64f068812d92",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-skills-protect-human-boundaries",
+          "identity": "sha256:1d0e4fe7d006b8a41d27d0fe5a7243b5d202bfc5dffa8271fc4087d150aa3a6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ui-projects-human-attention-mechanically",
+          "identity": "sha256:0eb203961606780c70e930e5c7d83aa4420942e3886ce32e4141ef1bdb60a1c2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:81453def3b66e9bd072c0ad7b1d3dfa268935ac42fa132768617269f9a24cd6a",
+      "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "agent-handoff-names-the-boundary",
+          "identity": "sha256:a724627f35592519f6999d582124d3e0940e572cab49a9517b172786ce4b0dd4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "authority-feature-remains-lightweight",
+          "identity": "sha256:07c1b7ef80315a84c1ce32bf71252e45bbff4c1928260ff83ecb2f6ba8f42f2d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "decision-boundary-policy-approved",
+          "identity": "sha256:a07b7163f91ce6c5b9eb3b93511b35208d360b7b2685ce53997324acda272ed8",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "human-attention-state-is-honest",
+          "identity": "sha256:c20cf898dbe62fe4cd1512ed5d6867b6472c82c21da33e4537c0c6a2f889b716",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
+          "identity": "sha256:7075af085a7709a36458184646ef3e893f7884b7fd7bf07cba40e7fbd74e3a30",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "plan-and-run-handle-human-decisions",
+          "identity": "sha256:62a40745d1a8a60b99fc1bc8eb5248c5687d27985f82558d4edbed0caf480949",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "rooms-flow-proves-graph-boundary",
+          "identity": "sha256:851e19d05c246bf6fff579d89d844a9f7182c9f01925ed85d6bb4f367977e70f",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ticket-skills-protect-human-boundaries",
+          "identity": "sha256:1d0e4fe7d006b8a41d27d0fe5a7243b5d202bfc5dffa8271fc4087d150aa3a6f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ui-projects-human-attention-mechanically",
+          "identity": "sha256:0eb203961606780c70e930e5c7d83aa4420942e3886ce32e4141ef1bdb60a1c2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8580e26957f5a85494686595e129c18849f453691a913ee5bddcde53c8b756ab",
+      "revision": 2
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-11T05:48:43.000Z",
@@ -110,6 +264,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

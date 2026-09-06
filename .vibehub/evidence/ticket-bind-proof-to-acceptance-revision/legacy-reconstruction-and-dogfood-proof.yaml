@@ -1,0 +1,44 @@
+{
+  "acceptance_ids": [
+    "current-repository-migration-preserves-historical-truth",
+    "legacy-proof-migration-reconstructs-history",
+    "migration-and-host-artifacts-stay-atomic"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "current-repository-migration-preserves-historical-truth",
+      "identity": "sha256:39702ecd3007324ea8cc6eef9acec9d042589d0fb1e80c8b9274bf2314b80fa5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "legacy-proof-migration-reconstructs-history",
+      "identity": "sha256:1a626dc79d574e0ccaebedc54e2012b2ae7c6bd0fff8738cba6d26c56a2e09e6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "migration-and-host-artifacts-stay-atomic",
+      "identity": "sha256:e24ab3ae136e313117e3643f4fcf699999f831e4d7189b0bc60f7cda6765124f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "legacy-reconstruction-and-dogfood-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:14:04Z",
+  "refs": [
+    "test/fixtures/legacy-proof-snapshot-59de368.json",
+    "test/legacy-proof-audit.test.mjs",
+    "test/proof-revision-migration.test.mjs",
+    "test/migration.test.mjs",
+    "test/upgrade.test.mjs",
+    "scripts/audit-legacy-proof.mjs",
+    "skills/vibehub-migrate/references/migrations.json",
+    "command:audit-308-evidence-96-outcomes-zero-unresolved",
+    "command:project-validate-format-4"
+  ],
+  "schema_version": 2,
+  "summary": "Format 4 separates deterministic pending materialization from current-HEAD semantic reconstruction. The pinned 59de368 fixture retains the policy baseline of 307 Evidence, 95 Outcomes, 24 drifted Evidence, two named drifted Outcomes, and zero unresolved. Dogfooding migrated the actual repository to 308 Evidence and 96 Outcomes; all reconstructed successfully, with 19 current-history Evidence drifts and two Outcome drifts preserved as older successful Contracts. Missing and delete/re-add ambiguity, idempotence, atomic rollback, safe-worktree boundaries, installed artifacts, and no-push behavior are covered by focused and full tests.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

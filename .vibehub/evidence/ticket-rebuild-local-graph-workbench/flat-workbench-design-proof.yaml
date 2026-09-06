@@ -3,6 +3,20 @@
     "flat-workbench-replaces-nested-shells",
     "design-language-is-coherent"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "flat-workbench-replaces-nested-shells",
+      "identity": "sha256:f55c2400de316fff97e4f3930a05db57f27854508d764343574af7d0d0d67936",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "design-language-is-coherent",
+      "identity": "sha256:1b6e9550955b7ffb92458afda20b51568dec6f0660589c9a1afd19a68c8e9cb0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "flat-workbench-design-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T09:15:00Z",
@@ -15,7 +29,7 @@
     "browser:2026-08-02-desktop-workbench",
     "browser:2026-08-02-narrow-workbench"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The former surface/signal/sheet DOM and CSS are absent. The real desktop render is one 1440x960 workbench with a single 72px product/source toolbar, graph canvas, state legend, minimap, and bounded right inspector. The 390x844 render shows the graph as the primary screen and the selected Ticket as a separate full-screen inspector state. A consistent warm Git-workbench palette, serif display hierarchy, mono provenance labels, green VibeHub brand, state colors, card/edge/minimap styling, spacing, empty/loading/error treatment, and responsive rules are defined in one asset stylesheet.",
   "ticket_id": "ticket-rebuild-local-graph-workbench"
 }

@@ -102,6 +102,12 @@ Plugin code and checked-in project data have separate lifecycles. Updating a
 plugin bundle never writes `.vibehub/`. The installed helper first reports the
 repository compatibility state:
 
+The supported `npx skills` updater detects plugin changes by content hash or
+an unconditional refetch; it does not depend on VibeHub's declared release
+version. VibeHub therefore ships no separate staleness command. Release
+versions remain human-facing identities for reproducible artifacts and their
+paired data migrations.
+
 ```bash
 node <plugin>/skills/vibehub-core/scripts/vh.mjs project compatibility --repo <repository>
 ```

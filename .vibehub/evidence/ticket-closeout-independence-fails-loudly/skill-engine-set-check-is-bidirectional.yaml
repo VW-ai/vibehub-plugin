@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "closeout-skill-matches-the-engine"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "closeout-skill-matches-the-engine",
+      "identity": "sha256:6000afc0017e469440d606c289595d4e6bf114e60f0bcd4108263bd2ac5ef8f0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "skill-engine-set-check-is-bidirectional",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +21,7 @@
     "skills/vibehub-core/scripts/vh.mjs",
     "commit:79650be324d2dd742fc2c744e2919306a31fad0a"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "SUPERSEDES the set-equality half of skill-and-engine-name-the-same-sources. The prior test filtered backticked tokens by a heuristic (includes an underscore, or equals subagent), which hardcoded the answer it was supposed to discover: an adjudicator showed a bogus fourth source added to the Skill still passed a test titled 'exactly', and an unrelated backticked word in prose failed it spuriously. The test now parses the Skill's own declared list — the '- `source` — description' bullets — and compares it to the engine's INDEPENDENCE_SOURCES by deep equality, so it fails in both directions. Mutation-checked: adding a bogus fourth bullet to the Skill now fails the test.",
   "ticket_id": "ticket-closeout-independence-fails-loudly"
 }

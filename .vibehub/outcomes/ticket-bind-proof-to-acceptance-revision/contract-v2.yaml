@@ -1,0 +1,38 @@
+{
+  "accepted_acceptance_ids": [
+    "acceptance-and-contract-revisions-are-canonical-data",
+    "current-repository-migration-preserves-historical-truth",
+    "legacy-proof-migration-reconstructs-history",
+    "migration-and-host-artifacts-stay-atomic",
+    "projection-uses-only-active-contract-coverage",
+    "regression-suite-proves-identity-and-rollback-boundaries",
+    "semantic-mutation-appends-and-preserves-lineage"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-04T20:45:17Z",
+  "contract_revision": {
+    "identity": "sha256:121a7d56213893b5b2552eb3286800ef6e5b4da093cfd96f2b70c7172f1bcea7",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "active-contract-projection-and-workbench-proof",
+    "contract-v2-stale-human-and-visible-history-proof",
+    "legacy-reconstruction-and-dogfood-proof",
+    "revision-identity-and-mutation-proof"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout Agent with no executor context; adjudicated from the current Ticket, Contract-v1 history, schemas, code, Evidence, diff, and independently rerun tests and artifact verification.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "partial",
+  "summary": "Independent Contract-v2 closeout accepted seven of nine active Acceptance revisions. Project and Ticket validation pass; focused revision, migration, lifecycle, upgrade, host, and production-asset checks passed 80 of 81 with one sandbox-only loopback skip; the complete suite passed 187 of 194 with seven sandbox-only loopback skips; unrestricted artifact verification passed at 67 files and 3,300,616 bytes; the current-corpus audit reports all 313 Evidence and 97 Outcomes reconstructable with zero unresolved; and git diff --check passes. The strengthened stale-human migration fixture now rejects v1 human approval for a materially strengthened v2 Contract and restores byte-identical pending state. Current reconstructed Outcomes preserve immutable mismatched legacy evidence_ids without granting revision credit. Production Workbench code and tests expose active Contract revision, Acceptance revisions and retirement, lineage, exact-current-proof filtering, historical Outcomes, and binding origin. Closeout remains partial because no valid native Evidence selection can accept all nine current revisions together: the only Evidence for acceptance-and-contract-revisions-are-canonical-data and semantic-mutation-appends-and-preserves-lineage also selects evidence-and-outcomes-bind-exact-revisions v1, while the only Evidence for projection-uses-only-active-contract-coverage also selects workbench-explains-revision-history v1. Selecting those records together with the exact v2 Evidence makes candidate validation reject both stale references. No implementation or repair was performed during adjudication.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision",
+  "unresolved_acceptance_ids": [
+    "evidence-and-outcomes-bind-exact-revisions",
+    "workbench-explains-revision-history"
+  ]
+}

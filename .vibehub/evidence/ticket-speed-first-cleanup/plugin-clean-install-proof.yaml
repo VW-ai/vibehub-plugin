@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "plugin-clean-install"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "plugin-clean-install",
+      "identity": "sha256:c9b447408f22eb954955e2d5b48f462949b1f94f2bb42d5d0a8e3b0904f86bc7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "plugin-clean-install-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-07-31T22:24:03.000Z",
@@ -12,7 +21,7 @@
     "scripts/verify-plugin-artifact.mjs",
     "docs/SPEED_FIRST_CLEANUP.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Dependency-free artifact verification built a 28-file Skill-only plugin, rejected forbidden runtime surfaces, and completed an installed Context capture/query roundtrip; Claude and Codex marketplace builds passed.",
   "ticket_id": "ticket-speed-first-cleanup"
 }

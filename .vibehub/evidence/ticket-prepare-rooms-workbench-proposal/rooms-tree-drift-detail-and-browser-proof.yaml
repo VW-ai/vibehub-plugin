@@ -3,6 +3,20 @@
     "rooms-proposal-is-reviewable",
     "rooms-proposal-respects-contracts"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "rooms-proposal-is-reviewable",
+      "identity": "sha256:5d4554ee019568c4e0eaa0ca2b15e11d18883bdf58d76e55e48e3d3f28878508",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rooms-proposal-respects-contracts",
+      "identity": "sha256:ddd3f4ff6ed9bdd88aec4c6bb3b2e9ca68a248c03268b0a8c145b56a41c8ced0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "rooms-tree-drift-detail-and-browser-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +33,7 @@
     "browser:narrow-bottom-sheet-14-of-14-controls-at-least-44px-no-overflow-or-console-errors",
     "room:all-four-rooms-fresh-at-ed12702"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit d4e8773 adds only a checked-in Rooms Workbench proposal and validation under docs/proposals/rooms-workbench and test/. It proposes an on-demand floating Rooms browser opened from a compact header control, never a permanent navigation rail. The tree is explicitly sourced from canonical room.yaml directory containment; selected detail combines Room boundary and anchors, canonical Context entries in the subtree, and Tickets mechanically consuming those Context refs. FRESH is quiet, while DRIFTED, WARNING/old checkout, STALE, and COLD_START each have explicit text, icon, and exceptional prominence in contract.json. The focused Workbench and Product examples expose Context, consuming Tickets, and exact drift rows, while a no-selection state explains the surface without replacing the causal graph. Show related Tickets is explicitly bound to the shared repeated-Room query contract; the prototype only recedes non-matching cards and never clusters, ranks, or moves the graph. Independent real-browser review at 1440x960, 1180x820, and 390x844 proved Rooms close/reopen synchronizes hidden, active, and aria-expanded; selected detail and empty state are mutually exclusive; filter status starts hidden; Context/Tickets/Drift tabs and Product's one changed plus six added rows are concrete. Filtering Workbench left all six card coordinates bit-for-bit unchanged and receded only the one non-matching Ticket; Clear restored every card and hid the filter. At 390x844 the Room surface is a bottom sheet ending exactly at the viewport bottom while the graph remains visible, document width equals viewport width, all 14 visible controls are at least 44x44, Clear is exactly 44x44, and no console warning/error appears. Full verification passes 70/70 and the installed production Plugin artifact remains exactly 54 files and 698815 bytes, so no production Room projection, Ticket layout, runtime, persistent state, cache, database, or writable route shipped. Product Room alignment leaves all four Rooms FRESH at ed12702.",
   "ticket_id": "ticket-prepare-rooms-workbench-proposal"
 }

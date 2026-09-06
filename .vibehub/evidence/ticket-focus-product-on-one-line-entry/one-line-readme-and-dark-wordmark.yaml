@@ -4,6 +4,25 @@
     "three-lines-carry-the-product",
     "details-move-without-truth-loss"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "hero-is-dark-mode-safe-and-immediate",
+      "identity": "sha256:bd0ce72c9fcead2df932c2df7bf4d34712a3009a16f7735d3ebc93f5417f5803",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "three-lines-carry-the-product",
+      "identity": "sha256:d491b96ec9a30b6bce5c44cabf1df4d1a8021c1ea5eaf8c921c65243d5808a84",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "details-move-without-truth-loss",
+      "identity": "sha256:9b325b08bf477b767b5c49c6487b52b21d4c40a7feeac2ce308ca559624143fd",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "one-line-readme-and-dark-wordmark",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-03T00:10:40.000Z",
@@ -16,7 +35,7 @@
     "test:readme-dark-safe-one-line-product-surface",
     "contrast:light-wordmark-17.304-green-accent-6.642-on-github-dark"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit e3ce26d cuts README from 121 to 33 lines and makes its complete hero exactly three ideas: what VibeHub does, the single entry 'Start this with VibeHub.', and the comparison that memory tools preserve conversation while VibeHub preserves the development cycle. The removed lifecycle table, data layout, capture semantics, and lightweight boundary now live in docs/CONCEPT.md or focused existing docs. A GitHub-compatible picture element selects checked-in light and dark wordmarks; the dark variant measures 17.30:1 for the primary wordmark and 6.64:1 for the green accent against GitHub dark #0D1117. Automated checks resolve every README link and both assets in source and the clean plugin artifact.",
   "ticket_id": "ticket-focus-product-on-one-line-entry"
 }

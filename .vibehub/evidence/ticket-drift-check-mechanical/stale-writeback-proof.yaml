@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "stale-writeback"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "stale-writeback",
+      "identity": "sha256:482b4928d83aa4f31e17555fe5b65cc6df91281569cf52527dd273fc97d67e67",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "stale-writeback-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-03T23:09:19.000Z",
@@ -9,7 +18,7 @@
     "commit:41db1eb",
     "test/room-drift.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "vh room stale --room <path> with a required non-empty reason marks a room stale in one command (the deferred align-on-use path), vh room drift surfaces manually marked stale rooms even when every anchored hash matches, and a later align clears the mark. A whole-repo drift check on this repository completes in about 0.2 seconds as a pure deterministic script with no agent or network use.",
   "ticket_id": "ticket-drift-check-mechanical"
 }

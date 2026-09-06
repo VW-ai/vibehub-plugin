@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VibeHub template · plugin 0.8.0 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
+// VibeHub template · plugin 0.9.0 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
 // One-way projection of VibeHub Tickets onto GitHub Issues.
 //
 // Git is the source of truth. This script reads .vibehub/tickets, outcomes,
@@ -17,6 +17,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertValid,
+  currentOutcome,
   loadRepository,
   ticketNextAction,
   ticketStatus,
@@ -153,7 +154,7 @@ export function computeProjection(repoRoot, github) {
   }
   const items = [];
   for (const { document: ticket } of repository.tickets.documents.values()) {
-    const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+    const outcome = currentOutcome(repository, ticket);
     const nextAction = ticketNextAction(repository, ticket);
     const status = ticketStatus(repository, ticket);
     const evidence = (evidenceByTicket.get(ticket.ticket_id) ?? [])

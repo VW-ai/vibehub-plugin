@@ -20,6 +20,16 @@ function trackedSnapshot(repo) {
   );
 }
 
+function legacyTicket(id) {
+  const current = ticket(id);
+  const { revision_state, active_contract_revision, contract_revisions, ...legacy } = current;
+  return {
+    ...legacy,
+    schema_version: 1,
+    acceptance: current.acceptance.map(({ identity, revision, state, derived_from, presentation, ...item }) => item),
+  };
+}
+
 test("a semantic-only 0.4 step makes no change, then the engine completes the mechanical path", () => {
   const repo = tempRepo("migrate-04-to-05");
   assert.equal(run(repo, "project", "init").status, 0);
@@ -31,15 +41,14 @@ test("a semantic-only 0.4 step makes no change, then the engine completes the me
     join(repo, ".vibehub", "context", "decision-use-tickets.yaml"),
     `${JSON.stringify(context(), null, 2)}\n`,
   );
-  const legacyTicket = ticket("feature");
-  legacyTicket.schema_version = 1;
-  delete legacyTicket.deliveries;
-  legacyTicket.context_refs = [
+  const legacy = legacyTicket("feature");
+  delete legacy.deliveries;
+  legacy.context_refs = [
     { ref: ".vibehub/context/decision-use-tickets.yaml", purpose: "Product direction." },
   ];
   writeFileSync(
     join(repo, ".vibehub", "tickets", "feature.yaml"),
-    `${JSON.stringify(legacyTicket, null, 2)}\n`,
+    `${JSON.stringify(legacy, null, 2)}\n`,
   );
 
   const broken = run(repo, "project", "validate");
@@ -90,19 +99,21 @@ test("a semantic-only 0.4 step makes no change, then the engine completes the me
   assert.equal(roomedCompatibility.envelope.data.detected_format, "0.5-unversioned");
 
   const completed = run(repo, "project", "migrate-mechanical");
-  assert.equal(completed.status, 0, completed.stderr);
+  assert.equal(completed.status, 0, completed.stdout || completed.stderr);
   assert.equal(completed.envelope.data.status, "migrated_with_semantic_pending");
   assert.deepEqual(completed.envelope.data.applied_migrations, [
     "0-5-unversioned-to-format-1",
     "format-1-to-format-2",
     "format-2-to-format-3",
+    "format-3-to-format-4",
   ]);
   assert.deepEqual(completed.envelope.data.changed_paths, [
     ".vibehub/tickets/feature.yaml",
     ".vibehub/version.yaml",
   ]);
   const pendingTicket = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"));
-  assert.equal(pendingTicket.schema_version, 2);
+  assert.equal(pendingTicket.schema_version, 3);
+  assert.equal(pendingTicket.revision_state, "legacy-pending-reconstruction");
   assert.deepEqual(pendingTicket.deliveries, []);
   assert.ok(pendingTicket.provenance_refs.includes(
     "migration-pending:format-1-to-format-2:classify-delivery-membership",
@@ -128,8 +139,7 @@ test("a semantic-only 0.4 step makes no change, then the engine completes the me
 test("mechanical migration changes only declared paths in the exact worktree", () => {
   const repo = tempRepo("migrate-one-worktree");
   assert.equal(run(repo, "project", "init").status, 0);
-  const legacy = ticket("feature");
-  legacy.schema_version = 1;
+  const legacy = legacyTicket("feature");
   delete legacy.deliveries;
   writeFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), `${JSON.stringify(legacy, null, 2)}\n`);
   writeFileSync(
@@ -152,7 +162,7 @@ test("mechanical migration changes only declared paths in the exact worktree", (
   const commitsBefore = git(repo, "rev-list", "--all", "--count");
 
   const migrated = run(repo, "project", "migrate-mechanical");
-  assert.equal(migrated.status, 0, migrated.stderr);
+  assert.equal(migrated.status, 0, migrated.stdout || migrated.stderr);
   assert.deepEqual(migrated.envelope.data.changed_paths, [
     ".vibehub/tickets/feature.yaml",
     ".vibehub/version.yaml",
@@ -175,8 +185,7 @@ test("mechanical migration changes only declared paths in the exact worktree", (
 test("a failed post-migration validation restores every original byte", () => {
   const repo = tempRepo("migrate-rollback");
   assert.equal(run(repo, "project", "init").status, 0);
-  const legacy = ticket("feature");
-  legacy.schema_version = 1;
+  const legacy = legacyTicket("feature");
   delete legacy.deliveries;
   legacy.context_refs = [{ ref: "docs/missing.md", purpose: "Deliberately invalid fixture." }];
   const ticketPath = join(repo, ".vibehub", "tickets", "feature.yaml");
@@ -201,7 +210,8 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
   assert.equal(run(repo, "project", "init").status, 0);
   mkdirSync(join(repo, "docs"), { recursive: true });
   writeFileSync(join(repo, "docs", "current.md"), "# Current source\n");
-  const existing = ticket("current-reference");
+  const existing = legacyTicket("current-reference");
+  existing.schema_version = 2;
   existing.context_refs = [{ ref: "docs/current.md", purpose: "Current source." }];
   writeFileSync(
     join(repo, ".vibehub", "tickets", "current-reference.yaml"),
@@ -215,14 +225,11 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
 
   const migrated = run(repo, "project", "migrate-mechanical");
   assert.equal(migrated.status, 0, migrated.stdout);
-  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3"]);
-  assert.deepEqual(migrated.envelope.data.changed_paths, [".vibehub/version.yaml"]);
-  assert.equal(
-    readFileSync(join(repo, ".vibehub", "tickets", "current-reference.yaml"), "utf8"),
-    ticketBefore,
-  );
-  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 3);
-  assert.equal(migrated.envelope.data.pending_semantic_steps.length, 1);
+  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3", "format-3-to-format-4"]);
+  assert.deepEqual(migrated.envelope.data.changed_paths, [".vibehub/tickets/current-reference.yaml", ".vibehub/version.yaml"]);
+  assert.notEqual(readFileSync(join(repo, ".vibehub", "tickets", "current-reference.yaml"), "utf8"), ticketBefore);
+  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 4);
+  assert.equal(migrated.envelope.data.pending_semantic_steps.length, 2);
   assert.equal(
     migrated.envelope.data.pending_semantic_steps[0].step_id,
     "bind-deleted-path-provenance-to-exact-history",
@@ -230,15 +237,15 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
   assert.equal(run(repo, "project", "validate").status, 0);
 });
 
-test("the repository format-3 project keeps Ticket schema 2 and audited delivery structure", () => {
+test("the repository format-4 project keeps Ticket schema 3 and audited delivery structure", () => {
   const version = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
-  assert.equal(version.format_version, 3);
+  assert.equal(version.format_version, 4);
   const ticketRoot = join(root, ".vibehub", "tickets");
   const tickets = readdirSync(ticketRoot)
     .filter((name) => name.endsWith(".yaml"))
     .map((name) => JSON.parse(readFileSync(join(ticketRoot, name), "utf8")));
   assert.ok(tickets.length >= 50);
-  assert.equal(tickets.every((item) => item.schema_version === 2), true);
+  assert.equal(tickets.every((item) => item.schema_version === 3 && item.revision_state === "bound"), true);
   assert.equal(tickets.every((item) => Array.isArray(item.deliveries)), true);
 
   const delivered = tickets.flatMap((item) => item.deliveries

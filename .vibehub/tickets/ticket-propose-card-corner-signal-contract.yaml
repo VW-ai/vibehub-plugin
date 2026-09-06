@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "canonical-facts-and-human-model-are-separated",
-      "criterion": "The proposal audits maturity, dependency readiness, next_action, Evidence and Outcome, human authority, non-success deviation, archive or delivery, and trusted Active Run presence as distinct truth sources, then evaluates one four-primary-phase Human model based on Context stability and forward motion: DRAFT while the Context or path still needs change, READY when it is stable and the next actor can act, RUNNING while the work loop is advancing including closeout, and DONE after independent acceptance."
-    },
-    {
-      "acceptance_id": "primary-phase-derivation-and-precedence-are-exact",
-      "criterion": "A deterministic derivation and adversarial matrix define every overlap, including successful Outcome versus stale or live presence, CLOSE_OUT with or without live presence, trusted Run start and end with incomplete Evidence, maturity:draft behind dependencies, firm work behind dependencies, NEEDS_HUMAN before start or mid-run, WAIT, REPLAN, failed closeout, and reopened work. BLOCKED and material DEVIATED both project the current primary phase to DRAFT because the Context or path must change; READY and RUNNING can never coexist with BLOCKED or material DEVIATED; prior execution history remains inspectable rather than controlling the current phase; and no live claim survives stale or absent trusted presence."
+      "criterion": "The proposal audits maturity, dependency readiness, next_action, Evidence and Outcome, human authority, non-success deviation, archive or delivery, and trusted Active Run presence as distinct truth sources, then evaluates one four-primary-phase Human model based on Context stability and forward motion: DRAFT while the Context or path still needs change, READY when it is stable and the next actor can act, RUNNING while the work loop is advancing including closeout, and DONE after independent acceptance.",
+      "identity": "sha256:5b6e66bc211ba35d48f6ad07e2f216513e80cda78e00c55da994c728c8bdbc73",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "one-cross-cutting-substate-slot-is-defined",
-      "criterion": "The upper-right slot is specified as one secondary signal with explicit eligibility by primary phase. The proposal defines a bounded taxonomy, absence, coexistence, replacement, and deterministic priority. It tests BLOCKED and DEVIATED only on DRAFT; tests NEEDS YOU on DRAFT when Human input is required to stabilize Context, on READY when the stable Task's next actor is Human, and on RUNNING when a Human boundary appears mid-flow; distinguishes those three explanations; and rejects contradictory combinations rather than rendering every Cartesian pair."
+      "criterion": "The upper-right slot is specified as one secondary signal with explicit eligibility by primary phase. The proposal defines a bounded taxonomy, absence, coexistence, replacement, and deterministic priority. It tests BLOCKED and DEVIATED only on DRAFT; tests NEEDS YOU on DRAFT when Human input is required to stabilize Context, on READY when the stable Task's next actor is Human, and on RUNNING when a Human boundary appears mid-flow; distinguishes those three explanations; and rejects contradictory combinations rather than rendering every Cartesian pair.",
+      "identity": "sha256:ac8384de7426c0d8799e8e84a55d92a816f01383f814ecddd351bf74b68233e9",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "running-substages-and-live-presence-are-distinct",
-      "criterion": "The proposal decides how executing, waiting on Agent or tool, and verifying or independent closeout fit inside RUNNING; treats CLOSE_OUT as a normally continuous internal phase rather than a major REVIEW lifecycle state; and separately specifies when pulse, avatar, motion, or live copy is allowed from trusted Active Run presence, including reduced-motion and stale-presence behavior."
+      "acceptance_id": "primary-phase-derivation-and-precedence-are-exact",
+      "criterion": "A deterministic derivation and adversarial matrix define every overlap, including successful Outcome versus stale or live presence, CLOSE_OUT with or without live presence, trusted Run start and end with incomplete Evidence, maturity:draft behind dependencies, firm work behind dependencies, NEEDS_HUMAN before start or mid-run, WAIT, REPLAN, failed closeout, and reopened work. BLOCKED and material DEVIATED both project the current primary phase to DRAFT because the Context or path must change; READY and RUNNING can never coexist with BLOCKED or material DEVIATED; prior execution history remains inspectable rather than controlling the current phase; and no live claim survives stale or absent trusted presence.",
+      "identity": "sha256:7e084ce8e5f0b67b15758bbcc79f7a7e6e55ae6a214397f17043a458796ee268",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "quiet-visual-and-language-system-is-reviewable",
-      "criterion": "Wide and narrow production-shaped prototypes show the four primary phases and representative substate combinations using the approved card anatomy, short DRAFT language, no Plan with Agent jargon, no more than four primary legend entries, no one-color-per-fact rainbow, icon-plus-text and non-color distinction, exact hover and focus explanation, accessibility names, long copy, selected or dimmed cards, causal focus, and cards with no substate."
+      "criterion": "Wide and narrow production-shaped prototypes show the four primary phases and representative substate combinations using the approved card anatomy, short DRAFT language, no Plan with Agent jargon, no more than four primary legend entries, no one-color-per-fact rainbow, icon-plus-text and non-color distinction, exact hover and focus explanation, accessibility names, long copy, selected or dimmed cards, causal focus, and cards with no substate.",
+      "identity": "sha256:032fb4fa9257ae038b71d70a371ff868bf38c686cacd3ed26dc2a1f900b86393",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "recommendation-and-downstream-boundaries-are-decision-ready",
-      "criterion": "The proposal recommends one exact phase derivation, substate taxonomy and priority, short action language, color or token budget, and review-to-running interaction; identifies the smallest protected Human decision and subsequent projection, Workbench, Skill routing, migration-or-compatibility, accessibility, and regression boundaries; and explicitly preserves raw v0.8 machine values until that decision is accepted."
+      "criterion": "The proposal recommends one exact phase derivation, substate taxonomy and priority, short action language, color or token budget, and review-to-running interaction; identifies the smallest protected Human decision and subsequent projection, Workbench, Skill routing, migration-or-compatibility, accessibility, and regression boundaries; and explicitly preserves raw v0.8 machine values until that decision is accepted.",
+      "identity": "sha256:68d926a61388272c302ba5e035e9c11e6564bc7b82e89bc8278dbbdf2a8336b2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "running-substages-and-live-presence-are-distinct",
+      "criterion": "The proposal decides how executing, waiting on Agent or tool, and verifying or independent closeout fit inside RUNNING; treats CLOSE_OUT as a normally continuous internal phase rather than a major REVIEW lifecycle state; and separately specifies when pulse, avatar, motion, or live copy is allowed from trusted Active Run presence, including reduced-motion and stale-presence behavior.",
+      "identity": "sha256:455036a90d5edbce207c11d71180830822ea1770148fc0c9bee524e4df232e70",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket produces a semantic and interaction proposal for explicit owner review; it does not change production projection, vocabulary, colors, or routing.",
     "Do not infer a primary phase from an untrusted Session, heartbeat, cache, browser state, Agent claim, or stale Run record.",
@@ -53,15 +72,53 @@
     },
     {
       "purpose": "Accepted current production card and state visual baseline.",
-      "ref": ".vibehub/outcomes/ticket-apply-codex-like-workbench-visual-language.yaml"
+      "ref": ".vibehub/outcomes/ticket-apply-codex-like-workbench-visual-language/contract-v1.yaml"
     },
     {
       "purpose": "Accepted closeout routing capability whose presentation may become a RUNNING substage without weakening independent adjudication.",
-      "ref": ".vibehub/outcomes/ticket-make-closeout-first-class-handoff.yaml"
+      "ref": ".vibehub/outcomes/ticket-make-closeout-first-class-handoff/contract-v1.yaml"
     },
     {
       "purpose": "Parallel graph-density proposal that must remain compatible with the final card information hierarchy.",
       "ref": ".vibehub/tickets/ticket-propose-large-graph-clarity-and-card-copy.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-facts-and-human-model-are-separated",
+          "identity": "sha256:5b6e66bc211ba35d48f6ad07e2f216513e80cda78e00c55da994c728c8bdbc73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-cross-cutting-substate-slot-is-defined",
+          "identity": "sha256:ac8384de7426c0d8799e8e84a55d92a816f01383f814ecddd351bf74b68233e9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "primary-phase-derivation-and-precedence-are-exact",
+          "identity": "sha256:7e084ce8e5f0b67b15758bbcc79f7a7e6e55ae6a214397f17043a458796ee268",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quiet-visual-and-language-system-is-reviewable",
+          "identity": "sha256:032fb4fa9257ae038b71d70a371ff868bf38c686cacd3ed26dc2a1f900b86393",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recommendation-and-downstream-boundaries-are-decision-ready",
+          "identity": "sha256:68d926a61388272c302ba5e035e9c11e6564bc7b82e89bc8278dbbdf2a8336b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "running-substages-and-live-presence-are-distinct",
+          "identity": "sha256:455036a90d5edbce207c11d71180830822ea1770148fc0c9bee524e4df232e70",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7414287447e3875e52432ad938a2133d3e84a8ee976f6867edca9c9571685dd0",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -79,6 +136,7 @@
     "conversation:2026-08-20-owner-groups-blocked-and-deviated-under-draft-and-needs-you-across-phases"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-propose-card-corner-signal-contract"
 }

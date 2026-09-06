@@ -3,6 +3,20 @@
     "founder-names-are-exact",
     "founder-links-and-layout-are-preserved"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "founder-names-are-exact",
+      "identity": "sha256:0b19d913073257e72805e9464eee4925640bec1902e56cdea94ad06d3d56140b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "founder-links-and-layout-are-preserved",
+      "identity": "sha256:c380e7860b157e737a0d75f3d363de87eb7499b8b4024d0a2519ae4e8b05c667",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-founder-identity-correction",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -12,7 +26,7 @@
     "file:site/tests/rendered-html.test.mjs",
     "diff:git-diff-site-founder-identity"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The existing compact founder strip now renders the exact bilingual identities Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬. Victor's image alt text and profile-link accessible name use Victor Zhang, and the former Chenyang Zhang identity is absent. Both existing portraits, personal websites, LinkedIn destinations, markup structure, and presentation remain otherwise unchanged.",
   "ticket_id": "ticket-correct-public-founder-identity"
 }

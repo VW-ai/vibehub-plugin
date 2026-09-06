@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "baseline-checkpoint",
-      "criterion": "The completed ticket-first runtime pivot worktree is captured in Git before hard deletions, providing a cheap exact rollback point."
+      "criterion": "The completed ticket-first runtime pivot worktree is captured in Git before hard deletions, providing a cheap exact rollback point.",
+      "identity": "sha256:7d6d655851682c293502f5f8fb7eb4fb9a9d7f0407d79c154bde46b76743048c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "context-minimum-works",
-      "criterion": "In a clean temporary repository, explicit capture writes schema-valid stable-ID Context YAML with readable source/evidence; a fresh process or reclone can query it; malformed YAML and obvious dangling references fail visibly."
+      "criterion": "In a clean temporary repository, explicit capture writes schema-valid stable-ID Context YAML with readable source/evidence; a fresh process or reclone can query it; malformed YAML and obvious dangling references fail visibly.",
+      "identity": "sha256:678a21fd476cf26b3442c274bb221726b512a60dd85c6a77a3a7137dc5d1d189",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "footprint-and-gap-report",
-      "criterion": "Closeout reports before-and-after production files, production dependencies, and packaged bytes plus gaps encountered during implementation; only observed gaps are rebuilt and no parity checklist is required."
+      "criterion": "Closeout reports before-and-after production files, production dependencies, and packaged bytes plus gaps encountered during implementation; only observed gaps are rebuilt and no parity checklist is required.",
+      "identity": "sha256:bfba03692846779f3d5e6763751ee019175d19d823b617dfdcc29f8bde4f34cf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "legacy-runtime-absent",
-      "criterion": "The repository, installed artifact, manifests, and dependency metadata contain no required CLI package or bin, MCP server or host config, better-sqlite3/native runtime, runtime launcher, per-turn hook/cadence pipeline, generic operation dispatcher, Run coordination machinery, Context compilation/artifacts, local Decision attestation/trust store, or writable loopback host."
+      "criterion": "The repository, installed artifact, manifests, and dependency metadata contain no required CLI package or bin, MCP server or host config, better-sqlite3/native runtime, runtime launcher, per-turn hook/cadence pipeline, generic operation dispatcher, Run coordination machinery, Context compilation/artifacts, local Decision attestation/trust store, or writable loopback host.",
+      "identity": "sha256:bfbdb61338ec26a1a5f71a5b1ae01b16dec982e937fefa201ab80c459bfdcd1c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "plugin-clean-install",
-      "criterion": "Claude and Codex plugin installation exposes the Skills and succeeds without a global executable, MCP configuration, database initialization, native build, daemon, hook process, or writable local server."
+      "criterion": "Claude and Codex plugin installation exposes the Skills and succeeds without a global executable, MCP configuration, database initialization, native build, daemon, hook process, or writable local server.",
+      "identity": "sha256:c9b447408f22eb954955e2d5b48f462949b1f94f2bb42d5d0a8e3b0904f86bc7",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "ticket-vertical-slice-works",
-      "criterion": "In a clean temporary repository, explicit Ticket entry creates and reads a YAML graph, validation catches missing endpoints and dependency cycles, an Agent records acceptance-linked Evidence and an independent Outcome, and success unlocks a direct dependent while non-success does not."
+      "criterion": "In a clean temporary repository, explicit Ticket entry creates and reads a YAML graph, validation catches missing endpoints and dependency cycles, an Agent records acceptance-linked Evidence and an independent Outcome, and success unlocks a direct dependent while non-success does not.",
+      "identity": "sha256:51aed01ffb18d868662268158f54f34fcab1515fa9fc99e9736eb1444e946378",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Optimize for speed and code deletion; temporary broken intermediate commits are acceptable.",
     "Do not build a retirement lifecycle, generic migration or archival framework, compatibility layer, dual-write path, or new coordination service.",
@@ -47,6 +66,44 @@
       "ref": "skills/vibehub-core/scripts/vh.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "baseline-checkpoint",
+          "identity": "sha256:7d6d655851682c293502f5f8fb7eb4fb9a9d7f0407d79c154bde46b76743048c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-minimum-works",
+          "identity": "sha256:678a21fd476cf26b3442c274bb221726b512a60dd85c6a77a3a7137dc5d1d189",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "footprint-and-gap-report",
+          "identity": "sha256:bfba03692846779f3d5e6763751ee019175d19d823b617dfdcc29f8bde4f34cf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "legacy-runtime-absent",
+          "identity": "sha256:bfbdb61338ec26a1a5f71a5b1ae01b16dec982e937fefa201ab80c459bfdcd1c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "plugin-clean-install",
+          "identity": "sha256:c9b447408f22eb954955e2d5b48f462949b1f94f2bb42d5d0a8e3b0904f86bc7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-vertical-slice-works",
+          "identity": "sha256:51aed01ffb18d868662268158f54f34fcab1515fa9fc99e9736eb1444e946378",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d40fae55802666bf64902fbf712ea29de09c59d09b23e1dcf1029db38c609e3f",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -64,6 +121,7 @@
     "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-speed-first-cleanup"
 }

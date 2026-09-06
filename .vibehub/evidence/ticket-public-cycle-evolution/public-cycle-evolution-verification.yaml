@@ -6,6 +6,35 @@
     "reduced-motion-preserves-the-sequence",
     "cycle-evolution-is-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "identity": "sha256:50e9879be6aaaa53ce5f9ce64c46f272414c119a90d9eec78bae3a8b39cf54bf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-projects-progressive-causality",
+      "identity": "sha256:27215c8a3e7bb117ced5982a0f37363fe41e9e6e83d82cebba631f81077e207e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "motion-explains-without-obstructing",
+      "identity": "sha256:23ec3d9c70c1ab81de5584e1dead4eee15d77f944ea707af83c2e3ddbd6e8830",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "reduced-motion-preserves-the-sequence",
+      "identity": "sha256:3e6abe6710a6c7f0a4c4211b623c62c1a17144122ea42c547b38291f817a2d4c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "cycle-evolution-is-verified",
+      "identity": "sha256:ebde5114b9c7e984d6fd7203a33c3dfe436d49a3ae89d67f210f23c9d1223442",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "public-cycle-evolution-verification",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T22:48:46Z",
@@ -19,7 +48,7 @@
     "command:npm test",
     "command:npm run verify:artifact"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fresh non-browser verification passes after the lifecycle refinement: ESLint, Vinext static production export, seven rendered product-contract tests, canonical project validation at 4 rooms / 26 Context / 33 Tickets / 104 prior Evidence / 28 Outcomes, canonical Ticket validation, the full repository suite at 43/43, and Plugin artifact verification at 51 files and 361397 bytes. The rendered contracts assert the two-step Evidence-before-Outcome schedule, mechanical connector and node states, the four lifecycle labels, horizontal and mobile-vertical connector projection, reduced-motion state preservation, both approved easing tokens, and the absence of transition-all, scale(0), ease-in, or 300ms-plus opacity/transform transitions. No motion dependency was added and the production site remains a static export.",
   "ticket_id": "ticket-public-cycle-evolution"
 }

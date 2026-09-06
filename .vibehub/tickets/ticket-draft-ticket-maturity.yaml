@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "draft-suite-green",
+      "criterion": "The full node --test suite and the plugin artifact verification pass.",
+      "identity": "sha256:53b1dde65eb6abb0387aef84a1ee8250fd5d578954ef207fc17c4aa14a34c4f8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "maturity-field-compatible",
-      "criterion": "ticket.schema.json and the vh.mjs validator accept an optional maturity field whose only value is draft, reject unknown values, and every existing checked-in ticket validates unchanged."
-    },
-    {
-      "acceptance_id": "refine-never-ready",
-      "criterion": "A draft whose dependencies are all satisfied reports REFINE, never READY; the frontier excludes drafts unconditionally; graph output carries the state; node --test covers a draft chain behind a blocker, including that a successful upstream Outcome flips a draft to REFINE and not to READY."
-    },
-    {
-      "acceptance_id": "refinement-owned-by-plan",
-      "criterion": "The lifecycle contract gains a draft-needs-refinement event owned by vibehub-ticket-plan stating the refinement transition once — plan rewrites acceptance and removes the marker in place — and the ownership test proves the event name appears only in the owner skill."
+      "criterion": "ticket.schema.json and the vh.mjs validator accept an optional maturity field whose only value is draft, reject unknown values, and every existing checked-in ticket validates unchanged.",
+      "identity": "sha256:4ff0476e0b81e3f34a2fd892a74d263d7c46cc39c2ab07dfc48afe4962f5cb61",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "projection-exposes-refine",
-      "criterion": "The UI projection reports the REFINE operational state and the maturity marker mechanically so representative tickets show it, with node --test coverage; no visual design is shipped."
+      "criterion": "The UI projection reports the REFINE operational state and the maturity marker mechanically so representative tickets show it, with node --test coverage; no visual design is shipped.",
+      "identity": "sha256:7dcb5d51fd704953f9a2c92006f055b55093ccafe6a8256e03af92c7d8d9b10d",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "draft-suite-green",
-      "criterion": "The full node --test suite and the plugin artifact verification pass."
+      "acceptance_id": "refine-never-ready",
+      "criterion": "A draft whose dependencies are all satisfied reports REFINE, never READY; the frontier excludes drafts unconditionally; graph output carries the state; node --test covers a draft chain behind a blocker, including that a successful upstream Outcome flips a draft to REFINE and not to READY.",
+      "identity": "sha256:15c0ce801bed9b030908d24197680b51dc3aa421487d3ec89e0670a9c716b037",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "refinement-owned-by-plan",
+      "criterion": "The lifecycle contract gains a draft-needs-refinement event owned by vibehub-ticket-plan stating the refinement transition once — plan rewrites acceptance and removes the marker in place — and the ownership test proves the event name appears only in the owner skill.",
+      "identity": "sha256:edeafd1a340a2a8a9e5ca406d8d83b673a6d877a817c015b13669b15ff7e3c8c",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "A draft can never enter the READY frontier under any condition; there is no override flag.",
     "Refinement rewrites the same ticket_id in place; no parallel draft store, no copy, no new document kind.",
@@ -40,6 +56,39 @@
     {
       "purpose": "Test-layer convention governing where each assertion lands.",
       "ref": ".vibehub/rooms/product/convention-skill-contract-test-layers.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "draft-suite-green",
+          "identity": "sha256:53b1dde65eb6abb0387aef84a1ee8250fd5d578954ef207fc17c4aa14a34c4f8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "maturity-field-compatible",
+          "identity": "sha256:4ff0476e0b81e3f34a2fd892a74d263d7c46cc39c2ab07dfc48afe4962f5cb61",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "projection-exposes-refine",
+          "identity": "sha256:7dcb5d51fd704953f9a2c92006f055b55093ccafe6a8256e03af92c7d8d9b10d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refine-never-ready",
+          "identity": "sha256:15c0ce801bed9b030908d24197680b51dc3aa421487d3ec89e0670a9c716b037",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "refinement-owned-by-plan",
+          "identity": "sha256:edeafd1a340a2a8a9e5ca406d8d83b673a6d877a817c015b13669b15ff7e3c8c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:bfc7a68534ec4bad9392385e671b1cdfbc54df777002423b78de2e3fb9a2dd82",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -64,6 +113,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-draft-ticket-maturity"
 }

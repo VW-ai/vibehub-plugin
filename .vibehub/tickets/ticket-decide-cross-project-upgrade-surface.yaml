@@ -2,22 +2,35 @@
   "acceptance": [
     {
       "acceptance_id": "invocation-shapes-are-compared-and-one-is-selected",
-      "criterion": "One-shot npx and any installed invocation shape are compared against the owner-approved write-capable upgrade behavior, including first install, subsequent update, cross-host availability, permission scope, failure recovery, and what command an existing user actually runs; the Evidence selects the smallest shape that can perform the complete flow and explains why the rejected shape cannot do so more cheaply."
-    },
-    {
-      "acceptance_id": "replacement-boundary-is-exact-and-testable",
-      "criterion": "Evidence supplies exact replacement text for architecture-boundary.md that permits one explicit outside-project upgrade entry while requiring all migration semantics to remain in the shared engine and migrations reference, limiting the entry to invocation, discovery, per-worktree orchestration, local commit, and reporting, and forbidding Skill dependency, background invocation, daemon or service state, authoritative indexes, telemetry, and push; it also names the mechanical assertions that will enforce each boundary in implementation."
-    },
-    {
-      "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
-      "criterion": "The operational definition of safe and unsafe is written as deterministic preflight, preview, pre-commit, and failure rules: registered/reachable/writable, named branch, no Git operation, completely clean status, recognized complete migration chain, same-HEAD deterministic preview limited to declared paths, valid writable result with semantic work explicitly pending, unchanged pre-commit snapshot, and successful local commit; current, unsupported, and pending are distinguished, and every non-success path proves no user bytes are changed."
+      "criterion": "One-shot npx and any installed invocation shape are compared against the owner-approved write-capable upgrade behavior, including first install, subsequent update, cross-host availability, permission scope, failure recovery, and what command an existing user actually runs; the Evidence selects the smallest shape that can perform the complete flow and explains why the rejected shape cannot do so more cheaply.",
+      "identity": "sha256:70ffa29e78453e14d0af6e6db3e2013f486cb4fe5a31d86d0932e53480dd5b68",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-selects-explicit-upgrade-behavior",
       "authority": "human",
-      "criterion": "The owner explicitly chooses an outside-project upgrade experience that enumerates all registered existing worktrees, mechanically migrates and locally commits each safe worktree separately, skips and reports unsafe worktrees, never pushes, and leaves remaining semantic migration to later in-worktree Agent sessions; the decision is recorded in product Context without claiming one commit updates multiple worktrees or unregistered branches."
+      "criterion": "The owner explicitly chooses an outside-project upgrade experience that enumerates all registered existing worktrees, mechanically migrates and locally commits each safe worktree separately, skips and reports unsafe worktrees, never pushes, and leaves remaining semantic migration to later in-worktree Agent sessions; the decision is recorded in product Context without claiming one commit updates multiple worktrees or unregistered branches.",
+      "identity": "sha256:b157ec66e0699b6a914a2a76b9d12bebd090207cd47783dabeb35e1365218b36",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "replacement-boundary-is-exact-and-testable",
+      "criterion": "Evidence supplies exact replacement text for architecture-boundary.md that permits one explicit outside-project upgrade entry while requiring all migration semantics to remain in the shared engine and migrations reference, limiting the entry to invocation, discovery, per-worktree orchestration, local commit, and reporting, and forbidding Skill dependency, background invocation, daemon or service state, authoritative indexes, telemetry, and push; it also names the mechanical assertions that will enforce each boundary in implementation.",
+      "identity": "sha256:9cbf7b645b7611368bdd063a3a44e3c899436b07d3b9f3a8b29c223830bdab48",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
+      "criterion": "The operational definition of safe and unsafe is written as deterministic preflight, preview, pre-commit, and failure rules: registered/reachable/writable, named branch, no Git operation, completely clean status, recognized complete migration chain, same-HEAD deterministic preview limited to declared paths, valid writable result with semantic work explicitly pending, unchanged pre-commit snapshot, and successful local commit; current, unsupported, and pending are distinguished, and every non-success path proves no user bytes are changed.",
+      "identity": "sha256:6f47fcceebe426bc907017e0976fee461b5f8d3b916a26070423c52303daf376",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "This Ticket decides and records the invocation and replacement architecture boundary; it implements no entry, scanner, migration, commit, or index.",
     "Do not amend architecture-boundary.md until this Ticket has a successful independent Outcome; the exact proposed text and tests are Evidence first.",
@@ -74,6 +87,34 @@
       "ref": "docs/INSTALL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "invocation-shapes-are-compared-and-one-is-selected",
+          "identity": "sha256:70ffa29e78453e14d0af6e6db3e2013f486cb4fe5a31d86d0932e53480dd5b68",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-selects-explicit-upgrade-behavior",
+          "identity": "sha256:b157ec66e0699b6a914a2a76b9d12bebd090207cd47783dabeb35e1365218b36",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "replacement-boundary-is-exact-and-testable",
+          "identity": "sha256:9cbf7b645b7611368bdd063a3a44e3c899436b07d3b9f3a8b29c223830bdab48",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "unsafe-predicate-is-exact-and-conservative",
+          "identity": "sha256:6f47fcceebe426bc907017e0976fee461b5f8d3b916a26070423c52303daf376",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:334fc93e2ebde2cd2f778286f0021635eb1b5e3781de98207dc852e51241399b",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -86,6 +127,7 @@
     "plan-validation:independent"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-cross-project-upgrade-surface"
 }

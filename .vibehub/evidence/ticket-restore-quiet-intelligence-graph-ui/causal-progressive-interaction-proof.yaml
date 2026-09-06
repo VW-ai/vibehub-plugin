@@ -4,6 +4,25 @@
     "quiet-progressive-disclosure",
     "interaction-is-deliberate-and-accessible"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "causal-graph-is-primary",
+      "identity": "sha256:e33a279e1e22f6a38ae51cdc90623214af172b47d1ee01a0162760d23b63d501",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "quiet-progressive-disclosure",
+      "identity": "sha256:36edc9a81891164a2b43f4d2d7a64d4b0152cb4759023146e6dee2f709b5ec6e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "interaction-is-deliberate-and-accessible",
+      "identity": "sha256:74be5c0d68d30bb284c65efc49554ffd4cecbf106bc4a67e01ba7afe239b56d6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "causal-progressive-interaction-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T08:26:06Z",
@@ -18,7 +37,7 @@
     "browser-test:desktop-ticket-selection-and-progressive-disclosure",
     "browser-test:390x720-full-screen-inspector"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The real browser rendered the complete deterministic left-to-right eight-Ticket graph with a three-way fork, two joins, nine direct unlocks, stable selection, minimap, fit, pan/zoom controls, causal dimming, and visible relation handles. Selecting the exact foundation-to-graph-layout handle opened that relation rather than an overlapping sibling. Ticket selection preserved the graph on desktop; state stayed immediately visible while execution Context, exact source, acceptance, constraints, bound Context, dependencies, provenance, and Git trace each remained one further disclosure away. The 390px state kept all graph controls in the toolbar and opened one full-screen Inspector with close/back, focusable disclosure rows, honest source/Copy controls, and no unsupported write affordances.",
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

@@ -1,0 +1,85 @@
+{
+  "acceptance_ids": [
+    "acceptance-and-contract-revisions-are-canonical-data",
+    "current-repository-migration-preserves-historical-truth",
+    "evidence-and-outcomes-bind-exact-revisions",
+    "legacy-proof-migration-reconstructs-history",
+    "migration-and-host-artifacts-stay-atomic",
+    "projection-uses-only-active-contract-coverage",
+    "regression-suite-proves-identity-and-rollback-boundaries",
+    "semantic-mutation-appends-and-preserves-lineage",
+    "workbench-explains-revision-history"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "acceptance-and-contract-revisions-are-canonical-data",
+      "identity": "sha256:e9266d60a5e5664eb2915d48594c2f2cefdb7ca3b6be4416b5ce81547cb7f1b8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "current-repository-migration-preserves-historical-truth",
+      "identity": "sha256:39702ecd3007324ea8cc6eef9acec9d042589d0fb1e80c8b9274bf2314b80fa5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "evidence-and-outcomes-bind-exact-revisions",
+      "identity": "sha256:27b168f678bac596997433c697fd999a6f3c06262de0df2861f5e4592cb4b7d0",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "legacy-proof-migration-reconstructs-history",
+      "identity": "sha256:1a626dc79d574e0ccaebedc54e2012b2ae7c6bd0fff8738cba6d26c56a2e09e6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "migration-and-host-artifacts-stay-atomic",
+      "identity": "sha256:e24ab3ae136e313117e3643f4fcf699999f831e4d7189b0bc60f7cda6765124f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "projection-uses-only-active-contract-coverage",
+      "identity": "sha256:76b3963aaba5743602c9ea3d0e95b18a3fee912ff63f802c7d1e72908541f5f7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "regression-suite-proves-identity-and-rollback-boundaries",
+      "identity": "sha256:b8e82f7b943cb561cb942b252d5d7fc2842ba225ec7088912dad82a7deab650b",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "semantic-mutation-appends-and-preserves-lineage",
+      "identity": "sha256:308917ada45c32db366702d09c6930fd3081b6d6dd00ef1ff26a36f21be99de9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-explains-revision-history",
+      "identity": "sha256:c22666a9d50ae840eaad2c657469260d3012a100c4f3e0f9beedf7d7f86aa6b8",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "contract-v3-complete-exact-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:53:01Z",
+  "refs": [
+    ".vibehub/outcomes/ticket-bind-proof-to-acceptance-revision/contract-v1.yaml",
+    ".vibehub/outcomes/ticket-bind-proof-to-acceptance-revision/contract-v2.yaml",
+    "skills/vibehub-core/contracts/revision-identity.md",
+    "skills/vibehub-core/scripts/revision-contract.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "test/revision-contract.test.mjs",
+    "test/proof-revision-migration.test.mjs",
+    "test/legacy-proof-audit.test.mjs",
+    "test/ui-visual-system.test.mjs",
+    "test/upgrade.test.mjs",
+    "command:npm-test-195-tests-188-pass-zero-fail-seven-sandbox-skips",
+    "command:verify-artifact-67-files-3300616-bytes",
+    "plan-validation:independent-contract-v3"
+  ],
+  "schema_version": 2,
+  "summary": "This replacement Evidence deliberately binds only the complete active Contract-v3 set: six unchanged v1 revisions, two strengthened v2 revisions, and evidence/outcomes binding v3. It supersedes old grouped proof for closeout selection without deleting or rebinding any historical Evidence. The grouped-Evidence regression proves a native Outcome cannot partially reuse a stale group after one claimed Acceptance advances and can close successfully with a complete exact replacement. The full repository suite passed 195 tests with 188 passes, zero failures, and seven sandbox-only loopback skips; the separately exercised artifact remains verified at 67 files and 3,300,616 bytes. Project validation, pinned/current legacy reconstruction, rollback, lifecycle, host projection, production Workbench visibility, installed-host parity, and deterministic build coverage are all included in that run.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

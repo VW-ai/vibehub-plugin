@@ -6,6 +6,35 @@
     "frontier-distinguishes-execution-from-adjudication",
     "no-automatic-success-or-unlock-is-introduced"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "real-regression-corpus-covers-observed-gaps",
+      "identity": "sha256:9e2bf498b6731140355b0bbb53d0c919a20ae87a80aca4f41926a038a7333e12",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "identity": "sha256:e9535bec0538426699fe4a5691620c75784d70cd9c098f7a69b797bc09dd415d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+      "identity": "sha256:c7e2479ff278f60b8f05e2aba5439c4199e28db69646ac907e340486e6f7689e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+      "identity": "sha256:179c9c759f752f84de2d51e47f92b6a85a2d9ffdf9966d02d31b5eaccc39897c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+      "identity": "sha256:99caf432f51c0bfbfd98eae20b28c893eb5048759b7364f5385ccc49d9f56d6a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "next-action-real-corpus-and-artifact-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +48,7 @@
     "command:vh-project-validate-format-2-79-tickets-202-evidence-59-outcomes",
     "command:vh-ticket-validate-79-tickets-202-evidence-59-outcomes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The regression corpus names and reproduces v0.8 publication and six-criterion dogfood repair as CLOSE_OUT-only, plus ordinary execution, incomplete human and mixed authority, unresolved dependency, draft refinement, successful Outcome, and partial, failed, and deviated Outcomes. Complete verification passed 110 of 110 tests, including current/all graph and real loopback Workbench host behavior; project and Ticket validation pass at format 2 with 79 Tickets, 202 Evidence, and 59 Outcomes before this Ticket's Evidence was appended; the dependency-free installed Plugin artifact passed with 56 files and exercised EXECUTE to CLOSE_OUT to DONE without writable Web state or automatic success.",
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

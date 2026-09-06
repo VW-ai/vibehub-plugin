@@ -1,31 +1,50 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "nothing-points-a-user-at-a-marketplace",
-      "criterion": "No document a user reads and no Skill still names a marketplace install: README.md, docs/INSTALL.md, and all eleven SKILL.md partial-install fallbacks present npx skills add and npx skills update only. A single mechanical check fails if a marketplace install command reappears in either surface, so the line cannot creep back."
-    },
-    {
       "acceptance_id": "marketplace-machinery-is-removed-not-orphaned",
-      "criterion": "scripts/build-claude-marketplace.mjs, scripts/build-codex-marketplace.mjs, their npm scripts, test/host-marketplaces.test.mjs, and the marketplace portions of test/release.test.mjs are removed together, leaving no script, test, or workflow step that builds or verifies a marketplace; npm run verify passes with the remaining suite and the removal is visible as deletions rather than as dead code left in place."
+      "criterion": "scripts/build-claude-marketplace.mjs, scripts/build-codex-marketplace.mjs, their npm scripts, test/host-marketplaces.test.mjs, and the marketplace portions of test/release.test.mjs are removed together, leaving no script, test, or workflow step that builds or verifies a marketplace; npm run verify passes with the remaining suite and the removal is visible as deletions rather than as dead code left in place.",
+      "identity": "sha256:b44b0c4a814c306371efc4578456433aa3201ca0ef62ea3961f8229350e471ee",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "release-identity-survives-the-removal",
-      "criterion": "verify-release-version.mjs no longer derives version declarations from a marketplace manifest and still enforces agreement across the declarations that remain plus the tag; the release workflow passes end to end on a rehearsed tag, and what it now compares is stated in docs/RELEASE.md."
-    },
-    {
-      "acceptance_id": "the-checked-in-manifests-have-a-decided-fate",
-      "criterion": "What becomes of .claude-plugin/marketplace.json and the .codex-plugin and .claude-plugin manifests is decided and implemented — removed, or kept solely because the host still requires them for a Skill-directory install — and the reason is recorded, so no later reader has to infer whether a leftover file is load-bearing."
-    },
-    {
-      "acceptance_id": "the-surviving-path-and-the-migration-are-proven-by-doing",
-      "criterion": "npx skills add VW-ai/vibehub-plugin is performed against a clean checkout for both a Claude Code and a Codex agent directory and the Evidence records what landed and its size; and the migration written for existing marketplace users is performed on a real marketplace install, recording the before and after. Documentation asserting either is not Evidence for it."
+      "acceptance_id": "nothing-points-a-user-at-a-marketplace",
+      "criterion": "No document a user reads and no Skill still names a marketplace install: README.md, docs/INSTALL.md, and all eleven SKILL.md partial-install fallbacks present npx skills add and npx skills update only. A single mechanical check fails if a marketplace install command reappears in either surface, so the line cannot creep back.",
+      "identity": "sha256:0956a4c3284055ff0b8510e00497c61d547f028d1a9296b984beb97399a058a3",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-accepts-the-single-path",
       "authority": "human",
-      "criterion": "The owner confirms, after the change, that removing marketplace support is right in practice rather than only on paper — having seen what a fresh npx install produces and what an existing marketplace user experiences; recorded as human-origin Evidence."
+      "criterion": "The owner confirms, after the change, that removing marketplace support is right in practice rather than only on paper — having seen what a fresh npx install produces and what an existing marketplace user experiences; recorded as human-origin Evidence.",
+      "identity": "sha256:f50018b88278b575e5b52871aee54e6320210e04b4ba2cc1c4ee586f787e9edd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-identity-survives-the-removal",
+      "criterion": "verify-release-version.mjs no longer derives version declarations from a marketplace manifest and still enforces agreement across the declarations that remain plus the tag; the release workflow passes end to end on a rehearsed tag, and what it now compares is stated in docs/RELEASE.md.",
+      "identity": "sha256:1bd268afe2b3f096363a9f278dbe71a2f321991405085c6eef865f6935dcb7e8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "the-checked-in-manifests-have-a-decided-fate",
+      "criterion": "What becomes of .claude-plugin/marketplace.json and the .codex-plugin and .claude-plugin manifests is decided and implemented — removed, or kept solely because the host still requires them for a Skill-directory install — and the reason is recorded, so no later reader has to infer whether a leftover file is load-bearing.",
+      "identity": "sha256:d0462340999d1671dcbeaa7fc5dd2f106d09c1dfbde88554fa5b54c11d0025ab",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "the-surviving-path-and-the-migration-are-proven-by-doing",
+      "criterion": "npx skills add VW-ai/vibehub-plugin is performed against a clean checkout for both a Claude Code and a Codex agent directory and the Evidence records what landed and its size; and the migration written for existing marketplace users is performed on a real marketplace install, recording the before and after. Documentation asserting either is not Evidence for it.",
+      "identity": "sha256:1c11495f333969563ad68a6de178f3e0735c4c29e2d2b651a75c8eff9d4e3e2f",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Retire, do not deprecate-and-keep: leaving the builders in place behind a note reproduces the surface this Ticket removes.",
     "Do not change what npx skills add installs; this Ticket removes a path, it does not redesign the surviving one.",
@@ -61,7 +80,7 @@
     },
     {
       "purpose": "The first independent partial Outcome that identified the exact remaining marketplace surfaces for this execution cycle.",
-      "ref": ".vibehub/outcomes/ticket-retire-marketplace-distribution.yaml"
+      "ref": ".vibehub/outcomes/ticket-retire-marketplace-distribution/contract-v1.yaml"
     },
     {
       "purpose": "The public install actions and copied Agent brief found to retain host marketplace commands.",
@@ -96,6 +115,44 @@
       "ref": "commit:33de83c2526258a48340863ab752d45ff7b56140:.agents/plugins/marketplace.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "marketplace-machinery-is-removed-not-orphaned",
+          "identity": "sha256:b44b0c4a814c306371efc4578456433aa3201ca0ef62ea3961f8229350e471ee",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "nothing-points-a-user-at-a-marketplace",
+          "identity": "sha256:0956a4c3284055ff0b8510e00497c61d547f028d1a9296b984beb97399a058a3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-accepts-the-single-path",
+          "identity": "sha256:f50018b88278b575e5b52871aee54e6320210e04b4ba2cc1c4ee586f787e9edd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-identity-survives-the-removal",
+          "identity": "sha256:1bd268afe2b3f096363a9f278dbe71a2f321991405085c6eef865f6935dcb7e8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "the-checked-in-manifests-have-a-decided-fate",
+          "identity": "sha256:d0462340999d1671dcbeaa7fc5dd2f106d09c1dfbde88554fa5b54c11d0025ab",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "the-surviving-path-and-the-migration-are-proven-by-doing",
+          "identity": "sha256:1c11495f333969563ad68a6de178f3e0735c4c29e2d2b651a75c8eff9d4e3e2f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e3ac176e3bf8f76d2797fc946959ecda72a2bad432810673a9861eef4d3b91ef",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -106,6 +163,7 @@
     "plan-validation:independent"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-retire-marketplace-distribution"
 }

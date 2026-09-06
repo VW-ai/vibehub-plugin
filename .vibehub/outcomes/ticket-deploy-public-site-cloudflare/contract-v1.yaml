@@ -1,0 +1,27 @@
+{
+  "accepted_acceptance_ids": [
+    "existing-pages-project-is-reused",
+    "canonical-apex-is-served-by-pages",
+    "repository-release-path-is-cloudflare-only",
+    "cloudflare-migration-is-regression-proven"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T21:53:28Z",
+  "contract_revision": {
+    "identity": "sha256:5b14954274cb745bbc9404a7c3d40527de4484f33dd5a4b6771367aef3e9d9ef",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "cloudflare-pages-current-state-reverification",
+    "cloudflare-pages-production-cutover",
+    "cloudflare-pages-release-contract"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent re-adjudication accepted all four revised criteria. Read-only Wrangler inventory independently confirmed authorized account 72091e7e079e357ced7f9603c03a926e, the pre-existing vibehub-website-v1 project with historical production deployments, domains vibehub-website-v1.pages.dev and vibehub.icu, and current main deployment c07ad72e-df89-429e-9903-29c9c94c411d identifying source 4d628ba; repository source and Evidence pin the complete commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77. Independent immutable and apex verification returned HTTPS 200 for the canonical homepage, robots.txt, sitemap.xml, Open Graph image, and favicon; public DNS retained one redacted Google verification TXT proof, and both HTTP and HTTPS www probes returned direct 301 redirects preserving path and query. Commit inspection confirms the executable release path is Cloudflare Pages Direct Upload only, with the Sites metadata/plugin removed and exact-clean-commit plus immutable-verification guardrails retained. Fresh closeout checks passed lint, 9/9 rendered contracts, 2/2 focused release contracts, release identity check, diff check, and canonical project/Ticket validation; acceptance-linked Evidence additionally records the successful deterministic build, complete preflight, and 104/104 repository suite. The revised contract truthfully evaluates reproducible current production state and future release safety rather than unavailable historical DNS audit ceremony.",
+  "ticket_id": "ticket-deploy-public-site-cloudflare",
+  "unresolved_acceptance_ids": []
+}

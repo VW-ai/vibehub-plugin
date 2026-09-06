@@ -504,7 +504,7 @@ test("Web projection shares current/all archive queries and progressive history 
   assert.deepEqual(all.state.graph.stubs, []);
 });
 
-test("read-only loopback host serves assets, current graph, inspector, and trace", async () => {
+test("read-only loopback host serves assets, current graph, inspector, and trace", async (t) => {
   const repo = fixture();
   const beforeUi = canonicalBytes(repo);
   const token = "a".repeat(64);
@@ -516,7 +516,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     view: "log",
   });
   hosts.push(host);
-  const { origin, url, focus } = await host.ready;
+  let ready;
+  try {
+    ready = await host.ready;
+  } catch (error) {
+    if (error?.code === "EPERM") {
+      hosts.pop();
+      t.skip("loopback sockets are unavailable in this sandbox");
+      return;
+    }
+    throw error;
+  }
+  const { origin, url, focus } = ready;
   const authorizedUrl = new URL(url);
   assert.equal(authorizedUrl.hash, `#${token}`);
   assert.equal(authorizedUrl.searchParams.get("ticket"), "foundation");

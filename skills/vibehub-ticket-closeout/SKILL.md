@@ -37,6 +37,9 @@ Read `../vibehub-core/contracts/ticket-next-action.md`. The normal closeout entr
 `next_action.action: CLOSE_OUT`; full Evidence coverage still requires this
 independent adjudication and never creates success automatically.
 This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
+Read `../vibehub-core/contracts/revision-identity.md`. An Outcome adjudicates
+one exact complete Contract revision. Older success remains historical truth
+and never closes a later active revision.
 
 1. Read the exact Ticket, diff, tests, and all Evidence:
 
@@ -53,6 +56,10 @@ This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
    `independence: { source, note }` naming how you were independent; the engine
    records that claim and never verifies it, so a reader can see what was
    asserted but not that it was true.
+   Use schema 2, `outcome_id: contract-vN`, `binding_state: bound`,
+   `binding_origin: native`, and copy the current Contract's exact revision and
+   identity. The engine writes it to
+   `.vibehub/outcomes/<ticket-id>/contract-vN.yaml` and refuses overwrite.
 4. Persist it:
 
    ```text

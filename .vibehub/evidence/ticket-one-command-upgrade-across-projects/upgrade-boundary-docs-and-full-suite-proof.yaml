@@ -8,6 +8,45 @@
     "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
     "architecture-docs-and-artifact-enforce-the-narrow-exception"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "release-paired-one-shot-package-is-verifiable",
+      "identity": "sha256:a99503db6ab5975ea5f4a2e3a5a8fcd34dfae069f616780be78dfe1f59409270",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "discovery-is-explicit-bounded-and-worktree-complete",
+      "identity": "sha256:a1252281720959c9f455755a1d420e45a78daf4e6893edc037d529570880ea84",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "classification-and-preview-use-the-shared-migration-contract",
+      "identity": "sha256:8cea78c927f5f8b3f1b11338a4ffcd23841ebc9611000dd6bf4fa59446fbb9ac",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "one-safe-worktree-produces-one-preverified-local-commit",
+      "identity": "sha256:eb5b5d58d43a444a48d238c851baf0c8afdf3c53557d96e23044b052c0717b17",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "every-non-success-proves-byte-and-git-invariance",
+      "identity": "sha256:70cb7fadc56ea31619cc8beba46357bcb119358a49e4fdc037bce34efd046742",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "multi-project-report-is-exhaustive-retryable-and-semantic-aware",
+      "identity": "sha256:edf43b40b5d5778b5a4428f72026b2e1f7df10e736c5258c372589c87b744781",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "architecture-docs-and-artifact-enforce-the-narrow-exception",
+      "identity": "sha256:a486be094da1033ece8aded0764564015050004ef788322c34f70db96b807fde",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "upgrade-boundary-docs-and-full-suite-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-03T04:35:40Z",
@@ -21,7 +60,7 @@
     "test/release.test.mjs",
     "command:npm run verify"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "skills/vibehub-setup/references/architecture-boundary.md exactly matches the independently accepted replacement text. docs/INSTALL.md and docs/RELEASE.md document one immutable tag across Skills and the versioned asset, explicit roots, safe per-worktree local commits, no push, and later semantic Agent work; vibehub-migrate tells that later Agent to report the exact 40-hex worktree migration commit without inferring sibling coverage. Source/contract tests prove no Skill invokes the entry and the coordinator contains no forbidden Git command path; a recording-Git proxy plus hostile fsmonitor/hook/signing sentinels prove the runtime subprocess boundary. Final `npm run verify` exited 0 on 2026-09-03: 178 tests passed, 0 failed, 0 skipped, followed by a successful clean installed-plugin artifact verification of 65 files and 3,213,802 bytes including the narrowed boundary and same-tag documentation.",
   "ticket_id": "ticket-one-command-upgrade-across-projects"
 }

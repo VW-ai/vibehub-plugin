@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "primary-install-action-is-skills-sh"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "primary-install-action-is-skills-sh",
+      "identity": "sha256:277c87a6eb448c059639dea6898e94e1819ca612058851fa0bd0848725a939e9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "primary-install-action-implemented",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T04:12:31Z",
@@ -10,7 +19,7 @@
     "site/app/page.tsx",
     "site/app/globals.css"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "site/app/page.tsx adds SKILLS_INSTALL = npx skills add VW-ai/vibehub-plugin; InstallActions renders it as a full-width install-primary button (monospace command, note: One line for Claude Code, Codex, Cursor, and any skills-capable agent) above the Codex, Claude Code, and GitHub actions, which stay as secondary; the header utilities gain a matching utility-primary npx skills add button first; CODEX_INSTALL now carries both marketplace lines. Styles in globals.css; copied-state messages updated.",
   "ticket_id": "ticket-site-leads-with-one-line-install"
 }

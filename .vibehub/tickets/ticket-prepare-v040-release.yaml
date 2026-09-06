@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "github-release-is-small-and-reproducible",
+      "criterion": "A tag-triggered GitHub Actions workflow validates that v0.4.0 matches every manifest, runs the complete verification suite, builds the dependency-free plugin artifact, archives it, produces a SHA-256 checksum, and creates the GitHub Release; it contains no npm authentication, package publication, host matrix, native build, marketplace branch, or restored installer machinery.",
+      "identity": "sha256:4c79091f0ab05dfbedf221c8701e65b66baa5c3e8f01cdc031c13a8e83d5e6c4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "readme-leads-with-product-and-visual",
-      "criterion": "README opens with the VibeHub brand, a concise Ticket-driven development proposition, and an approved local graph visual, then makes the Ticket/Context split and three-second product value understandable before architecture detail; every referenced local asset resolves and the page remains readable on GitHub."
+      "criterion": "README opens with the VibeHub brand, a concise Ticket-driven development proposition, and an approved local graph visual, then makes the Ticket/Context split and three-second product value understandable before architecture detail; every referenced local asset resolves and the page remains readable on GitHub.",
+      "identity": "sha256:64690910e3c06dc3c2305cc7124944b66ccb6209a21c8db5c9fe72deae78b091",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "readme-teaches-the-real-workflow",
-      "criterion": "README describes the current lifecycle truth: Plan presents a new Ticket, routine Run stays quiet, protected human attention presents Contract, Closeout presents Log, and explicit review/launcher use is a fallback; it no longer tells users they must remember to ask for the UI and remains honest about independent Outcome and explicit durable Context capture."
-    },
-    {
-      "acceptance_id": "v040-identity-is-consistent",
-      "criterion": "package metadata, Codex manifest, Claude plugin manifest, and Claude marketplace metadata all report 0.4.0; Changelog has a dated 0.4.0 entry summarizing the Skill-first pivot, local graph, proactive workflow, breaking runtime removal, and GitHub-only distribution with no stale Unreleased claims for shipped work."
-    },
-    {
-      "acceptance_id": "github-release-is-small-and-reproducible",
-      "criterion": "A tag-triggered GitHub Actions workflow validates that v0.4.0 matches every manifest, runs the complete verification suite, builds the dependency-free plugin artifact, archives it, produces a SHA-256 checksum, and creates the GitHub Release; it contains no npm authentication, package publication, host matrix, native build, marketplace branch, or restored installer machinery."
-    },
-    {
-      "acceptance_id": "release-procedure-is-explicit",
-      "criterion": "A concise checked-in release procedure states the real order—merge verified PR to main, tag the exact main commit, let the tag workflow publish the artifact, and verify the GitHub Release—and explicitly says npm is not a release surface for this product generation."
+      "criterion": "README describes the current lifecycle truth: Plan presents a new Ticket, routine Run stays quiet, protected human attention presents Contract, Closeout presents Log, and explicit review/launcher use is a fallback; it no longer tells users they must remember to ask for the UI and remains honest about independent Outcome and explicit durable Context capture.",
+      "identity": "sha256:2891a43ac3187d59b558bc9786199aeb2a2f0a70f0cd17354dd4d94e536e73dc",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "release-candidate-is-merge-ready",
-      "criterion": "The branch still contains current origin/main without divergence, project/Ticket validation and the full test/artifact suite pass, the built artifact contains only the intended plugin surface, and the prepared PR summary accurately calls out the v0.4.0 architecture break, user-visible workflow, validation, and any still-open follow-up Tickets."
+      "criterion": "The branch still contains current origin/main without divergence, project/Ticket validation and the full test/artifact suite pass, the built artifact contains only the intended plugin surface, and the prepared PR summary accurately calls out the v0.4.0 architecture break, user-visible workflow, validation, and any still-open follow-up Tickets.",
+      "identity": "sha256:edd6d474f5fe99bdd81d0de6ae6f5c3ebf92a5a65c932621dc3992f557672890",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-procedure-is-explicit",
+      "criterion": "A concise checked-in release procedure states the real order—merge verified PR to main, tag the exact main commit, let the tag workflow publish the artifact, and verify the GitHub Release—and explicitly says npm is not a release surface for this product generation.",
+      "identity": "sha256:400db56c1ba3cbc9c999036d6293f9e136567df45ddbee944516bdcba0d836d3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "v040-identity-is-consistent",
+      "criterion": "package metadata, Codex manifest, Claude plugin manifest, and Claude marketplace metadata all report 0.4.0; Changelog has a dated 0.4.0 entry summarizing the Skill-first pivot, local graph, proactive workflow, breaking runtime removal, and GitHub-only distribution with no stale Unreleased claims for shipped work.",
+      "identity": "sha256:d3b098a21ca9d4e2adaac54c6bd891ae4a993c6e189cd658f349c0579eade04e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Move quickly and replace the current text-heavy README directly; do not build a documentation site or introduce a frontend/docs framework.",
     "Use approved checked-in VibeHub brand and graph assets; do not invent a second visual identity or depend on external image hosting.",
@@ -89,6 +108,44 @@
       "ref": "commit:f371bf64d02fc4deb17568402eeb42af27af2302:.claude-plugin/marketplace.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "github-release-is-small-and-reproducible",
+          "identity": "sha256:4c79091f0ab05dfbedf221c8701e65b66baa5c3e8f01cdc031c13a8e83d5e6c4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-leads-with-product-and-visual",
+          "identity": "sha256:64690910e3c06dc3c2305cc7124944b66ccb6209a21c8db5c9fe72deae78b091",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-teaches-the-real-workflow",
+          "identity": "sha256:2891a43ac3187d59b558bc9786199aeb2a2f0a70f0cd17354dd4d94e536e73dc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-candidate-is-merge-ready",
+          "identity": "sha256:edd6d474f5fe99bdd81d0de6ae6f5c3ebf92a5a65c932621dc3992f557672890",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-procedure-is-explicit",
+          "identity": "sha256:400db56c1ba3cbc9c999036d6293f9e136567df45ddbee944516bdcba0d836d3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "v040-identity-is-consistent",
+          "identity": "sha256:d3b098a21ca9d4e2adaac54c6bd891ae4a993c6e189cd658f349c0579eade04e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e5098e85cd729fc47cfcb042cb5f45ba2c116c5868e0720eb85b0d4fc38ed403",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -118,6 +175,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-prepare-v040-release"
 }

@@ -3,6 +3,20 @@
     "bound-context-is-inspectable",
     "visual-polish-strengthens-not-obscures"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "identity": "sha256:797fb839ed91c2e61c02ce288b08edc8a7d6bf7b34c017bf4d6db36c91475562",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "ticket-header-and-reference-alignment",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T20:14:40.000Z",
@@ -15,7 +29,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood identified two presentation defects: the ordinary source-reference description escaped the card's horizontal rhythm, and the Inspector eyebrow shortened the selected Ticket identity. Commit e8d533d restores a 12px rendered inset that exactly aligns the README description with its Copy for Agent action, preserves the compact system type hierarchy, and renders the complete canonical Ticket ID in both loading and resolved Inspector states with natural wrapping instead of ellipsis. Real-browser review confirmed the exact text 'Ticket · ticket-rebuild-local-graph-workbench', no horizontal clipping at desktop width, and the README description/action alignment. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227705 bytes. Final owner approval of the overall visual direction remains protected.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

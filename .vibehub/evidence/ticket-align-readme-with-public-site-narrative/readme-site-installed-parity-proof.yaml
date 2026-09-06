@@ -4,6 +4,25 @@
     "readme-and-site-share-one-major-narrative",
     "existing-readme-contract-and-artifact-parity-remain-intact"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canonical-website-entry-is-visible-and-exact",
+      "identity": "sha256:1d078c7ed0113cba73e1d4dbd3c376f5e94278c77b79ce9bbb4b7ab29e50c092",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-and-site-share-one-major-narrative",
+      "identity": "sha256:adc8be12f139be26ab0e863978c2d536530359a5444955d574c8b258cedd4be2",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "existing-readme-contract-and-artifact-parity-remain-intact",
+      "identity": "sha256:56bb26bd2e5626831083892ff0d03ef772501418b6fc8261c1ea58be6731123a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-site-installed-parity-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "artifact:fresh-codex-claude-62-files-2828446-bytes",
     ".vibehub/rooms/product/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README-focused plus fresh Codex/Claude marketplace tests pass 6/6. Both independently built installed plugin roots contain byte-identical README content with the exact apex link, work-over-chat thesis, Ticket/Evidence/Outcome/Context narrative, and no www or Pages URL. The fresh installed-artifact verifier passes at 62 files and 2,828,446 bytes after asserting the same narrative, exact single apex link, and all relative README image targets. Full repository verification passes 131/131. The root README remains 59 physical lines and within its 60-element guard, preserves exactly one `Start this with VibeHub.`, all three accepted Retina Workbench PNGs, DRAFT/READY/RUNNING/DONE, current Codex and Claude installation/upgrades, and dark-mode brand assets. Product Room alignment is refreshed; all four Rooms are FRESH, Ticket/project validation passes, and the implementation diff contains no site path.",
   "ticket_id": "ticket-align-readme-with-public-site-narrative"
 }

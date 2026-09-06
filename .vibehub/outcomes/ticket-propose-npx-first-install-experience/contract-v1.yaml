@@ -1,0 +1,27 @@
+{
+  "accepted_acceptance_ids": [
+    "skills-sh-breakage-is-reproduced-and-recorded",
+    "install-paths-are-compared-empirically",
+    "setup-offers-github-mirror-as-one-time-option",
+    "recommendation-is-decision-ready"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-23T02:00:00Z",
+  "contract_revision": {
+    "identity": "sha256:2257bca36de214a1439cd8555ed0b1467f3457ad0aea25068adb47407aec8da5",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "skills-sh-install-reproduction",
+    "install-paths-comparison",
+    "setup-time-mirror-option-spec"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication at HEAD 1128534. Checked-in transcript shows npx skills add copying 11 skills for claude-code and codex with no scripts/ or contracts/ and a node ERR_MODULE_NOT_FOUND resolve attempt; re-counted 45 ../scripts|../contracts references in skills/*/SKILL.md. Proposal compares paths A, B, C on commands, disk layout, helper reachability, version skew, network, upgrade, cost, and decision-speed-first conformance; re-verified npm vibehub is an unrelated 0.2.2 package and @vibehub/cli is unpublished; untested items are marked. Setup-time mirror section names the two exact files, the single question asked, and states no Skill or instruction triggers the sync. Recommendation is A with cost, deferred B, rejected C, and one owner question. Constraints held: no README, docs/INSTALL.md, manifest, or skill text changes since plan commit 1a7c292; nothing published; installer tests ran in scratch only. npm test 137/137 pass.",
+  "ticket_id": "ticket-propose-npx-first-install-experience",
+  "unresolved_acceptance_ids": []
+}

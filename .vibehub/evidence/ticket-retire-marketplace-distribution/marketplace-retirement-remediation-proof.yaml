@@ -4,6 +4,25 @@
     "marketplace-machinery-is-removed-not-orphaned",
     "the-checked-in-manifests-have-a-decided-fate"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "nothing-points-a-user-at-a-marketplace",
+      "identity": "sha256:0956a4c3284055ff0b8510e00497c61d547f028d1a9296b984beb97399a058a3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "marketplace-machinery-is-removed-not-orphaned",
+      "identity": "sha256:b44b0c4a814c306371efc4578456433aa3201ca0ef62ea3961f8229350e471ee",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "the-checked-in-manifests-have-a-decided-fate",
+      "identity": "sha256:d0462340999d1671dcbeaa7fc5dd2f106d09c1dfbde88554fa5b54c11d0025ab",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "marketplace-retirement-remediation-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-03T05:24:48Z",
@@ -17,7 +36,7 @@
     "command:npm run verify",
     ".vibehub/outcomes/ticket-retire-marketplace-distribution.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After the first independent closeout found three residual surfaces, commit 594599e4b37d7753c6b750b0dc8d954f76c8afd3 removed the Codex marketplace manifest at .agents/plugins/marketplace.json; removed both host marketplace command constants, buttons, copied Agent instructions, and status messages from the public site; converted the older npx-first proposal into an explicitly historical document whose current guidance names npx Skills as the only supported install path; and added source plus rendered-output regression assertions that reject the retired commands and manifest. Site lint passed. A production-configured static site build and rendered HTML suite passed 9/9 with NEXT_PUBLIC_SITE_URL=https://vibehub.team. The repository-wide npm run verify passed 179/179 with zero skipped and reproduced the 65-file, 3,214,375-byte dependency-free artifact. Product Room drift was reconciled to FRESH; unrelated pre-existing stale Rooms remained untouched.",
   "ticket_id": "ticket-retire-marketplace-distribution"
 }

@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "causal-canvas-is-the-site-grammar",
+    "first-viewport-communicates-and-invites",
+    "canonical-cycle-is-visually-proven",
+    "interaction-remains-spatial-and-accessible",
+    "visual-language-is-public-grade",
+    "static-build-is-isolated-and-verifiable"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-05T08:33:53Z",
+  "contract_revision": {
+    "identity": "sha256:32166572b5d238f1b2a8de0ab5320998b72e42f1a2486fc6cf973d06450d42c4",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "public-site-content-and-cycle",
+    "public-site-interaction-and-visual",
+    "public-site-static-build"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria. The checked-in page and styles implement a content-first, normal-scroll causal narrative with no horizontal canvas controls, iframe, or nested webpage; desktop first-layer content includes VibeHub identity, a concise promise, the exact Start this with VibeHub. entry, the one-Ticket causal path, installation, and GitHub. The final product diagram visibly centers exactly one Ticket: human Request and long-term Context shape it, it produces Evidence, independent Outcome returns learning to Context, and Request, Context, Evidence, and Outcome use distinct forms; the hero path explicitly reads REQUEST to TICKET to EVIDENCE to OUTCOME and no dependent Ticket is manufactured. Keyboard-operable buttons, aria-pressed state, Escape close, visible focus, mobile single-column composition, overflow containment, reduced-motion, and forced-color rules preserve access without motion or color alone. The cool-neutral system/mono visual language, restrained semantic colors, deliberate object shapes, connector hierarchy, whitespace, and checked-in preview match the selected Causal Canvas authority without placeholder capabilities. Independently rerun verification passed: site production build and rendered assertions 3/3, site lint, repository suite 43/43, and Plugin artifact verification with 51 files and 361397 bytes. The generated dist is documented, static, Cloudflare-compatible, carries null D1/R2 bindings, and remains outside the Plugin artifact; no deployment, domain, account, persistence, or lifecycle mutation was added.",
+  "ticket_id": "ticket-launch-public-causal-canvas-site",
+  "unresolved_acceptance_ids": []
+}

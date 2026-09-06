@@ -6,6 +6,35 @@
     "pr15-authority-contract-stays-intact",
     "refine-repair-verifies-cleanly"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "refine-is-first-class-in-workbench",
+      "identity": "sha256:4518787bb4c22319b544a40d24ce3e7ec0044e875b0ff1816f690cc723125759",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "refine-remains-non-executable",
+      "identity": "sha256:9f47348ca678f9f1b18216e6fe010df52915fc0098cc11afe0720a90335f8b75",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "browser-regression-catches-refine-omission",
+      "identity": "sha256:696a63a09d152e2e0394f1621f6d140be3518c408a291ec1db9cdfe98e630bee",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "pr15-authority-contract-stays-intact",
+      "identity": "sha256:d1114aae3e58d0a05b3d93e23f9429f11139bd7c9c21107b596737ae4da1a537",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "refine-repair-verifies-cleanly",
+      "identity": "sha256:84e0a3679a9809e7a93ea4fbdba0aa7dbf8c3e789fa28bcfe28f9a0642c27356",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "refine-workbench-production-projection",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -23,7 +52,7 @@
     "browser:in-app-browser-refine-narrow-700x900",
     "browser:copy-for-agent-refine-interaction-confirmed"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The shared browser/Node presentation model now recognizes REFINE across graph-card text and dashed semantics, minimap, summary, Inspector, accessibility, causal sorting, and the non-executable Ticket Plan handoff. The production-model behavior regression exercises an unlocked draft with separate PENDING human attention and would fail if REFINE were removed. The full 49-test suite, 53-file artifact verification, project/Ticket validation, git diff check, and real in-app-browser smoke at 1440x900 and 700x900 passed; wide and narrow captures show REFINE without overflow. Existing PR #15 authority, human-origin Evidence, four attention states, exact human-boundary payload, and operational/attention separation remain covered by the unchanged passing suite.",
   "ticket_id": "ticket-repair-refine-workbench-projection"
 }

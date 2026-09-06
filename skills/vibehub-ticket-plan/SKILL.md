@@ -32,6 +32,13 @@ current contract for a later execution cycle.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it owns their planning semantics, not Agent/session
 routing or UI launch mechanics.
+Read `../vibehub-core/contracts/revision-identity.md` before creating or
+changing Acceptance. Existing semantic contracts are append-only: strengthen,
+correct, or redefine one responsibility by appending the same logical ID's
+next revision; create a new ID at v1 for a separately passable obligation;
+retire split/merge predecessors and give the new IDs exact `derived_from`
+references; retire a no-longer-applicable obligation without lineage; and put
+display-only wording in `presentation` without revising the criterion.
 `execution-discovers-work` is the single home of the mid-cycle transition:
 when execution surfaces new independently schedulable work, the same or a
 later Agent applies this Skill to turn the discovery into Tickets with their
@@ -98,6 +105,17 @@ is implied.
    an explicit non-empty causal rationale; otherwise move the exact Ticket,
    Outcome, Evidence, Context, or source file into `context_refs`. Do not
    manufacture migration, review, or dogfood stages.
+   For a new Ticket, materialize v1 identities and its complete Contract v1
+   with `materializeInitialTicket`. For an existing Ticket, use the canonical
+   append path instead of rewriting old entries:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs ticket revise --repo <root> --input <revision.json>
+   ```
+
+   `revision.json` carries `ticket_id`, the usual `validation` declaration,
+   and `mutation` with `acceptance_changes`, `retire_acceptance_ids`, and/or
+   `presentation_changes`. Review the resulting active Contract revision.
 6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate.
    The validator is read-only. A protected product, permission, or
    material-risk choice remains blocked for the user; ordinary engineering fog

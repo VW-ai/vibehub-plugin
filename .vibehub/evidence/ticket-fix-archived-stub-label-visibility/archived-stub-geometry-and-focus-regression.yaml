@@ -4,6 +4,25 @@
     "archive-expansion-remains-exact-and-operable",
     "quiet-accessible-visual-contract-is-preserved"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "archived-stub-is-legible-in-real-graph",
+      "identity": "sha256:5d66ddac0ee46398dcf19098080b7a927345173cb8c1e5fdb2accf79e876aa47",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "archive-expansion-remains-exact-and-operable",
+      "identity": "sha256:59adc1cb068c67a1a80bec94386cd8fd9f9e50597ef25672e0b56b9219144c92",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+      "identity": "sha256:ca0159a387761ecd0f55e2e2251113d8bec70494dae9b68623abd5e2b0b9a5a4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "archived-stub-geometry-and-focus-regression",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +37,7 @@
     "test:npm-run-verify-110-of-110",
     "artifact:dependency-free-read-only-55-files-577351-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The production Workbench now derives every archived-history stub from deterministic collision-aware geometry: a 132 by 70 opaque quiet-surface affordance is moved off the primary causal lane, avoids visible card bounds and routed relation segments in both causal directions, and retains an explicit dashed leader and anchor knot. Its visible two-line label separates the hidden archived count from the reveal action; its accessible name includes direction and the exact canonical next Ticket IDs; visible focus uses the shared focus token. Enter or Space still calls revealHistory with the projection supplied nextTicketIds, preserves the sorted history query and existing graph layout, then moves focus to the first actually revealed canonical Ticket. No query, archive, delivery, Ticket, Evidence, Outcome, or writable-host code changed. Focused layout and visual-contract tests passed 16 of 16, and the final complete verification passed 110 of 110 with the dependency-free read-only artifact at 55 files and 577351 bytes.",
   "ticket_id": "ticket-fix-archived-stub-label-visibility"
 }

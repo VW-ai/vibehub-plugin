@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "first-view-explains-and-installs",
-      "criterion": "At a 1440px desktop viewport Product is open by default and the first view plainly includes The development cycle survives the chat., the one-Ticket supporting line, the exact Start this with VibeHub. entry, truthful Codex and Claude Code installation access, Copy for Agent, and GitHub without requiring scrolling or prior product knowledge."
-    },
-    {
-      "acceptance_id": "ticket-shelf-is-the-site-navigation",
-      "criterion": "One persistent shelf exposes Start, Product, Workflow, Documentation, and Founder as distinct Ticket-shaped controls with ports, direct connector language, and state signals; the active shelf position is visibly empty or reserved and connected to the opened Ticket, while URL state, back-forward navigation, pointer activation, and keyboard activation all select the corresponding surface."
-    },
-    {
-      "acceptance_id": "opened-ticket-is-physical-and-readable",
-      "criterion": "The selected Ticket visibly originates at its shelf slot and opens into one coherent tactile dossier or flip-book with page thickness and hinge cues rather than a modal, browser frame, dashboard, or slide deck; Product, Workflow, Documentation, and Founder each expose module-specific, semantically structured, linearly readable content, and the Product graph unmistakably depicts Request and Context shaping one Ticket, acceptance-linked Evidence, independent Outcome, and durable learning returning to Context."
+      "criterion": "At a 1440px desktop viewport Product is open by default and the first view plainly includes The development cycle survives the chat., the one-Ticket supporting line, the exact Start this with VibeHub. entry, truthful Codex and Claude Code installation access, Copy for Agent, and GitHub without requiring scrolling or prior product knowledge.",
+      "identity": "sha256:262d419eb769812f1729b18f670537285173827fab62cef44f62fe92a94b904e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
-      "criterion": "Pointer press feedback is immediate, open and switch motion is origin-aware and can retarget without a blocking sequence, frequent hover feedback is near-imperceptible and only enabled on fine hover pointers, layout avoids transition-all and layout-property animation, keyboard selection is immediate, and prefers-reduced-motion receives a static or crossfade-equivalent experience without parallax or 3D travel."
+      "criterion": "Pointer press feedback is immediate, open and switch motion is origin-aware and can retarget without a blocking sequence, frequent hover feedback is near-imperceptible and only enabled on fine hover pointers, layout avoids transition-all and layout-property animation, keyboard selection is immediate, and prefers-reduced-motion receives a static or crossfade-equivalent experience without parallax or 3D travel.",
+      "identity": "sha256:6b0a6aa9bc9c9aec822897d9882582cfadc10ce8ab34d7545b6b13d272a68c7f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "opened-ticket-is-physical-and-readable",
+      "criterion": "The selected Ticket visibly originates at its shelf slot and opens into one coherent tactile dossier or flip-book with page thickness and hinge cues rather than a modal, browser frame, dashboard, or slide deck; Product, Workflow, Documentation, and Founder each expose module-specific, semantically structured, linearly readable content, and the Product graph unmistakably depicts Request and Context shaping one Ticket, acceptance-linked Evidence, independent Outcome, and durable learning returning to Context.",
+      "identity": "sha256:168a28bf9fe2509799857f99fd305e2b1eb3562866ebc9127b53f590c61c93fd",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "responsive-accessible-static-site-is-verifiable",
-      "criterion": "The experience remains causally legible and linearly readable at desktop and narrow mobile viewports without page-level horizontal overflow; touch targets, focus visibility, landmarks, headings, labels, contrast, copy status, and external links remain usable; rendered assertions, lint, production build, desktop and mobile browser inspection, canonical project validation, and Plugin artifact verification pass without adding backend state."
+      "criterion": "The experience remains causally legible and linearly readable at desktop and narrow mobile viewports without page-level horizontal overflow; touch targets, focus visibility, landmarks, headings, labels, contrast, copy status, and external links remain usable; rendered assertions, lint, production build, desktop and mobile browser inspection, canonical project validation, and Plugin artifact verification pass without adding backend state.",
+      "identity": "sha256:b4a5215f91d78a5e46d3800508cef744829bc0c65d07e1c8a95f5056462812d6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-shelf-is-the-site-navigation",
+      "criterion": "One persistent shelf exposes Start, Product, Workflow, Documentation, and Founder as distinct Ticket-shaped controls with ports, direct connector language, and state signals; the active shelf position is visibly empty or reserved and connected to the opened Ticket, while URL state, back-forward navigation, pointer activation, and keyboard activation all select the corresponding surface.",
+      "identity": "sha256:2c0cce98f00b9fd17aa4b1c62906bfefb27e4c200d9e10e771bcef4520195b9e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use one coherent central stage and persistent Ticket Shelf, not a conventional stack of SaaS marketing sections or horizontal page travel.",
     "Content clarity is the first priority; physical depth and motion explain spatial continuity but never make prose non-linear or obscure the installation path.",
@@ -64,6 +80,39 @@
       "ref": "site/app/globals.css"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "first-view-explains-and-installs",
+          "identity": "sha256:262d419eb769812f1729b18f670537285173827fab62cef44f62fe92a94b904e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
+          "identity": "sha256:6b0a6aa9bc9c9aec822897d9882582cfadc10ce8ab34d7545b6b13d272a68c7f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "opened-ticket-is-physical-and-readable",
+          "identity": "sha256:168a28bf9fe2509799857f99fd305e2b1eb3562866ebc9127b53f590c61c93fd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "responsive-accessible-static-site-is-verifiable",
+          "identity": "sha256:b4a5215f91d78a5e46d3800508cef744829bc0c65d07e1c8a95f5056462812d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-shelf-is-the-site-navigation",
+          "identity": "sha256:2c0cce98f00b9fd17aa4b1c62906bfefb27e4c200d9e10e771bcef4520195b9e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6e0b99d024f52b5e49ac6961ce2560e46637b4a9e475d4e90c22a4e172106d4e",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "kind": "pull_request",
@@ -83,6 +132,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-restore-public-hero-ticket-graph"
 }

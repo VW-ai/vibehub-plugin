@@ -4,6 +4,25 @@
     "shell-feels-formal-not-prototypical",
     "agent-first-cycle-remains-intact"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "product-entry-remains-reachable",
+      "identity": "sha256:a4ef6bf6fce3a2e0345e0f91d0bbfb7556f72095b20d9ea94ef6aae5929cd118",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "shell-feels-formal-not-prototypical",
+      "identity": "sha256:ba4bbd53b38462855a0306becc30025f971d31c9411850895ebab88f30f91c74",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "agent-first-cycle-remains-intact",
+      "identity": "sha256:0ecef9802c1c10d22c751ad169a97926e91188f4719ad4893fc505a0476984c9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "formal-public-entry-implementation",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T21:58:13Z",
@@ -14,7 +33,7 @@
     "context:.vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml",
     "conversation:2026-08-09-formal-product-entry"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public page now has a brand-level VibeHub masthead outside the Coding Agent product surface. The VibeHub mark and explicit Overview control both call the same reset path, and the active Agent header exposes Exit demo; reset clears every pending lifecycle timer and restores idle phase, Ticket view, suggested request, palette, founder disclosure, copy state, and task preview without a reload. Faux operating-system dots and LOCAL DEMO chrome were removed. The refined cool-neutral shell uses one precise outer frame, restrained depth and radii, larger status and support text, a flatter founder disclosure, and one consistent product-navigation hierarchy across arrival, Chat, App, and Ticket. The original truthful install/source/Copy for Agent actions, protected founder premise, deterministic dark-mode request, explicit human palette choice, App/Ticket switch, acceptance-linked Evidence, independent Outcome, and returned Context remain intact.",
   "ticket_id": "ticket-formal-public-agent-entry"
 }

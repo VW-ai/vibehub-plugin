@@ -4,6 +4,25 @@
     "github-release-is-small-and-reproducible",
     "release-procedure-is-explicit"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "v040-identity-is-consistent",
+      "identity": "sha256:d3b098a21ca9d4e2adaac54c6bd891ae4a993c6e189cd658f349c0579eade04e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "github-release-is-small-and-reproducible",
+      "identity": "sha256:4c79091f0ab05dfbedf221c8701e65b66baa5c3e8f01cdc031c13a8e83d5e6c4",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "release-procedure-is-explicit",
+      "identity": "sha256:400db56c1ba3cbc9c999036d6293f9e136567df45ddbee944516bdcba0d836d3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v040-github-release-mechanics",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T22:50:23.000Z",
@@ -16,7 +35,7 @@
     "test:verify-release-tag-v0.4.0",
     "test:npm-run-verify-16-of-16-40-files-324497-bytes"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit ecb811a aligns package, Codex, Claude, and marketplace identity at 0.4.0; cuts the dated v0.4.0 Changelog with the runtime break; adds a tag/version guard; and documents the merge-main→tag-exact-commit→GitHub-Release procedure. The 37-line tag workflow runs the complete verification gate, builds the dependency-free plugin, creates a tar archive and SHA-256 checksum, and publishes only through GitHub Releases. Tests mechanically reject npm publication/auth, matrices, native builds, and marketplace release machinery.",
   "ticket_id": "ticket-prepare-v040-release"
 }

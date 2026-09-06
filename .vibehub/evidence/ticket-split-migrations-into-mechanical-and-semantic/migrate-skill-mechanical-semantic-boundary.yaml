@@ -3,6 +3,20 @@
     "migrate-skill-covers-only-judgment",
     "classification-is-a-release-obligation"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "migrate-skill-covers-only-judgment",
+      "identity": "sha256:2514a11cfd7627f8fd09bc2a6efe65e3525a18c233cc1c301052af2dc6dc777b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "classification-is-a-release-obligation",
+      "identity": "sha256:5bf0b5070301158af40ef8c28744195f9a2785a258fc6354e2bb083690d7fc8b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "migrate-skill-mechanical-semantic-boundary",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +29,7 @@
     "test/skill-contracts.test.mjs",
     "docs/RELEASE.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The migrate Skill cites the real project migrate-mechanical --repo <root> operation, tells the Agent to review its declared paths and outputs, and reserves reasoning for semantic guidance returned from the single source. CURRENT is explicitly only structural writability, not a stop condition: the Skill requires the engine check in a later session, and documents current_with_semantic_pending as returning the same complete guidance until durable pending refs are cleared. The Skill states that the primitive does not discover sibling worktrees, commit, or push and no longer restates marker or Ticket rewrites. The regression test starts a fresh invocation after format 1 has mechanically become CURRENT and proves purpose, derivation sources, forbidden shortcuts, and instructions are exposed. skill-contracts proves the cited command resolves, rejects the old CURRENT-stop wording, requires the later-session status, binds the pending ref to its semantic step, validates every migration half and guidance shape, and RELEASE.md names these checks as a release gate.",
   "ticket_id": "ticket-split-migrations-into-mechanical-and-semantic"
 }

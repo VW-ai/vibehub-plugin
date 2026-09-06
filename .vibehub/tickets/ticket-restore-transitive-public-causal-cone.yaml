@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "selection-traces-complete-causal-cone",
-      "criterion": "Selecting any public graph Ticket highlights that Ticket, every transitive prerequisite upstream, and every transitive dependent downstream; unrelated Tickets remain dimmed."
-    },
-    {
       "acceptance_id": "only-traversed-relations-light-up",
-      "criterion": "The graph highlights the exact dependency relations traversed in the selected Ticket's upstream and downstream cones rather than inferring highlighted edges only from their endpoints."
+      "criterion": "The graph highlights the exact dependency relations traversed in the selected Ticket's upstream and downstream cones rather than inferring highlighted edges only from their endpoints.",
+      "identity": "sha256:c4b7fcf894d50ba211e44be3596131df64bbe80b04caf7dfd61069f10a868517",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "public-interaction-matches-workbench",
-      "criterion": "The public implementation follows the canonical Workbench directional-cone semantics, terminates safely for repeated or cyclic references, and preserves Ticket selection, Inspector, Rooms, pan, and responsive connector geometry."
+      "criterion": "The public implementation follows the canonical Workbench directional-cone semantics, terminates safely for repeated or cyclic references, and preserves Ticket selection, Inspector, Rooms, pan, and responsive connector geometry.",
+      "identity": "sha256:751b3881000d98ca9f03dfa77093fe7a66ead67992cd79835b025f01b571cff6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "selection-traces-complete-causal-cone",
+      "criterion": "Selecting any public graph Ticket highlights that Ticket, every transitive prerequisite upstream, and every transitive dependent downstream; unrelated Tickets remain dimmed.",
+      "identity": "sha256:45f88de2bfc97c19f46563ea8f6e5f70461cd867f1473475921e5cfb6462d1f4",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "transitive-focus-is-production-verified",
-      "criterion": "Regression contracts, lint, production build, release preflight, browser interaction checks from both ends of the multi-level fixture, production deployment, and canonical-domain verification pass."
+      "criterion": "Regression contracts, lint, production build, release preflight, browser interaction checks from both ends of the multi-level fixture, production deployment, and canonical-domain verification pass.",
+      "identity": "sha256:48dee1cc449dcc67309a8e98ab9aa2a736b45fdf1a460475ee610840d065474a",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Treat skills/vibehub-ticket-review/assets/app.js as the interaction source of truth; do not invent a second graph-selection model.",
     "Keep upstream and downstream traversal directional so a sibling prerequisite is not pulled into the cone merely because it shares a downstream Ticket.",
@@ -42,6 +55,34 @@
       "ref": "site/release/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "only-traversed-relations-light-up",
+          "identity": "sha256:c4b7fcf894d50ba211e44be3596131df64bbe80b04caf7dfd61069f10a868517",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-interaction-matches-workbench",
+          "identity": "sha256:751b3881000d98ca9f03dfa77093fe7a66ead67992cd79835b025f01b571cff6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selection-traces-complete-causal-cone",
+          "identity": "sha256:45f88de2bfc97c19f46563ea8f6e5f70461cd867f1473475921e5cfb6462d1f4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "transitive-focus-is-production-verified",
+          "identity": "sha256:48dee1cc449dcc67309a8e98ab9aa2a736b45fdf1a460475ee610840d065474a",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:23dd8e3c08e8f20cb61dafb44c90debfe57d1f009630645410af4fcceffcc61d",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -50,6 +91,7 @@
     "conversation:2026-08-20-owner-restores-full-dependency-chain-focus"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-restore-transitive-public-causal-cone"
 }

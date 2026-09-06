@@ -9,6 +9,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { helper, root, tempRepo, ticket } from "./helpers.mjs";
+import { loadRepository } from "../skills/vibehub-core/scripts/vh.mjs";
+import { activeAcceptanceReferenceMap, activeContract } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 import { writeFileSync } from "node:fs";
 
 let inputSeq = 0;
@@ -29,6 +31,31 @@ const bodies = new Map(skillNames.map((name) => [
 function invoke(repo, ...args) {
   const result = spawnSync(process.execPath, [helper, ...args, "--repo", repo], { encoding: "utf8" });
   return JSON.parse(result.stdout);
+}
+
+function bindEvidence(repo, input) {
+  const ticketDocument = loadRepository(repo).tickets.documents.get(input.ticket_id).document;
+  const references = activeAcceptanceReferenceMap(ticketDocument);
+  return {
+    ...input,
+    schema_version: 2,
+    binding_state: "bound",
+    binding_origin: "native",
+    acceptance_revisions: input.acceptance_ids.map((id) => references.get(id)),
+  };
+}
+
+function bindOutcome(repo, input) {
+  const ticketDocument = loadRepository(repo).tickets.documents.get(input.ticket_id).document;
+  const contract = activeContract(ticketDocument);
+  return {
+    ...input,
+    schema_version: 2,
+    outcome_id: `contract-v${contract.revision}`,
+    binding_state: "bound",
+    binding_origin: "native",
+    contract_revision: { revision: contract.revision, identity: contract.identity },
+  };
 }
 
 test("every vh.mjs command a skill cites resolves to a real operation", () => {
@@ -88,7 +115,7 @@ test("skills point at their governing shared references", () => {
   assert.equal(migrations.schema_version, 2);
   assert.equal(migrations.owner, "vibehub-migrate");
   assert.equal(migrations.current_format, versions.project_format);
-  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 4);
+  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 5);
   for (const migration of migrations.migrations) {
     assert.ok(Array.isArray(migration.mechanical.declared_paths));
     assert.ok(Array.isArray(migration.mechanical.actions));
@@ -153,6 +180,10 @@ test("skills point at their governing shared references", () => {
   assert.doesNotMatch(bodies.get("vibehub-migrate"), /CURRENT` stops with no work/u);
   assert.match(bodies.get("vibehub-migrate"), /current_with_semantic_pending/u);
 
+  const revisionBinding = migrations.migrations.find((migration) => migration.from === "format-3");
+  assert.equal(revisionBinding.to, "format-4");
+  assert.equal(revisionBinding.semantic.steps[0].step_id, "reconstruct-proof-revisions");
+
   const projectFormat = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");
   assert.equal(projectFormat.properties.kind.const, "vibehub_project");
@@ -160,13 +191,13 @@ test("skills point at their governing shared references", () => {
   assert.equal(currentProject.format_version, versions.project_format);
 
   const currentTicket = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "ticket.schema.json"), "utf8"));
-  assert.equal(currentTicket.$id, "https://vibehub.dev/schemas/ticket.v2.json");
+  assert.equal(currentTicket.$id, "https://vibehub.dev/schemas/ticket.v3.json");
   assert.equal(currentTicket.properties.schema_version.const, versions.document_schemas.ticket);
   assert.equal(
-    deliveryAudit.document_schema_versions.ticket.to,
+    revisionBinding.document_schema_versions.ticket.to,
     versions.document_schemas.ticket,
   );
-  assert.equal(historicalRefs.document_schema_versions.ticket.to, versions.document_schemas.ticket);
+  assert.equal(historicalRefs.document_schema_versions.ticket.to, deliveryAudit.document_schema_versions.ticket.to);
 
   const authority = "vibehub-core/contracts/acceptance-authority.md";
   assert.ok(existsSync(join(root, "skills", authority)));
@@ -288,7 +319,7 @@ test("the closeout Skill names exactly the independence sources the engine accep
     validation: { independent: false, note: "contract test" },
     tickets: [ticket("probe-work")],
   })).ok, true);
-  const attempt = (source) => invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
+  const attempt = (source) => invoke(repo, "ticket", "closeout", "--input", writeInput(repo, bindOutcome(repo, {
     schema_version: 1,
     kind: "ticket_outcome",
     ticket_id: "probe-work",
@@ -299,7 +330,7 @@ test("the closeout Skill names exactly the independence sources the engine accep
     summary: "contract test",
     closed_at: "2026-09-02T00:00:00.000Z",
     independence: { source, note: "contract test" },
-  }));
+  })));
   // A member must clear the independence check; it may still fail later for an
   // unrelated reason, which is exactly what distinguishes the two.
   const sourceRejected = (result) => result.ok === false
@@ -333,7 +364,7 @@ test("closeout without a declared independence source writes no Outcome", () => 
     tickets: [ticket("subject-work")],
   })).ok, true);
 
-  const outcome = {
+  const outcome = bindOutcome(repo, {
     schema_version: 1,
     kind: "ticket_outcome",
     ticket_id: "subject-work",
@@ -343,7 +374,7 @@ test("closeout without a declared independence source writes no Outcome", () => 
     evidence_ids: [],
     summary: "contract test",
     closed_at: "2026-09-02T00:00:00.000Z",
-  };
+  });
   const refused = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, outcome));
   assert.equal(refused.ok, false);
   assert.equal(refused.error.code, "missing_independence");
@@ -354,7 +385,7 @@ test("closeout without a declared independence source writes no Outcome", () => 
   );
   // The criterion is that a refused closeout leaves the Ticket at CLOSE_OUT, so
   // the fixture must actually be routing there: give every criterion Evidence.
-  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, {
+  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, bindEvidence(repo, {
     schema_version: 1,
     kind: "ticket_evidence",
     evidence_id: "subject-work-proof",
@@ -363,7 +394,7 @@ test("closeout without a declared independence source writes no Outcome", () => 
     summary: "contract test",
     refs: ["conversation:contract-test"],
     recorded_at: "2026-09-02T00:00:00.000Z",
-  })).ok, true);
+  }))).ok, true);
   const routed = invoke(repo, "ticket", "get", "--input", writeInput(repo, { ticket_id: "subject-work" }));
   assert.equal(routed.data.next_action.action, "CLOSE_OUT");
   const refusedAgain = invoke(repo, "ticket", "closeout", "--input", writeInput(repo, outcome));
@@ -440,7 +471,7 @@ test("the declared independence source reaches a reader and the Workbench", asyn
     validation: { independent: true, note: "contract test" },
     tickets: [ticket("judged-work")],
   })).ok, true);
-  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, {
+  assert.equal(invoke(repo, "ticket", "evidence", "--input", writeInput(repo, bindEvidence(repo, {
     schema_version: 1,
     kind: "ticket_evidence",
     evidence_id: "judged-work-proof",
@@ -449,8 +480,8 @@ test("the declared independence source reaches a reader and the Workbench", asyn
     summary: "contract test",
     refs: ["conversation:contract-test"],
     recorded_at: "2026-09-02T00:00:00.000Z",
-  })).ok, true);
-  assert.equal(invoke(repo, "ticket", "closeout", "--input", writeInput(repo, {
+  }))).ok, true);
+  assert.equal(invoke(repo, "ticket", "closeout", "--input", writeInput(repo, bindOutcome(repo, {
     schema_version: 1,
     kind: "ticket_outcome",
     ticket_id: "judged-work",
@@ -461,10 +492,10 @@ test("the declared independence source reaches a reader and the Workbench", asyn
     summary: "contract test",
     closed_at: "2026-09-02T00:01:00.000Z",
     independence: { source: "separate_session", note: "contract test" },
-  })).ok, true);
+  }))).ok, true);
 
   // A reader of the checked-in document sees it.
-  const written = readFileSync(join(repo, ".vibehub", "outcomes", "judged-work.yaml"), "utf8");
+  const written = readFileSync(join(repo, ".vibehub", "outcomes", "judged-work", "contract-v1.yaml"), "utf8");
   assert.match(written, /separate_session/u);
 
   // And so does the Log, which is the surface the closeout Skill sends them to.

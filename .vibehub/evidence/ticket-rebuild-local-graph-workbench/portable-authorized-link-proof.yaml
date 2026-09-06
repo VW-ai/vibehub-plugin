@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "authorized-link-is-portable"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "authorized-link-is-portable",
+      "identity": "sha256:02e7dd42751d4dd9dc06e788443df1976debb6db70b0d179e451a4ee1f1bddaf",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "portable-authorized-link-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T09:15:00Z",
@@ -13,7 +22,7 @@
     "browser:2026-08-02-second-tab-portability",
     "browser:2026-08-02-bare-origin-recovery"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The client no longer calls history.replaceState, retains the complete short-lived bearer fragment in location.href, and exposes a Copy link control. Real-browser interaction reported `Authorized link copied`; opening the same complete URL in a second tab rendered the 4-Ticket graph and retained the exact fragment, while the bare origin rendered explicit recovery guidance to copy the complete URL including the text after #. The server still receives the token only through the Authorization header.",
   "ticket_id": "ticket-rebuild-local-graph-workbench"
 }

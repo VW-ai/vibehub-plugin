@@ -1,0 +1,132 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-impact-is-explicit-semantic-input",
+      "criterion": "A dependency-free checked-in release-change contract under one documented maintainer-owned path records a unique change ID, owning Ticket and successful Outcome reference, summary, and exactly one impact in none, patch, minor, or major. CI requires every pull request that changes any PLUGIN_PATHS content to add or carry an applicable non-none record, rejects a non-successful or unreadable Outcome, duplicate IDs, malformed impacts, and a none-only justification for shipped changes, and does not require a release record for a diff proven to be entirely outside shipped content.",
+      "identity": "sha256:9c35a5e71198fc6a3152a7deb4ada24a9f48a28b4296d3bba8e7d1c5ecde9043",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "next-stable-version-is-derived-from-reachable-history",
+      "criterion": "One exported dependency-free calculator selects the highest SemVer stable vX.Y.Z tag reachable from the candidate HEAD, reads only valid release-change records added on that HEAD ancestry after the selected tag, takes the maximum impact with major greater than minor greater than patch greater than none, and mechanically computes the next stable SemVer. It returns no release only when shipped content is genuinely unchanged; changed shipped content with no applicable record or a none-only impact set is an error. It also fails visibly for missing baselines, non-ancestral or ambiguous inputs, and impact records that cannot be tied to their declared successful Outcomes.",
+      "identity": "sha256:b2a14567062c713d1672df10161d28317972878c3b292c00d5c98f6fc85f98c1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "development-identity-is-a-deterministic-projection",
+      "criterion": "For a changed unreleased tree, the calculator projects the computed stable core as a SemVer prerelease containing a deterministic abbreviated digest of the normalized PLUGIN_PATHS content. The normalization excludes only fields mechanically written by the same calculator so it cannot hash its own version output; every other shipped byte remains identity-bearing. Repeated calculation over the same tree is byte-identical, different normalized shipped trees do not share the full prerelease identity in the regression corpus, and no worktree-local cache, branch name, timestamp, counter, service, or uncommitted hidden state contributes.",
+      "identity": "sha256:e122001306d16ede6a64bff2e77175ad8188a0aff2aeaac6d3748008d38616cd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-metadata-has-one-materializer",
+      "criterion": "The calculator exposes a dry-run plan and an explicit prepare operation that atomically synchronizes package.json, the retained Claude plugin manifest, the matching CHANGELOG state, and one documented checked-in release-plan path from one computed result. Prerelease preparation preserves Unreleased; stable preparation finalizes exactly the computed version with an explicit supplied release date that is recorded in that plan and reused on retry. Ordinary verification never writes, and prepare never commits, pushes, creates a branch, tags, or publishes. CI rejects manual divergence between the computed plan and any materialized projection.",
+      "identity": "sha256:87a1ec2f3206614ef3760e366c65338c9fcaae99a13484d6e5cc71c57ab46f66",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "computed-plan-is-machine-readable-and-reproducible",
+      "criterion": "The CLI emits one documented machine-readable success or error envelope containing the baseline tag and version, included release-change IDs and Outcome refs, winning impact, normalized shipped-content digest, projected prerelease, computed stable version, explicit prepare inputs including release date when present, materialization state, and whether release work exists. Given the same Git objects, worktree bytes, and explicit CLI inputs it produces the same ordered output on macOS and Linux without network access or runtime dependencies.",
+      "identity": "sha256:e19a8a4896e20fba9f90dd90957403530f2a8265b15aba39249877fd50ceece0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "concurrent-worktree-recalculation-is-proven",
+      "criterion": "Git-backed tests create two worktrees from the same stable baseline, give them different shipped changes and explicit impacts, and prove they may target the same future stable core while receiving distinct full development identities. After one candidate is tagged as that stable release, the other is rebased or replayed on the new baseline and deterministically recalculates to the correct next patch, minor, or major version instead of retaining or publishing the consumed stable identity. The current v0.8.0 to v0.9.0 format-4 release is retained as a fixture proving the initial computed result.",
+      "identity": "sha256:ad578979cdde7c19fce3c00ab3e8a64274ad81efe32551d8723e2aa8613f50d3",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not infer patch, minor, or major from changed filenames, diff size, commit-message conventions, or branch names; release impact remains an explicit semantic judgment.",
+    "Do not add a registry, database, lock service, daemon, telemetry, runtime dependency, or per-worktree persistent cache.",
+    "Reuse PLUGIN_PATHS and the existing SemVer/tag implementation rather than introducing a second artifact boundary or version parser.",
+    "Preserve exact Git-history reproducibility and machine-readable failure envelopes; dirty local state may be inspected for planning but can never be published.",
+    "This Ticket computes and materializes metadata only; it must not create Git refs, commits, pull requests, tags, or Releases."
+  ],
+  "context": "The owner corrected the release model after examining concurrent worktrees: a version number is not something each worktree independently chooses. The semantic input is release impact; the numeric SemVer identity is derived from the latest reachable stable tag plus the highest impact among unreleased changes in the candidate history. This Ticket creates the dependency-free repository contract and calculator that the later publishing automation consumes. It deliberately keeps impact judgment explicit and reviewable rather than guessing patch, minor, or major from file paths or diff size. It also removes the circular multi-writer behavior in which package.json, the Claude manifest, and CHANGELOG can each be edited as if authoritative. Development identities may include a deterministic digest of normalized shipped content so concurrent worktrees targeting the same future core version remain distinguishable, while only a release preparation operation materializes the stable identity. The Ticket does not create branches, commits, tags, pull requests, or Releases.",
+  "context_refs": [
+    {
+      "purpose": "Owner authority that release impact is semantic input while version identity is a computed repository projection.",
+      "ref": ".vibehub/rooms/product/decision-release-version-is-a-computed-repository-projection.yaml"
+    },
+    {
+      "purpose": "Existing policy requiring shipped changes to move identity and main-between-releases to remain distinguishable from the latest stable release.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    },
+    {
+      "purpose": "Successful baseline that already provides SemVer parsing, reachable-tag selection, one shipped-content allowlist, and stale-identity regression coverage.",
+      "ref": ".vibehub/outcomes/ticket-enforce-release-version-identity/contract-v2.yaml"
+    },
+    {
+      "purpose": "Current dependency-free release identity engine to evolve into verification of computed plans and materialized projections.",
+      "ref": "scripts/verify-release-version.mjs"
+    },
+    {
+      "purpose": "Canonical PLUGIN_PATHS boundary and artifact builder that release calculation must reuse rather than duplicate.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Current manual prepare, tag, publish, checksum, and data-upgrader procedure to preserve or automate explicitly.",
+      "ref": "docs/RELEASE.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "computed-plan-is-machine-readable-and-reproducible",
+          "identity": "sha256:e19a8a4896e20fba9f90dd90957403530f2a8265b15aba39249877fd50ceece0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "concurrent-worktree-recalculation-is-proven",
+          "identity": "sha256:ad578979cdde7c19fce3c00ab3e8a64274ad81efe32551d8723e2aa8613f50d3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "development-identity-is-a-deterministic-projection",
+          "identity": "sha256:e122001306d16ede6a64bff2e77175ad8188a0aff2aeaac6d3748008d38616cd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "next-stable-version-is-derived-from-reachable-history",
+          "identity": "sha256:b2a14567062c713d1672df10161d28317972878c3b292c00d5c98f6fc85f98c1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-impact-is-explicit-semantic-input",
+          "identity": "sha256:9c35a5e71198fc6a3152a7deb4ada24a9f48a28b4296d3bba8e7d1c5ecde9043",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-metadata-has-one-materializer",
+          "identity": "sha256:87a1ec2f3206614ef3760e366c65338c9fcaae99a13484d6e5cc71c57ab46f66",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0f21abe3c91e42722c1a62333f3047077edfaaabac7cae8b6ed9f19af53714f8",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub's next prerelease and stable identities are reproducible calculations over reachable Git history and explicit release-impact records, while package, plugin, and changelog versions become synchronized projections rather than worktree-local claims.",
+  "provenance_refs": [
+    "conversation:2026-09-04-computed-release-version",
+    "https://github.com/VW-ai/vibehub-plugin/pull/134",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-compute-release-version-from-impact"
+}
