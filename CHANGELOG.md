@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fix GitHub Ticket mirroring for projects with versioned historical Context
+  references by checking out complete Git history in both the repository and
+  installed workflow templates.
+
 ## 0.9.0 — 2026-09-04
 
 - Make Acceptance and complete Ticket contracts append-only, monotonically

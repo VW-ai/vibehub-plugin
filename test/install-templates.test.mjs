@@ -21,6 +21,7 @@ test("GitHub mirror templates match their sources except for the import path and
     .replace("node scripts/sync-github-issues.mjs", "node scripts/vibehub/sync-github-issues.mjs")
     .replace('- "scripts/sync-github-issues.mjs"', '- "scripts/vibehub/**"');
   assert.equal(workflow, sourceWorkflow);
+  assert.match(workflow, /actions\/checkout@v6\n\s+with:\n\s+fetch-depth: 0/u);
   assert.match(workflow, /permissions:\n\s+contents: read\n\s+issues: write/);
   assert.doesNotMatch(workflow, /git (commit|push)/);
 });
