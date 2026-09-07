@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 — 2026-09-07
 
 - Add a five-pass large-document ingestion flow with deterministic source
   segments, citation-based coverage, reasoned exceptions, and a Room-tree
