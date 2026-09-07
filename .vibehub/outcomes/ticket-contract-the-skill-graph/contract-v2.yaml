@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "graph-contract",
+    "validation",
+    "retired-names-stay-retired"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-07T07:00:36.518871+00:00",
+  "contract_revision": {
+    "identity": "sha256:e292689d9337072bb97234c8ed9eacf069d5c7d9506a2b2e8bc5f9c8719351d5",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "evidence-independent-contract-v2-adjudication"
+  ],
+  "independence": {
+    "note": "Fresh /root/graph_revision_closeout agent, separate from executor, with bounded read-only handoff; independently inspected current criteria, source, historical references and ran tests/probe. Writes limited to this Ticket evidence and Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "partial",
+  "summary": "Independent closeout of exact active Contract v2: partial. Accepted graph-contract, validation, and retired-names-stay-retired v2 after 44/44 scoped tests, real repository graph validation, and source review. no-runtime-role is not satisfied: setup invokes skills retired, whose retiredSkillFolders function reads packaged skill-graph.json. An isolated copy probe confirmed changing only its retired list changes setup-command results. Validation itself is read-only (all 762 .vibehub file hashes unchanged), but this does not satisfy the separate no-runtime-reader clause. The same setup invocation and packaged read exist at pre-merge d3289c2; this is an inherited contractual mismatch, not a merge regression. Resolve through a later explicit contract/implementation decision; do not silently reinterpret the criterion. Historical successful contract-v1 remains unchanged and cannot close current v2.",
+  "ticket_id": "ticket-contract-the-skill-graph",
+  "unresolved_acceptance_ids": [
+    "no-runtime-role"
+  ]
+}
