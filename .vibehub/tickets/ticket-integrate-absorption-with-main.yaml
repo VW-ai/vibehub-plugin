@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "capabilities-preserved",
+      "criterion": "Merged tests and independent probes verify deterministic source segmentation, coverage settlement, normalized segment anchor collisions and internal-material exclusion, alongside main revision-bound proof semantics, explicit independence gate, and npx-only artifact distribution. No removed marketplace delivery surface is resurrected.",
+      "identity": "sha256:20e99c7b5c941d08d0652177a8bb50d7df689e29ec83ed9fbb13b4bce76cfc85",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "main-integrated",
+      "criterion": "The fetched main commit recorded in Evidence is an ancestor of the final PR branch, no unmerged entries remain, and the branch is pushed to PR 136 without force rewriting its existing history.",
+      "identity": "sha256:45316ebce7ab91557a251047fb24b600cb5dcb9c0a44f9ff72a847d0c296f8c8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "merged-validation",
+      "criterion": "Full npm test and verify:artifact pass on the merged branch; project and skills validators pass, entered Rooms are reconciled/aligned with no unexplained drift, and PR 136 description reflects merged scope and actual verification.",
+      "identity": "sha256:896dc2c005c4e43f77c4ea72120853f5c530ad63f24fc06e7a1b78e38ee3a20a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "records-migrated-honestly",
+      "criterion": "Merged project validates at main current format; branch-added Tickets/Evidence/Outcomes are explicitly migrated using repository-supported revision reconstruction, existing main revision records are preserved, and Peel verification remains partial with no-prompted-recovery unresolved and criterion meaning unchanged.",
+      "identity": "sha256:12098b1df3e469cdd45c3be5f2155494489e6ec4835ab04129dd1ea64dde7a6a",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not modify ~/Peel or its baseline changes.",
+    "Do not relax acceptance or proof/independence gates to make integration pass; preserve historical evidence and outcomes through Git and the main migration contract.",
+    "Do not publish a release, modify unrelated worktrees, force-push, or merge PR 136 into main."
+  ],
+  "context": "User requested aligning PR 136 with main. Current delivery tip d3289c2; current known main 5846c3f introduces project format 4, revision-bound Acceptance/Evidence/Outcome, explicit closeout independence, npx-only distribution and upgrades. Resolve integration rather than choosing an entire side. Record the exact fetched main commit in Evidence. Preserve the existing Peel partial semantics and historical evidence. GitHub CI additionally reaches the main shipped-content version gate. Its prerelease convention conflicts with the explicit no-Unreleased handoff; the linked owner-decision Ticket gates that next step.",
+  "context_refs": [
+    {
+      "purpose": "PR integration and Room alignment requirements.",
+      "ref": "skills/vibehub-pr/SKILL.md"
+    },
+    {
+      "purpose": "Shared runtime with competing branch changes.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Completed normalization contract to preserve.",
+      "ref": ".vibehub/tickets/ticket-normalize-anchors-before-collision.yaml"
+    },
+    {
+      "purpose": "Preserved partial verification contract.",
+      "ref": ".vibehub/tickets/ticket-verify-absorption-against-peel.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "capabilities-preserved",
+          "identity": "sha256:20e99c7b5c941d08d0652177a8bb50d7df689e29ec83ed9fbb13b4bce76cfc85",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "main-integrated",
+          "identity": "sha256:45316ebce7ab91557a251047fb24b600cb5dcb9c0a44f9ff72a847d0c296f8c8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "merged-validation",
+          "identity": "sha256:896dc2c005c4e43f77c4ea72120853f5c530ad63f24fc06e7a1b78e38ee3a20a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "records-migrated-honestly",
+          "identity": "sha256:12098b1df3e469cdd45c3be5f2155494489e6ec4835ab04129dd1ea64dde7a6a",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:2e961f0d380b7e25afb86a913f8349fbb4823714c419a923ebb71f10380717bb",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "PR 136 contains the latest main baseline and the absorption delivery with resolved merge conflicts, compatible revision-bound project data, passing checks and independently verified integration.",
+  "provenance_refs": [
+    "conversation:2026-09-07-align-pr-136-with-main",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The newly reached release-identity gate cannot be resolved or intentionally left red until the owner chooses which conflicting release convention governs this PR.",
+      "target_ticket_id": "ticket-decide-pr136-prerelease-convention",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-integrate-absorption-with-main"
+}

@@ -1,0 +1,42 @@
+{
+  "acceptance_ids": [
+    "open-ticket-refs-at-head",
+    "live-pointers-still-checked",
+    "degrades-without-git",
+    "regression"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "open-ticket-refs-at-head",
+      "identity": "sha256:8e50d43a4e4430dec0f8e74a6e0193bcab4979b9c71d0b5b5156240b728bcefa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-pointers-still-checked",
+      "identity": "sha256:e9f42f6bc865e255b88ea57f8d416d5ae8629799026c1a0bbde2d060a5897cea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "degrades-without-git",
+      "identity": "sha256:4fd396f2e54c8ba1bee85ec555e12d7f26fa87ac5274a3fadc890fd3838e4ba6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "regression",
+      "identity": "sha256:0d83ca087d04e74f23b9308ffbd5e981ee2dc49c2fa43af177a5ca5a9f228907",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "evidence_id": "evidence-lifecycle-ref-validation-regression",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    "test/ticket-context-ref-history.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "test/ticket-context-ref-history.test.mjs builds a real git repository, closes a Ticket whose ref points into a directory, then git mv's that directory, and covers all five required cases: a closed Ticket's ref resolving only at its commit; a closed Ticket's ref existing nowhere still failing; an open Ticket with the same dangling ref still failing against the working tree; a Room anchor staying a live pointer and still reporting DRIFTED after the same rename; and a tree with .git removed yielding an unverifiable entry rather than a failure. Full suite re-run independently: npm test -> tests 161, pass 161, fail 0.",
+  "ticket_id": "ticket-scope-reference-validation-to-lifecycle"
+}

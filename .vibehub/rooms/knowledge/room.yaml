@@ -6,24 +6,28 @@
         "path": "skills/vibehub-core/contracts/context.schema.json"
       },
       {
-        "blob": "bf8884197dba4632d84d96d42c315baf5b767d63",
+        "blob": "a1ed38887df4d44b51cacf95df02cc810feae2f1",
         "path": "skills/vibehub-core/contracts/room.schema.json"
       },
       {
-        "blob": "ebc9172a1b6ace72f317cef35c32654cceb92c13",
+        "blob": "450d4f1e50b45725a693d2030ac3fc31817912d3",
         "path": "skills/vibehub-distill/SKILL.md"
       },
       {
-        "blob": "d7a671ac57909d14ae52fbe8cbdce70a6b17ebe0",
+        "blob": "35a312a08ea09e7b7d1e85c8d26b71b46e2dd706",
         "path": "skills/vibehub-distill/agents/openai.yaml"
       },
       {
-        "blob": "3cbc95143d7973ae1ded6188e2530a94cd09457d",
+        "blob": "b8c0e4afc648432b7c3cf23adfa01a15f20c8fc8",
         "path": "skills/vibehub-ingest/SKILL.md"
       },
       {
         "blob": "2d90711188cd41e482615bc7714869bf60355545",
         "path": "skills/vibehub-ingest/agents/openai.yaml"
+      },
+      {
+        "blob": "d70ff1a66287009b92e2b93aeb1bbca3270cf08c",
+        "path": "skills/vibehub-ingest/references/bulk-absorption.md"
       },
       {
         "blob": "4fdd8f3bcd48be15dce4076b28d039e316279436",
@@ -50,8 +54,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-04T20:06:49.489Z",
-    "last_aligned_commit": "78314f7be0a01379f37f68cd314e945acf3ec7e7"
+    "checked_at": "2026-09-07T06:54:48.785Z",
+    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
   },
   "anchors": [
     "skills/vibehub-core/contracts/context.schema.json",

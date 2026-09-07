@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "closed-ticket-refs-at-their-commit",
+    "repository-green"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "closed-ticket-refs-at-their-commit",
+      "identity": "sha256:1893e4ef2bc2ddbc66f9dee17ac95a95b49b7da5a1b64c8b3889361a79146594",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "repository-green",
+      "identity": "sha256:39c507939d10330e2113daa4dc3b21d872b87025144ef2ea3e4cb8d1f08b1d9b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "evidence_id": "evidence-lifecycle-scoped-ref-validation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-29T00:00:00Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "test/ticket-context-ref-history.test.mjs",
+    ".vibehub/tickets/ticket-restore-local-graph-ui.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "After renaming skills/vibehub-ticket-review/ to skills/vibehub-review/, 24 closed Tickets still carry context_refs naming the old path and project validate returns valid:true with unverifiable_context_refs empty, proving those refs now resolve at each Ticket's recorded commit rather than the working tree. Re-run independently of the implementing agent: node skills/vibehub-core/scripts/vh.mjs project validate --repo . -> {ok:true, valid:true, rooms:6, contexts:63, tickets:102, outcomes:89, unverifiable_context_refs:[]}. git status --short .vibehub/ shows no modification to any file under .vibehub/outcomes/ or .vibehub/evidence/; the only entries are newly added directories for this cycle's own tickets.",
+  "ticket_id": "ticket-scope-reference-validation-to-lifecycle"
+}

@@ -121,5 +121,6 @@
   "kind": "room",
   "room_id": "marketing",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift:site release assets changed outside this deliverable"
 }

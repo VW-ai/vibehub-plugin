@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "owner-choice-recorded"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-07T07:13:19.266Z",
+  "contract_revision": {
+    "identity": "sha256:a39b0f0266fbce1b3f70006a254bee401df39f096698a435bb94fb2f74a12676",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-owner-prerelease-choice"
+  ],
+  "independence": {
+    "note": "Fresh independently spawned closeout Agent with no execution context; compared the checked-in faithful question/reply record with the actual user question and response supplied in the closeout assignment.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Accepted owner-choice-recorded v1: the readable owner-choice.md reproduces the explicit question and reply supplied to this fresh adjudicator. The human reply selects main prerelease convention, including 0.10.0-dev.1 plus Unreleased without publication. The native human Evidence binds the exact active Acceptance identity. This Outcome records only the owner decision, not completion of downstream metadata work.",
+  "ticket_id": "ticket-decide-pr136-prerelease-convention",
+  "unresolved_acceptance_ids": []
+}

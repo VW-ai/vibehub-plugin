@@ -1,0 +1,36 @@
+{
+  "context_id": "constraint-acceptance-must-bind-to-repository-facts",
+  "detail": "Peel 验证票的 no-prompted-recovery 判据要求「运行记录显示覆盖率靠流水线自身跑到零，且没有用户消息追问是否遗漏」。第二个合取项是一个关于会话的否定存在命题，而 VibeHub 是 Git-native 的：它保存指向会话的 conversation: 指针，不保存会话内容。因此没有任何仓库产物能确立它——更糟的是，运行产物按构造就不含用户消息，所以「产物里没有追问」空洞为真、毫无证据价值。第二次改写试图把它绑到「某段落是重算才结清的、而非有人读到」，同样失败：那是关于执行者内部过程的断言，而执行者的自述不是证据。连续两版都绑在不可观测量上，这本身就是判据形态错误的信号，不是措辞问题。规则：一条判据必须能由仓库状态、脚本输出或带可读引用的人类背书之一判定。想表达「而且是因为对的原因才成立」时，要么找到该原因留下的正面痕迹并检验那个痕迹，要么把它交给 human authority 由人背书，要么承认它不属于验收而属于叙述。本例的处置是保留 partial 而不改写判据，因为为了让票通过而修改判据，正是最该被怀疑的动作。",
+  "evidence": [
+    {
+      "note": "独立裁决判定该判据不可由仓库证据类满足，并指出产物中不含用户消息使其空洞为真。",
+      "ref": ".vibehub/outcomes/ticket-verify-absorption-against-peel.yaml"
+    },
+    {
+      "note": "判据原文保留未改写，票停在 partial。",
+      "ref": ".vibehub/tickets/ticket-verify-absorption-against-peel.yaml"
+    },
+    {
+      "note": "human-origin 证据需要显式人类输入与可读引用，是本规则的另一条合法出口。",
+      "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-02T00:00:00Z",
+    "quote": "就让它挂着 partial",
+    "ref": "conversation:2026-09-02-peel-verification-closeout"
+  },
+  "state": "active",
+  "summary": "验收判据必须绑定仓库能展示的事实；对会话的否定存在命题无法成为证据",
+  "tags": [
+    "acceptance",
+    "evidence",
+    "ticket-lifecycle",
+    "git-native",
+    "verification"
+  ],
+  "type": "constraint"
+}

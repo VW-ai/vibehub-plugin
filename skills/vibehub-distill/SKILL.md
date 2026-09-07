@@ -1,9 +1,15 @@
 ---
 name: vibehub-distill
-description: Build or resume a repository's Room tree when drift reports COLD_START, or refresh it on explicit user request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Use when a project has no Room tree yet or the user asks for a fresh distillation.
+description: Internal mechanism that writes Room shape and alignment stamps — building or resuming a repository's Room tree when drift reports COLD_START, and refreshing it on request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Invoked by $vibehub-ingest, $vibehub-ticket-plan, and $vibehub-migrate, not called directly by a user.
 ---
 
 # VibeHub Distill
+
+This Skill's job is Room shape and alignment stamps: boundaries, nesting,
+anchors, and the stamp that makes drift computable. It does not extract
+Context. A caller that needs a document turned into Context runs
+`$vibehub-ingest`, which invokes this Skill for the tree and then writes the
+Context itself.
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
@@ -24,14 +30,28 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    is no separate progress state to maintain.
 3. Propose the tree by judgment, not enumeration. A room is a bounded
    workspace someone does coherent work in, named by a semantic kebab-case
-   slug; nest a sub-room only when the parent genuinely composes it. A small
-   honest tree beats an exhaustive one — rooms are cheap to split later with
-   `git mv`.
+   slug; nest a sub-room only when the parent genuinely composes it. Split
+   under pressure rather than merging under it: a room must split when its
+   boundary needs "and" to join two unrelated concerns, or when its topics
+   serve visibly different readers (product / engineering / design). Collapsing
+   those into one room is how knowledge gets lost — rooms are cheap, and
+   splitting is `git mv` plus a boundary edit while they are still empty.
 4. Read enough of each room's territory to describe it truthfully, then write
-   its `room.yaml` (`../vibehub-core/contracts/room.schema.json`): a description, a
+   its Room document (`../vibehub-core/contracts/room.schema.json`): a description, a
    boundary that also says what the room is not, and anchors as
-   segment-boundary path prefixes covering what its knowledge is about. Stamp
-   it immediately:
+   segment-boundary path prefixes covering what its knowledge is about. Write
+   it with the operation, never by hand-editing `room.yaml` — the write
+   validates the document and refuses anchors that overlap another room's
+   territory, so a bad tree is rejected instead of discovered later:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs room put --repo <root> --room <path> --input <room.json>
+   ```
+
+   `--room` is the room's path under `.vibehub/rooms/`; `room_id` must equal
+   its last segment, and a nested room's parent must already exist. The write
+   creates or replaces the whole document and stamps nothing. Stamp it
+   immediately afterwards:
 
    ```text
    node ../vibehub-core/scripts/vh.mjs room align --repo <root> --room <path>
@@ -45,6 +65,8 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 ## Guardrails
 
 - Never write a room for territory you have not read.
+- There is no room delete. Removing or moving a room is `git rm` / `git mv`
+  plus a boundary edit, the same way Context documents move.
 - Do not introduce progress files, manifests, or a second store; the tree and
   its stamps are the whole state, inside
   `../vibehub-setup/references/architecture-boundary.md`.

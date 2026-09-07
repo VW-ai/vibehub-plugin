@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "owner": "vibehub-core",
+  "scope": "development-time-skill-graph",
+  "runtime_role": "none",
+  "purpose": "Declare the Skill-to-Skill invocation graph so that changing one Skill produces a runnable blast-radius check instead of an ad-hoc grep. Checked by `vh.mjs skills validate --repo <root>`. No Skill reads this file at runtime, it is not a router or a lifecycle, and `skills validate` writes nothing into .vibehub/.",
+  "entry_kinds": {
+    "user": "A user or host can select this Skill directly; its description carries a user-facing trigger.",
+    "internal": "Reached only from another Skill. Its description says so. An internal Skill with no inbound edge is an orphan.",
+    "infrastructure": "Ships as a Skill folder so installers carry it, but is never invoked and holds no edges. Only vibehub-core."
+  },
+  "edge_kinds": {
+    "invokes": "The caller runs the target as a step of its own workflow. This subgraph must stay acyclic.",
+    "presents": "The caller asks vibehub-review to present a lifecycle event the caller owns.",
+    "routes": "vibehub-review hands work back to the Skill that owns it. Together with `presents` this is the deliberate lifecycle loop governed by the lifecycle contract, so acyclicity is not asserted over these kinds."
+  },
+  "lifecycle_contract": "vibehub-review/references/ticket-lifecycle.json",
+  "skills": [
+    {
+      "name": "vibehub-core",
+      "entry": "infrastructure",
+      "invokes": [],
+      "presents": [],
+      "routes": [],
+      "events": [],
+      "note": "Helper script, schemas, templates. Reached only as ../vibehub-core/... relative paths, never as a $-invocation."
+    },
+    {
+      "name": "vibehub-distill",
+      "entry": "internal",
+      "invokes": [],
+      "presents": [],
+      "routes": [],
+      "events": [],
+      "note": "Writes Room shape and alignment stamps. Its description enumerates its callers and states it is not called directly by a user."
+    },
+    {
+      "name": "vibehub-ingest",
+      "entry": "user",
+      "invokes": [
+        "vibehub-distill"
+      ],
+      "presents": [
+        "vibehub-review"
+      ],
+      "routes": [],
+      "events": [],
+      "note": "Bulk absorption delegates the Room tree to distill and presents the written tree through review's Room tree surface (references/bulk-absorption.md)."
+    },
+    {
+      "name": "vibehub-migrate",
+      "entry": "user",
+      "invokes": [
+        "vibehub-distill"
+      ],
+      "presents": [],
+      "routes": [],
+      "events": []
+    },
+    {
+      "name": "vibehub-pr",
+      "entry": "user",
+      "invokes": [],
+      "presents": [
+        "vibehub-review"
+      ],
+      "routes": [],
+      "events": [
+        "pr-review-ready"
+      ]
+    },
+    {
+      "name": "vibehub-query",
+      "entry": "user",
+      "invokes": [],
+      "presents": [],
+      "routes": [],
+      "events": []
+    },
+    {
+      "name": "vibehub-review",
+      "entry": "user",
+      "invokes": [],
+      "presents": [],
+      "routes": [
+        "vibehub-distill",
+        "vibehub-ticket-closeout",
+        "vibehub-ticket-plan"
+      ],
+      "events": [
+        "explicit-review"
+      ],
+      "note": "The presenter. It routes CLOSE_OUT to closeout and requested edits to plan, and a proposed Room tree must be written by distill before the read-only UI can show it."
+    },
+    {
+      "name": "vibehub-setup",
+      "entry": "user",
+      "invokes": [
+        "vibehub-ingest"
+      ],
+      "presents": [],
+      "routes": [],
+      "events": []
+    },
+    {
+      "name": "vibehub-ticket-closeout",
+      "entry": "user",
+      "invokes": [
+        "vibehub-ingest"
+      ],
+      "presents": [
+        "vibehub-review"
+      ],
+      "routes": [],
+      "events": [
+        "closeout-recorded"
+      ]
+    },
+    {
+      "name": "vibehub-ticket-plan",
+      "entry": "user",
+      "invokes": [
+        "vibehub-distill",
+        "vibehub-setup",
+        "vibehub-ticket-validate"
+      ],
+      "presents": [
+        "vibehub-review"
+      ],
+      "routes": [],
+      "events": [
+        "draft-needs-refinement",
+        "execution-discovers-work",
+        "plan-applied"
+      ],
+      "note": "Owns the canonical user entry “Start this with VibeHub.”"
+    },
+    {
+      "name": "vibehub-ticket-run",
+      "entry": "user",
+      "invokes": [
+        "vibehub-ingest",
+        "vibehub-query",
+        "vibehub-ticket-closeout",
+        "vibehub-ticket-plan"
+      ],
+      "presents": [
+        "vibehub-review"
+      ],
+      "routes": [],
+      "events": [
+        "execution-needs-human",
+        "ready-execution"
+      ]
+    },
+    {
+      "name": "vibehub-ticket-validate",
+      "entry": "internal",
+      "invokes": [],
+      "presents": [],
+      "routes": [],
+      "events": [
+        "validation-needs-human"
+      ],
+      "note": "Read-only independent validation asked for by vibehub-ticket-plan; its description carries no user trigger."
+    }
+  ],
+  "retired": [
+    {
+      "name": "vibehub-ticket-review",
+      "replacement": "vibehub-review",
+      "reason": "The Skill presents both the Ticket graph and the Room tree; the old name described half its job. Retired as a clean break with no deprecation stub.",
+      "allowed_paths": [
+        {
+          "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
+          "text": "`-s vibehub-ticket-review` 的脚本",
+          "reason": "The same decision naming the hardcoded install flag a reader must change; quoting the old flag is what makes the instruction actionable."
+        },
+        {
+          "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
+          "text": "vibehub-ticket-review 改名 vibehub-review",
+          "reason": "The decision's summary line, which states the rename itself."
+        },
+        {
+          "path": ".vibehub/rooms/product/decision-retire-ticket-review-skill-name.yaml",
+          "text": "旧的 vibehub-ticket-review/ 可能与新的 vibehub-review/ 并存",
+          "reason": "The retirement decision naming the stale folder an installer may be left with; the old name is the subject of the sentence."
+        },
+        {
+          "path": ".vibehub/rooms/ticket-lifecycle/decision-lifecycle-scoped-reference-validation.yaml",
+          "text": "该缺陷是重命名 vibehub-ticket-review 时暴露的",
+          "reason": "Prose naming the rename as the event that exposed a pre-existing reference-validation defect."
+        },
+        {
+          "path": ".vibehub/tickets/ticket-contract-the-skill-graph.yaml",
+          "text": "The rename of vibehub-ticket-review to vibehub-review makes this concrete: retiring a name is only safe if something mechanically prevents the old one from creeping back into live references.",
+          "reason": "This Ticket's own context prose names the retired Skill to explain why a mechanical retired-name check was needed. It is an open Ticket, so it is a live document, not a historical record."
+        },
+        {
+          "path": ".vibehub/tickets/ticket-detect-retired-skill-folders-after-update.yaml",
+          "text": "discovered while retiring vibehub-ticket-review",
+          "reason": "Open Ticket whose context names the rename that revealed the zombie-folder problem."
+        },
+        {
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "The installed `vibehub-ticket-review` Skill launches the versioned Plugin",
+          "reason": "Dated attestation recording what the runtime chain was on 2026-07-30, before the rename; rewriting it would falsify the record."
+        },
+        {
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "The installed `vibehub-ticket-review` Skill resolves the packaged",
+          "reason": "The same dated attestation restating the resolution step it verified at the time."
+        },
+        {
+          "path": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "text": "`skills/vibehub-ticket-review/SKILL.md`",
+          "reason": "The same dated attestation citing the file path it inspected at the time."
+        },
+        {
+          "path": "docs/INSTALL.md",
+          "text": "`vibehub-ticket-review` became `vibehub-review`",
+          "reason": "Prose telling an installer which stale folder to delete after the rename; naming it is the instruction."
+        },
+        {
+          "path": "docs/proposals/bulk-absorption.md",
+          "text": "Generalized from `vibehub-ticket-review`",
+          "reason": "Proposal table row describing what the renamed Skill was generalized from."
+        },
+        {
+          "path": "docs/proposals/bulk-absorption.md",
+          "text": "Renaming `vibehub-ticket-review` under this proposal",
+          "reason": "Proposal prose recording that the rename broke project validate, which is why the reference rule exists."
+        },
+        {
+          "path": "docs/proposals/bulk-absorption.md",
+          "text": "at 12 — `vibehub-ticket-review` is renamed",
+          "reason": "Proposal prose explaining that the Skill count is unchanged because this was a rename."
+        },
+        {
+          "path": "scripts/measure-graph-layout.mjs",
+          "text": "const LEGACY_APP_PATH = \"skills/vibehub-ticket-review/assets/app.js\";",
+          "reason": "The LEGACY_APP_PATH constant itself: the measurement reads commits recorded before the rename, where this was the real path."
+        },
+        {
+          "path": "scripts/measure-graph-layout.mjs",
+          "text": "was still named vibehub-ticket-review. The rename must not invalidate them.",
+          "reason": "Comment documenting why the legacy path constant below it exists."
+        },
+        {
+          "path": ".vibehub/rooms/product/finding-npx-updates-by-content-not-by-version.yaml",
+          "text": "Workbench assets live inside skills/vibehub-ticket-review/assets",
+          "reason": "Historical investigation describes the actual asset path in the tested installation; retain the recorded finding without rewriting it as a new observation."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "stable-identity",
+      "criterion": "Package, retained Claude manifest and installed GitHub mirror template agree on0.10.0; CHANGELOG has a dated0.10.0 entry and no Unreleased; release tag and shipped-content gates pass against latest reachable stablev0.9.0.",
+      "identity": "sha256:e52fe9575ebcae4fbfff15de4fab56f1890b5b0962cfe63163b4ee26f7ebad85",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verified-candidate",
+      "criterion": "Full npm test and artifact verification pass on final candidate source; project and skills validators pass; entered Rooms are aligned; original partial Outcomes and historical integration Outcome remain unchanged.",
+      "identity": "sha256:451a9068877edabc6ce2f283ee11600fe7e5b80ef132ea25b6dcf498fe2e8748",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reviewable-release-scope",
+      "criterion": "PR136 release description and checked-in evidence record the user merge/release authorization, minor impact judgment, stable candidate scope and known Peel/Skill-graph partials without claiming those gaps resolved. A fresh independent closeout verifies this preparation before publication.",
+      "identity": "sha256:5045e6a4f4ae4fca580d334e231b92439460841b8e74651ecb77143babab1738",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not modify ~/Peel or unrelated worktrees.",
+    "Do not weaken tests or change historical acceptance/proofs to release.",
+    "Tag only the exact merged main commit after passing CI; never force-update refs or publish a feature-branch commit.",
+    "Use the current documented release procedure; future computed/atomic automation remains separate work."
+  ],
+  "context": "Owner explicitly requested: okay的话就合然后发release, after explanation that current main uses merge then tag-triggered publication and future atomic release automation is a separate unfinished ticket. Latest stable is0.9.0; this delivery adds ingestion and paragraph anchor capabilities, assessed minor, yielding0.10.0. Prepare the stable candidate without implementing future release automation. Publication and post-publication asset verification follow docs/RELEASE.md under the same explicit user authorization.",
+  "context_refs": [
+    {
+      "purpose": "Current supported manual release and asset verification procedure.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Tag-triggered build and GitHub release publisher.",
+      "ref": ".github/workflows/release.yml"
+    },
+    {
+      "purpose": "Historical independent integration proof to preserve.",
+      "ref": ".vibehub/outcomes/ticket-integrate-absorption-with-main/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "reviewable-release-scope",
+          "identity": "sha256:5045e6a4f4ae4fca580d334e231b92439460841b8e74651ecb77143babab1738",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "stable-identity",
+          "identity": "sha256:e52fe9575ebcae4fbfff15de4fab56f1890b5b0962cfe63163b4ee26f7ebad85",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verified-candidate",
+          "identity": "sha256:451a9068877edabc6ce2f283ee11600fe7e5b80ef132ea25b6dcf498fe2e8748",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:2ede9d0dc8f3db76cfcf5848a999cf61cc4d108dffbc25171fe4586b50778be2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "PR136 contains a verified stable 0.10.0 release candidate ready for the user-authorized merge and current documented tag-triggered publication.",
+  "provenance_refs": [
+    "conversation:2026-09-07-owner-merge-and-release",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-prepare-v0100-release"
+}

@@ -116,7 +116,7 @@
     },
     {
       "purpose": "Existing execution-discovers-work transition reused for late boundaries.",
-      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+      "ref": "skills/vibehub-review/references/ticket-lifecycle.json"
     },
     {
       "purpose": "Planning Prompt that identifies known boundaries and owns replanning.",

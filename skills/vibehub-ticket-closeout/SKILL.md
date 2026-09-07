@@ -28,7 +28,7 @@ you tried, and report that this Ticket cannot be adjudicated from here. An
 executor grading its own work is the one failure this Skill exists to prevent,
 and `ticket closeout` rejects an Outcome that declares no source.
 
-Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../vibehub-review/references/ticket-lifecycle.json` before acting.
 Read `../vibehub-core/contracts/acceptance-authority.md`. A human-authority criterion can be
 accepted only when the Outcome references Evidence with `origin: human` that
 faithfully records explicit human input. Agent-origin Evidence may support the
@@ -67,7 +67,7 @@ and never closes a later active revision.
    ```
 
 5. Read `ticket frontier` back. Only a successful Outcome unlocks direct
-   dependents. Follow `closeout-recorded`: ask `$vibehub-ticket-review` to
+   dependents. Follow `closeout-recorded`: ask `$vibehub-review` to
    present the exact Ticket's Log, then report the result and any concrete
    follow-up gap. A durable cross-ticket fact revealed by adjudication is
    delegated to `$vibehub-ingest`, placed in the Ticket's room. Do not create

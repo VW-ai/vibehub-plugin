@@ -258,7 +258,7 @@ test("every Ticket context consumer uses the shared current-or-history resolver"
     "vibehub-ticket-run",
     "vibehub-ticket-validate",
     "vibehub-query",
-    "vibehub-ticket-review",
+    "vibehub-review",
   ]) {
     const body = bodies.get(name);
     assert.ok(body.includes(command), `${name} must use the shared resolver command`);

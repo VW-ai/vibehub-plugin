@@ -7,7 +7,7 @@ description: Shared helper script, schemas, and templates that every other VibeH
 
 This folder is infrastructure for the VibeHub Skills, not a workflow. Do not
 invoke it. The Skills that drive work are `vibehub-ticket-plan`,
-`vibehub-ticket-run`, `vibehub-ticket-closeout`, `vibehub-ticket-review`,
+`vibehub-ticket-run`, `vibehub-ticket-closeout`, `vibehub-review`,
 `vibehub-ingest`, and the rest of the `vibehub-*` set; each one references
 the files below as `../vibehub-core/...`.
 
@@ -17,7 +17,7 @@ the files below as `../vibehub-core/...`.
   materialization, and append-only Acceptance/Contract mutation helpers.
 - `contracts/revision-identity.md` — human-readable semantic identity contract.
 - `scripts/vh-ui.mjs` — read-only loopback host for the local graph UI
-  (assets live in `../vibehub-ticket-review/assets`).
+  (assets live in `../vibehub-review/assets`).
 - `contracts/` — JSON Schemas and written contracts the Skills cite.
 - `templates/github/` — files `vibehub-setup` offers to copy into a project
   once, when the user opts into mirroring Tickets to GitHub Issues.

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 
-const root = join(process.cwd(), "skills/vibehub-ticket-review/assets");
+const root = join(process.cwd(), "skills/vibehub-review/assets");
 const html = readFileSync(join(root, "index.html"), "utf8");
 const css = readFileSync(join(root, "app.css"), "utf8");
 const script = readFileSync(join(root, "app.js"), "utf8");

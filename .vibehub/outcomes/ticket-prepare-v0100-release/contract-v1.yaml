@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "reviewable-release-scope",
+    "stable-identity",
+    "verified-candidate"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-07T08:17:43.423729+00:00",
+  "contract_revision": {
+    "identity": "sha256:2ede9d0dc8f3db76cfcf5848a999cf61cc4d108dffbc25171fe4586b50778be2",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-independent-release-closeout"
+  ],
+  "independence": {
+    "note": "Fresh /root/release_preparation_closeout Agent received bounded read-only handoff, separate from executor; independently read exact contract/source/evidence/PR and reran verification. Writes limited to this Ticket Evidence and Outcome through helper.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent preparation closeout accepts all three Contract v1 criteria at e0aae28: stable 0.10.0 identity and gates; 311-test/artifact/validator/Room checks and immutable historical proofs; reviewable PR136 authorization, minor scope and known partials. Publication is not claimed and must follow documented final CI, merged-main tag and asset verification.",
+  "ticket_id": "ticket-prepare-v0100-release",
+  "unresolved_acceptance_ids": []
+}

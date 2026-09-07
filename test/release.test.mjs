@@ -15,10 +15,10 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("v0.9.0 release identity is consistent and dependency-free", () => {
-  const identity = verifyReleaseTag("v0.9.0");
-  assert.equal(identity.version, "0.9.0");
-  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.9.0"]));
+test("v0.10.0 release identity is consistent and dependency-free", () => {
+  const identity = verifyReleaseTag("v0.10.0");
+  assert.equal(identity.version, "0.10.0");
+  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.10.0"]));
 });
 
 function git(repo, ...args) {
@@ -261,7 +261,8 @@ test("the canonical entry routes through existing Setup and Ticket Plan", () => 
 test("release is GitHub-only, reproducible, and documented", () => {
   const changelog = read("CHANGELOG.md");
   assert.match(changelog, /## 0\.9\.0 — 2026-09-04/u);
-  assert.doesNotMatch(changelog, /## Unreleased/u);
+  assert.doesNotMatch(changelog, /^## Unreleased$/mu);
+  assert.match(changelog, /^## 0\.10\.0 — 2026-09-07$/mu);
   assert.match(changelog, /## 0\.8\.0 — 2026-08-13/u);
 
   const workflow = read(".github/workflows/release.yml");

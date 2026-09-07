@@ -7,21 +7,26 @@ import { runInNewContext } from "node:vm";
 import { denseGraphFixtures } from "../test/fixtures/dense-graph-fixtures.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const APP_PATH = "skills/vibehub-ticket-review/assets/app.js";
+const APP_PATH = "skills/vibehub-review/assets/app.js";
+// Baselines are read out of historical commits, where the presentation Skill
+// was still named vibehub-ticket-review. The rename must not invalidate them.
+const LEGACY_APP_PATH = "skills/vibehub-ticket-review/assets/app.js";
 const VIEWPORTS = Object.freeze([
   { width: 1440, height: 960 },
   { width: 1180, height: 820 },
 ]);
 
-function gitShow(ref, path) {
-  const result = spawnSync("git", ["show", `${ref}:${path}`], {
-    cwd: ROOT,
-    encoding: "utf8",
-  });
-  if (result.status !== 0) {
-    throw new Error(result.stderr || `Unable to read ${ref}:${path}`);
+function gitShow(ref, ...paths) {
+  let failure = null;
+  for (const path of paths) {
+    const result = spawnSync("git", ["show", `${ref}:${path}`], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    if (result.status === 0) return result.stdout;
+    failure ??= result.stderr;
   }
-  return result.stdout;
+  throw new Error(failure || `Unable to read ${ref}:${paths[0]}`);
 }
 
 function functionSource(source, name) {
@@ -33,7 +38,7 @@ function functionSource(source, name) {
 }
 
 function baselineModel(ref, direction) {
-  const source = gitShow(ref, APP_PATH);
+  const source = gitShow(ref, APP_PATH, LEGACY_APP_PATH);
   const layoutName = direction === "ttb" && ref === "v0.7.0"
     ? "layoutGraphTopToBottom"
     : "layoutGraph";
@@ -62,7 +67,7 @@ function baselineModel(ref, direction) {
 function currentModel() {
   const source = readFileSync(resolve(
     ROOT,
-    "skills/vibehub-ticket-review/assets/app-layout.js",
+    "skills/vibehub-review/assets/app-layout.js",
   ), "utf8");
   const sandbox = {};
   sandbox.globalThis = sandbox;

@@ -1,0 +1,93 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "documented-where-it-is-needed",
+      "criterion": "`vibehub-distill/SKILL.md` and `skills/vibehub-ingest/references/bulk-absorption.md` name the exact command where they currently say to write a room.yaml, and neither implies a raw file write is the expected path.",
+      "identity": "sha256:2bbdcca51dc3fffa0fc53f1a8718cb46a736d008a9720a406fb09991838c3518",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "overlap-checked-on-write",
+      "criterion": "A Room whose anchors overlap an existing Room's territory is rejected by the write itself, with the same message repository validation gives, rather than being written and discovered later.",
+      "identity": "sha256:0add99184474f3ca846499ff307559bee07aef704e48036bac1a03d6a49aedc7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "regression",
+      "criterion": "Tests cover creating a Room, replacing one, rejecting an invalid document, rejecting an overlapping one, and that a Room created through the operation is byte-comparable with the hand-written form it replaces.",
+      "identity": "sha256:c445b7a157dbca73cffa0997f0ee0238f16feb7a8cb5829437d41e74f3616be9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "room-write-operation",
+      "criterion": "`vh.mjs room put --repo <root> --room <path> --input <room.json>` creates or replaces a Room document, validating it against room.schema.json and rejecting an invalid one without writing, in the same envelope shape as `context put`.",
+      "identity": "sha256:e124c8768914cd5f3f4db7d2c2671b817e19073e134eab4d9ad942dfc8683bf5",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not add a delete operation; removing a Room stays a git rm, consistent with how Context documents are moved with git.",
+    "Do not let the write stamp alignment; `room align` stays the only thing that stamps.",
+    "Keep the bare-invocation behaviour compatible with test/skill-contracts.test.mjs, which re-invokes every command it finds in a SKILL.md without arguments."
+  ],
+  "context": "The first real user of the bulk absorption pipeline reported that Pass 3 instructs the Agent to delegate Room writing to $vibehub-distill, but roomOperation supports only drift, tree, align and stale. Rooms are created by hand-writing .vibehub/rooms/<path>/room.yaml, and neither bulk-absorption.md nor vibehub-distill/SKILL.md says so — distill step 4 says write its room.yaml without saying that means a raw file write. A fresh Agent looks for a command and does not find one, then either stalls or invents a path.",
+  "context_refs": [
+    {
+      "purpose": "The step that says to write a room.yaml without naming a command.",
+      "ref": "skills/vibehub-distill/SKILL.md"
+    },
+    {
+      "purpose": "Pass 3 delegates Room writing to a Skill that has no write command.",
+      "ref": "skills/vibehub-ingest/references/bulk-absorption.md"
+    },
+    {
+      "purpose": "What the write must validate against.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "documented-where-it-is-needed",
+          "identity": "sha256:2bbdcca51dc3fffa0fc53f1a8718cb46a736d008a9720a406fb09991838c3518",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "overlap-checked-on-write",
+          "identity": "sha256:0add99184474f3ca846499ff307559bee07aef704e48036bac1a03d6a49aedc7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression",
+          "identity": "sha256:c445b7a157dbca73cffa0997f0ee0238f16feb7a8cb5829437d41e74f3616be9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "room-write-operation",
+          "identity": "sha256:e124c8768914cd5f3f4db7d2c2671b817e19073e134eab4d9ad942dfc8683bf5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:64c4c2068a317f7ac68a8d2f1a102d248720a02031bad738be1fa5a49a484fd7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Creating a Room is a helper operation an Agent can find and run, so the pipeline step that says to delegate Room writing names something that exists.",
+  "provenance_refs": [
+    "conversation:2026-09-01-peel-rerun-pass3-human-gate",
+    "commit:bf2eb1a"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-give-rooms-a-write-operation"
+}

@@ -1,0 +1,9 @@
+Verified identical inode for real macOS .VIBEHUB alias
+Rejected write, validation, coverage and drift: .VIBEHUB/evidence/probe
+Rejected write, validation, coverage and drift: .VIBEHUB/evidence/probe/notes.md
+Rejected write, validation, coverage and drift: .VIBEHUB/evidence/probe/notes.md#internal
+Nested mixed-case walk excludes internals and retains similarly named source: {"ok":true,"data":{"rooms":[{"room":"docs","files":[{"path":"docs/deep/.VIBEHUB-notes/notes.md","skipped":null,"segment_count":1,"uncovered":["docs/deep/.VIBEHUB-notes/notes.md#one"]}],"uncovered":1,"unresolved_anchors":[]}],"files_examined":1,"segments_total":1,"uncovered_total":1}}
+Symlink remains excluded: alias/probe
+Symlink remains excluded: alias/probe/notes.md
+Symlink remains excluded: alias/probe/notes.md#internal
+All independent retry probes passed.

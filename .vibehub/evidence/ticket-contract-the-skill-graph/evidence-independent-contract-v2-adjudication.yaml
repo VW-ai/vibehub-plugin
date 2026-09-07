@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "graph-contract",
+    "no-runtime-role",
+    "retired-names-stay-retired",
+    "validation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-contract",
+      "identity": "sha256:a2305576693b4da4c9080fd5935bd8a2b4dd7e90e50bf7317d500603e5a65648",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "no-runtime-role",
+      "identity": "sha256:021926967ece9b6611e420782abe03fb5b8a6bad161207ff0231012d7e5369c6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "retired-names-stay-retired",
+      "identity": "sha256:684e9214f1aed7d5924d9c66b1f067f2eb9f079c1897016b2cbbb851d6f3e4b2",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "validation",
+      "identity": "sha256:dcb4a6f62c8122d326e66267b2087e7cf08f5d52032ca30095947826ac16eab8",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-independent-contract-v2-adjudication",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-07T07:00:36.518871+00:00",
+  "refs": [
+    "skills/vibehub-setup/SKILL.md",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/skill-graph.json",
+    "test/skill-graph.test.mjs",
+    "test/retired-skill-folders.test.mjs",
+    "command:node --test test/skill-graph.test.mjs test/retired-skill-folders.test.mjs",
+    "command:node skills/vibehub-core/scripts/vh.mjs skills validate --repo .",
+    "command:node skills/vibehub-core/scripts/vh.mjs ticket validate --repo ."
+  ],
+  "schema_version": 2,
+  "summary": "Independent subagent adjudication at commit 556ec78 after reading active Contract v2, its exact acceptance identities, existing Evidence, the v1 historical Outcome, current source and scoped diff. Re-ran node --test test/skill-graph.test.mjs test/retired-skill-folders.test.mjs: 44 tests, 44 pass, zero failures. This exercises all six graph failure modes, occurrence-specific and stale allowances, dated META rejection, structural Context and history exemptions, duplicate-key/raw-byte cases, and active-Contract historical exemption (v1 success does not exempt revised live Ticket; v2 partial does not exempt it; v2 success does). Re-ran skills validate --repo .: valid, 12 Skills, 19 edges, 9 events, 1253 files scanned. ticket validate --repo .: valid, 121 Tickets, 378 Evidence, 112 Outcomes before this closeout. SHA-256 manifest of all 762 files under .vibehub before and after skills validate is identical, confirming no validation output persisted. Reviewed current graph declarations and lifecycle event ownership against source; graph-contract, validation, and retired-names-stay-retired v2 accepted. No-runtime-role FAILED: setup SKILL.md lines 28-34 requires skills retired and explicitly says the retired names come from the packaged skill-graph contract. vh.mjs lines 4357 and 4365 locate and read that contract at setup runtime. Reproduction performed outside repository: copy skills/vibehub-core to a temporary directory; create a separate fake project with .agents/skills/vibehub-ticket-review; run copied scripts/vh.mjs skills retired --repo fake-project. It reports the installed retired Skill with replacement vibehub-review. Change only the COPIED contracts/skill-graph.json retired property to [] and repeat: retired becomes []. Both calls succeed. This proves setup behavior consumes the contract, despite runtime_role:none and the existing development-time-only test passing. Temporary probe directory removed. Read git show d3289c2:skills/vibehub-core/scripts/vh.mjs (lines 2944,2952) and d3289c2:skills/vibehub-setup/SKILL.md (lines 28,34): the same packaged-contract read and setup command already exist before merge, so this is an existing contractual mismatch, not introduced by integrating main. No code or acceptance change made. The test named development-time only checks metadata and a narrow write-call string, not absence of runtime readers; its green status cannot satisfy that criterion. Historical v1 success remains immutable; this evidence and native partial Outcome adjudicate only current exact Contract v2. Full 311-test suite was not independently rerun; only the stated 44 scoped tests and two validators are claimed.",
+  "ticket_id": "ticket-contract-the-skill-graph"
+}

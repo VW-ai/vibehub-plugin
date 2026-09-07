@@ -1,0 +1,40 @@
+{
+  "context_id": "decision-retire-ticket-review-skill-name",
+  "detail": "该 Skill 从此同时展示 Ticket 图与 Room 树，旧名只描述了一半职责，会误导读技能列表的 Agent 与人，因此改名是正确性修复而非命名偏好。发布方式是干净断裂：不保留 deprecation stub，因为 stub 帮不到真正受影响的人。破坏面已核实且有限——Claude Code 与 Codex marketplace 安装不受影响，其插件缓存按版本隔离；`npx skills add` 会把 Skill 目录复制进项目且不清理上游已消失的目录，因此更新后旧的 vibehub-ticket-review/ 可能与新的 vibehub-review/ 并存，向 Agent 同时呈现两个同职责 Skill，需手动删除一次；任何写死 `-s vibehub-ticket-review` 的脚本必须改为 `-s vibehub-review`。已落盘的 Evidence、Outcome 与已关闭 Ticket 中的旧名一律不改写，它们是记录；改名暴露出的引用校验缺陷已单独修复。CHANGELOG 条目按本仓库策略在发版时才写，不设 Unreleased 段。僵尸目录的检测归 setup，另票处理。",
+  "evidence": [
+    {
+      "note": "提案中的 Skill topology 一节说明为什么展示职责应收敛为一个 Skill。",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "面向用户记录了 npx skills add 更新后遗留旧目录需手动删除。",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "note": "执行改名并要求历史记录不被改写的 Ticket。",
+      "ref": ".vibehub/tickets/ticket-generalize-review-to-room-trees.yaml"
+    },
+    {
+      "note": "把僵尸目录检测单独立票，因为它是任何改名的共同后果。",
+      "ref": ".vibehub/tickets/ticket-detect-retired-skill-folders-after-update.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-29T00:00:00Z",
+    "quote": "干净断裂 + 记录",
+    "ref": "conversation:2026-08-29-peel-knowledge-ingestion"
+  },
+  "state": "active",
+  "summary": "vibehub-ticket-review 改名 vibehub-review，作为一次刻意的干净断裂发布，不留兼容 stub",
+  "tags": [
+    "skill-topology",
+    "breaking-change",
+    "release",
+    "naming",
+    "review"
+  ],
+  "type": "decision"
+}

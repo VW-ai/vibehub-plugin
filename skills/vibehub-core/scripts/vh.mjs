@@ -4,6 +4,7 @@ import {
   lstatSync,
   mkdirSync,
   readFileSync,
+  readlinkSync,
   realpathSync,
   readdirSync,
   renameSync,
@@ -92,10 +93,12 @@ function parseArgs(argv) {
   const rooms = [];
   let scope = null;
   let delivery = null;
+  let path = null;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--repo") repo = argv[++index] ?? "";
     else if (value === "--input") inputPath = argv[++index] ?? "";
+    else if (value === "--path") path = argv[++index] ?? "";
     else if (value === "--room") {
       room = argv[++index] ?? "";
       rooms.push(room);
@@ -110,7 +113,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...; context operations include put and resolve; project operations include init, compatibility, migrate-mechanical, migrate-proof-revisions, and validate",
+      "Usage: vh.mjs <context|room|ticket|project|source|skills> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]... [--path <file>]; context supports resolve; project supports migrate-mechanical and migrate-proof-revisions",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -125,6 +128,7 @@ function parseArgs(argv) {
     rooms,
     scope,
     delivery,
+    path,
   };
 }
 
@@ -316,6 +320,81 @@ export function resolveTicketContextRef(repo, ref) {
 
 function add(errors, path, message) {
   errors.push({ path, message });
+}
+
+// Unverifiable is not failure. A closed Ticket's context ref that cannot be
+// checked because git is absent, the clone is shallow, or the commit was
+// garbage-collected is reported so a human can see it, but it does not fail
+// validation: failing would reintroduce exactly the brittleness this split
+// removes — a checked-in record would once again depend on the ambient
+// environment (git on PATH, full history) rather than on its own content.
+function addUnverifiable(unverifiable, path, message) {
+  unverifiable.push({ path, message });
+}
+
+// git that never throws and never inherits stdio: absent from PATH, a
+// non-repository directory, and an unknown revision all return null. Callers
+// treat null as "cannot verify", never as "verified absent".
+function gitQuiet(repo, args) {
+  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (result.error || result.status !== 0) return null;
+  return result.stdout;
+}
+
+const COMMIT_SHA = /^[0-9a-f]{7,40}$/u;
+
+// True only when <commit>:<path> is a readable regular file (blob) at that
+// commit. Anything else — missing commit, missing path, a tree — is false.
+function blobExistsAt(repo, commit, path) {
+  return (gitQuiet(repo, ["cat-file", "-t", `${commit}:${path}`]) ?? "").trim() === "blob";
+}
+
+// Which commit is "the commit recorded for this Ticket"? Three sources exist
+// in this repository's own data, and they are tried in this order:
+//
+//   1. `commit:<sha>` entries in the Ticket's provenance_refs — the most
+//      explicit statement anyone made about which commit this Ticket concerns.
+//   2. `delivered_commit` on the Ticket's deliveries — the commit the delivery
+//      actually landed as.
+//   3. The commit that recorded the Ticket's Outcome, from git's own history of
+//      .vibehub/outcomes/<id>.yaml.
+//
+// (3) is the load-bearing one and is deliberately last-resort-but-universal:
+// the Outcome schema has no commit field at all, and most closed Tickets here
+// carry neither a provenance commit nor a delivered_commit. (3) is also the
+// most defensible source available: it is git's own record of the tree as it
+// stood at the moment the Ticket was closed, it exists for every genuinely
+// closed and committed Ticket, and it requires editing no checked-in document
+// to come into being.
+function ticketCommitResolver(repo) {
+  const cache = new Map();
+  return (document) => {
+    const id = document.ticket_id;
+    if (cache.has(id)) return cache.get(id);
+    const candidates = [];
+    for (const provenance of document.provenance_refs ?? []) {
+      if (typeof provenance !== "string" || !provenance.startsWith("commit:")) continue;
+      // Provenance may point at one path inside a commit: "commit:<sha>:<path>".
+      const sha = provenance.slice("commit:".length).split(":")[0];
+      if (COMMIT_SHA.test(sha)) candidates.push(sha);
+    }
+    for (const delivery of document.deliveries ?? []) {
+      const sha = delivery?.delivered_commit;
+      if (typeof sha === "string" && COMMIT_SHA.test(sha)) candidates.push(sha);
+    }
+    const outcomePath = `.vibehub/outcomes/${id}.yaml`;
+    const closeout = (gitQuiet(repo, ["log", "-1", "--format=%H", "--", outcomePath, `.vibehub/outcomes/${id}/`]) ?? "").trim();
+    if (COMMIT_SHA.test(closeout)) candidates.push(closeout);
+    // Keep only commits this checkout can actually read: a shallow clone or a
+    // dropped object turns a candidate into "unverifiable", not into a failure.
+    const readable = [];
+    for (const sha of candidates) {
+      if (readable.includes(sha)) continue;
+      if (gitQuiet(repo, ["cat-file", "-e", `${sha}^{commit}`]) !== null) readable.push(sha);
+    }
+    cache.set(id, readable);
+    return readable;
+  };
 }
 
 function requiredString(errors, document, key, path, { id = false } = {}) {
@@ -1255,7 +1334,7 @@ function validateRoom(document, path = "room") {
     !strictKeys(
       errors,
       document,
-      new Set(["schema_version", "kind", "room_id", "description", "boundary", "anchors", "alignment", "stale", "stale_reason"]),
+      new Set(["schema_version", "kind", "room_id", "description", "boundary", "anchors", "alignment", "stale", "stale_reason", "coverage_exceptions"]),
       path,
     )
   ) return errors;
@@ -1265,9 +1344,35 @@ function validateRoom(document, path = "room") {
   requiredString(errors, document, "description", path);
   requiredString(errors, document, "boundary", path);
   stringArray(errors, document.anchors ?? null, `${path}.anchors`);
+  if (Array.isArray(document.anchors)) document.anchors.forEach((anchor, index) => {
+    if (typeof anchor !== "string") return;
+    const parsed = parseAnchor(anchor);
+    if (parsed.error) add(errors, `${path}.anchors[${index}]`, parsed.error);
+  });
   if (typeof document.stale !== "boolean") add(errors, `${path}.stale`, "must be a boolean");
   if (document.stale_reason !== undefined && (typeof document.stale_reason !== "string" || !document.stale_reason.trim())) {
     add(errors, `${path}.stale_reason`, "must be a non-empty string when present");
+  }
+  // A segment that yields no Context is a decision, not an omission: the room
+  // that owns the anchor records the segment id and the stated reason. Optional
+  // so every room written before this field existed still validates.
+  if (document.coverage_exceptions !== undefined) {
+    if (!Array.isArray(document.coverage_exceptions)) {
+      add(errors, `${path}.coverage_exceptions`, "must be an array when present");
+    } else {
+      const seen = new Set();
+      document.coverage_exceptions.forEach((item, index) => {
+        const itemPath = `${path}.coverage_exceptions[${index}]`;
+        if (strictKeys(errors, item, new Set(["segment", "reason"]), itemPath)) {
+          requiredString(errors, item, "segment", itemPath);
+          requiredString(errors, item, "reason", itemPath);
+          if (typeof item.segment === "string") {
+            if (seen.has(item.segment)) add(errors, `${itemPath}.segment`, "must be unique");
+            seen.add(item.segment);
+          }
+        }
+      });
+    }
   }
   if (document.alignment !== undefined
     && strictKeys(errors, document.alignment, new Set(["last_aligned_commit", "checked_at", "anchor_hashes"]), `${path}.alignment`)) {
@@ -1805,6 +1910,83 @@ export function currentOutcome(repository, ticket) {
 
 const ROOM_FILE = "room.yaml";
 
+// An anchor is one of two things, and both name a *set of segments*:
+//   - a path prefix, "src/auth", naming every segment of every file under it;
+//   - a segment id, "docs/prd.md#fork-flow" or "src/app.html#L120-179", exactly
+//     the ids `source segment` emits, naming that one segment and no other.
+// The "#" is the discriminator, so every anchor written before segment anchors
+// existed parses as a path prefix and behaves exactly as it did.
+//
+// The split is at the LAST "#", not the first, because a segment id is built as
+// `<file path>#<slug>` and a file path may itself contain "#". Splitting at the
+// first "#" made `source segment`'s own output for docs/a#b.md — the id
+// "docs/a#b.md#_preamble" — parse as a segment of the nonexistent file "docs/a",
+// so it resolved to nothing and spuriously collided with a real "docs/a" anchor.
+// The slug side is what `source segment` mints and never contains "#" (heading
+// slugs are [a-z0-9-], line ranges are L<n>-<n>, and _preamble is fixed), so the
+// last "#" is exactly the boundary the id was assembled at.
+//
+// The cost: a whole anchor string is read slug-side-first, so an anchor naming a
+// FILE whose own name contains "#" ("docs/a#b.md", meaning "all of that file")
+// is unreachable — it parses as segment "b.md" of "docs/a". That reading loses,
+// on purpose; see the anchor-parsing note in the Ticket evidence.
+// Normalisation is deliberately lexical: no stat, realpath or symlink lookup.
+// Parent traversal is rejected rather than collapsed, since collapsing it can
+// disagree with filesystem traversal through a symlink. Slugs remain verbatim.
+function parseAnchor(anchor) {
+  const hash = anchor.lastIndexOf("#");
+  const rawPath = hash === -1 ? anchor : anchor.slice(0, hash);
+  const parts = rawPath.split("/");
+  const path = parts.filter((part) => part && part !== ".").join("/");
+  let error = null;
+  if (!path) error = "anchor must name non-empty territory below the repository root; root anchors are not allowed";
+  else if (rawPath.startsWith("/") || /^[A-Za-z]:/u.test(rawPath) || rawPath.includes("\\") || parts.includes("..")) {
+    error = "anchor must be repository-relative, without parent traversal or backslashes";
+  } else if (isInternalSourcePath(path)) {
+    error = "anchor must not include .vibehub or .git internal documents";
+  }
+  return { path, segment: hash === -1 ? null : `${path}#${anchor.slice(hash + 1)}`, error };
+}
+
+function isInternalSourcePath(path) {
+  return path.split("/").some((part) => part.toLowerCase() === ".vibehub" || part.toLowerCase() === ".git");
+}
+
+// Two anchors collide when the segment sets they name intersect. That is decided
+// here in closed form rather than by segmenting files, and the two agree:
+// segments of one file are disjoint by construction, so two segment anchors
+// intersect only when they are the same id; a prefix owns every segment of every
+// file beneath it, so a prefix and a segment anchor intersect exactly when the
+// prefix covers the segment's file; and two prefixes name disjoint file sets
+// unless one contains the other. The rule is over *declared* territory: an
+// anchor that currently matches no file on disk still claims it.
+function anchorsCollide(a, b) {
+  if (a.segment !== null && b.segment !== null) return a.segment === b.segment;
+  if (a.segment !== null) return anchorMatches(b.path, a.path);
+  if (b.segment !== null) return anchorMatches(a.path, b.path);
+  return a.path === b.path || a.path.startsWith(`${b.path}/`) || b.path.startsWith(`${a.path}/`);
+}
+
+// The single definition of "these two rooms claim the same territory". Both the
+// repository-wide check in loadRooms and the write-time check in `room put`
+// call it, so a change to what overlap means lands in both at once. Returns the
+// anchors of A that collide with an anchor of B; an empty array means no clash.
+function overlappingTerritory(pathA, documentA, pathB, documentB) {
+  // A room nested inside the other is allowed to share territory: containment
+  // already says which one is the more specific owner.
+  if (pathA === pathB || pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) return [];
+  const anchorsB = (Array.isArray(documentB?.anchors) ? documentB.anchors : [])
+    .filter((anchor) => typeof anchor === "string")
+    .map(parseAnchor);
+  return (Array.isArray(documentA?.anchors) ? documentA.anchors : [])
+    .filter((anchorA) => typeof anchorA === "string"
+      && anchorsB.some((anchorB) => anchorsCollide(parseAnchor(anchorA), anchorB)));
+}
+
+function overlappingTerritoryMessage(pathA, pathB, overlapping) {
+  return `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`;
+}
+
 // Rooms are directories: the path carries containment, room.yaml carries the
 // room's own description. Every other .yaml inside a room is a Context entry.
 function loadRooms(roomsPath) {
@@ -1850,16 +2032,9 @@ function loadRooms(roomsPath) {
     for (let right = left + 1; right < entries.length; right += 1) {
       const [pathA, roomA] = entries[left];
       const [pathB, roomB] = entries[right];
-      if (pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) continue;
-      const overlapping = (Array.isArray(roomA.document?.anchors) ? roomA.document.anchors : [])
-        .filter((anchorA) => (Array.isArray(roomB.document?.anchors) ? roomB.document.anchors : [])
-          .some((anchorB) => {
-            const a = anchorA.replace(/\/+$/u, "");
-            const b = anchorB.replace(/\/+$/u, "");
-            return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
-          }));
+      const overlapping = overlappingTerritory(pathA, roomA.document, pathB, roomB.document);
       if (overlapping.length > 0) {
-        add(errors, roomA.path, `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`);
+        add(errors, roomA.path, overlappingTerritoryMessage(pathA, pathB, overlapping));
       }
     }
   }
@@ -1923,6 +2098,7 @@ export function loadRepository(repo, overrides = {}) {
     outcomes.documents.set(document.ticket_id, entry);
   }
   const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
+  const unverifiable = [];
   for (const { document, path } of contexts.documents.values()) {
     for (const relation of document.relations ?? []) {
       if (!contexts.documents.has(relation.target_context_id)) {
@@ -1930,13 +2106,35 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
+  const recordedCommits = ticketCommitResolver(repo);
   for (const { document, path } of tickets.documents.values()) {
+    const closed = outcomes.documents.has(document.ticket_id);
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
+      // Immutable commit refs and current paths use main's strict shared
+      // resolver. Missing plain paths on closed Tickets retain the historical
+      // fallback; malformed/explicit historical refs never gain that fallback.
       try {
         resolveTicketContextRef(repo, ref);
+        continue;
       } catch (error) {
-        add(errors, path, error instanceof Error ? error.message : `unreadable Ticket context ref: ${String(ref)}`);
+        const target = typeof ref === "string" ? resolve(repo, ref) : "";
+        const fallback = typeof ref === "string" && !ref.startsWith("commit:")
+          && !isAbsolute(ref) && target.startsWith(`${repo}${sep}`)
+          && !existsSync(target) && closed;
+        if (!fallback) {
+          add(errors, path, error instanceof Error ? error.message : `unreadable Ticket context ref: ${String(ref)}`);
+          continue;
+        }
+      }
+      const commits = recordedCommits(document);
+      if (commits.length === 0) {
+        addUnverifiable(unverifiable, path,
+          `unverifiable Ticket context ref: ${ref} (closed Ticket; no recorded commit is readable here)`);
+        continue;
+      }
+      if (!commits.some((commit) => blobExistsAt(repo, commit, ref))) {
+        add(errors, path, `unreadable Ticket context ref: ${ref} (absent from the working tree and from recorded commit ${commits[0].slice(0, 8)})`);
       }
     }
     for (const relation of document.relations ?? []) {
@@ -2046,7 +2244,7 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
-  return { paths, rooms, contexts, tickets, evidence, outcomes, errors };
+  return { paths, rooms, contexts, tickets, evidence, outcomes, errors, unverifiable };
 }
 
 export function assertValid(errors, message = "VibeHub validation failed") {
@@ -2118,6 +2316,7 @@ function contextOperation(operation, repo, input, options = {}) {
   const repository = loadRepository(repo);
   assertValid(repository.errors);
   if (operation === "validate") return { valid: true, context_count: repository.contexts.documents.size };
+  if (operation === "coverage") return contextCoverage(repo, repository, options.room ?? null);
   if (operation === "get") {
     if (typeof input.context_id !== "string" || !ID.test(input.context_id)) {
       throw new VibeHubError("invalid_input", "context get needs a valid context_id");
@@ -2251,6 +2450,20 @@ export function ticketNextAction(repository, ticket) {
   const humanEvidencedIds = new Set(ticketEvidence
     .filter((evidence) => evidenceOrigin(evidence) === "human")
     .flatMap((evidence) => evidence.acceptance_ids.filter((acceptanceId) => coversActive(evidence, acceptanceId))));
+  const missingAgentIds = currentAcceptance
+    .filter((criterion) => acceptanceAuthority(criterion) !== "human"
+      && !evidencedIds.has(criterion.acceptance_id))
+    .map((criterion) => criterion.acceptance_id);
+  if (missingAgentIds.length > 0) {
+    return {
+      action: "EXECUTE",
+      reason: "acceptance_evidence_incomplete",
+      detail: "Agent-authority criteria still need reproducible acceptance-linked Evidence; human authority is routed once it is the remaining blocker.",
+      acceptance_ids: missingAgentIds,
+      blocking_ticket_ids: [],
+    };
+  }
+
   const missingHumanIds = currentAcceptance
     .filter((criterion) => acceptanceAuthority(criterion) === "human"
       && !humanEvidencedIds.has(criterion.acceptance_id))
@@ -2259,29 +2472,20 @@ export function ticketNextAction(repository, ticket) {
     return {
       action: "NEEDS_HUMAN",
       reason: "missing_human_evidence",
-      detail: "Reachable human-authority criteria still need explicit human-origin Evidence.",
+      detail: "Every agent-authority criterion is evidenced; the reachable human-authority criteria still need explicit human-origin Evidence.",
       acceptance_ids: missingHumanIds,
       blocking_ticket_ids: [],
     };
   }
 
-  const missingEvidenceIds = currentAcceptance
-    .filter((criterion) => !evidencedIds.has(criterion.acceptance_id))
-    .map((criterion) => criterion.acceptance_id);
-  if (missingEvidenceIds.length === 0) {
-    return {
-      action: "CLOSE_OUT",
-      reason: "authority_satisfying_evidence_complete",
-      detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
-      acceptance_ids: acceptanceIds,
-      blocking_ticket_ids: [],
-    };
-  }
+  // Every agent-authority criterion is evidenced and every human-authority
+  // criterion carries human-origin Evidence, so the contract is fully
+  // satisfied and only independent adjudication remains.
   return {
-    action: "EXECUTE",
-    reason: "acceptance_evidence_incomplete",
-    detail: "Executable criteria still need reproducible acceptance-linked Evidence.",
-    acceptance_ids: missingEvidenceIds,
+    action: "CLOSE_OUT",
+    reason: "authority_satisfying_evidence_complete",
+    detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
+    acceptance_ids: acceptanceIds,
     blocking_ticket_ids: [],
   };
 }
@@ -2773,12 +2977,51 @@ function repoSnapshot(repo) {
   return snapshot;
 }
 
-function anchoredFiles(document, snapshot) {
-  const files = new Map();
+// The text of one segment, exactly as the file holds it, with the trailing
+// newline that terminates its last line. Hashing this and not the whole file is
+// what lets a room that anchors a segment stay FRESH while the rest of the file
+// moves underneath it.
+function segmentText(content, segment) {
+  return `${splitLines(content).slice(segment.start - 1, segment.end).join("\n")}\n`;
+}
+
+// What a room's alignment stamp records, one entry per anchored *unit*:
+//   - a path prefix contributes one entry per file it covers, keyed by the file
+//     path and holding git's blob hash — byte for byte what it recorded before
+//     segment anchors existed;
+//   - a segment anchor contributes exactly one entry, keyed by the segment id
+//     and holding the sha1 of that segment's bytes.
+// Both kinds live in the same `anchor_hashes` list because both answer the same
+// question: did the bytes this room was aligned against change?
+function anchoredUnits(repo, document, snapshot) {
+  const units = new Map();
+  const anchors = (document.anchors ?? []).filter((anchor) => typeof anchor === "string").map(parseAnchor);
+  const prefixes = anchors.filter((anchor) => anchor.segment === null);
   for (const [path, hash] of snapshot) {
-    if ((document.anchors ?? []).some((anchor) => anchorMatches(anchor, path))) files.set(path, hash);
+    if (isReadableSourcePath(repo, path) && prefixes.some((anchor) => anchorMatches(anchor.path, path))) units.set(path, hash);
   }
-  return files;
+  const byFile = new Map();
+  for (const anchor of anchors) {
+    if (anchor.segment === null) continue;
+    if (!byFile.has(anchor.path)) byFile.set(anchor.path, new Set());
+    byFile.get(anchor.path).add(anchor.segment);
+  }
+  for (const [path, wanted] of byFile) {
+    // A segment anchor on a file that is gone, unreadable, or binary resolves to
+    // nothing: the unit disappears from the current set and drift reports it as
+    // deleted, which is the honest answer.
+    if (!snapshot.has(path) || !isReadableSourcePath(repo, path)) continue;
+    const absolute = join(repo, path);
+    if (!existsSync(absolute) || !lstatSync(absolute).isFile()) continue;
+    const buffer = readFileSync(absolute);
+    if (isBinary(buffer)) continue;
+    const content = buffer.toString("utf8");
+    for (const segment of segmentFile(path, content)) {
+      if (!wanted.has(segment.id)) continue;
+      units.set(segment.id, createHash("sha1").update(segmentText(content, segment)).digest("hex"));
+    }
+  }
+  return units;
 }
 
 function headIsBehind(repo, baseline) {
@@ -2796,7 +3039,7 @@ export function projectRoomDrift(repo, loadedRepository = null) {
     if (document.stale === true) {
       let hashesMatch = null;
       if (document.alignment) {
-        const current = anchoredFiles(document, snapshot);
+        const current = anchoredUnits(repo, document, snapshot);
         const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
         hashesMatch = current.size === recorded.size
           && [...current].every(([path, blob]) => recorded.get(path) === blob);
@@ -2811,7 +3054,7 @@ export function projectRoomDrift(repo, loadedRepository = null) {
         reason: "checkout is older than the alignment baseline; never realign specs backwards",
       };
     }
-    const current = anchoredFiles(document, snapshot);
+    const current = anchoredUnits(repo, document, snapshot);
     const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
     const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
     const added = [...current.keys()].filter((path) => !recorded.has(path));
@@ -2824,7 +3067,87 @@ export function projectRoomDrift(repo, loadedRepository = null) {
   return { cold_start: false, rooms };
 }
 
+export function roomContextEntries(repository, roomPath) {
+  const prefix = join(repository.paths.rooms, ...roomPath.split("/")) + sep;
+  return [...repository.contexts.documents.values()]
+    .filter((item) => item.path.startsWith(prefix))
+    .sort((left, right) => left.document.context_id.localeCompare(right.document.context_id));
+}
+
+export function projectRoomTree(repo, loadedRepository = null) {
+  const repository = loadedRepository ?? loadRepository(repo);
+  assertValid(repository.errors);
+  let drift;
+  try {
+    drift = projectRoomDrift(repo, repository);
+  } catch (error) {
+    if (error?.code !== "git_error") throw error;
+    drift = {
+      cold_start: true,
+      rooms: [...repository.rooms.documents.keys()].map((room) => ({
+        room,
+        state: "UNKNOWN",
+        reason: "Git snapshot unavailable",
+      })),
+    };
+  }
+  const driftByRoom = new Map(drift.rooms.map((item) => [item.room, item]));
+  const rooms = [...repository.rooms.documents.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([roomPath, entry]) => {
+      const item = driftByRoom.get(roomPath) ?? { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+      return {
+        room: roomPath,
+        room_id: entry.document.room_id,
+        parent: roomPath.includes("/") ? roomPath.slice(0, roomPath.lastIndexOf("/")) : null,
+        description: entry.document.description,
+        boundary: entry.document.boundary,
+        drift: item.state === "UNKNOWN" ? { ...item, state: "COLD_START" } : item,
+        context_count: roomContextEntries(repository, roomPath).length,
+      };
+    });
+  return { cold_start: drift.cold_start, rooms };
+}
+
 function roomOperation(operation, repo, input, options = {}) {
+  // Creating a Room is a write like `context put`: validate the candidate
+  // first, refuse it whole if anything is wrong, and write nothing until every
+  // check has passed. Deleting a Room stays a `git rm` — there is no
+  // counterpart operation, on purpose.
+  if (operation === "put") {
+    assertCurrentProjectFormat(repo);
+    assertValid(validateRoom(input), "Room document is invalid");
+    if (!options.room) {
+      throw new VibeHubError("invalid_input", "a Room is its path; pass --room with the path this Room owns");
+    }
+    const slug = options.room.split("/").at(-1);
+    if (input.room_id !== slug) {
+      throw new VibeHubError("invalid_input", `room_id must equal its directory name: ${slug}`);
+    }
+    const repository = loadRepository(repo);
+    assertValid(repository.errors);
+    const parent = options.room.includes("/") ? options.room.slice(0, options.room.lastIndexOf("/")) : null;
+    if (parent && !repository.rooms.documents.has(parent)) {
+      throw new VibeHubError("not_found", `Parent room not found: ${parent}`);
+    }
+    // The overlap rule is enforced here, at the write, rather than left for a
+    // later `project validate` to discover in a tree that is already wrong.
+    for (const [otherPath, other] of repository.rooms.documents) {
+      const overlapping = overlappingTerritory(options.room, input, otherPath, other.document);
+      if (overlapping.length > 0) {
+        throw new VibeHubError(
+          "invalid_input",
+          overlappingTerritoryMessage(options.room, otherPath, overlapping),
+        );
+      }
+    }
+    const path = join(repository.paths.rooms, ...options.room.split("/"), ROOM_FILE);
+    const created = !repository.rooms.documents.has(options.room);
+    // Written exactly as given: no alignment is stamped here, so `room align`
+    // stays the only operation that can claim a Room is aligned with a commit.
+    writeDocument(path, input);
+    return { status: "written", room: options.room, room_id: input.room_id, created, path };
+  }
   if (operation === "align" || operation === "stale") {
     assertCurrentProjectFormat(repo);
   }
@@ -2833,13 +3156,16 @@ function roomOperation(operation, repo, input, options = {}) {
   if (operation === "drift") {
     return projectRoomDrift(repo, repository);
   }
+  if (operation === "tree") {
+    return projectRoomTree(repo, repository);
+  }
   const entry = repository.rooms.documents.get(options.room ?? "");
   if (!entry) throw new VibeHubError("not_found", `Room not found: ${options.room ?? "(missing --room)"}`);
   if (operation === "align") {
     if (entry.document.alignment && headIsBehind(repo, entry.document.alignment.last_aligned_commit)) {
       throw new VibeHubError("invalid_state", "checkout is older than the alignment baseline; refusing to realign backwards");
     }
-    const files = anchoredFiles(entry.document, repoSnapshot(repo));
+    const files = anchoredUnits(repo, entry.document, repoSnapshot(repo));
     const document = {
       ...entry.document,
       alignment: {
@@ -2863,6 +3189,1217 @@ function roomOperation(operation, repo, input, options = {}) {
   throw new VibeHubError("unsupported_operation", `Unsupported room operation: ${operation}`);
 }
 
+// ---------------------------------------------------------------------------
+// Source segmentation.
+//
+// Coverage can only be *recomputed* if segmentation is reproducible, so every
+// rule below is a pure function of the file's bytes: no clock, no locale, no
+// randomness, no stored state. Identical bytes always yield identical ids.
+// ---------------------------------------------------------------------------
+
+// A non-markdown segment holds at most this many lines.
+const SEGMENT_WINDOW_LINES = 60;
+// A window boundary may move backwards at most this far to land on a blank
+// line. Backwards only: moving forwards would break the "at most 60" promise.
+const SEGMENT_SNAP_RADIUS = 10;
+const MARKDOWN_EXTENSIONS = [".md", ".markdown"];
+// Content before a markdown file's first heading is its own segment. The slug
+// rule below can never produce a leading underscore, so this id cannot collide
+// with a heading slug.
+const PREAMBLE_SLUG = "_preamble";
+
+function isMarkdownPath(path) {
+  const lower = path.toLowerCase();
+  return MARKDOWN_EXTENSIONS.some((extension) => lower.endsWith(extension));
+}
+
+// Lines are 1-indexed everywhere in segment ids. A single trailing newline is
+// the line terminator of the last line, not the start of an empty one, so it is
+// dropped before splitting; an empty file therefore has zero lines and zero
+// segments.
+function splitLines(content) {
+  if (content === "") return [];
+  return (content.endsWith("\n") ? content.slice(0, -1) : content).split("\n");
+}
+
+// GitHub-shaped, but spelled out here so it never depends on a library or on a
+// locale: lowercase (String#toLowerCase is locale-independent; toLocaleLowerCase
+// is not), every run of characters that is neither a Unicode letter nor a
+// Unicode digit collapses to a single "-", and leading/trailing "-" are dropped.
+// Letters and digits are kept rather than restricted to ASCII so a CJK heading
+// keeps its identity instead of collapsing to a bare fallback.
+function headingSlug(text) {
+  const slug = text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/gu, "");
+  return slug || "section";
+}
+
+// Markdown splits at ATX heading boundaries. Headings inside fenced code blocks
+// are text, not structure, so fences are tracked and their contents ignored.
+function markdownSegments(path, lines) {
+  if (lines.length === 0) return [];
+  const boundaries = [];
+  let fence = null;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const fenceMatch = /^\s{0,3}(`{3,}|~{3,})/u.exec(line);
+    if (fenceMatch) {
+      const marker = fenceMatch[1][0];
+      if (fence === null) fence = marker;
+      else if (fence === marker) fence = null;
+      continue;
+    }
+    if (fence !== null) continue;
+    const heading = /^\s{0,3}#{1,6}\s+(.*)$/u.exec(line);
+    if (heading) boundaries.push({ line: index, text: heading[1].replace(/\s+#+\s*$/u, "").trim() });
+  }
+  const segments = [];
+  const firstHeading = boundaries.length > 0 ? boundaries[0].line : lines.length;
+  if (firstHeading > 0) {
+    segments.push({ id: `${path}#${PREAMBLE_SLUG}`, slug: PREAMBLE_SLUG, heading: null, start: 1, end: firstHeading });
+  }
+  // Two headings can slug identically. Disambiguation is positional and
+  // deterministic: the first occurrence keeps the bare slug, the nth gets
+  // "-<n>" appended, in file order.
+  const seen = new Map();
+  boundaries.forEach((boundary, index) => {
+    const base = headingSlug(boundary.text);
+    const count = (seen.get(base) ?? 0) + 1;
+    seen.set(base, count);
+    const slug = count === 1 ? base : `${base}-${count}`;
+    const end = index + 1 < boundaries.length ? boundaries[index + 1].line : lines.length;
+    segments.push({ id: `${path}#${slug}`, slug, heading: boundary.text, start: boundary.line + 1, end });
+  });
+  return segments;
+}
+
+// Everything that is not markdown splits into line windows. The nominal end of
+// a window is start + 59. If that is not already the last line of the file, the
+// boundary is searched backwards from the nominal end, one line at a time, for
+// up to SEGMENT_SNAP_RADIUS lines, and moves to the first blank (whitespace-only)
+// line found; the blank line becomes the last line of the segment. If no blank
+// line is within reach, or the search would run past the start of the window,
+// the hard nominal boundary stands. The next window starts on the following
+// line, so segments always cover every line with no gap and no overlap.
+function windowSegments(path, lines) {
+  const segments = [];
+  let start = 0;
+  while (start < lines.length) {
+    const nominal = start + SEGMENT_WINDOW_LINES - 1;
+    let end;
+    if (nominal >= lines.length - 1) {
+      end = lines.length - 1;
+    } else {
+      end = nominal;
+      for (let distance = 0; distance <= SEGMENT_SNAP_RADIUS; distance += 1) {
+        const candidate = nominal - distance;
+        if (candidate < start) break;
+        if (lines[candidate].trim() === "") {
+          end = candidate;
+          break;
+        }
+      }
+    }
+    segments.push({ id: `${path}#L${start + 1}-${end + 1}`, start: start + 1, end: end + 1 });
+    start = end + 1;
+  }
+  return segments;
+}
+
+function segmentFile(path, content) {
+  const lines = splitLines(content);
+  return isMarkdownPath(path) ? markdownSegments(path, lines) : windowSegments(path, lines);
+}
+
+function repoRelativePath(repo, value) {
+  const root = resolve(repo);
+  const absolute = isAbsolute(value) ? resolve(value) : resolve(root, value);
+  if (absolute === root || !absolute.startsWith(`${root}${sep}`)) {
+    throw new VibeHubError("invalid_argument", `--path must name a file inside the repository: ${value}`);
+  }
+  return absolute.slice(root.length + 1).split(sep).join("/");
+}
+
+// A NUL byte in the first bytes of a file is the standard cheap binary signal.
+// Segmenting a binary blob into "lines" would be noise, not coverage.
+function isBinary(buffer) {
+  return buffer.subarray(0, 8000).includes(0);
+}
+
+function sourceOperation(operation, repo, options = {}) {
+  if (operation !== "segment") {
+    throw new VibeHubError("unsupported_operation", `Unsupported source operation: ${operation}`);
+  }
+  if (typeof options.path !== "string" || !options.path.trim()) {
+    throw new VibeHubError("invalid_argument", "source segment needs --path <file> relative to the repository root");
+  }
+  const relative = repoRelativePath(repo, options.path);
+  const absolute = join(repo, relative);
+  if (!existsSync(absolute) || !lstatSync(absolute).isFile()) {
+    throw new VibeHubError("not_found", `File not found: ${relative}`);
+  }
+  const buffer = readFileSync(absolute);
+  if (isBinary(buffer)) {
+    throw new VibeHubError("invalid_input", `Refusing to segment a binary file: ${relative}`);
+  }
+  const content = buffer.toString("utf8");
+  const segments = segmentFile(relative, content);
+  return {
+    path: relative,
+    strategy: isMarkdownPath(relative) ? "markdown-headings" : "line-windows",
+    lines: splitLines(content).length,
+    segment_count: segments.length,
+    segments,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Coverage.
+//
+// Everything here is derived from the working tree on every invocation: the
+// anchored files are walked, segmented, and matched against the Contexts that
+// are on disk right now. Nothing is cached and nothing is written.
+// ---------------------------------------------------------------------------
+
+// Match the directory walk's no-symlink policy even when the anchor names a
+// file below a symlink. Otherwise an alias can pull .vibehub documents (or
+// files outside the repository) into source territory. This is a read-time
+// guard only; declared-territory collision remains entirely textual.
+function isReadableSourcePath(repo, path) {
+  if (isInternalSourcePath(path)) return false;
+  let absolute = repo;
+  for (const part of path.split("/")) {
+    absolute = join(absolute, part);
+    if (!existsSync(absolute) || lstatSync(absolute).isSymbolicLink()) return false;
+  }
+  return true;
+}
+
+function walkSourceFiles(repo, relative, out) {
+  const entries = readdirSync(join(repo, relative), { withFileTypes: true })
+    .sort((a, b) => (a.name < b.name ? -1 : 1));
+  for (const entry of entries) {
+    // .git and .vibehub are machinery, never source. Symlinks are neither isFile nor
+    // isDirectory here, so they are skipped and cannot escape the anchor.
+    if (isInternalSourcePath(entry.name)) continue;
+    const child = `${relative}/${entry.name}`;
+    if (entry.isDirectory()) walkSourceFiles(repo, child, out);
+    else if (entry.isFile()) out.push(child);
+  }
+}
+
+// The room's territory as files, each with the segments of that file the room
+// actually owns: null means "the whole file", a set means "these segment ids".
+// A path prefix that reaches a file wins over any segment anchor on the same
+// file in the same room — the room already owns all of it.
+function anchoredTerritory(repo, document) {
+  const anchors = (document.anchors ?? [])
+    .filter((anchor) => typeof anchor === "string")
+    .map(parseAnchor)
+    .filter((anchor) => !anchor.error);
+  const files = new Map();
+  for (const anchor of anchors) {
+    if (anchor.segment !== null) continue;
+    const absolute = join(repo, anchor.path);
+    if (!isReadableSourcePath(repo, anchor.path)) continue;
+    const stats = lstatSync(absolute);
+    const reached = [];
+    if (stats.isFile()) reached.push(anchor.path);
+    else if (stats.isDirectory()) walkSourceFiles(repo, anchor.path, reached);
+    for (const path of reached) files.set(path, null);
+  }
+  const missing = [];
+  for (const anchor of anchors) {
+    if (anchor.segment === null) continue;
+    if (files.get(anchor.path) === null) continue;
+    const absolute = join(repo, anchor.path);
+    if (!isReadableSourcePath(repo, anchor.path) || !lstatSync(absolute).isFile()) {
+      missing.push(anchor.segment);
+      continue;
+    }
+    if (!files.has(anchor.path)) files.set(anchor.path, new Set());
+    files.get(anchor.path).add(anchor.segment);
+  }
+  return {
+    files: [...files.entries()]
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([path, segments]) => ({ path, segments })),
+    missing,
+  };
+}
+
+// Citations are collected repository-wide, not per room: a Context filed in one
+// room can legitimately cite a segment of a file anchored by another.
+function citationRefs(repository) {
+  const refs = new Set();
+  for (const { document } of repository.contexts.documents.values()) {
+    const sourceRef = document?.source?.ref;
+    if (typeof sourceRef === "string" && sourceRef.trim()) refs.add(sourceRef.trim());
+    for (const item of document?.evidence ?? []) {
+      if (typeof item?.ref === "string" && item.ref.trim()) refs.add(item.ref.trim());
+    }
+  }
+  return refs;
+}
+
+// A ref matches a segment when it equals the segment id. A bare file path with
+// no "#" fragment covers every segment of that file: citing a source without
+// narrowing to a segment is a claim about the whole of it, and treating it
+// otherwise would make coverage unreachable for anything cited as a document.
+function refCovers(refs, segmentId, filePath) {
+  return refs.has(segmentId) || refs.has(filePath);
+}
+
+// Exceptions are collected repository-wide, exactly like citations, and for the
+// same reason: once several rooms may anchor segments of one file, a segment is
+// counted wherever it is owned, and an exception that only settled the count for
+// the declaring room would have to be copied into every other owner. A
+// coverage_exceptions entry is a statement about a segment, not about a room, so
+// it settles that segment wherever it is counted. The room that declares it is
+// still the room that owns the anchor and answers for the judgement.
+function coverageExceptions(repository) {
+  const exceptions = new Set();
+  for (const { document } of repository.rooms.documents.values()) {
+    for (const item of document?.coverage_exceptions ?? []) {
+      if (typeof item?.segment === "string" && item.segment.trim()) exceptions.add(item.segment.trim());
+    }
+  }
+  return exceptions;
+}
+
+function contextCoverage(repo, repository, roomFilter = null) {
+  if (roomFilter !== null && !repository.rooms.documents.has(roomFilter)) {
+    throw new VibeHubError("not_found", `Room not found: ${roomFilter}`);
+  }
+  const refs = citationRefs(repository);
+  const exceptions = coverageExceptions(repository);
+  const rooms = [];
+  let uncoveredTotal = 0;
+  let segmentsTotal = 0;
+  let filesExamined = 0;
+  const entries = [...repository.rooms.documents.entries()]
+    .filter(([roomPath]) => roomFilter === null || roomPath === roomFilter)
+    .sort(([a], [b]) => (a < b ? -1 : 1));
+  for (const [roomPath, { document }] of entries) {
+    const territory = anchoredTerritory(repo, document);
+    const files = [];
+    const unresolved = [...territory.missing];
+    let roomUncovered = 0;
+    for (const { path: filePath, segments: owned } of territory.files) {
+      const buffer = readFileSync(join(repo, filePath));
+      if (isBinary(buffer)) {
+        files.push({ path: filePath, skipped: "binary", segment_count: 0, uncovered: [] });
+        if (owned !== null) unresolved.push(...owned);
+        continue;
+      }
+      const all = segmentFile(filePath, buffer.toString("utf8"));
+      // A room that anchors segments answers only for the segments it anchors;
+      // a room that anchors the path answers for the whole file, as before.
+      const segments = owned === null ? all : all.filter((segment) => owned.has(segment.id));
+      if (owned !== null) {
+        const present = new Set(all.map((segment) => segment.id));
+        unresolved.push(...[...owned].filter((id) => !present.has(id)).sort());
+      }
+      filesExamined += 1;
+      segmentsTotal += segments.length;
+      const uncovered = segments
+        .filter((segment) => !refCovers(refs, segment.id, filePath)
+          && !refCovers(exceptions, segment.id, filePath))
+        .map((segment) => segment.id);
+      roomUncovered += uncovered.length;
+      files.push({ path: filePath, skipped: null, segment_count: segments.length, uncovered });
+    }
+    uncoveredTotal += roomUncovered;
+    // An anchor naming a segment that no longer exists owns nothing and would
+    // otherwise vanish silently, so it is reported rather than counted.
+    rooms.push({ room: roomPath, files, uncovered: roomUncovered, unresolved_anchors: unresolved.sort() });
+  }
+  return {
+    rooms,
+    files_examined: filesExamined,
+    segments_total: segmentsTotal,
+    uncovered_total: uncoveredTotal,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Skill graph.
+//
+// Development-time validation only. `skills validate` reads the checked-in
+// skills tree and `skills/vibehub-core/contracts/skill-graph.json` from the
+// repository under --repo, compares them, and writes nothing. No Skill reads
+// the contract at runtime and nothing here touches .vibehub/: this is a check
+// a developer runs before changing a Skill, not a router or a lifecycle.
+// ---------------------------------------------------------------------------
+
+const SKILL_DIR_PREFIX = "vibehub-";
+const SKILL_REFERENCE = /\$(vibehub-[a-z0-9]+(?:-[a-z0-9]+)*)/gu;
+const SKILL_EDGE_KINDS = ["invokes", "presents", "routes"];
+const SKILL_ENTRY_KINDS = new Set(["user", "internal", "infrastructure"]);
+const SKILL_GRAPH_CONTRACT = "skills/vibehub-core/contracts/skill-graph.json";
+// Gitignored build and dependency output. A stale dist/ copied before a rename
+// is not a live reference to fix; it is regenerated by `npm run build`.
+const SKILL_SCAN_SKIP = new Set([".git", "node_modules", "dist", "coverage", "test-results"]);
+
+function skillDirectories(repo) {
+  const skillsPath = join(repo, "skills");
+  if (!existsSync(skillsPath) || !lstatSync(skillsPath).isDirectory()) {
+    throw new VibeHubError("not_found", "No skills/ directory under the repository root");
+  }
+  return readdirSync(skillsPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith(SKILL_DIR_PREFIX))
+    .map((entry) => entry.name)
+    .sort();
+}
+
+// Walks files under a repository-relative directory.
+//
+// A symlink is never followed — that is what keeps the walk inside the root —
+// but it is not skipped either. Git checks a symlink in as a blob holding its
+// TARGET PATH, so that path string is the file's checked-in content and is
+// scanned like any other text. A link named `docs/app.js` pointing at
+// `../skills/<retired>/assets/app.js` used to be invisible to this walk.
+//
+// A file whose first 8000 bytes hold a NUL is classified binary. It is still
+// scanned, decoded as latin1, because a single NUL appended to a Markdown file
+// used to hide every reference in it. Binary files are marked so callers that
+// care about source structure (Skill references) can drop them; the retired
+// name check reads them.
+function walkTextFiles(repo, relative, out) {
+  const absolute = join(repo, relative);
+  if (!existsSync(absolute)) return;
+  for (const entry of readdirSync(absolute, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+    if (SKILL_SCAN_SKIP.has(entry.name)) continue;
+    const child = relative ? `${relative}/${entry.name}` : entry.name;
+    if (entry.isSymbolicLink()) {
+      out.push({ path: child, text: readlinkSync(join(repo, child)), symlink: true });
+      continue;
+    }
+    // A nested checkout or worktree (anything carrying its own .git) is a
+    // different repository's source, not this one's.
+    if (entry.isDirectory()) {
+      if (existsSync(join(repo, child, ".git"))) continue;
+      walkTextFiles(repo, child, out);
+    }
+    else if (entry.isFile()) {
+      const buffer = readFileSync(join(repo, child));
+      const binary = isBinary(buffer);
+      out.push({ path: child, text: buffer.toString(binary ? "latin1" : "utf8"), binary });
+    }
+  }
+}
+
+function countOccurrences(text, needle) {
+  if (needle === "") return 0;
+  let count = 0;
+  let index = text.indexOf(needle);
+  while (index !== -1) {
+    count += 1;
+    index = text.indexOf(needle, index + needle.length);
+  }
+  return count;
+}
+
+// A Skill's references are collected from every text file it ships, not from
+// SKILL.md alone: bulk absorption's process reference and the host agent
+// prompts carry real $-invocations too, and a reference the contract does not
+// explain is exactly what this check exists to catch.
+function skillReferences(repo, names) {
+  const references = new Map(names.map((name) => [name, new Map()]));
+  for (const name of names) {
+    const files = [];
+    walkTextFiles(repo, `skills/${name}`, files);
+    for (const file of files) {
+      if (file.binary) continue;
+      for (const match of file.text.matchAll(SKILL_REFERENCE)) {
+        const target = match[1];
+        if (target === name) continue;
+        if (!references.get(name).has(target)) references.get(name).set(target, file.path);
+      }
+    }
+  }
+  return references;
+}
+
+function findSkillCycle(adjacency) {
+  const visiting = new Set();
+  const visited = new Set();
+  const stack = [];
+  function visit(name) {
+    if (visiting.has(name)) return [...stack.slice(stack.indexOf(name)), name];
+    if (visited.has(name)) return null;
+    visiting.add(name);
+    stack.push(name);
+    for (const target of adjacency.get(name) ?? []) {
+      const cycle = visit(target);
+      if (cycle) return cycle;
+    }
+    stack.pop();
+    visiting.delete(name);
+    visited.add(name);
+    return null;
+  }
+  for (const name of [...adjacency.keys()].sort()) {
+    const cycle = visit(name);
+    if (cycle) return cycle;
+  }
+  return null;
+}
+
+// Positional JSON parser.
+//
+// Every legitimate-field exemption below has to answer the same question: which
+// RAW BYTES of the checked-in file does this parsed value occupy? Re-serialising
+// the parse and scanning that answered a different question, and the difference
+// is a hole: any bytes JSON.parse discards — a shadowed duplicate key, the
+// original escaping, whitespace — never reached the scan at all, so a live
+// `../<retired>/...` path hidden under a duplicate key passed while sitting in
+// the file in plain ASCII. The scan reads the raw text; the parse only says
+// which SPANS of that raw text to consume first.
+//
+// The tree mirrors JSON.parse's own semantics so the spans describe the same
+// document: an object member is stored by key with the LAST duplicate winning,
+// which is exactly what makes a shadowed earlier duplicate's span survive into
+// the scan. Trailing content after the top-level value is a parse failure, as
+// it is for JSON.parse.
+const JSON_SIMPLE_ESCAPES = { '"': '"', "\\": "\\", "/": "/", b: "\b", f: "\f", n: "\n", r: "\r", t: "\t" };
+
+function parseJsonWithSpans(text) {
+  let at = 0;
+  const fail = (message) => {
+    throw new SyntaxError(`${message} at offset ${at}`);
+  };
+  const skipSpace = () => {
+    while (at < text.length && (text[at] === " " || text[at] === "\t" || text[at] === "\n" || text[at] === "\r")) at += 1;
+  };
+  function parseString() {
+    const start = at;
+    if (text[at] !== '"') fail("expected a string");
+    at += 1;
+    let value = "";
+    for (;;) {
+      if (at >= text.length) fail("unterminated string");
+      const ch = text[at];
+      if (ch === '"') {
+        at += 1;
+        break;
+      }
+      if (ch === "\\") {
+        const escape = text[at + 1];
+        at += 2;
+        if (escape === "u") {
+          const hex = text.slice(at, at + 4);
+          if (!/^[0-9a-fA-F]{4}$/u.test(hex)) fail("malformed \\u escape");
+          value += String.fromCharCode(Number.parseInt(hex, 16));
+          at += 4;
+          continue;
+        }
+        const simple = JSON_SIMPLE_ESCAPES[escape];
+        if (simple === undefined) fail("unknown escape");
+        value += simple;
+        continue;
+      }
+      if (ch < " ") fail("control character in a string");
+      value += ch;
+      at += 1;
+    }
+    return { type: "string", value, start, end: at };
+  }
+  function parseValue() {
+    skipSpace();
+    if (at >= text.length) fail("unexpected end of input");
+    const ch = text[at];
+    if (ch === "{") return parseObject();
+    if (ch === "[") return parseArray();
+    if (ch === '"') return parseString();
+    for (const [literal, value] of [["true", true], ["false", false], ["null", null]]) {
+      if (text.startsWith(literal, at)) {
+        at += literal.length;
+        return { type: "literal", value };
+      }
+    }
+    const number = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/u.exec(text.slice(at));
+    if (!number) fail("unexpected token");
+    at += number[0].length;
+    return { type: "literal", value: Number(number[0]) };
+  }
+  function parseObject() {
+    at += 1;
+    const members = new Map();
+    skipSpace();
+    if (text[at] === "}") {
+      at += 1;
+      return { type: "object", members };
+    }
+    for (;;) {
+      skipSpace();
+      const key = parseString();
+      skipSpace();
+      if (text[at] !== ":") fail("expected :");
+      at += 1;
+      // Last duplicate wins, as in JSON.parse. The earlier member's span is
+      // dropped here on purpose: those bytes are shadowed, so nothing excuses
+      // them and the scan must still see them.
+      members.set(key.value, parseValue());
+      skipSpace();
+      if (text[at] === ",") {
+        at += 1;
+        continue;
+      }
+      if (text[at] === "}") {
+        at += 1;
+        return { type: "object", members };
+      }
+      fail("expected , or }");
+    }
+  }
+  function parseArray() {
+    at += 1;
+    const items = [];
+    skipSpace();
+    if (text[at] === "]") {
+      at += 1;
+      return { type: "array", items };
+    }
+    for (;;) {
+      items.push(parseValue());
+      skipSpace();
+      if (text[at] === ",") {
+        at += 1;
+        continue;
+      }
+      if (text[at] === "]") {
+        at += 1;
+        return { type: "array", items };
+      }
+      fail("expected , or ]");
+    }
+  }
+  const root = parseValue();
+  skipSpace();
+  if (at !== text.length) fail("trailing content after the top-level value");
+  return root;
+}
+
+function nodeValue(node) {
+  if (node.type === "object") {
+    // A null prototype, so a `__proto__` member becomes an OWN property exactly
+    // as JSON.parse makes it. On a plain object literal the assignment would hit
+    // the prototype setter instead, the key would vanish from the comparison,
+    // and a document carrying `__proto__` would be reported as a parser
+    // disagreement it is not.
+    const out = Object.create(null);
+    for (const [key, child] of node.members) out[key] = nodeValue(child);
+    return out;
+  }
+  if (node.type === "array") return node.items.map(nodeValue);
+  return node.value;
+}
+
+function objectMember(node, key) {
+  return node && node.type === "object" ? node.members.get(key) : undefined;
+}
+
+function arrayItems(node) {
+  return node && node.type === "array" ? node.items : [];
+}
+
+// Replaces each span's CONTENTS with nothing, keeping the surrounding quotes so
+// the bytes on either side can never be joined into a name that was not there.
+// Spans are removed right to left so earlier offsets stay valid.
+function blankSpans(text, spans) {
+  let out = text;
+  for (const span of [...spans].sort((a, b) => b.start - a.start)) {
+    out = out.slice(0, span.start + 1) + out.slice(span.end - 1);
+  }
+  return out;
+}
+
+// The bridge between "which values are legitimate" and "which raw bytes to
+// consume". The positional parser must agree with JSON.parse about the
+// document, or the spans describe a file other than the one being scanned; a
+// disagreement is reported LOUDLY and nothing is consumed, so the raw text is
+// scanned whole. Failing closed and silent would let a parser quirk become the
+// next bypass, and failing open and quiet would let one land unnoticed.
+function legitimateSpans(text, select) {
+  let expected;
+  try {
+    expected = JSON.parse(text);
+  } catch {
+    return { skip: true };
+  }
+  let root;
+  try {
+    root = parseJsonWithSpans(text);
+  } catch (error) {
+    return { problem: `could not be located in the raw file (${error.message})` };
+  }
+  if (JSON.stringify(nodeValue(root)) !== JSON.stringify(expected)) {
+    return { problem: "the positional parse disagrees with JSON.parse about this document" };
+  }
+  return { document: expected, spans: select(root, expected) };
+}
+
+// A Context document's `source.ref` and `evidence[].ref` record what proved a
+// past claim, so those two field values are exempt — their RAW SPANS are
+// consumed out of the checked-in text and everything else in the file, prose
+// included, is scanned as bytes.
+//
+// Consuming the raw span rather than subtracting an occurrence count is what
+// makes this exact, and consuming it out of the RAW text rather than out of a
+// re-serialisation is what keeps it honest. A count subtracted from the whole
+// file could be spent on an occurrence somewhere else in it: a ref written with
+// a JSON escape (`vibehub-ticket-\u0072eview`) parses to the retired name while
+// the raw bytes never spell it, so the subtraction landed on a live prose
+// mention instead. Consuming the span removes the escaped bytes themselves and
+// leaves the prose mention to fail. And because the scan reads the raw file, a
+// live path carried by a shadowed duplicate key — bytes JSON.parse drops — is
+// no longer invisible.
+//
+// The exemption belongs to Context, not to the two field names. It is claimed
+// only by a document that is one: a `kind: context` document under
+// .vibehub/rooms/. Otherwise any live JSON anywhere in the tree could carry a
+// retired path under a `source.ref` key and buy itself silence.
+function contextSpans(path, text) {
+  if (!path.startsWith(".vibehub/rooms/")) return null;
+  const located = legitimateSpans(text, (root) => {
+    const spans = [];
+    const source = objectMember(root, "source");
+    const ref = objectMember(source, "ref");
+    if (ref && ref.type === "string") spans.push(ref);
+    for (const entry of arrayItems(objectMember(root, "evidence"))) {
+      const entryRef = objectMember(entry, "ref");
+      if (entryRef && entryRef.type === "string") spans.push(entryRef);
+    }
+    return spans;
+  });
+  // Not JSON at all, or not a Context document: no exemption, and no complaint
+  // either. A .vibehub/rooms/ file that is not a Context document is simply
+  // scanned like every other file in the tree.
+  if (located.skip) return null;
+  if (located.problem) return located;
+  if (!isObject(located.document) || located.document.kind !== "context") return null;
+  return located;
+}
+
+// Historical records, which name a retired Skill because that is what was true
+// when they were written. Detected structurally, never by allowlist:
+//   - .vibehub/evidence/, .vibehub/outcomes/, and the .vibehub/history/ archive
+//   - a Ticket under .vibehub/tickets/ whose Outcome is SUCCESSFUL
+//   - a META/legacy-* tree, matched only as the segment directly under META/
+//
+// A Ticket is a historical record only once its Outcome says `successful`. A
+// partial, failed or deviated Outcome means the work is still live — the
+// Ticket's own next_action is REPLAN — so its YAML is a live document whose
+// references still have to be right. This is deliberately STRICTER than the
+// notion of "closed" loadRepository uses for lifecycle-scoped context_refs,
+// which counts a Ticket as closed the moment any Outcome exists. The two are
+// answering different questions: a context ref is pinned to the commit that
+// closed the loop, whereas a retired name in a still-live Ticket is a reference
+// someone will read and copy tomorrow. The divergence is scoped to this check
+// on purpose; unifying it would change an accepted, closed behaviour.
+// Every one of these is a whole directory whose contents are archived by
+// construction. A file's own name never earns an exemption: a dated basename
+// under META/ used to imply "record", which meant anyone could date-prefix a
+// live spec to silence the rule. A genuine dated record is exempted by an
+// explicit allowlist entry naming the text it carries, like any other file.
+// Everything else under META/ stays live, which is the point: an active META
+// spec naming skills/<retired>/SKILL.md is precisely the reference that slipped
+// past a careful human grep during the rename it documents.
+function isHistoricalRecord(repo, path) {
+  if (path.startsWith(".vibehub/evidence/")) return true;
+  if (path.startsWith(".vibehub/outcomes/")) return true;
+  if (path.startsWith(".vibehub/history/")) return true;
+  if (path.startsWith(".vibehub/tickets/") && path.endsWith(".yaml")) {
+    const id = path.slice(".vibehub/tickets/".length, -".yaml".length);
+    try {
+      const ticket = readDocument(join(repo, path));
+      if (ticket.revision_state === "bound") {
+        const contract = activeContract(ticket);
+        return nestedYamlFiles(join(repo, ".vibehub", "outcomes", id))
+          .map(readDocument)
+          .some((outcome) => outcome.status === "successful" && outcomeBindsContract(outcome, contract));
+      }
+      // Legacy records remain readable during an explicit format migration.
+      const outcomePath = join(repo, ".vibehub", "outcomes", `${id}.yaml`);
+      if (!existsSync(outcomePath)) return false;
+      const outcome = readDocument(outcomePath);
+      return isObject(outcome) && outcome.status === "successful";
+    } catch {
+      return false;
+    }
+  }
+  if (path.startsWith("META/")) {
+    const segments = path.split("/");
+    // Leading segment only: META/legacy-ui/note.md is archived, but
+    // META/09-ticket-runtime/legacy-notes/live.md is a live spec in a
+    // conveniently named folder.
+    if (segments.length > 2 && segments[1].startsWith("legacy-")) return true;
+  }
+  return false;
+}
+
+// One exempt class is not machine-detectable: an occurrence a human decided to
+// keep — prose describing the retirement, a documented legacy-path constant
+// kept so historical commits stay readable, a dated record under META/. Intent
+// is not in the bytes, so the contract pins those occurrences one by one.
+//
+// An allowance excuses OCCURRENCES, never a file. It names the path, the exact
+// `text` it excuses, how many times that text occurs (`occurrences`, default 1),
+// and why. Any occurrence of the retired name in that file which no allowance's
+// text accounts for still fails, so appending a live reference to an allowlisted
+// file is caught. The counts are what make it per-occurrence rather than
+// per-line: duplicating an excused line changes the count and fails.
+//
+// Four shape rules keep an allowance from degenerating back into a file pass:
+// its text must contain the retired name (otherwise it excuses nothing), must
+// be strictly NARROWER than the name (a text that is just the bare name excuses
+// any occurrence in the file, including a live path swapped in later — the
+// count stays at one and the file passes), must be a single line (otherwise
+// "text" could be the whole file), and must occur exactly as many times as
+// declared. A stale allowance — file gone, text gone, or count moved — is
+// itself a failure, so the list cannot rot into a silent blanket exemption. A
+// `$`-invocation is a live call wherever it appears and fails inside an
+// allowlisted file too, unless an allowance names that exact `$`-carrying text
+// and says why.
+//
+// Excusing works by DELETING each allowance's spans from the text and then
+// scanning what remains, not by subtracting counts. Counting let two
+// allowances whose texts overlap the same occurrence subtract two, buying the
+// file one silent live reference elsewhere; a deleted span can only be
+// consumed once.
+function stripAll(text, needle) {
+  return text.split(needle).join("");
+}
+
+function countOccurrencesInsensitive(text, needle) {
+  return countOccurrences(text.toLowerCase(), needle.toLowerCase());
+}
+
+// Removes up to `declared` occurrences of each allowance's text, longest text
+// first so a short allowance cannot eat the span a longer one names.
+function consumeAllowances(text, allowances) {
+  let residual = text;
+  for (const allowance of [...allowances].sort((a, b) => b.text.length - a.text.length)) {
+    for (let taken = 0; taken < allowance.declared; taken += 1) {
+      const at = residual.indexOf(allowance.text);
+      if (at === -1) break;
+      residual = residual.slice(0, at) + residual.slice(at + allowance.text.length);
+    }
+  }
+  return residual;
+}
+
+// The contract is scanned like every other file, and now as its own RAW BYTES.
+// It is not exempt by path — that is exactly the per-file exemption this rule
+// outlaws, and it used to let any stray key in the contract carry a live
+// `../<retired>/...` path.
+//
+// What the contract legitimately holds is three PARSED FIELDS: each retired
+// entry's `name` and `replacement`, and each allowance's `text`. Those values
+// are exempt by consuming THEIR RAW SPANS out of the checked-in file, so
+// anything else in the document — a stray key, a `reason` that quotes a live
+// path, an allowance `path` under the retired folder, or a value shadowed by a
+// duplicate key and therefore absent from the parse — is scanned normally and
+// fails.
+function contractSpans(text) {
+  const located = legitimateSpans(text, (root) => {
+    const spans = [];
+    for (const entry of arrayItems(objectMember(root, "retired"))) {
+      for (const key of ["name", "replacement"]) {
+        const field = objectMember(entry, key);
+        if (field && field.type === "string") spans.push(field);
+      }
+      for (const allowance of arrayItems(objectMember(entry, "allowed_paths"))) {
+        const field = objectMember(allowance, "text");
+        if (field && field.type === "string") spans.push(field);
+      }
+    }
+    return spans;
+  });
+  // validateSkillGraph has already parsed the contract through readDocument, so
+  // a parse failure here means the bytes on disk are not the document the rest
+  // of the check ran against. Report it rather than silently exempting nothing.
+  if (located.skip) return { problem: "is not parseable as JSON, so its legitimate fields cannot be located" };
+  return located;
+}
+
+// Applies the legitimate-field exemptions to the raw text of one file.
+//
+// A located problem is a LOUD failure that consumes nothing: the file's raw
+// bytes are still scanned in full, so a file whose spans cannot be located can
+// only ever be reported as MORE suspicious, never less. The alternative —
+// skipping the file, or silently consuming nothing without saying so — is how a
+// parser disagreement becomes the next quiet bypass.
+function applyLegitimateSpans(file, errors) {
+  const located = file.path === SKILL_GRAPH_CONTRACT ? contractSpans(file.text) : contextSpans(file.path, file.text);
+  if (located === null) return file;
+  if (located.problem) {
+    add(errors, file.path, `Legitimate-field exemption not applied: the document ${located.problem}; the whole file is scanned`);
+    return file;
+  }
+  return { ...file, text: blankSpans(file.text, located.spans) };
+}
+
+function validateRetiredNames(repo, contract, allFiles, errors) {
+  const files = allFiles.map((file) => applyLegitimateSpans(file, errors));
+  const texts = new Map(files.map((file) => [file.path, file.text]));
+  for (const [index, entry] of (Array.isArray(contract.retired) ? contract.retired : []).entries()) {
+    const path = `retired[${index}]`;
+    if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string"
+      || entry.name === "" || entry.replacement === "") {
+      add(errors, path, "A retired entry needs a non-empty name and its replacement");
+      continue;
+    }
+    // Both fields are BARE SKILL NAMES, matching the kebab-case grammar every
+    // folder under skills/ already follows. Two reasons, and either alone is
+    // enough. A `replacement` that is not a Skill name is meaningless as the
+    // guidance the failure message prints back to the user. And contractSpans
+    // consumes the raw spans of exactly these two fields, so without a grammar
+    // they are a place to park arbitrary text — a path, a sentence — inside the
+    // contract and have it exempted by key position rather than by being a
+    // name. Constraining the grammar is what makes that exemption safe.
+    for (const key of ["name", "replacement"]) {
+      if (!ID.test(entry[key])) {
+        add(errors, `${path}.${key}`, `must be a bare lowercase kebab-case Skill name, not ${JSON.stringify(entry[key])}`);
+      }
+    }
+    if (!ID.test(entry.name) || !ID.test(entry.replacement)) continue;
+    const allowances = [];
+    for (const [allowIndex, allowance] of (Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []).entries()) {
+      const where = `${path}.allowed_paths[${allowIndex}]`;
+      if (!isObject(allowance) || typeof allowance.path !== "string" || typeof allowance.text !== "string"
+        || typeof allowance.reason !== "string") {
+        add(errors, where, "An allowance needs a path, the exact text it excuses, and a reason");
+        continue;
+      }
+      if (countOccurrencesInsensitive(allowance.text, entry.name) === 0) {
+        add(errors, where, `The excused text does not contain ${entry.name}, so it excuses nothing`);
+        continue;
+      }
+      // Narrower than the bare name: strip every occurrence of the name and
+      // something meaningful must remain. A text that is the bare name on its
+      // own, or padded with whitespace, or repeated, would match any occurrence
+      // in the file and turn the allowance back into a count-bounded file pass.
+      if (stripAll(allowance.text.toLowerCase(), entry.name.toLowerCase()).trim() === "") {
+        add(
+          errors,
+          where,
+          `The excused text is no narrower than ${entry.name} itself; name the surrounding line so the allowance points at one occurrence`,
+        );
+        continue;
+      }
+      if (/[\n\r]/u.test(allowance.text)) {
+        add(errors, where, "The excused text must be a single line, naming one occurrence rather than a span");
+        continue;
+      }
+      const declared = allowance.occurrences ?? 1;
+      if (!Number.isInteger(declared) || declared < 1) {
+        add(errors, where, "occurrences must be a positive integer");
+        continue;
+      }
+      allowances.push({ where, path: allowance.path, text: allowance.text, declared });
+    }
+
+    // Stale allowances first: a count that no longer matches is a failure in its
+    // own right, and the excusing below is capped at what the file really holds.
+    for (const allowance of allowances) {
+      const text = texts.get(allowance.path);
+      if (text === undefined) {
+        add(errors, `${path}.allowed_paths`, `${allowance.path} no longer contains ${entry.name}; drop the allowance`);
+        continue;
+      }
+      const actual = countOccurrences(text, allowance.text);
+      if (actual === 0) {
+        add(
+          errors,
+          `${path}.allowed_paths`,
+          `${allowance.path} no longer contains the excused text ${JSON.stringify(allowance.text)}; drop or update the allowance`,
+        );
+      } else if (actual !== allowance.declared) {
+        add(
+          errors,
+          `${path}.allowed_paths`,
+          `${allowance.path} carries ${actual} occurrence${actual === 1 ? "" : "s"} of ${JSON.stringify(allowance.text)} but the allowance names ${allowance.declared}`,
+        );
+      }
+    }
+
+    const byPath = new Map();
+    for (const allowance of allowances) {
+      if (!byPath.has(allowance.path)) byPath.set(allowance.path, []);
+      byPath.get(allowance.path).push(allowance);
+    }
+
+    for (const file of files) {
+      if (countOccurrencesInsensitive(file.text, entry.name) === 0) continue;
+      if (isHistoricalRecord(repo, file.path)) continue;
+
+      const residual = consumeAllowances(file.text, byPath.get(file.path) ?? []);
+
+      if (countOccurrences(residual, `$${entry.name}`) > 0) {
+        add(errors, file.path, `Retired Skill ${entry.name} is invoked as $${entry.name}; use $${entry.replacement}`);
+        continue;
+      }
+      const live = countOccurrences(residual, entry.name);
+      if (live > 0) {
+        add(
+          errors,
+          file.path,
+          `Live reference to retired Skill ${entry.name} (${live} unexcused occurrence${live === 1 ? "" : "s"}); use ${entry.replacement}, or name the exact occurrence and its reason in ${SKILL_GRAPH_CONTRACT}`,
+        );
+        continue;
+      }
+      // A case-varied path is the same retired folder on a case-insensitive
+      // filesystem and the same name to a reader, so it cannot pass by
+      // spelling alone.
+      const variants = countOccurrencesInsensitive(residual, entry.name) - countOccurrences(residual, entry.name);
+      if (variants > 0) {
+        add(
+          errors,
+          file.path,
+          `Case-variant reference to retired Skill ${entry.name} (${variants} unexcused occurrence${variants === 1 ? "" : "s"}); use ${entry.replacement}`,
+        );
+      }
+    }
+  }
+}
+
+function validateSkillGraph(repo) {
+  const errors = [];
+  const contractPath = join(repo, SKILL_GRAPH_CONTRACT);
+  if (!existsSync(contractPath)) {
+    throw new VibeHubError("not_found", `Skill graph contract not found: ${SKILL_GRAPH_CONTRACT}`);
+  }
+  const contract = readDocument(contractPath);
+  if (!isObject(contract) || !Array.isArray(contract.skills)) {
+    throw new VibeHubError("invalid_input", `${SKILL_GRAPH_CONTRACT} needs a skills array`);
+  }
+
+  const present = skillDirectories(repo);
+  const declared = new Map();
+  for (const [index, entry] of contract.skills.entries()) {
+    const path = `skills[${index}]`;
+    if (!isObject(entry) || typeof entry.name !== "string") {
+      add(errors, path, "A declared Skill needs a name");
+      continue;
+    }
+    if (declared.has(entry.name)) add(errors, path, `Duplicate declaration of ${entry.name}`);
+    if (!SKILL_ENTRY_KINDS.has(entry.entry)) {
+      add(errors, `${path}.entry`, `entry must be one of ${[...SKILL_ENTRY_KINDS].join(", ")}`);
+    }
+    for (const kind of SKILL_EDGE_KINDS) {
+      if (!Array.isArray(entry[kind])) add(errors, `${path}.${kind}`, `${kind} must be an array`);
+    }
+    if (!Array.isArray(entry.events)) add(errors, `${path}.events`, "events must be an array");
+    declared.set(entry.name, entry);
+  }
+  assertValid(errors, "Skill graph validation failed");
+
+  for (const name of present) {
+    if (!declared.has(name)) {
+      add(errors, `skills/${name}`, `Skill is present in skills/ but missing from ${SKILL_GRAPH_CONTRACT}`);
+    }
+  }
+  for (const name of declared.keys()) {
+    if (!present.includes(name)) {
+      add(errors, `skills[${name}]`, "Declared Skill has no folder under skills/");
+    }
+  }
+  assertValid(errors, "Skill graph validation failed");
+
+  const outbound = new Map(present.map((name) => [name, new Set()]));
+  const inbound = new Map(present.map((name) => [name, new Set()]));
+  const invokes = new Map(present.map((name) => [name, []]));
+  for (const name of present) {
+    const entry = declared.get(name);
+    for (const kind of SKILL_EDGE_KINDS) {
+      for (const target of entry[kind]) {
+        const path = `skills[${name}].${kind}`;
+        if (typeof target !== "string" || !declared.has(target)) {
+          add(errors, path, `Edge target ${JSON.stringify(target)} is not a declared Skill`);
+          continue;
+        }
+        if (target === name) {
+          add(errors, path, "A Skill cannot declare an edge to itself");
+          continue;
+        }
+        if (declared.get(target).entry === "infrastructure") {
+          add(errors, path, `${target} is infrastructure and is never invoked`);
+          continue;
+        }
+        outbound.get(name).add(target);
+        inbound.get(target).add(name);
+        if (kind === "invokes") invokes.get(name).push(target);
+      }
+    }
+    if (entry.entry === "infrastructure" && SKILL_EDGE_KINDS.some((kind) => entry[kind].length > 0)) {
+      add(errors, `skills[${name}]`, "An infrastructure Skill holds no edges");
+    }
+  }
+  assertValid(errors, "Skill graph validation failed");
+
+  // A reference is direction-blind on purpose. `vibehub-distill` documents its
+  // own callers in its description ("Invoked by ..."), so requiring the mention
+  // to sit in the caller's folder would reject a true edge. A reference is
+  // explained when the contract declares an edge incident to both Skills.
+  const references = skillReferences(repo, present);
+  for (const name of present) {
+    for (const [target, where] of references.get(name)) {
+      if (!present.includes(target)) {
+        add(errors, where, `$${target} names a Skill that does not exist under skills/`);
+        continue;
+      }
+      if (!outbound.get(name).has(target) && !outbound.get(target).has(name)) {
+        add(errors, where, `$${target} is referenced by ${name} but no edge between them is declared in ${SKILL_GRAPH_CONTRACT}`);
+      }
+    }
+  }
+
+  for (const name of present) {
+    for (const target of outbound.get(name)) {
+      if (references.get(name).has(target) || references.get(target).has(name)) continue;
+      add(
+        errors,
+        `skills[${name}]`,
+        `Declared edge ${name} -> ${target} appears in no SKILL.md or Skill reference; no $${target} in skills/${name}/ and no $${name} in skills/${target}/`,
+      );
+    }
+  }
+
+  for (const name of present) {
+    const entry = declared.get(name);
+    if (entry.entry !== "internal") continue;
+    if (inbound.get(name).size === 0) {
+      add(errors, `skills[${name}]`, "Internal Skill is an orphan: no user entry and no inbound edge");
+    }
+  }
+
+  const cycle = findSkillCycle(invokes);
+  if (cycle) add(errors, "skills", `Invocation cycle: ${cycle.join(" -> ")}`);
+
+  const owners = new Map();
+  for (const name of present) {
+    for (const event of declared.get(name).events) {
+      if (typeof event !== "string") {
+        add(errors, `skills[${name}].events`, "An owned event must be a string");
+        continue;
+      }
+      if (owners.has(event)) add(errors, `skills[${name}].events`, `${event} is already owned by ${owners.get(event)}`);
+      else owners.set(event, name);
+    }
+  }
+  if (typeof contract.lifecycle_contract === "string") {
+    const lifecyclePath = join(repo, "skills", contract.lifecycle_contract);
+    if (!existsSync(lifecyclePath)) {
+      add(errors, "lifecycle_contract", `${contract.lifecycle_contract} not found under skills/`);
+    } else {
+      const lifecycle = readDocument(lifecyclePath);
+      for (const event of Array.isArray(lifecycle.events) ? lifecycle.events : []) {
+        if (!isObject(event) || typeof event.event !== "string") continue;
+        if (!owners.has(event.event)) {
+          add(errors, "lifecycle_contract", `${event.event} is owned by ${event.owner} in the lifecycle but declared by no Skill`);
+        } else if (owners.get(event.event) !== event.owner) {
+          add(
+            errors,
+            "lifecycle_contract",
+            `${event.event} is owned by ${owners.get(event.event)} in the graph and by ${event.owner} in the lifecycle`,
+          );
+        }
+      }
+      for (const [event, owner] of owners) {
+        const known = (lifecycle.events ?? []).some((candidate) => isObject(candidate) && candidate.event === event);
+        if (!known) add(errors, `skills[${owner}].events`, `${event} is not an event in ${contract.lifecycle_contract}`);
+      }
+    }
+  }
+
+  const files = [];
+  walkTextFiles(repo, "", files);
+  validateRetiredNames(repo, contract, files, errors);
+
+  assertValid(errors, "Skill graph validation failed");
+  const edgeCount = present.reduce((total, name) => total + outbound.get(name).size, 0);
+  return {
+    valid: true,
+    skills: present.length,
+    edges: edgeCount,
+    entry_points: present.filter((name) => declared.get(name).entry === "user"),
+    internal: present.filter((name) => declared.get(name).entry === "internal"),
+    infrastructure: present.filter((name) => declared.get(name).entry === "infrastructure"),
+    events: owners.size,
+    retired: (contract.retired ?? []).map((entry) => ({ name: entry.name, replacement: entry.replacement })),
+    files_scanned: files.length,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Retired Skill folders left behind by an update.
+//
+// `skills validate` above is a DEVELOPMENT-TIME check: it reads the contract at
+// `skills/vibehub-core/contracts/skill-graph.json` under --repo, which only
+// exists in this plugin's own checkout. `skills retired` answers a different
+// question, in a different place: a USER's project, which has no skills/ tree
+// at all — the Skill folders live under .claude/skills/ or .agents/skills/,
+// copied there by `npx skills add`. So the retired list is read from the copy
+// that TRAVELS WITH THIS SCRIPT (../contracts/skill-graph.json, the same
+// mechanism versions.json and dependency-hygiene.json already use). That copy
+// is guaranteed present wherever vh.mjs runs, because both ship inside the
+// vibehub-core folder, and it always describes the plugin version that is
+// actually installed. In this repository the two paths are the same file, so
+// the two operations cannot disagree here either.
+//
+// This reads directories and returns what it saw. It never deletes, moves, or
+// writes anything: removing an installed Skill from a user's agent directory
+// is the user's action. It runs only when the setup workflow asks — there is
+// no hook, watcher, or install-time daemon behind it.
+// ---------------------------------------------------------------------------
+
+const SKILL_GRAPH_PACKAGED = fileURLToPath(new URL("../contracts/skill-graph.json", import.meta.url));
+// Where an install actually lands. The first two are the directories
+// `npx skills add` was observed to write for the claude-code and codex agents;
+// the third is a repository that vendors Skill folders at its root, which is
+// the shape this plugin's own checkout has.
+const SKILL_INSTALL_LOCATIONS = [".claude/skills", ".agents/skills", "skills"];
+
+function retiredSkillFolders(repo) {
+  const contract = JSON.parse(readFileSync(SKILL_GRAPH_PACKAGED, "utf8"));
+  const retired = new Map();
+  for (const entry of Array.isArray(contract.retired) ? contract.retired : []) {
+    if (!isObject(entry) || typeof entry.name !== "string" || typeof entry.replacement !== "string") continue;
+    retired.set(entry.name, entry);
+  }
+
+  const scanned = [];
+  const found = [];
+  for (const location of SKILL_INSTALL_LOCATIONS) {
+    const absolute = join(repo, ...location.split("/"));
+    if (!existsSync(absolute) || !lstatSync(absolute).isDirectory()) continue;
+    scanned.push(location);
+    const installed = readdirSync(absolute, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+    for (const name of installed) {
+      const entry = retired.get(name);
+      if (!entry) continue;
+      found.push({
+        path: `${location}/${name}`,
+        name,
+        replacement: entry.replacement,
+        replacement_installed: installed.includes(entry.replacement),
+        reason: typeof entry.reason === "string" ? entry.reason : null,
+      });
+    }
+  }
+  return { locations: SKILL_INSTALL_LOCATIONS, scanned, retired: found };
+}
+
+function skillsOperation(operation, repo) {
+  if (operation === "validate") return validateSkillGraph(repo);
+  if (operation === "retired") return retiredSkillFolders(repo);
+  throw new VibeHubError("unsupported_operation", `Unsupported skills operation: ${operation}`);
+}
+
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
@@ -2880,6 +4417,7 @@ function projectOperation(operation, repo) {
       tickets: repository.tickets.documents.size,
       evidence: repository.evidence.documents.size,
       outcomes: outcomeDocuments(repository).length,
+      unverifiable_context_refs: repository.unverifiable,
     };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported project operation: ${operation}`);
@@ -2898,6 +4436,8 @@ function run() {
     rooms: args.rooms,
   });
   else if (args.domain === "project") data = projectOperation(args.operation, args.repo, input);
+  else if (args.domain === "source") data = sourceOperation(args.operation, args.repo, { path: args.path });
+  else if (args.domain === "skills") data = skillsOperation(args.operation, args.repo);
   else throw new VibeHubError("unsupported_domain", `Unsupported domain: ${args.domain}`);
   process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
 }

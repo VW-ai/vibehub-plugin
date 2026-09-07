@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+const helper=process.cwd()+'/skills/vibehub-core/scripts/vh.mjs';
+const repo=mkdtempSync('/tmp/integration-independent-');
+function run(d,o,input,flags=[]){const args=[helper,d,o,'--repo',repo,...flags];if(input)args.push('--input','-');const r=spawnSync(process.execPath,args,{input:input?JSON.stringify(input):undefined,encoding:'utf8'});return {...r,data:JSON.parse(r.stdout)};}
+assert.equal(run('project','init').status,0);
+mkdirSync(repo+'/docs/.ViBeHuB',{recursive:true});
+writeFileSync(repo+'/docs/.ViBeHuB/secret.md','# Secret\nNot source\n');
+writeFileSync(repo+'/docs/spec#draft.md','# Shared\nfirst\n# Shared\nsecond\n');
+const s=run('source','segment',null,['--path','docs/spec#draft.md']);
+assert.equal(s.status,0);assert.equal(s.stdout,run('source','segment',null,['--path','docs/spec#draft.md']).stdout);
+assert.deepEqual(s.data.data.segments.map(x=>x.id),['docs/spec#draft.md#shared','docs/spec#draft.md#shared-2']);
+const room=(id,anchors,ex=[])=>({schema_version:1,kind:'room',room_id:id,description:'Independent probe',boundary:'Probe source scope',anchors,stale:false,coverage_exceptions:ex});
+const first=room('first',['./docs//spec#draft.md#shared'],[{segment:'docs/spec#draft.md#shared',reason:'Explicit probe exception'}]);
+assert.equal(run('room','put',first,['--room','first']).status,0);
+assert.notEqual(run('room','put',room('collision',['docs/./spec#draft.md#shared']),['--room','collision']).status,0);
+assert.equal(run('room','put',room('second',['docs/spec#draft.md#shared-2']),['--room','second']).status,0);
+let c=run('context','coverage');assert.equal(c.status,0);assert.equal(c.data.data.segments_total,2);assert.equal(c.data.data.uncovered_total,1);
+assert.equal(run('room','put',room('second',['docs/spec#draft.md#shared-2'],[{segment:'docs/spec#draft.md#shared-2',reason:'Second explicit exception'}]),['--room','second']).status,0);
+assert.equal(run('context','coverage').data.data.uncovered_total,0);
+assert.notEqual(run('room','put',room('internal',['docs/.ViBeHuB']),['--room','internal']).status,0);
+const denied=run('ticket','closeout',{});assert.equal(denied.data.error.code,'missing_independence');
+const legacy=run('ticket','evidence',{schema_version:1});assert.notEqual(legacy.status,0);assert.match(legacy.stdout,/native exact revision binding/);
+console.log('PASS deterministic duplicate headings in hash-containing filename, canonical segment collision, disjoint ownership, coverage 1->0 by reasoned exceptions, mixed-case internal rejection, independence and native revision gates. Scratch '+repo);

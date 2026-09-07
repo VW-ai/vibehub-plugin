@@ -1,0 +1,43 @@
+{
+  "acceptance_ids": [
+    "capabilities-preserved",
+    "main-integrated",
+    "merged-validation",
+    "records-migrated-honestly"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "capabilities-preserved",
+      "identity": "sha256:20e99c7b5c941d08d0652177a8bb50d7df689e29ec83ed9fbb13b4bce76cfc85",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "main-integrated",
+      "identity": "sha256:45316ebce7ab91557a251047fb24b600cb5dcb9c0a44f9ff72a847d0c296f8c8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "merged-validation",
+      "identity": "sha256:896dc2c005c4e43f77c4ea72120853f5c530ad63f24fc06e7a1b78e38ee3a20a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "records-migrated-honestly",
+      "identity": "sha256:12098b1df3e469cdd45c3be5f2155494489e6ec4835ab04129dd1ea64dde7a6a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-authorized-prerelease-validation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T07:17:53.094988+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/prerelease-validation.md",
+    ".vibehub/outcomes/ticket-decide-pr136-prerelease-convention/contract-v1.yaml",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Owner-approved 0.10.0-dev.1 and Unreleased pass main shipped-content gate; final complete suite311/0/0, artifact verification, validators and preservation audit pass. Initial stale template version was caught and fixed. Independent closeout still required.",
+  "ticket_id": "ticket-integrate-absorption-with-main"
+}

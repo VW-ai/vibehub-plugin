@@ -189,7 +189,7 @@ test("proposal keeps raw machine and downstream decision boundaries explicit", (
   assert.match(readme, /Protected decision and implementation sequence/u);
   assert.equal(contract.downstream_boundaries.length, 7);
   const nextActionContract = readFileSync(join(process.cwd(), "skills/vibehub-core/contracts/ticket-next-action.md"), "utf8");
-  const lifecycle = readFileSync(join(process.cwd(), "skills/vibehub-ticket-review/references/ticket-lifecycle.json"), "utf8");
+  const lifecycle = readFileSync(join(process.cwd(), "skills/vibehub-review/references/ticket-lifecycle.json"), "utf8");
   assert.match(nextActionContract, /`REFINE`/u);
   assert.match(nextActionContract, /`CLOSE_OUT`/u);
   assert.match(lifecycle, /"REFINE"/u);

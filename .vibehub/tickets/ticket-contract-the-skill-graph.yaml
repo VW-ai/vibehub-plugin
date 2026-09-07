@@ -1,0 +1,132 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-contract",
+      "criterion": "`skills/vibehub-core/contracts/skill-graph.json` declares every Skill, its outbound invocation edges, and the events it owns, and matches the `$vibehub-*` references actually present in the checked-in SKILL.md files.",
+      "identity": "sha256:a2305576693b4da4c9080fd5935bd8a2b4dd7e90e50bf7317d500603e5a65648",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "no-runtime-role",
+      "criterion": "The contract and command are development-time validation only; no Skill's runtime behavior reads them, and nothing in `.vibehub/` records their output.",
+      "identity": "sha256:021926967ece9b6611e420782abe03fb5b8a6bad161207ff0231012d7e5369c6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "retired-names-stay-retired",
+      "criterion": "`skill-graph.json` declares retired Skill names with their replacement, and `skills validate` fails when a retired name appears in a live reference — a `$`-invocation, a `../<name>/` path, or a bare string in Skills, contracts, scripts, UI assets, or tests. Historical records under `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, and `META/legacy-*` are exempt, as is prose that deliberately names a retired Skill in order to describe its retirement.",
+      "identity": "sha256:96ba66a569b0e3bb316a2d7fa3a911457767912d7256cd18ad863b4f063f76d7",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "retired-names-stay-retired",
+      "criterion": "`skill-graph.json` declares retired Skill names with their replacement, and `skills validate` fails when a retired name appears in a live reference — a `$`-invocation, a `../<name>/` or `skills/<name>/` path, or a bare string in Skills, contracts, scripts, UI assets, or tests. Exemption is per occurrence, never per file: an allowlist entry names the path AND the exact text it excuses AND why, and any occurrence in that file which the entry does not name still fails. An allowance whose file no longer contains the named text is itself a failure. Historical records — `.vibehub/evidence/`, `.vibehub/outcomes/`, closed `.vibehub/tickets/`, `.vibehub/history/`, `META/legacy-*`, and Context `source.ref`/`evidence[].ref` — are exempt structurally. No other exemption may be inferred from a path or filename: a dated record under `META/` is exempt only through an explicit allowlist entry, never through a date-shaped basename, and a file whose only claim to exemption is its name must fail.",
+      "identity": "sha256:684e9214f1aed7d5924d9c66b1f067f2eb9f079c1897016b2cbbb851d6f3e4b2",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "validation",
+      "criterion": "`vh.mjs skills validate --repo <root>` fails on an unresolvable `$vibehub-*` reference, a Skill missing from the contract, an orphan Skill reachable from neither a user entry nor another Skill, a cycle, a `$vibehub-*` reference present in a SKILL.md but not declared as an edge in the contract, and an edge declared in the contract that no SKILL.md contains. It passes on this repository.",
+      "identity": "sha256:dcb4a6f62c8122d326e66267b2087e7cf08f5d52032ca30095947826ac16eab8",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 2,
+  "constraints": [
+    "Do not turn the graph into a router, a lifecycle, or runtime dispatch state.",
+    "Declare the graph as it stands after both the review rename and the absorb changes, not as it was."
+  ],
+  "context": "Skill-to-skill dependencies exist only as prose references today. Planning this deliverable required grepping `$vibehub-*` by hand to discover that distill has no user entry and that deleting it would cascade through active Context. That check should be reproducible rather than remembered. The rename of vibehub-ticket-review to vibehub-review makes this concrete: retiring a name is only safe if something mechanically prevents the old one from creeping back into live references.",
+  "context_refs": [
+    {
+      "purpose": "Records the impact scan this contract makes repeatable, including the reversed distill decision.",
+      "ref": "docs/proposals/bulk-absorption.md"
+    },
+    {
+      "purpose": "Bounds this to deterministic development-time validation in the bundled script.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-contract",
+          "identity": "sha256:a2305576693b4da4c9080fd5935bd8a2b4dd7e90e50bf7317d500603e5a65648",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-runtime-role",
+          "identity": "sha256:021926967ece9b6611e420782abe03fb5b8a6bad161207ff0231012d7e5369c6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retired-names-stay-retired",
+          "identity": "sha256:96ba66a569b0e3bb316a2d7fa3a911457767912d7256cd18ad863b4f063f76d7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "validation",
+          "identity": "sha256:dcb4a6f62c8122d326e66267b2087e7cf08f5d52032ca30095947826ac16eab8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8e413289e249c46d89759d585af2f8c69cfa41c184fa5e3643842ffbcefd1cad",
+      "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-contract",
+          "identity": "sha256:a2305576693b4da4c9080fd5935bd8a2b4dd7e90e50bf7317d500603e5a65648",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-runtime-role",
+          "identity": "sha256:021926967ece9b6611e420782abe03fb5b8a6bad161207ff0231012d7e5369c6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retired-names-stay-retired",
+          "identity": "sha256:684e9214f1aed7d5924d9c66b1f067f2eb9f079c1897016b2cbbb851d6f3e4b2",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "validation",
+          "identity": "sha256:dcb4a6f62c8122d326e66267b2087e7cf08f5d52032ca30095947826ac16eab8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e292689d9337072bb97234c8ed9eacf069d5c7d9506a2b2e8bc5f9c8719351d5",
+      "revision": 2
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Skill invocation graph is a checked-in contract that `vh.mjs skills validate` can check, so changing one Skill produces a runnable blast-radius report instead of an ad-hoc grep.",
+  "provenance_refs": [
+    "conversation:2026-08-29-peel-knowledge-ingestion",
+    "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
+  ],
+  "relations": [
+    {
+      "rationale": "The contract must declare the post-rename graph; authoring it before the rename would ship a contract that is wrong on its first day.",
+      "target_ticket_id": "ticket-generalize-review-to-room-trees",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Absorb adds the ingest -> distill and ingest -> review edges and removes distill's user-entry status, which the orphan rule reads; declaring the graph before that lands would ship a contract that is wrong on its first day.",
+      "target_ticket_id": "ticket-absorb-large-material-through-ingest",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-contract-the-skill-graph"
+}

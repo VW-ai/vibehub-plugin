@@ -64,7 +64,7 @@
     },
     {
       "purpose": "The handoff-copy action, currently the only shipped mechanism for obtaining independence.",
-      "ref": "skills/vibehub-ticket-review/SKILL.md"
+      "ref": "skills/vibehub-review/SKILL.md"
     },
     {
       "purpose": "Frames provenance claims as lightweight Git-document claims rather than an attestation system; the constraint this Ticket works inside.",

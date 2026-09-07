@@ -1,0 +1,36 @@
+{
+  "acceptance_ids": [
+    "stable-identity",
+    "verified-candidate",
+    "reviewable-release-scope"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reviewable-release-scope",
+      "identity": "sha256:5045e6a4f4ae4fca580d334e231b92439460841b8e74651ecb77143babab1738",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "stable-identity",
+      "identity": "sha256:e52fe9575ebcae4fbfff15de4fab56f1890b5b0962cfe63163b4ee26f7ebad85",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verified-candidate",
+      "identity": "sha256:451a9068877edabc6ce2f283ee11600fe7e5b80ef132ea25b6dcf498fe2e8748",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-stable-release-preparation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T08:15:04.745369+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-prepare-v0100-release/release-preparation.md",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136"
+  ],
+  "schema_version": 2,
+  "summary": "Stable0.10.0 candidate prepared under explicit owner merge/release authorization. Version/tag gates, full311tests and artifact verification pass; validators and record audit pass. Known partials preserved. See preparation record; independent closeout required before publication.",
+  "ticket_id": "ticket-prepare-v0100-release"
+}

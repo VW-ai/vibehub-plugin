@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Distill"
-  short_description: "Build or resume the repository's Room tree"
-  default_prompt: "Use $vibehub-distill to build or resume this repository's Room tree."
+  short_description: "Internal: Room shape and alignment stamps"
+  default_prompt: "Use $vibehub-distill from another VibeHub Skill to write this repository's Room shape and alignment stamps."

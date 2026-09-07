@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "capabilities-preserved",
+    "main-integrated",
+    "merged-validation",
+    "records-migrated-honestly"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "capabilities-preserved",
+      "identity": "sha256:20e99c7b5c941d08d0652177a8bb50d7df689e29ec83ed9fbb13b4bce76cfc85",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "main-integrated",
+      "identity": "sha256:45316ebce7ab91557a251047fb24b600cb5dcb9c0a44f9ff72a847d0c296f8c8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "merged-validation",
+      "identity": "sha256:896dc2c005c4e43f77c4ea72120853f5c530ad63f24fc06e7a1b78e38ee3a20a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "records-migrated-honestly",
+      "identity": "sha256:12098b1df3e469cdd45c3be5f2155494489e6ec4835ab04129dd1ea64dde7a6a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-main-integration-execution",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T07:03:31.197969+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/execution.md",
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/audit-records.mjs",
+    "test/anchor-normalization.test.mjs",
+    "test/skill-graph.test.mjs",
+    "test/revision-contract.test.mjs",
+    "test/ticket-context-ref-history.test.mjs",
+    "test/ticket-next-action.test.mjs",
+    ".vibehub/outcomes/ticket-contract-the-skill-graph/contract-v2.yaml",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136"
+  ],
+  "schema_version": 2,
+  "summary": "Merged fetched main 5846c3f in 556ec78 and pushed to PR136; conflict resolutions preserve coverage and main revision/independence/npx-only semantics. Declared migration reconstructed13 Tickets/63 Evidence/12 Outcomes with zero unresolved. Preservation audit passes. Merged tests311/0/0, artifact and site preflight pass, validators pass, entered Rooms aligned. Inherited graph v2 no-runtime-role mismatch independently recorded partial, and Peel partial unchanged. Exact commands, scope, migration mechanism and limitations in execution.md; independent integration adjudication required.",
+  "ticket_id": "ticket-integrate-absorption-with-main"
+}
