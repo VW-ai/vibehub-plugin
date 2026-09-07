@@ -495,6 +495,11 @@ function validateRoom(document, path = "room") {
   requiredString(errors, document, "description", path);
   requiredString(errors, document, "boundary", path);
   stringArray(errors, document.anchors ?? null, `${path}.anchors`);
+  if (Array.isArray(document.anchors)) document.anchors.forEach((anchor, index) => {
+    if (typeof anchor !== "string") return;
+    const parsed = parseAnchor(anchor);
+    if (parsed.error) add(errors, `${path}.anchors[${index}]`, parsed.error);
+  });
   if (typeof document.stale !== "boolean") add(errors, `${path}.stale`, "must be a boolean");
   if (document.stale_reason !== undefined && (typeof document.stale_reason !== "string" || !document.stale_reason.trim())) {
     add(errors, `${path}.stale_reason`, "must be a non-empty string when present");
@@ -765,11 +770,26 @@ const ROOM_FILE = "room.yaml";
 // FILE whose own name contains "#" ("docs/a#b.md", meaning "all of that file")
 // is unreachable — it parses as segment "b.md" of "docs/a". That reading loses,
 // on purpose; see the anchor-parsing note in the Ticket evidence.
+// Normalisation is deliberately lexical: no stat, realpath or symlink lookup.
+// Parent traversal is rejected rather than collapsed, since collapsing it can
+// disagree with filesystem traversal through a symlink. Slugs remain verbatim.
 function parseAnchor(anchor) {
   const hash = anchor.lastIndexOf("#");
-  if (hash === -1) return { path: anchor.replace(/\/+$/u, ""), segment: null };
-  const path = anchor.slice(0, hash).replace(/\/+$/u, "");
-  return { path, segment: `${path}#${anchor.slice(hash + 1)}` };
+  const rawPath = hash === -1 ? anchor : anchor.slice(0, hash);
+  const parts = rawPath.split("/");
+  const path = parts.filter((part) => part && part !== ".").join("/");
+  let error = null;
+  if (!path) error = "anchor must name non-empty territory below the repository root; root anchors are not allowed";
+  else if (rawPath.startsWith("/") || /^[A-Za-z]:/u.test(rawPath) || rawPath.includes("\\") || parts.includes("..")) {
+    error = "anchor must be repository-relative, without parent traversal or backslashes";
+  } else if (isInternalSourcePath(path)) {
+    error = "anchor must not include .vibehub or .git internal documents";
+  }
+  return { path, segment: hash === -1 ? null : `${path}#${anchor.slice(hash + 1)}`, error };
+}
+
+function isInternalSourcePath(path) {
+  return path.split("/").some((part) => part === ".vibehub" || part === ".git");
 }
 
 // Two anchors collide when the segment sets they name intersect. That is decided
@@ -1572,7 +1592,7 @@ function anchoredUnits(repo, document, snapshot) {
   const anchors = (document.anchors ?? []).filter((anchor) => typeof anchor === "string").map(parseAnchor);
   const prefixes = anchors.filter((anchor) => anchor.segment === null);
   for (const [path, hash] of snapshot) {
-    if (prefixes.some((anchor) => anchorMatches(anchor.path, path))) units.set(path, hash);
+    if (isReadableSourcePath(repo, path) && prefixes.some((anchor) => anchorMatches(anchor.path, path))) units.set(path, hash);
   }
   const byFile = new Map();
   for (const anchor of anchors) {
@@ -1584,7 +1604,7 @@ function anchoredUnits(repo, document, snapshot) {
     // A segment anchor on a file that is gone, unreadable, or binary resolves to
     // nothing: the unit disappears from the current set and drift reports it as
     // deleted, which is the honest answer.
-    if (!snapshot.has(path)) continue;
+    if (!snapshot.has(path) || !isReadableSourcePath(repo, path)) continue;
     const absolute = join(repo, path);
     if (!existsSync(absolute) || !lstatSync(absolute).isFile()) continue;
     const buffer = readFileSync(absolute);
@@ -1934,13 +1954,27 @@ function sourceOperation(operation, repo, options = {}) {
 // are on disk right now. Nothing is cached and nothing is written.
 // ---------------------------------------------------------------------------
 
+// Match the directory walk's no-symlink policy even when the anchor names a
+// file below a symlink. Otherwise an alias can pull .vibehub documents (or
+// files outside the repository) into source territory. This is a read-time
+// guard only; declared-territory collision remains entirely textual.
+function isReadableSourcePath(repo, path) {
+  if (isInternalSourcePath(path)) return false;
+  let absolute = repo;
+  for (const part of path.split("/")) {
+    absolute = join(absolute, part);
+    if (!existsSync(absolute) || lstatSync(absolute).isSymbolicLink()) return false;
+  }
+  return true;
+}
+
 function walkSourceFiles(repo, relative, out) {
   const entries = readdirSync(join(repo, relative), { withFileTypes: true })
     .sort((a, b) => (a.name < b.name ? -1 : 1));
   for (const entry of entries) {
-    // .git is machinery, never source. Symlinks are neither isFile nor
+    // .git and .vibehub are machinery, never source. Symlinks are neither isFile nor
     // isDirectory here, so they are skipped and cannot escape the anchor.
-    if (entry.name === ".git") continue;
+    if (entry.name === ".git" || entry.name === ".vibehub") continue;
     const child = `${relative}/${entry.name}`;
     if (entry.isDirectory()) walkSourceFiles(repo, child, out);
     else if (entry.isFile()) out.push(child);
@@ -1955,12 +1989,12 @@ function anchoredTerritory(repo, document) {
   const anchors = (document.anchors ?? [])
     .filter((anchor) => typeof anchor === "string")
     .map(parseAnchor)
-    .filter((anchor) => anchor.path && !anchor.path.split("/").includes(".."));
+    .filter((anchor) => !anchor.error);
   const files = new Map();
   for (const anchor of anchors) {
     if (anchor.segment !== null) continue;
     const absolute = join(repo, anchor.path);
-    if (!existsSync(absolute)) continue;
+    if (!isReadableSourcePath(repo, anchor.path)) continue;
     const stats = lstatSync(absolute);
     const reached = [];
     if (stats.isFile()) reached.push(anchor.path);
@@ -1972,7 +2006,7 @@ function anchoredTerritory(repo, document) {
     if (anchor.segment === null) continue;
     if (files.get(anchor.path) === null) continue;
     const absolute = join(repo, anchor.path);
-    if (!existsSync(absolute) || !lstatSync(absolute).isFile()) {
+    if (!isReadableSourcePath(repo, anchor.path) || !lstatSync(absolute).isFile()) {
       missing.push(anchor.segment);
       continue;
     }

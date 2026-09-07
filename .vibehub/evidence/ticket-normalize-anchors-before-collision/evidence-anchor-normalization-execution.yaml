@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "anchors-normalized-before-collision",
+    "repo-root-anchor-is-honest",
+    "empty-territory-anchors-are-reported",
+    "vibehub-internals-not-anchorable",
+    "existing-anchors-unchanged",
+    "regression"
+  ],
+  "evidence_id": "evidence-anchor-normalization-execution",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T04:24:08.638540+00:00",
+  "refs": [
+    "test/anchor-normalization.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/execution.md",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/compare-baseline.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Implemented textual anchor normalization shared by collision, coverage and alignment; invalid root/empty/internal anchors are rejected and internal/symlink paths excluded from source reads. 29 new regression tests; complete suite 251 pass, zero fail/skip. Frozen-baseline comparison confirms identical validation, drift, coverage and alignment commit/hashes across all six checked-in Rooms. Reproduction, scope and limitations are in execution.md. Independent adjudication required.",
+  "ticket_id": "ticket-normalize-anchors-before-collision"
+}
