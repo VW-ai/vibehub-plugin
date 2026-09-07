@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "anchors-normalized-before-collision",
+    "repo-root-anchor-is-honest",
+    "empty-territory-anchors-are-reported",
+    "vibehub-internals-not-anchorable",
+    "existing-anchors-unchanged",
+    "regression"
+  ],
+  "evidence_id": "evidence-anchor-independent-retry-closeout",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T04:32:23.046437+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/independent-retry-closeout.md",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/independent-retry-probe.mjs",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/independent-retry-output.txt"
+  ],
+  "schema_version": 1,
+  "summary": "Independent retry: all six criteria accepted after 257/257/0, six-Room frozen parity, validators, same-inode internal alias rejection, nested mixed-case internal exclusion and symlink controls.",
+  "ticket_id": "ticket-normalize-anchors-before-collision"
+}
