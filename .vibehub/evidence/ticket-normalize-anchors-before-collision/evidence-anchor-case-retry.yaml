@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "anchors-normalized-before-collision",
+    "repo-root-anchor-is-honest",
+    "empty-territory-anchors-are-reported",
+    "vibehub-internals-not-anchorable",
+    "existing-anchors-unchanged",
+    "regression"
+  ],
+  "evidence_id": "evidence-anchor-case-retry",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-07T04:30:27.385288+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/case-retry.md",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/independent-closeout.md",
+    "test/anchor-normalization.test.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/contracts/room.schema.json",
+    ".vibehub/evidence/ticket-normalize-anchors-before-collision/compare-baseline.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Retry closes independently reproduced case-alias internal-material bypass using one case-insensitive reserved-component predicate at validation and source traversal. Acceptance and constraints unchanged. Six new regressions, 257 total tests pass without fail/skip, both validators pass, and frozen six-Room parity rerun is identical. First partial and evidence retained; independent re-adjudication required.",
+  "ticket_id": "ticket-normalize-anchors-before-collision"
+}

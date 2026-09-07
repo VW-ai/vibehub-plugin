@@ -30,7 +30,7 @@
     "Do not change how segments are computed, and do not change what a segment anchor means.",
     "Keep normalisation textual and deterministic; do not resolve symlinks or touch the filesystem to decide whether two anchors collide."
   ],
-  "context": "Found by adjudication, and pre-existing rather than introduced: anchorsCollide compares anchors as strings, so a Room anchoring \".\" and a Room anchoring \"docs\" are judged non-overlapping while both in fact own docs/. Reproduced — both room put calls succeed, project validate returns valid:true, and context coverage shows the two Rooms owning the same file; the \".\" Room additionally owns .vibehub/ internals. That is exactly the defect the overlapping-territory rule exists to prevent, reached through an anchor form the rule does not normalise. A related family escapes a different check: \"#\" and \"/\" parse to an empty path, own nothing, and are filtered out by anchoredTerritory before the missing-anchor report, so they are neither honoured nor flagged. Both behaviours are identical before and after the last-hash parse fix.",
+  "context": "Found by adjudication, and pre-existing rather than introduced: anchorsCollide compares anchors as strings, so a Room anchoring \".\" and a Room anchoring \"docs\" are judged non-overlapping while both in fact own docs/. Reproduced — both room put calls succeed, project validate returns valid:true, and context coverage shows the two Rooms owning the same file; the \".\" Room additionally owns .vibehub/ internals. That is exactly the defect the overlapping-territory rule exists to prevent, reached through an anchor form the rule does not normalise. A related family escapes a different check: \"#\" and \"/\" parse to an empty path, own nothing, and are filtered out by anchoredTerritory before the missing-anchor report, so they are neither honoured nor flagged. Both behaviours are identical before and after the last-hash parse fix. Retry after independent partial at 7f3d6cd: on case-insensitive filesystems .VIBEHUB aliases the internal directory and bypasses case-sensitive exclusion. Preserve all six acceptance criteria and constraints; reject reserved internal path components case-insensitively at validation and source traversal. Retain the first partial Outcome in Git and its independent Evidence; a later independent closeout must rerun the original criteria plus directory, file, segment and nested uppercase-internal regressions.",
   "context_refs": [
     {
       "purpose": "parseAnchor, anchorsCollide, overlappingTerritory, anchoredTerritory.",
@@ -43,6 +43,10 @@
     {
       "purpose": "Records the reproduction and that it predates the parse fix.",
       "ref": ".vibehub/outcomes/ticket-parse-anchors-at-the-last-hash.yaml"
+    },
+    {
+      "purpose": "Independent counterexample that this retry must close without changing acceptance.",
+      "ref": ".vibehub/evidence/ticket-normalize-anchors-before-collision/independent-closeout.md"
     }
   ],
   "deliveries": [],

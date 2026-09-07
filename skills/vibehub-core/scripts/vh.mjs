@@ -789,7 +789,7 @@ function parseAnchor(anchor) {
 }
 
 function isInternalSourcePath(path) {
-  return path.split("/").some((part) => part === ".vibehub" || part === ".git");
+  return path.split("/").some((part) => part.toLowerCase() === ".vibehub" || part.toLowerCase() === ".git");
 }
 
 // Two anchors collide when the segment sets they name intersect. That is decided
@@ -1974,7 +1974,7 @@ function walkSourceFiles(repo, relative, out) {
   for (const entry of entries) {
     // .git and .vibehub are machinery, never source. Symlinks are neither isFile nor
     // isDirectory here, so they are skipped and cannot escape the anchor.
-    if (entry.name === ".git" || entry.name === ".vibehub") continue;
+    if (isInternalSourcePath(entry.name)) continue;
     const child = `${relative}/${entry.name}`;
     if (entry.isDirectory()) walkSourceFiles(repo, child, out);
     else if (entry.isFile()) out.push(child);

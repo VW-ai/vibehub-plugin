@@ -36,7 +36,9 @@ for (const [a, b] of [
 for (const anchor of ['.', './', '././', '#', '/', '///', '#one', '.#one',
   '../docs', 'docs/../docs', '/docs', 'C:/docs', 'docs\\a.md',
   '.vibehub', './.vibehub/tickets', '.vibehub/rooms/a/room.yaml#one',
-  'docs/.vibehub/a.md', '.git', 'docs/.git/config']) {
+  'docs/.vibehub/a.md', '.git', 'docs/.git/config',
+  '.VIBEHUB/evidence', '.VibeHub/evidence/a.md', '.VIBEHUB/evidence/a.md#one',
+  'docs/.VIBEHUB/a.md', '.GIT/config']) {
   test(`invalid anchor ${anchor} fails at write and cannot hide in a hand-written Room`, () => {
     const repo = fixture('anchor-invalid');
     assert.equal(put(repo, 'docs', 'docs').status, 0);
@@ -117,4 +119,16 @@ test('normalised anchors stamp canonical units and changing spelling alone prese
     assert.deepEqual(run(repo, 'room', 'drift').envelope, before);
     assert.deepEqual(JSON.parse(readFileSync(path, 'utf8')).alignment, document.alignment);
   }
+});
+
+test('wider prefixes exclude mixed-case internal directories on every filesystem', () => {
+  const repo = fixture('anchor-internal-case');
+  for (const dir of ['.VIBEHUB', '.GiT', '.VIBEHUB-notes']) {
+    mkdirSync(join(repo, 'docs', dir), { recursive: true });
+    writeFileSync(join(repo, 'docs', dir, 'a.md'), '# Internal\ntext\n');
+  }
+  assert.equal(put(repo, 'docs', 'docs').status, 0);
+  const result = run(repo, 'context', 'coverage');
+  assert.equal(result.status, 0, result.stdout);
+  assert.deepEqual(result.envelope.data.rooms[0].files.map(f => f.path), ['docs/.VIBEHUB-notes/a.md', 'docs/a.md']);
 });
