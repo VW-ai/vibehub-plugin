@@ -35,7 +35,7 @@
     "Do not relax acceptance or proof/independence gates to make integration pass; preserve historical evidence and outcomes through Git and the main migration contract.",
     "Do not publish a release, modify unrelated worktrees, force-push, or merge PR 136 into main."
   ],
-  "context": "User requested aligning PR 136 with main. Current delivery tip d3289c2; current known main 5846c3f introduces project format 4, revision-bound Acceptance/Evidence/Outcome, explicit closeout independence, npx-only distribution and upgrades. Resolve integration rather than choosing an entire side. Record the exact fetched main commit in Evidence. Preserve the existing Peel partial semantics and historical evidence.",
+  "context": "User requested aligning PR 136 with main. Current delivery tip d3289c2; current known main 5846c3f introduces project format 4, revision-bound Acceptance/Evidence/Outcome, explicit closeout independence, npx-only distribution and upgrades. Resolve integration rather than choosing an entire side. Record the exact fetched main commit in Evidence. Preserve the existing Peel partial semantics and historical evidence. GitHub CI additionally reaches the main shipped-content version gate. Its prerelease convention conflicts with the explicit no-Unreleased handoff; the linked owner-decision Ticket gates that next step.",
   "context_refs": [
     {
       "purpose": "PR integration and Room alignment requirements.",
@@ -88,9 +88,16 @@
   "outcome": "PR 136 contains the latest main baseline and the absorption delivery with resolved merge conflicts, compatible revision-bound project data, passing checks and independently verified integration.",
   "provenance_refs": [
     "conversation:2026-09-07-align-pr-136-with-main",
-    "https://github.com/VW-ai/vibehub-plugin/pull/136"
+    "https://github.com/VW-ai/vibehub-plugin/pull/136",
+    "plan-validation:independent"
   ],
-  "relations": [],
+  "relations": [
+    {
+      "rationale": "The newly reached release-identity gate cannot be resolved or intentionally left red until the owner chooses which conflicting release convention governs this PR.",
+      "target_ticket_id": "ticket-decide-pr136-prerelease-convention",
+      "type": "depends_on"
+    }
+  ],
   "revision_state": "bound",
   "schema_version": 3,
   "ticket_id": "ticket-integrate-absorption-with-main"

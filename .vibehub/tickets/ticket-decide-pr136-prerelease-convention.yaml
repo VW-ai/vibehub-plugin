@@ -1,0 +1,58 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "owner-choice-recorded",
+      "authority": "human",
+      "criterion": "An explicit owner response with readable conversation reference selects whether PR136 may adopt main prerelease metadata (0.10.0-dev.1 plus Unreleased, without publication), or must retain the no-Unreleased constraint and disclose the remaining CI gate.",
+      "identity": "sha256:a2170a6d8f48fad2ef42a39d0670e4704da23b02d76b9322c51732f9f9a53fd3",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "No release tag, GitHub Release, deployment or CI weakening.",
+    "Do not change release metadata before explicit owner choice."
+  ],
+  "context": "During user-authorized alignment with main, GitHub CI rejects changed shipped content retaining published 0.9.0. Main docs/RELEASE requires a greater prerelease plus Unreleased, while this task handoff explicitly prohibits Unreleased. The concrete options are prepare 0.10.0-dev.1 plus Unreleased without tagging/publishing, or retain the prohibition and leave the draft version gate failed. Do not infer which instruction to supersede.",
+  "context_refs": [
+    {
+      "purpose": "Main prerelease and stable candidate rules.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "The failing shipped-content identity gate.",
+      "ref": "scripts/verify-release-version.mjs"
+    },
+    {
+      "purpose": "Existing release identity decision; the current user handoff imposes a conflicting constraint.",
+      "ref": ".vibehub/rooms/product/decision-release-version-identity-policy.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "owner-choice-recorded",
+          "identity": "sha256:a2170a6d8f48fad2ef42a39d0670e4704da23b02d76b9322c51732f9f9a53fd3",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a39b0f0266fbce1b3f70006a254bee401df39f096698a435bb94fb2f74a12676",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly resolves the conflict between the handoff prohibition on Unreleased and main prerelease CI requirements for PR136.",
+  "provenance_refs": [
+    "conversation:2026-09-07-pr136-prerelease-conflict",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-decide-pr136-prerelease-convention"
+}

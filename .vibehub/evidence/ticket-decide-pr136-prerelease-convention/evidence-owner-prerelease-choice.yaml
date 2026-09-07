@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "owner-choice-recorded"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "owner-choice-recorded",
+      "identity": "sha256:a2170a6d8f48fad2ef42a39d0670e4704da23b02d76b9322c51732f9f9a53fd3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-owner-prerelease-choice",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-07T07:11:27.861065+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-decide-pr136-prerelease-convention/owner-choice.md",
+    "conversation:2026-09-07-pr136-prerelease-conflict"
+  ],
+  "schema_version": 2,
+  "summary": "Owner explicitly chose main prerelease convention in response to the displayed 0.10.0-dev.1 plus Unreleased question, with no tagging or publication.",
+  "ticket_id": "ticket-decide-pr136-prerelease-convention"
+}

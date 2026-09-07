@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "af55cb0000e43d2b84601bb724ddfb4139a7c488",
+        "blob": "f891f929707a9108dd0bad5a69ad7f5f883218e9",
         "path": "CHANGELOG.md"
       },
       {
@@ -198,8 +198,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-07T06:54:55.287Z",
-    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
+    "checked_at": "2026-09-07T07:14:34.764Z",
+    "last_aligned_commit": "e0f0f917eb055148b4b5ddce46b5d52b325f8c52"
   },
   "anchors": [
     "CHANGELOG.md",

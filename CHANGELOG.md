@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Add a five-pass large-document ingestion flow with deterministic source
+  segments, citation-based coverage, reasoned exceptions, and a Room-tree
+  confirmation step. Uncovered segments remain unfinished work.
+- Support paragraph-level Room anchors and drift checks; normalize paths
+  before collision checks and reject root, empty, and internal anchors.
+  Exclude internal case aliases and symlink traversal from source territory.
+- Generalize the review Skill to present both Ticket graphs and Room trees;
+  validate the declared Skill graph and report retired installed Skill folders.
+- Retain closed-Ticket missing-path history alongside immutable commit
+  references, and preserve revision-bound evidence and independent closeout
+  gates when integrating the ingestion delivery with format 4.
+
 ## 0.9.0 — 2026-09-04
 
 - Make Acceptance and complete Ticket contracts append-only, monotonically
