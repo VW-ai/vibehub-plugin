@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "capabilities-preserved",
+    "main-integrated",
+    "merged-validation",
+    "records-migrated-honestly"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-07T07:25:44.728960+00:00",
+  "contract_revision": {
+    "identity": "sha256:2e961f0d380b7e25afb86a913f8349fbb4823714c419a923ebb71f10380717bb",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-independent-integration-closeout"
+  ],
+  "independence": {
+    "note": "Fresh /root/integration_closeout Agent, separate from executor with bounded handoff; independently read current contract, evidence, source and directly reran checks/probe. Writes limited to this Ticket Evidence and current Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent acceptance of all four integration Contract v1 criteria at pushed d9ec3eb7e85fa242e32e514a24b2c68ab923009a: main ancestry/history retained, capabilities pass independent probe and311-test suite, npx artifact/version/validators/Room checks pass, exact record audit preserves main and imported proof semantics, PR scope and checks match. Peel v1 and skill graph v2 remain separately partial; this Outcome closes only integration.",
+  "ticket_id": "ticket-integrate-absorption-with-main",
+  "unresolved_acceptance_ids": []
+}

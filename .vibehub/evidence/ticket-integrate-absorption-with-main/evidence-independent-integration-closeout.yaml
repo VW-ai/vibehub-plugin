@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "capabilities-preserved",
+    "main-integrated",
+    "merged-validation",
+    "records-migrated-honestly"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "capabilities-preserved",
+      "identity": "sha256:20e99c7b5c941d08d0652177a8bb50d7df689e29ec83ed9fbb13b4bce76cfc85",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "main-integrated",
+      "identity": "sha256:45316ebce7ab91557a251047fb24b600cb5dcb9c0a44f9ff72a847d0c296f8c8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "merged-validation",
+      "identity": "sha256:896dc2c005c4e43f77c4ea72120853f5c530ad63f24fc06e7a1b78e38ee3a20a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "records-migrated-honestly",
+      "identity": "sha256:12098b1df3e469cdd45c3be5f2155494489e6ec4835ab04129dd1ea64dde7a6a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-independent-integration-closeout",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-07T07:25:44.728960+00:00",
+  "refs": [
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/independent-closeout.md",
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/independent-probe.mjs",
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/audit-records.mjs",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136"
+  ],
+  "schema_version": 2,
+  "summary": "Fresh independent integration adjudication: all four current criteria accepted after full311/0/0 tests, artifact/version gate, validators, record audit, isolated combined probe and direct pushed-head/PR verification; both separate partial Outcomes preserved.",
+  "ticket_id": "ticket-integrate-absorption-with-main"
+}
