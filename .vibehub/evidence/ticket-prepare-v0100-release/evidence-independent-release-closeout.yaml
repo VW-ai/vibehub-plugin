@@ -1,0 +1,39 @@
+{
+  "acceptance_ids": [
+    "reviewable-release-scope",
+    "stable-identity",
+    "verified-candidate"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reviewable-release-scope",
+      "identity": "sha256:5045e6a4f4ae4fca580d334e231b92439460841b8e74651ecb77143babab1738",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "stable-identity",
+      "identity": "sha256:e52fe9575ebcae4fbfff15de4fab56f1890b5b0962cfe63163b4ee26f7ebad85",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verified-candidate",
+      "identity": "sha256:451a9068877edabc6ce2f283ee11600fe7e5b80ef132ea25b6dcf498fe2e8748",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-independent-release-closeout",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-07T08:17:43.423729+00:00",
+  "refs": [
+    "git:e0aae289369d7f3e60f1236fa3c5192e24b61215",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136",
+    ".vibehub/evidence/ticket-prepare-v0100-release/release-preparation.md",
+    ".vibehub/evidence/ticket-integrate-absorption-with-main/audit-records.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Fresh independent subagent adjudication at e0aae289369d7f3e60f1236fa3c5192e24b61215. stable-identity accepted: read metadata diff from d39ef67; package/Claude/template agree on 0.10.0 and dated changelog replaces Unreleased; directly ran verify-release-version --tag v0.10.0 and --check-shipped-content, both pass with baseline v0.9.0. verified-candidate accepted: independently ran npm run verify with local loopback permission: 311 passed, 0 failed/skipped; artifact 69 files, 3405706 bytes. Project, skills and ticket validators valid; zero unverifiable context refs. Room drift FRESH for knowledge/product/ticket-lifecycle/workbench/marketing-video; unrelated marketing retains explicit stale marker with hashes_match true. Direct audit-records run preserves 108 main Ticket revision records/415 proofs and 13 branch Acceptance sets/constraints/163 original proofs. git diff --exit-code d39ef67 HEAD -- .vibehub/outcomes passes: historical partials and integration Outcome unchanged. reviewable-release-scope accepted: read PR136 via GitHub at exact candidate head plus preparation record; owner quotation matches explicit authorization supplied in fresh handoff; minor capability addition judgment and stable candidate metadata disclosed, Peel partial 4/5 and Skill graph v2 partial 3/4 retained. Read docs/RELEASE.md and release.yml: current merge/tag flow only, no future automation implementation. This independent closeout concerns preparation only; final CI, merge, main-only tag and release asset verification remain publication steps.",
+  "ticket_id": "ticket-prepare-v0100-release"
+}
