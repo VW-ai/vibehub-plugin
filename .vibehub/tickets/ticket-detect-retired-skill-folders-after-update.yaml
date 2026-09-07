@@ -2,21 +2,34 @@
   "acceptance": [
     {
       "acceptance_id": "detects-retired-folder",
-      "criterion": "When a project contains an installed Skill folder whose name is declared retired, setup reports the exact path and the replacement name, for every install location it already inspects."
-    },
-    {
-      "acceptance_id": "reports-does-not-delete",
-      "criterion": "Setup reports the stale folder and does not delete or modify it. Removing an installed Skill from the user's agent directory is the user's action, not setup's."
+      "criterion": "When a project contains an installed Skill folder whose name is declared retired, setup reports the exact path and the replacement name, for every install location it already inspects.",
+      "identity": "sha256:ff21d9a4ca009eafae772a5b781e17608836ca8fe8948b9b4633551cf90d468d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "quiet-when-clean",
-      "criterion": "A project with no retired Skill folder produces no additional output, and a project that never installed VibeHub through skills.sh is unaffected."
+      "criterion": "A project with no retired Skill folder produces no additional output, and a project that never installed VibeHub through skills.sh is unaffected.",
+      "identity": "sha256:e6e80476c6f89f7bed7cfc4c9ea30fded57be87ea1fedffa1d994a9e45031e7d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "regression",
-      "criterion": "Tests cover a project with a retired folder present, a project with only the replacement present, and a project with neither."
+      "criterion": "Tests cover a project with a retired folder present, a project with only the replacement present, and a project with neither.",
+      "identity": "sha256:b97d0731b015be54644b9da1eb969d8caeafc9eb2007a8e2abbadd1b85ac3fb7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reports-does-not-delete",
+      "criterion": "Setup reports the stale folder and does not delete or modify it. Removing an installed Skill from the user's agent directory is the user's action, not setup's.",
+      "identity": "sha256:e08c5fd78c7e63f4eaf5c7ee4f649bec0eb8f8732ce327a99752384e7a432c75",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not delete, move, or rewrite anything inside the user's agent Skill directories.",
     "Do not add a background check, hook, or install-time daemon; this runs only inside the setup workflow the user already invoked.",
@@ -37,6 +50,34 @@
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "detects-retired-folder",
+          "identity": "sha256:ff21d9a4ca009eafae772a5b781e17608836ca8fe8948b9b4633551cf90d468d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quiet-when-clean",
+          "identity": "sha256:e6e80476c6f89f7bed7cfc4c9ea30fded57be87ea1fedffa1d994a9e45031e7d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression",
+          "identity": "sha256:b97d0731b015be54644b9da1eb969d8caeafc9eb2007a8e2abbadd1b85ac3fb7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reports-does-not-delete",
+          "identity": "sha256:e08c5fd78c7e63f4eaf5c7ee4f649bec0eb8f8732ce327a99752384e7a432c75",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:aff53d5b7d1f674a3dd5d6e2186989e5803559f8c1436909caa395dc9feb93c9",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -52,6 +93,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-detect-retired-skill-folders-after-update"
 }

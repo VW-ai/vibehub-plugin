@@ -21,10 +21,10 @@ test("static arrival is one statement plus the real Ticket Graph", async () => {
   assert.match(html, /Interactive guided Ticket causal graph/);
   assert.match(html, /npx skills add VW-ai\/vibehub-plugin/);
   assert.match(html, /any skills-capable agent/);
-  assert.match(html, /Install for Codex/);
   assert.match(html, /Claude Code/);
   assert.match(html, /Copy for Agent/);
   assert.match(html, /GitHub/);
+  assert.doesNotMatch(html, /plugin marketplace add|plugin install vibehub@vibehub|Marketplace commands|Marketplace steps/);
   assert.doesNotMatch(html, /Start the walkthrough|VibeHub Ticket cycle stages|Continue to Evidence|Choose a palette to continue|Development request|Ask the Agent to change this repository|HOW IT WORKS/);
 });
 
@@ -32,16 +32,13 @@ test("installation, Agent handoff, founders, and local assets stay truthful", as
   const page = await source("app/page.tsx");
 
   assert.match(page, /const SKILLS_INSTALL = "npx skills add VW-ai\/vibehub-plugin"/);
-  assert.match(page, /const CODEX_INSTALL = "codex plugin marketplace add VW-ai\/vibehub-plugin\\ncodex plugin add vibehub@vibehub"/);
-  assert.match(page, /\/plugin marketplace add VW-ai\/vibehub-plugin/);
-  assert.ok(page.indexOf("${SKILLS_INSTALL}") < page.indexOf("${CODEX_INSTALL}"), "Agent brief must list the skills.sh command before the marketplace commands");
+  assert.equal((page.match(/const SKILLS_INSTALL =/g) ?? []).length, 1);
+  assert.doesNotMatch(page, /CODEX_INSTALL|CLAUDE_INSTALL|plugin marketplace add|plugin install vibehub@vibehub|through a host marketplace/);
   assert.match(page, /mirror one-way to GitHub Issues/);
   assert.match(page, /className="install-primary"/);
   assert.match(page, /function SiteHeader/);
   assert.match(page, /function InstallActions/);
   assert.match(page, /function BrandIcon/);
-  assert.match(page, /\/brands\/codex\.png/);
-  assert.match(page, /\/brands\/claude-code\.png/);
   assert.match(page, /\/brands\/github\.svg/);
   assert.match(page, /\/founders\/wayne-wang\.jpg/);
   assert.match(page, /\/founders\/victor-zhang\.jpg/);
@@ -56,8 +53,6 @@ test("installation, Agent handoff, founders, and local assets stay truthful", as
   assert.doesNotMatch(page, /Chenyang Zhang|张陈阳|张辰阳/);
 
   await Promise.all([
-    access(new URL("public/brands/codex.png", root)),
-    access(new URL("public/brands/claude-code.png", root)),
     access(new URL("public/brands/github.svg", root)),
     access(new URL("public/founders/wayne-wang.jpg", root)),
     access(new URL("public/founders/victor-zhang.jpg", root)),

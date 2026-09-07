@@ -2,29 +2,48 @@
   "acceptance": [
     {
       "acceptance_id": "closed-ticket-refs-at-their-commit",
-      "criterion": "A Ticket that has a recorded Outcome has each `context_refs` entry validated against a commit recorded for that Ticket rather than against the working tree. A ref readable at that commit passes even when the path no longer exists at HEAD; a ref readable at neither the commit nor the working tree still fails."
-    },
-    {
-      "acceptance_id": "open-ticket-refs-at-head",
-      "criterion": "A Ticket with no recorded Outcome still requires every `context_refs` entry to be readable in the working tree, unchanged from today's behavior."
-    },
-    {
-      "acceptance_id": "live-pointers-still-checked",
-      "criterion": "Room `anchors` and `alignment.anchor_hashes` continue to resolve against the working tree. A Room anchoring a path that no longer exists is still reported; this change never makes a stale Room anchor pass."
+      "criterion": "A Ticket that has a recorded Outcome has each `context_refs` entry validated against a commit recorded for that Ticket rather than against the working tree. A ref readable at that commit passes even when the path no longer exists at HEAD; a ref readable at neither the commit nor the working tree still fails.",
+      "identity": "sha256:1893e4ef2bc2ddbc66f9dee17ac95a95b49b7da5a1b64c8b3889361a79146594",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "degrades-without-git",
-      "criterion": "Validation still runs in a checkout with no reachable git history: when the recorded commit cannot be read, a closed Ticket's unreadable ref is reported as an unverifiable ref rather than crashing or silently passing, and the test suite continues to pass when run outside a git checkout."
+      "criterion": "Validation still runs in a checkout with no reachable git history: when the recorded commit cannot be read, a closed Ticket's unreadable ref is reported as an unverifiable ref rather than crashing or silently passing, and the test suite continues to pass when run outside a git checkout.",
+      "identity": "sha256:4fd396f2e54c8ba1bee85ec555e12d7f26fa87ac5274a3fadc890fd3838e4ba6",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "repository-green",
-      "criterion": "`vh.mjs project validate --repo .` passes on this repository with `skills/vibehub-ticket-review/` renamed and no closed Ticket, Evidence, or Outcome document edited, and the full test suite passes."
+      "acceptance_id": "live-pointers-still-checked",
+      "criterion": "Room `anchors` and `alignment.anchor_hashes` continue to resolve against the working tree. A Room anchoring a path that no longer exists is still reported; this change never makes a stale Room anchor pass.",
+      "identity": "sha256:e9f42f6bc865e255b88ea57f8d416d5ae8629799026c1a0bbde2d060a5897cea",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "open-ticket-refs-at-head",
+      "criterion": "A Ticket with no recorded Outcome still requires every `context_refs` entry to be readable in the working tree, unchanged from today's behavior.",
+      "identity": "sha256:8e50d43a4e4430dec0f8e74a6e0193bcab4979b9c71d0b5b5156240b728bcefa",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "regression",
-      "criterion": "Tests cover a closed Ticket whose ref exists only at its commit, a closed Ticket whose ref exists nowhere, an open Ticket with a dangling ref, a stale Room anchor, and the no-git fallback."
+      "criterion": "Tests cover a closed Ticket whose ref exists only at its commit, a closed Ticket whose ref exists nowhere, an open Ticket with a dangling ref, a stale Room anchor, and the no-git fallback.",
+      "identity": "sha256:0d83ca087d04e74f23b9308ffbd5e981ee2dc49c2fa43af177a5ca5a9f228907",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "repository-green",
+      "criterion": "`vh.mjs project validate --repo .` passes on this repository with `skills/vibehub-ticket-review/` renamed and no closed Ticket, Evidence, or Outcome document edited, and the full test suite passes.",
+      "identity": "sha256:39c507939d10330e2113daa4dc3b21d872b87025144ef2ea3e4cb8d1f08b1d9b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not edit closed Tickets, Evidence, or Outcomes to make validation pass; the point of this Ticket is that they should not have to change.",
     "Do not weaken validation for open Tickets or for Room anchors.",
@@ -46,6 +65,44 @@
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "closed-ticket-refs-at-their-commit",
+          "identity": "sha256:1893e4ef2bc2ddbc66f9dee17ac95a95b49b7da5a1b64c8b3889361a79146594",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "degrades-without-git",
+          "identity": "sha256:4fd396f2e54c8ba1bee85ec555e12d7f26fa87ac5274a3fadc890fd3838e4ba6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-pointers-still-checked",
+          "identity": "sha256:e9f42f6bc865e255b88ea57f8d416d5ae8629799026c1a0bbde2d060a5897cea",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "open-ticket-refs-at-head",
+          "identity": "sha256:8e50d43a4e4430dec0f8e74a6e0193bcab4979b9c71d0b5b5156240b728bcefa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression",
+          "identity": "sha256:0d83ca087d04e74f23b9308ffbd5e981ee2dc49c2fa43af177a5ca5a9f228907",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repository-green",
+          "identity": "sha256:39c507939d10330e2113daa4dc3b21d872b87025144ef2ea3e4cb8d1f08b1d9b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c94793074fdc6e59e6254d04052627370244c66470ce35ece720ceeea959edad",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -55,6 +112,7 @@
     "commit:99c5245"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-scope-reference-validation-to-lifecycle"
 }

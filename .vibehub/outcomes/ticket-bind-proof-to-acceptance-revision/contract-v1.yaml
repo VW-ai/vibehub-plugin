@@ -1,0 +1,38 @@
+{
+  "accepted_acceptance_ids": [
+    "acceptance-and-contract-revisions-are-canonical-data",
+    "current-repository-migration-preserves-historical-truth",
+    "legacy-proof-migration-reconstructs-history",
+    "migration-and-host-artifacts-stay-atomic",
+    "projection-uses-only-active-contract-coverage",
+    "semantic-mutation-appends-and-preserves-lineage"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-04T20:24:01Z",
+  "contract_revision": {
+    "identity": "sha256:05078ee8860dc2111848c9e7e48a76ab0b65e1f69190146eaa2fd84fd1b9f44e",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "active-contract-projection-and-workbench-proof",
+    "full-suite-and-artifact-proof",
+    "legacy-reconstruction-and-dogfood-proof",
+    "revision-identity-and-mutation-proof"
+  ],
+  "independence": {
+    "note": "Fresh independent Agent delegated only the Ticket id and worktree path; it did not plan or execute the implementation and adjudicated from repository artifacts, diff, code, schemas, Evidence, and independently rerun tests plus an isolated migration probe.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "partial",
+  "summary": "Independent closeout accepted six of nine active Acceptance revisions. Canonical Acceptance and Contract identities, append-only mutation, current-repository reconstruction, the mechanical/semantic migration boundary, source/artifact format parity, and active-Contract lifecycle projection were reproduced from the worktree. Project and Ticket validation pass; the focused revision/migration/projection/upgrade checks passed 71 of 72 with one sandbox-only loopback skip; the complete suite passed 184 of 191 with seven sandbox-only loopback skips; unrestricted artifact verification passed at 67 files and 3,299,557 bytes; git diff --check passed. The closeout remains partial because an isolated format-3 migration probe proved that reconstructed human Evidence bound to Acceptance v1 can support a successful reconstructed Outcome whose Contract contains a materially strengthened Acceptance v2: project validation accepts the mismatch and next_action reports DONE. This violates exact-revision Evidence/Outcome validation and human-authority semantics. The checked-in regression suite does not cover that stale-human-proof migration case, and it also lacks a representative user-visible Workbench test for distinguishing current versus historical revision proof; the Workbench source and host projection implement the intended labels, but the criterion explicitly requires representative UI proof. No implementation or repair was performed during adjudication.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision",
+  "unresolved_acceptance_ids": [
+    "evidence-and-outcomes-bind-exact-revisions",
+    "regression-suite-proves-identity-and-rollback-boundaries",
+    "workbench-explains-revision-history"
+  ]
+}

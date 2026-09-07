@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "graph-refinement-is-regression-checked",
+      "criterion": "Ticket selection, Rooms, inspector lenses, responsive layout, lint, production build, rendered contracts, release preflight, and browser visual comparison against the real local Workbench pass.",
+      "identity": "sha256:0f049e6a6a4f9a1d41d3c51e3b85c95927d337d2bfe785eddb58ae91348f9773",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "public-cards-match-workbench-grammar",
-      "criterion": "Public graph cards use the real Workbench card proportions and hierarchy: compact horizontal shape, top state accent, right circular aperture, Ticket ID and outcome, lower-left in/out relation metadata, lower-right state, and neutral selected styling."
+      "criterion": "Public graph cards use the real Workbench card proportions and hierarchy: compact horizontal shape, top state accent, right circular aperture, Ticket ID and outcome, lower-left in/out relation metadata, lower-right state, and neutral selected styling.",
+      "identity": "sha256:0cebec06277f51d2a57964acac836b1de9f88fbc8630c6470b13c4f2e01274d6",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "public-links-match-workbench-grammar",
-      "criterion": "Public graph dependencies render as thin routed SVG paths with visible circular control or endpoint knots and causal-cone focus behavior; the former rotated line-and-arrow implementation is absent."
+      "criterion": "Public graph dependencies render as thin routed SVG paths with visible circular control or endpoint knots and causal-cone focus behavior; the former rotated line-and-arrow implementation is absent.",
+      "identity": "sha256:e3119bb9eed5cfe287a50bb7f2f67ce8db4cf5eb7e10887a0162f38bfe51647f",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "public-shell-is-truthful-and-clear",
-      "criterion": "The Workbench header and inspector contain no VH initials tile, Vibe task app, demo/dark-mode, or GUIDED FIXTURE labels; the header uses the real VibeHub mark and plainly identifies the Ticket Workbench and example feature."
-    },
-    {
-      "acceptance_id": "graph-refinement-is-regression-checked",
-      "criterion": "Ticket selection, Rooms, inspector lenses, responsive layout, lint, production build, rendered contracts, release preflight, and browser visual comparison against the real local Workbench pass."
+      "criterion": "The Workbench header and inspector contain no VH initials tile, Vibe task app, demo/dark-mode, or GUIDED FIXTURE labels; the header uses the real VibeHub mark and plainly identifies the Ticket Workbench and example feature.",
+      "identity": "sha256:cf579abc7b502937d04c2fd11d144e31af65cec37fcee4ad95730d2e4d55e927",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Treat skills/vibehub-ticket-review/assets as the visual source of truth; do not invent another Ticket design language.",
     "Preserve the existing website narrative, guided Ticket interaction, and actual plugin Workbench implementation.",
@@ -46,6 +59,34 @@
       "ref": "site/release/SKILL.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-refinement-is-regression-checked",
+          "identity": "sha256:0f049e6a6a4f9a1d41d3c51e3b85c95927d337d2bfe785eddb58ae91348f9773",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-cards-match-workbench-grammar",
+          "identity": "sha256:0cebec06277f51d2a57964acac836b1de9f88fbc8630c6470b13c4f2e01274d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-links-match-workbench-grammar",
+          "identity": "sha256:e3119bb9eed5cfe287a50bb7f2f67ce8db4cf5eb7e10887a0162f38bfe51647f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-shell-is-truthful-and-clear",
+          "identity": "sha256:cf579abc7b502937d04c2fd11d144e31af65cec37fcee4ad95730d2e4d55e927",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f3547dff4aeb6075d1aa28ba7b88c17f0c1314138192748e3819ca7cc873c4ac",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -54,6 +95,7 @@
     "conversation:2026-08-20-align-public-ticket-graph-with-real-workbench"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-align-public-graph-with-real-workbench"
 }

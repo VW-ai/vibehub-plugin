@@ -5,6 +5,30 @@
     "installation-and-upgrade-copy-is-current",
     "readme-surface-stays-focused-and-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "identity": "sha256:b16e9cf73333599aeeefc965c30237c8ed21a88716752a4ac1121eb72f5094fb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "identity": "sha256:691727c58f5d37d021fb3d8298865c6920dd27b031f3779825a515a52cbf7f97",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "installation-and-upgrade-copy-is-current",
+      "identity": "sha256:fddf5d867b1343aaaa49d0e93f890a5d89fdfe528f49a18e1783e2102d067d73",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "identity": "sha256:3a4ca32bdad27d33112622aab02a1bd7c70103e19ffbd198d1c4a5afb5ca6a94",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-v080-current-surface-and-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -18,7 +42,7 @@
     "artifact:54-files-567833-bytes",
     "room:product-fresh"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README now presents v0.8 through an authentic 1280x720 capture from clean main in the read-only Workbench at scope=current and direction=ltr, with current controls, causal canvas, archived boundary, selected cone, minimap, and Execution Inspector visible; the browser had no console errors or document overflow. The adjacent two-paragraph scenario covers the canonical user entry, Git-native Ticket planning, current causal work, human boundaries, on-demand Rooms and history, acceptance-linked Evidence, and independent Outcome without becoming a feature inventory. Codex and Claude install/upgrade commands match the current docs and the locally verified v0.8.0 update flows, while explicitly preserving checked-in project data. README is 58 lines, retains exactly one canonical entry and the dark-safe wordmark, names no Desktop product, and all local links/assets exist. The focused release suite passed 4/4, full npm run verify passed 81/81 with a 54-file artifact, Ticket/project validation passed, git diff checks passed, and all four Rooms are FRESH after product alignment.",
   "ticket_id": "ticket-refresh-readme-for-v080-workbench"
 }

@@ -6,11 +6,11 @@
         "path": "skills/vibehub-core/contracts/dependency-hygiene.json"
       },
       {
-        "blob": "c980a2037f068b2d987ebaec69594b2ca6d58774",
+        "blob": "620cdb1f78b771e6d1f7751adfef12d0728040a1",
         "path": "skills/vibehub-core/contracts/evidence.schema.json"
       },
       {
-        "blob": "ebbc595d15ff936f9ee351d8d56abeae78ca2491",
+        "blob": "1f41e48ed073db20b0e202556991ab60efc8cd09",
         "path": "skills/vibehub-core/contracts/outcome.schema.json"
       },
       {
@@ -18,15 +18,23 @@
         "path": "skills/vibehub-core/contracts/project-format.schema.json"
       },
       {
-        "blob": "08a0f116a2d0b65398574cc99d14d332e940ac25",
+        "blob": "df39d4c14c689d8b9dda0de9cb32e1da857bdc8f",
+        "path": "skills/vibehub-core/contracts/revision-identity.md"
+      },
+      {
+        "blob": "50442160b19c57098eab828720f45495f898d7e0",
         "path": "skills/vibehub-core/contracts/ticket.schema.json"
       },
       {
-        "blob": "2e5319a9b338b011266e4a659aa2f186058fbb30",
+        "blob": "4e304ff47532a0c7b9c82e67d49d16123fdbf5f9",
+        "path": "skills/vibehub-core/scripts/revision-contract.mjs"
+      },
+      {
+        "blob": "2accf00d45597f75070701e1a6aa8902f1736bdd",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
-        "blob": "7ac06459fab55db0451f58681f889738a6c676b7",
+        "blob": "937d63268f3139aa99b4012236451a6d684adf1f",
         "path": "skills/vibehub-ticket-closeout/SKILL.md"
       },
       {
@@ -34,7 +42,7 @@
         "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
       },
       {
-        "blob": "135850165e087679586e50f9c0a163da7d2827d7",
+        "blob": "296bfd1b6c774d1760e586938011c7e1c75ffa58",
         "path": "skills/vibehub-ticket-plan/SKILL.md"
       },
       {
@@ -42,7 +50,7 @@
         "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
       },
       {
-        "blob": "2913ceba5836b516e8d929d2d4ab96179f7b29cd",
+        "blob": "abfb33ef7d1c6c28ebfae2c55cace293ff22923a",
         "path": "skills/vibehub-ticket-run/SKILL.md"
       },
       {
@@ -50,7 +58,7 @@
         "path": "skills/vibehub-ticket-run/agents/openai.yaml"
       },
       {
-        "blob": "71b5e63189f4a79fb5ecab5628b14132188daa77",
+        "blob": "ee2a67d6fbde6aaef3c386c0e567d85177f61e04",
         "path": "skills/vibehub-ticket-validate/SKILL.md"
       },
       {
@@ -58,15 +66,17 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-07T05:30:01.462Z",
-    "last_aligned_commit": "4ae39d7f7736947a1b8074b27085c76d9e2fda07"
+    "checked_at": "2026-09-07T06:55:01.794Z",
+    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
     "skills/vibehub-core/contracts/evidence.schema.json",
     "skills/vibehub-core/contracts/outcome.schema.json",
     "skills/vibehub-core/contracts/project-format.schema.json",
+    "skills/vibehub-core/contracts/revision-identity.md",
     "skills/vibehub-core/contracts/ticket.schema.json",
+    "skills/vibehub-core/scripts/revision-contract.mjs",
     "skills/vibehub-core/scripts/vh.mjs",
     "skills/vibehub-ticket-closeout/",
     "skills/vibehub-ticket-plan/",

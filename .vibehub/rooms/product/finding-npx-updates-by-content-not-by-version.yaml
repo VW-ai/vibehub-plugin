@@ -1,0 +1,45 @@
+{
+  "context_id": "finding-npx-updates-by-content-not-by-version",
+  "detail": "An investigation of the skills.sh CLI (npm `skills` 1.5.23, source vercel-labs/skills), read at the tag matching the published version and exercised live in a sandboxed HOME, establishes that the version-as-cache-key failure has no analogue on the npx path. Nothing in skills.sh reads a declared version — not .claude-plugin/plugin.json's version, not package.json, not skill frontmatter; a grep of the non-test source finds version only for the lock schema, the well-known protocol, and the CLI's own version. plugin.json is parsed solely for its skills and name fields, to locate and group skill directories. Update is decided by content, in both scopes. Global update compares the GitHub tree SHA of each skill's own folder against skillFolderHash in the lock, falling back to a clone plus a git tree hash or a SHA-256 over file contents; project update performs no comparison at all and unconditionally re-runs add for every locked skill. Proven in the sandbox: rewriting the recorded hash to a bogus value while leaving plugin.json at 0.8.0 produced an update, so an unchanged version string does not suppress one. Install tracks the default branch tip and pins nothing — there is no ref, tag, or version flag, and a bare owner/repo records no ref, so every later operation re-resolves the branch. Two consequences for this project. First, retiring host marketplace distribution does not merely reduce install size; it makes the observed 143-commit silent staleness structurally impossible, because the only surviving path never consults a version string. The declared version therefore stops being load-bearing for anyone receiving current code and becomes human-facing release metadata: still worth keeping accurate, no longer a defect that harms users. The CI bump gate drops accordingly from a fix to hygiene. Second, npx installs skill folders only. Installing this repository produced twelve skill directories and nothing else: no manifests, no commands, no hooks, no docs. Verified separately that this costs nothing functional, because no file under skills/ references anything outside it — the Workbench assets live inside skills/vibehub-ticket-review/assets. What a user loses from disk is README, CHANGELOG, LICENSE, docs, and the two plugin manifests, all readable on GitHub. The residual risk to watch is therefore not staleness but completeness: anything VibeHub ever ships outside skills/ reaches nobody on this path, and the global update check would not notice it changing.",
+  "evidence": [
+    {
+      "note": "Agent finding: source read plus live sandboxed install and update; the recorded hash was rewritten to a bogus value while plugin.json stayed at 0.8.0 and an update was produced.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    },
+    {
+      "note": "Names npx skills add as the recommended path and npx skills update as the update command, which is the path this finding characterises.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-npx-is-the-only-supported-install-path",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-release-and-update-experience-is-the-mainline",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-02T02:45:00.000Z",
+    "quote": "Agent investigation of npm skills 1.5.23 and vercel-labs/skills, read at the published tag and exercised in a sandboxed HOME confined to the session scratchpad.",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "skills.sh never reads a declared version; it updates by content hash or unconditional re-fetch, so retiring marketplace distribution makes the observed silent staleness structurally impossible and demotes the version gate from fix to hygiene",
+  "tags": [
+    "install",
+    "update",
+    "release",
+    "versioning",
+    "distribution"
+  ],
+  "type": "note"
+}

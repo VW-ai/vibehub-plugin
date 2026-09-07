@@ -1,30 +1,49 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "topology-cluster-contract-is-deterministic",
-      "criterion": "The proposal defines deterministic Project-scoped cluster membership and stable identity from the existing dependency DAG, evaluates convergence frontiers, upstream cones, shared prerequisites, overlap, boundary cost, and compression benefit on real plus adversarial fixtures, and leaves Tickets ungrouped when confidence or usefulness is insufficient; no AI output or canonical parent, child, subtask, or group field controls membership."
-    },
-    {
       "acceptance_id": "collapsed-causality-remains-exact",
-      "criterion": "Collapsed clusters preserve every cross-boundary Ticket dependency as inspectable source truth, distinguish shared non-owning prerequisites, expose why a cluster or Task is blocked or unlocked, and never invent a causal super-edge, conceal a two-way boundary pattern, or imply shared lifecycle ownership."
-    },
-    {
-      "acceptance_id": "semantic-zoom-and-project-focus-are-reviewable",
-      "criterion": "Reviewable wide and narrow prototypes cover the real graph plus deterministic approximately 200- and 1000-Ticket fixtures across multi-Project overview, Project focus, cluster focus, exact Task focus, return, current/all scope, both graph directions, selected and dimmed states, and smooth fade, shrink, exit, and restoration behavior, while Chat meta nodes and individual conversation branches remain progressively disclosed rather than competing as a second global graph."
-    },
-    {
-      "acceptance_id": "representative-and-ai-semantics-are-bounded",
-      "criterion": "The proposal defines a deterministic structural representative or small frontier for each cluster, then a separate human-facing label and purpose contract generated from member Outcomes, Acceptance, Rooms, and Context; AI cannot change membership, edges, state, or acceptance, deterministic fallback covers absent or stale generated semantics, an optional Human-pinned label overrides presentation only, and regeneration timing is left as a product-led backend boundary rather than an implicit background process."
-    },
-    {
-      "acceptance_id": "task-card-copy-remains-readable",
-      "criterion": "Using the real corpus plus deterministic long-copy fixtures, the proposal selects one graph-only Task summary contract with canonical Outcome fallback and full detail in the Inspector, reports fit and density effects, and keeps at least 90% of representative Task summaries readable at normal card-reading zoom without shrinking below the approved typography."
+      "criterion": "Collapsed clusters preserve every cross-boundary Ticket dependency as inspectable source truth, distinguish shared non-owning prerequisites, expose why a cluster or Task is blocked or unlocked, and never invent a causal super-edge, conceal a two-way boundary pattern, or imply shared lifecycle ownership.",
+      "identity": "sha256:e781b4bb03eac7210e627606cb3cdabfdd26ea8ffb6433ac450ff792b51c7633",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "implementation-boundaries-are-decision-ready",
-      "criterion": "The proposal identifies the smallest subsequent projection, clustering, semantic-label, interaction, layout, migration-or-fallback, accessibility, cache-invalidation, and verification Tickets; it preserves exact Git truth, read-only Web scope, current causal focus, archive boundaries, keyboard access, narrow layouts, and protected owner choices for explicit review."
+      "criterion": "The proposal identifies the smallest subsequent projection, clustering, semantic-label, interaction, layout, migration-or-fallback, accessibility, cache-invalidation, and verification Tickets; it preserves exact Git truth, read-only Web scope, current causal focus, archive boundaries, keyboard access, narrow layouts, and protected owner choices for explicit review.",
+      "identity": "sha256:377cb27b52983d594004bfd25fad9c8856f763aa79e3cc3cc826f9392586aa73",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "representative-and-ai-semantics-are-bounded",
+      "criterion": "The proposal defines a deterministic structural representative or small frontier for each cluster, then a separate human-facing label and purpose contract generated from member Outcomes, Acceptance, Rooms, and Context; AI cannot change membership, edges, state, or acceptance, deterministic fallback covers absent or stale generated semantics, an optional Human-pinned label overrides presentation only, and regeneration timing is left as a product-led backend boundary rather than an implicit background process.",
+      "identity": "sha256:9bb34fcd5e2e7c447a76963da6d44e9371e93393a01d0142cc8770696dbfaa0e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-zoom-and-project-focus-are-reviewable",
+      "criterion": "Reviewable wide and narrow prototypes cover the real graph plus deterministic approximately 200- and 1000-Ticket fixtures across multi-Project overview, Project focus, cluster focus, exact Task focus, return, current/all scope, both graph directions, selected and dimmed states, and smooth fade, shrink, exit, and restoration behavior, while Chat meta nodes and individual conversation branches remain progressively disclosed rather than competing as a second global graph.",
+      "identity": "sha256:8ada5e8143f28263abbac1089bd7593477585768294354078f5d825a406085c2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "task-card-copy-remains-readable",
+      "criterion": "Using the real corpus plus deterministic long-copy fixtures, the proposal selects one graph-only Task summary contract with canonical Outcome fallback and full detail in the Inspector, reports fit and density effects, and keeps at least 90% of representative Task summaries readable at normal card-reading zoom without shrinking below the approved typography.",
+      "identity": "sha256:d81a71ec1dbafbcb0b28ee94885855bf7fc38c2b2be88052c43f0cc6bf24b22c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "topology-cluster-contract-is-deterministic",
+      "criterion": "The proposal defines deterministic Project-scoped cluster membership and stable identity from the existing dependency DAG, evaluates convergence frontiers, upstream cones, shared prerequisites, overlap, boundary cost, and compression benefit on real plus adversarial fixtures, and leaves Tickets ungrouped when confidence or usefulness is insufficient; no AI output or canonical parent, child, subtask, or group field controls membership.",
+      "identity": "sha256:cc1d0506e48c4d4a5f26f621e600de0feac81294643a8cd24612ed6196f8cf4b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not add canonical High-Level Task, Low-Level Task, Parent Task, Subtask, or Task Group structure merely to support the view.",
     "Do not let AI infer cluster membership, dependencies, readiness, state, acceptance, or authority.",
@@ -52,7 +71,45 @@
     },
     {
       "purpose": "Accepted deterministic layout baseline that clustering and semantic zoom extend.",
-      "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout.yaml"
+      "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout/contract-v1.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "collapsed-causality-remains-exact",
+          "identity": "sha256:e781b4bb03eac7210e627606cb3cdabfdd26ea8ffb6433ac450ff792b51c7633",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "implementation-boundaries-are-decision-ready",
+          "identity": "sha256:377cb27b52983d594004bfd25fad9c8856f763aa79e3cc3cc826f9392586aa73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "representative-and-ai-semantics-are-bounded",
+          "identity": "sha256:9bb34fcd5e2e7c447a76963da6d44e9371e93393a01d0142cc8770696dbfaa0e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-zoom-and-project-focus-are-reviewable",
+          "identity": "sha256:8ada5e8143f28263abbac1089bd7593477585768294354078f5d825a406085c2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "task-card-copy-remains-readable",
+          "identity": "sha256:d81a71ec1dbafbcb0b28ee94885855bf7fc38c2b2be88052c43f0cc6bf24b22c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "topology-cluster-contract-is-deterministic",
+          "identity": "sha256:cc1d0506e48c4d4a5f26f621e600de0feac81294643a8cd24612ed6196f8cf4b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:dc5cd9b200b6697b583ea98a73c9211e425bed04d01d455396e670126d323126",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -71,6 +128,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-propose-large-graph-clarity-and-card-copy"
 }

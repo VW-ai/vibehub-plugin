@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "codex-like-visual-direction-chosen"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "codex-like-visual-direction-chosen",
+      "identity": "sha256:9a7f7e862f88bcdaf6dea9831c19066dd70a34a8efe738307aee5d6e2af7b507",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "codex-like-visual-direction-owner-decision",
   "kind": "ticket_evidence",
   "origin": "human",
@@ -11,7 +20,7 @@
     "commit:c5492028d15bfaf2ed04417b2a030733aa0625ea",
     "docs/proposals/codex-like-workbench/README.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After reviewing the live proposal, the repository owner explicitly selected the Codex-like Workbench direction for production, saying the overall treatment feels very good, with exact required refinements: keep whole-card operational state and the independent human-attention layer; make the Overview a clear two-axis legend with compact counts; remove the proposal-decision row, the no-Active-Run explanation row, the Proven-left/executable-right slogan, the redundant Execution flow label, and other explanatory copy already communicated by structure or interaction; and use a consistent compact SVG icon system rather than emoji. The owner further established the shared interface rule that hierarchy, position, selection state, and interaction should carry meaning wherever they can, while text is reserved for semantic distinctions, exceptions, decision boundaries, exact facts, and errors that would otherwise be ambiguous or unsafe. The separate Rooms proposal has been refined under this rule, including removal of Selected Room and Knowledge spaces, but this Evidence does not claim that the Rooms direction itself has been approved.",
   "ticket_id": "ticket-decide-codex-like-workbench-visual-language"
 }

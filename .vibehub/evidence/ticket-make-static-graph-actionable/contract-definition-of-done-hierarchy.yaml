@@ -6,6 +6,35 @@
     "visual-polish-strengthens-not-obscures",
     "read-only-boundary-remains-light"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "identity": "sha256:af2074788c31d95d195032e22dac58546a596795446fda2e2c82ce4dfbf8b0bb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "identity": "sha256:8f4b6c29a9a5f1eee99a3e0e794cdc9362d73a78164f8f5d914f5f23c24f0226",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "identity": "sha256:43abad3fdc65d5e170fc24cd32c6d35d2f2d8278c6fa86a7508ab939c2993eea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "identity": "sha256:797fb839ed91c2e61c02ce288b08edc8a7d6bf7b34c017bf4d6db36c91475562",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "identity": "sha256:b5fe59bca4c77fc35364d18b648067726153146f05d9da62651db5ba85a92e84",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "contract-definition-of-done-hierarchy",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T21:04:30.000Z",
@@ -19,7 +48,7 @@
     "file:skills/vibehub-ticket-review/assets/app.css",
     "file:test/ui-host.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Owner dogfood found Contract substantially less direct than Execution and Proof because Acceptance, Guardrails, Context, dependency rationale, and provenance were all presented at equal weight. Commit eb6e8ba turns Contract into a definition-of-done view: one brief leads with acceptance count, Evidence coverage, and independent Outcome state; acceptance conditions remain the sole default-expanded body; and Working boundaries, Required context, plus Dependency & source become three counted supporting disclosures. Execution, Contract, and Proof remain separate because they answer execution state, completion conditions, and recorded evidence respectively. Real-browser review on the current READY Ticket confirmed 8 acceptance conditions, live 8/8 Evidence coverage with Outcome pending, three closed support disclosures, intact expandable canonical Context, and 16 commit-pinned Proof file links carrying a visible external-link glyph and explicit GitHub hover title. Runtime logs were empty. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237396 bytes. Final owner approval of the overall visual direction remains protected.",
   "ticket_id": "ticket-make-static-graph-actionable"
 }

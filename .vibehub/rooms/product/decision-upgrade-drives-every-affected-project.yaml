@@ -1,0 +1,37 @@
+{
+  "context_id": "decision-upgrade-drives-every-affected-project",
+  "detail": "When a user takes an update, VibeHub is responsible for their existing project data being restructured rather than for announcing that it is stale. That responsibility splits at the line between finding out and doing. Finding out is machine-wide and happens at update time: the upgrade discovers every project that holds a .vibehub, reports which format each is at and which need migration, and leaves the user knowing the full extent of what an update implies. Doing is per-project and happens later, when an Agent is next opened in that project, which is where the work has always belonged — it needs judgment, it produces a reviewable Git diff in that repository, and it has to be seen by whoever owns that project. The rejected alternative was to drive migrations across the machine from the upgrade itself. It was rejected because it would write into repositories the user is not looking at, in a single sweep, with no natural place for per-project review — and because the per-project half already works: the engine returns format_mismatch MIGRATION_REQUIRED with a specific reason the moment anything is attempted in a stale project. What was missing was never the doing; it was that nobody was told which projects were affected. Three projects on the owner's machine, two at MIGRATION_REQUIRED, unnoticed until a survey was run by hand. This extends the scope of decision-agent-driven-upgrade-migration without relaxing it. That decision's honest triggers stand, and its no-background-conversion rule is strengthened rather than weakened: the machine-wide half is read-only, so nothing outside the user's current project is ever written by the upgrade. One consequence must not be discovered later: npx skills update belongs to skills.sh and cannot be hooked by VibeHub, so the reporting obligation cannot attach to the documented update command. It requires VibeHub's own explicit entry running outside any project. Because that entry only reads and reports, the boundary question it raises is materially smaller than a general cross-project tool would be — but it is still a question, and it must be answered before this experience can be built.",
+  "evidence": [
+    {
+      "note": "Owner first chose the machine-wide reading over the next-session-only reading, then narrowed it: discovery and reporting are machine-wide at update time, while the Agent-driven migration stays with the next session opened in each project.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:20:00.000Z",
+    "quote": "更新那一刻就扫全机所有受影响项目并驱动迁移 … 我们把需要agent 迁移的部分留到启动某一个项目开agent的时候",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "superseded",
+  "summary": "An explicit upgrade discovers and reports every affected project on the machine, while the migration work itself stays where it already belongs: the next Agent session opened in that project",
+  "tags": [
+    "upgrade",
+    "migration",
+    "install",
+    "cross-project",
+    "boundary"
+  ],
+  "type": "decision"
+}

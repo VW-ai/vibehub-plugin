@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "readme-images-are-lossless-retina-captures",
-      "criterion": "Every screenshot embedded by the root README is a checked-in lossless PNG captured from the real Workbench through a controlled DPR=2 path: the 1280x720 CSS desktop graph produces 2560x1440 pixels, the 1180x820 CSS focused Ticket execution/proof view produces 2360x1640 pixels, and the 390x844 CSS narrow Rooms view produces 780x1688 pixels. A checked-in capture manifest records source commit, CSS viewport, DPR, resulting pixel dimensions, file path, and SHA-256 for each PNG; automated verification checks PNG signature, exact dimensions, manifest fields and hashes, while capture Evidence records a controlled DPR=2 source whose returned pixel dimensions were verified before the asset was written and rejects rather than resizes any 1x result; the root README contains no .jpg or .jpeg Workbench screenshot reference."
+      "acceptance_id": "readme-copy-matches-current-product",
+      "criterion": "The root README describes the current DRAFT, READY, RUNNING, and DONE work surface plus progressively disclosed Recommended action and Evidence/Outcome inspection without retaining REFINE-era presentation language or overstating native DSH invocation.",
+      "identity": "sha256:99a928715ff40d550943e537f0365cd4c44a529056ec50f461e370ecdffd8df9",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "readme-copy-matches-current-product",
-      "criterion": "The root README describes the current DRAFT, READY, RUNNING, and DONE work surface plus progressively disclosed Recommended action and Evidence/Outcome inspection without retaining REFINE-era presentation language or overstating native DSH invocation."
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "criterion": "Every screenshot embedded by the root README is a checked-in lossless PNG captured from the real Workbench through a controlled DPR=2 path: the 1280x720 CSS desktop graph produces 2560x1440 pixels, the 1180x820 CSS focused Ticket execution/proof view produces 2360x1640 pixels, and the 390x844 CSS narrow Rooms view produces 780x1688 pixels. A checked-in capture manifest records source commit, CSS viewport, DPR, resulting pixel dimensions, file path, and SHA-256 for each PNG; automated verification checks PNG signature, exact dimensions, manifest fields and hashes, while capture Evidence records a controlled DPR=2 source whose returned pixel dimensions were verified before the asset was written and rejects rather than resizes any 1x result; the root README contains no .jpg or .jpeg Workbench screenshot reference.",
+      "identity": "sha256:100a29d550eb7997dc12b0ed480727066fa269697f41fc3f8c62c9e238929939",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "readme-render-and-artifact-parity-pass",
-      "criterion": "The rendered README is reviewed at normal GitHub-like desktop width and narrow width with crisp text and lines, useful crops, correct alt text, no broken links, and no accidental sensitive/local-only data; repository verification preserves the at-most-60-line surface, single canonical invocation, installation/upgrades, and dark-mode brand contract, while fresh Codex/Claude installed artifacts contain README plus all three referenced PNGs and verify that every relative README image link resolves inside each artifact."
+      "criterion": "The rendered README is reviewed at normal GitHub-like desktop width and narrow width with crisp text and lines, useful crops, correct alt text, no broken links, and no accidental sensitive/local-only data; repository verification preserves the at-most-60-line surface, single canonical invocation, installation/upgrades, and dark-mode brand contract, while fresh Codex/Claude installed artifacts contain README plus all three referenced PNGs and verify that every relative README image link resolves inside each artifact.",
+      "identity": "sha256:bac0a61d9d4319a8649746018a5da6b66b280f6e90d826c5110255d8c7ff0952",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Capture the real read-only Workbench from the exact implemented repository state; do not use the disposable proposal board, mock data, AI-generated imagery, or a compressed chat preview.",
     "Use lossless PNG from a controlled DPR=2 capture path for every README screenshot, with a clean viewport, readable text and fine lines, no browser chrome, no transient tooltip obscuring the subject, and no console error; a 1x capture that is merely upscaled fails acceptance.",
@@ -55,6 +65,29 @@
       "ref": "test/release.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "readme-copy-matches-current-product",
+          "identity": "sha256:99a928715ff40d550943e537f0365cd4c44a529056ec50f461e370ecdffd8df9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-images-are-lossless-retina-captures",
+          "identity": "sha256:100a29d550eb7997dc12b0ed480727066fa269697f41fc3f8c62c9e238929939",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-render-and-artifact-parity-pass",
+          "identity": "sha256:bac0a61d9d4319a8649746018a5da6b66b280f6e90d826c5110255d8c7ff0952",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:baa3fa4d9b972ab21052b54ec3f51cf2b24e43c7ae5f451ce43f493d9492d8a1",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -70,6 +103,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-refresh-readme-workbench-screenshots"
 }

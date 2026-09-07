@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "dogfood-product-room"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "dogfood-product-room",
+      "identity": "sha256:16c7e077a4830586673fcd2676da1dc987beb3b97bdd9d5d148b28d962a68fd9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "dogfood-product-room-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T00:20:51.000Z",
@@ -9,7 +18,7 @@
     "commit:ba0b30a",
     ".vibehub/rooms/product/room.yaml"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The three product-wide entries moved via git mv into a new top-level product room with an honest room.yaml (anchors on README, CHANGELOG, docs/), every ticket context_ref was rewritten to the roomed path, .vibehub/context/ is gone, and project validate reports rooms:4 contexts:10 tickets:15 with zero errors; all four rooms report FRESH after realignment.",
   "ticket_id": "ticket-context-always-roomed"
 }

@@ -6,8 +6,8 @@ description: Turn a deliverable into the smallest executable Git-native VibeHub 
 # VibeHub Ticket Plan
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Plan outcomes, not ceremony. One coherent deliverable is usually one Ticket.
 Split only at a real scheduling, dependency, retry, authority, or verification
@@ -32,6 +32,13 @@ current contract for a later execution cycle.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it owns their planning semantics, not Agent/session
 routing or UI launch mechanics.
+Read `../vibehub-core/contracts/revision-identity.md` before creating or
+changing Acceptance. Existing semantic contracts are append-only: strengthen,
+correct, or redefine one responsibility by appending the same logical ID's
+next revision; create a new ID at v1 for a separately passable obligation;
+retire split/merge predecessors and give the new IDs exact `derived_from`
+references; retire a no-longer-applicable obligation without lineage; and put
+display-only wording in `presentation` without revising the criterion.
 `execution-discovers-work` is the single home of the mid-cycle transition:
 when execution surfaces new independently schedulable work, the same or a
 later Agent applies this Skill to turn the discovery into Tickets with their
@@ -77,6 +84,16 @@ is implied.
 4. Query Context only for facts that govern the deliverable or fill a real
    planning gap. The Ticket itself carries enough `context`, `context_refs`,
    constraints, and acceptance for a fresh Agent.
+   Resolve every `context_ref` through the shared engine operation, whether it
+   names the current tree or immutable Git history:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+   ```
+
+   `ref.json` is `{"ref":"<Ticket context_ref>"}`. Consume the returned
+   source and identity; never interpret a versioned ref as a filesystem path
+   or check out its commit.
 5. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains
@@ -88,14 +105,33 @@ is implied.
    an explicit non-empty causal rationale; otherwise move the exact Ticket,
    Outcome, Evidence, Context, or source file into `context_refs`. Do not
    manufacture migration, review, or dogfood stages.
-6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate
-   when an independent Agent is available. The validator is read-only. A
-   protected product, permission, or material-risk choice remains blocked for
-   the user; ordinary engineering fog does not.
-7. Apply the unchanged passing batch:
+   For a new Ticket, materialize v1 identities and its complete Contract v1
+   with `materializeInitialTicket`. For an existing Ticket, use the canonical
+   append path instead of rewriting old entries:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs ticket revise --repo <root> --input <revision.json>
+   ```
+
+   `revision.json` carries `ticket_id`, the usual `validation` declaration,
+   and `mutation` with `acceptance_changes`, `retire_acceptance_ids`, and/or
+   `presentation_changes`. Review the resulting active Contract revision.
+6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate.
+   The validator is read-only. A protected product, permission, or
+   material-risk choice remains blocked for the user; ordinary engineering fog
+   does not. When no independent Agent is available, say so rather than
+   passing over it: step 7 requires the batch to declare which happened.
+7. Apply the unchanged passing batch. The input declares whether step 6
+   actually happened; the engine refuses a batch that does not say, and records
+   the answer on every Ticket it writes as a `plan-validation:independent` or
+   `plan-validation:none` provenance ref, so a skip stays visible afterwards:
 
    ```text
    node ../vibehub-core/scripts/vh.mjs ticket apply --repo <root> --input <tickets.json>
+   ```
+
+   ```json
+   { "validation": { "independent": true, "note": "..." }, "tickets": [ ... ] }
    ```
 
    Read any structured `advice` in the success envelope. A completed-dependency

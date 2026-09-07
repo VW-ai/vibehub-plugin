@@ -1,34 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "segment-scoped-anchors",
-      "criterion": "A Room may anchor a bounded part of a source file, not only a path prefix, using the same segment identifiers `vh.mjs source segment` emits. A Room anchoring `docs/x.md#4-fork-flow` covers that segment and no other."
-    },
-    {
-      "acceptance_id": "siblings-may-share-a-file",
-      "criterion": "Two sibling Rooms anchoring disjoint segments of the same file both validate. Two Rooms anchoring the same segment, or a Room whose segment anchor falls inside a sibling's path-prefix anchor for the same file, are still rejected as overlapping territory — the rule moves to segment granularity rather than being removed."
-    },
-    {
-      "acceptance_id": "per-room-coverage-is-real",
-      "criterion": "`vh.mjs context coverage --repo <root> --room <path>` reports the uncovered segments of exactly that Room's anchored territory, for a sub-Room that anchors segments rather than a whole file, and the sum over a tree's Rooms accounts for every segment of every anchored file exactly once."
+      "acceptance_id": "drift-still-honest",
+      "criterion": "Alignment and drift keep working for both anchor kinds: a Room anchoring segments reports DRIFTED when the bytes of those segments change, and does not report DRIFTED when only other parts of the same file change. A Room anchoring a path prefix behaves exactly as it does today.",
+      "identity": "sha256:278ea175dcb4645c0a7bf33935126b44d98b9ac6701c12e7e793558eb196e500",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "exceptions-match-citations",
-      "criterion": "A `coverage_exceptions` entry lowers the uncovered count wherever the segment it names is counted, without having to be duplicated across Rooms; the asymmetry between per-Room exceptions and repository-wide citations is resolved and the resolution is stated in the room schema or the coverage contract."
-    },
-    {
-      "acceptance_id": "drift-still-honest",
-      "criterion": "Alignment and drift keep working for both anchor kinds: a Room anchoring segments reports DRIFTED when the bytes of those segments change, and does not report DRIFTED when only other parts of the same file change. A Room anchoring a path prefix behaves exactly as it does today."
+      "criterion": "A `coverage_exceptions` entry lowers the uncovered count wherever the segment it names is counted, without having to be duplicated across Rooms; the asymmetry between per-Room exceptions and repository-wide citations is resolved and the resolution is stated in the room schema or the coverage contract.",
+      "identity": "sha256:e2f034ade0c720e7423a97f1c7e42dadeae3a78db5b3d1c873189541cd693429",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "peel-tree-anchors-cleanly",
-      "criterion": "The eight-Room tree already approved for Peel — product with positioning, domain-model, ux (holding fork-flow and overview), scope, and prototype — validates with each sub-Room anchoring its own segments of the two source files rather than carrying an empty anchor list, and `context coverage --room <each sub-room>` returns that Room's own uncovered segments."
+      "criterion": "The eight-Room tree already approved for Peel — product with positioning, domain-model, ux (holding fork-flow and overview), scope, and prototype — validates with each sub-Room anchoring its own segments of the two source files rather than carrying an empty anchor list, and `context coverage --room <each sub-room>` returns that Room's own uncovered segments.",
+      "identity": "sha256:4732ac8a25fdb9c4edbe95f6fc946bfe4a75ee8c57686d1bb831525859776449",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "per-room-coverage-is-real",
+      "criterion": "`vh.mjs context coverage --repo <root> --room <path>` reports the uncovered segments of exactly that Room's anchored territory, for a sub-Room that anchors segments rather than a whole file, and the sum over a tree's Rooms accounts for every segment of every anchored file exactly once.",
+      "identity": "sha256:737c7b14362570da93fe321bf324156f05d6771ea23f2a761e76d83389e70e4d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "regression",
-      "criterion": "Tests cover a segment anchor, two siblings splitting one file, two Rooms claiming one segment (rejected), a segment anchor inside a sibling's prefix anchor (rejected), per-Room coverage summing to the whole file, an exception counted once, and drift firing on the anchored segments only."
+      "criterion": "Tests cover a segment anchor, two siblings splitting one file, two Rooms claiming one segment (rejected), a segment anchor inside a sibling's prefix anchor (rejected), per-Room coverage summing to the whole file, an exception counted once, and drift firing on the anchored segments only.",
+      "identity": "sha256:325d5cad76a4b54c9155bc46249acac6b7bab1cb5e11266b7af0679c13dc0d11",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "segment-scoped-anchors",
+      "criterion": "A Room may anchor a bounded part of a source file, not only a path prefix, using the same segment identifiers `vh.mjs source segment` emits. A Room anchoring `docs/x.md#4-fork-flow` covers that segment and no other.",
+      "identity": "sha256:6c742d0eb2a32ac494553c26efa2f6317b2c907548dd3e664d9f32cd3aca7f55",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "siblings-may-share-a-file",
+      "criterion": "Two sibling Rooms anchoring disjoint segments of the same file both validate. Two Rooms anchoring the same segment, or a Room whose segment anchor falls inside a sibling's path-prefix anchor for the same file, are still rejected as overlapping territory — the rule moves to segment granularity rather than being removed.",
+      "identity": "sha256:aa3025de06e52cd9287d898529c09360ff0d52e57650585375a845430b7effca",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not remove the overlapping-territory rule; move it to segment granularity. Two Rooms owning the same knowledge is the defect it exists to prevent.",
     "Existing Rooms with path-prefix anchors must keep validating and behaving identically; this is an extension, not a migration.",
@@ -54,6 +76,49 @@
       "ref": "skills/vibehub-ingest/references/bulk-absorption.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "drift-still-honest",
+          "identity": "sha256:278ea175dcb4645c0a7bf33935126b44d98b9ac6701c12e7e793558eb196e500",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exceptions-match-citations",
+          "identity": "sha256:e2f034ade0c720e7423a97f1c7e42dadeae3a78db5b3d1c873189541cd693429",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "peel-tree-anchors-cleanly",
+          "identity": "sha256:4732ac8a25fdb9c4edbe95f6fc946bfe4a75ee8c57686d1bb831525859776449",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "per-room-coverage-is-real",
+          "identity": "sha256:737c7b14362570da93fe321bf324156f05d6771ea23f2a761e76d83389e70e4d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression",
+          "identity": "sha256:325d5cad76a4b54c9155bc46249acac6b7bab1cb5e11266b7af0679c13dc0d11",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "segment-scoped-anchors",
+          "identity": "sha256:6c742d0eb2a32ac494553c26efa2f6317b2c907548dd3e664d9f32cd3aca7f55",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "siblings-may-share-a-file",
+          "identity": "sha256:aa3025de06e52cd9287d898529c09360ff0d52e57650585375a845430b7effca",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ee8b5b10ca98f6bdfdc6e12d2c1f1407de854d47cadfe4eb7abd5cf234e05039",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -63,6 +128,7 @@
     "commit:bf2eb1a"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-anchor-rooms-to-source-segments"
 }

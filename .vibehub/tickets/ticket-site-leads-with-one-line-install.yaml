@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "primary-install-action-is-skills-sh",
-      "criterion": "InstallActions and the header utilities present npx skills add VW-ai/vibehub-plugin as the first, visually primary copy action with a one-line note that it works with Claude Code, Codex, Cursor, and any skills-capable agent; the Codex and Claude Code marketplace actions remain as secondary actions and the Codex command is completed to both lines."
+      "acceptance_id": "agent-brief-matches-readme-order",
+      "criterion": "SITE_AGENT_BRIEF lists the skills.sh command first and the marketplace commands as alternatives, keeps the Start this with VibeHub entry, and mentions that Tickets mirror one-way to GitHub Issues when the project opts in during setup.",
+      "identity": "sha256:db80026e2da8e644639cb6841faeec8008bc765a4de82063fe134fcc352ddc93",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "agent-brief-matches-readme-order",
-      "criterion": "SITE_AGENT_BRIEF lists the skills.sh command first and the marketplace commands as alternatives, keeps the Start this with VibeHub entry, and mentions that Tickets mirror one-way to GitHub Issues when the project opts in during setup."
+      "acceptance_id": "primary-install-action-is-skills-sh",
+      "criterion": "InstallActions and the header utilities present npx skills add VW-ai/vibehub-plugin as the first, visually primary copy action with a one-line note that it works with Claude Code, Codex, Cursor, and any skills-capable agent; the Codex and Claude Code marketplace actions remain as secondary actions and the Codex command is completed to both lines.",
+      "identity": "sha256:277c87a6eb448c059639dea6898e94e1819ca612058851fa0bd0848725a939e9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "site-tests-and-build-pass",
-      "criterion": "site/tests assertions are updated to the new install surface (primary command present, both marketplace commands complete, brief order) and the site lint, static build, and rendered-html tests pass from a clean install."
+      "criterion": "site/tests assertions are updated to the new install surface (primary command present, both marketplace commands complete, brief order) and the site lint, static build, and rendered-html tests pass from a clean install.",
+      "identity": "sha256:d4e25c11565e01b70e027cc64e6a16af1dc92c35adcfa07736bc3a259ed24653",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "visual-check-at-two-widths",
-      "criterion": "A rendered screenshot at desktop and at 390px shows the three install actions readable with the primary one first, no overflow, and no layout regression in the header, hero, or footer; screenshots are checked in as Evidence."
+      "criterion": "A rendered screenshot at desktop and at 390px shows the three install actions readable with the primary one first, no overflow, and no layout regression in the header, hero, or footer; screenshots are checked in as Evidence.",
+      "identity": "sha256:bf2c8fd6cf51965cea96df3a3d4e055108109ae1ccfeeb71749088ffca36dc99",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not deploy or touch Cloudflare in this Ticket; release is the owner's separate action.",
     "Do not change the site narrative, walkthrough, founders, or graph sections beyond the install surface.",
@@ -49,6 +62,34 @@
       "ref": ".vibehub/rooms/product/decision-vibehub-core-carries-helper-for-skill-copy-installers.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "agent-brief-matches-readme-order",
+          "identity": "sha256:db80026e2da8e644639cb6841faeec8008bc765a4de82063fe134fcc352ddc93",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "primary-install-action-is-skills-sh",
+          "identity": "sha256:277c87a6eb448c059639dea6898e94e1819ca612058851fa0bd0848725a939e9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "site-tests-and-build-pass",
+          "identity": "sha256:d4e25c11565e01b70e027cc64e6a16af1dc92c35adcfa07736bc3a259ed24653",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-check-at-two-widths",
+          "identity": "sha256:bf2c8fd6cf51965cea96df3a3d4e055108109ae1ccfeeb71749088ffca36dc99",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6233074b5ff5a88303b139629b9d643de9d00b74fa3a8cecaa72f5d7e93f8ced",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -63,6 +104,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-site-leads-with-one-line-install"
 }

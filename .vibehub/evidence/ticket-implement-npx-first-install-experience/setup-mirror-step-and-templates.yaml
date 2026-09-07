@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "setup-offers-github-mirror-once"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "setup-offers-github-mirror-once",
+      "identity": "sha256:add059cf286b2613e80c8c4575f6cf0288f78eead4f6ea6b534f8b9ea70925c4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "setup-mirror-step-and-templates",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T02:26:00Z",
@@ -13,7 +22,7 @@
     "test/install-templates.test.mjs",
     "test/setup-mirror-option.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "skills/vibehub-setup/SKILL.md step 6 asks once when origin is on github.com and lists the exact five-file copy; test/setup-mirror-option.test.mjs checks the five sources exist and that CLAUDE.md, AGENTS.md, and the setup Skill never ask an Agent to run the sync; test/install-templates.test.mjs proves the script template equals scripts/sync-github-issues.mjs except for the import path and version header, the workflow template equals .github/workflows/sync-issues.yml except for the script path, and that the five-file copy computes a projection in a scratch project with no plugin installed.",
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

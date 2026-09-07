@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "preflight-passes-locally"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "preflight-passes-locally",
+      "identity": "sha256:6a65ff7fbc8ea144fa4c3b5b43f163b9e15c2975cec53d92b6158283bf2be577",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-preflight-passes",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T09:06:15Z",
@@ -9,7 +18,7 @@
     "command:node site/release/scripts/release.mjs preflight",
     "git:eae2e6ab45c7aa8e46412069f292c17b4b931fd6"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "node site/release/scripts/release.mjs preflight returned ok with canonical_url https://vibehub.team; lint passed and site/tests reported 9 pass 0 fail.",
   "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
 }

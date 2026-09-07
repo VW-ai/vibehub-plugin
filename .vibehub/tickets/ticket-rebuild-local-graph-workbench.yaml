@@ -2,25 +2,41 @@
   "acceptance": [
     {
       "acceptance_id": "authorized-link-is-portable",
-      "criterion": "The short-lived bearer remains in a fragment that is not sent in HTTP request paths, the UI no longer erases it from browser history, a clearly labeled Copy link control copies the complete authorized URL, and pasting that URL into a separate browser session loads the same graph until expiry; opening the bare origin still fails visibly with recovery guidance."
-    },
-    {
-      "acceptance_id": "flat-workbench-replaces-nested-shells",
-      "criterion": "Desktop renders one full-viewport application with a single product/source toolbar, one graph canvas, and one bounded right-side inspector; the former collapsible signal/surface/sheet and bottom overlay treatments are absent, graph controls and source refresh remain reachable, and narrow screens use one deliberate responsive inspector state rather than stacked nested panels."
-    },
-    {
-      "acceptance_id": "design-language-is-coherent",
-      "criterion": "The UI defines and consistently applies a recognizable VibeHub visual language across typography, spacing, color, Ticket cards, dependency edges, operational states, minimap, empty/loading/error states, toolbar, and inspector hierarchy; real-browser screenshots at desktop and narrow widths make the hierarchy independently reviewable."
-    },
-    {
-      "acceptance_id": "normal-browser-entry-is-obvious",
-      "criterion": "The default launcher continues to open the complete authorized URL in the operating system's normal browser, `--no-open` remains an Agent/testing option, the launch envelope and docs explain the distinction, and the page itself exposes Copy link so Codex is not a required viewing surface."
+      "criterion": "The short-lived bearer remains in a fragment that is not sent in HTTP request paths, the UI no longer erases it from browser history, a clearly labeled Copy link control copies the complete authorized URL, and pasting that URL into a separate browser session loads the same graph until expiry; opening the bare origin still fails visibly with recovery guidance.",
+      "identity": "sha256:02e7dd42751d4dd9dc06e788443df1976debb6db70b0d179e451a4ee1f1bddaf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "canonical-readonly-boundary-survives",
-      "criterion": "Context, Ticket, Evidence, and Outcome remain fresh schema-validated Git-YAML inputs; loopback binding, token expiry, restrictive headers, GET/HEAD-only APIs, zero package dependencies, and no database, persistent cache, hidden state, or write authority all remain verified in the clean plugin artifact."
+      "criterion": "Context, Ticket, Evidence, and Outcome remain fresh schema-validated Git-YAML inputs; loopback binding, token expiry, restrictive headers, GET/HEAD-only APIs, zero package dependencies, and no database, persistent cache, hidden state, or write authority all remain verified in the clean plugin artifact.",
+      "identity": "sha256:a7fe53d921141a53ea80885ecfad1a2332481da14dcbbfb043d0e3a6329c7502",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "design-language-is-coherent",
+      "criterion": "The UI defines and consistently applies a recognizable VibeHub visual language across typography, spacing, color, Ticket cards, dependency edges, operational states, minimap, empty/loading/error states, toolbar, and inspector hierarchy; real-browser screenshots at desktop and narrow widths make the hierarchy independently reviewable.",
+      "identity": "sha256:1b6e9550955b7ffb92458afda20b51568dec6f0660589c9a1afd19a68c8e9cb0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "flat-workbench-replaces-nested-shells",
+      "criterion": "Desktop renders one full-viewport application with a single product/source toolbar, one graph canvas, and one bounded right-side inspector; the former collapsible signal/surface/sheet and bottom overlay treatments are absent, graph controls and source refresh remain reachable, and narrow screens use one deliberate responsive inspector state rather than stacked nested panels.",
+      "identity": "sha256:f55c2400de316fff97e4f3930a05db57f27854508d764343574af7d0d0d67936",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "normal-browser-entry-is-obvious",
+      "criterion": "The default launcher continues to open the complete authorized URL in the operating system's normal browser, `--no-open` remains an Agent/testing option, the launch envelope and docs explain the distinction, and the page itself exposes Copy link so Codex is not a required viewing surface.",
+      "identity": "sha256:9b1ee50e95b1fb232315070fb6044620ba9083eddf491d8ab5ca2301a412da40",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Move quickly and delete obsolete presentation structure instead of preserving CSS compatibility.",
     "Do not weaken loopback binding, bearer validation, expiry, or security headers to make the link portable.",
@@ -55,6 +71,39 @@
       "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "authorized-link-is-portable",
+          "identity": "sha256:02e7dd42751d4dd9dc06e788443df1976debb6db70b0d179e451a4ee1f1bddaf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-readonly-boundary-survives",
+          "identity": "sha256:a7fe53d921141a53ea80885ecfad1a2332481da14dcbbfb043d0e3a6329c7502",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "design-language-is-coherent",
+          "identity": "sha256:1b6e9550955b7ffb92458afda20b51568dec6f0660589c9a1afd19a68c8e9cb0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "flat-workbench-replaces-nested-shells",
+          "identity": "sha256:f55c2400de316fff97e4f3930a05db57f27854508d764343574af7d0d0d67936",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "normal-browser-entry-is-obvious",
+          "identity": "sha256:9b1ee50e95b1fb232315070fb6044620ba9083eddf491d8ab5ca2301a412da40",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:50dad1e2cc3b33726e7722cd97b21eac3d13bf5baecf83a930a6c176fc32a511",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -72,6 +121,7 @@
     "code:app-js-removes-bearer-fragment"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-rebuild-local-graph-workbench"
 }

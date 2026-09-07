@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "projection-exposes-refine"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "projection-exposes-refine",
+      "identity": "sha256:7dcb5d51fd704953f9a2c92006f055b55093ccafe6a8256e03af92c7d8d9b10d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "projection-refine-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-04T01:07:37.000Z",
@@ -10,7 +19,7 @@
     "skills/scripts/vh-ui.mjs",
     "test/draft-maturity.test.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "operationalState in vh-ui.mjs gained an explicit REFINE branch whose detail says planning must rewrite the acceptance, replacing the misleading READY fall-through wording; the projection test asserts the label, the honest detail, and the absence of the READY text. No visual design shipped.",
   "ticket_id": "ticket-draft-ticket-maturity"
 }

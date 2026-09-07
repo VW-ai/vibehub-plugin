@@ -2,9 +2,13 @@
   "acceptance": [
     {
       "acceptance_id": "refine-after-authoritative-outcomes",
-      "criterion": "After both prerequisite Outcomes exist, this same Ticket is replanned to maturity firm with executable acceptance derived from the owner-approved interaction direction and the proven DeepSeek Harness seams before implementation begins."
+      "criterion": "After both prerequisite Outcomes exist, this same Ticket is replanned to maturity firm with executable acceptance derived from the owner-approved interaction direction and the proven DeepSeek Harness seams before implementation begins.",
+      "identity": "sha256:ca02d6f8b96e9f357003351001d013af4e0d8323de6ca5aff29bbdf413c538de",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not execute while maturity remains draft.",
     "Keep current Skills and canonical Git-native Ticket, Context, Evidence, and Outcome documents working throughout the first vertical slice.",
@@ -20,6 +24,19 @@
     {
       "purpose": "Existing authority for the replaceable executor boundary that the prerequisite Outcomes will narrow.",
       "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "refine-after-authoritative-outcomes",
+          "identity": "sha256:ca02d6f8b96e9f357003351001d013af4e0d8323de6ca5aff29bbdf413c538de",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8ed9c1ed2de0facd11a5c3ad2b4c3a0dba3bdeab42414eddeb2c750f8ba90b21",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -42,6 +59,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-build-task-harness-vertical-slice"
 }

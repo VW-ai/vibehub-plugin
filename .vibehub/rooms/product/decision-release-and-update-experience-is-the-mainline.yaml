@@ -1,0 +1,44 @@
+{
+  "context_id": "decision-release-and-update-experience-is-the-mainline",
+  "detail": "The work opened by upgrading a stale install on 2026-09-01 is one mainline with side fixes attached, not a flat pile of defects. The mainline is the release and update experience: what a released version means, what a user actually receives when they install, what happens to their existing project data when they take an update, and how they find out an update concerns them at all. Everything on that line is in scope and is prioritised together. Two things found along the way are explicitly side fixes rather than mainline, and must not compete with it for priority: the closeout independence gate, which is a workflow-integrity defect, and GitHub Issue intake, which is a tooling convenience. They are worth doing and one is already done; they are not what this effort is about. One framing correction matters enough to record, because it was nearly built into the Tickets the wrong way round. That two of the owner's three projects sit write-blocked at MIGRATION_REQUIRED is a symptom, not the problem. The problem is that taking an update does not carry the user's data with it, and that nothing tells a user an update concerns their other projects. The two blocked projects are how that was noticed and are useful as a rehearsal target, but unblocking those two specific repositories is not a deliverable and must not be mistaken for one. A fix that migrated Undercurrent and nomi while leaving the update experience unchanged would resolve the symptom and deliver nothing.",
+  "evidence": [
+    {
+      "note": "Owner set the scope and corrected the framing after reviewing the planned Ticket set, distinguishing the symptom from the problem.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-npx-is-the-only-supported-install-path",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-upgrade-drives-every-affected-project",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-migrations-declare-mechanical-and-semantic-halves",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-02T00:30:00.000Z",
+    "quote": "你说的你三个用了 vibehub 的项目，有两个现在是写不进去的状态，你不知道 — 这个我理解是个现象，而不是问题本身，对吧。我能不能定个调子，我们这里是，主要在做我们的发布/更新的核心体验的升级，附加一下额外的bug fix",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "This effort is an upgrade of the release and update core experience, with incidental bug fixes attached; the two write-blocked projects are a symptom of it, not the deliverable",
+  "tags": [
+    "scope",
+    "release",
+    "upgrade",
+    "prioritisation"
+  ],
+  "type": "decision"
+}

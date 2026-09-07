@@ -1,26 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "put-requires-room",
-      "criterion": "vh context put without --room fails with guidance naming the placement rule, put with --room keeps working, and node --test covers both."
+      "acceptance_id": "dogfood-product-room",
+      "criterion": "This repository's three root entries move into a new top-level product room with an honest room.yaml, every ticket context_ref is updated, and project validate plus the full test suite pass.",
+      "identity": "sha256:16c7e077a4830586673fcd2676da1dc987beb3b97bdd9d5d148b28d962a68fd9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "no-root-context-loading",
-      "criterion": "loadRepository reads Context only from rooms, project init creates no context/ directory, and a populated legacy .vibehub/context/ fails project validate with an error instructing migration into rooms, covered by node --test."
+      "criterion": "loadRepository reads Context only from rooms, project init creates no context/ directory, and a populated legacy .vibehub/rooms/product/ fails project validate with an error instructing migration into rooms, covered by node --test.",
+      "identity": "sha256:73be29b0778cf9414c7b699596e6bb3bba46e972292156c8efc7e9ab16f04b27",
+      "revision": 1,
+      "state": "retired"
     },
     {
-      "acceptance_id": "dogfood-product-room",
-      "criterion": "This repository's three root entries move into a new top-level product room with an honest room.yaml, every ticket context_ref is updated, and project validate plus the full test suite pass."
+      "acceptance_id": "no-root-context-loading",
+      "criterion": "loadRepository reads Context only from rooms, project init creates no context/ directory, and a populated legacy .vibehub/context/ fails project validate with an error instructing migration into rooms, covered by node --test.",
+      "identity": "sha256:5555e2df8ff1194b013049d7308b3b14fee1c470f66c3f37ab342a2e440786ed",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "put-requires-room",
+      "criterion": "vh context put without --room fails with guidance naming the placement rule, put with --room keeps working, and node --test covers both.",
+      "identity": "sha256:b39cf24d82b680b1b1440abe893a75078c2f65a27847625c87f1582804ef9d0c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "skills-teach-placement",
-      "criterion": "The ingest and query skills state the placement judgment in a few lines — lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge at a root — and every checked-in instruction that still names .vibehub/context/ as a live location (CLAUDE.md, AGENTS.md, docs/INSTALL.md) is swept to rooms, without mechanical step inflation."
+      "criterion": "The ingest and query skills state the placement judgment in a few lines — lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge at a root — and every checked-in instruction that still names .vibehub/rooms/product/ as a live location (CLAUDE.md, AGENTS.md, docs/INSTALL.md) is swept to rooms, without mechanical step inflation.",
+      "identity": "sha256:49976abb9516634b61f1b2819f94019b5fb829f858394c7a05631df765703448",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "skills-teach-placement",
+      "criterion": "The ingest and query skills state the placement judgment in a few lines — lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge at a root — and every checked-in instruction that still names .vibehub/context/ as a live location (CLAUDE.md, AGENTS.md, docs/INSTALL.md) is swept to rooms, without mechanical step inflation.",
+      "identity": "sha256:9862f023b4506a21b76146de27e4d6bd91df259ca3405e29930d8f6881e8a304",
+      "revision": 2,
+      "state": "active"
     },
     {
       "acceptance_id": "ui-context-refs-roomed",
-      "criterion": "The UI projection resolves room-held ticket context_refs into context cards with their owning room attributed, so a roomed ref renders instead of silently disappearing, covered by node --test."
+      "criterion": "The UI projection resolves room-held ticket context_refs into context cards with their owning room attributed, so a roomed ref renders instead of silently disappearing, covered by node --test.",
+      "identity": "sha256:e1de8cad1d6f8e88b11986e44a40da1029ab860ba81d257229e1d71c4f1808ac",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "No dual read paths, aliases, or compatibility shims for the removed root context directory.",
     "The legacy-directory failure must be a visible validation error, never a silent skip.",
@@ -39,6 +69,39 @@
     {
       "purpose": "Speed-first boundary: delete cleanly, no compatibility machinery. This ref moves with the migration this ticket performs.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "dogfood-product-room",
+          "identity": "sha256:16c7e077a4830586673fcd2676da1dc987beb3b97bdd9d5d148b28d962a68fd9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-root-context-loading",
+          "identity": "sha256:5555e2df8ff1194b013049d7308b3b14fee1c470f66c3f37ab342a2e440786ed",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "put-requires-room",
+          "identity": "sha256:b39cf24d82b680b1b1440abe893a75078c2f65a27847625c87f1582804ef9d0c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-teach-placement",
+          "identity": "sha256:9862f023b4506a21b76146de27e4d6bd91df259ca3405e29930d8f6881e8a304",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ui-context-refs-roomed",
+          "identity": "sha256:e1de8cad1d6f8e88b11986e44a40da1029ab860ba81d257229e1d71c4f1808ac",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:80efc174aeb82094507f06b354b26acbfb7a964f2f788bba26318848dd93bea9",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -63,6 +126,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-context-always-roomed"
 }

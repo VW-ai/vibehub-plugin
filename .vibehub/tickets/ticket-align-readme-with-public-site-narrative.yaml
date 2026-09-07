@@ -2,17 +2,27 @@
   "acceptance": [
     {
       "acceptance_id": "canonical-website-entry-is-visible-and-exact",
-      "criterion": "The root README exposes a clear human-readable link to exactly https://vibehub.icu near the product hero; automated checks reject www, Pages, or alternate public-site destinations and fresh installed Codex/Claude artifacts retain the same link."
-    },
-    {
-      "acceptance_id": "readme-and-site-share-one-major-narrative",
-      "criterion": "The README hero and immediately adjacent product copy use the current site's concise work-over-chat thesis and accurately connect one coding request, exact Context, a Git-native Ticket, acceptance-linked Evidence, independent Outcome, returned durable Context, and repository/Git ownership without copying the full website, implying chat management, or introducing unsupported product-suite claims."
+      "criterion": "The root README exposes a clear human-readable link to exactly https://vibehub.icu near the product hero; automated checks reject www, Pages, or alternate public-site destinations and fresh installed Codex/Claude artifacts retain the same link.",
+      "identity": "sha256:1d078c7ed0113cba73e1d4dbd3c376f5e94278c77b79ce9bbb4b7ab29e50c092",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "existing-readme-contract-and-artifact-parity-remain-intact",
-      "criterion": "README-focused tests and full repository verification preserve the at-most-60-line surface, exactly one canonical entry, all three Retina Workbench images and four phases, current installation/upgrades and dark-mode brand; fresh Codex/Claude artifacts resolve every README image and retain the website/narrative, all Rooms are FRESH, and Ticket/project validation passes."
+      "criterion": "README-focused tests and full repository verification preserve the at-most-60-line surface, exactly one canonical entry, all three Retina Workbench images and four phases, current installation/upgrades and dark-mode brand; fresh Codex/Claude artifacts resolve every README image and retain the website/narrative, all Rooms are FRESH, and Ticket/project validation passes.",
+      "identity": "sha256:56bb26bd2e5626831083892ff0d03ef772501418b6fc8261c1ea58be6731123a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "readme-and-site-share-one-major-narrative",
+      "criterion": "The README hero and immediately adjacent product copy use the current site's concise work-over-chat thesis and accurately connect one coding request, exact Context, a Git-native Ticket, acceptance-linked Evidence, independent Outcome, returned durable Context, and repository/Git ownership without copying the full website, implying chat management, or introducing unsupported product-suite claims.",
+      "identity": "sha256:adc8be12f139be26ab0e863978c2d536530359a5444955d574c8b258cedd4be2",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use https://vibehub.icu as the only public-site destination; do not introduce www, a stale Pages URL, tracking parameters, or another website identity.",
     "Treat merged website source and successful domain-discovery Outcome as current product truth; do not adopt the obsolete broad AI-native product-suite copy returned by a stale external crawl.",
@@ -40,11 +50,34 @@
     },
     {
       "purpose": "Successful canonical-domain discovery and production verification truth.",
-      "ref": ".vibehub/outcomes/ticket-complete-public-domain-discovery.yaml"
+      "ref": ".vibehub/outcomes/ticket-complete-public-domain-discovery/contract-v1.yaml"
     },
     {
       "purpose": "Existing at-most-60-line, canonical-entry, image, installation, and artifact-facing README contract.",
       "ref": "test/release.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-website-entry-is-visible-and-exact",
+          "identity": "sha256:1d078c7ed0113cba73e1d4dbd3c376f5e94278c77b79ce9bbb4b7ab29e50c092",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "existing-readme-contract-and-artifact-parity-remain-intact",
+          "identity": "sha256:56bb26bd2e5626831083892ff0d03ef772501418b6fc8261c1ea58be6731123a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "readme-and-site-share-one-major-narrative",
+          "identity": "sha256:adc8be12f139be26ab0e863978c2d536530359a5444955d574c8b258cedd4be2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ff7118b1c688270f0d7b227617da979707189a907ccc2020f64b48e1170d5239",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -57,6 +90,7 @@
     "git:origin-main-1cbca5d"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-align-readme-with-public-site-narrative"
 }

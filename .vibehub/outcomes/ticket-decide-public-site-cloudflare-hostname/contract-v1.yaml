@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "owner-selects-account-hostname-and-conflict-rule"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-20T20:23:37Z",
+  "contract_revision": {
+    "identity": "sha256:666099af0f3a346349ac10395b99ebdf5215c955a0d1e72fdbc2761d1e723e55",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "vibehub-icu-hostname-and-replacement-decision"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted the sole human-authority criterion through the acceptance-linked human-origin Evidence. The owner explicitly selected the existing Cloudflare-zone apex hostname vibehub.icu in the human-owned account and explicitly authorized replacing the named old vibehub-website-v1.pages.dev site. Fresh read-only Sites inspection confirms that this exact hostname is attached to the persisted public-site project with custom-domain, provider, and SSL status all active and no recorded error. No Agent-origin record was used as a substitute for the human decision.",
+  "ticket_id": "ticket-decide-public-site-cloudflare-hostname",
+  "unresolved_acceptance_ids": []
+}

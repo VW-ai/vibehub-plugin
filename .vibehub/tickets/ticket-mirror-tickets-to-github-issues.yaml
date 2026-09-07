@@ -1,31 +1,50 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "projection-script-is-deterministic-and-idempotent",
-      "criterion": "A checked-in Node script (no new runtime dependencies beyond gh and node) reads .vibehub/tickets, outcomes, evidence, and the shared ticket graph projection, and computes for every Ticket an Issue title, body, labels, open/closed state, and the set of Evidence comments. Running it twice against the same repository state performs zero GitHub writes on the second run, proven by a fixture-based test that asserts the computed plan is empty when the remote already matches."
+      "acceptance_id": "ci-workflow-is-main-only-and-agent-free",
+      "criterion": "A GitHub Actions workflow runs the script on push to main filtered to .vibehub/tickets, .vibehub/outcomes, and .vibehub/evidence paths, plus workflow_dispatch with a dry_run input; it requests only issues:write and contents:read, produces no commit, and no Skill, CLAUDE.md rule, or hook asks an Agent to run or check it.",
+      "identity": "sha256:87131662313c60e3243c699dd9d38752f42d6845bf69abea508d330e69ce20a0",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "dry-run-prints-full-plan-without-writes",
-      "criterion": "A --dry-run flag prints every create, update, close, reopen, and comment the script would perform and makes no GitHub API write; the checked-in Evidence for this criterion includes a dry-run transcript over the real repository."
-    },
-    {
-      "acceptance_id": "ci-workflow-is-main-only-and-agent-free",
-      "criterion": "A GitHub Actions workflow runs the script on push to main filtered to .vibehub/tickets, .vibehub/outcomes, and .vibehub/evidence paths, plus workflow_dispatch with a dry_run input; it requests only issues:write and contents:read, produces no commit, and no Skill, CLAUDE.md rule, or hook asks an Agent to run or check it."
+      "criterion": "A --dry-run flag prints every create, update, close, reopen, and comment the script would perform and makes no GitHub API write; the checked-in Evidence for this criterion includes a dry-run transcript over the real repository.",
+      "identity": "sha256:d96577f16a27584326eb54cf9cd98af32d1d435776e3a43a41a79ccfb0c4d61e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "issue-content-is-readable-and-linked",
-      "criterion": "Each mirrored Issue shows a humanized title derived from the Ticket, the Ticket outcome, acceptance criteria as a task list checked according to the current Outcome, constraints, context refs as links to the files on main, direct dependencies as Blocked by #N lines resolved through the ticket-id marker, state and maturity as labels, and a footer linking to the Ticket file; Evidence records appear as one comment each in recorded_at order."
-    },
-    {
-      "acceptance_id": "one-way-projection-rule-is-recorded",
-      "criterion": "A decision Context in .vibehub/rooms/product records that GitHub Issues are a read-only projection of the Ticket graph, Git stays the source of truth, human Issue comments are discussion rather than durable Context, and outside-filed Issues become Tickets only through deliberate planning with the Issue as a context ref."
+      "criterion": "Each mirrored Issue shows a humanized title derived from the Ticket, the Ticket outcome, acceptance criteria as a task list checked according to the current Outcome, constraints, context refs as links to the files on main, direct dependencies as Blocked by #N lines resolved through the ticket-id marker, state and maturity as labels, and a footer linking to the Ticket file; Evidence records appear as one comment each in recorded_at order.",
+      "identity": "sha256:7a2f89c61506b376243ac91f2ee8e17592325ec77388cc736db8fa95cff69368",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "live-mirror-looks-good-on-github",
       "authority": "human",
-      "criterion": "After a live run against VW-ai/vibehub-plugin, the owner reviews the Issues list, one open Issue, one closed Issue with Evidence comments, and the dependency rendering, and explicitly judges that the mirror is readable and worth keeping."
+      "criterion": "After a live run against VW-ai/vibehub-plugin, the owner reviews the Issues list, one open Issue, one closed Issue with Evidence comments, and the dependency rendering, and explicitly judges that the mirror is readable and worth keeping.",
+      "identity": "sha256:b6bd4f8f269e5285f4880aec9aef4778b9679b97b2bc25cb172f75da413bf306",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "one-way-projection-rule-is-recorded",
+      "criterion": "A decision Context in .vibehub/rooms/product records that GitHub Issues are a read-only projection of the Ticket graph, Git stays the source of truth, human Issue comments are discussion rather than durable Context, and outside-filed Issues become Tickets only through deliberate planning with the Issue as a context ref.",
+      "identity": "sha256:4ca0de956b910886d9e764d97e86a0d3d6cc776a41c8d0ffa3bb9139f7cdaaf0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "projection-script-is-deterministic-and-idempotent",
+      "criterion": "A checked-in Node script (no new runtime dependencies beyond gh and node) reads .vibehub/tickets, outcomes, evidence, and the shared ticket graph projection, and computes for every Ticket an Issue title, body, labels, open/closed state, and the set of Evidence comments. Running it twice against the same repository state performs zero GitHub writes on the second run, proven by a fixture-based test that asserts the computed plan is empty when the remote already matches.",
+      "identity": "sha256:d633aa2b602af2662eec63652aed97c2931294e028d553660c8c05d030f1e9f4",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "One-way only: never read Issue titles, bodies, comments, or state back into .vibehub documents.",
     "Never commit or push from the workflow; the repository must not gain a mapping file or Issue-number field.",
@@ -52,6 +71,44 @@
       "ref": ".github/workflows/verify.yml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ci-workflow-is-main-only-and-agent-free",
+          "identity": "sha256:87131662313c60e3243c699dd9d38752f42d6845bf69abea508d330e69ce20a0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dry-run-prints-full-plan-without-writes",
+          "identity": "sha256:d96577f16a27584326eb54cf9cd98af32d1d435776e3a43a41a79ccfb0c4d61e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "issue-content-is-readable-and-linked",
+          "identity": "sha256:7a2f89c61506b376243ac91f2ee8e17592325ec77388cc736db8fa95cff69368",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-mirror-looks-good-on-github",
+          "identity": "sha256:b6bd4f8f269e5285f4880aec9aef4778b9679b97b2bc25cb172f75da413bf306",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-way-projection-rule-is-recorded",
+          "identity": "sha256:4ca0de956b910886d9e764d97e86a0d3d6cc776a41c8d0ffa3bb9139f7cdaaf0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "projection-script-is-deterministic-and-idempotent",
+          "identity": "sha256:d633aa2b602af2662eec63652aed97c2931294e028d553660c8c05d030f1e9f4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cce33c7bd1cf094825e917e5f36f1b9d098813b52788b67655967fafcbb807e2",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -60,6 +117,7 @@
     "conversation:2026-08-22-tickets-as-github-issues"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-mirror-tickets-to-github-issues"
 }

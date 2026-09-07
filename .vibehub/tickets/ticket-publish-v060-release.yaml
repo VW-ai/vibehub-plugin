@@ -1,21 +1,31 @@
 {
   "acceptance": [
     {
+      "acceptance_id": "github-release-verified",
+      "authority": "agent",
+      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.6.0 points to the tagged main commit; vibehub-plugin-0.6.0.tar.gz and vibehub-plugin-0.6.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes.",
+      "identity": "sha256:0e00a1c747fc73b899c366007ab10d1d93b626818693b159d1bc18c928c7f398",
+      "revision": 1,
+      "state": "active"
+    },
+    {
       "acceptance_id": "release-pr-merged",
       "authority": "agent",
-      "criterion": "The verified v0.6.0 release-preparation PR is merged into main, and updated origin/main contains its successful preparation Outcome and Evidence."
+      "criterion": "The verified v0.6.0 release-preparation PR is merged into main, and updated origin/main contains its successful preparation Outcome and Evidence.",
+      "identity": "sha256:affe5a9e1cd3d21acb0b5e6f979b68010d1de448d98115c296e16ab9f3d7570c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "tagged-merged-main",
       "authority": "agent",
-      "criterion": "After fast-forwarding local main, tag v0.6.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged."
-    },
-    {
-      "acceptance_id": "github-release-verified",
-      "authority": "agent",
-      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.6.0 points to the tagged main commit; vibehub-plugin-0.6.0.tar.gz and vibehub-plugin-0.6.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes."
+      "criterion": "After fast-forwarding local main, tag v0.6.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged.",
+      "identity": "sha256:094590fdc29fc2a0046653d1ce913d36aa3636668f0d491299aca98fd8de2b3e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Never tag or create the GitHub Release from the release branch.",
     "Do not create the GitHub Release manually; wait for the tag-triggered Release VibeHub workflow.",
@@ -31,6 +41,29 @@
     {
       "purpose": "Tag-triggered workflow that builds and creates the GitHub Release.",
       "ref": ".github/workflows/release.yml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "github-release-verified",
+          "identity": "sha256:0e00a1c747fc73b899c366007ab10d1d93b626818693b159d1bc18c928c7f398",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-pr-merged",
+          "identity": "sha256:affe5a9e1cd3d21acb0b5e6f979b68010d1de448d98115c296e16ab9f3d7570c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tagged-merged-main",
+          "identity": "sha256:094590fdc29fc2a0046653d1ce913d36aa3636668f0d491299aca98fd8de2b3e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d43f2c4fadd706a9478d6b33ae09cb58a5153d63d79e2717bfe2a7ccd0272d0a",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -56,6 +89,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-publish-v060-release"
 }

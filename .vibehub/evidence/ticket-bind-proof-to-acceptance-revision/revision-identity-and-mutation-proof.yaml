@@ -1,0 +1,42 @@
+{
+  "acceptance_ids": [
+    "acceptance-and-contract-revisions-are-canonical-data",
+    "evidence-and-outcomes-bind-exact-revisions",
+    "semantic-mutation-appends-and-preserves-lineage"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "acceptance-and-contract-revisions-are-canonical-data",
+      "identity": "sha256:e9266d60a5e5664eb2915d48594c2f2cefdb7ca3b6be4416b5ce81547cb7f1b8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "evidence-and-outcomes-bind-exact-revisions",
+      "identity": "sha256:42b36afd187383c169a4528bbbea692b3f46b8ff4f7498a36c0f310095144e7e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "semantic-mutation-appends-and-preserves-lineage",
+      "identity": "sha256:308917ada45c32db366702d09c6930fd3081b6d6dd00ef1ff26a36f21be99de9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "revision-identity-and-mutation-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:14:04Z",
+  "refs": [
+    "skills/vibehub-core/contracts/revision-identity.md",
+    "skills/vibehub-core/scripts/revision-contract.mjs",
+    "skills/vibehub-core/contracts/ticket.schema.json",
+    "skills/vibehub-core/contracts/evidence.schema.json",
+    "skills/vibehub-core/contracts/outcome.schema.json",
+    "test/revision-contract.test.mjs",
+    "command:node-test-revision-contract-pass"
+  ],
+  "schema_version": 2,
+  "summary": "Ticket, Evidence, and Outcome schemas now carry immutable revision identities, while revision-contract.mjs owns canonical serialization, exact Contract membership, retirement, lineage, and the only semantic append path. Focused tests prove presentation and unrelated metadata leave identity unchanged; criterion or authority changes append under the same logical ID; independent responsibilities, split, merge, and retirement follow their distinct rules; historical success remains readable but cannot close a later Contract.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

@@ -6,8 +6,8 @@ description: Execute one READY lightweight VibeHub Ticket from its checked-in Gi
 # VibeHub Ticket Run
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 There is no Run lease or compiled Context copy. The named branch, Ticket YAML,
 referenced Context, and Git status are the execution boundary, inside
@@ -24,6 +24,8 @@ Read `../vibehub-core/contracts/ticket-next-action.md`. Routine execution starts
 input or independent closeout.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
 UI launch mechanics.
+Read `../vibehub-core/contracts/revision-identity.md`. Evidence is proof for
+the exact active Acceptance revision, not for its logical ID in the abstract.
 
 ## Workflow
 
@@ -34,8 +36,17 @@ UI launch mechanics.
    node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
    ```
 
-2. Read every `context_ref` from the exact checkout. Use `$vibehub-query` only
-   when a real context gap appears. When a direct prerequisite produced an
+2. Resolve every `context_ref` with the shared engine operation and consume
+   the returned source plus identity:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+   ```
+
+   `ref.json` is `{"ref":"<Ticket context_ref>"}`. This reads both current
+   repository paths and immutable Git history. Never check out the referenced
+   commit.
+   Use `$vibehub-query` only when a real context gap appears. When a direct prerequisite produced an
    input this Ticket consumes, read that Ticket's successful Outcome and
    referenced Evidence too. Confirm the branch and preserve unrelated changes.
 3. Implement autonomously within the Ticket's outcome, constraints, and user
@@ -56,6 +67,11 @@ UI launch mechanics.
    ```text
    node ../vibehub-core/scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
    ```
+
+   A native Evidence document uses schema 2, `binding_state: bound`,
+   `binding_origin: native`, and copies each exact `acceptance_revisions`
+   reference from the current Ticket. Never copy an old revision forward or
+   emit either legacy migration state from this workflow.
 
 5. Read the exact Ticket back after Evidence is appended. If its host-derived
    `next_action.action` is `CLOSE_OUT`, hand the exact Ticket, current

@@ -3,6 +3,20 @@
     "www-permanently-redirects-to-canonical-apex",
     "domain-discovery-is-production-verified"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "www-permanently-redirects-to-canonical-apex",
+      "identity": "sha256:3229bd8886f76de6d7990f8073584c07ceeea7aabc6160dc45e02298d888a37d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "domain-discovery-is-production-verified",
+      "identity": "sha256:e6783042afa8841d546413bc3870b2fd3e4ef1f6f555b7b10c6a7822853336cd",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "canonical-www-redirect-production-verification",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -13,7 +27,7 @@
     "command:node-site-release-scripts-release-mjs-verify-www",
     "https://www.vibehub.icu/domain-discovery-check?source=vibehub"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "After a read-only Cloudflare DNS conflict preflight found no existing www record, a proxied redirect-only www A record and the narrowly scoped Single Redirect named Redirect www to canonical apex were added without changing apex or unrelated DNS. The production verifier confirmed that both HTTP and HTTPS requests to www.vibehub.icu return 301 directly to https://vibehub.icu while preserving the exact test path and query.",
   "ticket_id": "ticket-complete-public-domain-discovery"
 }

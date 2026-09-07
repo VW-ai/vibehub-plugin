@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "workbench-declares-canonical-favicon",
-      "criterion": "The production Workbench HTML declares an SVG favicon using the canonical VibeHub mark, with an explicit type and a local absolute asset path that works for every focused or query URL."
+      "acceptance_id": "installed-artifacts-and-regressions-pass",
+      "criterion": "Artifact verification requires the favicon file and HTML link, fresh Codex and Claude marketplace installs behave identically, focused host tests fetch the icon, and complete repository plus artifact verification pass.",
+      "identity": "sha256:f4593ccdb160794e17fd91b5b38f73cbd65f9a318e7fe33e9fbd0bb182281102",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "loopback-host-serves-favicon-exactly",
-      "criterion": "The read-only host serves the declared favicon with HTTP 200, image/svg+xml content type, canonical mark content, and no writable route, redirect, external dependency, or missing-resource console failure."
+      "criterion": "The read-only host serves the declared favicon with HTTP 200, image/svg+xml content type, canonical mark content, and no writable route, redirect, external dependency, or missing-resource console failure.",
+      "identity": "sha256:314c7317c02593760345cce13beb09d80f4e45f29a3cc25548d7a369431e57df",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "installed-artifacts-and-regressions-pass",
-      "criterion": "Artifact verification requires the favicon file and HTML link, fresh Codex and Claude marketplace installs behave identically, focused host tests fetch the icon, and complete repository plus artifact verification pass."
+      "acceptance_id": "workbench-declares-canonical-favicon",
+      "criterion": "The production Workbench HTML declares an SVG favicon using the canonical VibeHub mark, with an explicit type and a local absolute asset path that works for every focused or query URL.",
+      "identity": "sha256:fe2cf3f843fd0e0894e2aac4256454a76132472c19d352ef76b97d8820a74fdb",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Reuse the canonical VibeHub mark; do not create another logo or visual identity.",
     "Keep the Workbench dependency-free, read-only, loopback-only, and compatible with the URL bearer fragment.",
@@ -34,6 +44,29 @@
       "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "installed-artifacts-and-regressions-pass",
+          "identity": "sha256:f4593ccdb160794e17fd91b5b38f73cbd65f9a318e7fe33e9fbd0bb182281102",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "loopback-host-serves-favicon-exactly",
+          "identity": "sha256:314c7317c02593760345cce13beb09d80f4e45f29a3cc25548d7a369431e57df",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workbench-declares-canonical-favicon",
+          "identity": "sha256:fe2cf3f843fd0e0894e2aac4256454a76132472c19d352ef76b97d8820a74fdb",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:9cb23120e5bc94f2d0fbeec5ab4b8b3563579ecfd3e7d14d38a4aae3ab64f1f7",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -42,6 +75,7 @@
     "conversation:2026-08-20-owner-requests-ticket-graph-favicon"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-add-workbench-favicon"
 }

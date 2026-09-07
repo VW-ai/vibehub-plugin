@@ -1,0 +1,33 @@
+{
+  "context_id": "decision-npx-is-the-only-supported-install-path",
+  "detail": "The npx-first path was already chosen and implemented (decision recorded by ticket-decide-npx-first-install-experience, path A: a self-contained vibehub-core skill folder making skills.sh supported). Host marketplaces were kept alongside it as a secondary path and quietly rotted: a marketplace install delivers the entire development repository twice, measured at 30M for the marketplace clone including 14M of git history plus 17M for the plugin cache, against the 544K of skills/ that npx installs. No install-time filtering exists in the marketplace mechanism, so repairing it meant publishing a generated marketplace from a dedicated repository, with a new publication pipeline, a history-growth ceiling, and a migration for existing users — a substantial ongoing surface for a path the documentation does not recommend. The owner chose to retire it instead. This keeps one supported way in, removes the two marketplace builders and their release wiring from the maintained surface, and returns the project to the smallest thing that works, consistent with decision-speed-first-skill-plugin. Retirement is not free and its cost is accepted knowingly: existing marketplace installs must move to npx, the Codex marketplace entry goes with the Claude one, all eleven Skills carry a partial-install fallback line that names the marketplace and must be rewritten, and verify-release-version.mjs currently derives two of its five agreeing version declarations from the marketplace manifest.",
+  "evidence": [
+    {
+      "note": "Owner chose retirement over repair after seeing the measured 47M-versus-544K comparison and the cost of the repair route.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:00:00.000Z",
+    "quote": "然后说会marketplace，我们直接不要了，不支持markpetplace了",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "VibeHub supports one install path, npx skills add; host marketplace distribution is retired rather than repaired",
+  "tags": [
+    "install",
+    "distribution",
+    "release",
+    "boundary",
+    "simplification"
+  ],
+  "type": "decision"
+}

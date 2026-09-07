@@ -1,11 +1,12 @@
 # Install VibeHub
 
-VibeHub is a Skill-first plugin. Installation copies manifests, Skills,
-schemas, dependency-free helper scripts, and the local graph UI assets. It does
-not install a global CLI, MCP server, hook process, database, native module, or
-daemon. The read-only UI host starts in the foreground when a Ticket lifecycle
-moment needs a visual review, or when explicitly requested as a fallback, and
-exits with its launcher process.
+VibeHub is Skill-first. `npx skills add` copies the Skill directories, including
+their bundled schemas, dependency-free helper scripts, and local graph UI
+assets. It does not copy a marketplace bundle or install a global CLI, MCP
+server, hook process, database, native module, or daemon. The read-only UI host
+starts in the foreground when a Ticket lifecycle moment needs a visual review,
+or when explicitly requested as a fallback, and exits with its launcher
+process.
 
 ## Install
 
@@ -23,21 +24,29 @@ inside the `vibehub-core` skill folder; a partial install that omits
 — each Skill detects that and tells the Agent to run
 `npx skills add VW-ai/vibehub-plugin -s vibehub-core`.
 `vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
-directly. Update later with `npx skills update`.
+directly.
+
+There is no second install path. Host marketplace distribution was retired:
+it delivered the whole development repository rather than the Skills, and its
+version-string cache key let an install go stale in silence. If you installed
+VibeHub through a Claude Code or Codex marketplace, remove it there and run the
+command above instead.
+
+The source repository retains `.claude-plugin/plugin.json` only because
+skills.sh reads it as repository metadata and the release checker uses its
+version as an identity anchor. It is not installed as a marketplace. The
+marketplace manifest and the retired Codex plugin manifest were removed with
+their builders and tests.
 
 **Updating across a Skill rename.** `npx skills add` copies Skill folders and
 does not remove folders that no longer exist upstream. When a Skill is renamed
 — `vibehub-ticket-review` became `vibehub-review` — the old folder can survive
 an update and present a stale duplicate Skill to the Agent. Delete the old
 folder from `.claude/skills/`, `.agents/skills/`, or wherever your host
-installed it. Host marketplace installs are unaffected: their plugin cache is
-isolated per version. Setup notices this for you: while it inspects the
-checkout it names any installed Skill folder whose name the plugin has retired,
+installed it. Setup notices this for you: while it inspects the checkout it names any installed Skill folder whose name the plugin has retired,
 along with the replacement. It only reports — the folder is inside your agent
 directory, so deleting it stays your action.
 
-**Host marketplaces.** The same layout ships through the Codex and Claude Code
-marketplaces; see the README for the exact commands.
 
 ## Requirements
 
@@ -103,6 +112,12 @@ Plugin code and checked-in project data have separate lifecycles. Updating a
 plugin bundle never writes `.vibehub/`. The installed helper first reports the
 repository compatibility state:
 
+The supported `npx skills` updater detects plugin changes by content hash or
+an unconditional refetch; it does not depend on VibeHub's declared release
+version. VibeHub therefore ships no separate staleness command. Release
+versions remain human-facing identities for reproducible artifacts and their
+paired data migrations.
+
 ```bash
 node <plugin>/skills/vibehub-core/scripts/vh.mjs project compatibility --repo <repository>
 ```
@@ -113,20 +128,33 @@ explicit migration boundary before restructuring them. `UNSUPPORTED_NEWER`
 means the repository needs a newer plugin; VibeHub does not guess or downgrade
 the data.
 
-**Claude Code.** Claude Code can refresh auto-update-enabled marketplaces and
-installed plugins. Run `/reload-plugins` after an update when you want the new
-bundle in the current process, then start or resume work; repository migration
-remains a separate reviewed action.
-
-**Codex.** Current Codex releases expose explicit Git marketplace refresh:
+For a release upgrade, choose one immutable release tag and repeat it in both
+commands (replace `<host>` with `codex`, `claude-code`, or another skills.sh
+host, and replace the roots with directories you explicitly want scanned):
 
 ```bash
-codex plugin marketplace upgrade vibehub
+npx skills add https://github.com/VW-ai/vibehub-plugin/tree/<release-tag> -a <host> -s '*' -y
+npx --yes https://github.com/VW-ai/vibehub-plugin/releases/download/<release-tag>/vibehub-upgrade.tgz \
+  --root <bounded-root> [--root <another-root>]
 ```
 
-Refresh or reinstall `vibehub@vibehub` from the plugin browser, then start a
-new session. Codex does not currently expose a documented plugin hot-reload or
-background installed-plugin updater, so VibeHub does not claim or emulate one
+Do not pair `npx skills update` with a floating `releases/latest` upgrader:
+the default branch and latest published Release may be different revisions.
+The one-shot upgrader verifies and prints its embedded tag, commit, engine,
+contracts, and migration registry before discovery. It follows no symlinks,
+scans only below the explicit roots, then includes only the registered
+worktrees of repositories found there. A safe worktree is mechanically
+migrated and receives one local reviewable commit. Dirty, detached, missing,
+unsupported, semantic-first, or otherwise unsafe worktrees are unchanged and
+reported with an exact reason. Nothing is pushed. Open a later Agent session
+inside each worktree that reports semantic-pending refs to complete only that
+guided semantic work.
+
+**Claude Code.** Run `/reload-plugins` after an update when you want the new
+Skills in the current process, then start or resume work.
+
+**Codex.** Start a new session after an update. Codex does not currently
+expose a documented Skill hot-reload, so VibeHub does not claim or emulate one
 with a daemon or hook.
 
 ## Ticket graph presentation

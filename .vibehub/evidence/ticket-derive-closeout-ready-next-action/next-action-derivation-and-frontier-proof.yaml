@@ -5,6 +5,30 @@
     "runtime-presence-and-human-attention-remain-orthogonal",
     "no-automatic-success-or-unlock-is-introduced"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "identity": "sha256:e9535bec0538426699fe4a5691620c75784d70cd9c098f7a69b797bc09dd415d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+      "identity": "sha256:179c9c759f752f84de2d51e47f92b6a85a2d9ffdf9966d02d31b5eaccc39897c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+      "identity": "sha256:98de53b65c6a23994bbea3506e43d734ddc7ca463c039ad7177ab64f68a01748",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+      "identity": "sha256:99caf432f51c0bfbfd98eae20b28c893eb5048759b7364f5385ccc49d9f56d6a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "next-action-derivation-and-frontier-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -17,7 +41,7 @@
     "test/ui-model.test.mjs",
     "command:node-test-ticket-next-action-ticket-draft-ui-model-17-of-17"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "One documented host-side derivation now maps successful and non-success Outcomes, unresolved direct dependencies, draft maturity, missing human-origin Evidence, complete authority-satisfying Evidence, and incomplete Agent work to DONE, REPLAN, WAIT, REFINE, NEEDS_HUMAN, CLOSE_OUT, and EXECUTE with stable reasons and relevant IDs. Frontier preserves ready as an alias of ready_to_execute while separately grouping closeout, human, replan, refinement, wait, and done. Regression proves Agent Evidence cannot satisfy human authority, a mixed Ticket routes deterministically, runtime presence does not rewrite routing, and complete Evidence neither creates an Outcome nor unlocks a dependent.",
   "ticket_id": "ticket-derive-closeout-ready-next-action"
 }

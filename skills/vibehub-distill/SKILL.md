@@ -12,8 +12,8 @@ Context. A caller that needs a document turned into Context runs
 Context itself.
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Cold start is the one alignment experience allowed to be perceptible, and it
 runs once per project. Everything afterwards is align-on-use at Ticket start.

@@ -1,12 +1,15 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
       "acceptance_id": "rooms-workbench-direction-chosen",
       "authority": "human",
-      "criterion": "After reviewing the completed Rooms Workbench proposal, the owner explicitly approves one direction or records the changes required before implementation."
+      "criterion": "After reviewing the completed Rooms Workbench proposal, the owner explicitly approves one direction or records the changes required before implementation.",
+      "identity": "sha256:131e1b6aa318d36ae0c96361d5ab68e0225db373ff4247c503f6c5cfb80a43c2",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "The Agent running this Ticket presents the proposal and the exact decision needed; it does not substitute its recommendation for the owner's judgment.",
     "Do not begin implementation in this Ticket.",
@@ -27,6 +30,28 @@
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "rooms-workbench-direction-chosen",
+          "identity": "sha256:131e1b6aa318d36ae0c96361d5ab68e0225db373ff4247c503f6c5cfb80a43c2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3fa9f3bad0cc4470531c63f0389608a1112336a937acd3968d8adfd119786e82",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The owner-selected Rooms Workbench direction is recorded as human-origin Evidence and independently accepted, moving downstream implementation into refinement.",
@@ -42,6 +67,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-rooms-workbench-direction"
 }

@@ -1,34 +1,56 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "design-authority-is-explicit",
-      "criterion": "A concise checked-in local-graph design brief translates the approved quiet-intelligence and v8 causal-graph authority into this Plugin surface, explicitly identifies which historical product-language and interaction principles are retained, which old runtime capabilities are excluded, and why the rejected warm editorial/card-viewer direction is removed."
-    },
-    {
       "acceptance_id": "causal-graph-is-primary",
-      "criterion": "The complete direct-unlock graph is the dominant first view, reads left-to-right as what becomes executable next, uses deterministic stable layout with clear fork/join paths and no selection-driven reflow, keeps every non-orphan Ticket reachable, and preserves pan, zoom, fit, minimap, Ticket selection, relation selection, and causal-path focus."
+      "criterion": "The complete direct-unlock graph is the dominant first view, reads left-to-right as what becomes executable next, uses deterministic stable layout with clear fork/join paths and no selection-driven reflow, keeps every non-orphan Ticket reachable, and preserves pan, zoom, fit, minimap, Ticket selection, relation selection, and causal-path focus.",
+      "identity": "sha256:e33a279e1e22f6a38ae51cdc90623214af172b47d1ee01a0162760d23b63d501",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "quiet-progressive-disclosure",
-      "criterion": "The default surface is visually quiet and answers current source, executable frontier, blockers, deviations, and proof without exposing raw schema vocabulary or a dense dashboard; selecting a Ticket or relation keeps the graph visible and progressively reveals outcome, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and trace no more than two direct interactions from the graph."
-    },
-    {
-      "acceptance_id": "spatial-language-matches-authority",
-      "criterion": "Desktop and narrow real-browser screenshots over a representative fork-and-join fixture demonstrate compact system typography, cool-neutral matte surfaces, restrained elevation, a coherent small shape vocabulary, relations and symbols before chrome, neutral interaction states, and semantic color limited to truthful runtime meaning; warm editorial/serif branding, decorative green emphasis, persistent state legend, and floating dashboard-card styling are absent."
+      "acceptance_id": "design-authority-is-explicit",
+      "criterion": "A concise checked-in local-graph design brief translates the approved quiet-intelligence and v8 causal-graph authority into this Plugin surface, explicitly identifies which historical product-language and interaction principles are retained, which old runtime capabilities are excluded, and why the rejected warm editorial/card-viewer direction is removed.",
+      "identity": "sha256:0362e512a55d9fa915b0876017e3f922b2f9020329f5c87d94b9fb1a012995ad",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "interaction-is-deliberate-and-accessible",
-      "criterion": "Hover, selection, focus, close/back, source refresh, Copy link, graph controls, minimap recentering, and responsive Inspector behavior form one coherent interaction model; core controls are keyboard reachable with readable focus and contrast, reduced motion is honored, touch targets remain usable, and no affordance promises a capability or fact unavailable from canonical documents."
+      "criterion": "Hover, selection, focus, close/back, source refresh, Copy link, graph controls, minimap recentering, and responsive Inspector behavior form one coherent interaction model; core controls are keyboard reachable with readable focus and contrast, reduced motion is honored, touch targets remain usable, and no affordance promises a capability or fact unavailable from canonical documents.",
+      "identity": "sha256:74be5c0d68d30bb284c65efc49554ffd4cecbf106bc4a67e01ba7afe239b56d6",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "mechanical-boundary-remains-light",
-      "criterion": "The clean Plugin artifact still has zero package dependencies and no database, cache, hidden durable state, writes, restored legacy runtime, or semantic inference in the browser; it reads fresh schema-validated Context, Ticket, Evidence, and Outcome files through the loopback GET/HEAD-only host with the existing expiring fragment bearer and restrictive security headers."
+      "criterion": "The clean Plugin artifact still has zero package dependencies and no database, cache, hidden durable state, writes, restored legacy runtime, or semantic inference in the browser; it reads fresh schema-validated Context, Ticket, Evidence, and Outcome files through the loopback GET/HEAD-only host with the existing expiring fragment bearer and restrictive security headers.",
+      "identity": "sha256:9d8177699da56c915d96eb58f033e596b805bc00d3f69bf34fc759ad4eb7c73b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-approves-design-direction",
-      "criterion": "After seeing the real desktop and narrow surfaces, the repository owner explicitly confirms that the UI once again feels aligned with the intended VibeHub product direction; automated checks and an independent Agent cannot substitute for this aesthetic and interaction judgment."
+      "criterion": "After seeing the real desktop and narrow surfaces, the repository owner explicitly confirms that the UI once again feels aligned with the intended VibeHub product direction; automated checks and an independent Agent cannot substitute for this aesthetic and interaction judgment.",
+      "identity": "sha256:1a81c243e97e208f614ddac676c84d997ae6905b4b593b7b40ce2ffe3a651338",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "quiet-progressive-disclosure",
+      "criterion": "The default surface is visually quiet and answers current source, executable frontier, blockers, deviations, and proof without exposing raw schema vocabulary or a dense dashboard; selecting a Ticket or relation keeps the graph visible and progressively reveals outcome, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and trace no more than two direct interactions from the graph.",
+      "identity": "sha256:36edc9a81891164a2b43f4d2d7a64d4b0152cb4759023146e6dee2f709b5ec6e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "spatial-language-matches-authority",
+      "criterion": "Desktop and narrow real-browser screenshots over a representative fork-and-join fixture demonstrate compact system typography, cool-neutral matte surfaces, restrained elevation, a coherent small shape vocabulary, relations and symbols before chrome, neutral interaction states, and semantic color limited to truthful runtime meaning; warm editorial/serif branding, decorative green emphasis, persistent state legend, and floating dashboard-card styling are absent.",
+      "identity": "sha256:29d16fbd3beae9eef35dc7bffcfab069984f67dd505ccb1c93b9c58c5a7b3ec0",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Move fast and delete the rejected presentation rather than preserving CSS or DOM compatibility.",
     "Use the approved historical design authority as a product contract, not as permission to restore historical runtime architecture.",
@@ -72,6 +94,49 @@
       "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "causal-graph-is-primary",
+          "identity": "sha256:e33a279e1e22f6a38ae51cdc90623214af172b47d1ee01a0162760d23b63d501",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "design-authority-is-explicit",
+          "identity": "sha256:0362e512a55d9fa915b0876017e3f922b2f9020329f5c87d94b9fb1a012995ad",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "interaction-is-deliberate-and-accessible",
+          "identity": "sha256:74be5c0d68d30bb284c65efc49554ffd4cecbf106bc4a67e01ba7afe239b56d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "mechanical-boundary-remains-light",
+          "identity": "sha256:9d8177699da56c915d96eb58f033e596b805bc00d3f69bf34fc759ad4eb7c73b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-approves-design-direction",
+          "identity": "sha256:1a81c243e97e208f614ddac676c84d997ae6905b4b593b7b40ce2ffe3a651338",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quiet-progressive-disclosure",
+          "identity": "sha256:36edc9a81891164a2b43f4d2d7a64d4b0152cb4759023146e6dee2f709b5ec6e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "spatial-language-matches-authority",
+          "identity": "sha256:29d16fbd3beae9eef35dc7bffcfab069984f67dd505ccb1c93b9c58c5a7b3ec0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d8f9e84b518398c24c3f2d2d9f67150a1d05ad69d436b344be5e88cb416874d6",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-03T00:19:00.000Z",
@@ -96,6 +161,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

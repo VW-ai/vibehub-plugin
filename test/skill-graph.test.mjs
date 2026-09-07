@@ -5,7 +5,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { helper, root, run, tempRepo } from "./helpers.mjs";
+import { helper, root, run, tempRepo, ticket } from "./helpers.mjs";
+
+import { activeContract, appendTicketContractRevision } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 
 const CONTRACT = "skills/vibehub-core/contracts/skill-graph.json";
 const RETIRED = "vibehub-old-alpha";
@@ -760,4 +762,28 @@ test("this repository's real skill graph passes", () => {
   assert.ok(envelope.data.entry_points.includes("vibehub-ticket-plan"));
   assert.deepEqual(envelope.data.internal, ["vibehub-distill", "vibehub-ticket-validate"]);
   assert.deepEqual(envelope.data.infrastructure, ["vibehub-core"]);
+});
+
+test("revision-bound historical exemption requires success on the active Contract", () => {
+  const repo = baseline("skill-graph-revision-history");
+  const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
+  contract.retired = [{ name: RETIRED, replacement: "vibehub-alpha", reason: "retired", allowed_paths: [] }];
+  write(repo, CONTRACT, JSON.stringify(contract));
+  const initial = { ...ticket("review-history"), context: `Historical implementation used ${RETIRED}.` };
+  const path = ".vibehub/tickets/review-history.yaml";
+  write(repo, path, JSON.stringify(initial));
+  const v1 = activeContract(initial);
+  const outcomePath = ".vibehub/outcomes/review-history/contract-v1.yaml";
+  const outcome = { status: "successful", binding_state: "bound", contract_revision: { revision: v1.revision, identity: v1.identity } };
+  write(repo, outcomePath, JSON.stringify(outcome));
+  assert.equal(validate(repo).ok, true);
+  const revised = appendTicketContractRevision(initial, { acceptance_changes: [{ acceptance_id: "works", criterion: "New work must be reviewed again." }] });
+  write(repo, path, JSON.stringify(revised));
+  assert.match(messages(validate(repo)), /Live reference to retired Skill/);
+  const v2 = activeContract(revised);
+  const nextPath = ".vibehub/outcomes/review-history/contract-v2.yaml";
+  write(repo, nextPath, JSON.stringify({ ...outcome, status: "partial", contract_revision: { revision: v2.revision, identity: v2.identity } }));
+  assert.match(messages(validate(repo)), /Live reference to retired Skill/);
+  write(repo, nextPath, JSON.stringify({ ...outcome, contract_revision: { revision: v2.revision, identity: v2.identity } }));
+  assert.equal(validate(repo).ok, true);
 });

@@ -1,12 +1,15 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
       "acceptance_id": "codex-like-visual-direction-chosen",
       "authority": "human",
-      "criterion": "After reviewing the completed proposal at desktop, normal Codex width, and narrow sizes, the owner explicitly approves a concrete production direction, either the proposal as-is or the proposal with exact owner-specified modifications that themselves define the selected treatment, including whole-card operational state and the separate human-attention layer; a request for another proposal or review round without selecting a treatment remains unresolved or closes non-successfully."
+      "criterion": "After reviewing the completed proposal at desktop, normal Codex width, and narrow sizes, the owner explicitly approves a concrete production direction, either the proposal as-is or the proposal with exact owner-specified modifications that themselves define the selected treatment, including whole-card operational state and the separate human-attention layer; a request for another proposal or review round without selecting a treatment remains unresolved or closes non-successfully.",
+      "identity": "sha256:9a7f7e862f88bcdaf6dea9831c19066dd70a34a8efe738307aee5d6e2af7b507",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Only human-origin Evidence may satisfy the visual-direction choice.",
     "Do not treat automated contrast checks, an Agent opinion, or proposal completion as owner approval.",
@@ -23,6 +26,28 @@
       "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "codex-like-visual-direction-chosen",
+          "identity": "sha256:9a7f7e862f88bcdaf6dea9831c19066dd70a34a8efe738307aee5d6e2af7b507",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1e2609fb149283af25d52a89ddcae492cf995271f4e7a66c005993867d599cf2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The owner selects or revises the proposed Codex-like Workbench visual language, recording exact product constraints for downstream implementation.",
@@ -36,6 +61,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-decide-codex-like-workbench-visual-language"
 }

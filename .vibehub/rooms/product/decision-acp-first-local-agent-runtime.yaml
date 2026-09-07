@@ -1,0 +1,59 @@
+{
+  "context_id": "decision-acp-first-local-agent-runtime",
+  "detail": "ACP is the chosen execution protocol between a VibeHub host and replaceable coding Agents. The first implementation uses acpx as the preferred first replaceable headless ACP client and runtime facade, launching codex-acp and claude-agent-acp profiles before VibeHub invents provider-specific transports. V1 defaults to the user's already installed and authenticated Codex and Claude Code runtimes and subscriptions; VibeHub must not require API keys or a second provider login, and must not own, copy, export, persist, or synchronize provider OAuth tokens. Other local subscriptions and Agents may be added later through ACP launch profiles or narrowly scoped adapters. Reuse eligible open-source components under pinned versions with license and source provenance; write custom compatibility code only for demonstrated capability gaps. ACP and acpx carry session, stream, permission, cancel, resume, and configuration mechanics, while VibeHub continues to own Task/Ticket, Workflow role selection, exact ContextBinding, Evidence proposals, independent Outcome, and governed Context writeback. This decision chooses the executor protocol and preferred first facade; it does not by itself supersede the current DSH product-shell direction, which remains a separate host/composition decision.",
+  "evidence": [
+    {
+      "note": "The owner explicitly selected ACP and acpx after reviewing the local-subscription and multi-Agent adapter options.",
+      "ref": "conversation:2026-09-02-acp-acpx-local-agent-runtime"
+    },
+    {
+      "note": "The upstream protocol defines a versioned capability-negotiated interface between clients and coding Agents.",
+      "ref": "https://github.com/agentclientprotocol/agent-client-protocol"
+    },
+    {
+      "note": "The upstream headless client provides persistent sessions, machine-readable events, permissions, cancellation, and built-in Claude Code and Codex launch profiles.",
+      "ref": "https://github.com/openclaw/acpx"
+    },
+    {
+      "note": "The existing adapter launches Codex App Server and translates Codex operations and events into ACP.",
+      "ref": "https://github.com/agentclientprotocol/codex-acp"
+    },
+    {
+      "note": "The existing adapter exposes Claude Agent SDK behavior through ACP, including tools, permissions, terminals, and session behavior.",
+      "ref": "https://github.com/agentclientprotocol/claude-agent-acp"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-03T02:02:51Z",
+    "quote": "我觉得用acp是对的用acpx嘛，对吧。反正你都记录一下吧",
+    "ref": "conversation:2026-09-02-acp-acpx-local-agent-runtime"
+  },
+  "state": "active",
+  "summary": "V1 uses ACP as the coding-Agent protocol and prefers acpx as the first local runtime facade over locally authenticated Claude Code and Codex",
+  "tags": [
+    "acp",
+    "acpx",
+    "agents",
+    "claude-code",
+    "codex",
+    "local-auth",
+    "runtime-adapter"
+  ],
+  "type": "decision"
+}

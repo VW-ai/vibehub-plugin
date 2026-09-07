@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "2abd11614d16bfcbf86cf98f4fc96624a48b806b",
+        "blob": "09500a99a6d70ea082283eb74deaf05ee6187d22",
         "path": "skills/vibehub-review/SKILL.md"
       },
       {
@@ -18,11 +18,11 @@
         "path": "skills/vibehub-review/assets/app-model.js"
       },
       {
-        "blob": "754cd55cba2500773fe2346a02b2f849053c108f",
+        "blob": "244a49b76634be08a33088437393c58e92c4a0db",
         "path": "skills/vibehub-review/assets/app.css"
       },
       {
-        "blob": "9ee32aaff217d649708a4b3f01d8bb6580b90d85",
+        "blob": "193b888725200c9630804a156a44f703959bd0a0",
         "path": "skills/vibehub-review/assets/app.js"
       },
       {
@@ -38,8 +38,8 @@
         "path": "skills/vibehub-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-09-01T08:45:21.508Z",
-    "last_aligned_commit": "6a601a3b155769c064baa88d6e57e5b060b7fadf"
+    "checked_at": "2026-09-07T06:55:08.283Z",
+    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
   },
   "anchors": [
     "skills/vibehub-review/"

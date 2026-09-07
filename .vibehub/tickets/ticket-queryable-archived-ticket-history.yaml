@@ -1,31 +1,49 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
       "acceptance_id": "archive-and-delivery-membership-are-canonical",
-      "criterion": "Ticket schema v1 gains one optional deliveries array and no new document kind. A pull_request entry is exactly {kind: pull_request, ref: canonical https://github.com/<owner>/<repo>/pull/<number>, state: proposed|delivered|abandoned, delivered_at?, delivered_commit?, reverted_by?}; a cherry_pick entry is exactly {kind: cherry_pick, ref: commit:<40-hex>, state: delivered, delivered_at, delivered_commit, reverted_by?}. For pull_request, delivered_at and delivered_commit are required only for delivered and forbidden for proposed/abandoned; reverted_by is allowed only on a delivered entry. delivered_commit is 40-hex, reverted_by is commit:<40-hex>, and ref is unique per Ticket. Archive is a derived boolean orthogonal to operational status: true only when the Ticket has a successful Outcome and at least one explicit delivered entry. Omitted deliveries means [] and current, the sole backward-compatibility strategy; no migration, inference, move, or deletion occurs."
-    },
-    {
-      "acceptance_id": "history-edge-cases-stay-truthful",
-      "criterion": "A checked-in state-table test proves: successful Outcome plus no delivery or only proposed/abandoned pull_request entries is current; partial/failed/deviated Outcome is current regardless of delivery; successful plus any delivered pull_request or cherry_pick is archived; multiple entries preserve all memberships and any delivered entry archives; reverted_by preserves the historical archived delivery and a fix/reopen is represented by a new current Ticket whose provenance_refs contains `reopens:<old-ticket-id>`, never by deleting its Outcome or unarchiving it. Closing an unmerged PR changes its explicit entry from proposed to abandoned; no external PR state is inferred."
-    },
-    {
-      "acceptance_id": "one-query-model-serves-cli-json-and-web",
-      "criterion": "One exported query projection serves `vh ticket graph --scope <current|all> [--delivery <canonical-ref>] [--room <room-slug>]...` and the Workbench. Scope defaults to current; delivery accepts either the canonical pull_request URL or commit:<40-hex>; repeated Rooms form a union of each selected Room subtree based on canonical context_refs; scope, exact delivery-ref membership, and Room union compose by intersection. Tickets sort by ticket_id, relations by prerequisite then dependent id, and an ordinary relation is included only when both endpoints are visible; the existing JSON success/error envelope is the only CLI output contract. Unknown scope, malformed delivery ref, or unknown Room returns invalid_argument and Web shows that error without broadening."
-    },
-    {
-      "acceptance_id": "filtered-graphs-preserve-causal-truth",
-      "criterion": "The current-work graph suppresses unrelated archived history but never falsifies dependency state: every archived Ticket directly adjacent to a visible current Ticket remains as a subdued card carrying the textual ARCHIVED label; each deeper hidden direction is one keyboard-focusable relation stub labelled with hidden Ticket count and direction. Activating a stub adds exactly the next archived hop, records the newly revealed Ticket ids explicitly, and preserves every already-visible card's x/y coordinates; repeated activation progresses one hop, while all-history removes stubs and restores the complete canonical graph."
-    },
-    {
-      "acceptance_id": "query-focus-is-explicit-accessible-and-copyable",
-      "criterion": "The Workbench URL grammar is `scope=current|all`, optional `delivery=<canonical-ref>`, repeated sorted `room=<room-slug>`, and repeated sorted `history=<ticket-id>` for explicitly revealed archived Tickets, composed with existing ticket, view, and direction focus values. Missing scope defaults current; malformed or unknown delivery/Room/history values produce a visible invalid-filter state and do not broaden the graph. Keyboard and screen-reader users can identify ARCHIVED cards and count-labelled expansion stubs; Copy focused link restores the exact query, expansion, selection, lens, and direction in the same live host without localStorage or sessionStorage."
+      "criterion": "Ticket schema v1 gains one optional deliveries array and no new document kind. A pull_request entry is exactly {kind: pull_request, ref: canonical https://github.com/<owner>/<repo>/pull/<number>, state: proposed|delivered|abandoned, delivered_at?, delivered_commit?, reverted_by?}; a cherry_pick entry is exactly {kind: cherry_pick, ref: commit:<40-hex>, state: delivered, delivered_at, delivered_commit, reverted_by?}. For pull_request, delivered_at and delivered_commit are required only for delivered and forbidden for proposed/abandoned; reverted_by is allowed only on a delivered entry. delivered_commit is 40-hex, reverted_by is commit:<40-hex>, and ref is unique per Ticket. Archive is a derived boolean orthogonal to operational status: true only when the Ticket has a successful Outcome and at least one explicit delivered entry. Omitted deliveries means [] and current, the sole backward-compatibility strategy; no migration, inference, move, or deletion occurs.",
+      "identity": "sha256:b247083dbc8c93dbd1ec7b9eca8e39236c6a266a94d723a88d9cde4f26f9a689",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "archive-query-is-regression-verified",
-      "criterion": "Schema, migration or compatibility, projection, CLI/JSON parity, URL, accessibility, and graph-geometry tests pass; real-browser review covers current, all, per-PR, single-Room, multi-Room, one-hop expansion, both layout directions, 1440x960, 1180x820, and 390x844; the complete suite and installed Plugin artifact verify with no database, cache, hosted index, new writable Web route, or deleted historical record."
+      "criterion": "Schema, migration or compatibility, projection, CLI/JSON parity, URL, accessibility, and graph-geometry tests pass; real-browser review covers current, all, per-PR, single-Room, multi-Room, one-hop expansion, both layout directions, 1440x960, 1180x820, and 390x844; the complete suite and installed Plugin artifact verify with no database, cache, hosted index, new writable Web route, or deleted historical record.",
+      "identity": "sha256:a384fe62c8d806b5238e83791b9f4481abe335671556e117487767ea18b1e3bd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "filtered-graphs-preserve-causal-truth",
+      "criterion": "The current-work graph suppresses unrelated archived history but never falsifies dependency state: every archived Ticket directly adjacent to a visible current Ticket remains as a subdued card carrying the textual ARCHIVED label; each deeper hidden direction is one keyboard-focusable relation stub labelled with hidden Ticket count and direction. Activating a stub adds exactly the next archived hop, records the newly revealed Ticket ids explicitly, and preserves every already-visible card's x/y coordinates; repeated activation progresses one hop, while all-history removes stubs and restores the complete canonical graph.",
+      "identity": "sha256:1c647d292dd3098ddf7fcf5badd2b878ba400f498465f1f78701a2793ddc45eb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "history-edge-cases-stay-truthful",
+      "criterion": "A checked-in state-table test proves: successful Outcome plus no delivery or only proposed/abandoned pull_request entries is current; partial/failed/deviated Outcome is current regardless of delivery; successful plus any delivered pull_request or cherry_pick is archived; multiple entries preserve all memberships and any delivered entry archives; reverted_by preserves the historical archived delivery and a fix/reopen is represented by a new current Ticket whose provenance_refs contains `reopens:<old-ticket-id>`, never by deleting its Outcome or unarchiving it. Closing an unmerged PR changes its explicit entry from proposed to abandoned; no external PR state is inferred.",
+      "identity": "sha256:4917494355c655f3a4d1b05584a84d20458c555bb49ef8e69d5e5390f2973cfd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "one-query-model-serves-cli-json-and-web",
+      "criterion": "One exported query projection serves `vh ticket graph --scope <current|all> [--delivery <canonical-ref>] [--room <room-slug>]...` and the Workbench. Scope defaults to current; delivery accepts either the canonical pull_request URL or commit:<40-hex>; repeated Rooms form a union of each selected Room subtree based on canonical context_refs; scope, exact delivery-ref membership, and Room union compose by intersection. Tickets sort by ticket_id, relations by prerequisite then dependent id, and an ordinary relation is included only when both endpoints are visible; the existing JSON success/error envelope is the only CLI output contract. Unknown scope, malformed delivery ref, or unknown Room returns invalid_argument and Web shows that error without broadening.",
+      "identity": "sha256:eaa17b7d7350373335654a61f56a4a65aa58dc67d6aad21feacad2c0f2661155",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-focus-is-explicit-accessible-and-copyable",
+      "criterion": "The Workbench URL grammar is `scope=current|all`, optional `delivery=<canonical-ref>`, repeated sorted `room=<room-slug>`, and repeated sorted `history=<ticket-id>` for explicitly revealed archived Tickets, composed with existing ticket, view, and direction focus values. Missing scope defaults current; malformed or unknown delivery/Room/history values produce a visible invalid-filter state and do not broaden the graph. Keyboard and screen-reader users can identify ARCHIVED cards and count-labelled expansion stubs; Copy focused link restores the exact query, expansion, selection, lens, and direction in the same live host without localStorage or sessionStorage.",
+      "identity": "sha256:8ea1d90f257881f7aee1e8c3d31f71b21dec7d727ad38fbffb732224849f1898",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Archiving is a query and lifecycle projection over durable history; never delete or move canonical Ticket, Evidence, or Outcome records merely to keep the current panel quiet.",
     "Do not infer PR membership from a branch name, current checkout, prose, or whichever PR happens to be open; the refined contract must name one reviewable canonical source and authoritative transition.",
@@ -70,6 +88,53 @@
       "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "archive-and-delivery-membership-are-canonical",
+          "identity": "sha256:b247083dbc8c93dbd1ec7b9eca8e39236c6a266a94d723a88d9cde4f26f9a689",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "archive-query-is-regression-verified",
+          "identity": "sha256:a384fe62c8d806b5238e83791b9f4481abe335671556e117487767ea18b1e3bd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "filtered-graphs-preserve-causal-truth",
+          "identity": "sha256:1c647d292dd3098ddf7fcf5badd2b878ba400f498465f1f78701a2793ddc45eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "history-edge-cases-stay-truthful",
+          "identity": "sha256:4917494355c655f3a4d1b05584a84d20458c555bb49ef8e69d5e5390f2973cfd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "one-query-model-serves-cli-json-and-web",
+          "identity": "sha256:eaa17b7d7350373335654a61f56a4a65aa58dc67d6aad21feacad2c0f2661155",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-focus-is-explicit-accessible-and-copyable",
+          "identity": "sha256:8ea1d90f257881f7aee1e8c3d31f71b21dec7d727ad38fbffb732224849f1898",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:87ed9699569bdcef69340ad299c0c61124b4989f0f3787397baff89ef1bb74b7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "VibeHub preserves every historical Ticket while providing one canonical full-stack archive and query model for current work, all history, delivery PRs, and one-or-many related Rooms.",
@@ -86,6 +151,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-queryable-archived-ticket-history"
 }

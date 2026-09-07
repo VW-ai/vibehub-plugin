@@ -2,13 +2,22 @@
   "acceptance_ids": [
     "github-view-comparison-is-decision-ready"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "github-view-comparison-is-decision-ready",
+      "identity": "sha256:c46f9c30fae25fc2bdbc26c7aa8b3357bce60a7931d710655aa4bfd2981e393f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "github-view-comparison-doc",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T00:01:13Z",
   "refs": [
     "docs/GITHUB_ISSUES.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "docs/GITHUB_ISSUES.md documents the mirror contract and compares three GitHub surfaces — Issues list with label filters (zero setup, six saved-filter URLs), per-Issue sidebar Relationships for walking the graph, and a Projects board/roadmap requiring one-time human setup because the Actions token cannot create Projects — stating for each what the sync provides automatically and what it cannot show, and recommends the Issues list as the README default.",
   "ticket_id": "ticket-native-issue-dependencies-and-github-view"
 }

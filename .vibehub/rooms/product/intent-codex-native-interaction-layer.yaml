@@ -1,0 +1,58 @@
+{
+  "context_id": "intent-codex-native-interaction-layer",
+  "detail": "The product direction is to enter the Codex interaction domain itself: VibeHub should make the current Project, Workspace, Ticket graph, Context, attention, Evidence, and next action available through native-feeling, context-aware affordances inside Codex. A promising first hypothesis is a deliberately thin DOM-injected control that opens the current repository's existing VibeHub Workbench in Codex's right browser panel, preserving the Codex conversation beside the work surface; later interactions may add small contextual components and actions rather than replacing the Codex main view with a second taskboard. The exact DOM anchors, interaction set, browser-panel lifecycle, Task-to-thread bridge, security and compatibility boundary, and relationship to the currently selected DeepSeek Harness host direction are not yet decided. Exploration must learn from the demonstrated Dashi Taskboard integration path without cloning its UI or adopting its SQLite-centered product model, while Git-native Ticket, Context, Evidence, and Outcome remain VibeHub truth.",
+  "evidence": [
+    {
+      "note": "The owner explicitly selected Codex-native integration as the promising direction while saying the concrete interaction design is not yet settled and should be thought through before implementation.",
+      "ref": "conversation:2026-09-04-codex-native-interaction-direction"
+    },
+    {
+      "note": "The inspected upstream demonstrates that a loopback web surface can open in Codex's browser panel and that a separate CDP-based compatibility layer can inject native-feeling controls without patching the application bundle.",
+      "ref": "https://github.com/chuspeeism/dashi-taskboard/tree/2a6970a2f4334da65a1979b7f9a834f0d18ce84e"
+    },
+    {
+      "note": "The existing Workbench already provides the repository-scoped visual surface, so the first product question is how Codex hosts and invokes it rather than whether to create another dashboard.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-native-chat-with-additive-task-actions",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-acp-first-local-agent-runtime",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-04T21:11:39Z",
+    "quote": "这个方向是对的，就是我们去侵入Codex这个domain的这个方向是非常对的",
+    "ref": "conversation:2026-09-04-codex-native-interaction-direction"
+  },
+  "state": "active",
+  "summary": "VibeHub should explore becoming a contextual interaction layer inside Codex rather than merely placing another standalone task dashboard beside it",
+  "tags": [
+    "browser-panel",
+    "codex",
+    "dom-injection",
+    "interaction-layer",
+    "product-direction",
+    "workbench"
+  ],
+  "type": "intent"
+}

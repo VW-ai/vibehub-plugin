@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "drift-four-states",
+    "audited-edge-tests",
+    "atomic-align",
+    "stale-writeback"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-03T23:13:41.000Z",
+  "contract_revision": {
+    "identity": "sha256:984ae7f25038afe9c7f3c1565140aae666298a45d173e12ae3b8e50fbd9a6688",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "drift-states-proof",
+    "audited-edges-proof",
+    "atomic-align-proof",
+    "stale-writeback-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently verified against decision-drift-check-snapshot-hashes. npm test passes 28/28 including test/room-drift.test.mjs. Code review of repoSnapshot/anchorMatches/headIsBehind/roomOperation at commit 41db1eb confirms git ls-tree -r -z HEAD overlaid with status --porcelain -uall --no-renames -z, filter-clean hash-object --path ground truth, merge-base --is-ancestor direction check before hash comparison, segment-boundary anchor matching, single temp-file-plus-rename alignment write that also clears the stale flag, and manual-stale checked ahead of hashes. Reproduced independently in scratch git repos outside the suite: git mv out of the anchor reports DRIFTED with the old path in deleted; a pure staged delete (git rm) is detected; an untracked filename containing spaces is detected; change-then-revert stays FRESH; a manually staled room surfaces STALE while every hash matches and a later align clears it; a checkout strictly behind the baseline reports WARNING and align refuses backward realignment. Live whole-repo drift on this repository completes in about 0.24s and reports all three dogfood rooms FRESH across the implementation commit, confirming hash-not-commit ground truth. Minor non-blocking observations: a room with an empty anchors array aligns to zero files and is permanently FRESH, and a non-git repo or unborn HEAD yields a structured git_error rather than a drift state; neither is covered by the acceptance criteria or the governing decision.",
+  "ticket_id": "ticket-drift-check-mechanical",
+  "unresolved_acceptance_ids": []
+}

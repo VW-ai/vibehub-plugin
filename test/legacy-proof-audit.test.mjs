@@ -6,8 +6,52 @@ import { join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { firstCurrentAddition } from "../scripts/audit-legacy-proof.mjs";
+import { loadRepository } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+
+test("pinned 59de368 legacy audit remains fully reconstructable with known drift", () => {
+  const fixture = JSON.parse(readFileSync(new URL("./fixtures/legacy-proof-snapshot-59de368.json", import.meta.url), "utf8"));
+  const summarize = (classes) => ({
+    total: classes.reduce((sum, item) => sum + item.count, 0),
+    reconstructable: classes.filter((item) => item.reconstructable).reduce((sum, item) => sum + item.count, 0),
+    unresolved: classes.filter((item) => !item.reconstructable).reduce((sum, item) => sum + item.count, 0),
+    drifted: classes.filter((item) => item.contract_drifted).reduce((sum, item) => sum + item.count, 0),
+  });
+  assert.equal(fixture.commit, "59de368c8a420d2913a6aa7a9d35cf7f52a7e569");
+  assert.deepEqual(summarize(fixture.evidence_classes), { total: 307, reconstructable: 307, unresolved: 0, drifted: 24 });
+  assert.deepEqual(summarize(fixture.outcome_classes), { total: 95, reconstructable: 95, unresolved: 0, drifted: 2 });
+  assert.deepEqual(fixture.outcome_classes.find((item) => item.contract_drifted).ticket_ids, [
+    "ticket-deploy-public-site-cloudflare",
+    "ticket-encode-human-acceptance-authority",
+  ]);
+});
+
+test("current reconstructed Outcomes preserve mismatched legacy refs without granting revision credit", () => {
+  const repository = loadRepository(root);
+  assert.deepEqual(repository.errors, []);
+  let preservedMismatches = 0;
+  for (const { document: outcome } of repository.outcomes.history.values()) {
+    if (outcome.binding_origin !== "reconstructed" || outcome.binding_state !== "bound") continue;
+    const ticket = repository.tickets.documents.get(outcome.ticket_id)?.document;
+    const contract = ticket?.contract_revisions.find((item) =>
+      item.revision === outcome.contract_revision.revision
+      && item.identity === outcome.contract_revision.identity);
+    if (!contract) continue;
+    for (const acceptanceId of outcome.accepted_acceptance_ids) {
+      const expected = contract.acceptance_revisions.find((item) => item.acceptance_id === acceptanceId);
+      for (const evidenceId of outcome.evidence_ids) {
+        const evidence = repository.evidence.documents.get(evidenceId)?.document;
+        if (!evidence?.acceptance_ids.includes(acceptanceId)) continue;
+        const actual = evidence.acceptance_revisions?.find((item) => item.acceptance_id === acceptanceId);
+        if (!actual || actual.revision !== expected?.revision || actual.identity !== expected?.identity) {
+          preservedMismatches += 1;
+        }
+      }
+    }
+  }
+  assert.ok(preservedMismatches > 0, "fixture must retain at least one immutable mismatched legacy Evidence ref");
+});
 
 function git(repo, ...args) {
   return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8" }).trim();

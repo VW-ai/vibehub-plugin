@@ -6,8 +6,8 @@ description: Independently validate a proposed or current lightweight VibeHub Ti
 # VibeHub Ticket Validate
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Be independent and read-only. Do not rewrite or apply the candidate.
 
@@ -18,6 +18,11 @@ infer or remove authority from criterion wording.
 Read `../vibehub-core/contracts/dependency-hygiene.json` and use its exact classification
 when reviewing proposed dependency edges. It is advice about planning truth,
 not another schema gate.
+Read `../vibehub-core/contracts/revision-identity.md`. For an existing Ticket,
+verify the candidate preserves every immutable historical Acceptance and
+Contract revision, advances revisions monotonically, uses new logical IDs for
+separately passable obligations, and does not manufacture lineage or a
+semantic revision for presentation-only copy.
 This Skill owns `validation-needs-human`; an unapplied candidate cannot be
 projected as canonical UI state.
 
@@ -36,7 +41,17 @@ projected as canonical UI state.
 
 3. Verify each Ticket promises an observable outcome, has acceptance that can
    be independently checked, lists only direct dependencies, carries enough
-   checked-in Context for a fresh Agent, and encodes every judgment whose
+   checked-in Context for a fresh Agent, and resolves every `context_ref`
+   through the shared operation below rather than treating valid-looking
+   syntax as readable Context:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+   ```
+
+   `ref.json` is `{"ref":"<Ticket context_ref>"}`; consume the returned
+   source and immutable identity without checking out a historical commit.
+   Verify that the Ticket encodes every judgment whose
    decision owner must be the user as human-authority acceptance. When such a
    decision gates independently schedulable downstream work, verify that the
    proposal, decision, and implementation boundary is represented by direct

@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "product-entry-remains-reachable",
-      "criterion": "A keyboard- and pointer-reachable VibeHub brand/Overview entrance remains visible before and during the demo; activating it from any demo phase clears pending timers and returns to the initial product conversation without a reload, and the active experience also names an explicit Exit demo action."
-    },
-    {
-      "acceptance_id": "shell-feels-formal-not-prototypical",
-      "criterion": "The public shell removes faux operating-system window controls and other cheap prototype cues, establishes one coherent brand masthead and product frame, increases key text legibility, reduces repeated micro-label noise, and uses restrained borders, radii, depth, color, and background treatment consistently across arrival, Chat, App, and Ticket surfaces."
-    },
-    {
       "acceptance_id": "agent-first-cycle-remains-intact",
-      "criterion": "The initial state remains one Coding Agent conversation with truthful installation, source, founder-premise, Copy for Agent, and suggested-request access; the supported request still opens Chat plus View, pauses for a real palette choice, updates the App, and completes the one-Ticket Evidence/Outcome/Context cycle without adding fake execution or hiding App/Ticket switching."
+      "criterion": "The initial state remains one Coding Agent conversation with truthful installation, source, founder-premise, Copy for Agent, and suggested-request access; the supported request still opens Chat plus View, pauses for a real palette choice, updates the App, and completes the one-Ticket Evidence/Outcome/Context cycle without adding fake execution or hiding App/Ticket switching.",
+      "identity": "sha256:0ecef9802c1c10d22c751ad169a97926e91188f4719ad4893fc505a0476984c9",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "formal-entry-is-responsive-and-verifiable",
-      "criterion": "At desktop and narrow mobile sizes the persistent entrance, Exit demo action, conversation, composer, workspace, and Ticket graph remain readable and operable without page-level horizontal overflow; focus, touch targets, reduced motion, fine-pointer hover gating, rendered assertions, lint, production build, canonical VibeHub validation, and Plugin artifact verification pass."
+      "criterion": "At desktop and narrow mobile sizes the persistent entrance, Exit demo action, conversation, composer, workspace, and Ticket graph remain readable and operable without page-level horizontal overflow; focus, touch targets, reduced motion, fine-pointer hover gating, rendered assertions, lint, production build, canonical VibeHub validation, and Plugin artifact verification pass.",
+      "identity": "sha256:539a38136fce41865a7afa2f5230f171af7bdd268cc5cc8d6ad330571075c95b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "product-entry-remains-reachable",
+      "criterion": "A keyboard- and pointer-reachable VibeHub brand/Overview entrance remains visible before and during the demo; activating it from any demo phase clears pending timers and returns to the initial product conversation without a reload, and the active experience also names an explicit Exit demo action.",
+      "identity": "sha256:a4ef6bf6fce3a2e0345e0f91d0bbfb7556f72095b20d9ea94ef6aae5929cd118",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "shell-feels-formal-not-prototypical",
+      "criterion": "The public shell removes faux operating-system window controls and other cheap prototype cues, establishes one coherent brand masthead and product frame, increases key text legibility, reduces repeated micro-label noise, and uses restrained borders, radii, depth, color, and background treatment consistently across arrival, Chat, App, and Ticket surfaces.",
+      "identity": "sha256:ba4bbd53b38462855a0306becc30025f971d31c9411850895ebab88f30f91c74",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Keep Coding Agent as the primary product experience; the persistent product entrance is a minimal orientation layer, not a conventional multi-page marketing navigation or dashboard.",
     "Do not add routes, a backend, persistence, analytics, model calls, accounts, iframe content, a motion dependency, or writable product state.",
@@ -29,7 +42,7 @@
   "context_refs": [
     {
       "purpose": "Successful Agent-first interaction foundation this refinement preserves.",
-      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site.yaml"
+      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site/contract-v1.yaml"
     },
     {
       "purpose": "Binding interface-quality, visual-language, accessibility, and honesty standard.",
@@ -52,6 +65,34 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "agent-first-cycle-remains-intact",
+          "identity": "sha256:0ecef9802c1c10d22c751ad169a97926e91188f4719ad4893fc505a0476984c9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "formal-entry-is-responsive-and-verifiable",
+          "identity": "sha256:539a38136fce41865a7afa2f5230f171af7bdd268cc5cc8d6ad330571075c95b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "product-entry-remains-reachable",
+          "identity": "sha256:a4ef6bf6fce3a2e0345e0f91d0bbfb7556f72095b20d9ea94ef6aae5929cd118",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "shell-feels-formal-not-prototypical",
+          "identity": "sha256:ba4bbd53b38462855a0306becc30025f971d31c9411850895ebab88f30f91c74",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7284d7d66cf173c76b77e4b84f48f6af29dee572e0ecdb6645f83279bb54996f",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "kind": "pull_request",
@@ -71,6 +112,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-formal-public-agent-entry"
 }

@@ -1,0 +1,33 @@
+{
+  "context_id": "decision-inbound-issue-closes-into-its-mirror",
+  "detail": "GitHub Issues are a one-way projection of the Ticket graph, so once an outside-filed Issue has been planned into a Ticket, that Ticket produces a mirrored Issue of its own and the same subject exists twice. The rule: the inbound Issue is closed, with a comment pointing at the mirrored Issue that now carries the work; the original stays readable as the proposal and its discussion, and the mirror becomes the live record. The alternatives were leaving the inbound Issue open as a discussion thread, which accumulates silent duplicate pairs, and retrofitting the mirror's hidden marker onto it, which would make the projection adopt a document it did not generate. The owner further decided that this is not a convention to remember but behavior to implement: handling a non-standard, outside-filed Issue on its way into the system belongs inside VibeHub, so intake performs the close-and-point step rather than an Agent improvising it each time. The writes land on Issues in the owner's repository under the owner's account, so intake proposes and a human authorizes; the rule removes the question of what to do, not the authorization.",
+  "evidence": [
+    {
+      "note": "Owner chose close-and-point over leaving inbound Issues open or retrofitting the mirror marker, and asked for it to be implemented in VibeHub.",
+      "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-github-issues-are-a-read-only-ticket-projection",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-01T21:00:00.000Z",
+    "quote": "我们用关掉原来的指向新生成的那个比较好？我感觉这个规则可以impl进我们的vibehub，作为非标issue 进vibehub 系统的处理方式",
+    "ref": "conversation:2026-09-01-packaging-and-release-integrity"
+  },
+  "state": "active",
+  "summary": "An outside-filed Issue that becomes a Ticket is closed and pointed at the mirrored Issue of that Ticket, and this handling is implemented in VibeHub rather than performed ad hoc",
+  "tags": [
+    "github",
+    "issues",
+    "intake",
+    "projection",
+    "tickets"
+  ],
+  "type": "decision"
+}

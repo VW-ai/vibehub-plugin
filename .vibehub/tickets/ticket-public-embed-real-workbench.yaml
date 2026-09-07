@@ -2,58 +2,98 @@
   "acceptance": [
     {
       "acceptance_id": "dark-canvas-clarifies-the-product",
-      "criterion": "Desktop and 390px layouts use a near-black deep-graphite public canvas instead of the current warm off-white field; text, controls, focus, links, semantic state colors, and the faithful lighter Workbench remain legible and accessible, with green reserved for meaningful state, relation, or interaction rather than large decorative fills."
+      "criterion": "Desktop and 390px layouts use a near-black deep-graphite public canvas instead of the current warm off-white field; text, controls, focus, links, semantic state colors, and the faithful lighter Workbench remain legible and accessible, with green reserved for meaningful state, relation, or interaction rather than large decorative fills.",
+      "identity": "sha256:ef4d4fc0ad33ff50a3840f24edc3d8a86ac40cfe9e4c45ad13af6a62537e1ba3",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "first-message-is-one-authentic-composer",
-      "criterion": "The hero contains one familiar coding-agent composer whose single message reads Add dark mode to this task app. Start this with VibeHub. with a restrained caret; no REQUEST label, In your coding agent label, attached status, separate command chip, duplicate frame, send arrow, fake streaming, or claim of arbitrary execution remains."
-    },
-    {
-      "acceptance_id": "persistent-header-keeps-real-entry-points",
-      "criterion": "A restrained sticky header keeps a keyboard-reachable VibeHub home mark, Codex install, Claude Code install, GitHub, and Copy for Agent available with their established icons and truthful links or copy actions; the brand returns to the page top, the full wordmark may appear only after leaving the hero, and How it works is not a persistent navigation burden."
-    },
-    {
-      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
-      "criterion": "The first viewport pairs the product promise and authentic message with the faithful real Ticket Graph and Inspector as the dominant product evidence; Ticket selection and optional disposable canvas panning remain browser-only view state and never imply saved canonical data."
-    },
-    {
-      "acceptance_id": "ticket-is-an-agent-executable-object",
-      "criterion": "The second vertical screen is titled What is a Ticket? and displays one complete, readable, schema-valid Ticket file for the persistent-dark-mode example, including outcome, context, context_refs, direct depends_on relations, acceptance, constraints, and provenance; the adjacent faithful Workbench opens the corresponding selected Ticket so the source file and parsed product surface are visibly the same object, with no custom anatomy table or long request-fragment mapping."
-    },
-    {
-      "acceptance_id": "rooms-explain-context-without-a-second-topology",
-      "criterion": "A focused section titled How is context built up? combines a readable schema-valid room.yaml with multiple complete Context-file examples covering Decision, Constraint, and Contract, a concise lifecycle from capture into a Room through Ticket context_refs and accepted Outcome learning back into Context, and the faithful Rooms Workbench showing the same Room and consuming Tickets; Rooms remain Context boundaries rather than a second work graph."
+      "acceptance_id": "embedded-workbench-is-verified",
+      "criterion": "Rendered content contracts, site lint, static production build, desktop and narrow no-overflow behavior, keyboard focus, contrast, reduced motion, fine-pointer hover gating, canonical VibeHub project validation, full repository verification, and unchanged Plugin artifact verification pass.",
+      "identity": "sha256:205846ea04b834d60b5968d6902b72573acb6927324acd19d8c324d66c10b5e7",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "evidence-and-outcome-explain-trust",
-      "criterion": "A focused section uses the real Acceptance, Evidence, Log, and Outcome surfaces to show what changed, what supports each acceptance condition, how independent Outcome decides completion, and how durable learning returns to Context without exposing raw schema JSON or relying on confidence language."
+      "criterion": "A focused section uses the real Acceptance, Evidence, Log, and Outcome surfaces to show what changed, what supports each acceptance condition, how independent Outcome decides completion, and how durable learning returns to Context without exposing raw schema JSON or relying on confidence language.",
+      "identity": "sha256:4fdfcaf6bbacb3ad51df1accc177e29c23eec9e5e1aad39003ddc3c170906173",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "motion-is-explanatory-and-disposable",
-      "criterion": "Any remaining first-view motion is rare explanatory motion implemented without a new dependency, animates only transform and opacity or an existing sanctioned property, does not move text while it is being read, uses the existing strong easing tokens, and preserves a complete static presentation under prefers-reduced-motion."
+      "acceptance_id": "first-message-is-one-authentic-composer",
+      "criterion": "The hero contains one familiar coding-agent composer whose single message reads Add dark mode to this task app. Start this with VibeHub. with a restrained caret; no REQUEST label, In your coding agent label, attached status, separate command chip, duplicate frame, send arrow, fake streaming, or claim of arbitrary execution remains.",
+      "identity": "sha256:3d22bfc3e2742d0bee7a13d7ad71df7c078da2d1f9ee4afdc8318cdc8fde912e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "git-and-github-stay-below-product-value",
-      "criterion": "The hero does not use Git or GitHub to explain VibeHub's primary value; a later compact section separately explains that repository files hold the record, Git carries reviewable and reversible history, and GitHub provides review and collaboration."
+      "criterion": "The hero does not use Git or GitHub to explain VibeHub's primary value; a later compact section separately explains that repository files hold the record, Git carries reviewable and reversible history, and GitHub provides review and collaboration.",
+      "identity": "sha256:80a03db5e7a4ba078f67166a92f566652ce8de8070aac82f05f7f526f2c7cd72",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "public-fixture-is-honest-and-lightweight",
-      "criterion": "Every displayed Ticket, Room Context, Acceptance, Evidence, and Outcome belongs to one deterministic typed fixture; the site adds no model call, backend, persistence, analytics, iframe, video dependency, motion library, second lifecycle state machine, or claim that the public example is executing a live repository."
+      "acceptance_id": "motion-is-explanatory-and-disposable",
+      "criterion": "Any remaining first-view motion is rare explanatory motion implemented without a new dependency, animates only transform and opacity or an existing sanctioned property, does not move text while it is being read, uses the existing strong easing tokens, and preserves a complete static presentation under prefers-reduced-motion.",
+      "identity": "sha256:2e1cddd3ecf784cc36dfb97510383a6d302281eff14617de07fcfa7617ba194b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "owner-accepts-the-product-feel",
       "authority": "human",
-      "criterion": "After the revised page is visible in the retained localhost preview, the owner explicitly confirms that the dark palette, authentic message, real Ticket Graph, Ticket anatomy, and Ticket-to-Room-to-Evidence story feel clear enough to continue refining."
+      "criterion": "After the revised page is visible in the retained localhost preview, the owner explicitly confirms that the dark palette, authentic message, real Ticket Graph, Ticket anatomy, and Ticket-to-Room-to-Evidence story feel clear enough to continue refining.",
+      "identity": "sha256:c03da9359ff112544d51ee883af1c826aa82f521fb786cba1b071f02b6eb0cb2",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "embedded-workbench-is-verified",
-      "criterion": "Rendered content contracts, site lint, static production build, desktop and narrow no-overflow behavior, keyboard focus, contrast, reduced motion, fine-pointer hover gating, canonical VibeHub project validation, full repository verification, and unchanged Plugin artifact verification pass."
+      "acceptance_id": "persistent-header-keeps-real-entry-points",
+      "criterion": "A restrained sticky header keeps a keyboard-reachable VibeHub home mark, Codex install, Claude Code install, GitHub, and Copy for Agent available with their established icons and truthful links or copy actions; the brand returns to the page top, the full wordmark may appear only after leaving the hero, and How it works is not a persistent navigation burden.",
+      "identity": "sha256:80c7d423ac0eabb17b96aa5b4730ba9bb9f8c74294f06484eefbb6a27a855bd8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "criterion": "Every displayed Ticket, Room Context, Acceptance, Evidence, and Outcome belongs to one deterministic typed fixture; the site adds no model call, backend, persistence, analytics, iframe, video dependency, motion library, second lifecycle state machine, or claim that the public example is executing a live repository.",
+      "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rooms-explain-context-without-a-second-topology",
+      "criterion": "A focused section titled How is context built up? combines a readable schema-valid room.yaml with multiple complete Context-file examples covering Decision, Constraint, and Contract, a concise lifecycle from capture into a Room through Ticket context_refs and accepted Outcome learning back into Context, and the faithful Rooms Workbench showing the same Room and consuming Tickets; Rooms remain Context boundaries rather than a second work graph.",
+      "identity": "sha256:ddbbb9a64e97fd7a780904f2703250535a9af83ed85651a1aae08483bd2fbbc3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-is-an-agent-executable-object",
+      "criterion": "The second vertical screen is titled What is a Ticket? and displays one complete, readable, schema-valid Ticket file for the persistent-dark-mode example, including outcome, context, context_refs, direct depends_on relations, acceptance, constraints, and provenance; the adjacent faithful Workbench opens the corresponding selected Ticket so the source file and parsed product surface are visibly the same object, with no custom anatomy table or long request-fragment mapping.",
+      "identity": "sha256:93df717fb3c2f97c9f91b8ea8fab2d63954203b4c7d22419fc8a7eca4211250c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+      "criterion": "The first viewport pairs the product promise and authentic message with the faithful real Ticket Graph and Inspector as the dominant product evidence; Ticket selection and optional disposable canvas panning remain browser-only view state and never imply saved canonical data.",
+      "identity": "sha256:c3367f50bf7d7bc3cb0ef75dad3fb975c059f9ecdbbd0fa53358115a6e2b656d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "workbench-embedding-preserves-product-quality",
-      "criterion": "The site reuses the current public Ticket Graph and Inspector components with their cool-neutral product tokens, semantic states, causal selection, progressive lenses, keyboard focus, 44px narrow targets, fine-pointer hover gating, reduced-motion behavior, and responsive no-overflow boundary; the new dark marketing canvas remains visually subordinate to the embedded product."
+      "criterion": "The site reuses the current public Ticket Graph and Inspector components with their cool-neutral product tokens, semantic states, causal selection, progressive lenses, keyboard focus, 44px narrow targets, fine-pointer hover gating, reduced-motion behavior, and responsive no-overflow boundary; the new dark marketing canvas remains visually subordinate to the embedded product.",
+      "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use near-black deep graphite as the public background direction; do not turn the site into a generic neon-on-black technology template or recolor semantic Workbench states for decoration.",
     "The product UI is evidence, not illustration: reuse the current typed Workbench fixture, components, geometry, Inspector lenses, Rooms, and state language before creating any new visual object; raw schema may appear only inside explicitly labelled educational source-file viewers.",
@@ -65,11 +105,11 @@
   "context_refs": [
     {
       "purpose": "Accepted public lifecycle and Evidence-before-Outcome behavior to explain through real product surfaces.",
-      "ref": ".vibehub/outcomes/ticket-public-cycle-evolution.yaml"
+      "ref": ".vibehub/outcomes/ticket-public-cycle-evolution/contract-v1.yaml"
     },
     {
       "purpose": "Accepted production Workbench capability and interaction baseline to reuse faithfully.",
-      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr.yaml"
+      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr/contract-v1.yaml"
     },
     {
       "purpose": "Binding decision that the public hero must unmistakably show a realistic multi-Ticket graph.",
@@ -98,6 +138,79 @@
     {
       "purpose": "Static product contracts to rewrite around the real Ticket and Room file story.",
       "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "dark-canvas-clarifies-the-product",
+          "identity": "sha256:ef4d4fc0ad33ff50a3840f24edc3d8a86ac40cfe9e4c45ad13af6a62537e1ba3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "embedded-workbench-is-verified",
+          "identity": "sha256:205846ea04b834d60b5968d6902b72573acb6927324acd19d8c324d66c10b5e7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "evidence-and-outcome-explain-trust",
+          "identity": "sha256:4fdfcaf6bbacb3ad51df1accc177e29c23eec9e5e1aad39003ddc3c170906173",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "first-message-is-one-authentic-composer",
+          "identity": "sha256:3d22bfc3e2742d0bee7a13d7ad71df7c078da2d1f9ee4afdc8318cdc8fde912e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "git-and-github-stay-below-product-value",
+          "identity": "sha256:80a03db5e7a4ba078f67166a92f566652ce8de8070aac82f05f7f526f2c7cd72",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "motion-is-explanatory-and-disposable",
+          "identity": "sha256:2e1cddd3ecf784cc36dfb97510383a6d302281eff14617de07fcfa7617ba194b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "owner-accepts-the-product-feel",
+          "identity": "sha256:c03da9359ff112544d51ee883af1c826aa82f521fb786cba1b071f02b6eb0cb2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "persistent-header-keeps-real-entry-points",
+          "identity": "sha256:80c7d423ac0eabb17b96aa5b4730ba9bb9f8c74294f06484eefbb6a27a855bd8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "public-fixture-is-honest-and-lightweight",
+          "identity": "sha256:7e334c10d0a92d1403505e0454f4c2266f57fe3827064bc0e1de53704202b9c7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rooms-explain-context-without-a-second-topology",
+          "identity": "sha256:ddbbb9a64e97fd7a780904f2703250535a9af83ed85651a1aae08483bd2fbbc3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-is-an-agent-executable-object",
+          "identity": "sha256:93df717fb3c2f97c9f91b8ea8fab2d63954203b4c7d22419fc8a7eca4211250c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+          "identity": "sha256:c3367f50bf7d7bc3cb0ef75dad3fb975c059f9ecdbbd0fa53358115a6e2b656d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workbench-embedding-preserves-product-quality",
+          "identity": "sha256:72c8335d6af95e24f76e60af42420c297ff196f020703fda4b2f842c62864006",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c54331e08929af540bc5d5ca710478e6fd741f72f9ae20b6605de383c2190f61",
+      "revision": 1
     }
   ],
   "deliveries": [
@@ -130,6 +243,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-public-embed-real-workbench"
 }

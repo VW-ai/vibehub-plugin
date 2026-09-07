@@ -1,0 +1,27 @@
+{
+  "accepted_acceptance_ids": [
+    "hero-is-dark-mode-safe-and-immediate",
+    "three-lines-carry-the-product",
+    "one-entry-is-product-truth",
+    "details-move-without-truth-loss",
+    "release-pr-remains-verified"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-03T00:12:54Z",
+  "contract_revision": {
+    "identity": "sha256:4cd98abe5c1e7b8f888cccdac417022aaaf52c664cd3f63f13b417bdbf72fc7c",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "one-line-readme-and-dark-wordmark",
+    "canonical-entry-clean-install-and-pr"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria. The 33-line README uses a GitHub-compatible picture element with checked-in light and dark wordmarks before the product graph, and objective contrast checks confirm both variants remain legible: the light-background accent is 4.950:1 on white, while the dark variant is 17.304:1 for its primary fill and 6.642:1 for its accent on GitHub dark #0D1117. This records measurable readability and the owner-provided one-line direction, not broader Agent-authored aesthetic approval. The hero carries the concise product sentence, the single visibly dominant exact instruction Start this with VibeHub., and the conversation-memory versus durable-development-cycle comparison; the former lifecycle table and redundant taxonomy are absent. The Codex manifest exposes exactly that one defaultPrompt, existing Ticket Plan canonically owns it, invokes existing Setup when .vibehub is absent, and resumes the normal lifecycle without a router or new runtime. Clean-installed verification proves setup plus Ticket application reach one READY executable Ticket. Secondary Ticket/Context, lifecycle, canonical-file, explicit-capture, lightweight-architecture, and fallback truth remains in docs/CONCEPT.md and linked focused docs; all README assets and links resolve in source and the bounded artifact. Fresh verification passes 17 of 17 and reports exactly 42 files and 325439 bytes; project and Ticket validation and v0.4.0 identity validation pass. PR #11 is OPEN draft, MERGEABLE/CLEAN at head 3d8cbf8 with both Verify VibeHub checks successful and an accurate one-line refinement summary. ticket-encode-human-acceptance-authority remains READY and unexecuted.",
+  "ticket_id": "ticket-focus-product-on-one-line-entry",
+  "unresolved_acceptance_ids": []
+}

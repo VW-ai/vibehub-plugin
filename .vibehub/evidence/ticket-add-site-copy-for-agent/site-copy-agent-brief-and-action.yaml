@@ -3,6 +3,20 @@
     "global-copy-action-is-immediate",
     "copied-brief-is-complete-and-truthful"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "global-copy-action-is-immediate",
+      "identity": "sha256:4663b42be1e61321a6241f1cc5811acf14814aa20cf03a2a101604c53b724de9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "copied-brief-is-complete-and-truthful",
+      "identity": "sha256:f29ff7483b73e4a5a6ff5c0a1bfe7feec9f64315be470cf24bba9c1f1c54da9e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "site-copy-agent-brief-and-action",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-05T08:46:06Z",
@@ -14,7 +28,7 @@
     "browser:http://localhost:3000/ mobile-390x844 Copy, Install, and GH actions visible",
     "browser:mobile role checks copyCount=1 githubCount=1 and clipboard complete=true"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The global desktop and narrow top bar exposes one keyboard-reachable Copy for Agent control without hiding Install or GitHub; real browser activation reports Copied and writes a 2317-character plain-text brief containing the product definition, exact Codex and Claude Code installation commands, canonical entry, one-Ticket Context loop, Git truth, setup safety, and concrete next action.",
   "ticket_id": "ticket-add-site-copy-for-agent"
 }

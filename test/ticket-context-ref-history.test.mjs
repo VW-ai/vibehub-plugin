@@ -36,6 +36,7 @@ function closeSuccessfully(repo, ticketId) {
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
+    independence: { source: "subagent", note: "test fixture" },
     ticket_id: ticketId,
     status: "successful",
     accepted_acceptance_ids: ["works"],
@@ -54,7 +55,7 @@ function closedTicketOverARename(label) {
   writeFileSync(join(repo, "skills", "old-name", "SKILL.md"), "# old\n");
   const done = ticket("read-the-old-path");
   done.context_refs = [{ ref: "skills/old-name/SKILL.md", purpose: "The surface this Ticket read." }];
-  assert.equal(run(repo, "ticket", "apply", { tickets: [done] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "behavioral test fixture" }, tickets: [done] }).status, 0);
   closeSuccessfully(repo, "read-the-old-path");
   sh(repo, "add", "-A");
   sh(repo, "commit", "-qm", "close read-the-old-path while skills/old-name still exists");
@@ -105,11 +106,11 @@ test("an open Ticket with a dangling context ref still fails against the working
   // context_refs are a live pointer and must resolve in the working tree.
   const open = ticket("about-to-read-the-old-path");
   open.context_refs = [{ ref: "skills/old-name/SKILL.md", purpose: "About to be read." }];
-  const applied = run(repo, "ticket", "apply", { tickets: [open] });
+  const applied = run(repo, "ticket", "apply", { validation: { independent: false, note: "behavioral test fixture" }, tickets: [open] });
   assert.notEqual(applied.status, 0);
   assert.match(
     JSON.stringify(applied.envelope.error.details),
-    /unreadable Ticket context ref: skills\/old-name\/SKILL.md/u,
+    /Ticket context ref path does not exist: skills\/old-name\/SKILL.md/u,
   );
 });
 

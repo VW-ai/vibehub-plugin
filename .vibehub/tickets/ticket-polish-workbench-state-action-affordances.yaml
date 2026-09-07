@@ -1,18 +1,28 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "production-phase-icon-and-label-align-tightly",
-      "criterion": "DRAFT, READY, RUNNING, DONE, and archived production cards render the lower-right phase icon on the label's visual centerline with a deliberately small, consistent icon-to-label gap, while card bounds, right-edge placement, upper-right substate, aperture, live presence, proof line, copy, and causal geometry remain unchanged."
+      "acceptance_id": "action-detail-is-progressively-disclosed",
+      "criterion": "The focused Execution panel's Recommended action block visibly contains only the eyebrow, short action title, primary Copy prompt control, phase/substate, and existing metrics; the exact canonical next_action detail is attached to the short title as hover and keyboard-focus help, is programmatically associated for assistive technology, and never alters the exact host-owned copied payload, while the remaining Execution Inspector content stays available and unchanged below the block.",
+      "identity": "sha256:0b4335eecd8a80ef01c993d88f64c4f46f3060909f96e66f1c9cac2c7a750626",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "action-detail-is-progressively-disclosed",
-      "criterion": "The focused Execution panel's Recommended action block visibly contains only the eyebrow, short action title, primary Copy prompt control, phase/substate, and existing metrics; the exact canonical next_action detail is attached to the short title as hover and keyboard-focus help, is programmatically associated for assistive technology, and never alters the exact host-owned copied payload, while the remaining Execution Inspector content stays available and unchanged below the block."
+      "acceptance_id": "production-phase-icon-and-label-align-tightly",
+      "criterion": "DRAFT, READY, RUNNING, DONE, and archived production cards render the lower-right phase icon on the label's visual centerline with a deliberately small, consistent icon-to-label gap, while card bounds, right-edge placement, upper-right substate, aperture, live presence, proof line, copy, and causal geometry remain unchanged.",
+      "identity": "sha256:18b9c2b2e044d141e55785451f1b60aa5883afbd111e2b82e5168a11f3affe29",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "workbench-polish-regressions-pass",
-      "criterion": "Focused source and installed-artifact tests plus real-browser review cover all four phases, archived state, long and short labels, CLOSE_OUT detail disclosure, wide and 390x844 narrow layouts, keyboard focus, reduced motion, no console errors, exact payload identity, and unchanged graph/panel semantics in fresh Codex and Claude artifacts."
+      "criterion": "Focused source and installed-artifact tests plus real-browser review cover all four phases, archived state, long and short labels, CLOSE_OUT detail disclosure, wide and 390x844 narrow layouts, keyboard focus, reduced motion, no console errors, exact payload identity, and unchanged graph/panel semantics in fresh Codex and Claude artifacts.",
+      "identity": "sha256:b24c5720ffd796e78d3aed31d98e80e32fd7e69e60892ade04eaddefe0aabc93",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change four-phase or upper-right substate semantics, trusted live projection, Ticket card dimensions, canonical next_action, host-owned Agent payload, graph topology, or Inspector information architecture.",
     "Keep state icon and text as separate non-color carriers; adjust only the lower-right phase pair, not substate, legend, aperture, relation, or live icons.",
@@ -23,7 +33,7 @@
   "context_refs": [
     {
       "purpose": "Accepted four-phase, one-substate, honest-live, and Recommended-action production baseline to preserve.",
-      "ref": ".vibehub/outcomes/ticket-simplify-workbench-primary-state-language.yaml"
+      "ref": ".vibehub/outcomes/ticket-simplify-workbench-primary-state-language/contract-v1.yaml"
     },
     {
       "purpose": "Production SVG card geometry and Recommended action markup to adjust.",
@@ -46,6 +56,29 @@
       "ref": ".vibehub/evidence/ticket-align-card-state-icon-baseline/card-phase-native-centering-proof.yaml"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "action-detail-is-progressively-disclosed",
+          "identity": "sha256:0b4335eecd8a80ef01c993d88f64c4f46f3060909f96e66f1c9cac2c7a750626",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-phase-icon-and-label-align-tightly",
+          "identity": "sha256:18b9c2b2e044d141e55785451f1b60aa5883afbd111e2b82e5168a11f3affe29",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workbench-polish-regressions-pass",
+          "identity": "sha256:b24c5720ffd796e78d3aed31d98e80e32fd7e69e60892ade04eaddefe0aabc93",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3160dcc6d1d3b05d9f697607a1f96450e576edcc632d40ee89dd0ef93f93b8f2",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -61,6 +94,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-polish-workbench-state-action-affordances"
 }

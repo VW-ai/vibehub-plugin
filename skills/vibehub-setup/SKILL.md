@@ -6,8 +6,8 @@ description: Set up the lightweight Skill-first VibeHub folders and project inst
 # VibeHub Setup
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 VibeHub installs as Skills plus checked-in Git YAML, inside the product
 boundary defined once in `references/architecture-boundary.md`.
@@ -66,13 +66,14 @@ deliverable continues without another user command.
 6. Optional, asked once: if `git remote get-url origin` points at
    `github.com`, ask the user whether to mirror Tickets to GitHub Issues
    (one workflow plus a small script; runs only in GitHub Actions on push to
-   `main`; nothing for an Agent to run or check). On yes, copy these five
+   `main`; nothing for an Agent to run or check). On yes, copy these six
    files and nothing else, then record the copy as setup Evidence:
 
    ```text
    ../vibehub-core/templates/github/sync-issues.yml        → .github/workflows/sync-issues.yml
    ../vibehub-core/templates/github/sync-github-issues.mjs → scripts/vibehub/sync-github-issues.mjs
    ../vibehub-core/scripts/vh.mjs                          → scripts/vibehub/scripts/vh.mjs
+   ../vibehub-core/scripts/revision-contract.mjs           → scripts/vibehub/scripts/revision-contract.mjs
    ../vibehub-core/contracts/versions.json                 → scripts/vibehub/contracts/versions.json
    ../vibehub-core/contracts/dependency-hygiene.json       → scripts/vibehub/contracts/dependency-hygiene.json
    ```

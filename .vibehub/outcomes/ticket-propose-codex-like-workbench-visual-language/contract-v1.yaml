@@ -1,0 +1,26 @@
+{
+  "accepted_acceptance_ids": [
+    "proposal-defines-one-coherent-token-system",
+    "proposal-separates-state-from-human-attention",
+    "proposal-preserves-victor-product-value",
+    "proposal-is-reviewable-at-real-sizes",
+    "proposal-does-not-ship-production-style"
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
+  "closed_at": "2026-08-13T00:59:41Z",
+  "contract_revision": {
+    "identity": "sha256:cd732921b59d8654926c17ec49f311e216491c6218fbd03e8f77d9f3014be442",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "codex-like-token-state-and-browser-proposal-proof"
+  ],
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all five criteria after reading the exact Ticket, successful v0.7.0 publication prerequisite, Context authority, proposal artifacts, production baseline, commits f5daedb/e79ca19/d0b3d27, tests, and acceptance-linked Evidence. proposal-defines-one-coherent-token-system: tokens.json concretely defines system and monospace typography, spacing, radii, borders, elevation, neutral surfaces, six semantic treatments including ARCHIVED, four attention treatments, compact icons, hover, focus, neutral selection, reduced motion, and 44px narrow targets for the canvas, cards, graph, Overview, controls, and Inspector. proposal-separates-state-from-human-attention: state-matrix.json independently defines restrained whole-card DONE, READY, BLOCKED, REFINE, and DEVIATED states plus non-color-only UPCOMING, PENDING, RECORDED, and COMPLETE attention with stable labels/icons and four coexistence cases that do not misreport future human authority as an operational blocker; the live prototype renders all five operational states, ARCHIVED, and representative UPCOMING and RECORDED coexistence. proposal-preserves-victor-product-value: the checked-in prototype retains the complete causal graph, selected and unfocused Tickets, upstream/downstream cone, selected relation, archived boundary/stub, compact Overview, progressive Execution/Contract/Log Inspector, exact-source and Copy-focus utilities, honest no-Active-Run empty state, and Agent-owned READY handoff. proposal-is-reviewable-at-real-sizes: fresh in-app-browser review covered left-to-right and top-to-bottom at 1440x960, 1180x820, and 390x844; default Overview was hidden and toggled correctly, the Inspector became a narrow bottom sheet, the document never exceeded the viewport, visible narrow controls were 44px and the scaled history target was 44.8px, card state labels/icons and attention badges remained legible, and no console warnings/errors appeared. Mechanical tests prove at least 12:1 ink-to-state-surface and 4.5:1 semantic-accent contrast, mandatory label/icon redundancy, and reduced-motion CSS. proposal-does-not-ship-production-style: the proposal commit adds only docs/proposals/codex-like-workbench and its validation, followed only by Product Room alignment and Evidence; production Workbench assets, package release identity v0.7.0, runtime, schemas, CLI, and canonical Ticket semantics are byte-unchanged from 5e54b3a. Fresh npm run verify passed 66/66 and reproduced the exact 54-file, 698815-byte dependency-free artifact; project and Ticket validation passed, all four Rooms were FRESH, and the worktree was clean at d0b3d27 before this Outcome.",
+  "ticket_id": "ticket-propose-codex-like-workbench-visual-language",
+  "unresolved_acceptance_ids": []
+}

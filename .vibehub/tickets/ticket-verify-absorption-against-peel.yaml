@@ -1,27 +1,43 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "rerun",
-      "criterion": "A scratch repository containing copies of `spatial-thread-workspace-prd-v0-original.md` and `peel-demo-v0-original.html` is absorbed end to end through the bulk path, and the run transcript is captured as Evidence. `~/Peel` is not modified."
-    },
-    {
       "acceptance_id": "coverage-zero",
-      "criterion": "`vh.mjs context coverage` reports zero uncovered segments across both source files at the end of the run, with every exception carrying a stated reason."
+      "criterion": "`vh.mjs context coverage` reports zero uncovered segments across both source files at the end of the run, with every exception carrying a stated reason.",
+      "identity": "sha256:5ecef85c18a43d3fabbbdcb515043a8008d65bee9f1ffd7bfc5e1976462f2f06",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "no-prompted-recovery",
-      "criterion": "The transcript shows coverage reaching zero through the pipeline's own passes, with no user message asking whether content was missed."
+      "criterion": "The transcript shows coverage reaching zero through the pipeline's own passes, with no user message asking whether content was missed.",
+      "identity": "sha256:2a973920eee041735b4698a0897edfe211d6d757593c47dde33677032e6d386d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rerun",
+      "criterion": "A scratch repository containing copies of `spatial-thread-workspace-prd-v0-original.md` and `peel-demo-v0-original.html` is absorbed end to end through the bulk path, and the run transcript is captured as Evidence. `~/Peel` is not modified.",
+      "identity": "sha256:cdc76a3fe4dd04b4fe9b82180c39a53e7d5693b9e903377d3e3be90e2ce93d87",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "tree-multi-room",
-      "criterion": "The resulting Room tree contains more than one room, and no single room holds every Context the way the checked-in `~/Peel/.vibehub/rooms/product/` result does."
+      "criterion": "The resulting Room tree contains more than one room, and no single room holds every Context the way the checked-in `~/Peel/.vibehub/rooms/product/` result does.",
+      "identity": "sha256:82cae8cc3b57d99dd17ea279cee20033cc1fcddc9dd5ed8b21a090d16c070a9d",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "tree-usability",
       "authority": "human",
-      "criterion": "A person judges the resulting split — product intent separated from UX and interaction evidence — more usable than the checked-in single-room result at `~/Peel/.vibehub/rooms/product/`."
+      "criterion": "A person judges the resulting split — product intent separated from UX and interaction evidence — more usable than the checked-in single-room result at `~/Peel/.vibehub/rooms/product/`.",
+      "identity": "sha256:56bf55cdff1850c7df33f8c266acc6a446231c4bd3a54481c70928a7753e212b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not modify `~/Peel`; it is the comparison baseline.",
     "Do not tune the pipeline to Peel's two files; fixes must be general or recorded as known limits.",
@@ -32,6 +48,39 @@
     {
       "purpose": "Defines the verification and the exact baseline to compare against.",
       "ref": "docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "coverage-zero",
+          "identity": "sha256:5ecef85c18a43d3fabbbdcb515043a8008d65bee9f1ffd7bfc5e1976462f2f06",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-prompted-recovery",
+          "identity": "sha256:2a973920eee041735b4698a0897edfe211d6d757593c47dde33677032e6d386d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rerun",
+          "identity": "sha256:cdc76a3fe4dd04b4fe9b82180c39a53e7d5693b9e903377d3e3be90e2ce93d87",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tree-multi-room",
+          "identity": "sha256:82cae8cc3b57d99dd17ea279cee20033cc1fcddc9dd5ed8b21a090d16c070a9d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "tree-usability",
+          "identity": "sha256:56bf55cdff1850c7df33f8c266acc6a446231c4bd3a54481c70928a7753e212b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0bd6f1349dd950c5c3548dd19993629a456e9b2ce79a7bfd5bea43b5367fec28",
+      "revision": 1
     }
   ],
   "deliveries": [],
@@ -59,6 +108,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-verify-absorption-against-peel"
 }

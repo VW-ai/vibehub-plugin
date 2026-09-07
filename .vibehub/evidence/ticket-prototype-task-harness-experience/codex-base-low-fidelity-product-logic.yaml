@@ -7,6 +7,40 @@
     "browser-first-app-like-shell",
     "review-pack-is-decision-ready"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "near-and-far-scenarios-are-explicit",
+      "identity": "sha256:d4ec68f93cddc54da2ae7112b26a29a5eacd22d3ee2b9e2028c48e3d9c313bb1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "clickable-core-loop-prototype",
+      "identity": "sha256:4d0106ec5cdf0a54811228e99844ffb8e18dba8827c2c4401a7bfccee47603ee",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ticket-context-annotation-language",
+      "identity": "sha256:90afb55b3d60fd9b92dd4174542890bf9bd28141b214cd4278b5dfd51f72ccea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "execution-is-strongly-perceptible",
+      "identity": "sha256:fa1e6f6a64b892ea228cdfb493daf695f9cdbf2c7edc619b3dc34d2fe85f4c4c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "browser-first-app-like-shell",
+      "identity": "sha256:c4fdaf935c373f7d3c015f51c4090c0156fc091a37f7f2b871a832b6ce1ce694",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "review-pack-is-decision-ready",
+      "identity": "sha256:b8aaf00a5c91795a635eaa075297d468bdb732a8894bb70231d950afd30e7bd9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "codex-base-low-fidelity-product-logic",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -22,7 +56,7 @@
     "test:npm-test-99-of-99",
     "http:127.0.0.1:55724-health-ok"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The owner explicitly accepted the Codex-base build as a low-fidelity carrier and deferred high-fidelity visual work. The new product-logic authority defines the near-term think-first and act-first paths, the complete single-Workspace loop, the longer-term person-centered multi-Workspace direction, the separate Ticket and trusted Run lifecycles, the human attention axis, and the default center surface in Explore, Ready, Running, Needs you, Review, and Done. The disposable browser prototype now opens with Run as the dominant work surface, preserves a phase-aware Composer for Chat and steering, organizes the sidebar by human attention, and lets a reviewer traverse explicit Branch, Compare, Bring Back, scoped Context, Ticket craft, Start, Run progress, exact attention, Evidence review, closeout, governed Context proposals, reopen, and follow-up. It claims no high-fidelity visual completion, production backend, or durable UI state. The complete repository test suite passed 99/99, and the local-only preview returned a healthy response on 127.0.0.1:55724.",
   "ticket_id": "ticket-prototype-task-harness-experience"
 }

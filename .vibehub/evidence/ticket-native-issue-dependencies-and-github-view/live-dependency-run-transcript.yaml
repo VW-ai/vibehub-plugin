@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "live-relationships-render-natively"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "live-relationships-render-natively",
+      "identity": "sha256:9c2221fc5d7b7cd2901fcdb3283515f342d35f91fc2707dd0b9d2faa52ffa0c8",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "live-dependency-run-transcript",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T00:01:13Z",
@@ -10,7 +19,7 @@
     "https://github.com/VW-ai/vibehub-plugin/issues/44",
     ".vibehub/evidence/ticket-native-issue-dependencies-and-github-view/live-run-dependencies-2026-08-22.txt"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Live run applied 70 dependency changes with 0 failures (plus 1 create and 4 follow-ups for branch-only state); rerun planned 0. gh api confirms #35 blocked_by = [44, 51] and #44 blocking = [35]; the Issue page for #35 shows the red Blocked-by pill and a populated Relationships section (closed blocker #51 is not counted in the pill, matching DONE semantics). Transcript checked in beside this Evidence.",
   "ticket_id": "ticket-native-issue-dependencies-and-github-view"
 }

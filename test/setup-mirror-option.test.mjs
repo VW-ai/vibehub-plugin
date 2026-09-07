@@ -9,12 +9,13 @@ test("setup offers the GitHub mirror once and every listed source file exists", 
   assert.match(skill, /Optional, asked once/);
   assert.match(skill, /nothing for an Agent to run or check/);
   const sources = [...skill.matchAll(/^\s+(\.\.\/vibehub-core\/[^\s]+)\s+→\s+(\S+)$/gmu)];
-  assert.equal(sources.length, 5);
+  assert.equal(sources.length, 6);
   for (const [, src] of sources) assert.ok(existsSync(join(root, "skills", "vibehub-setup", src)), `missing ${src}`);
   assert.deepEqual(sources.map(([, , dst]) => dst), [
     ".github/workflows/sync-issues.yml",
     "scripts/vibehub/sync-github-issues.mjs",
     "scripts/vibehub/scripts/vh.mjs",
+    "scripts/vibehub/scripts/revision-contract.mjs",
     "scripts/vibehub/contracts/versions.json",
     "scripts/vibehub/contracts/dependency-hygiene.json",
   ]);

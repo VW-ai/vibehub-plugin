@@ -5,6 +5,30 @@
     "human-choice-drives-live-app",
     "app-and-ticket-views-share-one-cycle"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "arrival-is-one-coding-agent-conversation",
+      "identity": "sha256:0c80d64f7304b498869201ae069535bc5604d43cb42f418c15b2d999f0dcaffc",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "development-request-opens-contextual-view",
+      "identity": "sha256:e25406efa8c7bfe38fcd56957431a5a47ee9e2b88c44d4ec60822e6d63a74146",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "human-choice-drives-live-app",
+      "identity": "sha256:e41cc75f98f210702b95be4882b8e873f3721f2e530349c81690b38310cfa19d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "app-and-ticket-views-share-one-cycle",
+      "identity": "sha256:66a48e8d406d2c67a55949bb538bd5ac4c44cada55f0b0552cf45ab75064d01f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "agent-first-interaction-implementation",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-09T21:08:36Z",
@@ -15,7 +39,7 @@
     "context:.vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml",
     "conversation:2026-08-09-coding-agent-first-public-site"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The public page was rebuilt around a generic Coding Agent rather than the prior Ticket Shelf. Initial static render contains only the Agent conversation: VibeHub identity and product sentence, exact Codex and Claude Code copy actions, GitHub, a protected founder-premise entry, Copy for Agent, and the prefilled dark-mode example. Submitting that supported request creates one browser-local deterministic lifecycle with planning, decision, applying, and done states. The right View is conditionally absent until development begins; it then opens Ticket first, automatically switches to the localhost task app for the explicit palette choice, applies the selected dark palette immediately, and returns to Ticket after independent Outcome. Unrelated requests are answered with an explicit one-example/no-model-call boundary. App and Ticket remain manually switchable. The Ticket surface uses distinct Request, Context, Ticket, Human, Evidence, Outcome, and returned-Context objects, acceptance rows, and a parsed Evidence ledger rather than raw schema JSON.",
   "ticket_id": "ticket-coding-agent-first-public-site"
 }

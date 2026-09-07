@@ -3,6 +3,20 @@
     "production-phase-icon-and-label-align-tightly",
     "action-detail-is-progressively-disclosed"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-phase-icon-and-label-align-tightly",
+      "identity": "sha256:18b9c2b2e044d141e55785451f1b60aa5883afbd111e2b82e5168a11f3affe29",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "action-detail-is-progressively-disclosed",
+      "identity": "sha256:0b4335eecd8a80ef01c993d88f64c4f46f3060909f96e66f1c9cac2c7a750626",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "production-state-pair-and-action-disclosure-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -16,7 +30,7 @@
     "browser:http-127-0-0-1-58153-recommended-action-hover-focus-disclosure",
     "browser:http-127-0-0-1-58153-console-zero-errors"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Production Workbench SVG now leaves each phase label right-aligned and derives the adjacent 14px icon position from the actual rendered label width, producing a deliberate four-pixel logical gap for DRAFT, READY, RUNNING, DONE, and ARCHIVED rather than a fixed coordinate that drifted by label length. The icon y-position moves from NODE.height-24 to NODE.height-22; the real wide host measured icon/text centerline deltas of about 0.08 CSS px and rendered gaps of about 4.3-4.8 px after graph scaling. Card bounds, proof line, aperture, substate, live indicator, copy, and relations were not changed. The Recommended action block removes canonical detail from visible flow, keeps its short title keyboard-focusable, attaches exact next_action.detail through data-full-text and aria-describedby, and reuses the existing hover/focus tooltip. Real host inspection showed visible block text only `RECOMMENDED ACTION / Start work / Copy prompt`; hover and focus both exposed the exact detail `Executable criteria still need reproducible acceptance-linked Evidence.` with zero console errors. The exact host-owned copied payload path is unchanged.",
   "ticket_id": "ticket-polish-workbench-state-action-affordances"
 }

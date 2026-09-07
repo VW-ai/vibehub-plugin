@@ -1,26 +1,42 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "segment-determinism",
-      "criterion": "`vh.mjs source segment --repo <root> --path <file>` returns identical segment ids for identical file bytes across repeated runs. Markdown splits at heading boundaries yielding `path#heading-slug`; every other file type splits into windows of at most 60 lines with boundaries snapped to the nearest blank line, yielding `path#L<start>-<end>`. Segments cover every line of the file with no gap and no overlap."
-    },
-    {
       "acceptance_id": "coverage-recomputation",
-      "criterion": "`vh.mjs context coverage --repo <root> [--room <path>]` reports, per anchored source file, every segment cited by no Context `source.ref` or `evidence[].ref` and listed in no room `coverage_exceptions`, plus an uncovered total. Every value is recomputed from the working tree on each run and never read from stored state."
-    },
-    {
-      "acceptance_id": "room-schema-exceptions",
-      "criterion": "`room.schema.json` accepts an optional `coverage_exceptions` array of `{segment, reason}` objects; every existing room document without the field still validates, and `project validate` passes on this repository."
+      "criterion": "`vh.mjs context coverage --repo <root> [--room <path>]` reports, per anchored source file, every segment cited by no Context `source.ref` or `evidence[].ref` and listed in no room `coverage_exceptions`, plus an uncovered total. Every value is recomputed from the working tree on each run and never read from stored state.",
+      "identity": "sha256:6feadfdd383c0eee100299486d2e3f0fb9b01e3c107f2fa2b531c9943c9bd01b",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "no-new-store",
-      "criterion": "The change adds no manifest, progress file, cache, daemon, or second store. Segmentation and coverage are derived on every invocation."
+      "criterion": "The change adds no manifest, progress file, cache, daemon, or second store. Segmentation and coverage are derived on every invocation.",
+      "identity": "sha256:83ad33602d8e713d4758453c8ef98a1b13350a18539cfa8f9f996e60c621a8bf",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "regression",
-      "criterion": "Tests cover markdown heading splitting, non-markdown line-window splitting with blank-line snapping, a file shorter than one window, coverage with zero Contexts, coverage satisfied by an exception, and a segment cited only through `evidence[].ref`."
+      "criterion": "Tests cover markdown heading splitting, non-markdown line-window splitting with blank-line snapping, a file shorter than one window, coverage with zero Contexts, coverage satisfied by an exception, and a segment cited only through `evidence[].ref`.",
+      "identity": "sha256:c92b7bfab1228cebd2ac6e7858049a7ddf8e17edfafd05507d950687129a5a62",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "room-schema-exceptions",
+      "criterion": "`room.schema.json` accepts an optional `coverage_exceptions` array of `{segment, reason}` objects; every existing room document without the field still validates, and `project validate` passes on this repository.",
+      "identity": "sha256:bd758acf600720794676c37bf1d6d506c1832dc6b299315729bd13aae870b94b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "segment-determinism",
+      "criterion": "`vh.mjs source segment --repo <root> --path <file>` returns identical segment ids for identical file bytes across repeated runs. Markdown splits at heading boundaries yielding `path#heading-slug`; every other file type splits into windows of at most 60 lines with boundaries snapped to the nearest blank line, yielding `path#L<start>-<end>`. Segments cover every line of the file with no gap and no overlap.",
+      "identity": "sha256:d537f7d046e4a2f6c4e80c2fe1b5167488d13681771aed6e31e9aa095d8dd86e",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Do not change `context.schema.json`; segment-level references are already legal in the free-text `source.ref` and `evidence[].ref` fields.",
     "Keep the helper dependency-free and deterministic; semantic judgment belongs in Skills, not in this script.",
@@ -37,6 +53,39 @@
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "coverage-recomputation",
+          "identity": "sha256:6feadfdd383c0eee100299486d2e3f0fb9b01e3c107f2fa2b531c9943c9bd01b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "no-new-store",
+          "identity": "sha256:83ad33602d8e713d4758453c8ef98a1b13350a18539cfa8f9f996e60c621a8bf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression",
+          "identity": "sha256:c92b7bfab1228cebd2ac6e7858049a7ddf8e17edfafd05507d950687129a5a62",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "room-schema-exceptions",
+          "identity": "sha256:bd758acf600720794676c37bf1d6d506c1832dc6b299315729bd13aae870b94b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "segment-determinism",
+          "identity": "sha256:d537f7d046e4a2f6c4e80c2fe1b5167488d13681771aed6e31e9aa095d8dd86e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8a5662280c0e8750ef7956b8f9fc357a825832f7dbb5cec80c4b0e7f381fe522",
+      "revision": 1
+    }
+  ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
@@ -46,6 +95,7 @@
     "commit:3849ec8acc5ee69f69b2f98f3cfa000d34a6eae8"
   ],
   "relations": [],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-add-source-segmentation-and-coverage"
 }

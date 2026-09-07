@@ -6,8 +6,8 @@ description: Present or review the checked-in VibeHub Ticket graph and the canon
 # VibeHub Review
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
-> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
-> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
+> for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 This Skill is the sole presentation surface for VibeHub. It presents two
 things and writes nothing: the **Ticket graph** and the **Room tree**.
@@ -19,6 +19,12 @@ calling Ticket Skill.
 Read `../vibehub-core/contracts/ticket-next-action.md`. Present the host-derived next action
 beside operational state and human attention; never infer it again from UI
 copy, Evidence counts, or browser state.
+Read `../vibehub-core/contracts/revision-identity.md`. Present the active
+Contract revision separately from historical Outcomes; show each Acceptance's
+logical ID, revision, active/retired state and `derived_from` lineage, plus
+Evidence binding origin. A `legacy-unresolved` record must show its reason and
+attempted provenance as repair guidance, never as globally failed or stale
+proof.
 
 ## Local graph UI
 
@@ -107,6 +113,17 @@ node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
 
 Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,
 direct dependencies, acceptance, Evidence, and Outcome in the conversation.
+Resolve every displayed or consumed `context_ref` through the shared engine
+operation so current paths and immutable historical refs have one source and
+identity contract:
+
+```text
+node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.json>
+```
+
+`ref.json` is `{"ref":"<Ticket context_ref>"}`. Do not check out a historical
+commit or bypass the resolver with ad hoc Git commands. Consume the returned
+source and identity when presenting the reference.
 When `next_action.action` is `CLOSE_OUT`, present it as independent review work
 and route it to `$vibehub-ticket-closeout`; never call Ticket Run again. When a
 bounded list is requested, report only `ready_to_closeout` from this exact

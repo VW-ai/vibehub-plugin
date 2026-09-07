@@ -7,6 +7,40 @@
     "existing-anchors-unchanged",
     "regression"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "anchors-normalized-before-collision",
+      "identity": "sha256:8299c5d66b009a785b8c13cf04808e6937922e5822fe0b05b70ce0d3c24cbc94",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "repo-root-anchor-is-honest",
+      "identity": "sha256:821ac5d92f9d1226056a0efbd68391c172eab89e1e2560be9b874771e58656ba",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "empty-territory-anchors-are-reported",
+      "identity": "sha256:c5f8eca2fe987062a1a34d35ee0d526c0e7e62ce53c31c53f3eb7eebf19aac3d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "vibehub-internals-not-anchorable",
+      "identity": "sha256:b6193cf0d6bd316b989589cbe380d756c2c1062ec734af372bfe07160c2a5c59",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "existing-anchors-unchanged",
+      "identity": "sha256:ef897d8d679a93ad5577f55d8ab1c6b1b79fd71350fe447aab2971732bef8255",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "regression",
+      "identity": "sha256:c085164a8d44e324d8e48b0d0cad5564a4eefe093ddd6d09c2da4a101d44a5a2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "evidence-anchor-case-retry",
   "kind": "ticket_evidence",
   "recorded_at": "2026-09-07T04:30:27.385288+00:00",
@@ -18,7 +52,7 @@
     "skills/vibehub-core/contracts/room.schema.json",
     ".vibehub/evidence/ticket-normalize-anchors-before-collision/compare-baseline.mjs"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Retry closes independently reproduced case-alias internal-material bypass using one case-insensitive reserved-component predicate at validation and source traversal. Acceptance and constraints unchanged. Six new regressions, 257 total tests pass without fail/skip, both validators pass, and frozen six-Room parity rerun is identical. First partial and evidence retained; independent re-adjudication required.",
   "ticket_id": "ticket-normalize-anchors-before-collision"
 }

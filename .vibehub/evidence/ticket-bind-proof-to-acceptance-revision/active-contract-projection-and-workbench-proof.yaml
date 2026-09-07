@@ -1,0 +1,36 @@
+{
+  "acceptance_ids": [
+    "projection-uses-only-active-contract-coverage",
+    "workbench-explains-revision-history"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "projection-uses-only-active-contract-coverage",
+      "identity": "sha256:76b3963aaba5743602c9ea3d0e95b18a3fee912ff63f802c7d1e72908541f5f7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-explains-revision-history",
+      "identity": "sha256:a1fe28d1801797090f335ff14ef8fd23fbfcc2c290be6354749c5d191d5e8967",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "active-contract-projection-and-workbench-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-04T20:14:04Z",
+  "refs": [
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "test/ticket.test.mjs",
+    "test/ui-host.test.mjs",
+    "test/revision-contract.test.mjs",
+    "command:npm-test-191-tests-zero-failures"
+  ],
+  "schema_version": 2,
+  "summary": "The shared repository projection now computes coverage, next_action, DONE, archive, and dependency unlock only from exact proof for the active Contract. It retains complete Outcome history separately from currentOutcome. The Workbench consumes that same projection and displays Contract revision, Acceptance logical IDs and revisions, retired history, derived_from lineage, binding origin, current versus historical Outcomes, and actionable unresolved diagnostics. CLI and UI regressions passed.",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}

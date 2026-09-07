@@ -4,6 +4,25 @@
     "plugin-boundary-and-artifact-stay-clean",
     "v080-release-candidate-identity-is-in-pr"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "main-and-pr15-contracts-are-reconciled",
+      "identity": "sha256:ba242705599cd6d553ebb8b2f9be9333e67768a9df0865a163f070d87e8b4da7",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+      "identity": "sha256:732944c987230899a03b9b8262056cf0684b813c942bd10d4f863fe8933b142b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "v080-release-candidate-identity-is-in-pr",
+      "identity": "sha256:7fb6c92e1e979540a92f6010b48ddc1f665bb9e1b80d0f31d0d77c16465bfc62",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "v080-main-contract-release-and-boundary-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -15,7 +34,7 @@
     "artifact:54-files-724304-bytes",
     "release:v0.8.0-candidate"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Fetched origin/main at 92802fa54739ed8051a8c0704fb0eae873ab60e8 is an ancestor of the release branch. Full local verification passed 81/81 and the dependency-free installed artifact verified at 54 files / 724304 bytes; a separate clean output directory built the same 54-file / 724304-byte artifact. Project and Ticket validation passed with 48 Tickets, 145 Evidence, and 42 Outcomes before this Evidence; knowledge, product, ticket-lifecycle, and workbench Rooms were FRESH. Version identity is exactly 0.8.0 across package, Codex, Claude, marketplace, release test, and top Changelog entry dated 2026-08-13; data format remains 1 and the GitHub-only tag workflow is unchanged except for fetching full history required by the committed dense-layout baseline test. Source/diff audit found no Desktop app, repository switcher, launcher runtime, session watcher, deep-link app packaging, database, daemon, persistent browser store, or writable Workbench route. The passing suite explicitly retains human authority/origin Evidence, human attention, READY-only handoff, REFINE non-execution, causal focus, exact source, and archive/query contracts.",
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

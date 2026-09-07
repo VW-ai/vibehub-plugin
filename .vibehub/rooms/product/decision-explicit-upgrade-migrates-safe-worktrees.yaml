@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-explicit-upgrade-migrates-safe-worktrees",
+  "detail": "This supersedes the earlier read-only machine-wide rule and the in-project-only placement rule in the mechanical/semantic migration decision while preserving that decision's core classification. Every release that changes project data must still declare which steps are deterministic and which require Agent judgment. The mechanical half must run alone to a valid writable project; every semantic step remains separately reviewable and must ship guidance covering purpose, authoritative inputs, quality, and forbidden shortcuts. What changes is where the halves run. When the user explicitly invokes VibeHub's upgrade experience, it discovers affected projects and enumerates every registered, existing worktree reported by git worktree list. Each worktree is a separate branch snapshot and is migrated separately; one commit is never assumed to update the others, and branches without a registered worktree are outside this sweep. For every eligible safe worktree, the upgrade runs only the declared mechanical migration, proves the resulting project is CURRENT and valid with any remaining semantic work explicitly pending, and creates one local reviewable migration commit containing only the declared migration paths. It never pushes. A later Agent session in that worktree reports the migration commit and performs only the remaining semantic steps using the shipped authoring guidance. Safety is deliberately conservative. A worktree is safe for automatic write only when it is registered, reachable and writable; is attached to a named, non-unborn branch; has no merge, rebase, cherry-pick, revert, or bisect in progress; has a completely clean status including staged, unstaged, and untracked files; has a recognized older project format with a complete migration chain; and a deterministic preview on the same HEAD touches only declared paths and reaches a valid writable target without semantic judgment. HEAD and status are checked again immediately before commit, and local commit capability must succeed. A current worktree is a no-op, not unsafe. A malformed or unsupported-newer format is reported as unsupported. Every other failed safety predicate is reported as pending with its exact reason; it is never silently skipped, modified, stashed, reset, committed, or pushed. If a verified preview cannot be applied and validated exactly, the worktree is restored to its clean preimage and reported pending. This is explicit upgrade behavior, not background conversion.",
+  "evidence": [
+    {
+      "note": "The owner explicitly confirmed registered-worktree scope, separate per-worktree migration commits, no automatic push, and the rule that unsafe worktrees are skipped and reported; the conservative mechanical safety predicate answers the requested definition without broadening the authorized behavior.",
+      "ref": "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-upgrade-drives-every-affected-project",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-migrations-declare-mechanical-and-semantic-halves",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-03T02:12:37Z",
+    "quote": "‘所有 worktree’指已经通过 git worktree list 注册、实际存在的 worktree … yes；不自动 push … yes；用户明确发起 VibeHub 升级时 … 对所有已发现项目和已注册 worktree 尝试机械迁移并创建本地 commit … 我觉得可以的，就是你如何定义不安全呢？",
+    "ref": "conversation:2026-09-02-explicit-upgrade-all-worktrees-safety"
+  },
+  "state": "active",
+  "summary": "Every migration still separates mechanical work from guided semantic judgment, but an explicit VibeHub upgrade now runs and locally commits the mechanical half in every safe registered worktree, reports every skip, never pushes, and leaves semantics to later in-worktree Agent sessions",
+  "tags": [
+    "upgrade",
+    "migration",
+    "cross-project",
+    "worktree",
+    "git",
+    "safety"
+  ],
+  "type": "decision"
+}

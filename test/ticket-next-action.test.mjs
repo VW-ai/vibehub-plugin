@@ -36,7 +36,7 @@ function evidence(id, ticketId, acceptanceIds, origin = "agent") {
 function outcome(ticketId, status, accepted, unresolved, evidenceIds = []) {
   return {
     schema_version: 1,
-    kind: "ticket_outcome",
+    kind: "ticket_outcome", independence: { source: "subagent", note: "test fixture" },
     ticket_id: ticketId,
     status,
     accepted_acceptance_ids: accepted,
@@ -74,7 +74,7 @@ test("next action covers execution, authority, adjudication, dependencies, matur
     ticket("failed-work"),
     ticket("deviated-work"),
   ];
-  assert.equal(run(repo, "ticket", "apply", { tickets }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets }).status, 0);
 
   for (const [id, count] of [["v080-publication", 4], ["dogfood-repair", 6]]) {
     const ids = acceptance(count).map((criterion) => criterion.acceptance_id);
@@ -166,8 +166,7 @@ test("human precedence remains authority-aware and full Evidence never unlocks d
   assert.equal(run(repo, "project", "init").status, 0);
   const mixed = withAcceptance("mixed", 2, { human: [2] });
   const prerequisite = withAcceptance("fully-evidenced", 2);
-  assert.equal(run(repo, "ticket", "apply", {
-    tickets: [mixed, prerequisite, ticket("dependent", ["fully-evidenced"])],
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [mixed, prerequisite, ticket("dependent", ["fully-evidenced"])],
   }).status, 0);
 
   assert.equal(run(repo, "ticket", "evidence", evidence(
@@ -212,7 +211,7 @@ test("human routing waits until the human criterion is the remaining blocker", (
 
   const delivery = withAcceptance("terminal-signoff", 3, { human: [3] });
   const humanOnly = withAcceptance("human-only", 1, { human: [1] });
-  assert.equal(run(repo, "ticket", "apply", { tickets: [delivery, humanOnly] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { validation: { independent: false, note: "behavioral test fixture" }, tickets: [delivery, humanOnly] }).status, 0);
 
   // Mixed authority, before any Evidence: agent work remains, so the Ticket is
   // executable and names only the agent-authority criteria.
@@ -294,6 +293,7 @@ test("rows one through four still outrank both EXECUTE and NEEDS_HUMAN", () => {
   });
   const draft = { ...mixed("mixed-draft"), maturity: "draft" };
   assert.equal(run(repo, "ticket", "apply", {
+    validation: { independent: false, note: "behavioral test fixture" },
     tickets: [
       mixed("mixed-successful"),
       mixed("mixed-partial"),

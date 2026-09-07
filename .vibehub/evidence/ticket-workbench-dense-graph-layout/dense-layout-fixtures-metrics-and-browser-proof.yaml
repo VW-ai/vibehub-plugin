@@ -6,6 +6,35 @@
     "causal-focus-scales-with-layout",
     "dense-layout-verifies-in-browser"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "dense-fixtures-cover-real-failure-shapes",
+      "identity": "sha256:d1fc03e135d56173e9e3391fd3fcaf344009841fa65b9f75e106f2c5c2de8905",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "cards-and-routes-remain-legible",
+      "identity": "sha256:71645cdddaf1c2d7b57c0068b25f7e06f24e3c31cccf24d19e0cde1a294c9f60",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "crossings-and-congestion-are-materially-reduced",
+      "identity": "sha256:efa4e13a5b40aa992c893c5c566b68b7fc4dba40115374cb3f267c6f007c6b6f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "causal-focus-scales-with-layout",
+      "identity": "sha256:15e8bb9cb9c797edea81d3ccfa0d1c85ad1e879df86d889b196791e0525c8e54",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "dense-layout-verifies-in-browser",
+      "identity": "sha256:d31f87fd33c40e925a4b8b6f38e410dccd11256ecdb4386df1652f7434d10178",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "dense-layout-fixtures-metrics-and-browser-proof",
   "kind": "ticket_evidence",
   "origin": "agent",
@@ -19,7 +48,7 @@
     "browser:45-ticket-42-relation-causal-cone-hit-target-minimap-pan-zoom-keyboard-proof",
     "room:product-and-workbench-fresh-at-74a5d65"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "Commit 74a5d65 introduces one dependency-free layered layout engine for both orientations. Two checked-in deterministic fixtures contain 42 and 36 Tickets; together they cover a 10-sibling rank, a five-prerequisite/five-unlock hub, multi-rank relations, all five operational states, and all four human-attention states. Geometry tests prove stable positions and routes, no card overlap, no ordinary route through an unrelated card interior, bounded distinct source and target ports, and preservation of every Ticket and relation in both orientations. The checked-in comparison mechanically reads the exact v0.7.0 app.js for the top-to-bottom baseline and commit edf4140 for the left-to-right baseline at 1440x960 and 1180x820: unique route-pair crossings fall from 1060 to 564 (46.79%) and coincident orthogonal-segment length falls from 44635.59 to 263.19 (99.41%), with no fixture or orientation regressing by more than five percent. Full verification passes 56/56 plus the dependency-free 54-file, 673758-byte installed artifact. Real-browser review of the clean current checkout at 1440x960, 1180x820, and 390x844 renders all 45 current Tickets and 42 relations in both directions with no document horizontal overflow; cards remain readable at the initial 0.64 detail scale, narrow controls remain 44x44, and the selected Ticket/Inspector survive direction changes. The selected dense Ticket keeps a complete 12-node/12-relation transitive cone while 33 unrelated nodes and 30 relations recede; 42 relation hit targets and 42 minimap routes remain present. Orientation-aware ArrowLeft and ArrowUp focus the direct prerequisite, zoom and direct canvas pan change the world transform, minimap recentering changes its translation, and Exact Git source reports clean commit 7050983. Product and Workbench Rooms were aligned at 74a5d65 and all four Rooms are FRESH.",
   "ticket_id": "ticket-workbench-dense-graph-layout"
 }

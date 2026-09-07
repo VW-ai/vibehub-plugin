@@ -245,6 +245,11 @@
           "path": "scripts/measure-graph-layout.mjs",
           "text": "was still named vibehub-ticket-review. The rename must not invalidate them.",
           "reason": "Comment documenting why the legacy path constant below it exists."
+        },
+        {
+          "path": ".vibehub/rooms/product/finding-npx-updates-by-content-not-by-version.yaml",
+          "text": "Workbench assets live inside skills/vibehub-ticket-review/assets",
+          "reason": "Historical investigation describes the actual asset path in the tested installation; retain the recorded finding without rewriting it as a new observation."
         }
       ]
     }

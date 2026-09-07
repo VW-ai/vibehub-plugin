@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "install-docs-lead-with-one-line"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "install-docs-lead-with-one-line",
+      "identity": "sha256:6b8f7351723d1739a4da471c97ac6d74ba4d028888e5dcc40022a436fe35724f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "readme-and-install-docs",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-23T02:26:00Z",
@@ -10,7 +19,7 @@
     "README.md",
     "docs/INSTALL.md"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "README Installation now leads with npx skills add VW-ai/vibehub-plugin --all, keeps both marketplace command sets on one line each, and is 52 lines (budget 60, release test passes); docs/INSTALL.md gains an Install section describing the skills.sh path, the vibehub-core carrier, the install-all caveat, npx skills update, the marketplace path, and the setup-time mirror option, with helper paths updated.",
   "ticket_id": "ticket-implement-npx-first-install-experience"
 }

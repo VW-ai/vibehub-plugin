@@ -1,28 +1,61 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket-evidence.v1.json",
+  "$id": "https://vibehub.dev/schemas/ticket-evidence.v2.json",
   "title": "VibeHub Ticket Evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "evidence_id", "ticket_id", "acceptance_ids", "summary", "refs", "recorded_at"],
+  "required": ["schema_version", "kind", "evidence_id", "ticket_id", "acceptance_ids", "binding_state", "summary", "refs", "recorded_at"],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 2 },
     "kind": { "const": "ticket_evidence" },
     "evidence_id": { "$ref": "#/$defs/id" },
     "ticket_id": { "$ref": "#/$defs/id" },
     "acceptance_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "binding_state": { "enum": ["bound", "legacy-pending-reconstruction", "legacy-unresolved"] },
+    "binding_origin": { "enum": ["native", "reconstructed"] },
+    "acceptance_revisions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/acceptance_ref" } },
+    "unresolved": { "$ref": "#/$defs/unresolved" },
     "summary": { "$ref": "#/$defs/text" },
     "refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
-    "origin": {
-      "type": "string",
-      "enum": ["agent", "human"],
-      "default": "agent",
-      "description": "Who supplied the recorded fact or judgment. Omission means agent origin."
-    },
+    "origin": { "enum": ["agent", "human"], "default": "agent" },
     "recorded_at": { "type": "string", "format": "date-time" }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "binding_state": { "const": "bound" } } },
+      "then": { "required": ["binding_origin", "acceptance_revisions"], "not": { "required": ["unresolved"] } },
+      "else": {
+        "not": { "anyOf": [{ "required": ["binding_origin"] }, { "required": ["acceptance_revisions"] }] }
+      }
+    },
+    {
+      "if": { "properties": { "binding_state": { "const": "legacy-unresolved" } } },
+      "then": { "required": ["unresolved"] },
+      "else": { "not": { "required": ["unresolved"] } }
+    }
+  ],
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "identity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "acceptance_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance_id", "revision", "identity"],
+      "properties": {
+        "acceptance_id": { "$ref": "#/$defs/id" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "identity": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "unresolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "attempted_refs"],
+      "properties": {
+        "reason": { "enum": ["missing-history", "ambiguous-history"] },
+        "attempted_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } }
+      }
+    }
   }
 }

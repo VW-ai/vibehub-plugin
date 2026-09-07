@@ -2,6 +2,15 @@
   "acceptance_ids": [
     "inspector-reads-current-yaml"
   ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "inspector-reads-current-yaml",
+      "identity": "sha256:36d147b1e0a43e1577b80b5f6895b9dd02ce93486034da769d3a6f3e4533fb32",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "reconstructed",
+  "binding_state": "bound",
   "evidence_id": "direct-yaml-inspector-proof",
   "kind": "ticket_evidence",
   "recorded_at": "2026-08-02T07:18:44Z",
@@ -11,7 +20,7 @@
     "test/ui-host.test.mjs",
     "browser:2026-08-02-ticket-inspector"
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "summary": "The host builds every state, subject, and trace response from a fresh validated read of Context, Ticket, Evidence, and Outcome YAML. API tests proved current topology, acceptance, Evidence, Outcome, and disk-refresh behavior; browser inspection displayed the selected Ticket's outcome, context, acceptance, constraints, refs, provenance, Evidence, and successful Outcome without a database or persistent cache.",
   "ticket_id": "ticket-restore-local-graph-ui"
 }

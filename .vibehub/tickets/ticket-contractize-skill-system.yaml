@@ -1,22 +1,35 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "knowledge-governance-reference",
-      "criterion": "A checked-in shared knowledge-governance reference states placement (lowest owning room, lowest common ancestor, create the missing room), trust layers (distill: source refs are the lower-trust layer, human-ingested Context wins, Git PR is the only gate), and the distill: source-ref convention exactly once; ingest, distill, and query each carry a single pointer line and no restated rule, and a node --test asserts the pointers exist."
+      "acceptance_id": "boundary-stated-once",
+      "criterion": "The product-wide architecture boundary is stated in exactly one shared reference; every skill keeps a one-line pointer plus only its skill-specific temptations (the four restating skills lose their variant wordings, plan and distill gain the pointer), and the two prose restatements of lifecycle continuation semantics (presentation is not an approval gate) are removed in favor of the contract.",
+      "identity": "sha256:7dcd900bf5fd0694c3887c785775cce86dcc97391791fe9ec890248011ffc73e",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "command-surface-welded",
-      "criterion": "A node --test extracts every vh.mjs domain-and-operation invocation cited in any SKILL.md and fails if one does not resolve to a real operation in vh.mjs, including the --room flag form."
+      "criterion": "A node --test extracts every vh.mjs domain-and-operation invocation cited in any SKILL.md and fails if one does not resolve to a real operation in vh.mjs, including the --room flag form.",
+      "identity": "sha256:8df759c32ed8fef5aa21eabdc36a902135d7d0a69c1aa23483a98a7bfb49ed35",
+      "revision": 1,
+      "state": "active"
     },
     {
-      "acceptance_id": "boundary-stated-once",
-      "criterion": "The product-wide architecture boundary is stated in exactly one shared reference; every skill keeps a one-line pointer plus only its skill-specific temptations (the four restating skills lose their variant wordings, plan and distill gain the pointer), and the two prose restatements of lifecycle continuation semantics (presentation is not an approval gate) are removed in favor of the contract."
+      "acceptance_id": "knowledge-governance-reference",
+      "criterion": "A checked-in shared knowledge-governance reference states placement (lowest owning room, lowest common ancestor, create the missing room), trust layers (distill: source refs are the lower-trust layer, human-ingested Context wins, Git PR is the only gate), and the distill: source-ref convention exactly once; ingest, distill, and query each carry a single pointer line and no restated rule, and a node --test asserts the pointers exist.",
+      "identity": "sha256:57ed7dbfcb6e30ac0d11b54ff6905a44b13e5e6c9b3802c436a278082ddced1c",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "taxonomy-reflected",
-      "criterion": "Contract-layer tests are grouped recognizably (single test file or named section) so the unit, contract, and e2e layers of convention-skill-contract-test-layers are visible in the test tree, and the full suite plus artifact verification pass."
+      "criterion": "Contract-layer tests are grouped recognizably (single test file or named section) so the unit, contract, and e2e layers of convention-skill-contract-test-layers are visible in the test tree, and the full suite plus artifact verification pass.",
+      "identity": "sha256:6f4afbec970fbae27453c7a5600aa04178f2b112ee595aef2c9613d4160d9873",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Skills stay short and judgment-first; no skill gains mechanical step inflation from this work.",
     "No agent-in-the-loop e2e harness in this ticket; e2e remains the social independent validate and closeout practice.",
@@ -41,6 +54,34 @@
       "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "boundary-stated-once",
+          "identity": "sha256:7dcd900bf5fd0694c3887c785775cce86dcc97391791fe9ec890248011ffc73e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "command-surface-welded",
+          "identity": "sha256:8df759c32ed8fef5aa21eabdc36a902135d7d0a69c1aa23483a98a7bfb49ed35",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "knowledge-governance-reference",
+          "identity": "sha256:57ed7dbfcb6e30ac0d11b54ff6905a44b13e5e6c9b3802c436a278082ddced1c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "taxonomy-reflected",
+          "identity": "sha256:6f4afbec970fbae27453c7a5600aa04178f2b112ee595aef2c9613d4160d9873",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8a3b4011d5ae7f2131312cf799694e17d5e27fc3dab63aa4f7cfa8d2fd36ad2d",
+      "revision": 1
+    }
+  ],
   "deliveries": [
     {
       "delivered_at": "2026-08-04T03:35:11.000Z",
@@ -63,6 +104,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-contractize-skill-system"
 }

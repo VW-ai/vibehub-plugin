@@ -1,27 +1,42 @@
 {
-  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"delivered","delivered_at":"2026-08-13T18:27:34Z","delivered_commit":"ee2cd9bbe7489754e513de6b2c376e63473187fe"}],
   "acceptance": [
     {
       "acceptance_id": "proposal-defines-one-coherent-token-system",
-      "criterion": "A checked-in proposal defines concrete typography, spacing, radii, border, elevation, surface, semantic color, icon, hover, focus, selection, and reduced-motion tokens for the canvas, Ticket cards, graph edges, compact overview, controls, and Inspector."
-    },
-    {
-      "acceptance_id": "proposal-separates-state-from-human-attention",
-      "criterion": "A complete state matrix shows whole-card but restrained treatments for DONE, READY, BLOCKED, REFINE, and DEVIATED, plus an independent non-color-only layer for UPCOMING, PENDING, RECORDED, and COMPLETE human attention so a human boundary is never falsely presented as an operational blocker."
-    },
-    {
-      "acceptance_id": "proposal-preserves-victor-product-value",
-      "criterion": "Representative focused, unfocused, dense, relation-selected, Inspector, source, empty, and narrow states preserve the complete graph, upstream/downstream causal cone, progressive Execution/Contract/Log detail, exact Git truth, focused local link, and READY-gated Agent handoff."
-    },
-    {
-      "acceptance_id": "proposal-is-reviewable-at-real-sizes",
-      "criterion": "Review artifacts show the actual repository at desktop, normal Codex width, and 390px narrow sizes with enough fidelity to judge color, shape, shadow, icons, typography, hierarchy, and card-state coexistence; contrast and color-independent labels are annotated mechanically."
+      "criterion": "A checked-in proposal defines concrete typography, spacing, radii, border, elevation, surface, semantic color, icon, hover, focus, selection, and reduced-motion tokens for the canvas, Ticket cards, graph edges, compact overview, controls, and Inspector.",
+      "identity": "sha256:810a6059e483185e2e3768c8ad753c0b28f733d162321ff20ecdf70545418b39",
+      "revision": 1,
+      "state": "active"
     },
     {
       "acceptance_id": "proposal-does-not-ship-production-style",
-      "criterion": "This Ticket changes only checked-in proposal or prototype artifacts and their validation; production Workbench assets, release identity, runtime behavior, and canonical Ticket semantics remain unchanged."
+      "criterion": "This Ticket changes only checked-in proposal or prototype artifacts and their validation; production Workbench assets, release identity, runtime behavior, and canonical Ticket semantics remain unchanged.",
+      "identity": "sha256:67563982a94b9d3b6c4c0f3e4096a5c529d5bb4a3f62e54601a9fd2bad90c334",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "proposal-is-reviewable-at-real-sizes",
+      "criterion": "Review artifacts show the actual repository at desktop, normal Codex width, and 390px narrow sizes with enough fidelity to judge color, shape, shadow, icons, typography, hierarchy, and card-state coexistence; contrast and color-independent labels are annotated mechanically.",
+      "identity": "sha256:49b761ea6b962ddd39a62b61fd9d8d1ac5da9c068563612c092e7834a5207169",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "proposal-preserves-victor-product-value",
+      "criterion": "Representative focused, unfocused, dense, relation-selected, Inspector, source, empty, and narrow states preserve the complete graph, upstream/downstream causal cone, progressive Execution/Contract/Log detail, exact Git truth, focused local link, and READY-gated Agent handoff.",
+      "identity": "sha256:b52167dd92a88d01f756b7b5faea6232c6cff930dfde54bb7b23d96206d9f19a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "proposal-separates-state-from-human-attention",
+      "criterion": "A complete state matrix shows whole-card but restrained treatments for DONE, READY, BLOCKED, REFINE, and DEVIATED, plus an independent non-color-only layer for UPCOMING, PENDING, RECORDED, and COMPLETE human attention so a human boundary is never falsely presented as an operational blocker.",
+      "identity": "sha256:2e929163ece418888cbeaaf6ef21ad881e8827ebd0c80cff63059c067f0b671b",
+      "revision": 1,
+      "state": "active"
     }
   ],
+  "active_contract_revision": 1,
   "constraints": [
     "Use Codex as interaction and visual-language inspiration, not as a claim of exact proprietary design reproduction.",
     "Do not trade away Victor's causal-cone, Inspector, source, handoff, accessibility, or read-only capabilities for visual similarity.",
@@ -51,6 +66,48 @@
       "ref": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
     }
   ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "proposal-defines-one-coherent-token-system",
+          "identity": "sha256:810a6059e483185e2e3768c8ad753c0b28f733d162321ff20ecdf70545418b39",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "proposal-does-not-ship-production-style",
+          "identity": "sha256:67563982a94b9d3b6c4c0f3e4096a5c529d5bb4a3f62e54601a9fd2bad90c334",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "proposal-is-reviewable-at-real-sizes",
+          "identity": "sha256:49b761ea6b962ddd39a62b61fd9d8d1ac5da9c068563612c092e7834a5207169",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "proposal-preserves-victor-product-value",
+          "identity": "sha256:b52167dd92a88d01f756b7b5faea6232c6cff930dfde54bb7b23d96206d9f19a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "proposal-separates-state-from-human-attention",
+          "identity": "sha256:2e929163ece418888cbeaaf6ef21ad881e8827ebd0c80cff63059c067f0b671b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cd732921b59d8654926c17ec49f311e216491c6218fbd03e8f77d9f3014be442",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A reviewable visual-system proposal translates the owner's Codex-like interaction direction into concrete Workbench tokens, state layers, and wide/narrow examples without changing production UI.",
@@ -65,6 +122,7 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 2,
+  "revision_state": "bound",
+  "schema_version": 3,
   "ticket_id": "ticket-propose-codex-like-workbench-visual-language"
 }
