@@ -1,0 +1,55 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "main-integrated",
+      "criterion": "The fetched main commit recorded in Evidence is an ancestor of the final PR branch, no unmerged entries remain, and the branch is pushed to PR 136 without force rewriting its existing history."
+    },
+    {
+      "acceptance_id": "capabilities-preserved",
+      "criterion": "Merged tests and independent probes verify deterministic source segmentation, coverage settlement, normalized segment anchor collisions and internal-material exclusion, alongside main revision-bound proof semantics, explicit independence gate, and npx-only artifact distribution. No removed marketplace delivery surface is resurrected."
+    },
+    {
+      "acceptance_id": "records-migrated-honestly",
+      "criterion": "Merged project validates at main current format; branch-added Tickets/Evidence/Outcomes are explicitly migrated using repository-supported revision reconstruction, existing main revision records are preserved, and Peel verification remains partial with no-prompted-recovery unresolved and criterion meaning unchanged."
+    },
+    {
+      "acceptance_id": "merged-validation",
+      "criterion": "Full npm test and verify:artifact pass on the merged branch; project and skills validators pass, entered Rooms are reconciled/aligned with no unexplained drift, and PR 136 description reflects merged scope and actual verification."
+    }
+  ],
+  "constraints": [
+    "Do not modify ~/Peel or its baseline changes.",
+    "Do not relax acceptance or proof/independence gates to make integration pass; preserve historical evidence and outcomes through Git and the main migration contract.",
+    "Do not publish a release, modify unrelated worktrees, force-push, or merge PR 136 into main."
+  ],
+  "context": "User requested aligning PR 136 with main. Current delivery tip d3289c2; current known main 5846c3f introduces project format 4, revision-bound Acceptance/Evidence/Outcome, explicit closeout independence, npx-only distribution and upgrades. Resolve integration rather than choosing an entire side. Record the exact fetched main commit in Evidence. Preserve the existing Peel partial semantics and historical evidence.",
+  "context_refs": [
+    {
+      "purpose": "PR integration and Room alignment requirements.",
+      "ref": "skills/vibehub-pr/SKILL.md"
+    },
+    {
+      "purpose": "Shared runtime with competing branch changes.",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Completed normalization contract to preserve.",
+      "ref": ".vibehub/tickets/ticket-normalize-anchors-before-collision.yaml"
+    },
+    {
+      "purpose": "Preserved partial verification contract.",
+      "ref": ".vibehub/tickets/ticket-verify-absorption-against-peel.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "PR 136 contains the latest main baseline and the absorption delivery with resolved merge conflicts, compatible revision-bound project data, passing checks and independently verified integration.",
+  "provenance_refs": [
+    "conversation:2026-09-07-align-pr-136-with-main",
+    "https://github.com/VW-ai/vibehub-plugin/pull/136"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-integrate-absorption-with-main"
+}
