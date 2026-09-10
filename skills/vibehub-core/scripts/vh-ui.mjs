@@ -468,6 +468,7 @@ function projectRooms(repo, repository) {
       state: item.state,
       summary: item.summary,
       path: relative(repo, path).split("\\").join("/"),
+      ...(item.type === "authority" ? { authority: authorityProjection(item) } : {}),
     }));
     const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
       const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
@@ -488,6 +489,18 @@ function projectRooms(repo, repository) {
   return { coldStart: tree.cold_start, rooms };
 }
 
+// Golden truth is shown, never edited, from the Workbench: what it governs,
+// which artifacts are canonical, and whether a change needs a person.
+function authorityProjection(context) {
+  return {
+    governs: [...context.authority.governs],
+    canonical: [...context.authority.canonical],
+    updateRules: [...context.authority.update_rules],
+    validation: [...context.authority.validation],
+    approval: context.authority.approval ?? "none",
+  };
+}
+
 function canonicalContextFromRef(repository, reference) {
   const match = reference.match(/^\.vibehub\/rooms\/((?:[a-z0-9-]+\/)+)([a-z0-9-]+)\.yaml$/u);
   if (!match || match[2] === "room") return null;
@@ -504,6 +517,7 @@ function canonicalContextFromRef(repository, reference) {
     source: context.source,
     evidence: context.evidence,
     relations: context.relations,
+    ...(context.type === "authority" ? { authority: authorityProjection(context) } : {}),
   };
 }
 

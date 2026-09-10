@@ -43,7 +43,9 @@ const CONTEXT_TYPES = new Set([
   "convention",
   "change",
   "note",
+  "authority",
 ]);
+const CONTEXT_APPROVALS = new Set(["none", "human"]);
 const CONTEXT_STATES = new Set(["active", "superseded", "archived"]);
 const OUTCOME_STATUSES = new Set([
   "successful",
@@ -1284,6 +1286,7 @@ function validateContext(document, path = "context") {
         "source",
         "evidence",
         "relations",
+        "authority",
       ]),
       path,
     )
@@ -1292,6 +1295,12 @@ function validateContext(document, path = "context") {
   if (document.kind !== "context") add(errors, `${path}.kind`, "must equal context");
   requiredString(errors, document, "context_id", path, { id: true });
   if (!CONTEXT_TYPES.has(document.type)) add(errors, `${path}.type`, "is not a supported context type");
+  if (document.type === "authority") {
+    if (!isObject(document.authority)) add(errors, `${path}.authority`, "an authority Context must carry an authority object");
+    else validateContextAuthority(errors, document.authority, `${path}.authority`);
+  } else if (document.authority !== undefined) {
+    add(errors, `${path}.authority`, "is only allowed when type equals authority");
+  }
   if (!CONTEXT_STATES.has(document.state)) add(errors, `${path}.state`, "is not a supported context state");
   requiredString(errors, document, "summary", path);
   requiredString(errors, document, "detail", path);
@@ -1326,6 +1335,42 @@ function validateContext(document, path = "context") {
     }
   });
   return errors;
+}
+
+// An authority Context is golden truth: the territory it governs (Room anchor
+// syntax), the artifacts that are the source of truth (current repository
+// paths), the ordered steps an Agent follows before changing one of them, and
+// the checks that keep implementation consistent with it. Approval defaults to
+// none: the discipline is the update rules, not a sign-off service.
+function validateContextAuthority(errors, authority, path) {
+  if (!strictKeys(errors, authority, new Set(["governs", "canonical", "update_rules", "validation", "approval"]), path)) return;
+  stringArray(errors, authority.governs ?? null, `${path}.governs`, { nonEmpty: true });
+  if (Array.isArray(authority.governs)) authority.governs.forEach((scope, index) => {
+    if (typeof scope !== "string") return;
+    const parsed = parseAnchor(scope);
+    if (parsed.error) add(errors, `${path}.governs[${index}]`, parsed.error);
+  });
+  stringArray(errors, authority.canonical ?? null, `${path}.canonical`, { nonEmpty: true });
+  if (Array.isArray(authority.canonical)) authority.canonical.forEach((ref, index) => {
+    if (typeof ref !== "string" || ref.trim() === "") return;
+    const itemPath = `${path}.canonical[${index}]`;
+    if (ref.startsWith("commit:")) {
+      add(errors, itemPath, "canonical artifact must be a current repository path, not a versioned ref");
+      return;
+    }
+    try {
+      validateContextRefPath(ref, ref);
+    } catch (error) {
+      add(errors, itemPath, error instanceof Error ? error.message : String(error));
+      return;
+    }
+    if (isInternalSourcePath(ref)) add(errors, itemPath, "canonical artifact must not live under .vibehub or .git");
+  });
+  stringArray(errors, authority.update_rules ?? null, `${path}.update_rules`, { nonEmpty: true });
+  stringArray(errors, authority.validation ?? null, `${path}.validation`, { nonEmpty: true });
+  if (authority.approval !== undefined && !CONTEXT_APPROVALS.has(authority.approval)) {
+    add(errors, `${path}.approval`, "must equal none or human");
+  }
 }
 
 function validateRoom(document, path = "room") {
@@ -2105,6 +2150,18 @@ export function loadRepository(repo, overrides = {}) {
         add(errors, path, `dangling Context relation: ${relation.target_context_id}`);
       }
     }
+    // Golden truth that points at nothing is not truth: every canonical
+    // artifact of an authority Context must be readable in the working tree.
+    if (document.type === "authority" && isObject(document.authority)) {
+      for (const ref of document.authority.canonical ?? []) {
+        if (typeof ref !== "string") continue;
+        try {
+          resolveTicketContextRef(repo, ref);
+        } catch (error) {
+          add(errors, path, `authority canonical artifact unreadable: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+    }
   }
   const recordedCommits = ticketCommitResolver(repo);
   for (const { document, path } of tickets.documents.values()) {
@@ -2304,7 +2361,8 @@ function contextOperation(operation, repo, input, options = {}) {
       );
     }
     writeDocument(path, input);
-    return { status: "written", context_id: input.context_id, room: options.room ?? null, path };
+    const advice = input.type === "authority" ? authorityPlacementAdvice(repository, options.room, input) : [];
+    return { status: "written", context_id: input.context_id, room: options.room ?? null, path, ...(advice.length ? { advice } : {}) };
   }
   if (operation === "resolve") {
     assertCurrentProjectFormat(repo);
@@ -2317,6 +2375,8 @@ function contextOperation(operation, repo, input, options = {}) {
   assertValid(repository.errors);
   if (operation === "validate") return { valid: true, context_count: repository.contexts.documents.size };
   if (operation === "coverage") return contextCoverage(repo, repository, options.room ?? null);
+  if (operation === "governing") return contextGoverning(repo, repository, input);
+  if (operation === "guard") return contextGuard(repo, repository, input);
   if (operation === "get") {
     if (typeof input.context_id !== "string" || !ID.test(input.context_id)) {
       throw new VibeHubError("invalid_input", "context get needs a valid context_id");
@@ -2351,6 +2411,161 @@ function contextOperation(operation, repo, input, options = {}) {
     return { contexts: matches, count: matches.length };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported context operation: ${operation}`);
+}
+
+// ---- Authority Context: governing lookup and the change guard ----------------
+
+function normalizeRepoPath(value) {
+  return String(value).split("/").filter((part) => part && part !== ".").join("/");
+}
+
+function repoRelative(repo, path) {
+  return relative(resolve(repo), path).split(sep).join("/");
+}
+
+function contextRoomPath(repository, contextPath) {
+  return relative(repository.paths.rooms, dirname(contextPath)).split(sep).join("/");
+}
+
+function authorityContexts(repository) {
+  return [...repository.contexts.documents.values()]
+    .filter(({ document }) => document.type === "authority" && document.state === "active" && isObject(document.authority))
+    .sort((left, right) => left.document.context_id.localeCompare(right.document.context_id));
+}
+
+// A governs entry reuses Room anchor syntax: a prefix covers every path at or
+// beneath it, a segment id covers exactly its file (a changed path cannot say
+// which segment moved, so the file is the unit the guard and lookup see).
+function scopeCovers(scope, path) {
+  const parsed = parseAnchor(scope);
+  if (parsed.error) return false;
+  return parsed.segment === null ? anchorMatches(parsed.path, path) : parsed.path === path;
+}
+
+function authorityProjection(repo, repository, { document, path }) {
+  return {
+    context_id: document.context_id,
+    room: contextRoomPath(repository, path),
+    path: repoRelative(repo, path),
+    summary: document.summary,
+    governs: [...document.authority.governs],
+    canonical: [...document.authority.canonical],
+    update_rules: [...document.authority.update_rules],
+    validation: [...document.authority.validation],
+    approval: document.authority.approval ?? "none",
+  };
+}
+
+function inputPaths(input, key, operation) {
+  if (input[key] === undefined) return null;
+  if (!Array.isArray(input[key])) throw new VibeHubError("invalid_input", `context ${operation} ${key} must be an array of repository paths`);
+  return input[key].map((value) => {
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new VibeHubError("invalid_input", `context ${operation} ${key} entries must be non-empty strings`);
+    }
+    if (isAbsolute(value) || /^[A-Za-z]:/u.test(value) || value.includes("\\") || value.split("/").includes("..")) {
+      throw new VibeHubError("invalid_input", `context ${operation} ${key} must contain repository-relative paths without parent traversal`);
+    }
+    const normalized = normalizeRepoPath(value);
+    if (!normalized) throw new VibeHubError("invalid_input", `context ${operation} ${key} must identify a repository path`);
+    return normalized;
+  });
+}
+
+// Which golden truth governs these paths? Read-only: the answer is the set of
+// active authority Contexts whose scope covers at least one path, each with the
+// exact scope entries that matched, so planning can attach them as
+// context_refs and execution can read the rules before touching territory.
+function contextGoverning(repo, repository, input) {
+  const explicit = inputPaths(input, "paths", "governing");
+  const paths = new Set(explicit ?? []);
+  if (input.ticket_id !== undefined) {
+    if (typeof input.ticket_id !== "string" || !ID.test(input.ticket_id)) {
+      throw new VibeHubError("invalid_input", "context governing ticket_id must be a valid Ticket ID");
+    }
+    const ticket = repository.tickets.documents.get(input.ticket_id)?.document;
+    if (!ticket) throw new VibeHubError("not_found", `Ticket not found: ${input.ticket_id}`);
+    for (const item of ticket.context_refs ?? []) paths.add(parseTicketContextRef(item.ref).path);
+  } else if (explicit === null) {
+    throw new VibeHubError("invalid_input", 'context governing needs {"paths":[...]} and/or {"ticket_id":"..."}');
+  }
+  const ordered = [...paths].sort();
+  const authorities = authorityContexts(repository).map((entry) => {
+    const matched = entry.document.authority.governs
+      .map((scope) => ({ scope, paths: ordered.filter((path) => scopeCovers(scope, path)) }))
+      .filter((match) => match.paths.length > 0);
+    if (matched.length === 0) return null;
+    return { ...authorityProjection(repo, repository, entry), matched };
+  }).filter(Boolean);
+  return { paths: ordered, authorities, count: authorities.length };
+}
+
+function changedWorktreePaths(repo, since) {
+  const changed = new Set();
+  if (since !== undefined) {
+    if (typeof since !== "string" || since.trim() === "") {
+      throw new VibeHubError("invalid_input", "context guard since must be a git revision");
+    }
+    const diff = git(repo, ["diff", "--name-only", "-z", since, "--"], { allowFailure: true });
+    if (diff.status !== 0) throw new VibeHubError("git_error", `context guard could not diff against ${since}`);
+    for (const entry of diff.stdout.split("\0")) if (entry) changed.add(entry);
+  }
+  const status = git(repo, ["status", "--porcelain", "-uall", "--no-renames", "-z"], { allowFailure: true });
+  if (status.status !== 0) {
+    throw new VibeHubError("git_error", 'context guard could not read git status; pass {"paths":[...]} explicitly');
+  }
+  for (const entry of status.stdout.split("\0")) if (entry.length >= 4) changed.add(entry.slice(3));
+  return [...changed];
+}
+
+// Did golden truth change without its record? For every active authority whose
+// canonical artifact is in the changed set, look for an active `change` Context
+// in that same set that relates to the authority and cites the changed
+// artifact. The guard reads; it never writes a record or a completion. The
+// changed set is explicit input, or derived from git status plus an optional
+// `since` revision so committed work on a branch is not vacuously clean.
+function contextGuard(repo, repository, input) {
+  const explicit = inputPaths(input, "paths", "guard");
+  const origin = explicit === null ? "git" : "input";
+  const changed = new Set(explicit ?? changedWorktreePaths(repo, input.since));
+  const records = [...repository.contexts.documents.values()].filter(({ document, path }) => document.type === "change"
+    && document.state === "active"
+    && !path.startsWith("<candidate:")
+    && changed.has(repoRelative(repo, path)));
+  const authorities = authorityContexts(repository).map((entry) => {
+    const changedCanonical = entry.document.authority.canonical.filter((ref) => changed.has(ref));
+    if (changedCanonical.length === 0) return null;
+    const matchingRecords = records.filter(({ document }) => document.relations.some((relation) => relation.target_context_id === entry.document.context_id));
+    const coveringRecords = changedCanonical.map((ref) => matchingRecords.find(({ document }) => document.evidence.some((item) => {
+      try { return parseTicketContextRef(item.ref).path === ref; } catch { return false; }
+    })));
+    const recorded = coveringRecords.every(Boolean);
+    const recordIds = recorded ? [...new Set(coveringRecords.map(({ document }) => document.context_id))] : [];
+    return {
+      ...authorityProjection(repo, repository, entry),
+      changed_canonical: changedCanonical,
+      status: recorded ? "recorded" : "unrecorded",
+      recorded_by: recordIds[0] ?? null,
+      ...(recordIds.length > 1 ? { recorded_by_contexts: recordIds } : {}),
+    };
+  }).filter(Boolean);
+  const violations = authorities.filter((item) => item.status === "unrecorded").map((item) => item.context_id);
+  return { origin, changed_paths: [...changed].sort(), authorities, violations, passed: violations.length === 0 };
+}
+
+// Written with the Context, not enforced: a canonical artifact outside the
+// owning Room's anchors means drift in that artifact never marks the Room, so
+// say so at write time and let the author widen the anchors.
+function authorityPlacementAdvice(repository, roomPath, document) {
+  const room = repository.rooms.documents.get(roomPath)?.document;
+  const anchors = (room?.anchors ?? []).filter((anchor) => typeof anchor === "string").map(parseAnchor).filter((anchor) => !anchor.error);
+  return document.authority.canonical
+    .filter((ref) => !anchors.some((anchor) => anchor.segment === null ? anchorMatches(anchor.path, ref) : anchor.path === ref))
+    .map((ref) => ({
+      kind: "canonical_outside_room_anchors",
+      canonical: ref,
+      message: `canonical artifact ${ref} is outside room ${roomPath}'s anchors; anchor it so drift in the golden truth marks the room`,
+    }));
 }
 
 export function ticketStatus(repository, ticket) {
