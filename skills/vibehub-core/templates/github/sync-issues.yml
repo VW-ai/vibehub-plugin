@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   sync:
+    if: ${{ vars.VIBEHUB_GITHUB_SYNC == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -42,4 +43,4 @@ jobs:
           node scripts/vibehub/sync-github-issues.mjs
           --repo .
           --github "${{ github.repository }}"
-          ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
+          ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '--publish' }}

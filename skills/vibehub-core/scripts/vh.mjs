@@ -2312,7 +2312,19 @@ export function documents(map) {
   return [...map.values()].map((entry) => entry.document);
 }
 
-function initProject(repo) {
+const LOCAL_RECORDS_RULE = "# VibeHub: keep new records local unless explicitly shared\n*\n";
+
+export function projectSharing(repo) {
+  const ignorePath=join(repo,'.vibehub','.gitignore');
+  const local=existsSync(ignorePath) && readFileSync(ignorePath,'utf8').includes(LOCAL_RECORDS_RULE);
+  const tracked=spawnSync('git',['-C',repo,'ls-files','-z','--','.vibehub/'],{encoding:'utf8'});
+  const trackedCount=tracked.status===0 ? tracked.stdout.split('\0').filter(Boolean).length : 0;
+  return { default:local?'local':'existing', github:'opt-in', tracked_records:trackedCount,
+    notice:trackedCount?'Existing tracked records remain part of repository commits. Local exclusions only protect untracked records.':local?'New records are excluded from normal Git staging.':'No managed local exclusion exists in this project.' };
+}
+
+function initProject(repo, input = {}) {
+  if(input.sharing!==undefined && !['local','shared'].includes(input.sharing)) throw new VibeHubError('invalid_input','sharing must be local or shared');
   const paths = dirs(repo);
   const compatibility = projectCompatibility(repo);
   if (
@@ -2326,6 +2338,12 @@ function initProject(repo) {
     );
   }
   for (const path of Object.values(paths)) mkdirSync(path, { recursive: true });
+  if(input.sharing!=='shared') {
+    const ignorePath=join(paths.root,'.gitignore');
+    if(existsSync(ignorePath) && lstatSync(ignorePath).isSymbolicLink()) throw new VibeHubError('invalid_input','VibeHub local exclusion must not be a symlink');
+    const existing=existsSync(ignorePath)?readFileSync(ignorePath,'utf8'):'';
+    if(!existing.includes(LOCAL_RECORDS_RULE)) writeFileSync(ignorePath,`${existing}${existing && !existing.endsWith('\n')?'\n':''}${LOCAL_RECORDS_RULE}`);
+  }
   if (!existsSync(projectFormatPath(repo))) {
     writeDocument(projectFormatPath(repo), canonicalProjectFormat());
   }
@@ -2334,6 +2352,7 @@ function initProject(repo) {
     format_version: CURRENT_PROJECT_FORMAT,
     version_path: projectFormatPath(repo),
     directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes],
+    sharing: projectSharing(repo),
   };
 }
 
@@ -4615,8 +4634,9 @@ function skillsOperation(operation, repo) {
   throw new VibeHubError("unsupported_operation", `Unsupported skills operation: ${operation}`);
 }
 
-function projectOperation(operation, repo) {
-  if (operation === "init") return initProject(repo);
+function projectOperation(operation, repo, input) {
+  if (operation === "init") return initProject(repo, input);
+  if (operation === "sharing") return projectSharing(repo);
   if (operation === "compatibility") return projectCompatibility(repo);
   if (operation === "migrate-mechanical") return migrateMechanical(repo);
   if (operation === "migrate-proof-revisions") return migrateProofRevisions(repo);

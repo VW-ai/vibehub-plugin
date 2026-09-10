@@ -17,6 +17,9 @@ export function tempRepo(label) {
 }
 
 export function run(repo, domain, operation, input, flags = []) {
+  // Historical Git-history fixtures explicitly opt into shareable records.
+  // Default local initialization is tested directly in local-defaults.test.mjs.
+  if(domain === "project" && operation === "init" && input === undefined) input = { sharing: "shared" };
   let inputPath;
   if (input !== undefined) {
     input = upgradeLegacyProofFixture(repo, input);

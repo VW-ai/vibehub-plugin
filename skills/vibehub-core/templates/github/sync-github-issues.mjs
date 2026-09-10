@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VibeHub template · plugin 0.10.0 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
+// VibeHub template · plugin 0.11.0-dev.1 · copied by vibehub-setup; keep with scripts/vh.mjs and contracts/
 // One-way projection of VibeHub Tickets onto GitHub Issues.
 //
 // Git is the source of truth. This script reads .vibehub/tickets, outcomes,
@@ -9,7 +9,7 @@
 // the Issue body; Evidence comments carry their own marker so reruns are
 // idempotent.
 //
-//   node scripts/sync-github-issues.mjs --repo . --github VW-ai/vibehub-plugin [--dry-run]
+//   node scripts/sync-github-issues.mjs --repo . --github VW-ai/vibehub-plugin (--dry-run | --publish)
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -298,7 +298,10 @@ function ensureLabels(github, dryRun, log) {
   }
 }
 
-export async function sync({ repoRoot, github, dryRun, log = console.log, writeDelayMs = 1000 }) {
+export async function sync({ repoRoot, github, dryRun = false, publish = false, log = console.log, writeDelayMs = 1000 }) {
+  if(!dryRun && publish!==true) throw new Error('GitHub publishing is disabled by default. Explicitly choose --publish or --dry-run.');
+  if(dryRun && publish) throw new Error('Choose either --publish or --dry-run.');
+  if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(github||'')) throw new Error('An explicit GitHub owner/repo is required.');
   const projection = computeProjection(repoRoot, github);
   const remote = fetchRemoteIssues(github);
   log(`${projection.length} tickets on disk, ${remote.length} issues on ${github}`);
@@ -369,30 +372,25 @@ export async function sync({ repoRoot, github, dryRun, log = console.log, writeD
 
 // ---------- CLI ----------
 
-function parseArgs(argv) {
-  const args = { repo: process.cwd(), github: null, dryRun: false };
+export function parseArgs(argv) {
+  const args = { repo: process.cwd(), github: null, dryRun: false, publish: false };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "--repo") args.repo = resolve(argv[++i]);
     else if (a === "--github") args.github = argv[++i];
     else if (a === "--dry-run") args.dryRun = true;
+    else if (a === "--publish") args.publish = true;
     else throw new Error(`unknown argument ${a}`);
   }
-  if (!args.github) {
-    const pkg = join(args.repo, "package.json");
-    if (existsSync(pkg)) {
-      const url = JSON.parse(readFileSync(pkg, "utf8")).repository?.url ?? "";
-      const m = url.match(/github\.com[/:]([^/]+\/[^/.]+)/);
-      if (m) args.github = m[1];
-    }
-  }
-  if (!args.github) throw new Error("--github owner/repo is required");
+  if(!args.dryRun && !args.publish) throw new Error('GitHub publishing is disabled by default. Explicitly choose --publish or --dry-run.');
+  if(args.dryRun && args.publish) throw new Error('Choose either --publish or --dry-run.');
+  if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(args.github||'')) throw new Error('--github owner/repo is required; the destination is never inferred');
   return args;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = parseArgs(process.argv.slice(2));
-  sync({ repoRoot: args.repo, github: args.github, dryRun: args.dryRun }).catch((error) => {
+  sync({ repoRoot: args.repo, github: args.github, dryRun: args.dryRun, publish: args.publish }).catch((error) => {
     console.error(error.message);
     process.exit(1);
   });

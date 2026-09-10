@@ -464,7 +464,11 @@ test("the implemented boundary and release documentation preserve the narrow exc
     .split("\n")
     .map((line) => line === ">" ? "" : line.replace(/^> ?/u, ""))
     .join("\n");
-  assert.equal(readFileSync(join(root, "skills", "vibehub-setup", "references", "architecture-boundary.md"), "utf8").trim(), quoted.trim());
+  const boundary = readFileSync(join(root, "skills", "vibehub-setup", "references", "architecture-boundary.md"), "utf8");
+  // The later unified-dashboard amendment expands foreground presentation,
+  // while the historical proposal still governs the one-shot upgrade lane.
+  assert.equal(boundary.split("One narrow exception", 2)[1].split("\n## Unified dashboard", 1)[0].trim(),
+    quoted.split("One narrow exception", 2)[1].trim());
 
   const install = readFileSync(join(root, "docs", "INSTALL.md"), "utf8");
   assert.match(install, /tree\/<release-tag>/u);
@@ -483,4 +487,16 @@ test("the implemented boundary and release documentation preserve the narrow exc
   const migrate = readFileSync(join(root, "skills", "vibehub-migrate", "SKILL.md"), "utf8");
   assert.match(migrate, /tell the user the\s+40-hex local migration commit for this worktree/u);
   assert.match(migrate, /do not infer a commit from branch position/u);
+});
+
+test('commit-producing upgrades preserve ignored personal records without tracking or rewriting them', t => {
+  const holder=mkdtempSync(join(tmpdir(),'vibehub-upgrade-local-')); t.after(()=>rmSync(holder,{recursive:true,force:true}));
+  const repo=initializeLegacyRepo(join(holder,'project'));
+  // Model a personal goal alongside already shared legacy project records.
+  writeFileSync(join(repo,'.vibehub','.gitignore'),'# Local records\n*\n');
+  writeFileSync(join(repo,'.vibehub','tickets','private-goal.yaml'),'private planning contents\n');
+  const before=snapshot(repo), result=invokeUpgrade(packagedBin(holder),[repo]);
+  assert.equal(result.status,0,result.stderr);
+  assert.match(result.stdout,/local-records/);
+  assert.deepEqual(snapshot(repo),before);
 });

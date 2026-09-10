@@ -4,10 +4,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { root } from "./helpers.mjs";
 
-test("setup offers the GitHub mirror once and every listed source file exists", () => {
+test("setup leaves GitHub disabled until explicitly requested and every listed source file exists", () => {
   const skill = readFileSync(join(root, "skills", "vibehub-setup", "SKILL.md"), "utf8");
-  assert.match(skill, /Optional, asked once/);
-  assert.match(skill, /nothing for an Agent to run or check/);
+  assert.match(skill, /GitHub is off by default/);
+  assert.match(skill, /Only when the user explicitly requests/);
+  assert.match(skill, /Nothing for an Agent to run or check/);
   const sources = [...skill.matchAll(/^\s+(\.\.\/vibehub-core\/[^\s]+)\s+→\s+(\S+)$/gmu)];
   assert.equal(sources.length, 6);
   for (const [, src] of sources) assert.ok(existsSync(join(root, "skills", "vibehub-setup", src)), `missing ${src}`);
