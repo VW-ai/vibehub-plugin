@@ -52,6 +52,8 @@ try {
     "skills/vibehub-core/scripts/vh.mjs",
     "skills/vibehub-core/scripts/revision-contract.mjs",
     "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-core/scripts/vh-start.mjs",
+    "skills/vibehub-core/contracts/session-entry.md",
     "skills/vibehub-review/assets/index.html",
     "skills/vibehub-review/assets/app.css",
     "skills/vibehub-review/assets/app-layout.js",
@@ -399,6 +401,19 @@ try {
   if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
     || allState.data.interventions.authority.status !== "available") {
     throw new Error("installed UI human-attention projection failed");
+  }
+  await uiHost.close();
+  uiHost = undefined;
+
+  const entryModule = await import(pathToFileURL(
+    join(artifact, "skills", "vibehub-core", "scripts", "vh-start.mjs"),
+  ).href);
+  const opened = [];
+  const entered = await entryModule.enterVibeHub({ repoRoot: repo, openUrl: (url) => opened.push(url) });
+  uiHost = entered.handle;
+  const reused = await entryModule.enterVibeHub({ repoRoot: repo, reuseUrl: entered.url, openUrl: (url) => opened.push(url) });
+  if (entered.reused || !reused.reused || reused.handle || opened.length !== 1 || reused.url !== entered.url) {
+    throw new Error("installed VibeHub entry failed automatic dashboard startup or live session reuse");
   }
   await uiHost.close();
   uiHost = undefined;
