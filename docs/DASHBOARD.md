@@ -24,9 +24,12 @@ goal lanes summarize the most urgent unfinished work. Context groups records int
 worktree provenance, and direct Room explorer links. Search keeps matching
 records inside their Rooms; empty Rooms remain visible. **Context → Project authority** collects project-level canonical design systems, infrastructure diagrams, data models, and contracts.
 Each resource opens its document first, with separate **Update rules** and **Record details** views.
-Ticket popups lead with the next action and name their prerequisites, unlocked work, and goal.
-Regular Context uses compact, searchable rows grouped by collapsible Rooms. Each row shows
-its type, title, non-active state, and linked-ticket count; select it for full details.
+Ticket popups lead with the full description, followed by saved completion criteria,
+background, and constraints. Related goals, prerequisites, and unlocked tickets are
+clickable; source paths and recorded next actions sit under collapsed Record details.
+Copy decision brief or Copy work brief carries those requirements into the agent conversation.
+Regular Context uses compact, searchable rows grouped by collapsible Rooms. Colored rails and circular nodes show recorded Room ancestry within each worktree; search retains ancestor Rooms for orientation. Within each Room, collapsible type groups (Decisions, Constraints, Contracts, and others) show record counts. Each row shows
+its title, non-active state, and linked-ticket count; select it for full details.
 Authority retains its reference cards. Evidence and file paths remain in Record details.
 Each resource exposes its canonical files, governed scope, update rules, and validation. Authority
 records retain their Room provenance; the catalog shows the selected worktree revision. Ordinary

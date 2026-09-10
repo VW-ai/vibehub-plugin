@@ -349,47 +349,64 @@
     }
     $('work').append(grid);
   }
+  let roomRailCleanup=null;
+  const contextTypeExpanded=new Map();
   function renderContexts() {
     renderContextTabs();
     const query=$('search').value.trim().toLowerCase(), records=contextRecords.filter(c=>c.type!=='authority').filter(c=>`${c.context_id} ${c.summary} ${c.detail||''} ${c.room} ${c.roomDescription||''} ${c.type} ${(c.tags||[]).join(' ')} ${c.project}`.toLowerCase().includes(query));
     const groups=new Map(); for(const record of records) { const key=`${record.workspace}:${record.room}`; if(!groups.has(key)) groups.set(key,[]); groups.get(key).push(record); }
-    const rooms=contextRooms.filter(room=>!query||groups.has(room.key)||`${room.room} ${room.roomDescription||''} ${room.project}`.toLowerCase().includes(query)).sort((a,b)=>a.project.localeCompare(b.project)||a.worktree.localeCompare(b.worktree)||a.room.localeCompare(b.room));
+    const orderedRooms=[...contextRooms].sort((a,b)=>a.project.localeCompare(b.project)||a.worktree.localeCompare(b.worktree)||a.room.localeCompare(b.room));
+    const matches=orderedRooms.filter(room=>!query||groups.has(room.key)||`${room.room} ${room.roomDescription||''} ${room.project}`.toLowerCase().includes(query)).map(room=>room.key);
+    const fullHierarchy=VibeHubRooms.hierarchy(orderedRooms), tones=new Map(fullHierarchy.map(room=>[room.key,room.tone]));
+    const rooms=VibeHubRooms.hierarchy(VibeHubRooms.matchingRooms(orderedRooms,matches)).map(room=>({...room,tone:tones.get(room.key)}));
     $('list-title').textContent='Context by Room'; $('count').textContent=`${rooms.length} ${rooms.length===1?'room':'rooms'} · ${records.length} records`;
     const toolbar=el('div',undefined,'rooms-toolbar');
     const controls=el('div',undefined,'room-controls');
-    for(const [label,open] of [['Expand all',true],['Collapse all',false]]) {const button=el('button',label);button.type='button';button.disabled=!rooms.length;button.addEventListener('click',()=>{for(const room of rooms)roomExpanded.set(room.key,open);document.querySelectorAll('.room-group').forEach(node=>{node.open=open;});});controls.append(button);}
-    toolbar.append(controls); $('work').append(toolbar);
+    for(const [label,open] of [['Expand all',true],['Collapse all',false]]) {const button=el('button',label);button.type='button';button.disabled=!rooms.length;button.addEventListener('click',()=>{for(const room of rooms)roomExpanded.set(room.key,open);document.querySelectorAll('.room-group,.context-type-group').forEach(node=>{node.open=open;if(node.dataset.groupKey)contextTypeExpanded.set(node.dataset.groupKey,open);});});controls.append(button);}
+    toolbar.append(el('p','Rooms branch from their parent. Select a record to read it.','rooms-hint'),controls); $('work').append(toolbar);
 
     if(contextLoading) $('work').append(el('p','Reading Rooms from connected worktrees…','context-notice'));
     if(contextErrors.length) { const details=el('details',undefined,'context-errors'); details.append(el('summary',`${contextErrors.length} worktrees could not be read`)); for(const error of contextErrors) details.append(el('p',error)); $('work').append(details); }
     if(!rooms.length && !contextLoading) $('work').append(el('p',query?'No Rooms or Context records match your search.':'No Rooms recorded in this workspace yet. Context saved through VibeHub will appear in its Room.','empty'));
-    const list=el('div',undefined,'room-groups');
+    const list=el('div',undefined,'room-groups room-branches'), entries=[];
+    list.style.setProperty('--room-depth',Math.max(0,...rooms.map(room=>room.depth)));
     for(const room of rooms) {
       const group=groups.get(room.key)||[], section=el('details',undefined,'room-group'); section.open=query?true:roomExpanded.get(room.key)!==false;
-      const summary=el('summary',undefined,'room-heading'), icon=el('span','▱','room-icon'); icon.setAttribute('aria-hidden','true');
-      const copy=el('span',undefined,'room-heading-copy');copy.append(el('strong',room.room,'room-name'),el('span',selected?`${group.filter(c=>c.state==='active').length} active records`:`${room.project} · ${room.branch}`,'room-location'));
-      const count=el('span',`${group.length} ${group.length===1?'record':'records'}`,'room-record-count'), chevron=el('span','⌄','room-chevron');chevron.setAttribute('aria-hidden','true');summary.append(icon,copy,count,chevron);section.append(summary);
+      const summary=el('summary',undefined,'room-heading');section.classList.add(`tone-${room.tone}`);
+      const copy=el('span',undefined,'room-heading-copy');copy.append(el('strong',room.room.split('/').pop(),'room-name'),el('span',room.parent?`in ${room.parent}`:selected?'Root Room':`${room.project} · ${room.branch}`,'room-location'));
+      const count=el('span',`${group.length} ${group.length===1?'record':'records'}`,'room-record-count'), chevron=el('span','⌄','room-chevron');chevron.setAttribute('aria-hidden','true');summary.append(copy,count,chevron);section.append(summary);
       section.addEventListener('toggle',()=>{if(!query&&section.isConnected)roomExpanded.set(room.key,section.open);});
       const body=el('div',undefined,'room-contents');
       if(room.roomDescription)body.append(el('p',room.roomDescription,'room-description'));
       if(room.parent)body.append(el('p',`Parent Room: ${room.parent}`,'room-parent'));
-      const rank={authority:0,decision:1,constraint:2,contract:3,intent:4,convention:5,change:6,note:7};
-      const rows=el('ul',undefined,'context-rows');rows.setAttribute('aria-label',`${room.room} Context records`);
-      for(const record of [...group].sort((x,y)=>(x.state==='active'?0:1)-(y.state==='active'?0:1)||(rank[x.type]??9)-(rank[y.type]??9)||x.summary.localeCompare(y.summary))) {
-        const kind=contextKind(record.type), row=el('li'), button=el('button',undefined,`context-row kind-${record.type}`);button.type='button';
-        button.append(el('span',kind.label,'context-row-type'),el('strong',record.summary,'context-row-title'));
-        const meta=el('span',undefined,'context-row-meta');
-        if(record.state!=='active')meta.append(el('span',record.state,'context-state'));
-        const used=record.consumingTickets||[];if(used.length)meta.append(el('span',plural(used.length,'ticket'),'context-row-used'));
-        button.append(meta);const arrow=el('span','→','context-row-arrow');arrow.setAttribute('aria-hidden','true');button.append(arrow);
-        button.addEventListener('click',()=>showContext(record,button));row.append(button);rows.append(row);
+      for(const {type,records:typeRecords} of VibeHubRooms.groupByType(group)) {
+        const kind=contextKind(type), typeKey=`${room.key}:${type}`;
+        const typeGroup=el('details',undefined,`context-type-group kind-${type}`);
+        typeGroup.dataset.groupKey=typeKey;typeGroup.open=query?true:contextTypeExpanded.get(typeKey)!==false;
+        const typeHeading=el('summary',undefined,'context-type-heading');
+        const label={decision:'Decisions',constraint:'Constraints',contract:'Contracts',intent:'Intents',convention:'Conventions',change:'Changes',note:'Notes'}[type]||kind.label;
+        typeHeading.append(el('strong',label),el('span',String(typeRecords.length),'context-type-count'));
+        const chevron=el('span','⌄','context-type-chevron');chevron.setAttribute('aria-hidden','true');typeHeading.append(chevron);
+        typeGroup.append(typeHeading);
+        typeGroup.addEventListener('toggle',()=>{if(!query&&typeGroup.isConnected)contextTypeExpanded.set(typeKey,typeGroup.open);});
+        const rows=el('ul',undefined,'context-rows');rows.setAttribute('aria-label',`${room.room} ${label}`);
+        for(const record of typeRecords) {
+          const row=el('li'), button=el('button',undefined,`context-row kind-${record.type}`);button.type='button';
+          button.append(el('strong',record.summary,'context-row-title'));
+          const meta=el('span',undefined,'context-row-meta');
+          if(record.state!=='active')meta.append(el('span',record.state,'context-state'));
+          const used=record.consumingTickets||[];if(used.length)meta.append(el('span',plural(used.length,'ticket'),'context-row-used'));
+          button.append(meta);const arrow=el('span','→','context-row-arrow');arrow.setAttribute('aria-hidden','true');button.append(arrow);
+          button.addEventListener('click',()=>showContext(record,button));row.append(button);rows.append(row);
+        }
+        typeGroup.append(rows);body.append(typeGroup);
       }
-      body.append(rows);
       if(!group.length)body.append(el('p',query?'No matching records in this Room.':'No Context recorded in this Room yet.','room-empty'));
       const link=el('a','Open Room explorer ↗','room-explorer-link'), url=new URL('/',location.origin);url.searchParams.set('workspace',room.workspace);url.searchParams.set('surface','rooms');url.searchParams.set('room',room.room);url.hash=token;link.href=url.href;body.append(link);
-      section.append(body); list.append(section);
+      section.append(body); list.append(section);entries.push({room,section});
     }
     $('work').append(list);
+    roomRailCleanup=VibeHubRooms.connect(list,entries);
   }
   function renderSummary() {
     const scoped=selectedGoal ? [items.find(t=>t.id===selectedGoal),...scopeItems()].filter(Boolean) : items, tickets=scoped.filter(t=>t.type!=='goal');
@@ -477,6 +494,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
   }
   function renderWork(emptyTitle, emptyText) {
     if (!data) return;
+    roomRailCleanup?.();roomRailCleanup=null;
     canvasObserver?.disconnect(); canvasObserver=null; $('work').replaceChildren(); $('work').classList.remove('with-queue'); renderGoals(); renderHierarchy(); renderSummary(); renderGoalProgress(); if(surface==='authority') {renderAuthorities();return;} if(surface==='contexts') { renderContexts(); return; } const visible = scopeItems().filter(matches);
     $('legend').hidden = view !== 'canvas';
     document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
@@ -644,28 +662,39 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
     }
     catch { document.querySelector('.start').open = true; $('request').value = text; $('request').focus(); $('request').select(); status('Clipboard unavailable. The text is selected; copy it manually.'); }
   }
+  let ticketDetailCleanup=null;
   function showDetail(item, trigger) {
+    const focusOrigin=trigger.closest('#inspector')?lastFocused:trigger;
     closeDetail(false);
     document.querySelectorAll('.work-card[aria-pressed=true],.board-card[aria-pressed=true]').forEach(card => card.setAttribute('aria-pressed', 'false'));
-    trigger.setAttribute('aria-pressed', 'true');
-    lastFocused = trigger;  $('detail-kind').textContent = `${item.type.toUpperCase()} · ${item.state}`;
-    $('detail-title').textContent = item.title; $('detail-outcome').textContent = item.outcome; $('detail-outcome').hidden=!item.outcome || item.outcome.trim()===item.title.trim(); $('detail-meta').replaceChildren(); $('detail-actions').replaceChildren();
-    const workflow=workflowFor(item,items,edges);
-    $('detail-kind').textContent=`${item.type==='goal'?'Goal':'Ticket'} · ${workflow.label}`;
-    const dependencies = edges.filter((e) => !e.membership && e.to === item.id).map((e) => items.find((t) => t.id === e.from)?.title || e.from);
-    const dependents = edges.filter((e) => !e.membership && e.from === item.id).map((e) => items.find((t) => t.id === e.to)?.title || e.to);
-    for (const [key, value] of [['Source', item.path], ['Prerequisites', dependencies.join(', ') || 'None'], ['Unlocks', dependents.join(', ') || 'None'], ['Goal', item.relations.filter((r) => ['task_of','sub_goal_of'].includes(r.type)).map((r) => items.find(t=>t.id===r.target)?.title||r.target).join(', ') || 'Unassigned'], ['Next action', workflow.detail]]) {
-      $('detail-meta').append(el('dt', key), el('dd', value));
-    }
-    const next=el('section',undefined,`ticket-next-step stage-${workflow.lane}`);next.append(el('strong',workflow.lane==='attention'?'Your input is needed':workflow.label),el('p',({attention:'This ticket is waiting for your decision. Review the request above to unblock the affected work.',running:'Agent activity is recorded for this ticket. Refresh to check for updates.',ready:'This ticket has an actionable next step for an agent.',planned:'The plan or acceptance criteria need attention before execution.',waiting:'This ticket is waiting for its prerequisites.',completed:'This ticket is recorded as complete.'})[workflow.lane]||workflow.label));
-    if(workflow.lane==='attention')next.append(el('small','Copy the decision context to your agent to review the options. This does not approve or change the ticket.'));
-    $('detail-meta').before(next);
-    detailTabs([['Task details',['Prerequisites','Unlocks','Goal']],['Record details',['Source','Next action']]],'Task details');
-    const copy = el('button', workflow.lane==='attention'?'Copy decision context':'Copy work context'); copy.type = 'button'; copy.addEventListener('click', () => copyText(`${item.title}\nSource: ${item.path}\n${item.outcome}\nNext action: ${workflow.detail}\n${workflow.lane==='attention'?'Help me review this decision. Prepare options and tradeoffs; do not treat this request as approval.':''}`)); $('detail-actions').append(copy);
-    if (item.ticket) { const link = el('a', 'Open contract & evidence ↗'); link.href = inspectorLink(item.originalId || item.id, item.workspace || selected); $('detail-actions').append(link); }
-    if(!$('inspector').open) $('inspector').showModal(); $('inspector').scrollTop=0; $('close-detail').focus();
+    trigger.setAttribute('aria-pressed', 'true');lastFocused=focusOrigin;
+    const workflow=workflowFor(item,items,edges), workspace=item.workspace||selected;
+    $('inspector').classList.add('ticket-dialog');
+    $('detail-kind').textContent=`Ticket · ${workflow.label}`;
+    $('detail-title').textContent=item.title;$('detail-outcome').hidden=true;
+    $('detail-meta').replaceChildren();$('detail-actions').replaceChildren();
+    const content=el('div',undefined,'ticket-content');$('detail-meta').before(content);
+    const related=(ids)=>ids.map(id=>items.find(item=>item.id===id)||{id,title:id,type:'missing'});
+    ticketDetailCleanup=VibeHubTicket.mount({container:content,item,workflow,
+      dependencies:related(edges.filter(e=>!e.membership&&e.to===item.id).map(e=>e.from)),
+      dependents:related(edges.filter(e=>!e.membership&&e.from===item.id).map(e=>e.to)),
+      goals:related(item.relations.filter(r=>['task_of','sub_goal_of'].includes(r.type)).map(r=>r.target)),
+      navigate:(target,button)=>{if(target.type==='missing')return;if(target.type==='goal'){closeDetail();selectGoal(target.id);}else showDetail(target,button);},
+      copy:copyText,contractUrl:item.ticket?inspectorLink(item.originalId||item.id,workspace):null,
+      loadDetails:async()=>{
+        const query=new URLSearchParams({workspace}), state=await api(`/api/state?${query}`);
+        query.set('snapshotId',state.graph.snapshotId);query.set('kind','ticket');query.set('ticketId',item.originalId||item.id);
+        const result=await api(`/api/subject?${query}`);return result.subject.contextPackage;
+      },
+    });
+    if(!$('inspector').open)$('inspector').showModal();$('inspector').scrollTop=0;$('close-detail').focus();
   }
-  function closeDetail(restore = true) { document.querySelector('.detail-view-tabs')?.remove();document.querySelector('.ticket-next-step')?.remove();$('inspector').classList.remove('reference-dialog');if($('inspector').open) $('inspector').close(); lastFocused?.setAttribute('aria-pressed', 'false'); if (restore && lastFocused?.isConnected) lastFocused.focus(); }
+  function closeDetail(restore = true) {
+    ticketDetailCleanup?.();ticketDetailCleanup=null;document.querySelector('.ticket-content')?.remove();
+    document.querySelector('.detail-view-tabs')?.remove();document.querySelector('.ticket-next-step')?.remove();
+    $('inspector').classList.remove('reference-dialog','ticket-dialog');if($('inspector').open)$('inspector').close();
+    lastFocused?.setAttribute('aria-pressed','false');if(restore&&lastFocused?.isConnected)lastFocused.focus();
+  }
   async function loadRepositoryTickets() {
     const turn = generation;
     repositoryItems = []; repositoryEdges = []; sourceWarnings = [];
