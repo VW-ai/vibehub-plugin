@@ -2525,7 +2525,9 @@ function changedWorktreePaths(repo, since) {
     if (typeof since !== "string" || since.trim() === "") {
       throw new VibeHubError("invalid_input", "context guard since must be a git revision");
     }
-    const diff = git(repo, ["diff", "--name-only", "-z", since, "--"], { allowFailure: true });
+    const revision = git(repo, ["rev-parse", "--verify", "--end-of-options", `${since}^{commit}`], { allowFailure: true });
+    if (revision.status !== 0) throw new VibeHubError("git_error", `context guard could not resolve revision ${since}`);
+    const diff = git(repo, ["diff", "--name-only", "-z", revision.stdout.trim(), "--"], { allowFailure: true });
     if (diff.status !== 0) throw new VibeHubError("git_error", `context guard could not diff against ${since}`);
     for (const entry of diff.stdout.split("\0")) if (entry) changed.add(entry);
   }

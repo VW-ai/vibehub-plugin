@@ -4,7 +4,7 @@
 // meaning.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
@@ -208,6 +208,9 @@ test("context guard derives the changed set from git status and an optional sinc
   assert.equal(recorded.envelope.data.passed, true, JSON.stringify(recorded.envelope.data));
   assert.equal(recorded.envelope.data.authorities[0].recorded_by, "change-add-session-service");
   assert.equal(run(repo, "context", "guard", { since: "not-a-revision" }).envelope.error.code, "git_error");
+  const injected = join(repo, "injected-output.txt");
+  assert.equal(run(repo, "context", "guard", { since: `--output=${injected}` }).envelope.error.code, "git_error");
+  assert.equal(existsSync(injected), false, "revision input cannot become a Git option");
 });
 
 test("the Rooms projection marks authority Context with its scope and canonical artifacts", () => {
