@@ -610,6 +610,8 @@ function processWorktree(repository, worktree) {
   if (operation) return pending(result, "git-operation-in-progress", operation);
   maybeFail("after-operation-preflight");
   if (statusBytes(canonical).length !== 0) return pending(result, "dirty-worktree");
+  const ignoredRecords = text(git(canonical, ["ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", ".vibehub/"]));
+  if (ignoredRecords.length) return pending(result, "local-records", "Ignored VibeHub records remain local. Use the local migration helpers; the commit-producing upgrader must not track personal records.");
   let baselineIndex;
   try {
     baselineIndex = readFileSync(indexPath(canonical));

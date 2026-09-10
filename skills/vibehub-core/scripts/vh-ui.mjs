@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import http from "node:http";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertValid,
@@ -27,6 +27,8 @@ import {
   evidenceBoundReferenceMap,
 } from "./revision-contract.mjs";
 
+import { discoverDashboard, readPersonalStore } from "./dashboard-data.mjs";
+
 const LOOPBACK_HOST = "127.0.0.1";
 const HOST_SCHEMA_VERSION = 1;
 const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
@@ -35,6 +37,11 @@ const TICKET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const FOCUS_VIEWS = new Set(["execution", "contract", "log"]);
 const ROOM_PATH_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/u;
 const ASSET_FILES = new Map([
+  ["/dashboard", ["dashboard.html", "text/html; charset=utf-8"]],
+  ["/dashboard.css", ["dashboard.css", "text/css; charset=utf-8"]],
+  ["/dashboard.js", ["dashboard.js", "text/javascript; charset=utf-8"]],
+  ["/dashboard-preview.js", ["dashboard-preview.js", "text/javascript; charset=utf-8"]],
+  ["/dashboard-graph.js", ["dashboard-graph.js", "text/javascript; charset=utf-8"]],
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/app.css", ["app.css", "text/css; charset=utf-8"]],
@@ -468,6 +475,7 @@ function projectRooms(repo, repository) {
       state: item.state,
       summary: item.summary,
       path: relative(repo, path).split("\\").join("/"),
+      ...(item.type === "authority" ? { authority: authorityProjection(item) } : {}),
     }));
     const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
       const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
@@ -488,6 +496,18 @@ function projectRooms(repo, repository) {
   return { coldStart: tree.cold_start, rooms };
 }
 
+// Golden truth is shown, never edited, from the Workbench: what it governs,
+// which artifacts are canonical, and whether a change needs a person.
+function authorityProjection(context) {
+  return {
+    governs: [...context.authority.governs],
+    canonical: [...context.authority.canonical],
+    updateRules: [...context.authority.update_rules],
+    validation: [...context.authority.validation],
+    approval: context.authority.approval ?? "none",
+  };
+}
+
 function canonicalContextFromRef(repository, reference) {
   const match = reference.match(/^\.vibehub\/rooms\/((?:[a-z0-9-]+\/)+)([a-z0-9-]+)\.yaml$/u);
   if (!match || match[2] === "room") return null;
@@ -504,6 +524,7 @@ function canonicalContextFromRef(repository, reference) {
     source: context.source,
     evidence: context.evidence,
     relations: context.relations,
+    ...(context.type === "authority" ? { authority: authorityProjection(context) } : {}),
   };
 }
 
@@ -962,6 +983,8 @@ export function startVibeHubUi({
   view = null,
   rooms = false,
   room = null,
+  dashboardRoots = null,
+  personalStore = null,
 } = {}) {
   if (!repoRoot) throw new Error("repoRoot is required");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
@@ -971,9 +994,13 @@ export function startVibeHubUi({
     throw new Error("tokenLifetimeMs must be a positive integer");
   }
   validateFocus(ticket, view, rooms, room);
+  if (dashboardRoots && (ticket || view || rooms || room)) throw new Error("Dashboard focus must be selected in the browser.");
   if (!existsSync(resolve(repoRoot))) throw new Error(`Repository does not exist: ${repoRoot}`);
   assertAssets(assetRoot);
-  const initialSnapshot = buildUiSnapshot(repoRoot);
+  const discoverConnected = () => discoverDashboard(dashboardRoots, { projectRefs: readPersonalStore(personalStore).tickets.flatMap(ticket => ticket.projects) });
+  let dashboard = dashboardRoots ? discoverConnected() : null;
+  const workspaces = new Map((dashboard?.projects || []).flatMap((project) => project.worktrees.map((tree) => [tree.id, tree])));
+  const initialSnapshot = dashboard ? null : buildUiSnapshot(repoRoot);
   if (ticket !== null
     && !initialSnapshot.state.graph.tickets.some((item) => item.ticketId === ticket)) {
     throw new Error(`Unknown Ticket for --ticket: ${ticket}`);
@@ -985,6 +1012,11 @@ export function startVibeHubUi({
   let origin = null;
   let closed = false;
   let expiry = null;
+  const renewSession = () => {
+    if (expiry) clearTimeout(expiry);
+    expiry = setTimeout(() => server.close(), tokenLifetimeMs);
+    expiry.unref();
+  };
   let resolveClosed;
   const closedPromise = new Promise((resolveClosedPromise) => {
     resolveClosed = resolveClosedPromise;
@@ -1013,9 +1045,71 @@ export function startVibeHubUi({
         throw new UiError(404, "not_found", "Route not found");
       }
       requireBearer(request, token);
+      if (url.pathname === "/api/session-active" && dashboard) {
+        renewSession();
+        writeJson(response, 200, { ok: true, data: { idleTimeoutMs: tokenLifetimeMs } });
+        return;
+      }
+      if (url.pathname === "/api/dashboard") {
+        if (!dashboard) throw new UiError(404, "not_found", "Launch with --dashboard to connect projects.");
+        dashboard = discoverConnected();
+        workspaces.clear();
+        for (const project of dashboard.projects) for (const tree of project.worktrees) workspaces.set(tree.id, tree);
+        writeJson(response, 200, { ok: true, data: { ...dashboard, roots: dashboardRoots.map((root) => resolve(root)), personalStore, personal: readPersonalStore(personalStore) } });
+        return;
+      }
+      const workspaceId = url.searchParams.get("workspace");
+      const workspace = workspaceId ? workspaces.get(workspaceId) : null;
+      if (workspaceId && !workspace) throw new UiError(404, "unknown_workspace", "Workspace was not discovered by this launcher.");
+      if (dashboard && !workspace) throw new UiError(400, "workspace_required", "Select a workspace from the dashboard.");
+      if (url.pathname === "/api/authority-preview") {
+        const root = realpathSync(workspace?.path || repoRoot);
+        const repository = loadRepository(root);
+        assertValid(repository.errors);
+        const record = repository.contexts.documents.get(url.searchParams.get("context"))?.document;
+        const index = url.searchParams.get("artifact") || "0";
+        if (record?.type !== "authority" || !/^\d+$/u.test(index) || !record.authority.canonical[Number(index)]) {
+          throw new UiError(404, "unknown_artifact", "Choose a canonical artifact from this Authority.");
+        }
+        const ref = record.authority.canonical[Number(index)];
+        const path = resolve(root, ref.split("#")[0]);
+        const inside = candidate => { const rel = relative(root, candidate); return rel && !isAbsolute(rel) && rel !== ".." && !rel.startsWith("../") && !/^(?:\.git|\.vibehub)(?:\/|$)/u.test(rel); };
+        if (!inside(path) || !existsSync(path) || !inside(realpathSync(path))) {
+          throw new UiError(403, "unavailable_artifact", "This canonical file is not available inside the selected worktree.");
+        }
+        const extension = extname(path).toLowerCase();
+        const images = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml" };
+        const texts = new Set([".md", ".markdown", ".txt", ".json", ".yaml", ".yml", ".csv", ".tsv", ".sql", ".js", ".ts", ".css", ".html", ".mmd", ".mermaid"]);
+        const mime = images[extension], file = statSync(path);
+        if (!file.isFile() || (!mime && !texts.has(extension))) throw new UiError(415, "unsupported_preview", "This file format has no inline preview yet.");
+        if (file.size > (mime ? 2_000_000 : 512_000)) throw new UiError(413, "preview_too_large", "This file is too large for an inline preview.");
+        const bytes = readFileSync(path);
+        if (!mime && bytes.includes(0)) throw new UiError(415, "unsupported_preview", "Binary content cannot be previewed as text.");
+        writeJson(response, 200, { ok: true, data: { ref, extension, kind: mime ? "image" : "text", mime, content: bytes.toString(mime ? "base64" : "utf8") } });
+        return;
+      }
+      if (url.pathname === "/api/contexts") {
+        const repo = workspace?.path || repoRoot;
+        const repository = loadRepository(repo); assertValid(repository.errors);
+        // Which Tickets read each record is the first thing a reader wants to
+        // know about it, so the projection carries it per Context.
+        const ticketDocuments = documents(repository.tickets.documents);
+        const rooms = projectRooms(repo, repository).rooms.map(room => ({ ...room, contexts: room.contexts.map(context => ({
+          ...repository.contexts.documents.get(context.contextId).document, path: context.path,
+          consumingTickets: ticketDocuments.filter(ticket => ticket.context_refs.some(({ ref }) => ref === context.path)).map(ticket => ticket.ticket_id).sort(),
+        })) }));
+        writeJson(response, 200, { ok: true, data: { rooms } });
+        return;
+      }
+      if (url.pathname === "/api/tickets") {
+        const repository = loadRepository(workspace?.path || repoRoot);
+        assertValid(repository.errors);
+        writeJson(response, 200, { ok: true, data: projectGraph(repository, queryOptionsFromUrl(url)) });
+        return;
+      }
       let snapshot;
       try {
-        snapshot = buildUiSnapshot(repoRoot, queryOptionsFromUrl(url));
+        snapshot = buildUiSnapshot(workspace?.path || repoRoot, queryOptionsFromUrl(url));
       } catch (error) {
         if (error?.code === "invalid_argument") {
           throw new UiError(400, "invalid_filter", error.message, error.details ?? null);
@@ -1048,11 +1142,10 @@ export function startVibeHubUi({
         return;
       }
       origin = `http://${LOOPBACK_HOST}:${address.port}`;
-      expiry = setTimeout(() => server.close(), tokenLifetimeMs);
-      expiry.unref();
+      renewSession();
       resolveReady({
         origin,
-        url: focusedUrl(origin, token, ticket, view, rooms, room),
+        url: dashboard ? `${origin}/dashboard#${token}` : focusedUrl(origin, token, ticket, view, rooms, room),
         port: address.port,
         expiresInMs: tokenLifetimeMs,
         focus: { ticket, view, rooms: rooms || room !== null, room },
@@ -1082,9 +1175,19 @@ export function parseUiFlags(argv) {
   let view = null;
   let rooms = false;
   let room = null;
+  const roots = [];
+  let dashboard = false;
+  let personalStore = null;
   const seen = new Set();
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index];
+    if (flag === "--root" || flag === "--personal-store") {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
+      if (flag === "--root") roots.push(resolve(value));
+      else personalStore = resolve(value);
+      continue;
+    }
     if (seen.has(flag)) throw new Error(`repeated flag: ${flag}`);
     seen.add(flag);
     if (flag === "--repo" || flag === "--port"
@@ -1104,13 +1207,18 @@ export function parseUiFlags(argv) {
     else if (flag === "--no-open") open = false;
     else if (flag === "--json") json = true;
     else if (flag === "--rooms") rooms = true;
+    else if (flag === "--dashboard") dashboard = true;
     else throw new Error(`unknown flag: ${flag}`);
   }
   validateFocus(ticket, view, rooms, room);
-  return { repo: resolve(repo), port, open, json, ticket, view, rooms: rooms || room !== null, room };
+  if ((roots.length || personalStore) && !dashboard) throw new Error("--root and --personal-store require --dashboard");
+  if (dashboard && (ticket || view || rooms || room)) throw new Error("Select Ticket or Room focus from the dashboard.");
+  const flags = { repo: resolve(repo), port, open, json, ticket, view, rooms: rooms || room !== null, room };
+  if (dashboard) Object.assign(flags, { dashboardRoots: roots.length ? roots : [resolve(repo)], personalStore });
+  return flags;
 }
 
-function openBrowser(url) {
+export function openBrowser(url) {
   const command = process.platform === "darwin"
     ? { file: "open", args: [url] }
     : process.platform === "win32"
@@ -1127,6 +1235,8 @@ async function launch(argv) {
   const flags = parseUiFlags(argv);
   const handle = startVibeHubUi({
     repoRoot: flags.repo,
+    dashboardRoots: flags.dashboardRoots,
+    personalStore: flags.personalStore,
     port: flags.port,
     ticket: flags.ticket,
     view: flags.view,

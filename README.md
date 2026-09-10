@@ -26,9 +26,17 @@ Then open the repository in a fresh Agent session, describe one concrete deliver
 
 - **One Ticket per request, in Git.** Acceptance contracts evolve through append-only revisions; Evidence and Outcomes bind the exact revision they judged. Old success remains readable history without silently closing a newer contract, and every record stays an ordinary file next to the code.
 - **A graph of the work, not a list.** The local Workbench shows DRAFT, READY, RUNNING, and DONE Tickets with their real prerequisites and unlocks, and tells you the next action.
-- **Your team sees it on GitHub.** Every Ticket on `main` mirrors one-way to a GitHub Issue — checklist, Evidence comments, native *Blocked by* links — with no Agent in the loop.
+- **Local by default.** Goals, Tickets, and Context work without GitHub. Sharing records and mirroring them to Issues are explicit opt-ins.
 
 <img src="docs/assets/local-graph/quiet-workbench-desktop-2x.png" alt="VibeHub four-phase Ticket Workbench showing the current causal graph" width="1280">
+
+## One home for your work
+
+VibeHub opens its local dashboard when you choose to use it. Navigate projects and
+worktrees, track goal progress, and open executable tickets with human decisions first.
+Context is grouped into Rooms, with canonical references under Project authority.
+Records stay local by default; GitHub sharing is opt-in. See the [dashboard guide](docs/DASHBOARD.md)
+for navigation, previews, session behavior, and manual startup.
 
 ## How it works
 
@@ -37,7 +45,7 @@ Describe one coding request and say the line above. The request and exact Contex
 1. **Plan** — the request plus checked-in Context becomes one Ticket with explicit acceptance criteria, dependencies, and constraints.
 2. **Run** — an Agent executes from that contract and appends Evidence linked to each criterion.
 3. **Close** — a *separate* Agent adjudicates every criterion and writes the Outcome; a criterion can name a human as its decision owner.
-4. **Learn** — durable decisions return to Rooms of Context that the next Ticket reads.
+4. **Learn** — durable decisions return to Rooms of Context that the next Ticket reads. Golden truth such as an architecture graph or a game's contracts lives there as `authority` Context with update rules; Agents follow it, and a canonical change without its record blocks closeout.
 
 ## See what matters now
 
@@ -53,7 +61,7 @@ Describe one coding request and say the line above. The request and exact Contex
 
 <img src="docs/assets/github-issues/issue-blocked-by-2x.png" alt="A mirrored VibeHub Ticket as a GitHub Issue with state labels and a native Blocked-by relationship" width="1280">
 
-Git stays the source of truth; GitHub Issues are its read-only projection. A workflow runs on every push to `main`, upserts one Issue per Ticket with the acceptance checklist, one comment per Evidence record, `state:` and `maturity:` labels, and native *Blocked by / Blocking* relationships, and closes the Issue when the Outcome is successful. Nobody — human or Agent — runs a sync. Project setup offers it once; [docs/GITHUB_ISSUES.md](docs/GITHUB_ISSUES.md) explains the mirror and which views to use.
+GitHub integration is disabled by default. After explicit setup and enabling `VIBEHUB_GITHUB_SYNC=true`, GitHub Issues project the records you choose to share. The workflow runs on pushes to `main`, upserts one Issue per Ticket with the acceptance checklist, one comment per Evidence record, `state:` and `maturity:` labels, and native *Blocked by / Blocking* relationships, and closes the Issue when the Outcome is successful. Nobody — human or Agent — runs a sync. Project setup only installs it on request; [docs/GITHUB_ISSUES.md](docs/GITHUB_ISSUES.md) explains the mirror and which views to use.
 
 ## Learn more
 

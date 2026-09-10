@@ -4,24 +4,80 @@
   "title": "VibeHub Context",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "context_id", "type", "state", "summary", "detail", "tags", "source", "evidence", "relations"],
+  "required": [
+    "schema_version",
+    "kind",
+    "context_id",
+    "type",
+    "state",
+    "summary",
+    "detail",
+    "tags",
+    "source",
+    "evidence",
+    "relations"
+  ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "kind": { "const": "context" },
-    "context_id": { "$ref": "#/$defs/id" },
-    "type": { "enum": ["intent", "decision", "constraint", "contract", "convention", "change", "note"] },
-    "state": { "enum": ["active", "superseded", "archived"] },
-    "summary": { "$ref": "#/$defs/text" },
-    "detail": { "$ref": "#/$defs/text" },
-    "tags": { "type": "array", "items": { "$ref": "#/$defs/text" }, "uniqueItems": true },
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "context"
+    },
+    "context_id": {
+      "$ref": "#/$defs/id"
+    },
+    "type": {
+      "enum": [
+        "intent",
+        "decision",
+        "constraint",
+        "contract",
+        "convention",
+        "change",
+        "note",
+        "authority"
+      ],
+      "description": "authority marks golden truth: an artifact-backed Context that governs repository territory and carries the update rules an Agent must follow; contract remains long-range prose."
+    },
+    "state": {
+      "enum": [
+        "active",
+        "superseded",
+        "archived"
+      ]
+    },
+    "summary": {
+      "$ref": "#/$defs/text"
+    },
+    "detail": {
+      "$ref": "#/$defs/text"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      },
+      "uniqueItems": true
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ref", "captured_at"],
+      "required": [
+        "ref",
+        "captured_at"
+      ],
       "properties": {
-        "ref": { "$ref": "#/$defs/text" },
-        "quote": { "$ref": "#/$defs/text" },
-        "captured_at": { "type": "string", "format": "date-time" }
+        "ref": {
+          "$ref": "#/$defs/text"
+        },
+        "quote": {
+          "$ref": "#/$defs/text"
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "evidence": {
@@ -30,8 +86,18 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ref", "note"],
-        "properties": { "ref": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" } }
+        "required": [
+          "ref",
+          "note"
+        ],
+        "properties": {
+          "ref": {
+            "$ref": "#/$defs/text"
+          },
+          "note": {
+            "$ref": "#/$defs/text"
+          }
+        }
       }
     },
     "relations": {
@@ -39,16 +105,104 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["type", "target_context_id"],
+        "required": [
+          "type",
+          "target_context_id"
+        ],
         "properties": {
-          "type": { "enum": ["relates_to", "depends_on", "supersedes"] },
-          "target_context_id": { "$ref": "#/$defs/id" }
+          "type": {
+            "enum": [
+              "relates_to",
+              "depends_on",
+              "supersedes"
+            ]
+          },
+          "target_context_id": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Required when type equals authority and forbidden otherwise. Governed scope reuses Room anchor syntax; canonical artifacts are current repository paths outside .vibehub that must exist; update_rules are followed in order before a canonical artifact changes; validation lists the checks that keep implementation consistent; approval defaults to none and human only when the Context itself reserves the change to a person.",
+      "required": [
+        "governs",
+        "canonical",
+        "update_rules",
+        "validation"
+      ],
+      "properties": {
+        "governs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "canonical": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "update_rules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "validation": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "approval": {
+          "enum": [
+            "none",
+            "human"
+          ]
         }
       }
     }
   },
   "$defs": {
-    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  },
+  "if": {
+    "properties": {
+      "type": {
+        "const": "authority"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "authority"
+    ]
+  },
+  "else": {
+    "not": {
+      "required": [
+        "authority"
+      ]
+    }
   }
 }

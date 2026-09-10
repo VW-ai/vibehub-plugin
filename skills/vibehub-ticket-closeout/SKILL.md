@@ -5,6 +5,27 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 
 # VibeHub Ticket Closeout
 
+## Optional workflow and unrestricted responses
+
+Use this Skill when the user requests its VibeHub operation or has already
+chosen VibeHub for the current work. Installation alone does not opt a user
+into ticketing. Ordinary chat, exploration, and implementation can continue
+without a Ticket, a special phrase, or a prescribed response format. Users can
+leave the workflow at any time; do not block their work for missing VibeHub
+records. Never truncate, rewrite, suppress, or withhold a model response to
+satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
+writes only, not the model's answer or the user's ability to work.
+
+
+
+## Automatic dashboard entry
+
+Before the first user-facing operation in an opted-in VibeHub session, follow
+`../vibehub-core/contracts/session-entry.md`: run the bundled `vh-start.mjs`
+entry helper, reuse the session's existing dashboard when available, then
+continue this Skill. Do not ask the user to start a separate dashboard.
+Subagents reuse the parent's entry; a user request to keep it closed wins.
+
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
 > for every Skill) before continuing; every VibeHub Skill needs that folder.
@@ -33,6 +54,13 @@ Read `../vibehub-core/contracts/acceptance-authority.md`. A human-authority crit
 accepted only when the Outcome references Evidence with `origin: human` that
 faithfully records explicit human input. Agent-origin Evidence may support the
 record but cannot substitute for that judgment.
+Read `../vibehub-core/contracts/agent-session.md`. When executing this workflow,
+report a local session for the exact Ticket with operation `closeout`. Report meaningful
+activity and waiting boundaries, and end the session when this work ends. Use
+the foreground wrapper for a command-based agent; otherwise use the explicit
+reporter and let missed reports expire. Session completion never replaces
+Ticket Evidence or independent Outcome.
+
 Read `../vibehub-core/contracts/ticket-next-action.md`. The normal closeout entry is
 `next_action.action: CLOSE_OUT`; full Evidence coverage still requires this
 independent adjudication and never creates success automatically.
@@ -48,6 +76,21 @@ and never closes a later active revision.
    node ../vibehub-core/scripts/vh.mjs ticket validate --repo <root>
    ```
 
+   Then check that golden truth did not change without its record:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context guard --repo <root> --input <guard.json>
+   ```
+
+   `guard.json` is `{}` for the dirty worktree or `{"since":"<base commit>"}`
+   when the work is committed. Git cannot see ignored local records. For a
+   local-only workflow, pass `{"paths":[...changedArtifactPaths,...changeRecordPaths]}`
+   with the complete changed artifact set and the exact local change Contexts
+   written for this work. Never stage private records just to make the guard
+   see them. A `violations` entry names an `authority`
+   Context whose canonical artifact changed with no `change` Context relating
+   to it in the same change set; that blocks `successful` and belongs in the
+   Outcome as the reason.
 2. Decide each current acceptance criterion from reproducible evidence. Do not
    accept an executor's summary as proof.
 3. Create one complete Outcome using `../vibehub-core/contracts/outcome.schema.json`.

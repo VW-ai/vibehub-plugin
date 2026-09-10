@@ -1,7 +1,15 @@
 # Tickets on GitHub Issues
 
-Every Ticket on `main` is mirrored to a GitHub Issue by
-`.github/workflows/sync-issues.yml`. The mirror is one-way: Git is the source
+GitHub integration is **disabled by default**. Local VibeHub work needs no
+GitHub account, remote, or Issue mirror. Only after explicit installation and
+enabling the repository Actions variable `VIBEHUB_GITHUB_SYNC=true` are shared
+Tickets on `main` mirrored by `.github/workflows/sync-issues.yml`.
+
+New project records are ignored by normal Git staging. Review and explicitly
+share only the chosen records before enabling the mirror. Existing tracked
+records remain tracked; ignoring a file does not undo earlier publication.
+The sync CLI requires an explicit `--github owner/repo` destination and either
+`--publish` or `--dry-run`; a dry run reads GitHub but does not write it. The mirror is one-way: Git is the source
 of truth, the workflow never commits, and nothing written on GitHub flows back
 into `.vibehub/`. Comments on an Issue are discussion; a durable decision still
 enters through `$vibehub-ingest`. No Agent runs or checks the sync — a failure

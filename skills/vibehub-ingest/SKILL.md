@@ -5,6 +5,27 @@ description: Explicitly capture durable user intent, decisions, constraints, con
 
 # VibeHub Ingest
 
+## Optional workflow and unrestricted responses
+
+Use this Skill when the user requests its VibeHub operation or has already
+chosen VibeHub for the current work. Installation alone does not opt a user
+into ticketing. Ordinary chat, exploration, and implementation can continue
+without a Ticket, a special phrase, or a prescribed response format. Users can
+leave the workflow at any time; do not block their work for missing VibeHub
+records. Never truncate, rewrite, suppress, or withhold a model response to
+satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
+writes only, not the model's answer or the user's ability to work.
+
+
+
+## Automatic dashboard entry
+
+Before the first user-facing operation in an opted-in VibeHub session, follow
+`../vibehub-core/contracts/session-entry.md`: run the bundled `vh-start.mjs`
+entry helper, reuse the session's existing dashboard when available, then
+continue this Skill. Do not ask the user to start a separate dashboard.
+Subagents reuse the parent's entry; a user request to keep it closed wins.
+
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
 > for every Skill) before continuing; every VibeHub Skill needs that folder.
@@ -46,6 +67,25 @@ around them. Otherwise continue directly with the workflow.
    package runtime. Git owns history, review, concurrency, and rollback.
 5. Report the Context ID and path only after `ok:true`. A failed envelope means
    nothing was persisted.
+
+## Authority Context
+
+When the user names golden truth — a contract, an architecture graph, a rule
+set, or a resource that implementation must follow — write `type: authority`
+with an `authority` object: `governs` (repository territory in Room anchor
+syntax), `canonical` (current repository paths of the artifacts, never under
+`.vibehub/`), `update_rules` (the ordered steps an Agent follows before a
+canonical artifact changes), `validation` (the checks that keep implementation
+and related Context consistent), and `approval: human` only when the user
+reserves that change to a person. Place it in the Room whose anchors cover the
+canonical artifacts; `context put` returns `advice` when one falls outside, so
+widen the anchors rather than leave drift in the golden truth invisible.
+
+A change to a canonical artifact is recorded as a `type: change` Context in the
+same Room that `relates_to` the authority and cites the changed artifact in
+`evidence`. `context guard` reads that record; without it the change blocks
+closeout. Keep `contract` for long-range prose; `authority` is the
+artifact-backed sibling.
 
 ## Guardrails
 

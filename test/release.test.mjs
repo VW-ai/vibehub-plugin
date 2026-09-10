@@ -15,10 +15,10 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("v0.10.0 release identity is consistent and dependency-free", () => {
-  const identity = verifyReleaseTag("v0.10.0");
-  assert.equal(identity.version, "0.10.0");
-  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.10.0"]));
+test("v0.11.0-dev.1 release identity is consistent and dependency-free", () => {
+  const identity = verifyReleaseTag("v0.11.0-dev.1");
+  assert.equal(identity.version, "0.11.0-dev.1");
+  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.11.0-dev.1"]));
 });
 
 function git(repo, ...args) {
@@ -180,7 +180,8 @@ test("README is a dark-safe one-line product surface", () => {
   assert.ok(installAt > 0 && installAt < firstImageAt && installAt < storyAt, "install command must precede the first image and the story");
   assert.ok(entryAt > installAt && entryAt < firstImageAt, "entry line must follow install and precede the first image");
   assert.match(readme, /## Work with your team on GitHub/u);
-  assert.match(readme, /mirrors one-way to a GitHub Issue/u);
+  assert.match(readme, /GitHub integration is disabled by default/u);
+  assert.match(readme, /records you choose to share/u);
   assert.match(readme, /Stop managing chats\. Manage the work\./u);
   assert.match(readme, /Turn one coding request into a Git-native Ticket with the exact Context needed/u);
   assert.equal([...readme.matchAll(/href="https:\/\/vibehub\.team"/gu)].length, 1);
@@ -261,7 +262,7 @@ test("the canonical entry routes through existing Setup and Ticket Plan", () => 
 test("release is GitHub-only, reproducible, and documented", () => {
   const changelog = read("CHANGELOG.md");
   assert.match(changelog, /## 0\.9\.0 — 2026-09-04/u);
-  assert.doesNotMatch(changelog, /^## Unreleased$/mu);
+  assert.match(changelog, /^## Unreleased$/mu);
   assert.match(changelog, /^## 0\.10\.0 — 2026-09-07$/mu);
   assert.match(changelog, /## 0\.8\.0 — 2026-08-13/u);
 

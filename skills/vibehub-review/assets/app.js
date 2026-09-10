@@ -135,6 +135,12 @@
   };
 
   let token = location.hash.slice(1);
+  if (new URLSearchParams(location.search).has("workspace")) {
+    const home = document.createElement("a");
+    home.textContent = "← All work";
+    home.href = `/dashboard#${token}`;
+    document.querySelector(".title-actions").prepend(home);
+  }
   let state = null;
   let positions = new Map();
   let graphGeometry = { positions, routes: new Map() };
@@ -208,6 +214,8 @@
       ? undefined
       : JSON.stringify(options.body);
     const requestUrl = new URL(path, location.origin);
+    const workspace = new URLSearchParams(location.search).get("workspace");
+    if (workspace) requestUrl.searchParams.set("workspace", workspace);
     const query = graphQuery();
     requestUrl.searchParams.set("scope", query.scope);
     if (query.delivery) requestUrl.searchParams.set("delivery", query.delivery);
@@ -303,6 +311,62 @@
     } finally {
       if (request === graphRequest) setBusy(false);
     }
+  }
+
+  let sessionPollTimer = null;
+  let sessionPollBusy = false;
+  async function refreshSessions() {
+    if (!state || document.hidden || sessionPollBusy) return;
+    sessionPollBusy = true;
+    const currentState = state;
+    const request = graphRequest;
+    try {
+      const snapshot = await api("/api/sessions");
+      if (state !== currentState || request !== graphRequest) return;
+      state.sessions = snapshot;
+      for (const ticket of state.graph.tickets) {
+        ticket.capabilities.runtime = snapshot.tickets[ticket.ticketId] || {
+          availability: snapshot.availability, reason: snapshot.reason, sessions: [], summary: null,
+        };
+      }
+    } catch {
+      if (state !== currentState || request !== graphRequest) return;
+      for (const ticket of state.graph.tickets) {
+        ticket.capabilities.runtime = {
+          availability: "unavailable", reason: "Session updates unavailable; last reports may be stale.",
+          sessions: (ticket.capabilities.runtime?.sessions || []).map(session => ({ ...session, fresh: false, effective_state: ["completed", "failed", "cancelled"].includes(session.state) ? session.state : "disconnected" })),
+        };
+      }
+    } finally {
+      sessionPollBusy = false;
+    }
+    if (state !== currentState || request !== graphRequest) return;
+    const focused = document.activeElement;
+    const focusedTicket = focused?.dataset?.ticketId;
+    const focusedRelation = focused?.dataset?.relationRef;
+    renderChrome();
+    renderGraph();
+    renderMinimap();
+    if (focusedTicket) focusGraphSubject({ kind: "ticket", id: focusedTicket });
+    else if (focusedRelation) focusGraphSubject({ kind: "relation", id: focusedRelation });
+    if (selected?.kind === "ticket") {
+      const ticket = state.graph.tickets.find(item => item.ticketId === selected.id);
+      const panel = elements.inspectorContent.querySelector(".agent-sessions");
+      if (ticket && panel) panel.replaceWith(agentSessionsPanel(ticket));
+      const phaseLabel = elements.inspectorContent.querySelector(".recommended-action-phase");
+      if (ticket && phaseLabel) {
+        const phase = ticketPhasePresentation(ticket);
+        phaseLabel.textContent = phase.substate ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}` : phase.label;
+      }
+    }
+  }
+
+  function scheduleSessionPoll() {
+    clearTimeout(sessionPollTimer);
+    sessionPollTimer = setTimeout(async () => {
+      await refreshSessions();
+      scheduleSessionPoll();
+    }, 5000);
   }
 
   function renderChrome() {
@@ -457,7 +521,7 @@
       tab.setAttribute("aria-selected", String(tab.dataset.roomView === roomView));
     }
     const rows = roomView === "context"
-      ? room.contexts.map((item) => [item.contextId, item.summary])
+      ? room.contexts.map((item) => roomContextRow(item))
       : roomView === "tickets"
         ? room.consumingTickets.map((ticketId) => [ticketId, "Consumes this Room subtree"])
         : roomDriftRows(room);
@@ -476,6 +540,18 @@
     elements.roomFilterAction.querySelector("span").textContent = elements.roomFilterAction.disabled
       ? "Showing related Tickets"
       : "Show related Tickets";
+  }
+
+  // An authority Context is golden truth: name it as such and show what it
+  // governs and which artifacts are canonical, so a reader knows which rules
+  // an Agent must follow before touching that territory.
+  function roomContextRow(item) {
+    if (item.type !== "authority" || !item.authority) return [item.contextId, item.summary];
+    const approval = item.authority.approval === "human" ? " · human approval" : "";
+    return [
+      `AUTHORITY · ${item.contextId}`,
+      `${item.summary} · Governs ${item.authority.governs.join(", ")} · Canonical ${item.authority.canonical.join(", ")}${approval}`,
+    ];
   }
 
   function roomEmptyRow(view) {
@@ -1586,6 +1662,11 @@
     );
     signal.append(heading, phaseMeta, metrics);
     panel.append(signal);
+    panel.append(section("Ticket state", facts([
+      ["Workflow", (ticket.workState?.state || operational?.label || "Unknown").replaceAll("_", " ")],
+      ["Basis", "Ticket contract, dependencies, Evidence and Outcome"],
+    ])));
+    panel.append(agentSessionsPanel(ticket));
 
     const review = closeoutReviewBrief(contextPackage, nextAction);
     if (review) panel.append(review);
@@ -1614,6 +1695,40 @@
       why.classList.add("ticket-why");
       panel.append(why);
     }
+    return panel;
+  }
+
+  function agentSessionsPanel(ticket) {
+    const body = document.createElement("div");
+    const capability = ticket.capabilities.runtime || {};
+    const sessions = capability.sessions || [];
+    if (capability.availability !== "available") body.append(textBlock(capability.reason || "Session reporting is unavailable."));
+    if (!sessions.length && capability.availability === "available") body.append(textBlock("No agent has reported a session for this Ticket."));
+    for (const session of sessions) {
+      const row = document.createElement("article");
+      row.className = "agent-session";
+      const heading = document.createElement("h3");
+      heading.textContent = `${session.agent_name} · ${session.provider}`;
+      const status = document.createElement("p");
+      const expired = !["completed", "failed", "cancelled"].includes(session.state)
+        && Date.parse(session.expires_at) <= Date.now();
+      const effective = expired ? "disconnected" : session.effective_state;
+      status.className = `agent-session-state session-${effective}`;
+      status.textContent = effective.replaceAll("_", " ").toUpperCase();
+      row.append(heading, status, facts([
+        ["Agent", session.agent_id],
+        ["Session", session.host_session_id || session.session_id],
+        ["Operation", session.operation],
+        ["Source", session.source === "process" ? "Observed process; detailed states are reported" : "Agent report"],
+        ["Last reported", new Date(session.last_reported_at).toLocaleString()],
+        ["Last activity", new Date(session.last_activity_at).toLocaleString()],
+      ]));
+      if (session.message) row.append(textBlock(session.message));
+      if (effective === "disconnected") row.append(textBlock("Reports expired or the reporter is unreachable. Current activity is unknown."));
+      body.append(row);
+    }
+    const panel = section("Agent sessions", body);
+    panel.classList.add("agent-sessions");
     return panel;
   }
 
@@ -3452,4 +3567,7 @@
   });
 
   void refresh();
+  scheduleSessionPoll();
+  window.addEventListener("pagehide", () => clearTimeout(sessionPollTimer));
+  window.addEventListener("pageshow", scheduleSessionPoll);
 })();

@@ -3,10 +3,9 @@
 VibeHub is Skill-first. `npx skills add` copies the Skill directories, including
 their bundled schemas, dependency-free helper scripts, and local graph UI
 assets. It does not copy a marketplace bundle or install a global CLI, MCP
-server, hook process, database, native module, or daemon. The read-only UI host
-starts in the foreground when a Ticket lifecycle moment needs a visual review,
-or when explicitly requested as a fallback, and exits with its launcher
-process.
+server, hook process, database, native module, or daemon. The built-in dashboard starts automatically when a user chooses or resumes
+VibeHub. Its foreground host is reused within the current agent session and
+exits with its launcher process. It is not a separate app the user must start.
 
 ## Install
 
@@ -56,7 +55,9 @@ directory, so deleting it stays your action.
 
 ## Start in a repository
 
-Describe the concrete deliverable, then tell the Agent:
+VibeHub is optional. You can chat and implement without creating Tickets. To
+choose the Ticket workflow, describe the deliverable and ask naturally to use
+VibeHub. One example is:
 
 > Start this with VibeHub.
 
@@ -99,12 +100,15 @@ and a small managed project-instruction block. Validate with:
 node <plugin>/skills/vibehub-core/scripts/vh.mjs project validate --repo <repository>
 ```
 
-Setup then asks one optional question when the repository's `origin` is on
-GitHub: whether to mirror Tickets to GitHub Issues. Saying yes copies one
-workflow and a self-contained `scripts/vibehub/` folder (the sync script, the
-helper, and two contract files) so the mirror runs in GitHub Actions on push
-to `main` without the plugin; no Agent ever runs or checks it. See
-[GITHUB_ISSUES.md](GITHUB_ISSUES.md).
+Setup defaults to local-only records and no GitHub integration. New `.vibehub/`
+records are ignored by normal Git staging; existing tracked records remain
+tracked. Managed setup instructions stay inside the ignored folder. No remote,
+GitHub login, Issue mirror, or publication is required.
+
+GitHub mirroring is installed only on explicit request and requires the repository
+Actions variable `VIBEHUB_GITHUB_SYNC=true`. See [GITHUB_ISSUES.md](GITHUB_ISSUES.md).
+The commit-producing upgrader leaves ignored VibeHub records untouched and reports
+`local-records`; use the local migration helpers for those records.
 
 ## Upgrade the plugin and project data
 
@@ -157,6 +161,50 @@ Skills in the current process, then start or resume work.
 expose a documented Skill hot-reload, so VibeHub does not claim or emulate one
 with a daemon or hook.
 
+## Unified dashboard
+
+When you choose VibeHub, your agent automatically opens one home for projects,
+registered worktrees, goals, and tickets before continuing your request. A live
+host already known in the session is reused without another tab. You do not
+need to run a dashboard command. Asking to keep it closed overrides startup.
+If the browser or host is unavailable, your work continues in conversation.
+
+The bundled `vh-start.mjs` helper implements entry and capability-checked reuse;
+it connects the existing personal-hub config pointer when available. Project
+roots already selected by you are carried forward; otherwise discovery starts
+at the current checkout and its registered worktrees. Installation alone does
+not trigger startup.
+
+For manual launch or troubleshooting only:
+
+```bash
+node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --dashboard \
+  --root <projects-directory> --personal-store <personal-hub-data-directory>
+```
+
+Repeat `--root` for additional project directories. Discovery descends up to
+four directory levels, skips hidden and dependency/build directories and
+symlinks, and shows only worktrees with a `.vibehub/version.yaml` connection
+marker, or repositories explicitly linked by the connected personal store's
+`project_refs` (exact path or an unambiguous project name). Unrelated repositories
+are omitted, while connected checkouts needing
+repair remain visible with their read errors.
+Point `--root` directly at a repository for locations outside that discovery
+scope. Refresh repeats discovery. No persistent registry is created.
+
+`--personal-store` is optional and reads the JSON-compatible YAML records
+written by vibehub-personal. Its goals and task membership remain distinct
+from dependency arrows. This dashboard never writes to that store. The All
+work view includes current graphs from discovered VibeHub worktrees, with
+workspace-scoped identities so identical Ticket IDs in different checkouts
+remain distinguishable. Invalid checkouts are reported individually.
+
+Select a worktree to see its Git-style ticket flow or to copy a freeform
+request with its exact path into your agent. Ticket setup is optional. A
+Ticket's inspector opens the existing Contract/Evidence Workbench. Copying
+context does not launch an agent; the dashboard has no execution runtime.
+The default per-repository Workbench command remains available below.
+
 ## Ticket graph presentation
 
 Ticket Skills proactively present the focused graph after planning, at a
@@ -183,3 +231,17 @@ no write routes. Its visual and interaction contract is documented in
 Remove the plugin through the host. Repository Context and Tickets remain
 ordinary Git files. Delete them only when you intentionally want to remove the
 project history; Git can restore earlier versions.
+
+### Dashboard hierarchy and recorded Context
+
+A project opens its goal graph. Selecting a goal opens the graph of its linked
+tickets; Back to goal graph returns to the project. Goals use the connected
+personal store's explicit `project_refs`; `task_of` and `sub_goal_of` establish
+membership. Dependency edges remain distinct from membership. Existing tickets
+without a recorded goal remain under Unassigned tickets. The dashboard does
+not infer goals from ticket titles or create records to fill an empty graph.
+
+The Context view reads canonical records under `.vibehub/rooms/`, grouped by Room
+and worktree. Selecting a record displays its saved detail, source, capture time,
+tags, evidence, and relations. It is a read-only view of recorded knowledge,
+not conversation capture. Invalid checkouts are reported individually.

@@ -88,5 +88,6 @@
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift:authority change validation and optional local Ticket workflow changed; existing shared Context claims need a follow-up review against the updated lifecycle"
 }

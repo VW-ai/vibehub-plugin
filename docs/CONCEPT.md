@@ -23,6 +23,18 @@ A Ticket exists when there is executable work. Context exists only when a
 decision, intent, constraint, contract, convention, or reusable explanation
 must survive beyond the current task.
 
+Some Context is golden truth rather than a claim about it: a game's rule set
+or asset contracts, a system's architecture graph, an interface schema. That
+is `type: authority`. It names the territory it governs, the canonical
+artifacts that are the source of truth, the ordered update rules an Agent
+follows before changing one, and the validation checks that keep
+implementation consistent. Planning attaches governing authority to a Ticket
+automatically; execution reads it before touching that territory; a change
+to a canonical artifact is recorded as a `change` Context, and closeout is
+refused while that record is missing. No approval service exists: the
+discipline is the rules, and a person decides only when the authority itself
+says `approval: human`.
+
 “Record this”, “remember this”, and “沉淀一下” normally create Context, not a
 Ticket. If one conversation contains both durable meaning and work, VibeHub
 captures one Context item and creates a Ticket that references it. It does not
@@ -49,14 +61,29 @@ advice cannot substitute for the decision. These fields are lightweight Git
 provenance, not an identity or approval service, and they never change
 dependency status.
 
-## Four durable document types
+## Goals, Epics, and Tickets
+
+A **Goal** records the intended benefit and success criteria. An **Epic** groups
+a coherent capability under exactly one Goal. A **Ticket** is independently
+executable and verifiable, optionally owned by one Epic. A Ticket's Goal is
+derived through that Epic; standalone Tickets remain valid.
+
+A PRD can produce several Goals and Epics. Containment describes scope, while
+`depends_on` remains a separate execution prerequisite. Parent progress counts
+completed Tickets without declaring the Goal achieved. See the
+[planning hierarchy contract](../skills/vibehub-core/contracts/planning-hierarchy.md).
+
+## Durable documents
 
 ```text
 .vibehub/
-  context/<context-id>.yaml
+  goals/<goal-id>.yaml
+  epics/<epic-id>.yaml
+  rooms/<room-path>/room.yaml
+  rooms/<room-path>/<context-id>.yaml
   tickets/<ticket-id>.yaml
   evidence/<ticket-id>/<evidence-id>.yaml
-  outcomes/<ticket-id>.yaml
+  outcomes/<ticket-id>/<outcome-id>.yaml
 ```
 
 They use a deterministic JSON-compatible YAML 1.2 subset and shared schemas.
@@ -75,3 +102,16 @@ no write endpoint.
 That boundary is deliberate: memory products preserve conversation; VibeHub
 preserves the development cycle. Missing capabilities are rebuilt only when
 real use demonstrates a gap.
+
+## Ticket state and Agent sessions
+
+Ticket state answers whether work is ready, blocked, awaiting review, or done.
+Local Agent sessions independently show who is associated with a Ticket, their
+reported state, and last report/activity time. Explicit reports and a
+foreground process wrapper provide observations; expired reports become
+disconnected. Process completion does not close Tickets. Sessions stay in
+worktree-specific Git metadata and do not travel with the repository.
+
+See the [session integration contract](../skills/vibehub-core/contracts/agent-session.md)
+for reporter and command-wrapper usage. Native host sessions must explicitly
+integrate; the Workbench does not automatically discover them.

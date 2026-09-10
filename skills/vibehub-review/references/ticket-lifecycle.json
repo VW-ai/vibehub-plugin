@@ -2,13 +2,34 @@
   "schema_version": 1,
   "presenter": "vibehub-review",
   "next_action_routing": {
-    "EXECUTE": { "owner": "vibehub-ticket-run", "independent_agent": false },
-    "CLOSE_OUT": { "owner": "vibehub-ticket-closeout", "independent_agent": true },
-    "NEEDS_HUMAN": { "owner": "vibehub-review", "independent_agent": false },
-    "REFINE": { "owner": "vibehub-ticket-plan", "independent_agent": false },
-    "REPLAN": { "owner": "vibehub-ticket-plan", "independent_agent": false },
-    "WAIT": { "owner": "vibehub-review", "independent_agent": false },
-    "DONE": { "owner": "vibehub-review", "independent_agent": false }
+    "EXECUTE": {
+      "owner": "vibehub-ticket-run",
+      "independent_agent": false
+    },
+    "CLOSE_OUT": {
+      "owner": "vibehub-ticket-closeout",
+      "independent_agent": true
+    },
+    "NEEDS_HUMAN": {
+      "owner": "vibehub-review",
+      "independent_agent": false
+    },
+    "REFINE": {
+      "owner": "vibehub-ticket-plan",
+      "independent_agent": false
+    },
+    "REPLAN": {
+      "owner": "vibehub-ticket-plan",
+      "independent_agent": false
+    },
+    "WAIT": {
+      "owner": "vibehub-review",
+      "independent_agent": false
+    },
+    "DONE": {
+      "owner": "vibehub-review",
+      "independent_agent": false
+    }
   },
   "planning_contracts": {
     "dependency_hygiene": "../../vibehub-core/contracts/dependency-hygiene.json"
@@ -17,7 +38,10 @@
     "scope": "current-agent-task",
     "reuse_live_host": true,
     "reuse_browser_tab": true,
-    "cross_task_discovery": "forbidden"
+    "cross_task_discovery": "forbidden",
+    "on_user_entry": "open-unified-dashboard",
+    "entry_contract": "../../vibehub-core/contracts/session-entry.md",
+    "entry_failure": "continue-in-conversation"
   },
   "events": [
     {

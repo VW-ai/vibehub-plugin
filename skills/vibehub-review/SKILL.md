@@ -5,6 +5,27 @@ description: Present or review the checked-in VibeHub Ticket graph and the canon
 
 # VibeHub Review
 
+## Optional workflow and unrestricted responses
+
+Use this Skill when the user requests its VibeHub operation or has already
+chosen VibeHub for the current work. Installation alone does not opt a user
+into ticketing. Ordinary chat, exploration, and implementation can continue
+without a Ticket, a special phrase, or a prescribed response format. Users can
+leave the workflow at any time; do not block their work for missing VibeHub
+records. Never truncate, rewrite, suppress, or withhold a model response to
+satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
+writes only, not the model's answer or the user's ability to work.
+
+
+
+## Automatic dashboard entry
+
+Before the first user-facing operation in an opted-in VibeHub session, follow
+`../vibehub-core/contracts/session-entry.md`: run the bundled `vh-start.mjs`
+entry helper, reuse the session's existing dashboard when available, then
+continue this Skill. Do not ask the user to start a separate dashboard.
+Subagents reuse the parent's entry; a user request to keep it closed wins.
+
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
 > for every Skill) before continuing; every VibeHub Skill needs that folder.
@@ -25,6 +46,24 @@ logical ID, revision, active/retired state and `derived_from` lineage, plus
 Evidence binding origin. A `legacy-unresolved` record must show its reason and
 attempted provenance as repair guidance, never as globally failed or stale
 proof.
+
+## Unified home
+
+The dashboard opens automatically on entry to an opted-in VibeHub session,
+using the shared entry contract above. For explicit review, reuse that host.
+The direct launcher below is a manual fallback, with selected discovery roots
+and an optional personal hub data directory:
+
+```text
+node ../vibehub-core/scripts/vh-ui.mjs --dashboard --root <projects-root> --personal-store <personal-data-root>
+```
+
+Repeat `--root` for additional locations. Do not guess or scan the entire home
+directory. The home reads personal goals and current repository Ticket graphs,
+keeps each worktree's identities separate, and offers freeform request copying
+without Ticket setup. Solid arrows mean prerequisites; dotted branches mean
+membership. Users select a worktree before opening its Contract/Evidence view.
+A broken checkout must not prevent browsing or working in another project.
 
 ## Local graph UI
 

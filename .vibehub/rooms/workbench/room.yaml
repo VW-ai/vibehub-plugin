@@ -49,5 +49,6 @@
   "kind": "room",
   "room_id": "workbench",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift:unified dashboard and Context previews added; existing shared Context claims need a follow-up review against the new presentation surfaces"
 }
