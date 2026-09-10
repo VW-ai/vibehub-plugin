@@ -1,11 +1,12 @@
 {
   "name": "vibehub-plugin",
-  "version": "0.10.0",
+  "version": "0.11.0-dev.1",
   "private": true,
   "description": "Lightweight Skill-first Git-native Tickets and durable project Context.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "dashboard": "node skills/vibehub-core/scripts/vh-ui.mjs --dashboard",
     "build": "node scripts/build-plugin-artifact.mjs --out dist/plugin",
     "prototype:directions": "node scripts/vh-harness-directions.mjs",
     "prototype:directions:safari": "node scripts/vh-harness-directions.mjs --safari",
@@ -18,7 +19,7 @@
     "test": "node --test test/*.test.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
     "verify": "node --test test/*.test.mjs && node scripts/verify-plugin-artifact.mjs",
-    "issues:sync:dry-run": "node scripts/sync-github-issues.mjs --repo . --dry-run"
+    "issues:sync:dry-run": "node scripts/sync-github-issues.mjs --repo . --github VW-ai/vibehub-plugin --dry-run"
   },
   "engines": {
     "node": ">=20"

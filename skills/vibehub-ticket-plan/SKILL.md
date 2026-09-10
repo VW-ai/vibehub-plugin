@@ -1,9 +1,30 @@
 ---
 name: vibehub-ticket-plan
-description: Turn a deliverable into the smallest executable Git-native VibeHub Ticket graph. This Skill owns the canonical user entry “Start this with VibeHub.” Use when the user starts a development cycle, asks to plan work as Tickets, or when execution discovers new independently schedulable work.
+description: Turn a deliverable into the smallest executable Git-native VibeHub Ticket graph. This Skill owns the canonical user entry “Start this with VibeHub.” Use when the user explicitly chooses VibeHub, asks to plan work as Tickets, or an opted-in Ticket execution discovers independently schedulable work.
 ---
 
 # VibeHub Ticket Plan
+
+## Optional workflow and unrestricted responses
+
+Use this Skill when the user requests its VibeHub operation or has already
+chosen VibeHub for the current work. Installation alone does not opt a user
+into ticketing. Ordinary chat, exploration, and implementation can continue
+without a Ticket, a special phrase, or a prescribed response format. Users can
+leave the workflow at any time; do not block their work for missing VibeHub
+records. Never truncate, rewrite, suppress, or withhold a model response to
+satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
+writes only, not the model's answer or the user's ability to work.
+
+
+
+## Automatic dashboard entry
+
+Before the first user-facing operation in an opted-in VibeHub session, follow
+`../vibehub-core/contracts/session-entry.md`: run the bundled `vh-start.mjs`
+entry helper, reuse the session's existing dashboard when available, then
+continue this Skill. Do not ask the user to start a separate dashboard.
+Subagents reuse the parent's entry; a user request to keep it closed wins.
 
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
@@ -94,6 +115,19 @@ is implied.
    `ref.json` is `{"ref":"<Ticket context_ref>"}`. Consume the returned
    source and identity; never interpret a versioned ref as a filesystem path
    or check out its commit.
+   Attach golden truth without asking the user to pick a Room:
+
+   ```text
+   node ../vibehub-core/scripts/vh.mjs context governing --repo <root> --input <governing.json>
+   ```
+
+   `governing.json` carries `paths` — the territory the Ticket will touch and
+   its `context_refs` — and/or a `ticket_id`. Add every returned `authority`
+   Context path to `context_refs` with a purpose naming what it governs, and
+   carry its `validation` checks into acceptance when the Ticket changes a
+   canonical artifact. `approval: human` on an authority whose canonical
+   artifact the Ticket must change is a human-authority boundary: encode it as
+   `authority: human` acceptance per the acceptance-authority contract.
 5. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains
@@ -141,8 +175,9 @@ is implied.
 8. Read the graph back and report Ticket IDs, paths, READY/BLOCKED state, and
    the next executable outcome. Follow `plan-applied`: ask
    `$vibehub-review` to present the refreshed graph, focused on the new
-   Ticket when there is one clear subject. Git commit/PR is the review and
-   rollback boundary.
+   Ticket when there is one clear subject. Keep records local by default;
+   publishing code does not authorize publishing the planning records. Use Git
+   commit/PR boundaries only for records the user explicitly chooses to share.
 
 ## Guardrails
 

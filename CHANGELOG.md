@@ -1,5 +1,38 @@
 # Changelog
 
+## Unreleased
+
+- Add the `authority` Context type for golden truth: governed territory in
+  Room anchor syntax, canonical repository artifacts, ordered update rules,
+  validation checks, and optional human approval. `context governing` finds
+  the authority covering paths or a Ticket's refs; `context guard` refuses a
+  canonical change that has no `change` Context recording it. Planning
+  attaches governing authority, execution follows the rules, closeout runs
+  the guard, and the Rooms surface marks authority Context. Additive: Context
+  schema stays at version 1 with no project-format migration.
+Development version: 0.11.0-dev.1.
+
+- Default new records to local Git exclusions, leave GitHub setup silent unless
+  requested, and require explicit opt-in for issue publishing and Actions sync.
+  Existing tracked records remain intact and are reported as already tracked.
+- Keep ignored personal records out of commit-producing upgrades.
+
+- Open the built-in dashboard automatically when users enter VibeHub, reuse
+  known live session hosts, and continue work if presentation is unavailable.
+- Add a unified local dashboard for discovered projects, registered worktrees,
+  personal goals, and Ticket flows with Git-style dependency lanes.
+- Add project goal graphs, goal-to-ticket drill-down, and a read-only Context view grouped by Room.
+- Put goals and tickets on a full-height canvas with compact controls, readable
+  card layouts, goal progress, connection highlighting, and anchored zoom.
+- Add a goal execution view with actionable human decisions ordered by downstream
+  impact, distinct agent readiness and waiting states, planning and continuation
+  briefs, and refresh that preserves the current view and filters.
+- Limit the dashboard to VibeHub-connected checkouts; omit unrelated local repositories.
+- Add project/branch/worktree switching, active-goal navigation, recorded
+  activity lanes, Board/Flow views, and system light/dark appearance.
+- Make VibeHub opt-in: record contracts govern saved records, never ordinary
+  work or the form or content of model responses.
+
 ## 0.10.0 — 2026-09-07
 
 - Add a five-pass large-document ingestion flow with deterministic source
