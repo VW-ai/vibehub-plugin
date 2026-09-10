@@ -662,28 +662,39 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
     }
     catch { document.querySelector('.start').open = true; $('request').value = text; $('request').focus(); $('request').select(); status('Clipboard unavailable. The text is selected; copy it manually.'); }
   }
+  let ticketDetailCleanup=null;
   function showDetail(item, trigger) {
+    const focusOrigin=trigger.closest('#inspector')?lastFocused:trigger;
     closeDetail(false);
     document.querySelectorAll('.work-card[aria-pressed=true],.board-card[aria-pressed=true]').forEach(card => card.setAttribute('aria-pressed', 'false'));
-    trigger.setAttribute('aria-pressed', 'true');
-    lastFocused = trigger;  $('detail-kind').textContent = `${item.type.toUpperCase()} · ${item.state}`;
-    $('detail-title').textContent = item.title; $('detail-outcome').textContent = item.outcome; $('detail-outcome').hidden=!item.outcome || item.outcome.trim()===item.title.trim(); $('detail-meta').replaceChildren(); $('detail-actions').replaceChildren();
-    const workflow=workflowFor(item,items,edges);
-    $('detail-kind').textContent=`${item.type==='goal'?'Goal':'Ticket'} · ${workflow.label}`;
-    const dependencies = edges.filter((e) => !e.membership && e.to === item.id).map((e) => items.find((t) => t.id === e.from)?.title || e.from);
-    const dependents = edges.filter((e) => !e.membership && e.from === item.id).map((e) => items.find((t) => t.id === e.to)?.title || e.to);
-    for (const [key, value] of [['Source', item.path], ['Prerequisites', dependencies.join(', ') || 'None'], ['Unlocks', dependents.join(', ') || 'None'], ['Goal', item.relations.filter((r) => ['task_of','sub_goal_of'].includes(r.type)).map((r) => items.find(t=>t.id===r.target)?.title||r.target).join(', ') || 'Unassigned'], ['Next action', workflow.detail]]) {
-      $('detail-meta').append(el('dt', key), el('dd', value));
-    }
-    const next=el('section',undefined,`ticket-next-step stage-${workflow.lane}`);next.append(el('strong',workflow.lane==='attention'?'Your input is needed':workflow.label),el('p',({attention:'This ticket is waiting for your decision. Review the request above to unblock the affected work.',running:'Agent activity is recorded for this ticket. Refresh to check for updates.',ready:'This ticket has an actionable next step for an agent.',planned:'The plan or acceptance criteria need attention before execution.',waiting:'This ticket is waiting for its prerequisites.',completed:'This ticket is recorded as complete.'})[workflow.lane]||workflow.label));
-    if(workflow.lane==='attention')next.append(el('small','Copy the decision context to your agent to review the options. This does not approve or change the ticket.'));
-    $('detail-meta').before(next);
-    detailTabs([['Task details',['Prerequisites','Unlocks','Goal']],['Record details',['Source','Next action']]],'Task details');
-    const copy = el('button', workflow.lane==='attention'?'Copy decision context':'Copy work context'); copy.type = 'button'; copy.addEventListener('click', () => copyText(`${item.title}\nSource: ${item.path}\n${item.outcome}\nNext action: ${workflow.detail}\n${workflow.lane==='attention'?'Help me review this decision. Prepare options and tradeoffs; do not treat this request as approval.':''}`)); $('detail-actions').append(copy);
-    if (item.ticket) { const link = el('a', 'Open contract & evidence ↗'); link.href = inspectorLink(item.originalId || item.id, item.workspace || selected); $('detail-actions').append(link); }
-    if(!$('inspector').open) $('inspector').showModal(); $('inspector').scrollTop=0; $('close-detail').focus();
+    trigger.setAttribute('aria-pressed', 'true');lastFocused=focusOrigin;
+    const workflow=workflowFor(item,items,edges), workspace=item.workspace||selected;
+    $('inspector').classList.add('ticket-dialog');
+    $('detail-kind').textContent=`Ticket · ${workflow.label}`;
+    $('detail-title').textContent=item.title;$('detail-outcome').hidden=true;
+    $('detail-meta').replaceChildren();$('detail-actions').replaceChildren();
+    const content=el('div',undefined,'ticket-content');$('detail-meta').before(content);
+    const related=(ids)=>ids.map(id=>items.find(item=>item.id===id)||{id,title:id,type:'missing'});
+    ticketDetailCleanup=VibeHubTicket.mount({container:content,item,workflow,
+      dependencies:related(edges.filter(e=>!e.membership&&e.to===item.id).map(e=>e.from)),
+      dependents:related(edges.filter(e=>!e.membership&&e.from===item.id).map(e=>e.to)),
+      goals:related(item.relations.filter(r=>['task_of','sub_goal_of'].includes(r.type)).map(r=>r.target)),
+      navigate:(target,button)=>{if(target.type==='missing')return;if(target.type==='goal'){closeDetail();selectGoal(target.id);}else showDetail(target,button);},
+      copy:copyText,contractUrl:item.ticket?inspectorLink(item.originalId||item.id,workspace):null,
+      loadDetails:async()=>{
+        const query=new URLSearchParams({workspace}), state=await api(`/api/state?${query}`);
+        query.set('snapshotId',state.graph.snapshotId);query.set('kind','ticket');query.set('ticketId',item.originalId||item.id);
+        const result=await api(`/api/subject?${query}`);return result.subject.contextPackage;
+      },
+    });
+    if(!$('inspector').open)$('inspector').showModal();$('inspector').scrollTop=0;$('close-detail').focus();
   }
-  function closeDetail(restore = true) { document.querySelector('.detail-view-tabs')?.remove();document.querySelector('.ticket-next-step')?.remove();$('inspector').classList.remove('reference-dialog');if($('inspector').open) $('inspector').close(); lastFocused?.setAttribute('aria-pressed', 'false'); if (restore && lastFocused?.isConnected) lastFocused.focus(); }
+  function closeDetail(restore = true) {
+    ticketDetailCleanup?.();ticketDetailCleanup=null;document.querySelector('.ticket-content')?.remove();
+    document.querySelector('.detail-view-tabs')?.remove();document.querySelector('.ticket-next-step')?.remove();
+    $('inspector').classList.remove('reference-dialog','ticket-dialog');if($('inspector').open)$('inspector').close();
+    lastFocused?.setAttribute('aria-pressed','false');if(restore&&lastFocused?.isConnected)lastFocused.focus();
+  }
   async function loadRepositoryTickets() {
     const turn = generation;
     repositoryItems = []; repositoryEdges = []; sourceWarnings = [];

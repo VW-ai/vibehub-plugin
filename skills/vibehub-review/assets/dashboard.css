@@ -313,3 +313,37 @@ main{display:flex;flex-direction:column;height:100dvh;min-height:0;padding:0;ove
   .context-type-group .context-row-meta { grid-column:1;grid-row:2; }
   .context-type-group .context-row-arrow { grid-column:2;grid-row:1; }
 }
+
+/* Ticket reading order: description, requirements, related work, provenance. */
+#inspector.ticket-dialog { width:min(760px,calc(100vw - 32px)); }
+.ticket-dialog #detail-meta { display:none; }
+.ticket-dialog #detail-kind { font-size:11px;letter-spacing:.02em; }
+.ticket-dialog h2 { margin-bottom:24px!important;font-size:26px!important; }
+.ticket-narrative { display:grid;gap:24px; }
+.ticket-section h3,.ticket-related h3 { margin:0 0 8px;font-size:11px;font-weight:600;color:var(--muted); }
+.ticket-description { font-size:16px;line-height:1.75;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;margin:0; }
+.ticket-background { font-size:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;color:var(--ink); }
+.ticket-criteria,.ticket-constraints { margin:0;padding-left:18px;font-size:13px;line-height:1.7;overflow-wrap:anywhere; }
+.ticket-criteria li,.ticket-constraints li { padding:3px 0; }
+.criterion-human { display:inline-block;margin-left:8px;color:var(--orange);font-size:10px; }
+.ticket-load-status { font-size:12px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere; }
+.ticket-load-status:empty { display:none; }
+.ticket-related { margin-top:24px;padding-top:20px;border-top:1px solid var(--line);display:grid;gap:12px; }
+.ticket-related-row { display:grid;grid-template-columns:88px minmax(0,1fr);align-items:baseline;gap:12px; }
+.ticket-related h3 { margin:0; }
+.ticket-related-links { display:flex;flex-wrap:wrap;gap:8px; }
+.ticket-related-link { padding:4px 0;font-size:12px;border:0;background:transparent;color:var(--accent);border-radius:0;text-align:left;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere; }
+.ticket-record-details { margin-top:20px;padding-top:16px;border-top:1px solid var(--line); }
+.ticket-record-details summary { cursor:pointer;font-size:11px;color:var(--muted);padding:8px 0; }
+.ticket-record-details dl { display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px 12px;margin:12px 0 0; }
+.ticket-record-details dt,.ticket-record-details dd { margin:0;font-size:11px; }
+.ticket-handoff-hint { font-size:10px;color:var(--muted);width:100%; }
+@media(max-width:768px) {
+  #inspector.ticket-dialog { width:calc(100vw - 24px); }
+  .ticket-dialog h2 { font-size:21px!important; }
+  .ticket-description { font-size:14px; }
+  .ticket-related-row { grid-template-columns:1fr;gap:4px; }
+  .ticket-related-link { min-height:44px; }
+  .ticket-record-details dl { grid-template-columns:1fr;gap:4px; }
+  .ticket-record-details dd { margin-bottom:8px; }
+}
