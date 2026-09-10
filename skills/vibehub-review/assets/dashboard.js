@@ -359,7 +359,7 @@
     const controls=el('div',undefined,'room-controls');
     for(const [label,open] of [['Expand all',true],['Collapse all',false]]) {const button=el('button',label);button.type='button';button.disabled=!rooms.length;button.addEventListener('click',()=>{for(const room of rooms)roomExpanded.set(room.key,open);document.querySelectorAll('.room-group').forEach(node=>{node.open=open;});});controls.append(button);}
     toolbar.append(controls); $('work').append(toolbar);
-    
+
     if(contextLoading) $('work').append(el('p','Reading Rooms from connected worktrees…','context-notice'));
     if(contextErrors.length) { const details=el('details',undefined,'context-errors'); details.append(el('summary',`${contextErrors.length} worktrees could not be read`)); for(const error of contextErrors) details.append(el('p',error)); $('work').append(details); }
     if(!rooms.length && !contextLoading) $('work').append(el('p',query?'No Rooms or Context records match your search.':'No Rooms recorded in this workspace yet. Context saved through VibeHub will appear in its Room.','empty'));

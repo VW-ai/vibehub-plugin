@@ -43,4 +43,3 @@ Use **New goal** to copy a planning brief into your agent, or **Copy next steps*
 to resume a goal with its current decisions and work frontier. These are agent
 handoffs: the read-only dashboard does not launch an agent or submit approvals.
 VibeHub is optional: no Ticket, special phrase, or response format is required for ordinary work.
-

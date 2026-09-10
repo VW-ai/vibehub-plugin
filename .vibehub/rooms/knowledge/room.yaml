@@ -70,5 +70,6 @@
   "kind": "room",
   "room_id": "knowledge",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift:project authority contracts and optional Context workflow changed; existing shared Context claims need a follow-up review against these contracts"
 }
