@@ -115,7 +115,7 @@ test("skills point at their governing shared references", () => {
   assert.equal(migrations.schema_version, 2);
   assert.equal(migrations.owner, "vibehub-migrate");
   assert.equal(migrations.current_format, versions.project_format);
-  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 5);
+  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length === 6);
   for (const migration of migrations.migrations) {
     assert.ok(Array.isArray(migration.mechanical.declared_paths));
     assert.ok(Array.isArray(migration.mechanical.actions));

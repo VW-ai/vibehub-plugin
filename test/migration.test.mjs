@@ -106,6 +106,7 @@ test("a semantic-only 0.4 step makes no change, then the engine completes the me
     "format-1-to-format-2",
     "format-2-to-format-3",
     "format-3-to-format-4",
+    "format-4-to-format-5",
   ]);
   assert.deepEqual(completed.envelope.data.changed_paths, [
     ".vibehub/tickets/feature.yaml",
@@ -225,10 +226,10 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
 
   const migrated = run(repo, "project", "migrate-mechanical");
   assert.equal(migrated.status, 0, migrated.stdout);
-  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3", "format-3-to-format-4"]);
+  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3", "format-3-to-format-4", "format-4-to-format-5"]);
   assert.deepEqual(migrated.envelope.data.changed_paths, [".vibehub/tickets/current-reference.yaml", ".vibehub/version.yaml"]);
   assert.notEqual(readFileSync(join(repo, ".vibehub", "tickets", "current-reference.yaml"), "utf8"), ticketBefore);
-  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 4);
+  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 5);
   assert.equal(migrated.envelope.data.pending_semantic_steps.length, 2);
   assert.equal(
     migrated.envelope.data.pending_semantic_steps[0].step_id,
@@ -237,9 +238,9 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
   assert.equal(run(repo, "project", "validate").status, 0);
 });
 
-test("the repository format-4 project keeps Ticket schema 3 and audited delivery structure", () => {
+test("the repository format-5 project keeps Ticket schema 3 and audited delivery structure", () => {
   const version = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
-  assert.equal(version.format_version, 4);
+  assert.equal(version.format_version, 5);
   const ticketRoot = join(root, ".vibehub", "tickets");
   const tickets = readdirSync(ticketRoot)
     .filter((name) => name.endsWith(".yaml"))

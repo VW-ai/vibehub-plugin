@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 4,
+  "current_format": 5,
   "migrations": [
     {
       "migration_id": "0-4-unversioned-to-0-5-unversioned",
@@ -231,6 +231,38 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "migration_id": "format-4-to-format-5",
+      "from": "format-4",
+      "to": "format-5",
+      "document_schema_versions": {
+        "goal": {
+          "to": 1
+        },
+        "epic": {
+          "to": 1
+        },
+        "ticket": {
+          "from": 3,
+          "to": 3
+        }
+      },
+      "detect": "Project format 4 predates canonical Goal/Epic ownership. Format 5 adds Goal and Epic documents and optional Ticket.epic_id.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "write-project-format",
+            "format_version": 5
+          }
+        ]
+      },
+      "semantic": {
+        "steps": []
       }
     }
   ]

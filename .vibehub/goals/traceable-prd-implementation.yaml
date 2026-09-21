@@ -1,0 +1,19 @@
+{
+  "context_refs": [
+    {
+      "purpose": "User-authorized product direction.",
+      "ref": ".vibehub/rooms/product/decision-goal-epic-ticket-hierarchy.yaml"
+    }
+  ],
+  "description": "Connect executable work to the product benefits and capabilities it serves.",
+  "goal_id": "traceable-prd-implementation",
+  "kind": "goal",
+  "provenance_refs": [
+    "conversation:2026-09-08-goal-epic-ticket-model"
+  ],
+  "schema_version": 1,
+  "success_criteria": [
+    "A PRD plan preserves explicit Goal to Epic to Ticket ownership that another Agent can read and validate."
+  ],
+  "title": "Make PRD implementation traceable to intended outcomes"
+}

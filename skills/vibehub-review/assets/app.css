@@ -3326,3 +3326,10 @@ a.reference-label:hover {
     transform: none;
   }
 }
+
+/* Session observation stays separate from the Ticket's proof and next action. */
+.agent-session + .agent-session { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
+.agent-session h3 { font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+.agent-session-state { font-size: 11px; letter-spacing: .04em; font-weight: 600; margin: 6px 0 12px; }
+.agent-session .facts dd { overflow-wrap: anywhere; }
+.agent-sessions { min-width: 0; }

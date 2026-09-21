@@ -64,6 +64,16 @@ keeps each worktree's identities separate, and offers freeform request copying
 without Ticket setup. Solid arrows mean prerequisites; dotted branches mean
 membership. Users select a worktree before opening its Contract/Evidence view.
 A broken checkout must not prevent browsing or working in another project.
+Read `../vibehub-core/contracts/planning-hierarchy.md`. Use `project hierarchy`
+to explain Goal → Epic → Ticket membership and full-project delivery progress.
+Do not label a Goal achieved merely because all current Tickets are DONE.
+The canvas shows execution dependencies; parent documents are carried in the
+graph data and Agent handoffs.
+
+Read `../vibehub-core/contracts/agent-session.md`. Present canonical Ticket
+state separately from local Agent session observations, their source, and
+report/activity timestamps. Disconnected means freshness is unknown, not that
+the Ticket failed. The host polls no provider and the browser writes no state.
 
 ## Local graph UI
 
@@ -95,7 +105,7 @@ controlled, opening the focused authorized URL is sufficient.
 The graph, Ticket inspector, Evidence, and Outcome trace are projected fresh
 from `.vibehub/` on every refresh. The UI is read-only and has no database,
 persistent cache, daemon, review write route, or Decision authority.
-The four canonical schemas and repository validation are the complete handoff:
+The canonical schemas and repository validation are the complete handoff:
 do not repair, infer, or translate invalid Agent output inside the UI.
 
 For one Ticket awaiting adjudication, focus its Log directly with `--ticket`

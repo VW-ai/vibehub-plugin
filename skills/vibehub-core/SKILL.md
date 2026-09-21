@@ -32,6 +32,11 @@ the files below as `../vibehub-core/...`.
 - `contracts/revision-identity.md` — human-readable semantic identity contract.
 - `scripts/vh-ui.mjs` — read-only loopback host for the local graph UI
   (assets live in `../vibehub-review/assets`).
+- `contracts/planning-hierarchy.md` — Goal, Epic, and Ticket semantics, ownership,
+  PRD planning, helper operations, and progress boundaries.
+- `scripts/session-store.mjs` and `scripts/vh-session.mjs` — local worktree
+  session reporting and the foreground command wrapper.
+- `contracts/agent-session.md` — Ticket versus session state and reporter integration.
 - `contracts/` — JSON Schemas and written contracts the Skills cite.
 - `templates/github/` — files `vibehub-setup` offers to copy into a project
   once, when the user opts into mirroring Tickets to GitHub Issues.

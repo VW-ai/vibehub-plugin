@@ -15,6 +15,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readSessions, ticketSessionCapability } from "./session-store.mjs";
 import {
   REVISION_BINDING_ORIGINS,
   REVISION_BINDING_STATES,
@@ -115,7 +116,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project|source|skills> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]... [--path <file>]; context supports resolve; project supports migrate-mechanical and migrate-proof-revisions",
+      "Usage: vh.mjs <context|room|goal|epic|ticket|project|source|skills> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]... [--path <file>]; goal/epic support put/get/list; project supports hierarchy, migrate-mechanical and migrate-proof-revisions",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -183,7 +184,11 @@ function writeDocument(path, document) {
   mkdirSync(dirname(path), { recursive: true });
   const temporary = `${path}.tmp-${process.pid}`;
   writeFileSync(temporary, serialize(document), { flag: "wx" });
-  renameSync(temporary, path);
+  try {
+    renameSync(temporary, path);
+  } finally {
+    if (existsSync(temporary)) unlinkSync(temporary);
+  }
 }
 
 function yamlFiles(path) {
@@ -209,6 +214,8 @@ function dirs(repo) {
   return {
     root: join(repo, ".vibehub"),
     rooms: join(repo, ".vibehub", "rooms"),
+    goals: join(repo, ".vibehub", "goals"),
+    epics: join(repo, ".vibehub", "epics"),
     tickets: join(repo, ".vibehub", "tickets"),
     evidence: join(repo, ".vibehub", "evidence"),
     outcomes: join(repo, ".vibehub", "outcomes"),
@@ -1444,6 +1451,35 @@ function validateRoom(document, path = "room") {
   return errors;
 }
 
+function validatePlanningDocument(document, kind, path = kind) {
+  const errors = [];
+  const fields = ["schema_version", "kind", `${kind}_id`, "title", "context_refs", "provenance_refs",
+    ...(kind === "goal" ? ["description", "success_criteria"] : ["goal_id", "outcome"])];
+  if (!strictKeys(errors, document, new Set(fields), path)) return errors;
+  if (document.schema_version !== VERSION_CONTRACT.document_schemas[kind]) {
+    add(errors, `${path}.schema_version`, `must equal ${VERSION_CONTRACT.document_schemas[kind]}`);
+  }
+  if (document.kind !== kind) add(errors, `${path}.kind`, `must equal ${kind}`);
+  requiredString(errors, document, `${kind}_id`, path, { id: true });
+  requiredString(errors, document, "title", path);
+  if (kind === "goal") {
+    requiredString(errors, document, "description", path);
+    stringArray(errors, document.success_criteria, `${path}.success_criteria`, { nonEmpty: true });
+  } else {
+    requiredString(errors, document, "goal_id", path, { id: true });
+    requiredString(errors, document, "outcome", path);
+  }
+  stringArray(errors, document.provenance_refs, `${path}.provenance_refs`);
+  if (!Array.isArray(document.context_refs)) add(errors, `${path}.context_refs`, "must be an array");
+  else document.context_refs.forEach((ref, index) => {
+    const at = `${path}.context_refs[${index}]`;
+    if (!strictKeys(errors, ref, new Set(["ref", "purpose"]), at)) return;
+    requiredString(errors, ref, "ref", at);
+    requiredString(errors, ref, "purpose", at);
+  });
+  return errors;
+}
+
 function validateTicket(document, path = "ticket") {
   const errors = [];
   if (
@@ -1454,6 +1490,7 @@ function validateTicket(document, path = "ticket") {
         "schema_version",
         "kind",
         "ticket_id",
+        "epic_id",
         "revision_state",
         "active_contract_revision",
         "contract_revisions",
@@ -1481,6 +1518,7 @@ function validateTicket(document, path = "ticket") {
     add(errors, `${path}.maturity`, "must equal firm or draft when present");
   }
   requiredString(errors, document, "ticket_id", path, { id: true });
+  if (document.epic_id !== undefined) requiredString(errors, document, "epic_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
   if (!Array.isArray(document.deliveries)) {
     add(errors, `${path}.deliveries`, "must be an array");
@@ -2121,6 +2159,8 @@ export function loadRepository(repo, overrides = {}) {
     add(rooms.errors, legacyContext, "every Context lives in a room now; migrate these entries into their owning rooms under .vibehub/rooms/");
   }
   const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
+  const goals = loadMap(yamlFiles(paths.goals), "goal_id", (doc, path) => validatePlanningDocument(doc, "goal", path), "Goal");
+  const epics = loadMap(yamlFiles(paths.epics), "epic_id", (doc, path) => validatePlanningDocument(doc, "epic", path), "Epic");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
   const outcomes = loadOutcomes(paths.outcomes);
   for (const document of overrides.contexts ?? []) {
@@ -2128,6 +2168,11 @@ export function loadRepository(repo, overrides = {}) {
   }
   for (const document of overrides.tickets ?? []) {
     tickets.documents.set(document.ticket_id, { document, path: `<candidate:${document.ticket_id}>` });
+  }
+  for (const [kind, collection] of [["goal", goals], ["epic", epics]]) {
+    for (const document of overrides[`${kind}s`] ?? []) {
+      collection.documents.set(document[`${kind}_id`], { document, path: `<candidate:${kind}:${document[`${kind}_id`]}>` });
+    }
   }
   for (const document of overrides.evidence ?? []) {
     evidence.documents.set(document.evidence_id, { document, path: `<candidate:${document.evidence_id}>` });
@@ -2142,8 +2187,17 @@ export function loadRepository(repo, overrides = {}) {
     outcomes.byTicket.set(document.ticket_id, entries);
     outcomes.documents.set(document.ticket_id, entry);
   }
-  const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
+  const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...goals.errors, ...epics.errors, ...evidence.errors, ...outcomes.errors];
   const unverifiable = [];
+  for (const { document, path } of [...goals.documents.values(), ...epics.documents.values()]) {
+    if (document.kind === "epic" && !goals.documents.has(document.goal_id)) {
+      add(errors, path, `dangling Epic Goal: ${document.goal_id}`);
+    }
+    if (Array.isArray(document.context_refs)) for (const ref of document.context_refs) {
+      try { resolveTicketContextRef(repo, ref?.ref); }
+      catch (error) { add(errors, path, error.message); }
+    }
+  }
   for (const { document, path } of contexts.documents.values()) {
     for (const relation of document.relations ?? []) {
       if (!contexts.documents.has(relation.target_context_id)) {
@@ -2165,6 +2219,9 @@ export function loadRepository(repo, overrides = {}) {
   }
   const recordedCommits = ticketCommitResolver(repo);
   for (const { document, path } of tickets.documents.values()) {
+    if (document.epic_id !== undefined && !epics.documents.has(document.epic_id)) {
+      add(errors, path, `dangling Ticket Epic: ${document.epic_id}`);
+    }
     const closed = outcomes.documents.has(document.ticket_id);
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
@@ -2301,7 +2358,7 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
-  return { paths, rooms, contexts, tickets, evidence, outcomes, errors, unverifiable };
+  return { paths, rooms, contexts, goals, epics, tickets, evidence, outcomes, errors, unverifiable };
 }
 
 export function assertValid(errors, message = "VibeHub validation failed") {
@@ -2351,7 +2408,7 @@ function initProject(repo, input = {}) {
     root: paths.root,
     format_version: CURRENT_PROJECT_FORMAT,
     version_path: projectFormatPath(repo),
-    directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes],
+    directories: [paths.rooms, paths.goals, paths.epics, paths.tickets, paths.evidence, paths.outcomes],
     sharing: projectSharing(repo),
   };
 }
@@ -2602,6 +2659,15 @@ export function ticketStatus(repository, ticket) {
   // A draft can never become READY: it surfaces as REFINE until planning
   // rewrites its acceptance for real and marks the Ticket firm.
   return ticket.maturity === "draft" ? "REFINE" : "READY";
+}
+
+export function ticketWorkState(repository, ticket) {
+  const next = ticketNextAction(repository, ticket);
+  return {
+    state: { EXECUTE: "READY", WAIT: "BLOCKED", CLOSE_OUT: "AWAITING_REVIEW", NEEDS_HUMAN: "NEEDS_HUMAN", REFINE: "NEEDS_REFINEMENT", REPLAN: "NEEDS_REPLAN", DONE: "DONE" }[next.action],
+    reason: next.reason,
+    detail: next.detail,
+  };
 }
 
 function acceptanceAuthority(criterion) {
@@ -2967,6 +3033,68 @@ function validateTicketMutation(existing, candidate, path = "ticket") {
   return errors;
 }
 
+export function ticketHierarchy(repository, ticket) {
+  const epic = ticket.epic_id ? repository.epics?.documents.get(ticket.epic_id)?.document : null;
+  const goal = epic ? repository.goals?.documents.get(epic.goal_id)?.document : null;
+  return { goal: goal ?? null, epic: epic ?? null };
+}
+
+export function projectHierarchy(repository) {
+  const tickets = documents(repository.tickets.documents).sort((a, b) => a.ticket_id.localeCompare(b.ticket_id));
+  const summarize = (members) => {
+    const counts = {};
+    for (const ticket of members) {
+      const status = ticketStatus(repository, ticket);
+      counts[status] = (counts[status] ?? 0) + 1;
+    }
+    return { total_tickets: members.length, completed_tickets: counts.DONE ?? 0, by_status: counts };
+  };
+  const epics = documents(repository.epics.documents).sort((a, b) => a.epic_id.localeCompare(b.epic_id))
+    .map((epic) => {
+      const members = tickets.filter((ticket) => ticket.epic_id === epic.epic_id);
+      return { epic, ticket_ids: members.map((ticket) => ticket.ticket_id), progress: summarize(members) };
+    });
+  const goals = documents(repository.goals.documents).sort((a, b) => a.goal_id.localeCompare(b.goal_id))
+    .map((goal) => {
+      const members = epics.filter(({ epic }) => epic.goal_id === goal.goal_id);
+      const ids = new Set(members.flatMap((epic) => epic.ticket_ids));
+      return { goal, epic_ids: members.map(({ epic }) => epic.epic_id), progress: summarize(tickets.filter((ticket) => ids.has(ticket.ticket_id))) };
+    });
+  return {
+    scope: "all",
+    progress_basis: "Current Ticket Outcomes; delivery progress does not establish Goal achievement or Epic acceptance.",
+    goals,
+    epics,
+    standalone_ticket_ids: tickets.filter((ticket) => ticket.epic_id === undefined).map((ticket) => ticket.ticket_id),
+  };
+}
+
+function planningOperation(kind, operation, repo, input) {
+  assertCurrentProjectFormat(repo);
+  const key = `${kind}_id`;
+  if (operation === "put") {
+    assertValid(validatePlanningDocument(input, kind));
+    const repository = loadRepository(repo, { [`${kind}s`]: [input] });
+    assertValid(repository.errors);
+    const path = join(repository.paths[`${kind}s`], `${input[key]}.yaml`);
+    writeDocument(path, input);
+    return { status: "written", [key]: input[key], path };
+  }
+  const repository = loadRepository(repo);
+  assertValid(repository.errors);
+  const hierarchy = projectHierarchy(repository);
+  if (operation === "list") return hierarchy[`${kind}s`];
+  if (operation === "get") {
+    if (typeof input[key] !== "string" || !ID.test(input[key])) {
+      throw new VibeHubError("invalid_input", `${kind} get needs a valid ${key}`);
+    }
+    const item = hierarchy[`${kind}s`].find((entry) => entry[kind][key] === input[key]);
+    if (!item) throw new VibeHubError("not_found", `${kind} not found: ${input[key]}`);
+    return item;
+  }
+  throw new VibeHubError("unsupported_operation", `Unsupported ${kind} operation: ${operation}`);
+}
+
 function ticketOperation(operation, repo, input, options = {}) {
   if (operation === "revise") {
     assertCurrentProjectFormat(repo);
@@ -3026,6 +3154,20 @@ function ticketOperation(operation, repo, input, options = {}) {
       );
     }
     const errors = input.tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
+    for (const kind of ["goal", "epic"]) {
+      const candidates = input[`${kind}s`] === undefined ? [] : input[`${kind}s`];
+      if (!Array.isArray(candidates)) {
+        add(errors, `${kind}s`, "must be an array");
+        continue;
+      }
+      const seen = new Set();
+      candidates.forEach((document, index) => {
+        errors.push(...validatePlanningDocument(document, kind, `${kind}s[${index}]`));
+        const id = document?.[`${kind}_id`];
+        if (seen.has(id)) add(errors, `${kind}s`, `duplicate candidate ${kind}: ${id}`);
+        seen.add(id);
+      });
+    }
     const ids = new Set();
     for (const ticket of input.tickets) {
       if (ids.has(ticket.ticket_id)) add(errors, "tickets", `duplicate candidate Ticket: ${ticket.ticket_id}`);
@@ -3039,26 +3181,38 @@ function ticketOperation(operation, repo, input, options = {}) {
       errors.push(...validateTicketMutation(existing, ticket, `tickets[${index}]`));
     }
     assertValid(errors, "Ticket candidate violates append-only revision history");
-    const repository = loadRepository(repo, { tickets: input.tickets });
+    const repository = loadRepository(repo, { tickets: input.tickets, goals: input.goals, epics: input.epics });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
     // Namespaced deliberately: bare `validation:` is already used in checked-in
     // Tickets to name the Ticket or decision that validated a claim, and
     // rewriting that would erase history on every re-apply.
     const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
-    const written = [];
+    const writes = new Map();
+    for (const kind of ["goal", "epic"]) {
+      for (const document of input[`${kind}s`] ?? []) {
+        writes.set(join(repository.paths[`${kind}s`], `${document[`${kind}_id`]}.yaml`), document);
+      }
+    }
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
       const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:"));
       const recorded = { ...ticket, provenance_refs: [...provenance, validationRef] };
       assertValid(validateTicket(recorded, `tickets[${ticket.ticket_id}]`), "Ticket candidate is invalid");
-      writeDocument(path, recorded);
-      written.push(path);
+      writes.set(path, recorded);
     }
+    // Validate the entire proposed graph before writing; restore files on an
+    // I/O failure. Like other Git-native operations, this assumes one writer
+    // per worktree, not database transaction isolation or crash atomicity.
+    const originals = new Map([...writes.keys()].map((path) => [path, existsSync(path) ? readFileSync(path, "utf8") : null]));
+    try { for (const [path, document] of writes) writeDocument(path, document); }
+    catch (error) { restoreFiles(originals); throw error; }
     return {
       status: "written",
       ticket_ids: input.tickets.map((ticket) => ticket.ticket_id),
-      paths: written,
+      goal_ids: (input.goals ?? []).map((goal) => goal.goal_id),
+      epic_ids: (input.epics ?? []).map((epic) => epic.epic_id),
+      paths: [...writes.keys()],
       advice,
     };
   }
@@ -3118,6 +3272,9 @@ function ticketOperation(operation, repo, input, options = {}) {
     const ticketEvidence = documents(repository.evidence.documents).filter((entry) => entry.ticket_id === input.ticket_id);
     return {
       ticket: item,
+      hierarchy: ticketHierarchy(repository, item),
+      ticket_state: ticketWorkState(repository, item),
+      agent_sessions: ticketSessionCapability(readSessions(repo), item.ticket_id),
       status: ticketStatus(repository, item),
       next_action: ticketNextAction(repository, item),
       evidence: ticketEvidence,
@@ -3126,11 +3283,14 @@ function ticketOperation(operation, repo, input, options = {}) {
     };
   }
   if (operation === "graph" || operation === "frontier") {
+    const sessions = readSessions(repo);
     const query = operation === "graph"
       ? projectTicketQuery(repository, options)
       : { tickets: documents(repository.tickets.documents), relations: [], stubs: [], filters: null };
     const items = query.tickets.map((ticket) => ({
       ticket,
+      ticket_state: ticketWorkState(repository, ticket),
+      agent_sessions: ticketSessionCapability(sessions, ticket.ticket_id),
       status: ticketStatus(repository, ticket),
       next_action: ticketNextAction(repository, ticket),
       archived: ticketArchived(repository, ticket),
@@ -3163,6 +3323,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     }
     return {
       tickets: items.sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id)),
+      hierarchy: projectHierarchy(repository),
       relations: query.relations,
       stubs: query.stubs,
       filters: query.filters,
@@ -4642,6 +4803,12 @@ function projectOperation(operation, repo, input) {
   if (operation === "compatibility") return projectCompatibility(repo);
   if (operation === "migrate-mechanical") return migrateMechanical(repo);
   if (operation === "migrate-proof-revisions") return migrateProofRevisions(repo);
+  if (operation === "hierarchy") {
+    assertCurrentProjectFormat(repo);
+    const repository = loadRepository(repo);
+    assertValid(repository.errors);
+    return projectHierarchy(repository);
+  }
   if (operation === "validate") {
     const compatibility = assertCurrentProjectFormat(repo);
     const repository = loadRepository(repo);
@@ -4651,6 +4818,8 @@ function projectOperation(operation, repo, input) {
       format_version: compatibility.current_format,
       rooms: repository.rooms.documents.size,
       contexts: repository.contexts.documents.size,
+      goals: repository.goals.documents.size,
+      epics: repository.epics.documents.size,
       tickets: repository.tickets.documents.size,
       evidence: repository.evidence.documents.size,
       outcomes: outcomeDocuments(repository).length,
@@ -4667,6 +4836,7 @@ function run() {
   let data;
   if (args.domain === "context") data = contextOperation(args.operation, args.repo, input, { room: args.room });
   else if (args.domain === "room") data = roomOperation(args.operation, args.repo, input, { room: args.room });
+  else if (args.domain === "goal" || args.domain === "epic") data = planningOperation(args.domain, args.operation, args.repo, input);
   else if (args.domain === "ticket") data = ticketOperation(args.operation, args.repo, input, {
     scope: args.scope,
     delivery: args.delivery,

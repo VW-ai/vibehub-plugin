@@ -36,7 +36,7 @@
     "quote": "我不想说硬生造一个high level task的概念",
     "ref": "conversation:2026-08-20-derived-task-hierarchy-correction"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Projects still own normal Tasks and Rooms, but Task hierarchy remains a derived Graph projection rather than an accepted canonical parent-child model",
   "tags": [
     "cross-project",

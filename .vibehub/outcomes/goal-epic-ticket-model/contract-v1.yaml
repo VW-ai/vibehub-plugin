@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "compatibility",
+    "model",
+    "planning",
+    "verification"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-08T22:28:13.138Z",
+  "contract_revision": {
+    "identity": "sha256:272be8a0bd1c6cb398a84aa05c070dc0ffade49709a571f099db0df368d3fd1d",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "goal-epic-ticket-model-validation"
+  ],
+  "independence": {
+    "note": "Fresh closeout Agent independently read the raw Ticket, new files, implementation diff, schemas, skill guidance and Evidence; did not execute implementation or inherit execution context.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Accepted model: schema and persistence validate typed Goal/Epic/Ticket ownership, malformed and dangling references, complete candidate writes and rollback, while preserving standalone Tickets. Accepted planning: PRD benefits, capabilities and independently verifiable Tickets are distinguished; parent Context is resolved and containment is independent of execution dependencies. Independently exercised a disposable 2-Goal, 2-Epic, 6-Ticket workspace-launch PRD including parent reuse, a draft unknown-provider Ticket, standalone work and cross-Epic prerequisite. Accepted compatibility: marker-only format 4 to 5 migration and reparenting preserve proof bytes and identities; parent projections count Ticket progress without claiming Goal achievement. Accepted verification: final stable full suite 318/318 passed; artifact, prerelease shipped-content gate, project validation and skill graph validation passed. Initial stale template version header was corrected and independently rechecked. Local unpublished implementation.",
+  "ticket_id": "goal-epic-ticket-model",
+  "unresolved_acceptance_ids": []
+}

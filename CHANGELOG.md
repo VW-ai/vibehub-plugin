@@ -32,6 +32,15 @@ Development version: 0.11.0-dev.1.
   activity lanes, Board/Flow views, and system light/dark appearance.
 - Make VibeHub opt-in: record contracts govern saved records, never ordinary
   work or the form or content of model responses.
+- Separate canonical Ticket state from local Agent session identity, assignment,
+  running/waiting state and activity freshness. Add an explicit reporter,
+  foreground command observation, and live Workbench session details.
+
+- Model Goals, Epics, and Tickets with validated project-local ownership, PRD
+  planning guidance, parent context in Agent handoffs, and full-project ticket
+  progress independent of execution dependencies.
+- Add explicit format 4 → 5 migration that changes only the version marker;
+  existing Tickets and proof identities remain intact and standalone.
 
 ## 0.10.0 — 2026-09-07
 

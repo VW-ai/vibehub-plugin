@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "model",
+      "criterion": "Goal and Epic schemas, persistence and helper operations validate Goal to Epic to Ticket references, reject malformed or dangling ownership and preserve standalone Tickets.",
+      "identity": "sha256:cede889809d001b74d27728f52d677452c4d31a6cb9f50d382a4ae0e742d42d0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "planning",
+      "criterion": "Planning and execution guidance distinguish benefits, grouped capabilities and independently verifiable Tickets, resolve parent context, and keep dependencies independent of containment.",
+      "identity": "sha256:1def5af95cff75038752e5b2a611b6ef1c68ab1e655b458749ddf4eeae125009",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "compatibility",
+      "criterion": "A declared format migration preserves existing Ticket, Acceptance, Evidence and Outcome bytes and identities; hierarchy projections report membership and ticket progress without asserting goal achievement.",
+      "identity": "sha256:22bf11bb4123922383540290b54a7dd878487606f39d49f3dff6044f29638f31",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification",
+      "criterion": "Tests exercise write/read hierarchy, rejected invalid batches, reparenting, standalone compatibility, migration and unchanged dependency/revision semantics; repository and artifact verification pass.",
+      "identity": "sha256:13f039d0f20124938dc4abc8649b332ce9329dc479c0a7980ec13a63cb2af7e4",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Keep storage Git-native and dependency-free.",
+    "Do not invent historical Goal/Epic membership or infer Goal achievement from completed Tickets.",
+    "Preserve unrelated .claude/ files."
+  ],
+  "context": "The user requests distinct Goals, Epics, and Tickets with canonical relations. This supersedes the earlier dependency-only hierarchy decision. Goals describe intended benefits and success criteria; Epics group a coherent capability under one Goal; executable Tickets may belong to one Epic. Standalone existing Tickets remain valid. Containment never substitutes for depends_on. Implement storage, validation, read/write operations, hierarchy projection, safe format migration and skill guidance; this request does not include publication or a Workbench redesign.",
+  "context_refs": [
+    {
+      "purpose": "Existing Ticket schema and revision guarantees.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Preserve immutable proof bindings.",
+      "ref": "skills/vibehub-core/contracts/revision-identity.md"
+    },
+    {
+      "purpose": "Prior model explicitly superseded by the current user request.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Current user-authorized Goal/Epic/Ticket semantics.",
+      "ref": ".vibehub/rooms/product/decision-goal-epic-ticket-hierarchy.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "compatibility",
+          "identity": "sha256:22bf11bb4123922383540290b54a7dd878487606f39d49f3dff6044f29638f31",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "model",
+          "identity": "sha256:cede889809d001b74d27728f52d677452c4d31a6cb9f50d382a4ae0e742d42d0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "planning",
+          "identity": "sha256:1def5af95cff75038752e5b2a611b6ef1c68ab1e655b458749ddf4eeae125009",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification",
+          "identity": "sha256:13f039d0f20124938dc4abc8649b332ce9329dc479c0a7980ec13a63cb2af7e4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:272be8a0bd1c6cb398a84aa05c070dc0ffade49709a571f099db0df368d3fd1d",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "epic_id": "prd-planning-hierarchy",
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "PRD planning preserves explicit Goal to Epic to Ticket ownership in validated Git-native data.",
+  "provenance_refs": [
+    "conversation:2026-09-08-goal-epic-ticket-model",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "goal-epic-ticket-model"
+}
