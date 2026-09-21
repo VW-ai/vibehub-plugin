@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "surface-stable-context-pages",
+      "criterion": "Provide stable Project, logical Context, exact ContextVersion, Proposal, and Conflict links that clearly show accepted, contested, superseded, and working states plus provenance and freshness watermarks.",
+      "identity": "sha256:d7f43cb2881a105ceedd57f1bfc67c40ae95760130a0bfeaf3ac6afb03c4bfd1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "surface-realtime-awareness",
+      "criterion": "Expose the selected realtime or near-realtime mechanism so agents and people see who is changing which Context, from what base version, in which workstream and repositories, without automatically injecting every draft into every agent.",
+      "identity": "sha256:cf93dfd5289f177fb6083bbf77a254592c9687faef813d0aaad507b222fbf739",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "surface-agent-overlay",
+      "criterion": "Provide an agent-facing query and proposal path that materializes accepted Project Context plus the current workstream overlay and relevant conflict headlines, with exact version references in every returned citation.",
+      "identity": "sha256:346e2280793e9e99955be0187c8def8e1b99807acb8f31ee12bf250eb412d0d4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "surface-resolution-journey",
+      "criterion": "An end-to-end two-agent, two-repository journey demonstrates compatible auto-promotion, a contradictory variation becoming a visible Conflict, an authorized resolution producing a new immutable version, and both agents observing the result.",
+      "identity": "sha256:d196189701616535af1948bde7744f5d09d3b2c550947fc8d72d2b1517d82d39",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Refine this Ticket after the online service Outcome exists; do not execute it while maturity remains draft.",
+    "Do not build a general collaborative text editor or expose internal Ticket graph mechanics as the primary user mental model.",
+    "Default to quiet availability and relevant conflict headlines rather than context spam."
+  ],
+  "context": "The service becomes a product only when addressability and concurrent awareness are usable. This Ticket remains draft until the service and selected realtime mechanism make its exact UI and agent integration contract concrete.",
+  "context_refs": [
+    {
+      "purpose": "The stable-link and exact-version user experience.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-addressable-versioned-context-identity.yaml"
+    },
+    {
+      "purpose": "The realtime overlay, conflict, and resolution behavior.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-realtime-context-variations-and-reconciliation.yaml"
+    },
+    {
+      "purpose": "The Project, Repository, Workstream, and Execution vocabulary shown by the surface.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-project-is-semantic-scope-repository-is-source.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "surface-agent-overlay",
+          "identity": "sha256:346e2280793e9e99955be0187c8def8e1b99807acb8f31ee12bf250eb412d0d4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surface-realtime-awareness",
+          "identity": "sha256:cf93dfd5289f177fb6083bbf77a254592c9687faef813d0aaad507b222fbf739",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surface-resolution-journey",
+          "identity": "sha256:d196189701616535af1948bde7744f5d09d3b2c550947fc8d72d2b1517d82d39",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surface-stable-context-pages",
+          "identity": "sha256:d7f43cb2881a105ceedd57f1bfc67c40ae95760130a0bfeaf3ac6afb03c4bfd1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0579f8931f37ebec76bd3cb02b1ca19393da80012459452510c23c8944710fdd",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "People and agents can open stable Context links, inspect exact versions and active variations, observe relevant concurrent work, submit proposals, and resolve conflicts through the online alpha without treating every draft as canonical.",
+  "provenance_refs": [
+    "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "target_ticket_id": "ticket-build-semantic-runtime-service-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-build-semantic-collaboration-surface-v0"
+}

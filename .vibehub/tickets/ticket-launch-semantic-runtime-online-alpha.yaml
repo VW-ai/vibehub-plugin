@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "alpha-protected-deployment",
+      "criterion": "Deploy the selected build behind the chosen authenticated alpha boundary with tenant/project isolation, managed secrets, bounded provider routing, retention settings, and no credential or private fixture in build artifacts or logs.",
+      "identity": "sha256:c896e7f32ffd5ef7afc30781087366f90b49a4c1292c19a9f1fbd1d331c65f26",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "alpha-live-journey",
+      "criterion": "Run the accepted synthetic or explicitly authorized live journey through Project and Repository setup, two concurrent agent proposals, exact Context links, visible conflict, resolution, realtime propagation, and immutable version retrieval.",
+      "identity": "sha256:2e5f77b8053fb061fc63819ae917924f1f885b72abe8e197a83ec6da97ab246d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "alpha-observability-and-rollback",
+      "criterion": "Record health, error, latency, provider-route, retry, rate-limit, conflict, promotion, and realtime delivery signals; document and verify rollback without corrupting accepted Context versions or blocking ordinary plugin work.",
+      "identity": "sha256:1f8a36c9d9be92fe52ed0175d5b3e510c4ec68198dc29ebd8e116e7b9e81a265",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "alpha-release-evidence",
+      "criterion": "Version the final deployment contract, endpoint and access instructions, known limitations, verification evidence, and an independently adjudicated Outcome; generated logs, credentials, private payloads, and temporary provider artifacts remain outside Git.",
+      "identity": "sha256:edba828f5663d75ab85fdd6ec59b6920fe92828d0116103df4a36db68298faeb",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Refine this Ticket after the collaboration surface Outcome exists; do not execute it while maturity remains draft.",
+    "Do not send any real repository, agent, or team data to an external model or connector without explicit destination-specific authorization.",
+    "Do not advance productization claims from one alpha journey; keep downstream user-value and repeated-work metrics explicit."
+  ],
+  "context": "This is the terminal alpha delivery Ticket. It remains draft until the selected platform, service, and collaboration surface define the real deploy target, health checks, user boundary, and release evidence.",
+  "context_refs": [
+    {
+      "purpose": "The rapid but bounded alpha objective.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
+    },
+    {
+      "purpose": "The live model-node observability and upgrade discipline.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-judgeops-continuous-evaluation.yaml"
+    },
+    {
+      "purpose": "The isolation and graceful-degradation boundary that launch must preserve.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-semantic-runtime-strong-service-boundary.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "alpha-live-journey",
+          "identity": "sha256:2e5f77b8053fb061fc63819ae917924f1f885b72abe8e197a83ec6da97ab246d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "alpha-observability-and-rollback",
+          "identity": "sha256:1f8a36c9d9be92fe52ed0175d5b3e510c4ec68198dc29ebd8e116e7b9e81a265",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "alpha-protected-deployment",
+          "identity": "sha256:c896e7f32ffd5ef7afc30781087366f90b49a4c1292c19a9f1fbd1d331c65f26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "alpha-release-evidence",
+          "identity": "sha256:edba828f5663d75ab85fdd6ec59b6920fe92828d0116103df4a36db68298faeb",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cc184e3cbda979e75e2043cefbbfb7c46c3b8508361e41c4e68586a2ed6d6ff0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A protected Semantic Runtime online alpha is deployed, observable, rollback-ready, and verified through the complete referenceable multi-agent collaboration journey.",
+  "provenance_refs": [
+    "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "target_ticket_id": "ticket-build-semantic-collaboration-surface-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-launch-semantic-runtime-online-alpha"
+}

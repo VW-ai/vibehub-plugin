@@ -1,0 +1,102 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "service-project-and-context-api",
+      "criterion": "Implement authenticated Project, Repository membership, Execution, Context, ContextVersion, Proposal, Conflict, exact-reference, and source-watermark APIs on the selected platform in conformance with the accepted v0 protocol.",
+      "identity": "sha256:1d2ceaa4712d4a662ddab67cc486c27eebfd1bf0225eafb4c6caa1c3f3ef871f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "service-atomic-promotion",
+      "criterion": "Persist idempotent events and enforce atomic base-version comparison, compatible promotion, contested canonical state, explicit resolution, immutable provenance, and tenant/project isolation under concurrent requests.",
+      "identity": "sha256:26b9e4c6a31917be94b2cd1837d8cead6a3fe7d1a6ccf59bb618ddf5b6afa679",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "service-semantic-policy-path",
+      "criterion": "Integrate bounded asynchronous conflict/relevance judgment with official TypeSafe direct JEV as the initial primary-route candidate, Gateway fallback, timeout and retry limits, route telemetry, and no authority to silently resolve protected conflicts.",
+      "identity": "sha256:62cedcd4564e0115a49becf456337ecb356b8f07b6735b5f912c218439360d22",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "service-contract-verification",
+      "criterion": "Run contract and integration tests for two Projects, multiple Repositories, concurrent agents, stale proposals, conflicting variations, cross-tenant rejection, provider degradation, and exact-version retrieval; preserve all existing offline replay and plugin-isolation checks.",
+      "identity": "sha256:01a7c272b6b6e3a6a9c90555d8418eaf34a50cb9793740d6b5f1568777ba9eb2",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Refine this Ticket after the platform selection and protocol Outcome exist; do not execute it while maturity remains draft.",
+    "Keep raw source payload retention explicit and minimal; no private project data leaves its authorized provider boundary.",
+    "Runtime failure must not corrupt canonical records or prevent ordinary plugin and Agent work."
+  ],
+  "context": "This is the service implementation after the protocol and platform decisions. It remains draft because the selected persistence, realtime, authentication, and release target determine its exact acceptance and validation commands.",
+  "context_refs": [
+    {
+      "purpose": "The minimum service slice and excluded platform scope.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
+    },
+    {
+      "purpose": "The evaluation and route-observability discipline for live semantic nodes.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-judgeops-continuous-evaluation.yaml"
+    },
+    {
+      "purpose": "The current direct-primary and Gateway-fallback hypothesis.",
+      "ref": ".vibehub/rooms/semantic-runtime/finding-typesafe-direct-route-performance.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "service-atomic-promotion",
+          "identity": "sha256:26b9e4c6a31917be94b2cd1837d8cead6a3fe7d1a6ccf59bb618ddf5b6afa679",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "service-contract-verification",
+          "identity": "sha256:01a7c272b6b6e3a6a9c90555d8418eaf34a50cb9793740d6b5f1568777ba9eb2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "service-project-and-context-api",
+          "identity": "sha256:1d2ceaa4712d4a662ddab67cc486c27eebfd1bf0225eafb4c6caa1c3f3ef871f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "service-semantic-policy-path",
+          "identity": "sha256:62cedcd4564e0115a49becf456337ecb356b8f07b6735b5f912c218439360d22",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:614577fd9b9b794db87be9ee4d72fb49953f19a0aeb5ac73572c623f8f14d354",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The selected platform hosts an authenticated, tenant-isolated Semantic Runtime service that persists Projects, Repository memberships, Executions, Context versions, Proposals, Conflicts, watermarks, and auditable promotion transitions through stable APIs.",
+  "provenance_refs": [
+    "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "target_ticket_id": "ticket-define-semantic-context-protocol-v0",
+      "type": "depends_on"
+    },
+    {
+      "target_ticket_id": "ticket-select-semantic-runtime-alpha-platform",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-build-semantic-runtime-service-v0"
+}

@@ -1,0 +1,99 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "platform-comparison",
+      "criterion": "A bounded comparison evaluates at least Cloudflare Worker plus per-Project Durable Object and a conventional Node service plus Postgres against the two-day alpha constraint, project-scoped serialization, stable HTTP links, realtime fanout, TypeSafe outbound calls, authentication, secret management, local testing, operational complexity, cost visibility, and rollback.",
+      "identity": "sha256:7781ead40842fd2871d6c3aeca115c56e407c1d189ba950a92775931e377b636",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "platform-synthetic-spike",
+      "criterion": "The recommended target has a disposable synthetic spike proving one authenticated Project, durable write/read, an atomic compare-and-set style update, one realtime subscriber notification or the target-equivalent mechanism, and one synthetic TypeSafe call without sending real project data or exposing credentials.",
+      "identity": "sha256:8e90d703e9e8be633b850958ddbc2ab31ae4ce857abcb0269e8ea12b18bb19ec",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "platform-owner-selection",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records the owner selecting the exact alpha runtime, persistence, realtime, and deployment target after reviewing the comparison and spike, including any cost or operational tradeoff the owner accepts.",
+      "identity": "sha256:d37938e3f3d1e2f46028e56f2532d8a54932bd8cd85a3e38d0ff8a3551e2d1a8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "platform-deployment-contract",
+      "criterion": "A checked-in deployment contract records the selected service topology, environment and secret names without values, tenant/project isolation boundary, data locality assumptions, local development command, deploy command, health check, rollback path, and what remains deliberately deferred.",
+      "identity": "sha256:b31f2ac6761025fa5c4901cb528309e7d233a7dea2350180bcdc2c22138e33c7",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Use synthetic data only during platform evaluation and spike work.",
+    "Never expose, print, log, or commit provider, platform, or deployment credentials.",
+    "Do not make the Skill plugin depend on the selected online service.",
+    "Prefer the smallest topology that proves the collaboration loop; do not add enterprise connectors or a general graph database."
+  ],
+  "context": "The online alpha is intended to ship quickly, but its service/storage target is still open. A Cloudflare Worker plus per-Project Durable Object is a strong hypothesis because it serializes concurrent Project writes and supports realtime fanout; a conventional Node service plus Postgres is the comparison baseline. This Ticket turns that hypothesis into a bounded technical and human decision rather than letting platform assumptions leak into core contracts.",
+  "context_refs": [
+    {
+      "purpose": "The service and component boundary the platform must preserve.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-semantic-runtime-strong-service-boundary.yaml"
+    },
+    {
+      "purpose": "The rapid online-alpha intent and deliberate scope exclusions.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
+    },
+    {
+      "purpose": "The current primary-route hypothesis and exact operational caveat.",
+      "ref": ".vibehub/rooms/semantic-runtime/finding-typesafe-direct-route-performance.yaml"
+    },
+    {
+      "purpose": "The isolation, private-state, and graceful-degradation contract.",
+      "ref": "semantic-runtime/AGENTS.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "platform-comparison",
+          "identity": "sha256:7781ead40842fd2871d6c3aeca115c56e407c1d189ba950a92775931e377b636",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "platform-deployment-contract",
+          "identity": "sha256:b31f2ac6761025fa5c4901cb528309e7d233a7dea2350180bcdc2c22138e33c7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "platform-owner-selection",
+          "identity": "sha256:d37938e3f3d1e2f46028e56f2532d8a54932bd8cd85a3e38d0ff8a3551e2d1a8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "platform-synthetic-spike",
+          "identity": "sha256:8e90d703e9e8be633b850958ddbc2ab31ae4ce857abcb0269e8ea12b18bb19ec",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:71f5ceecc8cf512d73b44a7cfffe21647b64b13ed5b5cdd54dc7200a78374e4e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner selects one concrete online-alpha deployment contract covering runtime, persistence, realtime delivery, authentication, secret handling, local development, release, and rollback, backed by a synthetic working spike.",
+  "provenance_refs": [
+    "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-select-semantic-runtime-alpha-platform"
+}
