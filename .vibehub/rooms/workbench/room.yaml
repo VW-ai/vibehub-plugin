@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "09500a99a6d70ea082283eb74deaf05ee6187d22",
+        "blob": "29d5bd308ae50276bb4bce6a1435a2cd05206b5f",
         "path": "skills/vibehub-review/SKILL.md"
       },
       {
@@ -18,12 +18,40 @@
         "path": "skills/vibehub-review/assets/app-model.js"
       },
       {
-        "blob": "244a49b76634be08a33088437393c58e92c4a0db",
+        "blob": "1de1212ef50e7ac31f53bb3b41d11194b3897f05",
         "path": "skills/vibehub-review/assets/app.css"
       },
       {
-        "blob": "193b888725200c9630804a156a44f703959bd0a0",
+        "blob": "43667aff725d07c672cc5896eb67d906f232a143",
         "path": "skills/vibehub-review/assets/app.js"
+      },
+      {
+        "blob": "8a96279633ce677eab40d02e8c07e9570bff5755",
+        "path": "skills/vibehub-review/assets/dashboard-graph.js"
+      },
+      {
+        "blob": "f0edb8232d60b0a5181e079b723d1f4ff4d1c05e",
+        "path": "skills/vibehub-review/assets/dashboard-preview.js"
+      },
+      {
+        "blob": "e0d9dc2d1da8da53fa6327520a3637350287e33f",
+        "path": "skills/vibehub-review/assets/dashboard-rooms.js"
+      },
+      {
+        "blob": "9373c87efd86e8317e0454e545ace5f8069c01bb",
+        "path": "skills/vibehub-review/assets/dashboard-ticket.js"
+      },
+      {
+        "blob": "9da00a775e045b8f290bcf50b82a01ba9a3fe028",
+        "path": "skills/vibehub-review/assets/dashboard.css"
+      },
+      {
+        "blob": "9245ce6aca3fcf7c132c2fcd8e800f22061dab09",
+        "path": "skills/vibehub-review/assets/dashboard.html"
+      },
+      {
+        "blob": "3aee656988531c7acaf80b78bbe54f23808312a2",
+        "path": "skills/vibehub-review/assets/dashboard.js"
       },
       {
         "blob": "5effca213341ab14477c55ffd49755ae0fe10cb7",
@@ -34,12 +62,12 @@
         "path": "skills/vibehub-review/assets/vibehub-mark.svg"
       },
       {
-        "blob": "5b720acc302917c52c677885eed50772a5705d59",
+        "blob": "32406a74b65dc06219545ab38033b97b0384ad74",
         "path": "skills/vibehub-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-09-07T06:55:08.283Z",
-    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
+    "checked_at": "2026-09-21T14:38:54.187Z",
+    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
   },
   "anchors": [
     "skills/vibehub-review/"
@@ -49,6 +77,5 @@
   "kind": "room",
   "room_id": "workbench",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift:unified dashboard and Context previews added; existing shared Context claims need a follow-up review against the new presentation surfaces"
+  "stale": false
 }

@@ -6,12 +6,24 @@
         "path": "skills/vibehub-core/contracts/dependency-hygiene.json"
       },
       {
+        "blob": "fcc3be2ff6e70fc038257dd810cb659e2f1592dd",
+        "path": "skills/vibehub-core/contracts/epic.schema.json"
+      },
+      {
         "blob": "620cdb1f78b771e6d1f7751adfef12d0728040a1",
         "path": "skills/vibehub-core/contracts/evidence.schema.json"
       },
       {
+        "blob": "4d9fe0c9f9f620ca696a1b099267c8ac13d867b6",
+        "path": "skills/vibehub-core/contracts/goal.schema.json"
+      },
+      {
         "blob": "1f41e48ed073db20b0e202556991ab60efc8cd09",
         "path": "skills/vibehub-core/contracts/outcome.schema.json"
+      },
+      {
+        "blob": "e0d69404173f8af44cafae9cdac4a9bb87b15936",
+        "path": "skills/vibehub-core/contracts/planning-hierarchy.md"
       },
       {
         "blob": "5a5f279f13c65f0b9decf0732e5af1d43a11dce5",
@@ -22,7 +34,7 @@
         "path": "skills/vibehub-core/contracts/revision-identity.md"
       },
       {
-        "blob": "50442160b19c57098eab828720f45495f898d7e0",
+        "blob": "ac15127892bc5d25d80fca594d76818f7f6f7a59",
         "path": "skills/vibehub-core/contracts/ticket.schema.json"
       },
       {
@@ -30,11 +42,11 @@
         "path": "skills/vibehub-core/scripts/revision-contract.mjs"
       },
       {
-        "blob": "2accf00d45597f75070701e1a6aa8902f1736bdd",
+        "blob": "c3c2aabf53ce1549b2da82c2fa29be81aef0a739",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
-        "blob": "937d63268f3139aa99b4012236451a6d684adf1f",
+        "blob": "40b44c07b899d70e2a0550d6dc2a6e4aab173c53",
         "path": "skills/vibehub-ticket-closeout/SKILL.md"
       },
       {
@@ -42,7 +54,7 @@
         "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
       },
       {
-        "blob": "296bfd1b6c774d1760e586938011c7e1c75ffa58",
+        "blob": "84a9bcceb5c286f1db04b7a5469a035d7a25a5ef",
         "path": "skills/vibehub-ticket-plan/SKILL.md"
       },
       {
@@ -50,7 +62,7 @@
         "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
       },
       {
-        "blob": "abfb33ef7d1c6c28ebfae2c55cace293ff22923a",
+        "blob": "9cd29666687d6ee3936f451453db0df29192b692",
         "path": "skills/vibehub-ticket-run/SKILL.md"
       },
       {
@@ -58,7 +70,7 @@
         "path": "skills/vibehub-ticket-run/agents/openai.yaml"
       },
       {
-        "blob": "ee2a67d6fbde6aaef3c386c0e567d85177f61e04",
+        "blob": "8dd40e909b52bb02ffadf191b628a0527737ca05",
         "path": "skills/vibehub-ticket-validate/SKILL.md"
       },
       {
@@ -66,13 +78,16 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-07T06:55:01.794Z",
-    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
+    "checked_at": "2026-09-21T14:38:52.488Z",
+    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
+    "skills/vibehub-core/contracts/epic.schema.json",
     "skills/vibehub-core/contracts/evidence.schema.json",
+    "skills/vibehub-core/contracts/goal.schema.json",
     "skills/vibehub-core/contracts/outcome.schema.json",
+    "skills/vibehub-core/contracts/planning-hierarchy.md",
     "skills/vibehub-core/contracts/project-format.schema.json",
     "skills/vibehub-core/contracts/revision-identity.md",
     "skills/vibehub-core/contracts/ticket.schema.json",
@@ -84,10 +99,9 @@
     "skills/vibehub-ticket-validate/"
   ],
   "boundary": "The Ticket execution lifecycle from plan through independent closeout, including the deterministic vh.mjs validation surface. Not knowledge capture and not the workbench UI.",
-  "description": "Ticket-driven development: planning, validation, execution, evidence, and independent closeout.",
+  "description": "Goal and Epic planning scope plus Ticket planning, validation, execution, evidence, and independent closeout.",
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift:authority change validation and optional local Ticket workflow changed; existing shared Context claims need a follow-up review against the updated lifecycle"
+  "stale": false
 }

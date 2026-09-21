@@ -1,0 +1,72 @@
+{
+  "authority": {
+    "approval": "none",
+    "canonical": [
+      "skills/vibehub-core/contracts/context.schema.json",
+      "skills/vibehub-core/contracts/room.schema.json"
+    ],
+    "governs": [
+      "skills/vibehub-core/contracts/context.schema.json",
+      "skills/vibehub-core/contracts/room.schema.json",
+      "skills/vibehub-ingest",
+      "skills/vibehub-query",
+      "skills/vibehub-distill",
+      "skills/vibehub-migrate"
+    ],
+    "update_rules": [
+      "Change the schema and the matching validateContext or validateRoom code in vh.mjs in the same change; neither may lead the other.",
+      "Keep the change additive within schema_version 1, or bump the version and add a migration entry in vibehub-migrate.",
+      "Add or extend a test in test/ that exercises both acceptance and rejection of the new shape.",
+      "Update every Skill that writes the document (ingest, distill, migrate) so it names the new field.",
+      "Record the reason as a change Context in the knowledge room that relates to this authority and cites the schema file."
+    ],
+    "validation": [
+      "vh.mjs context validate passes for every checked-in Context and Room.",
+      "npm run verify passes, including test/skill-contracts.test.mjs.",
+      "Every SKILL.md field reference matches a schema property."
+    ]
+  },
+  "context_id": "authority-knowledge-document-schemas",
+  "detail": "Every Context entry and room.yaml under .vibehub/rooms/ must validate against context.schema.json and room.schema.json, and the validators in vh.mjs must agree with those schemas field for field. Ingest, query, distill and migrate consume these documents, so a schema change is a change to what every Skill may write. Changes stay additive within schema_version 1; a breaking change bumps the version and ships with a migration.",
+  "evidence": [
+    {
+      "note": "Canonical Context document contract.",
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
+    },
+    {
+      "note": "Canonical Room document contract.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    },
+    {
+      "note": "Tests hold the engine validator to the schema.",
+      "ref": "test/context.test.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-authority-context-type",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-09T18:40:00.000Z",
+    "quote": "put demo data in so that I can see in the dashboard",
+    "ref": "conversation:2026-09-09-authority-context-type"
+  },
+  "state": "active",
+  "summary": "The Context and Room JSON Schemas are the golden truth for every durable knowledge document VibeHub reads or writes",
+  "tags": [
+    "authority",
+    "schemas",
+    "context",
+    "rooms",
+    "golden-truth"
+  ],
+  "type": "authority"
+}
