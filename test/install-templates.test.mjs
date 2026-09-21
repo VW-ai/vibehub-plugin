@@ -36,7 +36,7 @@ test("vibehub-core is a non-invocable carrier for helper, contracts, and templat
   assert.ok(!existsSync(join(root, "skills", "contracts")));
 });
 
-test("the six-file project copy runs from scripts/vibehub in a clean checkout", async () => {
+test("the seven-file project copy runs from scripts/vibehub in a clean checkout", async () => {
   const { mkdtempSync, mkdirSync, copyFileSync, writeFileSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const project = mkdtempSync(join(tmpdir(), "vibehub-mirror-copy-"));
@@ -48,6 +48,7 @@ test("the six-file project copy runs from scripts/vibehub in a clean checkout", 
   copyFileSync(join(templates, "sync-github-issues.mjs"), join(project, "scripts", "vibehub", "sync-github-issues.mjs"));
   copyFileSync(join(core, "scripts", "vh.mjs"), join(project, "scripts", "vibehub", "scripts", "vh.mjs"));
   copyFileSync(join(core, "scripts", "revision-contract.mjs"), join(project, "scripts", "vibehub", "scripts", "revision-contract.mjs"));
+  copyFileSync(join(core, "scripts", "session-store.mjs"), join(project, "scripts", "vibehub", "scripts", "session-store.mjs"));
   copyFileSync(join(core, "contracts", "versions.json"), join(project, "scripts", "vibehub", "contracts", "versions.json"));
   copyFileSync(join(core, "contracts", "dependency-hygiene.json"), join(project, "scripts", "vibehub", "contracts", "dependency-hygiene.json"));
   // minimal valid project so the projection can be computed without any plugin installed

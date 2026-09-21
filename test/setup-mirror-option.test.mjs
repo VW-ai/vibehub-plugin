@@ -10,13 +10,14 @@ test("setup leaves GitHub disabled until explicitly requested and every listed s
   assert.match(skill, /Only when the user explicitly requests/);
   assert.match(skill, /Nothing for an Agent to run or check/);
   const sources = [...skill.matchAll(/^\s+(\.\.\/vibehub-core\/[^\s]+)\s+→\s+(\S+)$/gmu)];
-  assert.equal(sources.length, 6);
+  assert.equal(sources.length, 7);
   for (const [, src] of sources) assert.ok(existsSync(join(root, "skills", "vibehub-setup", src)), `missing ${src}`);
   assert.deepEqual(sources.map(([, , dst]) => dst), [
     ".github/workflows/sync-issues.yml",
     "scripts/vibehub/sync-github-issues.mjs",
     "scripts/vibehub/scripts/vh.mjs",
     "scripts/vibehub/scripts/revision-contract.mjs",
+    "scripts/vibehub/scripts/session-store.mjs",
     "scripts/vibehub/contracts/versions.json",
     "scripts/vibehub/contracts/dependency-hygiene.json",
   ]);

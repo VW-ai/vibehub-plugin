@@ -415,7 +415,7 @@ for (const stage of [
       assert.equal(printed.commit, RELEASE_COMMIT);
       assert.match(printed.engine_sha256, /^[0-9a-f]{64}$/u);
       assert.match(printed.migrations_sha256, /^[0-9a-f]{64}$/u);
-      assert.equal(Object.keys(printed.contract_sha256).length, 11);
+      assert.equal(Object.keys(printed.contract_sha256).length, 14);
     }
     assert.deepEqual(snapshot(repo), before);
   });
@@ -469,6 +469,9 @@ test("the implemented boundary and release documentation preserve the narrow exc
   // while the historical proposal still governs the one-shot upgrade lane.
   assert.equal(boundary.split("One narrow exception", 2)[1].split("\n## Unified dashboard", 1)[0].trim(),
     quoted.split("One narrow exception", 2)[1].trim());
+  assert.match(boundary, /## Explicit local session observation/u);
+  assert.match(boundary, /worktree-specific Git metadata/u);
+  assert.match(boundary, /No session record is Ticket\s+authority/u);
 
   const install = readFileSync(join(root, "docs", "INSTALL.md"), "utf8");
   assert.match(install, /tree\/<release-tag>/u);

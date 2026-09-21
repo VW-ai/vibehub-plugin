@@ -1,0 +1,110 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ticket-state",
+      "criterion": "CLI and Workbench expose deterministic ready, blocked, awaiting-review, needs-human, refinement/replan and done Ticket state solely from canonical Ticket data, unaffected by session reports or process exit.",
+      "identity": "sha256:c4281d5b920a78f42ac1171480fc2678583bf950d26167ef586bacce2623d1d6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "session-model",
+      "criterion": "A strict versioned local session model binds agent/provider/session identity and operation to an existing Ticket, records state and report/activity timestamps, rejects stale sequence updates and invalid transitions, and isolates records by worktree without adding runtime files to Git.",
+      "identity": "sha256:50027739760b83f83306fa2d310257c145feba131fd0709a0376d3604a583bf6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "runtime-integration",
+      "criterion": "A usable explicit reporter supports ready, running, waiting, paused and terminal session states; a real foreground command wrapper reports process start, heartbeat and exit/cancellation, preserves command I/O, and never invents activity or Ticket completion.",
+      "identity": "sha256:2d8cba801f338ca0240cdf078e98daada5d554888d68f99d15e7c5c56d7ac7b1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "workbench",
+      "criterion": "Workbench lists assigned agents, session state, last report and last activity, shows stale/disconnected reports honestly, refreshes runtime presence, and preserves authoritative Ticket routing, keyboard access and narrow-screen readability.",
+      "identity": "sha256:19882755a4b9411b6741e1df98c0acd6115791cbfd891453a0aec26f09aab82e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification",
+      "criterion": "Tests and live smoke verification cover state independence, invalid reports, stale recovery, concurrent update protection, worktree isolation, process success/failure/cancellation and responsive Workbench rendering; repository, skills and artifact checks pass.",
+      "identity": "sha256:a670be0d541de20bb8a040cc379c30a36eb58809fe6edc0091e73d2684209ca0",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Preserve prior uncommitted Goal/Epic implementation and unrelated .claude/ files.",
+    "Runtime snapshots are disposable observations, never semantic authority or proof.",
+    "No daemon, global host scan, installed provider hooks, automatic agent scheduling, commit, push or deployment.",
+    "Distinguish explicit agent reports from process observation; heartbeats establish connectivity, not meaningful activity."
+  ],
+  "context": "User authorized implementation of separate Ticket state and Agent session state. Implement a provider-neutral foreground session reporter and command wrapper, local worktree-scoped disposable session storage, explicit assignment, state reports, heartbeat freshness and visible Workbench session details. Ticket truth remains in Git; runtime data does not create Evidence, Outcomes or unlocks. Existing agents integrate by reporting, and commands launched through the wrapper are observed. Do not claim universal automatic detection of pre-existing Codex, Claude or other host sessions. This bounded local observability feature amends the prior no-runtime-state boundary, without implementing AgentProfile/WorkflowProfile routing or the separate ticket-define-agent-workflow-runtime scope.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative routing remains unaffected.",
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Existing card/state presentation and live presence honesty.",
+      "ref": ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml"
+    },
+    {
+      "purpose": "Keep runtime internals opaque and integrations narrow.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Prior boundary narrowed by explicit current user authorization.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "runtime-integration",
+          "identity": "sha256:2d8cba801f338ca0240cdf078e98daada5d554888d68f99d15e7c5c56d7ac7b1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-model",
+          "identity": "sha256:50027739760b83f83306fa2d310257c145feba131fd0709a0376d3604a583bf6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-state",
+          "identity": "sha256:c4281d5b920a78f42ac1171480fc2678583bf950d26167ef586bacce2623d1d6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification",
+          "identity": "sha256:a670be0d541de20bb8a040cc379c30a36eb58809fe6edc0091e73d2684209ca0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workbench",
+          "identity": "sha256:19882755a4b9411b6741e1df98c0acd6115791cbfd891453a0aec26f09aab82e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:da173912c08f94ab03ee8bde4459dd34ed10a013cd20c90fc55f5d8bcec12672",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub shows canonical Ticket readiness separately from explicit local Agent session assignment, state and freshness.",
+  "provenance_refs": [
+    "conversation:2026-09-08-ticket-and-agent-session-state",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-agent-session-status"
+}

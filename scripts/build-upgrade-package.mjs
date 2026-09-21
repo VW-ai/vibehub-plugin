@@ -24,6 +24,7 @@ const RELEASE_FILES = [
   ["scripts/vibehub-upgrade.mjs", "bin/vibehub-upgrade.mjs"],
   ["skills/vibehub-core/scripts/vh.mjs", "vibehub-core/scripts/vh.mjs"],
   ["skills/vibehub-core/scripts/revision-contract.mjs", "vibehub-core/scripts/revision-contract.mjs"],
+  ["skills/vibehub-core/scripts/session-store.mjs", "vibehub-core/scripts/session-store.mjs"],
   ...CONTRACTS.map((name) => [
     `skills/vibehub-core/contracts/${name}`,
     `vibehub-core/contracts/${name}`,

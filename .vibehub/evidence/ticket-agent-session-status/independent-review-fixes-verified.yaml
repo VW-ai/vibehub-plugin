@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "ticket-state",
+    "session-model",
+    "runtime-integration",
+    "workbench",
+    "verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ticket-state",
+      "identity": "sha256:c4281d5b920a78f42ac1171480fc2678583bf950d26167ef586bacce2623d1d6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "session-model",
+      "identity": "sha256:50027739760b83f83306fa2d310257c145feba131fd0709a0376d3604a583bf6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "runtime-integration",
+      "identity": "sha256:2d8cba801f338ca0240cdf078e98daada5d554888d68f99d15e7c5c56d7ac7b1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench",
+      "identity": "sha256:19882755a4b9411b6741e1df98c0acd6115791cbfd891453a0aec26f09aab82e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification",
+      "identity": "sha256:a670be0d541de20bb8a040cc379c30a36eb58809fe6edc0091e73d2684209ca0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "independent-review-fixes-verified",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-08T23:04:51.603Z",
+  "refs": [
+    "test/agent-session.test.mjs",
+    "skills/vibehub-core/scripts/session-store.mjs",
+    "skills/vibehub-core/scripts/vh-session.mjs",
+    "skills/vibehub-core/contracts/agent-session.md",
+    "/tmp/vb-session-verify-complete.log",
+    "/tmp/vb-session-group-test.log"
+  ],
+  "schema_version": 2,
+  "summary": "Resolved two independently reproduced process lifecycle defects: child report credentials cannot finalize process-source sessions; the wrapper retains a private finalization credential and records actual exit. Noninteractive cancellation keeps process-group cleanup active after the leader exits, terminating signal-ignoring descendants after grace. Added real-process regressions for early completed report followed by exit 7 and cancellation with an ignoring grandchild. Final npm run verify passed all 327 tests and the 76-file plugin artifact check. Earlier responsive/live UI evidence remains applicable; no UI code changed in these fixes.",
+  "ticket_id": "ticket-agent-session-status"
+}
