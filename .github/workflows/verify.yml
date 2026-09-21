@@ -22,3 +22,23 @@ jobs:
       - run: node scripts/verify-release-version.mjs --check-shipped-content
       - run: npm test
       - run: npm run verify:artifact
+
+  semantic-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [22, 24]
+    defaults:
+      run:
+        working-directory: semantic-runtime
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run verify
+      - if: matrix.node == 24
+        run: npm run verify:standalone

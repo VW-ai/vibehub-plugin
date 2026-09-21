@@ -1,0 +1,38 @@
+{
+  "acceptance_ids": [
+    "official-typesafe-adapter",
+    "typesafe-retry-and-checkpoint-path"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "official-typesafe-adapter",
+      "identity": "sha256:c72cf9c4d06ede4cc868d431b2b33e6471837cd276111f32d4c31ac74b7a3d82",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "typesafe-retry-and-checkpoint-path",
+      "identity": "sha256:1c99cd208f92104e7640b77b14a624684f84d08465e02732199314bcc12c37f3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-direct-adapter",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:52:27Z",
+  "refs": [
+    "semantic-runtime/package.json",
+    "semantic-runtime/package-lock.json",
+    "semantic-runtime/src/adapters/typesafe-jev-judge.mjs",
+    "semantic-runtime/src/adapters/judge-input.mjs",
+    "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs",
+    "semantic-runtime/test/typesafe-jev-judge.test.mjs",
+    "semantic-runtime/README.md",
+    "semantic-runtime/test/fixtures/peel/README.md",
+    "command:npm-run-verify-54-tests"
+  ],
+  "schema_version": 2,
+  "summary": "TypeSafeJevJudge uses exact @typesafe-ai/sdk 0.6.0 and jev-latest through the official v1/systemone client. It shares minimizedJudgeState with Gateway JEV, batches visible relational candidates as Noul questions, maps only supplied target IDs, emits bounded resolved-model/token/latency metadata, and keeps core/policy provider-independent. The optional Peel runner composes this adapter with the shared serial ResilientJudge and successful-result CachedJudge, writes only ignored local artifacts, and documents the separate api.typesafe.ai authorization boundary.",
+  "ticket_id": "ticket-connect-jev-through-typesafe-direct"
+}

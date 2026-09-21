@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "runtime-boundaries-remain-intact"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "runtime-boundaries-remain-intact",
+      "identity": "sha256:6b2b0971057c611698b53a3b25732094e2406577050b4185a5d5cc9ede7cdbf2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-haiku-runtime-boundaries",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:37:08Z",
+  "refs": [
+    "command:npm-run-verify-54-tests-36-files",
+    "command:npm-run-verify-standalone-54-tests-36-files",
+    "command:npm-run-verify-peel-provenance-36-resolved",
+    "command:node-scripts-verify-plugin-artifact-mjs-79-files",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Current-tree verification passed 54 unit/integration tests and boundary analysis across 36 Runtime files. A clean standalone copy installed its exact dependencies and passed the same 54 tests. Peel provenance resolved all 36 sources. Plugin artifact verification produced the isolated 79-file skill-first artifact; credentials, caches, reports, and SQLite audits remain ignored local state.",
+  "ticket_id": "ticket-compare-jev-with-claude-haiku"
+}

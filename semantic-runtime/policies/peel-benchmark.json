@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "policy_id": "phase0-peel-jev-benchmark",
+  "version": "1",
+  "entry": "acceptance",
+  "nodes": {
+    "acceptance": { "type": "judge", "family": "acceptance_relevance", "question": "Does this event support a listed acceptance criterion?", "confidence_threshold": 0.8, "timeout_ms": 15000, "next": "durability" },
+    "durability": { "type": "judge", "family": "durable_cross_ticket_value", "question": "Does this event contain knowledge useful beyond this task?", "confidence_threshold": 0.8, "timeout_ms": 15000, "next": "context" },
+    "context": { "type": "judge", "family": "context_relevance", "question": "Which listed context is relevant to this event?", "confidence_threshold": 0.8, "timeout_ms": 15000, "next": "work" },
+    "work": { "type": "judge", "family": "independently_schedulable_work", "question": "Does this event reveal independently schedulable new work?", "confidence_threshold": 0.8, "timeout_ms": 15000, "next": "end" },
+    "end": { "type": "end" }
+  }
+}

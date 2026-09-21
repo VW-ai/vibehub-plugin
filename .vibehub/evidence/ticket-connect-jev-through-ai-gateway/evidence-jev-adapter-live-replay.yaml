@@ -1,0 +1,35 @@
+{
+  "acceptance_ids": [
+    "jev-judge-adapter",
+    "jev-live-call"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "jev-judge-adapter",
+      "identity": "sha256:e635340265ad50f7d08299e408aa484abbefcddaae82fcaf4eff7fffe641636e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "jev-live-call",
+      "identity": "sha256:506a210d662dc61960604b4b28f198b8a4b7c5b417411ff7d3c0b63f36952a3b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-jev-adapter-live-replay",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T04:17:51Z",
+  "refs": [
+    "semantic-runtime/src/adapters/jev-judge.mjs",
+    "semantic-runtime/test/jev-judge.test.mjs",
+    "semantic-runtime/scripts/smoke-jev.mjs",
+    "command:npm-run-smoke-jev",
+    "replay-run:f3462264-bd02-45e9-be6a-ec68f5ad6875",
+    "command:npm-run-audit-f3462264"
+  ],
+  "schema_version": 2,
+  "summary": "JevJudge implements the SemanticJudge contract through AI SDK evaluation, deterministic tests cover probability and target mapping, a live synthetic smoke returned a contract-valid decision, and an end-to-end one-event replay completed with four audited decisions and zero judge errors.",
+  "ticket_id": "ticket-connect-jev-through-ai-gateway"
+}

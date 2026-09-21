@@ -108,6 +108,7 @@ try {
     "codex",
     "hooks",
     "runtime",
+    "semantic-runtime",
     "packages",
     "node_modules",
   ]) {

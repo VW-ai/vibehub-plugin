@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "official-typesafe-adapter",
+    "typesafe-credential-boundary",
+    "typesafe-synthetic-live-smoke",
+    "typesafe-retry-and-checkpoint-path",
+    "typesafe-runtime-boundaries"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T07:57:15Z",
+  "contract_revision": {
+    "identity": "sha256:cd4e6fdb63cd21b18d5d23f2991952eed50af51ff2327ec3e62e836ebd8341c6",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-typesafe-direct-adapter",
+    "evidence-typesafe-direct-credential",
+    "evidence-typesafe-direct-smoke",
+    "evidence-typesafe-direct-boundaries"
+  ],
+  "independence": {
+    "note": "Independent subagent did not implement this Ticket; it read the exact Contract and Evidence, inspected the implementation and synthetic-smoke record, independently reproduced local verification, and did not make a real Peel official-direct request.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Contract v1 is successful. The exact TypeSafe SDK 0.6.0 adapter uses jev-latest through v1/systemone, preserves minimized visible inputs and provider-independent core boundaries, returns bounded SemanticJudge decisions and telemetry, and composes with the shared retry and cache path. The ignored mode-0600 credential remains untracked and unobserved; scripts only test presence and SDK authentication consumes it with logging disabled. Recorded live evidence establishes a synthetic jev-1.13.0 smoke success after an earlier bounded 529 overload, without response bodies or credential output. Independent local verification passed 54/54 tests across 36 boundary files, standalone 54/54, Peel provenance 36/36, plugin isolation at 79 files, Git diff checking, and Context guard. No real Peel official-direct run was executed or found; sending the sanitized real Peel corpus to api.typesafe.ai remains outside this Contract and requires separate destination-specific authorization.",
+  "ticket_id": "ticket-connect-jev-through-typesafe-direct",
+  "unresolved_acceptance_ids": []
+}

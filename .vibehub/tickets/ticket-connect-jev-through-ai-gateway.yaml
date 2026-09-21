@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "gateway-example",
+      "criterion": "semantic-runtime declares the ai package as a runtime dependency and provides index.ts importing generateText from ai, using model openai/gpt-5.5, and asking it to invent a new holiday and describe its traditions.",
+      "identity": "sha256:82d8cd80c43051494746fe8a30c3f913f0523841af3f061247aef1685b9a42dd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "gateway-live-call",
+      "criterion": "Running the index.ts example with AI_GATEWAY_API_KEY loaded from semantic-runtime/.env.local completes successfully and returns non-empty generated text.",
+      "identity": "sha256:066597c7ed84599eeddcb80d7062f5ca8695fa4c01222e024cecb33d549d35db",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "jev-judge-adapter",
+      "criterion": "A JevJudge adapter implements the existing SemanticJudge evaluate contract through AI SDK experimental_evaluate with model typesafe-ai/jev, maps boolean probabilities into bounded relevance decisions and relational target_ids, reports provider/model/latency metadata, and keeps provider-specific behavior outside semantic core and policy code.",
+      "identity": "sha256:e635340265ad50f7d08299e408aa484abbefcddaae82fcaf4eff7fffe641636e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "jev-live-call",
+      "criterion": "A synthetic live JEV smoke call through the adapter completes successfully and returns a decision that passes the Runtime decision contract without exposing the API key.",
+      "identity": "sha256:506a210d662dc61960604b4b28f198b8a4b7c5b417411ff7d3c0b63f36952a3b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "credential-boundary",
+      "criterion": "semantic-runtime/.env.local is ignored by Git and contains only the locally retrieved AI_GATEWAY_API_KEY; tests, examples, reports, VibeHub records, and tracked files contain no credential value.",
+      "identity": "sha256:86a3f51be7dab411554da22ff12c7b979a27c68a55094e764dab1a3f788bc270",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "runtime-verification",
+      "criterion": "Semantic Runtime boundary checks and tests pass, including deterministic adapter tests that do not require network access, and the component still verifies from a standalone copy outside the parent repository.",
+      "identity": "sha256:2da8c3d285c48f0b043ed761c7a4ed397944c053aada976209c76ac656d5533e",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Never read, print, log, commit, or place the API key in Agent-visible output; retrieve it directly from the macOS Keychain service vercel-vb into the ignored local env file.",
+    "Keep AI SDK and JEV implementation inside semantic-runtime so the shipped VibeHub Skill plugin remains independently installable.",
+    "Keep semantic core and policy code provider-independent; typesafe-ai/jev belongs in an adapter.",
+    "Use only synthetic content for live smoke calls and test fixtures.",
+    "Do not treat JEV output as canonical truth or let the adapter bypass existing policy thresholds, defer behavior, provenance, or audit storage."
+  ],
+  "context": "Phase 0 already has a provider-independent SemanticJudge interface plus offline replay. This slice installs Vercel AI SDK inside semantic-runtime, adds the requested runnable openai/gpt-5.5 example, and connects typesafe-ai/jev as the first live judge adapter. The API key comes directly from the macOS Keychain item vercel-vb into an ignored semantic-runtime/.env.local file and must never enter logs, Git, Ticket evidence, or Agent-visible output.",
+  "context_refs": [
+    {
+      "purpose": "Product requirements for a model-agnostic fast semantic judge, replay, audit, and truth-authority boundaries.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "SemanticJudge contract, JevJudge adapter seam, failure handling, and provider metadata requirements.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current Phase 0 event, state, judge, failure, and evaluation contracts that the live adapter must preserve.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "Executable provider-independent SemanticJudge interface consumed by offline replay.",
+      "ref": "semantic-runtime/src/core/replay.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "credential-boundary",
+          "identity": "sha256:86a3f51be7dab411554da22ff12c7b979a27c68a55094e764dab1a3f788bc270",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "gateway-example",
+          "identity": "sha256:82d8cd80c43051494746fe8a30c3f913f0523841af3f061247aef1685b9a42dd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "gateway-live-call",
+          "identity": "sha256:066597c7ed84599eeddcb80d7062f5ca8695fa4c01222e024cecb33d549d35db",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "jev-judge-adapter",
+          "identity": "sha256:e635340265ad50f7d08299e408aa484abbefcddaae82fcaf4eff7fffe641636e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "jev-live-call",
+          "identity": "sha256:506a210d662dc61960604b4b28f198b8a4b7c5b417411ff7d3c0b63f36952a3b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "runtime-verification",
+          "identity": "sha256:2da8c3d285c48f0b043ed761c7a4ed397944c053aada976209c76ac656d5533e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:62028f7ec44083af0874286ce9636666683fc9da80540da6f07973c5ea911b48",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The isolated Semantic Runtime can make verified Vercel AI Gateway text-generation and typesafe-ai/jev evaluation calls, with JEV exposed through the provider-independent SemanticJudge contract and credentials kept local.",
+  "provenance_refs": [
+    "conversation:2026-09-20-connect-jev-through-vercel-ai-gateway",
+    "https://vercel.com/docs/ai-gateway/sdks-and-apis/ai-sdk",
+    "https://vercel.com/docs/ai-gateway/modalities/evaluation",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-connect-jev-through-ai-gateway"
+}

@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "haiku-semantic-judge"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "haiku-semantic-judge",
+      "identity": "sha256:f6b807d3997866d14861bc1c8e03ce4b74e13a5e695534ee9892961694ed916c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-haiku-semantic-judge",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:37:08Z",
+  "refs": [
+    "semantic-runtime/src/adapters/judge-input.mjs",
+    "semantic-runtime/src/adapters/haiku-judge.mjs",
+    "semantic-runtime/src/adapters/claude-cli-judge.mjs",
+    "semantic-runtime/test/haiku-judge.test.mjs",
+    "semantic-runtime/test/claude-cli-judge.test.mjs",
+    "command:npm-run-verify-54-tests"
+  ],
+  "schema_version": 2,
+  "summary": "Haiku is implemented behind the provider-independent SemanticJudge contract in both Vercel AI Gateway and pinned Claude CLI transports. Both use the shared minimized event/state shape, ordered probability schema, visible-target mapping, and bounded metadata; no provider branch was added to semantic core or policy code. Unit tests exercise non-relational, relational, empty-state, cardinality, and malformed-output behavior.",
+  "ticket_id": "ticket-compare-jev-with-claude-haiku"
+}

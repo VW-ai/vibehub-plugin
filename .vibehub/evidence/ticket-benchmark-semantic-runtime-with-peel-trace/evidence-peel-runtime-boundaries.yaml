@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "runtime-boundaries-still-pass"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "runtime-boundaries-still-pass",
+      "identity": "sha256:c8899f28bdd35808e269c46a10b515a78df9de36eea05b751f72bb5a3547a4ba",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-peel-runtime-boundaries",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T06:18:30Z",
+  "refs": [
+    "command:npm-run-verify-37-tests",
+    "command:npm-run-verify-standalone-37-tests",
+    "command:node-scripts-verify-plugin-artifact-mjs-79-files",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Semantic Runtime boundary checks scanned 22 files and all 37 tests passed. A fresh standalone copy installed and passed the same 37-test suite. Plugin artifact verification produced 79 plugin files while excluding semantic-runtime and its AI SDK dependencies.",
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace"
+}

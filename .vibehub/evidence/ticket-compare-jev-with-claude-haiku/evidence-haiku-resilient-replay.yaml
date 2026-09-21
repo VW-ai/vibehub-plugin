@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "rate-limit-resilient-replay"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "rate-limit-resilient-replay",
+      "identity": "sha256:c8acda19c646d746f9d88b95ca82a29548aa238f6dd933f17da3ec5a96773fe0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-haiku-resilient-replay",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:37:08Z",
+  "refs": [
+    "semantic-runtime/src/adapters/resilient-judge.mjs",
+    "semantic-runtime/src/adapters/cached-judge.mjs",
+    "semantic-runtime/test/judge-resilience.test.mjs",
+    "semantic-runtime/scripts/compare-peel-judges.mjs",
+    "command:npm-run-benchmark-peel-compare-cache-hits-79-provider-requests-1",
+    "command:npm-run-verify-54-tests"
+  ],
+  "schema_version": 2,
+  "summary": "Provider calls are serialized with configurable pacing, Retry-After-aware bounded retry for 429 and 5xx, AbortSignal propagation, bounded provider errors, and append-only successful-result checkpoints keyed by semantic model descriptor plus normalized input hash. The live Claude run resumed twice: the final invocation reused 79 cached decisions and issued exactly one provider request, proving interrupted work does not repeat completed decisions. Tests cover pacing, transient retry, exhaustion, abort, permanent-error redaction, descriptor invalidation, and offline cache reuse.",
+  "ticket_id": "ticket-compare-jev-with-claude-haiku"
+}

@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "jev-benchmark-is-auditable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "jev-benchmark-is-auditable",
+      "identity": "sha256:558edbee418650ff822573fa38d0703a54badaffe6ffdd264b1db3c07214f742",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-peel-live-jev-benchmark",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T06:18:30Z",
+  "refs": [
+    "conversation:2026-09-21-authorized-sanitized-peel-vercel-ai-gateway",
+    "semantic-runtime/scripts/benchmark-peel-jev.mjs",
+    "semantic-runtime/policies/peel-benchmark.json",
+    "command:npm-run-benchmark-peel-jev",
+    "replay-run:b6854e64-6104-4ee3-8cb2-84a054c84a44",
+    "command:npm-run-verify-37-tests",
+    "command:npm-run-verify-standalone-37-tests"
+  ],
+  "schema_version": 2,
+  "summary": "Authorized live run b6854e64-6104-4ee3-8cb2-84a054c84a44 evaluated all 20 sanitized Peel events through typesafe-ai/jev with 80 audited decisions and zero judge errors. Acceptance relevance had 0.45 coverage, 1.0 precision, and 0.5 recall; Context relevance had 0.6 coverage, 0.7 event precision, 0.636364 event recall, 0.421053 target precision, and 0.615385 target recall; schedulable work had 0.3 coverage, 1.0 precision, and 0.333333 recall; durable value abstained on all 20 events. The audit kept productization_gate not_evaluated and generated state remained ignored under .local.",
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace"
+}

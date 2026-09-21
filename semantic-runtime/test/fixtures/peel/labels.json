@@ -1,0 +1,518 @@
+[
+  {
+    "event_id": "peel-001",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-001",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-001",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-001",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-002",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-002",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-002",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-002",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-003",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-003",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-003",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-003",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-004",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-004",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-004",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-product-success-metric"
+    ]
+  },
+  {
+    "event_id": "peel-004",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-005",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-automated-v01-journeys"
+    ]
+  },
+  {
+    "event_id": "peel-005",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-005",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-005",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-006",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-006",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-006",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-contract-worktree-and-diff-boundary"
+    ]
+  },
+  {
+    "event_id": "peel-006",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-007",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-temporary-repository-proof"
+    ]
+  },
+  {
+    "event_id": "peel-007",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-007",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-constraint-main-git-baseline"
+    ]
+  },
+  {
+    "event_id": "peel-007",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-008",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-008",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-008",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-008",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-009",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-009",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-009",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-decision-demo-authoritative-v01-ui-direction"
+    ]
+  },
+  {
+    "event_id": "peel-009",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-010",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-overview-visual-and-scale-regression"
+    ]
+  },
+  {
+    "event_id": "peel-010",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-010",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-decision-demo-authoritative-v01-ui-direction"
+    ]
+  },
+  {
+    "event_id": "peel-010",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-011",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-011",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-011",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-011",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-012",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-real-voice-dictation"
+    ]
+  },
+  {
+    "event_id": "peel-012",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-012",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-012",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-013",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-013",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-013",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-decision-demo-authoritative-v01-ui-direction"
+    ]
+  },
+  {
+    "event_id": "peel-013",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-014",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-014",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-014",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-logo-options"
+    ]
+  },
+  {
+    "event_id": "peel-014",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-015",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-brand-and-package-verification"
+    ]
+  },
+  {
+    "event_id": "peel-015",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-015",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-logo-choice"
+    ]
+  },
+  {
+    "event_id": "peel-015",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-016",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-016",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-016",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-016",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-017",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-durable-current-visuals"
+    ]
+  },
+  {
+    "event_id": "peel-017",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-017",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-017",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-018",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-018",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-018",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-decision-demo-authoritative-v01-ui-direction",
+      "context-logo-choice",
+      "context-semantic-zoom-pr-scope"
+    ]
+  },
+  {
+    "event_id": "peel-018",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-019",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-019",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-019",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-semantic-zoom-pr-scope"
+    ]
+  },
+  {
+    "event_id": "peel-019",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-020",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-020",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "peel-020",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-logo-choice"
+    ]
+  },
+  {
+    "event_id": "peel-020",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  }
+]

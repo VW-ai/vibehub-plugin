@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "typesafe-synthetic-live-smoke"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-synthetic-live-smoke",
+      "identity": "sha256:50fdff742697b7837d692f4795593bb843a72f0999227e598b732ed4c9ee857c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-direct-smoke",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:52:27Z",
+  "refs": [
+    "semantic-runtime/scripts/smoke-typesafe-direct.mjs",
+    "command:typesafe-models-list-bounded",
+    "command:npm-run-smoke-jev-direct",
+    "live-model:jev-1.13.0",
+    "observation:typesafe-direct-synthetic-latency-436.355ms"
+  ],
+  "schema_version": 2,
+  "summary": "The official key authenticated successfully and listed jev-latest plus jev-preview. One initial synthetic evaluation returned bounded HTTP status 529 Overloaded rather than an authentication error; the retry-enabled synthetic smoke then succeeded on its first attempt with resolved model jev-1.13.0, schema-valid negative decision confidence 0.51, 436.355 ms adapter latency, and zero retries/rate limits. No response body or credential was recorded.",
+  "ticket_id": "ticket-connect-jev-through-typesafe-direct"
+}

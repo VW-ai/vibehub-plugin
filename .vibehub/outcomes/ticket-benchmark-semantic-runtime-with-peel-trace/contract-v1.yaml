@@ -1,0 +1,34 @@
+{
+  "accepted_acceptance_ids": [
+    "peel-corpus-is-sanitized-and-traceable",
+    "four-families-have-balanced-hard-labels",
+    "real-corpus-replay-is-reproducible",
+    "jev-benchmark-is-auditable",
+    "runtime-boundaries-still-pass"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T05:36:29Z",
+  "contract_revision": {
+    "identity": "sha256:f31ce641834c9a6ecae8b8fa1a653fb64699c9186aa71843d970edebb4611fc3",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-peel-curated-corpus-replay",
+    "evidence-peel-live-jev-benchmark",
+    "evidence-peel-runtime-boundaries"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; I did not implement this Ticket and did not accept executor summaries as proof.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "partial",
+  "summary": "Independent subagent closeout accepts five of six criteria and rejects the point-in-time criterion. The checked-in fixture has exactly 20 bounded chronological excerpts, stable trace aliases, a curation entry per event, all required phases and hard cases, and no absolute user paths, raw session identifiers, or credential-shaped content in an independent scan. Its 80 labels cover all four families with positive and negative examples and relational targets that are visible under the declared timestamps. A fresh offline dataset-kind real replay, run 72b5370f-9ecf-427c-8c14-d1d044f64e91, produced 20 events, 80 decisions, zero judge errors, and productization_gate not_evaluated; both SQLite files are ignored under semantic-runtime/.local. The stored authorized live audit 7f00aefa-16c3-4d08-8af1-fa7d3927639c is complete for vercel-ai-gateway/typesafe-ai/jev with 20 events, 80 decisions, zero judge errors, and reported labeled metrics: acceptance coverage 0.70 with precision and recall 1.0; context coverage 0.60 with event precision 1.0, recall 0.785714, target precision 0.565217, and target recall 0.764706; durable coverage 0 with 20 abstentions; work coverage 0.30 with precision 1.0 and recall 0.333333. The live audit remains explicitly uncalibrated and productization_gate is not_evaluated. I read this ignored audit without re-running the Gateway benchmark and never read or printed the API key. Current independent verification passes the 21-file boundary scan, all 36 tests, a fresh standalone install/build/test, and plugin artifact isolation with 79 files; ticket validation and Context guard also pass with no authority violations. The protected human boundary represented by peel-019 remains evaluator-only scheduling truth and is not replaced by an Agent judgment; this Ticket has no human-authority acceptance criterion.\n\nThe unresolved criterion is contradicted by the source repository. peel-005 is timestamped 2026-08-25T18:00:00Z and tells the judge that independent closeout 10/10 passed, but the source implementation commit 39194ada8bed962fa65f99efd1bb2cc7bd4ecf2b is dated 2026-08-25T22:08:16Z and the corresponding successful Outcome closed at 2026-08-25T23:12:50Z. peel-015 is timestamped 2026-08-28T14:00:00Z and likewise says independent closeout passed, while the source logo Outcome closed at 2026-08-29T01:41:22Z. Both normalized source events therefore contain their own future adjudication. The fixture also declares acceptance-logo-git-durability available at 2026-08-28T11:35:00Z and uses it as peel-020 gold truth, but the source ticket-update-app-logo acceptance set contains only production-phase-assets, renderer-logo-adoption, packaged-macos-icon, and brand-and-package-verification; the declared acceptance never existed in that source Ticket. The current test checks label targets only against fixture-authored available_at values, so it cannot detect either authentic-source backdating or an invented historical acceptance. This also makes evidence-peel-curated-corpus-replay overstate the point-in-time proof. The stable trace aliases do not resolve to an immutable source ledger, so the remaining events' exact source timestamps retain some fog even though the two future-closeout contradictions are independently reproducible. Correct the event timestamps or remove future closeout facts, replace the invented acceptance with state that actually existed at that time, add tests against an immutable source-time ledger, then record new Evidence and replan a new Contract revision before claiming success.",
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace",
+  "unresolved_acceptance_ids": [
+    "point-in-time-inputs-exclude-future-truth"
+  ]
+}

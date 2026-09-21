@@ -1,0 +1,38 @@
+{
+  "acceptance_ids": [
+    "apples-to-apples-comparison",
+    "peel-haiku-live-run"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "apples-to-apples-comparison",
+      "identity": "sha256:c99cdef3e2bbef001acd5609ab9983d2a8a75f6d26bb5862c12ce849c2a557c3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "peel-haiku-live-run",
+      "identity": "sha256:2fdb2cf971d787014148bfb303f64059aab2382b303e043a335be1caba2c136c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-jev-haiku-live-comparison",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:37:08Z",
+  "refs": [
+    "conversation:2026-09-21-authorized-sanitized-peel-claude-cli",
+    "semantic-runtime/scripts/compare-peel-judges.mjs",
+    "semantic-runtime/test/judge-comparison.test.mjs",
+    "semantic-runtime/policies/peel-benchmark.json",
+    "replay-run:b6854e64-6104-4ee3-8cb2-84a054c84a44",
+    "replay-run:fb5b8a80-3069-4807-88e8-a76aa17bcda0",
+    "local-report:semantic-runtime/.local/peel-jev-vs-haiku-v1.json",
+    "command:npm-run-benchmark-peel-compare",
+    "command:npm-run-verify-peel-provenance-36-resolved"
+  ],
+  "schema_version": 2,
+  "summary": "Authorized Claude Haiku run fb5b8a80-3069-4807-88e8-a76aa17bcda0 completed the same 20 sanitized Peel events and 80 decision inputs as accepted JEV run b6854e64-6104-4ee3-8cb2-84a054c84a44 with zero judge errors and productization_gate not_evaluated. The comparison binds identical dataset, state, labels, semantic graph, questions, confidence thresholds, and decision input hashes while recording the CLI deadline separately. Haiku improved recall and coverage in every family and all Context metrics; JEV retained higher acceptance target precision and schedulable-work precision. The report records 36 disagreements, action counts, provider latency, token use, and $0.75512 observed Claude CLI cost without claiming calibration or permanent routing truth.",
+  "ticket_id": "ticket-compare-jev-with-claude-haiku"
+}

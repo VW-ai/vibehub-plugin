@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "gateway-example"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "gateway-example",
+      "identity": "sha256:82d8cd80c43051494746fe8a30c3f913f0523841af3f061247aef1685b9a42dd",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-ai-gateway-example-installed",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T04:17:51Z",
+  "refs": [
+    "semantic-runtime/package.json",
+    "semantic-runtime/package-lock.json",
+    "semantic-runtime/index.ts",
+    "command:npm-ls-ai-depth-0"
+  ],
+  "schema_version": 2,
+  "summary": "semantic-runtime pins ai 7.0.107 and index.ts imports generateText, calls openai/gpt-5.5, uses the requested holiday prompt, and rejects empty text.",
+  "ticket_id": "ticket-connect-jev-through-ai-gateway"
+}

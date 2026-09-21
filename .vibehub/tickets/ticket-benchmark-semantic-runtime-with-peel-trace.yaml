@@ -1,0 +1,175 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "peel-corpus-is-sanitized-and-traceable",
+      "criterion": "A checked-in Peel fixture contains exactly 20 deliberately selected chronological events drawn from setup, product decision, implementation or evidence, PR review, and unfinished-work recovery traces. Every event has a stable sanitized source alias and curation note, while automated checks reject absolute user paths, raw Codex thread identifiers, credential-shaped content, and copied full trajectories.",
+      "identity": "sha256:abeaf08f1c69c7b4880dd456ba22190485a830e6f27b0c3070df79f41fbde9bf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "point-in-time-inputs-exclude-future-truth",
+      "criterion": "The fixture supplies explicit point-in-time acceptance and context state with available_at timestamps plus a separate evaluator-only labels file. Automated checks prove every labeled target existed no later than its event, gold labels or later Outcomes never enter normalized judge input, and source events do not state their own future adjudication.",
+      "identity": "sha256:34d41bd501abdfd6ac02f75c614ff6c546457845d528038363ea70bcb0d2cedb",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "four-families-have-balanced-hard-labels",
+      "criterion": "Each of the 20 events has one independently curated label for each Phase 0 family. Every family contains positive and negative examples, the relational families contain valid target associations, and the corpus documents hard cases covering durable versus transient information, evidence versus activity, context supersession, schedulable work, human review boundaries, and semantic-versus-Git durability mismatch.",
+      "identity": "sha256:c6050e55691047179a8ec1d1ae558f9b94543158ce584e4a9776e9257ea541ea",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "real-corpus-replay-is-reproducible",
+      "criterion": "A documented repository command replays the Peel fixture with dataset-kind real through the offline Runtime, produces 20 events and 80 audited decisions with no judge or contract errors, and keeps SQLite output under ignored semantic-runtime/.local. Tests validate the fixture and replay behavior without network access.",
+      "identity": "sha256:1c01d198db9507c2c2fe3e82a3585c7f492cc090c4e4b66b98cfde5b107ec246",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "jev-benchmark-is-auditable",
+      "criterion": "Running the sanitized Peel corpus through the existing typesafe-ai/jev adapter completes successfully, records a run ID and per-family labeled metrics in the ignored local audit store, and reports the observed results without treating them as calibrated truth or changing productization_gate from not_evaluated.",
+      "identity": "sha256:558edbee418650ff822573fa38d0703a54badaffe6ffdd264b1db3c07214f742",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "runtime-boundaries-still-pass",
+      "criterion": "Semantic Runtime boundary checks, unit tests, and standalone verification pass with the Peel corpus and benchmark workflow included; the shipped VibeHub Skill plugin remains isolated from Runtime dependencies and fixtures.",
+      "identity": "sha256:c8899f28bdd35808e269c46a10b515a78df9de36eea05b751f72bb5a3547a4ba",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "point-in-time-inputs-exclude-future-truth",
+      "criterion": "The fixture keeps point-in-time acceptance and Context state, evaluator-only labels, and a checked-in sanitized provenance ledger separate. Every event and state candidate has a stable source identity, sanitized resolvable locator, and source_available_at from the actual Codex turn, Git object, VibeHub record, or PR commit. Event timestamps may not predate their source; every state available_at must equal its ledger availability. Acceptance candidates preserve real source Ticket acceptance IDs, while Context candidates resolve to actual source, Context, decision, or PR records. Automated checks prove every labeled target was visible then, labels, curation, and provenance never enter normalized judge input, and source events do not state future adjudication.",
+      "identity": "sha256:a4aa9d6b68c05c4041105bf9f998e4625489a9ef92285911fe0e436806e8f32d",
+      "revision": 2,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 2,
+  "constraints": [
+    "Do not commit raw Codex project trajectories, complete transcripts, local absolute paths, user identities, credentials, generated model responses, SQLite databases, or replay output.",
+    "Treat labels as evaluation artifacts established from later human correction, repository facts, Evidence, and Outcomes; never expose them to SemanticJudge input.",
+    "Preserve SemanticJudge provider independence. Corpus logic and validation cannot import or special-case JEV.",
+    "Use the existing Phase 0 four-family contract and explicit event envelope; do not add live host capture, background ingestion, canonical Context writes, or worker execution.",
+    "A dataset-kind real run and one JEV result are benchmark evidence only; downstream task success, repeated-work reduction, calibration, and the productization gate remain unresolved."
+  ],
+  "context": "Peel is a small project developed from initial VibeHub setup through product decisions, implementation, independent closeout, PR review, and unfinished-work recovery. Its trace contains durable decisions, acceptance evidence, independently schedulable follow-up work, transient operational noise, and hard state mismatches such as a DONE semantic outcome with uncommitted Git changes. This Ticket turns a bounded selection of those real events into the first Phase 0 corpus. Events are curated and sanitized rather than copied as a full private transcript; point-in-time state and evaluator-only labels prevent future information leakage.",
+  "context_refs": [
+    {
+      "purpose": "Product requirements for Phase 0 real trajectory replay, quality metrics, privacy, and the productization gate.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Technical design for event normalization, SemanticJudge, candidate state, replay, and evaluation boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current executable event, point-in-time state, label-separation, replay, and audit contract.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "Provider-independent replay implementation the real corpus must exercise without host coupling.",
+      "ref": "semantic-runtime/src/core/replay.mjs"
+    },
+    {
+      "purpose": "Existing live JEV adapter used by the auditable benchmark while remaining outside corpus validation.",
+      "ref": "semantic-runtime/src/adapters/jev-judge.mjs"
+    },
+    {
+      "purpose": "Current synthetic fixture boundary that the real curated corpus must complement rather than misrepresent.",
+      "ref": "semantic-runtime/test/fixtures/README.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "four-families-have-balanced-hard-labels",
+          "identity": "sha256:c6050e55691047179a8ec1d1ae558f9b94543158ce584e4a9776e9257ea541ea",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "jev-benchmark-is-auditable",
+          "identity": "sha256:558edbee418650ff822573fa38d0703a54badaffe6ffdd264b1db3c07214f742",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "peel-corpus-is-sanitized-and-traceable",
+          "identity": "sha256:abeaf08f1c69c7b4880dd456ba22190485a830e6f27b0c3070df79f41fbde9bf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "point-in-time-inputs-exclude-future-truth",
+          "identity": "sha256:34d41bd501abdfd6ac02f75c614ff6c546457845d528038363ea70bcb0d2cedb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "real-corpus-replay-is-reproducible",
+          "identity": "sha256:1c01d198db9507c2c2fe3e82a3585c7f492cc090c4e4b66b98cfde5b107ec246",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "runtime-boundaries-still-pass",
+          "identity": "sha256:c8899f28bdd35808e269c46a10b515a78df9de36eea05b751f72bb5a3547a4ba",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f31ce641834c9a6ecae8b8fa1a653fb64699c9186aa71843d970edebb4611fc3",
+      "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "four-families-have-balanced-hard-labels",
+          "identity": "sha256:c6050e55691047179a8ec1d1ae558f9b94543158ce584e4a9776e9257ea541ea",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "jev-benchmark-is-auditable",
+          "identity": "sha256:558edbee418650ff822573fa38d0703a54badaffe6ffdd264b1db3c07214f742",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "peel-corpus-is-sanitized-and-traceable",
+          "identity": "sha256:abeaf08f1c69c7b4880dd456ba22190485a830e6f27b0c3070df79f41fbde9bf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "point-in-time-inputs-exclude-future-truth",
+          "identity": "sha256:a4aa9d6b68c05c4041105bf9f998e4625489a9ef92285911fe0e436806e8f32d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "real-corpus-replay-is-reproducible",
+          "identity": "sha256:1c01d198db9507c2c2fe3e82a3585c7f492cc090c4e4b66b98cfde5b107ec246",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "runtime-boundaries-still-pass",
+          "identity": "sha256:c8899f28bdd35808e269c46a10b515a78df9de36eea05b751f72bb5a3547a4ba",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0b0145cb27302ae92c20e56b5c6fff46ba58fce205985f8bae07f8695ee86f56",
+      "revision": 2
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Semantic Runtime replays a deliberately selected and sanitized point-in-time corpus from Peel development, measures all four Phase 0 decision families with separated gold labels, and produces an auditable live JEV benchmark without committing raw trajectories or generated replay state.",
+  "provenance_refs": [
+    "conversation:2026-09-21-peel-trace-replay",
+    "codex-project-space:peel",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace"
+}

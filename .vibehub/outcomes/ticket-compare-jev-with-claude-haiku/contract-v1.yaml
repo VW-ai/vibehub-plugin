@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "haiku-semantic-judge",
+    "rate-limit-resilient-replay",
+    "apples-to-apples-comparison",
+    "peel-haiku-live-run",
+    "runtime-boundaries-remain-intact"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T07:42:34Z",
+  "contract_revision": {
+    "identity": "sha256:404cd9d14666a301d4f194c0e21439ef3af00b31252d266c0bb7a9bbc1814ea3",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-haiku-semantic-judge",
+    "evidence-haiku-resilient-replay",
+    "evidence-jev-haiku-live-comparison",
+    "evidence-haiku-runtime-boundaries"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent; I did not implement this Ticket and reproduced its offline checks and audit comparisons instead of accepting executor summaries.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent Contract-v1 closeout accepts all five active criteria. I adjudicated only ticket-compare-jev-with-claude-haiku; the separately steered TypeSafe direct adapter is not used as acceptance proof.\n\nACCEPTED haiku-semantic-judge. The HaikuJudge adapter uses Vercel AI Gateway model anthropic/claude-haiku-4.5 behind the existing SemanticJudge shape. JEV and Haiku share minimizedJudgeState, so the model-visible event fields, visible candidate order, and policy question are aligned. The adapter requests an exact ordered probability schema, rejects malformed cardinality or probabilities, maps only supplied visible IDs, records bounded provider/model/latency and route/token/cost metadata, sets calibrated false, passes AbortSignal, and disables AI SDK retries. Direct inspection and boundary tests show no Haiku or provider branch in semantic core or policy code.\n\nACCEPTED rate-limit-resilient-replay. Replay remains sequential, while ResilientJudge adds configurable inter-request pacing, no retry except 429 and 5xx, bounded exponential and Retry-After delay, capped attempts, AbortSignal-aware pacing/backoff, and bounded provider errors that omit upstream bodies. CachedJudge keys validated successful results by the semantic judge descriptor, including prompt and schema versions, plus the complete normalized judge input hash; it writes an ignored mode-0600 JSONL checkpoint that contains no event text or secret-shaped value. Offline tests reproduce pacing, 429 Retry-After, 5xx exhaustion, permanent-error redaction, abort, descriptor invalidation, validation-before-write, and restart reuse. The completed live invocation used 79 cache hits and one provider request, independently confirming restart recovery.\n\nACCEPTED apples-to-apples-comparison. Read-only inspection of accepted JEV run b6854e64-6104-4ee3-8cb2-84a054c84a44 and Haiku run fb5b8a80-3069-4807-88e8-a76aa17bcda0 proves identical tenant/project, dataset hash, point-in-time state hash, evaluator-label hash, semantic policy graph, questions, confidence thresholds, and all 80 decision input hashes. The only policy difference is the separately recorded transport deadline. The comparator rejects mismatches in those semantic inputs, requires complete 20-event and 80-decision zero-error runs, and requires productization_gate not_evaluated. I reconstructed semantic-runtime/.local/peel-jev-vs-haiku-v1.json from the two audits and obtained an exact canonical match. The bounded report records 36 action/value disagreements, action counts, per-family precision, recall, coverage and relational target metrics, observed decision latency, cache/retry/provider-route observations, calibrated false, and the unchanged productization gate.\n\nACCEPTED peel-haiku-live-run. The authorized Haiku audit fb5b8a80-3069-4807-88e8-a76aa17bcda0 is complete for the pinned Claude Haiku 4.5 model claude-haiku-4-5-20251001 over the 20 sanitized Peel events, with 80 decisions and zero judge errors. This run used the explicitly authorized Claude CLI fallback rather than the Gateway transport; the criterion requires an authorized Claude Haiku 4.5 live run, while the separate Gateway-adapter criterion is satisfied above. The report labels CLI latency, provider route, token count, and cost as transport-specific and does not present them as Gateway performance. Haiku increased recall and coverage in every family and all Context metrics; JEV retained higher acceptance target precision and schedulable-work precision. Durable-value precision is not comparable because JEV resolved no labeled decisions. The report explicitly limits these findings to the 20-event regression corpus, treats probabilities as uncalibrated, leaves downstream success and repeated-work reduction unresolved, and keeps productization_gate not_evaluated.\n\nACCEPTED runtime-boundaries-remain-intact. Independent current-tree verification passes the 36-file dependency scan and all 54 tests. A fresh standalone installation passes the same boundary scan and 54 tests. Peel provenance resolves all 20 events and 16 state candidates, plugin artifact verification passes with 79 files while excluding Semantic Runtime, Git diff checking passes, Context guard reports no authority violations, and VibeHub validation reports 126 Tickets, 396 Evidence records, and 118 pre-closeout Outcomes. Credentials, the response cache, generated comparison report, and SQLite audits are ignored local state. I did not read or print AI_GATEWAY_API_KEY and did not issue a new JEV or Haiku request during closeout.",
+  "ticket_id": "ticket-compare-jev-with-claude-haiku",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "peel-corpus-is-sanitized-and-traceable",
+    "point-in-time-inputs-exclude-future-truth",
+    "four-families-have-balanced-hard-labels",
+    "real-corpus-replay-is-reproducible"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "peel-corpus-is-sanitized-and-traceable",
+      "identity": "sha256:abeaf08f1c69c7b4880dd456ba22190485a830e6f27b0c3070df79f41fbde9bf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "point-in-time-inputs-exclude-future-truth",
+      "identity": "sha256:a4aa9d6b68c05c4041105bf9f998e4625489a9ef92285911fe0e436806e8f32d",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "four-families-have-balanced-hard-labels",
+      "identity": "sha256:c6050e55691047179a8ec1d1ae558f9b94543158ce584e4a9776e9257ea541ea",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "real-corpus-replay-is-reproducible",
+      "identity": "sha256:1c01d198db9507c2c2fe3e82a3585c7f492cc090c4e4b66b98cfde5b107ec246",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-peel-curated-corpus-replay",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T06:18:30Z",
+  "refs": [
+    "semantic-runtime/test/fixtures/peel/events.jsonl",
+    "semantic-runtime/test/fixtures/peel/state.json",
+    "semantic-runtime/test/fixtures/peel/labels.json",
+    "semantic-runtime/test/fixtures/peel/curation.json",
+    "semantic-runtime/test/fixtures/peel/provenance.json",
+    "semantic-runtime/test/fixtures/peel/README.md",
+    "semantic-runtime/test/peel-fixture.test.mjs",
+    "semantic-runtime/scripts/verify-peel-provenance.mjs",
+    "command:npm-run-verify-peel-provenance-36-resolved",
+    "command:npm-run-replay-peel",
+    "replay-run:c89da944-4aaa-4199-90a8-08cdcbf819e4",
+    "command:npm-run-verify-37-tests"
+  ],
+  "schema_version": 2,
+  "summary": "The checked-in Peel corpus contains exactly 20 chronological sanitized events, 16 point-in-time state candidates, 80 evaluator-only labels, and a 36-entry provenance ledger. The source resolver authenticated all 36 event and state records against Codex turn phase and time, Git commit, path, blob and time, or Outcome bytes and closed_at. Tests prove labels, curation, and provenance stay outside judge input. Offline real-data replay run c89da944-4aaa-4199-90a8-08cdcbf819e4 produced 20 events, 80 decisions, zero judge errors, and left productization_gate not_evaluated.",
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace"
+}

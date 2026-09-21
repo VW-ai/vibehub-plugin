@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "dataset_id": "peel-curated-v3",
+  "source_kind": "selected-sanitized-real-trajectory",
+  "events": [
+    {
+      "event_id": "peel-001",
+      "trace_phase": "setup",
+      "selection_reason": "Product model supersession",
+      "label_basis": "The later Product Room retained Thread-first and single-root Space as durable decisions.",
+      "hard_cases": [
+        "context-supersession"
+      ]
+    },
+    {
+      "event_id": "peel-002",
+      "trace_phase": "setup",
+      "selection_reason": "Scope correction",
+      "label_basis": "The implemented v0.1 and closeout included Voice, Worktree, Diff, Subagent and titles.",
+      "hard_cases": [
+        "context-supersession"
+      ]
+    },
+    {
+      "event_id": "peel-003",
+      "trace_phase": "setup",
+      "selection_reason": "Source preservation boundary",
+      "label_basis": "The repository preserved original source files and a separate compressed Context layer.",
+      "hard_cases": [
+        "durable-vs-transient"
+      ]
+    },
+    {
+      "event_id": "peel-004",
+      "trace_phase": "planning",
+      "selection_reason": "Explicit downstream dogfood boundary",
+      "label_basis": "The next READY Ticket was a separately executable dogfood validation.",
+      "hard_cases": [
+        "schedulable-work"
+      ]
+    },
+    {
+      "event_id": "peel-005",
+      "trace_phase": "implementation",
+      "selection_reason": "Acceptance-linked v0.1 evidence",
+      "label_basis": "The independent Outcome accepted all v0.1 criteria from these checks.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ],
+      "source_not_before": "2026-08-25T23:12:50Z",
+      "source_outcome_ref": "peel-outcome://ticket-deliver-v01-spatial-loop"
+    },
+    {
+      "event_id": "peel-006",
+      "trace_phase": "product-correction",
+      "selection_reason": "Git baseline decision",
+      "label_basis": "A later fix and enduring constraint made main the baseline.",
+      "hard_cases": [
+        "context-supersession"
+      ]
+    },
+    {
+      "event_id": "peel-007",
+      "trace_phase": "implementation",
+      "selection_reason": "Main baseline evidence",
+      "label_basis": "The independent Outcome accepted the main baseline behavior.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ],
+      "source_not_before": "2026-08-26T09:18:01Z",
+      "source_outcome_ref": "peel-outcome://ticket-fix-main-git-baseline"
+    },
+    {
+      "event_id": "peel-008",
+      "trace_phase": "operations",
+      "selection_reason": "Ephemeral authentication noise",
+      "label_basis": "The device login was an environment step and created no project knowledge or Ticket.",
+      "hard_cases": [
+        "durable-vs-transient"
+      ]
+    },
+    {
+      "event_id": "peel-009",
+      "trace_phase": "product-feedback",
+      "selection_reason": "Demo authority reasserted",
+      "label_basis": "The Demo remained canonical and the Overview rebuild became separate executable work.",
+      "hard_cases": [
+        "context-supersession",
+        "schedulable-work"
+      ]
+    },
+    {
+      "event_id": "peel-010",
+      "trace_phase": "implementation",
+      "selection_reason": "Overview evidence",
+      "label_basis": "The independent Outcome accepted Demo fidelity using these checks.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ],
+      "source_not_before": "2026-08-26T10:21:56Z",
+      "source_outcome_ref": "peel-outcome://ticket-rebuild-overview-demo-fidelity"
+    },
+    {
+      "event_id": "peel-011",
+      "trace_phase": "testing",
+      "selection_reason": "Unresolved transient test signal",
+      "label_basis": "This observation alone did not establish a product defect or durable fact.",
+      "hard_cases": [
+        "durable-vs-transient",
+        "evidence-vs-activity"
+      ]
+    },
+    {
+      "event_id": "peel-012",
+      "trace_phase": "debugging",
+      "selection_reason": "Transient signal became a product finding",
+      "label_basis": "Source-level investigation connected the suspended AudioContext to the Voice acceptance contract.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ]
+    },
+    {
+      "event_id": "peel-013",
+      "trace_phase": "implementation",
+      "selection_reason": "New bounded UI follow-up",
+      "label_basis": "Markdown-safe Overview summaries were implemented and tested as a distinct change.",
+      "hard_cases": [
+        "schedulable-work"
+      ]
+    },
+    {
+      "event_id": "peel-014",
+      "trace_phase": "product-decision",
+      "selection_reason": "Human logo choice",
+      "label_basis": "Subsequent implementation used C Expressive Phase throughout the product.",
+      "hard_cases": [
+        "context-supersession"
+      ]
+    },
+    {
+      "event_id": "peel-015",
+      "trace_phase": "implementation",
+      "selection_reason": "Logo acceptance evidence",
+      "label_basis": "The logo Outcome accepted the implementation using these checks.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ],
+      "source_not_before": "2026-08-29T01:41:22Z",
+      "source_outcome_ref": "peel-outcome://ticket-update-app-logo"
+    },
+    {
+      "event_id": "peel-016",
+      "trace_phase": "operations",
+      "selection_reason": "Transient network failure",
+      "label_basis": "Later browser verification showed no repository defect.",
+      "hard_cases": [
+        "durable-vs-transient"
+      ]
+    },
+    {
+      "event_id": "peel-017",
+      "trace_phase": "verification",
+      "selection_reason": "README rendering evidence",
+      "label_basis": "Direct browser inspection proved both images rendered and no code change was needed.",
+      "hard_cases": [
+        "evidence-vs-activity"
+      ]
+    },
+    {
+      "event_id": "peel-018",
+      "trace_phase": "pr-review",
+      "selection_reason": "Scope and supersession mismatch",
+      "label_basis": "The review blocked merge and separated semantic zoom from a new visual direction.",
+      "hard_cases": [
+        "context-supersession",
+        "schedulable-work"
+      ]
+    },
+    {
+      "event_id": "peel-019",
+      "trace_phase": "pr-review",
+      "selection_reason": "Protected visual judgment",
+      "label_basis": "The draft PR explicitly required human packaged-app inspection before merge.",
+      "hard_cases": [
+        "human-review-boundary",
+        "schedulable-work"
+      ]
+    },
+    {
+      "event_id": "peel-020",
+      "trace_phase": "unfinished-work-recovery",
+      "selection_reason": "Semantic and Git durability mismatch",
+      "label_basis": "Repository inspection found accepted logo files still uncommitted and exposed concrete recovery work.",
+      "hard_cases": [
+        "semantic-git-durability-mismatch",
+        "schedulable-work"
+      ]
+    }
+  ]
+}

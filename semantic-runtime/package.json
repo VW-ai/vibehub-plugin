@@ -1,0 +1,40 @@
+{
+  "name": "@vibehub/semantic-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Experimental semantic runtime for persistent understanding of development work.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "verify": "npm run check:boundaries && npm test",
+    "verify:standalone": "node scripts/verify-standalone.mjs",
+    "verify:peel:provenance": "node scripts/verify-peel-provenance.mjs",
+    "example:gateway": "node --experimental-strip-types --env-file=.env.local index.ts",
+    "smoke:jev": "node --env-file=.env.local scripts/smoke-jev.mjs",
+    "smoke:jev:direct": "node --env-file=.env.local scripts/smoke-typesafe-direct.mjs",
+    "replay": "node src/cli.mjs replay",
+    "replay:jev": "node --env-file=.env.local src/cli.mjs replay --judge jev",
+    "replay:peel": "node src/cli.mjs replay --events test/fixtures/peel/events.jsonl --state test/fixtures/peel/state.json --labels test/fixtures/peel/labels.json --tenant benchmark --project peel --dataset-kind real --db .local/peel-replay-v3.sqlite",
+    "benchmark:peel:jev": "node --env-file=.env.local scripts/benchmark-peel-jev.mjs",
+    "benchmark:peel:jev:direct": "node --env-file=.env.local scripts/benchmark-peel-typesafe-direct.mjs",
+    "benchmark:peel:compare": "node scripts/compare-peel-judges.mjs --transport claude-cli",
+    "benchmark:peel:compare:gateway": "node --env-file=.env.local scripts/compare-peel-judges.mjs --transport gateway",
+    "audit": "node src/cli.mjs audit",
+    "compare": "node src/cli.mjs compare"
+  },
+  "devDependencies": {
+    "acorn": "8.15.0"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "0.6.0",
+    "ai": "7.0.107"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "typesafe-runtime-boundaries"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-runtime-boundaries",
+      "identity": "sha256:c13e39ff3f32968ede73362e4eccf0a0bc93d70afbe88e8fb201a8acd136c874",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-direct-boundaries",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T07:52:27Z",
+  "refs": [
+    "command:npm-run-verify-54-tests-36-files",
+    "command:npm-run-verify-standalone-54-tests-36-files",
+    "command:npm-run-verify-peel-provenance-36-resolved",
+    "command:node-scripts-verify-plugin-artifact-mjs-79-files",
+    "command:npm-install-typesafe-sdk-audit-zero",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "With the exact TypeSafe SDK and direct adapter present, boundary analysis passed across 36 Runtime files and all 54 tests passed. A clean standalone install passed the same 54 tests, Peel provenance resolved 36 sources, plugin artifact isolation passed with 79 files, npm audit reported zero vulnerabilities, Git diff checking passed, and Context guard found no authority violations.",
+  "ticket_id": "ticket-connect-jev-through-typesafe-direct"
+}

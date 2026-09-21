@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "peel-corpus-is-sanitized-and-traceable",
+    "point-in-time-inputs-exclude-future-truth",
+    "four-families-have-balanced-hard-labels",
+    "real-corpus-replay-is-reproducible",
+    "jev-benchmark-is-auditable",
+    "runtime-boundaries-still-pass"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T06:23:30Z",
+  "contract_revision": {
+    "identity": "sha256:0b0145cb27302ae92c20e56b5c6fff46ba58fce205985f8bae07f8695ee86f56",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "evidence-peel-curated-corpus-replay",
+    "evidence-peel-live-jev-benchmark",
+    "evidence-peel-runtime-boundaries"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent; I did not implement Contract v2 and reproduced the acceptance checks instead of relying on executor summaries.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent Contract-v2 closeout accepts all six active criteria. The prior contract-v1 partial Outcome remains immutable history; this Outcome adjudicates only Contract v2 identity sha256:0b0145cb27302ae92c20e56b5c6fff46ba58fce205985f8bae07f8695ee86f56.\n\nACCEPTED peel-corpus-is-sanitized-and-traceable. Direct inspection and tests confirm exactly 20 bounded chronological Peel events, one stable sanitized trace alias and curation entry per event, every required trace phase, and no checked fixture content matching local user paths, raw Codex identifiers, Gateway credential names, bearer tokens, or secret-shaped values. The source material is curated excerpts rather than transcript or generated-response export.\n\nACCEPTED point-in-time-inputs-exclude-future-truth revision 2. The fixture separates 20 events, 16 acceptance/Context state candidates, 80 evaluator-only labels, curation, and a 36-entry sanitized provenance ledger. The independent provenance command resolved all 36 entries against the Peel checkout and ignored local turn index. Codex locators bind SHA-256 of thread ID, turn ID, and turn phase and verify the authoritative phase time; Git locators bind commit, repository-relative path, blob, and committer time; committed and local Outcomes bind exact content and closed_at. Every state available_at equals its authenticated ledger time and no event predates its source. All six acceptance candidates preserve real source Ticket acceptance IDs; Context candidates resolve to source, Context, decision, or PR records. The previous future-closeout facts now occur no earlier than their Outcomes, the invented Git-durability acceptance/context is gone, and early decisions do not target Context created by those same decisions. Replay inspection proves labels, curation, ledger keys, and ledger locator values never enter SemanticJudge input while ordinary event provenance remains. Raw source IDs stay only in ignored semantic-runtime/.local/peel-turn-index.json.\n\nACCEPTED four-families-have-balanced-hard-labels. The corpus has exactly one label for each of four families on each of 20 events, with positive and negative examples in every family, valid visible relational targets, and documented durable/transient, evidence/activity, supersession, schedulable-work, protected-human-review, and semantic/Git-durability hard cases. The protected human visual judgment remains a schedulable boundary and was not substituted with Agent authority; this Ticket has no human-authority acceptance criterion.\n\nACCEPTED real-corpus-replay-is-reproducible. Stored offline run c89da944-4aaa-4199-90a8-08cdcbf819e4 is complete with dataset_kind real, 20 events, 80 decisions, zero judge errors, and productization_gate not_evaluated. I independently reran npm run replay:peel and obtained run 59910c5f-5b50-4624-91bb-300ee36e7c6f with the same 20/80/0 and gate result. Replay databases and the private turn index are ignored under semantic-runtime/.local.\n\nACCEPTED jev-benchmark-is-auditable. I read stored authorized run b6854e64-6104-4ee3-8cb2-84a054c84a44 without issuing a network request or reading the API key. The manifest is complete for vercel-ai-gateway/typesafe-ai/jev, explicitly uncalibrated, and matches the offline dataset, state, and label hashes. It records 20 events, 80 decisions, zero judge errors, and productization_gate not_evaluated. Reported metrics are acceptance coverage 0.45, precision 1.0, recall 0.5; Context coverage 0.6, event precision 0.7, recall 0.636364, target precision 0.421053, target recall 0.615385; schedulable-work coverage 0.3, precision 1.0, recall 0.333333; durable-value coverage 0 with 20 abstentions. Downstream success and repeated-work reduction remain null, so the run is benchmark evidence rather than calibrated truth or productization approval.\n\nACCEPTED runtime-boundaries-still-pass. Independent current-tree verification passes the 22-file dependency boundary scan and all 37 tests. Fresh standalone installation and the same 37-test suite pass outside the repository. Plugin artifact verification succeeds with 79 files and excludes Semantic Runtime and its AI SDK dependencies. Git diff checking passes. VibeHub Ticket validation reports 125 Tickets, 392 Evidence records, and the pre-closeout 117 Outcomes; Context guard passes with no governing-authority violations. No product code, external system, API credential, or network state was changed by this closeout.",
+  "ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "haiku-semantic-judge",
+      "criterion": "A Claude Haiku 4.5 adapter implements the existing SemanticJudge contract through Vercel AI Gateway model anthropic/claude-haiku-4.5, receives the same minimized event, visible state, and policy question shape as JEV, uses schema-validated probability output, returns only visible target IDs, records bounded model/provider/latency metadata, and adds no provider branch to semantic core or policy code.",
+      "identity": "sha256:f6b807d3997866d14861bc1c8e03ce4b74e13a5e695534ee9892961694ed916c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rate-limit-resilient-replay",
+      "criterion": "The live comparison executes provider requests serially with configurable spacing, retries only transient 429 and 5xx failures with bounded Retry-After-aware backoff, honors AbortSignal, and checkpoints successful judge results by model descriptor plus normalized input hash under ignored semantic-runtime/.local so an interrupted run does not call completed decisions again. Tests cover pacing, retry, exhaustion, abort, and cache reuse without network access or secret-shaped errors entering audit output.",
+      "identity": "sha256:c8acda19c646d746f9d88b95ca82a29548aa238f6dd933f17da3ec5a96773fe0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "apples-to-apples-comparison",
+      "criterion": "The comparison refuses runs whose dataset, point-in-time state, labels, semantic questions, or confidence thresholds differ; it compares the existing complete JEV audit with one complete Haiku audit, reports action disagreements plus per-family precision, recall, coverage, relational target precision and recall, decision latency, retry/cache/provider-route observations, and keeps productization_gate not_evaluated.",
+      "identity": "sha256:c99cdef3e2bbef001acd5609ab9983d2a8a75f6d26bb5862c12ce849c2a557c3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "peel-haiku-live-run",
+      "criterion": "An authorized live Claude Haiku 4.5 run over the 20-event sanitized Peel corpus completes with 80 audited decisions and zero judge errors. Its ignored audit and a bounded comparison report identify which model performed better or worse for each family without treating the 20-event corpus as calibrated product truth.",
+      "identity": "sha256:2fdb2cf971d787014148bfb303f64059aab2382b303e043a335be1caba2c136c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "runtime-boundaries-remain-intact",
+      "criterion": "Semantic Runtime boundary checks, unit tests, and standalone verification pass with the comparison workflow included; credentials, response cache, generated reports, and SQLite audits remain ignored local state, and the shipped VibeHub Skill plugin remains isolated from Runtime dependencies.",
+      "identity": "sha256:6b2b0971057c611698b53a3b25732094e2406577050b4185a5d5cc9ede7cdbf2",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Reuse the successful JEV run b6854e64-6104-4ee3-8cb2-84a054c84a44 rather than issuing another JEV benchmark solely for comparison.",
+    "Send only the already sanitized checked-in Peel fixture through Vercel AI Gateway; do not send provenance ledgers, labels, curation notes, raw trajectories, local identifiers, or credentials.",
+    "Do not read, print, log, or commit AI_GATEWAY_API_KEY. Load it only through the ignored semantic-runtime/.env.local file.",
+    "Keep both adapters behind the same SemanticJudge contract. Model-specific prompting, structured output parsing, routing metadata, and retry handling stay outside semantic core.",
+    "Treat model-reported probabilities as uncalibrated and compare downstream decisions and labeled metrics rather than claiming raw confidence equivalence.",
+    "A single 20-event comparison is regression evidence, not a productization gate or a permanent model-routing decision."
+  ],
+  "context": "The first live JEV benchmark completed with 20 events and 80 decisions but exposed asymmetric behavior: acceptance precision was high, Context target precision was weak, schedulable-work recall was low, and durable-value abstained on every event. This follow-up adds Claude Haiku 4.5 as a second provider-independent SemanticJudge and performs an apples-to-apples comparison. The existing successful JEV audit is reused instead of spending JEV rate-limit capacity again. Live Haiku requests use the same previously authorized sanitized fixture and local Gateway credential.",
+  "context_refs": [
+    {
+      "purpose": "The sanitized real-trajectory corpus, point-in-time trust boundaries, and live-use limits shared by both judges.",
+      "ref": "semantic-runtime/test/fixtures/peel/README.md"
+    },
+    {
+      "purpose": "The current JEV mapping whose visible inputs and bounded decision semantics the Haiku adapter must match.",
+      "ref": "semantic-runtime/src/adapters/jev-judge.mjs"
+    },
+    {
+      "purpose": "The first paced live benchmark and its current provider-error checks.",
+      "ref": "semantic-runtime/scripts/benchmark-peel-jev.mjs"
+    },
+    {
+      "purpose": "Provider-independent SemanticJudge, audit, privacy, label, and productization boundaries.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "Independent successful Outcome for the exact Peel corpus and JEV baseline consumed by this comparison.",
+      "ref": ".vibehub/outcomes/ticket-benchmark-semantic-runtime-with-peel-trace/contract-v2.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "apples-to-apples-comparison",
+          "identity": "sha256:c99cdef3e2bbef001acd5609ab9983d2a8a75f6d26bb5862c12ce849c2a557c3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "haiku-semantic-judge",
+          "identity": "sha256:f6b807d3997866d14861bc1c8e03ce4b74e13a5e695534ee9892961694ed916c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "peel-haiku-live-run",
+          "identity": "sha256:2fdb2cf971d787014148bfb303f64059aab2382b303e043a335be1caba2c136c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rate-limit-resilient-replay",
+          "identity": "sha256:c8acda19c646d746f9d88b95ca82a29548aa238f6dd933f17da3ec5a96773fe0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "runtime-boundaries-remain-intact",
+          "identity": "sha256:6b2b0971057c611698b53a3b25732094e2406577050b4185a5d5cc9ede7cdbf2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:404cd9d14666a301d4f194c0e21439ef3af00b31252d266c0bb7a9bbc1814ea3",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Semantic Runtime can compare typesafe-ai/jev with Claude Haiku 4.5 on the same sanitized Peel corpus through a rate-limit-aware, restartable benchmark and report which judge is stronger by decision family, latency, coverage, and operational reliability.",
+  "provenance_refs": [
+    "conversation:2026-09-21-compare-jev-with-claude-haiku",
+    "https://vercel.com/ai-gateway/models/claude-haiku-4.5",
+    "https://vercel.com/docs/ai-gateway/models-and-providers/provider-options",
+    "https://vercel.com/docs/ai-gateway/sdks-and-apis/openresponses",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The comparison consumes that completed Ticket's independently accepted Peel corpus and exact live JEV audit as its fixed baseline.",
+      "target_ticket_id": "ticket-benchmark-semantic-runtime-with-peel-trace",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-compare-jev-with-claude-haiku"
+}

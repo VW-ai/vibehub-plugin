@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "runtime-verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "runtime-verification",
+      "identity": "sha256:2da8c3d285c48f0b043ed761c7a4ed397944c053aada976209c76ac656d5533e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-semantic-runtime-jev-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T04:17:51Z",
+  "refs": [
+    "command:npm-run-verify-31-tests",
+    "command:npm-run-verify-standalone",
+    "command:node-scripts-verify-plugin-artifact-mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Semantic Runtime dependency boundaries and 31 tests passed, a fresh standalone copy installed and passed the same suite, and plugin artifact verification excluded the Runtime and its AI SDK dependencies.",
+  "ticket_id": "ticket-connect-jev-through-ai-gateway"
+}

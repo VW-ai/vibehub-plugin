@@ -18,6 +18,32 @@ under `.vibehub/rooms/` when a real gap appears. When the user explicitly says t
 conversation checkpoints or background capture.
 <!-- VIBEHUB:END -->
 
+## This repository's shared development records
+
+The owner explicitly opts this repository into Git sharing for VibeHub's own
+development records. This repository-specific choice overrides the local-only
+default above: project goals, Tickets, Context, Evidence, and Outcomes created
+for this repository belong in Git alongside the code they describe.
+
+When committing a change, include its related project records in the same
+commit or coordinated commit series; include them when publishing that work.
+Do not introduce local-only ignore rules for these records. If initialization
+is needed, use `project init` with `sharing: "shared"`.
+Personal records unrelated to this project and temporary runtime files remain
+outside this sharing authorization. GitHub Issue mirroring is a separate opt-in.
+
+Direct development without Tickets remains valid. Do not create a Ticket or
+Context solely to satisfy this sharing policy; when durable project records
+are created or updated, version them with the work.
+
+## Semantic Runtime development
+
+Develop the proposed Semantic Runtime inside `semantic-runtime/`, with its own
+dependency, build, test, and release boundaries. Read `semantic-runtime/AGENTS.md`
+before working there. Share this repository's existing `.vibehub/` project
+Context; do not initialize a second project store inside the Runtime directory.
+The shipped Skill plugin remains independently installable and usable.
+
 ## Public site releases
 
 For changes, deployment, verification, or rollback of `site/` and

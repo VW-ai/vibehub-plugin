@@ -1,0 +1,126 @@
+[
+  {
+    "event_id": "event-1",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-1",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-1",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-1",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-2",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-2",
+    "family": "durable_cross_ticket_value",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-2",
+    "family": "context_relevance",
+    "relevant": true,
+    "target_ids": [
+      "context-schema"
+    ]
+  },
+  {
+    "event_id": "event-2",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-3",
+    "family": "acceptance_relevance",
+    "relevant": true,
+    "target_ids": [
+      "acceptance-refresh"
+    ]
+  },
+  {
+    "event_id": "event-3",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-3",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-3",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-4",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-4",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-4",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-4",
+    "family": "independently_schedulable_work",
+    "relevant": true,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-5",
+    "family": "acceptance_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-5",
+    "family": "durable_cross_ticket_value",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-5",
+    "family": "context_relevance",
+    "relevant": false,
+    "target_ids": []
+  },
+  {
+    "event_id": "event-5",
+    "family": "independently_schedulable_work",
+    "relevant": false,
+    "target_ids": []
+  }
+]

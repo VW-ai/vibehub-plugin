@@ -1,0 +1,117 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "official-typesafe-adapter",
+      "criterion": "An adapter built on exact dependency @typesafe-ai/sdk 0.6.0 calls jev-latest through the official v1/systemone API, maps the same minimized event and visible state as the Gateway adapter into batched Noul questions, returns only visible target IDs through the existing SemanticJudge contract, records bounded resolved-model/token/latency metadata, and adds no provider branch to semantic core or policy code.",
+      "identity": "sha256:c72cf9c4d06ede4cc868d431b2b33e6471837cd276111f32d4c31ac74b7a3d82",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-credential-boundary",
+      "criterion": "TYPESAFE_API_KEY is loaded only from ignored semantic-runtime/.env.local, the checked-in example contains an empty placeholder, and SDK logging is off. Runtime scripts may test whether the variable exists and the SDK may consume it for authentication, but code, tests, audits, reports, Git state, tool output, and Agent output never serialize, echo, log, or commit its value.",
+      "identity": "sha256:2b5f050f7007a657511f6e62909741d85c2787df8adb6acebfb7b7704dcb7e1a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-synthetic-live-smoke",
+      "criterion": "A live synthetic official TypeSafe request succeeds with a schema-valid SemanticJudge decision and bounded model, token, latency, retry, and provider metadata; transient service overload is distinguished from authentication failure without recording response bodies.",
+      "identity": "sha256:50fdff742697b7837d692f4795593bb843a72f0999227e598b732ed4c9ee857c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-retry-and-checkpoint-path",
+      "criterion": "The optional real-corpus runner composes the official adapter with the shared serial pacing, bounded 429/5xx Retry-After-aware retry, AbortSignal handling, successful-decision input-hash cache, ignored SQLite audit, and an ignored bounded report. Its documentation states that running it requires explicit authorization for api.typesafe.ai and that labels, curation, provenance, and credentials are never sent.",
+      "identity": "sha256:1c99cd208f92104e7640b77b14a624684f84d08465e02732199314bcc12c37f3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-runtime-boundaries",
+      "criterion": "Semantic Runtime boundary checks, the complete test suite, standalone verification, and plugin artifact isolation pass with the exact official SDK dependency and direct adapter included.",
+      "identity": "sha256:c13e39ff3f32968ede73362e4eccf0a0bc93d70afbe88e8fb201a8acd136c874",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not send the sanitized Peel fixture or other real project data to api.typesafe.ai without explicit destination-specific user authorization.",
+    "Never expose, serialize, print, log, or commit the value of TYPESAFE_API_KEY; runtime presence checks and SDK authentication consumption are allowed. Retrieve it from macOS Keychain only through a command whose output is redirected directly into ignored local environment state.",
+    "Keep TypeSafe SDK types, request mapping, resolved-model metadata, and transport errors inside the adapter boundary; semantic core stays provider-independent.",
+    "Treat the 436 ms synthetic direct observation and the existing 304 ms Gateway median as route observations, not a provider-wide benchmark or a permanent routing decision.",
+    "A future real-corpus direct benchmark is a separate authorization and Ticket outcome."
+  ],
+  "context": "The existing JEV adapter reaches TypeSafe through Vercel AI Gateway. The owner supplied an official TypeSafe key and asked whether Gateway was causing latency. Current evidence says the Claude CLI path, not JEV Gateway, dominates the observed comparison latency: the accepted Gateway JEV run has 304 ms median provider latency, while an official direct synthetic JEV 1.13.0 call completed in 436 ms after one earlier 529 overload. This Ticket adds the official transport and safe measurement seam without treating one synthetic call as a provider-wide speed conclusion. Sending the sanitized Peel fixture to api.typesafe.ai is a separate destination decision and remains outside this Ticket.",
+  "context_refs": [
+    {
+      "purpose": "The existing Gateway JEV mapping and SemanticJudge behavior the official adapter must preserve.",
+      "ref": "semantic-runtime/src/adapters/jev-judge.mjs"
+    },
+    {
+      "purpose": "The provider-independent pacing and bounded transient-retry contract reused by direct TypeSafe.",
+      "ref": "semantic-runtime/src/adapters/resilient-judge.mjs"
+    },
+    {
+      "purpose": "The ignored successful-decision checkpoint contract reused by the optional benchmark.",
+      "ref": "semantic-runtime/src/adapters/cached-judge.mjs"
+    },
+    {
+      "purpose": "The provider boundary, privacy, audit, and real-data authorization rules.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "The sanitized corpus boundary and destination-specific authorization rule for a future direct benchmark.",
+      "ref": "semantic-runtime/test/fixtures/peel/README.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "official-typesafe-adapter",
+          "identity": "sha256:c72cf9c4d06ede4cc868d431b2b33e6471837cd276111f32d4c31ac74b7a3d82",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-credential-boundary",
+          "identity": "sha256:2b5f050f7007a657511f6e62909741d85c2787df8adb6acebfb7b7704dcb7e1a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-retry-and-checkpoint-path",
+          "identity": "sha256:1c99cd208f92104e7640b77b14a624684f84d08465e02732199314bcc12c37f3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-runtime-boundaries",
+          "identity": "sha256:c13e39ff3f32968ede73362e4eccf0a0bc93d70afbe88e8fb201a8acd136c874",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-synthetic-live-smoke",
+          "identity": "sha256:50fdff742697b7837d692f4795593bb843a72f0999227e598b732ed4c9ee857c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cd4e6fdb63cd21b18d5d23f2991952eed50af51ff2327ec3e62e836ebd8341c6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Semantic Runtime has a first-class official TypeSafe JEV transport with secure local credentials, bounded telemetry, shared retry/checkpoint behavior, and a verified synthetic live path, ready for a separately authorized real-corpus benchmark.",
+  "provenance_refs": [
+    "conversation:2026-09-21-typesafe-official-key",
+    "https://docs.typesafe.ai/sdk/javascript.md",
+    "https://docs.typesafe.ai/api.md",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-connect-jev-through-typesafe-direct"
+}

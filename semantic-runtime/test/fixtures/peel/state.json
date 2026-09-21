@@ -1,0 +1,210 @@
+[
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-automated-v01-journeys",
+    "type": "acceptance",
+    "available_at": "2026-08-25T20:55:34.000Z",
+    "text": "Automated tests cover Start Space, Focus streaming and approval, Draft cancel, Current and New Worktree First Send, recoverable failures, exact Parent return, native Voice boundaries, Rename precedence, status, Diff, packaged restart restoration, and unsupported optional capabilities.",
+    "source_ref": "peel-ticket://ticket-deliver-v01-spatial-loop/acceptance/automated-v01-journeys",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-temporary-repository-proof",
+    "type": "acceptance",
+    "available_at": "2026-08-26T09:05:45.000Z",
+    "text": "Disposable-repository tests prove main-based Diff and Worktree ancestry, missing-main failures, divergent branches, linked-worktree invocation, working-tree coverage, and preservation of existing refs, checkout, main, and Git config.",
+    "source_ref": "peel-ticket://ticket-fix-main-git-baseline/acceptance/temporary-repository-proof",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-overview-visual-and-scale-regression",
+    "type": "acceptance",
+    "available_at": "2026-08-26T09:57:28.000Z",
+    "text": "Production Electron evidence directly inspects the Demo, 2-node, 6-node, and 50-node Overview states; automated assertions preserve nodes, edges, positions, readable fields, narrow-window containment, and Focus re-entry.",
+    "source_ref": "peel-ticket://ticket-rebuild-overview-demo-fidelity/acceptance/overview-visual-and-scale-regression",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-real-voice-dictation",
+    "type": "acceptance",
+    "available_at": "2026-08-25T20:55:34.000Z",
+    "text": "The packaged desktop captures real microphone audio into the current editable Draft without auto-send; permission, capture, and transcription failures remain recoverable and preserve the existing Draft.",
+    "source_ref": "peel-ticket://ticket-deliver-v01-spatial-loop/acceptance/real-voice-dictation",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-brand-and-package-verification",
+    "type": "acceptance",
+    "available_at": "2026-08-29T01:44:03.000Z",
+    "text": "Automated checks cover the reusable mark and placeholder removal, desktop checks and package verification pass, and light, dark, and small-size samples preserve expressive geometry without clipping, blur, or lost identity.",
+    "source_ref": "peel-ticket://ticket-update-app-logo/acceptance/brand-and-package-verification",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "acceptance-durable-current-visuals",
+    "type": "acceptance",
+    "available_at": "2026-08-28T22:51:33.000Z",
+    "text": "The README includes tracked repository-relative current Focus and Overview screenshots that render from a GitHub checkout rather than ignored output or absolute local paths.",
+    "source_ref": "peel-ticket://ticket-publish-project-readme/acceptance/durable-current-visuals",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-original-project-model",
+    "type": "context",
+    "available_at": "2026-08-25T06:29:18.000Z",
+    "text": "The original proposal organizes work Project first and allows multiple Spaces beneath one Project.",
+    "source_ref": "peel-source://spatial-thread-workspace-prd-v0-original",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-original-v0-scope",
+    "type": "context",
+    "available_at": "2026-08-25T06:29:18.000Z",
+    "text": "The first scope draft postpones Voice Dictation, New Worktree, Diff, richer Subagent data and automatic short titles.",
+    "source_ref": "peel-source://spatial-thread-workspace-prd-v0-original",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-source-archive",
+    "type": "context",
+    "available_at": "2026-08-25T18:29:27.000Z",
+    "text": "Original product sources are golden evidence; summarized Context is a retrieval layer and must not silently replace source material.",
+    "source_ref": "peel-context://contract-product-source-preservation",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-product-success-metric",
+    "type": "context",
+    "available_at": "2026-08-25T06:29:18.000Z",
+    "text": "Peel creates value when a user returns to a non-current Fork and continues work, not merely when the user creates branches.",
+    "source_ref": "peel-context://contract-success-and-dogfood-measurement",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-contract-worktree-and-diff-boundary",
+    "type": "context",
+    "available_at": "2026-08-25T08:06:42.000Z",
+    "text": "Git-backed Fork Drafts choose Current Workspace or New Worktree before First Send; Worktree remains Thread metadata and Diff stays a lightweight surface rather than a Git-management workflow.",
+    "source_ref": "peel-context://contract-worktree-and-diff-boundary",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-constraint-main-git-baseline",
+    "type": "context",
+    "available_at": "2026-08-26T09:05:45.000Z",
+    "text": "Main is the canonical Git baseline for Diff and new worktrees; Ticket branches must not replace the default branch.",
+    "source_ref": "peel-context://constraint-main-git-baseline",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-decision-demo-authoritative-v01-ui-direction",
+    "type": "context",
+    "available_at": "2026-08-25T07:30:55.000Z",
+    "text": "The original Demo is the visual and interaction authority for Focus, Overview, Fork, activity hierarchy and information density.",
+    "source_ref": "peel-context://decision-demo-authoritative-v01-ui-direction",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-logo-options",
+    "type": "context",
+    "available_at": "2026-08-29T00:05:15.000Z",
+    "text": "The active logo exploration compares restrained Phase wordmark variants including option C Expressive Phase.",
+    "source_ref": "peel-decision://logo-options",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-logo-choice",
+    "type": "context",
+    "available_at": "2026-08-29T00:53:15.000Z",
+    "text": "C Expressive Phase is the selected Peel logo direction for the product mark, wordmark and macOS app icon.",
+    "source_ref": "peel-decision://logo-choice",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "benchmark",
+    "project_id": "peel",
+    "id": "context-semantic-zoom-pr-scope",
+    "type": "context",
+    "available_at": "2026-08-29T08:09:53.000Z",
+    "text": "Draft PR #1 proposes detail, compact, and map zoom levels, transient interaction updates, and persistence after interactions settle.",
+    "source_ref": "peel-pr://1@b6124b19a6810c4f874cfe4f12027fc91ffa7e26",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  }
+]

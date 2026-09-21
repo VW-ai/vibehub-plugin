@@ -1,0 +1,28 @@
+[
+  {
+    "tenant_id": "demo",
+    "project_id": "auth",
+    "id": "acceptance-refresh",
+    "type": "acceptance",
+    "available_at": "2026-09-19T09:00:00Z",
+    "text": "Session refresh regression must pass.",
+    "source_ref": "fixture://auth/contract/acceptance-refresh",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  },
+  {
+    "tenant_id": "demo",
+    "project_id": "auth",
+    "id": "context-schema",
+    "type": "context",
+    "available_at": "2026-09-19T09:00:00Z",
+    "text": "Preserve refresh token schema.",
+    "source_ref": "fixture://auth/decisions/schema",
+    "acl": {
+      "visibility": "project",
+      "sensitivity": "INTERNAL"
+    }
+  }
+]
