@@ -5,6 +5,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import http from "node:http";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readSessions, ticketSessionCapability } from "./session-store.mjs";
 import {
   assertValid,
   currentOutcome,
@@ -15,10 +16,13 @@ import {
   outcomeDocuments,
   outcomesForTicket,
   projectTicketQuery,
+  projectHierarchy,
+  ticketHierarchy,
   resolveTicketContextRef,
   ticketArchived,
   ticketNextAction,
   ticketStatus,
+  ticketWorkState,
 } from "./vh.mjs";
 import {
   activeAcceptance,
@@ -394,7 +398,7 @@ function humanAttentionState(repository, ticket, outcome) {
   };
 }
 
-function projectGraph(repository, queryOptions = {}) {
+function projectGraph(repository, queryOptions = {}, sessions = { availability: "unavailable", sessions: [], reason: "No session source connected." }) {
   const query = projectTicketQuery(repository, queryOptions);
   const ticketDocuments = query.tickets;
   const relations = query.relations.map((relation) => {
@@ -422,7 +426,9 @@ function projectGraph(repository, queryOptions = {}) {
     const nextAction = projectedNextAction(repository, ticket);
     return {
       ticketId: ticket.ticket_id,
+      workState: ticketWorkState(repository, ticket),
       ticketRevision: digest(ticket),
+      hierarchy: ticketHierarchy(repository, ticket),
       outcome: ticket.outcome,
       archived: ticketArchived(repository, ticket),
       deliveries: ticket.deliveries ?? [],
@@ -441,16 +447,14 @@ function projectGraph(repository, queryOptions = {}) {
           availability: "available",
           summary: nextAction,
         },
-        runtime: {
-          availability: "unavailable",
-          reason: "No trusted runtime source is connected to this read-only host.",
-        },
+        runtime: ticketSessionCapability(sessions, ticket.ticket_id),
       },
     };
   });
   return {
     tickets,
     relations,
+    hierarchy: projectHierarchy(repository),
     stubs: query.stubs.map((stub) => ({
       stubRef: stub.stub_ref,
       anchorTicketId: stub.anchor_ticket_id,
@@ -573,6 +577,8 @@ export function ticketContextPackage(ticket, relations, repository, source) {
   });
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
+    ticketState: ticketWorkState(repository, ticket),
+    hierarchy: ticketHierarchy(repository, ticket),
     ticketId: ticket.ticket_id,
     ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
     maturity,
@@ -747,9 +753,10 @@ export function buildUiSnapshot(repoRoot, queryOptions = {}) {
   const rawTickets = documents(repository.tickets.documents);
   const rawEvidence = documents(repository.evidence.documents);
   const rawOutcomes = outcomeDocuments(repository);
-  const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
+  const graphDigest = digest({ contexts, goals: documents(repository.goals.documents), epics: documents(repository.epics.documents), tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
-  const graph = projectGraph(repository, queryOptions);
+  const sessions = readSessions(repo);
+  const graph = projectGraph(repository, queryOptions, sessions);
   const rooms = projectRooms(repo, repository);
   const protectedBoundaries = graph.tickets
     .filter((ticket) =>
@@ -777,9 +784,11 @@ export function buildUiSnapshot(repoRoot, queryOptions = {}) {
       source,
       tickets: graph.tickets,
       relations: graph.relations,
+      hierarchy: graph.hierarchy,
       stubs: graph.stubs,
       filters: graph.filters,
     },
+    sessions,
     rooms,
     interventions: {
       review: { available: false },
@@ -1047,6 +1056,15 @@ export function startVibeHubUi({
         throw new UiError(404, "not_found", "Route not found");
       }
       requireBearer(request, token);
+      if (url.pathname === "/api/sessions") {
+        // Runtime is a separate read projection: heartbeats must not change
+        // semantic snapshot identity or invalidate proof/subject requests.
+        const sessions = readSessions(repoRoot);
+        const tickets = Object.fromEntries([...new Set(sessions.sessions.map(session => session.ticket_id))]
+          .map(id => [id, ticketSessionCapability(sessions, id)]));
+        writeJson(response, 200, { ok: true, data: { ...sessions, tickets } });
+        return;
+      }
       if (url.pathname === "/api/session-active" && dashboard) {
         renewSession();
         writeJson(response, 200, { ok: true, data: { idleTimeoutMs: tokenLifetimeMs } });

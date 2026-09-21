@@ -1,6 +1,6 @@
 ---
 name: vibehub-ticket-plan
-description: Turn a deliverable into the smallest executable Git-native VibeHub Ticket graph. This Skill owns the canonical user entry “Start this with VibeHub.” Use when the user explicitly chooses VibeHub, asks to plan work as Tickets, or an opted-in Ticket execution discovers independently schedulable work.
+description: Turn a PRD or deliverable into Goals, Epics, and the smallest executable Git-native VibeHub Ticket graph. This Skill owns the canonical user entry “Start this with VibeHub.” Use when the user explicitly chooses VibeHub, asks to plan work as Tickets, or an opted-in Ticket execution discovers independently schedulable work.
 ---
 
 # VibeHub Ticket Plan
@@ -29,6 +29,11 @@ Subagents reuse the parent's entry; a user request to keep it closed wins.
 > If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
 > `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or rerun it
 > for every Skill) before continuing; every VibeHub Skill needs that folder.
+
+Read `../vibehub-core/contracts/planning-hierarchy.md` before choosing scope.
+A PRD can define several Goals, each with Epics and executable Tickets. Persist
+Goal/Epic ownership separately from Ticket execution dependencies; reuse matching
+parents and keep small standalone work lightweight.
 
 Plan outcomes, not ceremony. One coherent deliverable is usually one Ticket.
 Split only at a real scheduling, dependency, retry, authority, or verification
@@ -98,6 +103,7 @@ is implied.
 3. Read the current graph and any named Ticket:
 
    ```text
+   node ../vibehub-core/scripts/vh.mjs project hierarchy --repo <root>
    node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root>
    node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
    ```
@@ -128,7 +134,10 @@ is implied.
    canonical artifact. `approval: human` on an authority whose canonical
    artifact the Ticket must change is a human-authority boundary: encode it as
    `authority: human` acceptance per the acceptance-authority contract.
-5. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
+5. For a PRD, draft/reuse Goals and Epics under the hierarchy contract, and
+   link each member Ticket with `epic_id`. Read the parents and resolve their
+   Context references. Include new/changed parents in the same candidate batch
+   as their Tickets. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains
    legacy-compatible firm, but new or rewritten Tickets state it explicitly.
@@ -172,7 +181,7 @@ is implied.
    review is nonblocking: resolve it semantically before reporting the plan,
    but never treat it as a schema failure or let the helper rewrite the batch.
 
-8. Read the graph back and report Ticket IDs, paths, READY/BLOCKED state, and
+8. Read the graph back and report Goal/Epic membership, Ticket IDs, paths, READY/BLOCKED state, and
    the next executable outcome. Follow `plan-applied`: ask
    `$vibehub-review` to present the refreshed graph, focused on the new
    Ticket when there is one clear subject. Keep records local by default;

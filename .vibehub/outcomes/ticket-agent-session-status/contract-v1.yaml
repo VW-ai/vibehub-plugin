@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "ticket-state",
+    "session-model",
+    "runtime-integration",
+    "workbench",
+    "verification"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-08T23:05:12.099584Z",
+  "contract_revision": {
+    "identity": "sha256:da173912c08f94ab03ee8bde4459dd34ed10a013cd20c90fc55f5d8bcec12672",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "implementation-and-verification",
+    "independent-review-fixes-verified"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent, started without execution context; read checked-in Contract and Evidence, inspected implementation, ran full verification, and used disposable fixtures to reproduce defects and verify executor corrections. Did not edit implementation.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout read the exact Contract, all Evidence, context references, implementation and tests. Canonical Ticket state is projected only from Ticket routing; local sessions keep immutable assignment, guarded revisions and worktree isolation, with freshness distinct from activity. Reporter and wrapper support documented states and preserve process I/O. The reviewer independently reproduced and then verified corrections for premature child finalization and signal-ignoring descendant cancellation. Workbench source preserves canonical routing, exposes separately labelled session details, expires live claims and refreshes without replacing inspector controls; recorded live responsive and keyboard evidence supports the rendering. Independent final npm run verify passed 327 tests and the 76-file artifact check, and Ticket validation passed. All five criteria accepted. Scope remains explicit local reporting and foreground process observation, with no automatic discovery of unrelated native host sessions.",
+  "ticket_id": "ticket-agent-session-status",
+  "unresolved_acceptance_ids": []
+}

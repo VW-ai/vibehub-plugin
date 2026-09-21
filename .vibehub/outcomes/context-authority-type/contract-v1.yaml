@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "schema-and-validation",
+    "governing-lookup",
+    "change-guard",
+    "skill-workflow",
+    "workbench-and-docs",
+    "verification"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-09T16:15:11.127Z",
+  "contract_revision": {
+    "identity": "sha256:7ee1ea6e71096938a08153c4b61992cd1e0cd3c838827af5e0fd49d9361eac6b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "authority-context-implementation-and-verification"
+  ],
+  "independence": {
+    "note": "Fresh closeout subagent with no execution context; re-ran the suite and exercised context put, governing and guard in disposable fixture repositories under the scratchpad directory.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout of contract revision 1. Repository state: ticket validate valid (126 Tickets, 389 Evidence, 118 Outcomes), context validate valid (83 Contexts unchanged), context guard over the dirty worktree passed with no authorities and no violations, npm run verify passed 333/333 tests and the 76-file artifact check. Each criterion was re-verified in a disposable fixture repository, not from the executor summary. schema-and-validation: context put accepted a complete authority Context and rejected, with specific messages, the authority field on a decision, a missing authority object, a .vibehub anchor, a parent-traversal anchor, a .vibehub canonical, a commit: canonical, a missing canonical file, empty update_rules, empty validation, and approval board; nothing was written on rejection. governing-lookup: prefix scope matched src/services/auth/index.js after path normalisation, segment scope docs/architecture.md#overview matched its file, a Ticket context_ref resolved through ticket_id, ticket_id plus paths merged in sorted order, a superseded authority was excluded, README.md returned an honest empty result, empty input and a missing Ticket returned invalid_input and not_found, and two runs were byte-identical. change-guard: explicit paths reported untouched, unrecorded, recorded-by change Context, and refused a record outside the change set, a record citing the wrong file, a record without a relation, and an archived record; git-derived mode was clean at baseline, failed on a dirty canonical, was vacuously clean after commit without since, failed with since base, passed once the change Context was added, and returned git_error for a bad revision; a tree hash before and after the guards was identical. skill-workflow: ingest, query, plan, run, validate and closeout SKILL.md carry the authority capture, governing attachment, ordered update_rules and change record, approval human routed to execution-needs-human or human-authority acceptance, and guard violations as blocking; the skill-contract harvester regex matches the cited context governing and context guard commands and the suite resolves them. workbench-and-docs: buildUiSnapshot rooms projection carries type authority with governs, canonical, updateRules, validation and approval; app.js roomContextRow renders AUTHORITY with governed scope, canonical artifacts and human approval; CONCEPT.md, README.md and CHANGELOG.md describe the type. verification: test/context-authority.test.mjs covers schema acceptance and rejection, governing by prefix, segment and Ticket refs, guard pass and fail with explicit and git-derived paths including since, and the Rooms projection; all five pass inside the green suite. No defect found. Observation, not a defect: the guard accepts any relation type from the change Context to the authority, not only relates_to, which is within the criterion wording.",
+  "ticket_id": "context-authority-type",
+  "unresolved_acceptance_ids": []
+}

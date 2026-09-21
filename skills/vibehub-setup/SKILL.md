@@ -108,6 +108,7 @@ deliverable continues without another user command.
    ../vibehub-core/templates/github/sync-github-issues.mjs → scripts/vibehub/sync-github-issues.mjs
    ../vibehub-core/scripts/vh.mjs                          → scripts/vibehub/scripts/vh.mjs
    ../vibehub-core/scripts/revision-contract.mjs           → scripts/vibehub/scripts/revision-contract.mjs
+   ../vibehub-core/scripts/session-store.mjs               → scripts/vibehub/scripts/session-store.mjs
    ../vibehub-core/contracts/versions.json                 → scripts/vibehub/contracts/versions.json
    ../vibehub-core/contracts/dependency-hygiene.json       → scripts/vibehub/contracts/dependency-hygiene.json
    ```

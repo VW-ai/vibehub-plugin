@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "model",
+    "planning",
+    "compatibility",
+    "verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "model",
+      "identity": "sha256:cede889809d001b74d27728f52d677452c4d31a6cb9f50d382a4ae0e742d42d0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "planning",
+      "identity": "sha256:1def5af95cff75038752e5b2a611b6ef1c68ab1e655b458749ddf4eeae125009",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "compatibility",
+      "identity": "sha256:22bf11bb4123922383540290b54a7dd878487606f39d49f3dff6044f29638f31",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification",
+      "identity": "sha256:13f039d0f20124938dc4abc8649b332ce9329dc479c0a7980ec13a63cb2af7e4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "goal-epic-ticket-model-validation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-09-08T22:25:23.910Z",
+  "refs": [
+    "test/planning-hierarchy.test.mjs",
+    "skills/vibehub-core/contracts/planning-hierarchy.md",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-migrate/references/migrations.json",
+    "test/project-format.test.mjs",
+    "command:node --test test/*.test.mjs",
+    "command:node scripts/verify-plugin-artifact.mjs",
+    "command:node scripts/verify-release-version.mjs --check-shipped-content"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented and verified Git-native Goal/Epic ownership, full-repository hierarchy and parent context, PRD skills, marker-only format migration and legacy proof preservation. 317 tests pass, including six hierarchy suites. Artifact, skill graph, and prerelease identity checks pass; independent plan validation passed twice. Local unpublished implementation.",
+  "ticket_id": "goal-epic-ticket-model"
+}

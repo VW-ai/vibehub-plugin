@@ -12,7 +12,7 @@ const bundleRoot=mkdtempSync(join(tmpdir(),'vibehub-opt-in-bundle-'));
 after(()=>rmSync(bundleRoot,{recursive:true,force:true}));
 for(const [source,destination] of [
   ['templates/github/sync-github-issues.mjs','sync-github-issues.mjs'],
-  ['scripts/vh.mjs','scripts/vh.mjs'],['scripts/revision-contract.mjs','scripts/revision-contract.mjs'],
+  ['scripts/vh.mjs','scripts/vh.mjs'],['scripts/revision-contract.mjs','scripts/revision-contract.mjs'],['scripts/session-store.mjs','scripts/session-store.mjs'],
   ['contracts/versions.json','contracts/versions.json'],['contracts/dependency-hygiene.json','contracts/dependency-hygiene.json'],
 ]) { const target=join(bundleRoot,destination); mkdirSync(dirname(target),{recursive:true}); copyFileSync(join(root,'skills/vibehub-core',source),target); }
 const bundled=await import(pathToFileURL(join(bundleRoot,'sync-github-issues.mjs')));

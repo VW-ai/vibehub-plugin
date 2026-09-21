@@ -42,3 +42,13 @@ affects the selected record view only; one invalid checkout cannot block the hom
 or other projects. The existing authenticated Workbench remains the per-checkout
 contract and evidence inspector. VibeHub never dictates model response formats
 or requires users to adopt its Ticket lifecycle for ordinary work.
+## Explicit local session observation
+
+The user-authorized session integration adds one bounded exception: the
+bundled foreground reporter/wrapper may store disposable session observations
+in worktree-specific Git metadata, report connectivity while its child lives,
+and expose them through the existing read-only Workbench. See
+`../../vibehub-core/contracts/agent-session.md`. No session record is Ticket
+authority, a work lease, automatic scheduling, or an Outcome. This permits no
+daemon, global discovery, provider hooks installed without request, prompt/log
+capture, or background conversation capture. Git-native semantics are unchanged.

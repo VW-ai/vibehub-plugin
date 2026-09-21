@@ -1,0 +1,50 @@
+{
+  "context_id": "decision-authority-context-type",
+  "detail": "The user wants VibeHub to hold golden truth for a project, for example a game's contracts and resources or a system's architecture graph, so that Agents follow it during implementation. This is a new Context type named authority inside the existing Room tree, not a separate data room. An authority Context names the repository territory it governs using Room anchor syntax, the canonical artifacts that are the source of truth as current repository paths, the ordered update rules an Agent must follow before changing a canonical artifact, and the validation checks that keep implementation and related Context consistent. It does not require human approval by default; approval is demanded only when the Context itself sets approval to human. Planning attaches governing authority to a Ticket automatically without asking the user to pick a Room; execution reads it before implementing and flags conflicts instead of silently diverging; a change to a canonical artifact is recorded as a change Context relating to the authority in the same change set, and a mechanical check refuses closeout when a canonical artifact changed without that record. The existing contract type keeps its meaning as long-range prose; authority is the artifact-backed sibling. Room anchors remain the drift signal, so canonical artifacts should sit inside the owning Room's territory.",
+  "evidence": [
+    {
+      "note": "The owner confirmed golden truth as a Context type with update rules rather than an approval-gated data room, and authorized implementation.",
+      "ref": "conversation:2026-09-09-authority-context-type"
+    },
+    {
+      "note": "Per-Ticket activation of a minimal Context packet is the existing mechanism the authority type plugs into.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    },
+    {
+      "note": "Room anchors already define territory and drift detection that governed scope and canonical artifacts reuse.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-playbook-context-guides-tickets",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-09T17:40:00.000Z",
+    "quote": "this should be a type for context, does not have to need approval, but agent have to ex. follow strict ways when updating",
+    "ref": "conversation:2026-09-09-authority-context-type"
+  },
+  "state": "active",
+  "summary": "Context gains an authority type: a Room-owned golden-truth artifact with governed scope, ordered update rules and validation checks that Agents must follow",
+  "tags": [
+    "authority",
+    "context",
+    "golden-truth",
+    "update-rules",
+    "rooms",
+    "agent-guidance"
+  ],
+  "type": "decision"
+}

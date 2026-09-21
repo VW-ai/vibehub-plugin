@@ -1,0 +1,134 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "schema-and-validation",
+      "criterion": "context.schema.json and vh.mjs accept type authority with a required authority object (governs anchors, canonical current-tree file refs, ordered update_rules, non-empty validation, optional approval none|human); reject the authority field on other types, malformed or internal anchors, and missing canonical files; every existing Context stays valid unchanged.",
+      "identity": "sha256:450ca11fb726236ff163cde84d8659b0c0f0c2cda2df4c2aeb7a7b4958f95074",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "governing-lookup",
+      "criterion": "context governing returns, for explicit repository paths and/or a Ticket's context_refs, every active authority Context whose governs scope covers them with the matched scope, canonical refs, update rules, validation and approval in deterministic order, and returns an honest empty result otherwise.",
+      "identity": "sha256:18386263a6eb840f97e6d772abf524079ad0c047fe5c0ce7cf9b9063ce056564",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "change-guard",
+      "criterion": "context guard, over an explicit changed-path set or one derived from git status, reports each authority Context whose canonical artifact changed without an active change Context in the same set that relates to it and cites the changed canonical path, passes when the record exists, and never rewrites files.",
+      "identity": "sha256:e1d42744ab1921d1081f04326aa35e57668eef31833675907cc3f8bda8be4c1a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "skill-workflow",
+      "criterion": "Ingest documents how to capture authority Context; plan attaches governing authority into context_refs; run reads governing authority before implementing, follows update_rules in order, records the change Context and routes approval human through the existing human boundary; validate and closeout run context guard and treat violations as blocking. Skill-contract tests hold every cited command to a real operation.",
+      "identity": "sha256:43013c845f950182d7d0abacdd1ebd39c423f4ab654af549685ed376bc595d08",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "workbench-and-docs",
+      "criterion": "The Rooms projection and Workbench mark authority Context and expose its governed scope and canonical artifacts; CONCEPT.md and README describe the type; CHANGELOG records it.",
+      "identity": "sha256:8e84fa46ee818535e95008a7a4739bed4ca9a55c792e241aa66f83769a420461",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification",
+      "criterion": "Tests cover schema acceptance and rejection, governing lookup for prefix and segment anchors and Ticket refs, guard pass and fail with explicit and git-derived paths, and the Rooms projection; the full test suite passes.",
+      "identity": "sha256:301cee4c23207f4b6c030441b7391eb561ed8a19ce26b15964908ad4ce9741ba",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Authority stays Git-native Context inside a Room; no approval service, second lifecycle, hidden state or background capture.",
+    "Additive only: Context schema_version stays 1, existing Context types keep their meaning, and no project-format migration is introduced.",
+    "context governing and context guard are read-only and deterministic over their inputs; the guard never invents a change record or Ticket completion.",
+    "Preserve unrelated uncommitted work in this worktree."
+  ],
+  "context": "The user asked for golden truth in VibeHub: a game's contracts or resources, a system's architecture graph, that Agents must follow while implementing and must update only through strict rules. The owner confirmed this is a Context type inside the existing Room tree, not a separate data room, and that no human approval is required unless the Context itself demands it. Implement type authority in the Context schema and engine with an authority object carrying governs (Room anchor syntax: path prefixes or segment ids), canonical (current repository file paths that are the source of truth), update_rules (ordered non-empty steps), validation (non-empty checks) and optional approval none|human. Add two read-only engine operations: context governing returns every active authority Context covering a set of repository paths and/or a Ticket's context_refs; context guard reports every authority whose canonical artifact is in a changed path set (explicit input or derived from git status) without an active change Context in that same set relating to the authority and citing the changed canonical path. Wire the Skills: ingest captures authority Context; plan attaches governing authority to context_refs; run reads governing authority before implementing, follows update_rules in order, records the change Context, and routes approval human through the existing human boundary; validate and closeout run the guard and treat violations as blocking. Project the type into the Rooms surface and document it. The contract type keeps its prose meaning. Context schema_version stays 1 and no project-format migration is introduced because the change is additive.",
+  "context_refs": [
+    {
+      "purpose": "The owner's decision that defines the authority type, its fields and its update discipline.",
+      "ref": ".vibehub/rooms/knowledge/decision-authority-context-type.yaml"
+    },
+    {
+      "purpose": "Per-Ticket Context activation and governed writeback that authority plugs into.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    },
+    {
+      "purpose": "Business vocabulary: Context is one durable claim; Rooms own Context; References point at external reality.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Playbook Context guides Tickets without asking the user to pick a Room.",
+      "ref": ".vibehub/rooms/product/decision-project-playbook-context-guides-tickets.yaml"
+    },
+    {
+      "purpose": "Current Context document contract to extend.",
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
+    },
+    {
+      "purpose": "Anchor syntax and drift semantics that governed scope reuses.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    },
+    {
+      "purpose": "Placement and trust-layer rules for writing Context.",
+      "ref": "skills/vibehub-ingest/references/knowledge-governance.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "change-guard",
+          "identity": "sha256:e1d42744ab1921d1081f04326aa35e57668eef31833675907cc3f8bda8be4c1a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "governing-lookup",
+          "identity": "sha256:18386263a6eb840f97e6d772abf524079ad0c047fe5c0ce7cf9b9063ce056564",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "schema-and-validation",
+          "identity": "sha256:450ca11fb726236ff163cde84d8659b0c0f0c2cda2df4c2aeb7a7b4958f95074",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skill-workflow",
+          "identity": "sha256:43013c845f950182d7d0abacdd1ebd39c423f4ab654af549685ed376bc595d08",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification",
+          "identity": "sha256:301cee4c23207f4b6c030441b7391eb561ed8a19ce26b15964908ad4ce9741ba",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workbench-and-docs",
+          "identity": "sha256:8e84fa46ee818535e95008a7a4739bed4ca9a55c792e241aa66f83769a420461",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7ee1ea6e71096938a08153c4b61992cd1e0cd3c838827af5e0fd49d9361eac6b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub Context supports an authority type whose governed scope, canonical artifacts, ordered update rules and validation checks are attached to Tickets automatically, followed during execution, and mechanically guarded at closeout when a canonical artifact changes.",
+  "provenance_refs": [
+    "conversation:2026-09-09-authority-context-type",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "context-authority-type"
+}

@@ -100,3 +100,8 @@ actions. This Skill supplies only the judgment named by declared semantic steps.
   sibling worktrees here and do not stash, reset, commit, or push.
 - Restructure in place on the same history — no shims, no dual formats, no
   copies (`../vibehub-setup/references/architecture-boundary.md`).
+
+Format 4 → 5 adds Goal/Epic ownership with a marker-only mechanical migration.
+Existing Tickets stay standalone; do not infer parents or rewrite historical
+proof. Read `../vibehub-core/contracts/planning-hierarchy.md` when planning new
+parent records after migration.

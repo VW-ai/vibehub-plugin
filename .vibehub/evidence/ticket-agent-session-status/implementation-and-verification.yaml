@@ -1,0 +1,57 @@
+{
+  "acceptance_ids": [
+    "ticket-state",
+    "session-model",
+    "runtime-integration",
+    "workbench",
+    "verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ticket-state",
+      "identity": "sha256:c4281d5b920a78f42ac1171480fc2678583bf950d26167ef586bacce2623d1d6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "session-model",
+      "identity": "sha256:50027739760b83f83306fa2d310257c145feba131fd0709a0376d3604a583bf6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "runtime-integration",
+      "identity": "sha256:2d8cba801f338ca0240cdf078e98daada5d554888d68f99d15e7c5c56d7ac7b1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench",
+      "identity": "sha256:19882755a4b9411b6741e1df98c0acd6115791cbfd891453a0aec26f09aab82e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification",
+      "identity": "sha256:a670be0d541de20bb8a040cc379c30a36eb58809fe6edc0091e73d2684209ca0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "implementation-and-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-08T23:01:31.586Z",
+  "refs": [
+    "test/agent-session.test.mjs",
+    "test/ui-host.test.mjs",
+    "skills/vibehub-core/scripts/session-store.mjs",
+    "skills/vibehub-core/scripts/vh-session.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-review/assets/app.js",
+    "skills/vibehub-core/contracts/agent-session.md",
+    "/tmp/vb-session-verify-final.log",
+    "conversation:2026-09-08-cua-session-live-refresh-and-responsive-check"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented canonical Ticket state projection and separate worktree-local session observations. npm run verify passed 325 tests and artifact verification (76 files). Session tests exercise immutable identity, writer credentials, concurrent revisions, freshness/activity separation, stale recovery, worktree isolation, snapshot independence, authenticated read API, real process exit/failure/cancellation and child waiting reports. Live Workbench showed Ticket READY alongside Codex RUNNING; its timestamp/message updated without navigation. CUA checked widths 320/390/768/1024/1440 with no horizontal overflow, keyboard navigation to Copy prompt and disclosure, and no browser warning/error logs. Explicit reporting and foreground process observation are supported; native host auto-discovery is not claimed.",
+  "ticket_id": "ticket-agent-session-status"
+}

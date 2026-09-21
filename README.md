@@ -24,7 +24,7 @@ Then open the repository in a fresh Agent session, describe one concrete deliver
 
 **What you get**
 
-- **One Ticket per request, in Git.** Acceptance contracts evolve through append-only revisions; Evidence and Outcomes bind the exact revision they judged. Old success remains readable history without silently closing a newer contract, and every record stays an ordinary file next to the code.
+- **PRDs become Goals, Epics, and executable Tickets, in Git.** Goals name the intended benefit, Epics group capabilities, and Tickets define independently verifiable work. Small requests can remain standalone Tickets. Acceptance contracts evolve through append-only revisions; Evidence and Outcomes bind the exact revision they judged. Old success remains readable history without silently closing a newer contract, and every record stays an ordinary file next to the code.
 - **A graph of the work, not a list.** The local Workbench shows DRAFT, READY, RUNNING, and DONE Tickets with their real prerequisites and unlocks, and tells you the next action.
 - **Local by default.** Goals, Tickets, and Context work without GitHub. Sharing records and mirroring them to Issues are explicit opt-ins.
 
@@ -40,9 +40,9 @@ for navigation, previews, session behavior, and manual startup.
 
 ## How it works
 
-Describe one coding request and say the line above. The request and exact Context shape one Ticket; work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context. Tickets, Context, Evidence, and Outcomes remain ordinary Git files, so another Agent can resume from repository truth while Git keeps the history reviewable and reversible.
+Provide a PRD or describe one coding request and say the line above. The request and exact Context shape one Ticket; work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context. Tickets, Context, Evidence, and Outcomes remain ordinary Git files, so another Agent can resume from repository truth while Git keeps the history reviewable and reversible.
 
-1. **Plan** — the request plus checked-in Context becomes one Ticket with explicit acceptance criteria, dependencies, and constraints.
+1. **Plan** — the PRD plus checked-in Context becomes Goals, Epics, and a Ticket graph with explicit acceptance criteria, dependencies, and constraints. Ownership and execution prerequisites are separate.
 2. **Run** — an Agent executes from that contract and appends Evidence linked to each criterion.
 3. **Close** — a *separate* Agent adjudicates every criterion and writes the Outcome; a criterion can name a human as its decision owner.
 4. **Learn** — durable decisions return to Rooms of Context that the next Ticket reads. Golden truth such as an architecture graph or a game's contracts lives there as `authority` Context with update rules; Agents follow it, and a canonical change without its record blocks closeout.
@@ -56,6 +56,14 @@ Describe one coding request and say the line above. The request and exact Contex
 <img src="docs/assets/local-graph/workbench-rooms-narrow-2x.png" alt="VibeHub Workbench Room open at a real 390 by 844 narrow viewport" width="390">
 
 **Bring repository context in only when useful.** Rooms expose durable Context, consuming Tickets, and drift state on demand; the same read-only graph remains usable at a real narrow viewport.
+
+## Track work and agent activity separately
+
+The Execution panel shows canonical Ticket state alongside local Agent
+sessions: agent/provider, running or waiting state, and last report/activity.
+Use the [explicit reporter or foreground command wrapper](skills/vibehub-core/contracts/agent-session.md)
+to connect a session. Expired reports show disconnected; a process exiting
+never marks a Ticket done. Existing native sessions are not auto-discovered.
 
 ## Work with your team on GitHub
 

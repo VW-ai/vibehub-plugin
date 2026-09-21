@@ -2,23 +2,27 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "d7c56d9be4e1e09d60a60e59e9c3251696f221d0",
+        "blob": "8280acf38ab45a18a29de3a1e313023d04d459e5",
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "959f08806dedab81fde9e623e92f9fc7d8040b91",
+        "blob": "4f6484c6ba8cae1d4287a49ecc1a0c642e39135a",
         "path": "README.md"
       },
       {
-        "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
+        "blob": "c619eb32834b6b8f553a5890ca5558ca8bddd663",
         "path": "docs/CONCEPT.md"
+      },
+      {
+        "blob": "029fdbbae07a032062b219e226f796613a815b6b",
+        "path": "docs/DASHBOARD.md"
       },
       {
         "blob": "31f81498982a9b3f14bcf7b16fd235022d473561",
         "path": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
       },
       {
-        "blob": "e813eebb932d23a0a7e23c9cb9296b8c2744d80f",
+        "blob": "d1a28c64452fee0c797b707a67cfc4ff9d8729fa",
         "path": "docs/GITHUB_ISSUES.md"
       },
       {
@@ -50,7 +54,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "8acaaaefcd990c376926073bffd38812a28b9fd4",
+        "blob": "7cf080269c1959b3ffe766b8bdfd82350946bb05",
         "path": "docs/INSTALL.md"
       },
       {
@@ -198,8 +202,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-07T08:13:50.205Z",
-    "last_aligned_commit": "d39ef672bb03bce65ce6e053df8dd07efd12f042"
+    "checked_at": "2026-09-21T14:38:50.993Z",
+    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
   },
   "anchors": [
     "CHANGELOG.md",
@@ -211,6 +215,5 @@
   "kind": "room",
   "room_id": "product",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift:local-first dashboard and optional GitHub product behavior changed; existing shared Context claims need a follow-up review against the updated product documentation"
+  "stale": false
 }

@@ -1,0 +1,78 @@
+{
+  "authority": {
+    "approval": "human",
+    "canonical": [
+      "skills/vibehub-core/contracts/ticket.schema.json",
+      "skills/vibehub-core/contracts/evidence.schema.json",
+      "skills/vibehub-core/contracts/outcome.schema.json",
+      "skills/vibehub-core/contracts/revision-identity.md"
+    ],
+    "governs": [
+      "skills/vibehub-core/contracts/ticket.schema.json",
+      "skills/vibehub-core/contracts/evidence.schema.json",
+      "skills/vibehub-core/contracts/outcome.schema.json",
+      "skills/vibehub-core/contracts/revision-identity.md",
+      "skills/vibehub-core/scripts/revision-contract.mjs",
+      "skills/vibehub-ticket-plan",
+      "skills/vibehub-ticket-run",
+      "skills/vibehub-ticket-validate",
+      "skills/vibehub-ticket-closeout"
+    ],
+    "update_rules": [
+      "Present the proposed schema or identity change to the owner and wait for the decision before editing a canonical file.",
+      "Change the schema, revision-contract.mjs and the vh.mjs validator together, and bump document_schemas in versions.json when the shape is not additive.",
+      "Add a migration entry in vibehub-migrate with mechanical and semantic halves, and prove existing identities recompute unchanged.",
+      "Extend test/revision-contract.test.mjs and test/ticket.test.mjs for the new shape.",
+      "Record the reason as a change Context in the ticket-lifecycle room that relates to this authority and cites the changed file."
+    ],
+    "validation": [
+      "Every checked-in Ticket, Evidence and Outcome identity recomputes byte-identical after the change.",
+      "vh.mjs ticket validate passes for this repository and for the migration fixtures.",
+      "npm run verify passes."
+    ]
+  },
+  "context_id": "authority-ticket-proof-schemas",
+  "detail": "A Ticket's acceptance identities, Evidence bindings and Outcome contract revisions are semantic proof objects. Changing their schemas or the identity contract changes what counts as proof for every closed Ticket in every project, so the change is a product decision: append-only revisions, deterministic identities, and explicit migrations are non-negotiable, and a person decides before the canonical documents move.",
+  "evidence": [
+    {
+      "note": "Canonical Ticket contract.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "note": "Identity and append-only revision rules that proof depends on.",
+      "ref": "skills/vibehub-core/contracts/revision-identity.md"
+    },
+    {
+      "note": "The decision that makes these documents append-only.",
+      "ref": ".vibehub/rooms/product/decision-acceptance-contracts-use-append-only-revisions.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-authority-context-type",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-acceptance-contracts-use-append-only-revisions",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-09T18:40:00.000Z",
+    "quote": "put demo data in so that I can see in the dashboard",
+    "ref": "conversation:2026-09-09-authority-context-type"
+  },
+  "state": "active",
+  "summary": "The Ticket, Evidence and Outcome schemas plus the revision identity contract are the golden truth of the execution lifecycle",
+  "tags": [
+    "authority",
+    "schemas",
+    "tickets",
+    "evidence",
+    "outcomes",
+    "golden-truth"
+  ],
+  "type": "authority"
+}

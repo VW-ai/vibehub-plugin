@@ -1,0 +1,32 @@
+{
+  "context_id": "decision-goal-epic-ticket-hierarchy",
+  "detail": "The user requests the Goal, Epic and Ticket distinction in both VibeHub understanding and its data model. A Goal describes the intended benefit and success criteria. An Epic groups a coherent capability under exactly one Goal. A Ticket describes independently executable and verifiable work and may belong to one Epic; its Goal is derived through that Epic. Existing and small standalone Tickets remain valid. Persist ownership in Git-native files, validate references, and retain depends_on solely for direct execution prerequisites. Completed Tickets indicate delivery progress, not automatic proof that a business Goal was achieved. This supersedes the earlier restriction to derived hierarchy, while preserving project scope and independent Ticket lifecycle semantics.",
+  "evidence": [
+    {
+      "note": "User explicitly requested Goal/Epic/Ticket distinctions and model relationships following the team invitation example.",
+      "ref": "conversation:2026-09-08-goal-epic-ticket-model"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-scope-with-derived-task-hierarchy",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-08T22:24:23.556Z",
+    "quote": "make vibehub understand these difference and the data model should have this relation",
+    "ref": "conversation:2026-09-08-goal-epic-ticket-model"
+  },
+  "state": "active",
+  "summary": "Model Goals, Epics and Tickets explicitly with canonical ownership independent of execution dependencies",
+  "tags": [
+    "goals",
+    "epics",
+    "tickets",
+    "hierarchy"
+  ],
+  "type": "decision"
+}

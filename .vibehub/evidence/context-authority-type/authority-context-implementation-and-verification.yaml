@@ -1,0 +1,69 @@
+{
+  "acceptance_ids": [
+    "schema-and-validation",
+    "governing-lookup",
+    "change-guard",
+    "skill-workflow",
+    "workbench-and-docs",
+    "verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "schema-and-validation",
+      "identity": "sha256:450ca11fb726236ff163cde84d8659b0c0f0c2cda2df4c2aeb7a7b4958f95074",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "governing-lookup",
+      "identity": "sha256:18386263a6eb840f97e6d772abf524079ad0c047fe5c0ce7cf9b9063ce056564",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "change-guard",
+      "identity": "sha256:e1d42744ab1921d1081f04326aa35e57668eef31833675907cc3f8bda8be4c1a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "skill-workflow",
+      "identity": "sha256:43013c845f950182d7d0abacdd1ebd39c423f4ab654af549685ed376bc595d08",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workbench-and-docs",
+      "identity": "sha256:8e84fa46ee818535e95008a7a4739bed4ca9a55c792e241aa66f83769a420461",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification",
+      "identity": "sha256:301cee4c23207f4b6c030441b7391eb561ed8a19ce26b15964908ad4ce9741ba",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "authority-context-implementation-and-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-09T18:20:00.000Z",
+  "refs": [
+    "skills/vibehub-core/contracts/context.schema.json",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
+    "skills/vibehub-review/assets/app.js",
+    "skills/vibehub-ingest/SKILL.md",
+    "skills/vibehub-query/SKILL.md",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket-validate/SKILL.md",
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "test/context-authority.test.mjs",
+    "docs/CONCEPT.md",
+    "README.md",
+    "CHANGELOG.md",
+    ".vibehub/rooms/knowledge/decision-authority-context-type.yaml",
+    "conversation:2026-09-09-authority-context-type"
+  ],
+  "schema_version": 2,
+  "summary": "Added Context type authority with a required authority object (governs in Room anchor syntax, canonical current-tree paths outside .vibehub, ordered update_rules, non-empty validation, optional approval none|human) in context.schema.json and vh.mjs; validateContext rejects the field on other types, malformed or internal anchors, versioned or internal canonical refs, and loadRepository fails on a missing canonical file. Added read-only operations context governing (paths and/or ticket_id; matched scope per authority; deterministic order; honest empty result) and context guard (explicit paths or git status plus optional since revision; a canonical change passes only when an active change Context in the same set relates to the authority and cites the changed artifact; never writes). context put returns advice when a canonical artifact sits outside the owning Room's anchors. Wired ingest (how to capture authority and its change record), query (governing lookup), plan (attach governing authority to context_refs; approval human becomes human-authority acceptance), run (read governing authority before implementing; follow update_rules in order; record change Context; approval human routes to execution-needs-human; run guard before Evidence), validate (governing and guard; violations are material), closeout (guard blocks successful). Rooms projection carries an authority block and the Workbench row reads AUTHORITY with governed scope, canonical artifacts and human approval; verified live on a fixture repository with no console errors. CONCEPT.md, README.md and CHANGELOG.md describe the type. test/context-authority.test.mjs covers schema acceptance and rejection, governing by prefix, segment file and Ticket refs, guard pass and fail with explicit and git-derived paths including since, and the projection. npm run verify passed 333 tests and the 76-file artifact check. Context schema_version stays 1 and no project-format migration was added.",
+  "ticket_id": "context-authority-type"
+}

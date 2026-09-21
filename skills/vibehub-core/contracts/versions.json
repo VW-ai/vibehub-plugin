@@ -1,9 +1,11 @@
 {
   "schema_version": 1,
-  "project_format": 4,
+  "project_format": 5,
   "document_schemas": {
     "ticket": 3,
     "evidence": 2,
-    "outcome": 2
+    "outcome": 2,
+    "goal": 1,
+    "epic": 1
   }
 }

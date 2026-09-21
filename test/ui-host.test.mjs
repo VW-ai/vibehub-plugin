@@ -574,8 +574,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.deepEqual(state.graph.stubs, []);
   for (const ticket of state.graph.tickets) {
     assert.deepEqual(ticket.capabilities.runtime, {
-      availability: "unavailable",
-      reason: "No trusted runtime source is connected to this read-only host.",
+      availability: "available",
+      sessions: [],
+      summary: null,
     });
   }
 

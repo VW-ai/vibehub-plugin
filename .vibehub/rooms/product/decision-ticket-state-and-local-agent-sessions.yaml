@@ -1,0 +1,31 @@
+{
+  "context_id": "decision-ticket-state-and-local-agent-sessions",
+  "detail": "The user authorized implementing Ticket readiness/blocking/review/completion alongside Agent session identity, Ticket assignment, running/waiting state and last activity. Git-native Ticket data remains completion authority. A narrow explicit local reporter and foreground process wrapper may keep disposable worktree-scoped runtime observations in Git metadata and supply the read-only Workbench. Fresh reports are labelled by source; expired reports become disconnected, and process exit never creates Evidence or Outcome. This amends the prior exclusion of runtime observation and heartbeat only for explicit sessions; no daemon, provider discovery, automatic scheduling, background capture or hidden semantic state is authorized.",
+  "evidence": [
+    {
+      "note": "Explicit user implementation request for both state layers.",
+      "ref": "conversation:2026-09-08-ticket-and-agent-session-state"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-08T22:52:02.477Z",
+    "quote": "1. **Ticket state:** whether work is ready, blocked, awaiting review, or done.\n2. **Agent session state:** which agent is working on which ticket, whether it is running or waiting, and when it last reported activity.\n\nstart implement",
+    "ref": "conversation:2026-09-08-ticket-and-agent-session-state"
+  },
+  "state": "active",
+  "summary": "Track Ticket workflow state separately from local Agent session observations",
+  "tags": [
+    "runtime",
+    "sessions",
+    "ticket-state"
+  ],
+  "type": "decision"
+}

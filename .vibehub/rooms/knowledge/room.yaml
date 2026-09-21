@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "956fb8cf65743894e27e167c6da586dfc716107e",
+        "blob": "1581f6b2b6647e9708f33aeb01f71dd8ada33c04",
         "path": "skills/vibehub-core/contracts/context.schema.json"
       },
       {
@@ -10,7 +10,7 @@
         "path": "skills/vibehub-core/contracts/room.schema.json"
       },
       {
-        "blob": "450d4f1e50b45725a693d2030ac3fc31817912d3",
+        "blob": "163f838714a8164cabc5e0ddd64c43697c6cd946",
         "path": "skills/vibehub-distill/SKILL.md"
       },
       {
@@ -18,7 +18,7 @@
         "path": "skills/vibehub-distill/agents/openai.yaml"
       },
       {
-        "blob": "b8c0e4afc648432b7c3cf23adfa01a15f20c8fc8",
+        "blob": "cea21e904c42f144be3ab019618c9ace2272a588",
         "path": "skills/vibehub-ingest/SKILL.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "skills/vibehub-ingest/references/knowledge-governance.json"
       },
       {
-        "blob": "53aa9db2f422cbd869d2de2f66396d3f4bc203d5",
+        "blob": "b2fc0b3822543fca063abc617cc4e9dc09a2545b",
         "path": "skills/vibehub-migrate/SKILL.md"
       },
       {
@@ -42,11 +42,11 @@
         "path": "skills/vibehub-migrate/agents/openai.yaml"
       },
       {
-        "blob": "9f3baa96c46bf245348618d655c28e63d8fbab3f",
+        "blob": "7dac473c02c03ac5b7edb1c3489cd5ed8d070fc2",
         "path": "skills/vibehub-migrate/references/migrations.json"
       },
       {
-        "blob": "0b026fb477a2addf70efc6bdca5d6c3eea0e5b4f",
+        "blob": "293861288d8b22adb644cc612544dc74bf64e55a",
         "path": "skills/vibehub-query/SKILL.md"
       },
       {
@@ -54,8 +54,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-07T06:54:48.785Z",
-    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
+    "checked_at": "2026-09-21T14:38:49.506Z",
+    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
   },
   "anchors": [
     "skills/vibehub-core/contracts/context.schema.json",
@@ -70,6 +70,5 @@
   "kind": "room",
   "room_id": "knowledge",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift:project authority contracts and optional Context workflow changed; existing shared Context claims need a follow-up review against these contracts"
+  "stale": false
 }

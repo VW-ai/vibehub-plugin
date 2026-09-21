@@ -1,0 +1,44 @@
+{
+  "context_id": "change-context-schema-adds-authority-type",
+  "detail": "The Context schema now lists authority among its types and defines an authority object with governs, canonical, update_rules, validation and approval, required exactly when type equals authority. The change is additive: schema_version stays 1, every existing Context validates unchanged, and vh.mjs validateContext, the ingest and query Skills, and test/context-authority.test.mjs changed with it.",
+  "evidence": [
+    {
+      "note": "The canonical schema that changed.",
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
+    },
+    {
+      "note": "Acceptance and rejection tests for the new shape.",
+      "ref": "test/context-authority.test.mjs"
+    },
+    {
+      "note": "The Ticket that delivered the change.",
+      "ref": ".vibehub/tickets/context-authority-type.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "authority-knowledge-document-schemas",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-authority-context-type",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-09T18:40:00.000Z",
+    "quote": "sounds good, start implementing",
+    "ref": "conversation:2026-09-09-authority-context-type"
+  },
+  "state": "active",
+  "summary": "context.schema.json gained the authority type and its authority object",
+  "tags": [
+    "change",
+    "context",
+    "schema",
+    "authority"
+  ],
+  "type": "change"
+}

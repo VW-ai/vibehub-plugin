@@ -9,6 +9,7 @@
     "schema_version": { "const": 3 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
+    "epic_id": { "$ref": "#/$defs/id", "description": "Optional owning Epic; Goal is derived through Epic.goal_id. Independent of depends_on." },
     "revision_state": { "enum": ["bound", "legacy-pending-reconstruction"] },
     "active_contract_revision": { "$ref": "#/$defs/revision" },
     "contract_revisions": {

@@ -50,6 +50,10 @@ try {
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket-run/SKILL.md",
     "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/session-store.mjs",
+    "skills/vibehub-core/scripts/vh-session.mjs",
+    "skills/vibehub-core/contracts/agent-session.schema.json",
+    "skills/vibehub-core/contracts/agent-session.md",
     "skills/vibehub-core/scripts/revision-contract.mjs",
     "skills/vibehub-core/scripts/vh-ui.mjs",
     "skills/vibehub-core/scripts/vh-start.mjs",
@@ -66,6 +70,9 @@ try {
     "skills/vibehub-migrate/references/migrations.json",
     "skills/vibehub-core/contracts/project-format.schema.json",
     "skills/vibehub-core/contracts/context.schema.json",
+    "skills/vibehub-core/contracts/goal.schema.json",
+    "skills/vibehub-core/contracts/epic.schema.json",
+    "skills/vibehub-core/contracts/planning-hierarchy.md",
     "skills/vibehub-core/contracts/ticket.schema.json",
     "skills/vibehub-core/contracts/evidence.schema.json",
     "skills/vibehub-core/contracts/outcome.schema.json",
@@ -354,7 +361,9 @@ try {
     || !/label: "Copy prompt"/u.test(installedScript)
     || !/if \(contextPackage\.agentPayload\) return canonical;/u.test(installedScript)
     || !/action === "CLOSE_OUT" \|\| runtimeEligible/u.test(installedModel)
-    || !/No trusted runtime source is connected/u.test(installedHost)
+    || !/ticketSessionCapability\(sessions, ticket.ticket_id\)/u.test(installedHost)
+    || !/function agentSessionsPanel/u.test(installedScript)
+    || !/function refreshSessions/u.test(installedScript)
     || !/requiresIndependentAgent: true/u.test(installedHost)
     || !/reviewInputs/u.test(installedHost)
     || !/evidenceRefs/u.test(installedHost)) {
