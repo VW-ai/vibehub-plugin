@@ -1,0 +1,35 @@
+{
+  "acceptance_ids": [
+    "source-partition-order",
+    "watermark-vector"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "source-partition-order",
+      "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "watermark-vector",
+      "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-late-parent-attestation-repair-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:16:06.137Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Addressed parent review finding that a completed-child/local-parent snapshot invariant rejected a valid late parent observation after an exact external completion attestation. Removed that overly strong snapshot implication while retaining scoped parent equality, causal order/cycle validation and the completion-time check for locally known parents. New regression completes child sequence1 with exact parent0 ref while parent is absent, admits parent0 later without altering either completion fact, then explicitly completes parent0 so the contiguous projected prefix reaches1. No fabricated parent completion, new protocol or changed Contract. Documentation names this late-admission behavior and keeps external attestation verification with adapters. Final focused suite passes30/30; boundary check passes51 files; independent probes still pass2808 cursor/freshness cases,1024 DAG cases,41 malformed effects and both4096-depth chains. Context guard passed with zero authorities/violations before append. Prior Evidence retained unchanged.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

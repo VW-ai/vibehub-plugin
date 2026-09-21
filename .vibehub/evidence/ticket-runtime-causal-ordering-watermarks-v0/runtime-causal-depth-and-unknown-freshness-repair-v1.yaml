@@ -1,0 +1,41 @@
+{
+  "acceptance_ids": [
+    "source-partition-order",
+    "git-causality",
+    "watermark-vector"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "source-partition-order",
+      "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "git-causality",
+      "identity": "sha256:1b4c888d1b5dc0522c3de7669cfeca308f5b3d31c31540187451bb1ed97a0332",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "watermark-vector",
+      "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-depth-and-unknown-freshness-repair-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:14:48.507Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Addressed two independently discovered validator defects without changing the Ticket contract or existing Evidence. Freshness validation now rejects a known maximum at the first missing accepted position even when target_sequence is null or before the attested epoch: that position would necessarily extend the contiguous prefix. Regression covers zero/nonzero origins, null and before-start heads, MAX_SAFE_INTEGER boundaries, and valid sparse unknown vectors. Replaced recursive source/Git cycle traversal with an iterative DFS so valid reverse-ordered 4096-entry causal chains do not exhaust the JavaScript stack; tests verify full-capacity cursor validation/completion, overflow refusal, full-depth Git ancestry and cycle rejection. Final targeted suite passes 29/29 tests and boundary check passes 51 files with zero errors. Re-ran independent review probes: 2808 cursor/freshness oracle cases, 1024 complete-DAG cases and 41 malformed replay-effect rejections pass; reverse-depth probe now reports cursor true and Git advance; original impossible-summary probe is rejected. Context guard passed with zero applicable authorities/violations before this append. Earlier Evidence remains historical; this supplemental proof describes the corrected implementation.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

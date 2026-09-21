@@ -25,3 +25,10 @@ export {
   normalizeRawEvent, sourceObjectKey, eventObservationKey, eventIdempotencyKey,
   effectiveEventAccess, verifyEventPayload,
 } from './core/event-provenance.mjs';
+export {
+  CAUSAL_CONTRACT_VERSION, sourcePartitionKey, sourceEventFingerprint,
+  validateSourcePartition, validateFreshnessVector, validateGraphGenerationPin,
+  validateSourceCursor, createSourceCursor, acceptSourceEvent, completeSourceEvent,
+  projectFreshness, classifyGitRefMovement, createReplayManifest,
+  validateReplayManifest, assertReplayEffect, createReplayState, applyReplayEffect,
+} from './core/causal-ordering.mjs';

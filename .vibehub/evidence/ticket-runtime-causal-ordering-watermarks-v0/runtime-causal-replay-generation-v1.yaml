@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "replay-generation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "replay-generation",
+      "identity": "sha256:df10b5e81f1123044b31531edc6a9d7e7b601fe267b3d5180ad474e0145f9fc7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-replay-generation-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:08:28.103Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented frozen replay manifests with exact normalized event bodies/full-event and payload digests, immutable eligibility, one-to-one observation/retry/position uniqueness, recompiled whole PolicyArtifact plus operation implementation pins, model descriptors and complete JudgeNode bindings, input graph snapshot/generation and distinct output generation. Tamper tests reject changed event metadata, payload/policy/operations/models/bindings/generations. Executable replay state dispatcher admits only generation/scope/manifest-bound replay-derived and audit records; rejects live graph/cursor/job/callback/canonical/model effects, imported foreign states, callable handles and conflicting record identities, with no live handles or I/O. Current access, source authenticity, actual payload/graph bytes, storage fencing and live model determinism are explicitly external obligations. Final focused contract/public-entry verification passed 26/26 tests; component boundary check passed 51 files with zero errors. Every Ticket Context resolved through the shared engine; governing returned zero applicable authorities and context guard passed with zero violations before Evidence. This accepts executable protocol behavior on synthetic fixtures, not a deployed or durable service.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

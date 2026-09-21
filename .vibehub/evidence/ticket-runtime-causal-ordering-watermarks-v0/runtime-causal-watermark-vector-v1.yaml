@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "watermark-vector"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "watermark-vector",
+      "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-watermark-vector-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:08:27.134Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented Project/Context freshness vectors over explicit required source tuples and captured target heads, with unknown/caught-up/known-gap per member and aggregate. Receipt and completed semantic projection remain separate. Missing source/head, epoch-before-start and unsequenced observations cannot become caught-up. Strict reusable validator checks unique scope, prefix bounds, compact gaps, missing-input subset of missing-projection, unseen tail and observed maximum consistency. Tests cover 0,2,1, missing producer epoch, mixed vectors, forged status/ranges, cross-scope and safe-integer sparse heads. Empty requirements remain unknown; caught-up is relative to captured heads, not remote latest truth. Final focused contract/public-entry verification passed 26/26 tests; component boundary check passed 51 files with zero errors. Every Ticket Context resolved through the shared engine; governing returned zero applicable authorities and context guard passed with zero violations before Evidence. This accepts executable protocol behavior on synthetic fixtures, not a deployed or durable service.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

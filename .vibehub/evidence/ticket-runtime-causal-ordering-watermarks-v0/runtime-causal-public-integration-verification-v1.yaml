@@ -1,0 +1,48 @@
+{
+  "acceptance_ids": [
+    "source-partition-order",
+    "git-causality",
+    "watermark-vector",
+    "replay-generation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "source-partition-order",
+      "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "git-causality",
+      "identity": "sha256:1b4c888d1b5dc0522c3de7669cfeca308f5b3d31c31540187451bb1ed97a0332",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "watermark-vector",
+      "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "replay-generation",
+      "identity": "sha256:df10b5e81f1123044b31531edc6a9d7e7b601fe267b3d5180ad474e0145f9fc7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-public-integration-verification-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:09:12.944Z",
+  "refs": [
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Public entry integration verifies 0/2/1 receipt and projection gaps, captured-head freshness, first-event retry preservation, producer epoch isolation, exact policy/model replay identity, and denial of live graph, connector cursor, worker, callback, canonical and cross-project effects. On the final frozen source, npm run verify and actual npm run verify:standalone each passed 144/144 tests; boundaries passed 51 files. Existing Skill artifact verification passed 79 files and excludes Runtime. Synthetic tests only; no live provider calls or deployed capacity claim.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "source-partition-order"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "source-partition-order",
+      "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-source-partition-order-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:08:25.187Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented validated six-field source/producer/epoch keys and pure bounded cursor transitions. Explicit epoch start, accepted vs completed contiguous prefixes, separate maximum and compact gaps retain 0,2,1 correctly; null positions never establish continuity. All 24 arrival/completion permutations converge; MAX_SAFE_INTEGER sparse gaps do not enumerate missing positions. Logical fingerprints bind changed source payload/type/asserted and resolved identity/ACL while excluding receipt time and delivery-attempt metadata; duplicate receipts preserve first_event_digest and completion. Scoped parent attestations, local ordering/cycle checks, safe integer/capacity checks and nonmutation are covered. Source authentication, committed projection and checkpoint storage remain adapter obligations. Final focused contract/public-entry verification passed 26/26 tests; component boundary check passed 51 files with zero errors. Every Ticket Context resolved through the shared engine; governing returned zero applicable authorities and context guard passed with zero violations before Evidence. This accepts executable protocol behavior on synthetic fixtures, not a deployed or durable service.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

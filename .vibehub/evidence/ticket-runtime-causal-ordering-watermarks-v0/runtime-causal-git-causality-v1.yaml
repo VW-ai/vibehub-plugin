@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "git-causality"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "git-causality",
+      "identity": "sha256:1b4c888d1b5dc0522c3de7669cfeca308f5b3d31c31540187451bb1ed97a0332",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-causal-git-causality-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:08:26.165Z",
+  "refs": [
+    "semantic-runtime/src/core/causal-ordering.mjs",
+    "semantic-runtime/test/causal-ordering.test.mjs",
+    "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json",
+    "semantic-runtime/docs/causal-ordering-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/causal-integration.test.mjs",
+    "command:node --test semantic-runtime/test/causal-ordering.test.mjs semantic-runtime/test/causal-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented pure Git ref-movement classifier using accepted exact tenant/repository/object-format/full-OID identities. Conformance covers create, advance, merge ancestry, rewind, delete, unchanged, diverge, reported force_push/rebase, duplicate/self/cyclic parent refusal, cross-repository/tenant/format separation and missing/shallow ancestry returning unknown. Source-reported operations remain separate from DAG facts; no timestamp ordering, Git history rewrite, subprocess or concrete Git adapter is introduced. Final focused contract/public-entry verification passed 26/26 tests; component boundary check passed 51 files with zero errors. Every Ticket Context resolved through the shared engine; governing returned zero applicable authorities and context guard passed with zero violations before Evidence. This accepts executable protocol behavior on synthetic fixtures, not a deployed or durable service.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

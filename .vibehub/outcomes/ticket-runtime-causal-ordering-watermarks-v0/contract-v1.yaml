@@ -1,0 +1,36 @@
+{
+  "accepted_acceptance_ids": [
+    "git-causality",
+    "replay-generation",
+    "source-partition-order",
+    "watermark-vector"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T23:18:04.218634Z",
+  "contract_revision": {
+    "identity": "sha256:6f57ce3788ee36ff959159400ccb0b5cae200c7479a799fc9ccc2fb696e51aa6",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-causal-depth-and-unknown-freshness-repair-v1",
+    "runtime-causal-git-causality-v1",
+    "runtime-causal-late-parent-attestation-repair-v1",
+    "runtime-causal-public-integration-verification-v1",
+    "runtime-causal-replay-generation-v1",
+    "runtime-causal-reviewed-integration-verification-v1",
+    "runtime-causal-source-partition-order-v1",
+    "runtime-causal-watermark-vector-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_causality did not execute this Ticket or modify implementation, tests, fixtures, documentation, Evidence or Git. It independently read the exact active Contract, resolved Context, prerequisite Outcome/Evidence and final implementation; reproduced checks, reported concrete defects, and re-adjudicated the corrected frozen source before writing only this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts every Acceptance revision in Contract v1. Source partition order has exact tenant/Project/installation/partition/producer/epoch identity, explicit epoch start, separate receipt and projection prefixes, bounded compact gaps, safe zero/null/MAX_SAFE_INTEGER behavior, immutable first-event pins, conflicting-retry refusal, scoped causal parents and late-event recovery without timestamp ordering. Git causality separates immutable repository/tenant/format/full-OID commit ancestry from mutable create/advance/rewind/delete/unchanged/diverge/unknown ref observations and reported force-push/rebase operations; incomplete ancestry never fabricates a negative fact. Freshness represents required per-source captured heads with unknown, known-gap and caught-up states, preserving input/projection gaps and exact Project scope. Replay manifests bind normalized bodies and payload/event digests, recompiled complete PolicyArtifacts and operation descriptors, complete judge/model routing, input graph snapshots and distinct output generations; the pure dispatcher rejects live graph, cursor, job, callback, model and canonical effects and foreign generations. Independent review found impossible unknown-head cursor summaries and call-stack failure on a valid 4096-entry reversed causal chain; executor repairs and supplemental Evidence were rechecked. The parent additionally found a late-parent admission deadlock after an external completion attestation; the fixed path was independently reproduced while existing local incomplete parents still block new child completion. Final independent npm run verify passed 148/148 and 51-file boundary checks. Independent probes passed 2808 source/freshness oracle cases, 1024 complete-DAG cases, 65536 partial-DAG soundness cases, 41 malformed replay-effect rejections, source/Git 4096-depth checks, late-parent recovery, accessor non-invocation and input nonmutation. Final release Evidence and inspected logs show an actual isolated standalone install passing 148/148 and unchanged 79-file plugin artifact verification; this agent did not rerun standalone, and its artifact rerun was sandbox-blocked on loopback. All four Context references resolved; Ticket validation and Context guard passed with zero authorities or violations. No blocking findings remain. This accepts the executable protocol slice, not an online service or authenticated/durable implementation: adapter attestation verification, payload/graph byte availability and current access, atomic projection/checkpoint storage, namespace fencing and live model determinism remain explicit external obligations.",
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0",
+  "unresolved_acceptance_ids": []
+}
