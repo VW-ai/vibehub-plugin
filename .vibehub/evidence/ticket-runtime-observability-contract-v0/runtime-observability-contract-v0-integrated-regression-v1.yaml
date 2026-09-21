@@ -1,0 +1,43 @@
+{
+  "acceptance_ids": [
+    "telemetry-contract",
+    "slo-workload-contract",
+    "resource-budget-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "telemetry-contract",
+      "identity": "sha256:7de54bc0c9746e89c86ed642e5288cef9e143237a0cb3d148c6c8ec4045519a5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "slo-workload-contract",
+      "identity": "sha256:83b22a9e12d801d691113aa523e897317d332b0f62bba97f9d59a682ea3497fe",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "resource-budget-contract",
+      "identity": "sha256:ac7d714e99d0d98d4806f031976b009faa5b5ec00328b10c48486749fe5950eb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-observability-contract-v0-integrated-regression-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:02.192Z",
+  "refs": [
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Integration verification for the first three Runtime foundation contracts: npm run verify in semantic-runtime passed its dependency/import boundary check and all 92 tests; npm run verify:standalone installed a copy outside the parent repository and passed the same boundary check and 92 tests. Root npm run verify:artifact passed and excluded semantic-runtime from the shipped Skill artifact. The two public-entry integration tests connect resolved scoped identity (including punctuation in logical IDs), typed audit aliases and exact published Policy content hash; reject cross-project audit continuation and identity metric labels; and carry a resource-saturation reason into a valid audit record. These are executable contract and synthetic integration results, not deployed-service, capacity or provider-quality proof.",
+  "ticket_id": "ticket-runtime-observability-contract-v0"
+}

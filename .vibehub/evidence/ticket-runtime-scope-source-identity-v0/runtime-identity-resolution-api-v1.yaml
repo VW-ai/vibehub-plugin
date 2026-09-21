@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "identity-resolution-api"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "identity-resolution-api",
+      "identity": "sha256:69d1f5070f2cd713c59a35b0fffa19f46b7455aa68634c7e443e09c259f39a07",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-identity-resolution-api-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:23:53.894Z",
+  "refs": [
+    "semantic-runtime/src/core/identity.mjs",
+    "semantic-runtime/docs/identity-contract-v0.md",
+    "semantic-runtime/test/identity.test.mjs",
+    "semantic-runtime/test/fixtures/identity/multi-source.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented pure resolveIdentity(catalog, observation) with resolved/ambiguous/unmapped results, categorical exact/none confidence, stable tenant-scoped evidence, bounded reasons and ignored hint names. Tests cover unknown IDs, cross-tenant lookups, conflicting asserted parents, mismatched source bindings, exact provider-instance/object matching, path-only refusal and deterministic nonmutating behavior. Project/source-only inputs never invent repository membership, including a single-member source. node --test semantic-runtime/test/identity.test.mjs passed 14 tests. The module has no imports and performs no I/O; overall component boundary verification is tracked by the parent integration agent because another concurrent module was still being edited.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0"
+}

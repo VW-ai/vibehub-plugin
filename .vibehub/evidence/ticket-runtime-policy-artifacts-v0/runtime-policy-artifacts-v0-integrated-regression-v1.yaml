@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "policy-schema-covers-node-model",
+    "policy-compiler-is-deterministic",
+    "policy-artifacts-are-immutable",
+    "phase-zero-policy-compatibility"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "policy-schema-covers-node-model",
+      "identity": "sha256:5cb45559d0bfaa45b4e6b584e9ccdf4a9f026593870e40c9ed75a2a415f87483",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "policy-compiler-is-deterministic",
+      "identity": "sha256:6a2ed073d4fcad6d8b748de818b546ccccec5b47d21a6321a58116ada93b2e04",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "policy-artifacts-are-immutable",
+      "identity": "sha256:2357c1a3593b79641bfe6d43a5ef3cec2d4dc949cee0abd18c32272fbb74434e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "phase-zero-policy-compatibility",
+      "identity": "sha256:55a508d30565c6b0a1b3b2f5ceb5687fc7c55a0c3b513605b2e5db58cc35d476",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-artifacts-v0-integrated-regression-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:02.192Z",
+  "refs": [
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Integration verification for the first three Runtime foundation contracts: npm run verify in semantic-runtime passed its dependency/import boundary check and all 92 tests; npm run verify:standalone installed a copy outside the parent repository and passed the same boundary check and 92 tests. Root npm run verify:artifact passed and excluded semantic-runtime from the shipped Skill artifact. The two public-entry integration tests connect resolved scoped identity (including punctuation in logical IDs), typed audit aliases and exact published Policy content hash; reject cross-project audit continuation and identity metric labels; and carry a resource-saturation reason into a valid audit record. These are executable contract and synthetic integration results, not deployed-service, capacity or provider-quality proof.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

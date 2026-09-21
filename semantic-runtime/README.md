@@ -177,6 +177,26 @@ judge adapters, metrics, and remaining work. Only an explicit `--judge jev`
 selection makes network/model calls. No host hooks, background capture, context
 injection, worker execution, or canonical writes occur in this prototype.
 
+## Online foundation contracts
+
+The first online delivery slice adds executable, host- and store-independent
+contracts through the package's public entry:
+
+- [Identity and source resolution](docs/identity-contract-v0.md): tenant/project
+  scope, repository membership, stable checkout/worktree/session identities,
+  and explicit ambiguous or unmapped results.
+- [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
+  deterministic compilation and immutable publication, with a compatibility
+  path for the existing Phase 0 policies.
+- [Observability and budgets](docs/observability-contract-v0.md): safe audit and
+  metric contracts, a reproducible alpha workload, numerical SLO targets and
+  bounded resource admission.
+
+These contracts have synthetic conformance tests in `npm run verify`. They
+provide inputs for the later execution, storage, worker and service Tickets in
+the [online delivery plan](docs/online-delivery-plan.md). The online service and
+capacity drill are still pending; numerical targets are not measured results.
+
 ## Design baseline
 
 - [Thought log](docs/01_thought_log_semantic_runtime.md): how the direction evolved.

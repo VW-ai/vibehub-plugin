@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "phase-zero-policy-compatibility"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "phase-zero-policy-compatibility",
+      "identity": "sha256:55a508d30565c6b0a1b3b2f5ceb5687fc7c55a0c3b513605b2e5db58cc35d476",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-phase-zero-policy-compatibility-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:29.513Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-artifacts.mjs",
+    "semantic-runtime/test/policy-artifacts.test.mjs",
+    "semantic-runtime/test/fixtures/policy-artifacts/ingress.json",
+    "semantic-runtime/docs/policy-artifacts-v0.md",
+    "command:cd semantic-runtime && node --test test/policy-artifacts.test.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Phase 0 loader validates and freezes the unchanged schema 1 policy; parity test executes original and loaded policies and checks identical four judge inputs/input hashes, recorded decisions/results and candidate IDs, excluding only measured elapsed time. Focused policy/replay/Gateway-JEV/TypeSafe-JEV/Haiku/Claude CLI/resilience regression passes 47 tests; root integrated npm run verify and npm run verify:standalone passed 92 tests plus boundary checks, and root plugin artifact verifier passed. No live calls or credentials used. Final added assertion for 11-node aggregate attempts passes focused suite.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

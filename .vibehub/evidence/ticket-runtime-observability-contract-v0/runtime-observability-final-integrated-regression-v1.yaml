@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "telemetry-contract",
+    "slo-workload-contract",
+    "resource-budget-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "telemetry-contract",
+      "identity": "sha256:7de54bc0c9746e89c86ed642e5288cef9e143237a0cb3d148c6c8ec4045519a5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "slo-workload-contract",
+      "identity": "sha256:83b22a9e12d801d691113aa523e897317d332b0f62bba97f9d59a682ea3497fe",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "resource-budget-contract",
+      "identity": "sha256:ac7d714e99d0d98d4806f031976b009faa5b5ec00328b10c48486749fe5950eb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-observability-final-integrated-regression-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:32:11.090Z",
+  "refs": [
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact",
+    "semantic-runtime/src/core/observability-contract.mjs",
+    "semantic-runtime/test/observability-contract.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "After the independent reviewer identified the global-every-fourth workload concentration defect, the implementation now selects every fourth project-local event with selectAlphaWorkloadEvent exposed through the public entry. The full steady plus burst trace is checked against per-project and global fixed-window calls/tokens/usage-proxy budgets without changing SLO or resource limits. Final npm run verify and npm run verify:standalone both passed boundary checks and all93 tests. Standalone performed an actual dependency install outside the parent repository. Public identity/policy/audit integration remains green. This verifies synthetic contract behavior, not deployed capacity or live provider performance.",
+  "ticket_id": "ticket-runtime-observability-contract-v0"
+}

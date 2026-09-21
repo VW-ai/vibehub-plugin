@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "telemetry-contract",
+    "slo-workload-contract",
+    "resource-budget-contract"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T22:33:03.398Z",
+  "contract_revision": {
+    "identity": "sha256:bc6fe542ded6290c6f29f39d4a42a9f4f03f694efefd455cafb9ca5fc93e9016",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-runtime-observability-telemetry-contract-v1",
+    "evidence-runtime-observability-slo-workload-contract-v1",
+    "evidence-runtime-observability-resource-budget-contract-v1",
+    "runtime-observability-contract-v0-integrated-regression-v1",
+    "evidence-runtime-observability-project-local-workload-fix-v1",
+    "runtime-observability-final-integrated-regression-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_observability had no execution context and did not implement or edit source, fixtures, tests, documentation or Evidence. It read the exact Contract and Evidence, independently inspected and tested the artifacts, required executor correction of a reproduced workload defect, and reviewed the correction before writing only this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout of Contract v1 accepts all three current Acceptance revisions. Telemetry v1 supplies all seven lifecycle correlations, bounded reason/status vocabularies, strict payload/credential field rejection, immutable scoped sequence/hash append transitions, numeric measurement bounds and metric label/series admission. Adapter-owned authentication, atomic persistence, audit-ID uniqueness and retention are explicit limits. The initial workload defines scope/source counts, graph and payload bounds, request mix/concurrency, steady/burst/recovery windows, worker duration, SLI timing endpoints, percentile/success denominators and numerical targets that remain unproven. This reviewer found a material concentration defect in the original every-fourth-global-event interpretation; the executor corrected selection to every fourth project-local event, added the public pure selector and complete workload regression without changing budgets, SLOs or Acceptance. Independently reviewed the correction and native Evidence, reran 15 focused/integration tests and the 45-file dependency boundary check, and ran a separate 26-window/6960-event public-entry trace including recovery: burst demands 120 calls and 138240 tokens per project; every call/token/proxy reservation was admitted within unchanged budgets. Forty additional independent negative/boundary assertions passed for secret/raw fields, invalid measurements, tenant/stream/sequence conflicts, all seven resource dimensions and explicit unknown usage/cost. Configurable queue/concurrency/model-call/retry/token/proxy budgets, bounded diagnostics and safe saturation actions are executable; account availability remains separate from monetary estimates, ordinary crash acknowledged-event RPO is zero, and disaster RPO/RTO targets are 300/900 seconds. Current ticket validate and context guard passed with zero guard violations. Read final integrated Evidence and parent-produced full and isolated-install logs showing 93 tests passed in each. No blocking findings remain. This Outcome accepts the protocol slice only; storage enforcement, deployed capacity, live provider performance and recovery proof remain downstream work.",
+  "ticket_id": "ticket-runtime-observability-contract-v0",
+  "unresolved_acceptance_ids": []
+}

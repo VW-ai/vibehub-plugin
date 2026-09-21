@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "multi-repo-and-fork-mapping"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "multi-repo-and-fork-mapping",
+      "identity": "sha256:f387903ef4fa39e70525a07e8dcdbda36cf3b6996a4bab5a524f7115da3412c3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-multi-repo-and-fork-mapping-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:23:52.975Z",
+  "refs": [
+    "semantic-runtime/src/core/identity.mjs",
+    "semantic-runtime/docs/identity-contract-v0.md",
+    "semantic-runtime/test/identity.test.mjs",
+    "semantic-runtime/test/fixtures/identity/multi-source.json"
+  ],
+  "schema_version": 2,
+  "summary": "Synthetic multi-source fixture covers two tenants, a Project with API/web/fork repositories, one repository shared by two Projects, multiple clones and worktrees, connector registration and repository-free Project work. Tests distinguish fork provider object 103 from upstream 101 even with identical path-like attributes; repository membership ambiguity requires explicit Project or source mapping. node --test semantic-runtime/test/identity.test.mjs passed 14 tests.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0"
+}

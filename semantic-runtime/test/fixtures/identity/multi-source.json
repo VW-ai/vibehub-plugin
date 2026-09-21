@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "tenants": [{"tenant_id":"acme"},{"tenant_id":"other"}],
+  "workspaces": [{"tenant_id":"acme","workspace_id":"engineering"},{"tenant_id":"acme","workspace_id":"research"},{"tenant_id":"other","workspace_id":"engineering"}],
+  "projects": [
+    {"tenant_id":"acme","project_id":"product","workspace_id":"engineering"},
+    {"tenant_id":"acme","project_id":"shared","workspace_id":"engineering"},
+    {"tenant_id":"acme","project_id":"notes","workspace_id":"research"},
+    {"tenant_id":"other","project_id":"product","workspace_id":"engineering"}
+  ],
+  "repositories": [
+    {"tenant_id":"acme","repository_id":"api","external_identity":{"provider":"git-host","authority":"git.example","object_id":"101"},"attributes":{"name":"team/api","remote_url":"https://git.example/team/api.git"}},
+    {"tenant_id":"acme","repository_id":"web","external_identity":{"provider":"git-host","authority":"git.example","object_id":"102"}},
+    {"tenant_id":"acme","repository_id":"api-fork","external_identity":{"provider":"git-host","authority":"git.example","object_id":"103"},"fork_of_repository_id":"api"},
+    {"tenant_id":"other","repository_id":"api","external_identity":{"provider":"git-host","authority":"git.example","object_id":"101"}}
+  ],
+  "memberships": [
+    {"tenant_id":"acme","membership_id":"product-api","project_id":"product","repository_id":"api"},
+    {"tenant_id":"acme","membership_id":"product-web","project_id":"product","repository_id":"web"},
+    {"tenant_id":"acme","membership_id":"shared-api","project_id":"shared","repository_id":"api"},
+    {"tenant_id":"acme","membership_id":"product-fork","project_id":"product","repository_id":"api-fork"},
+    {"tenant_id":"other","membership_id":"product-api","project_id":"product","repository_id":"api"}
+  ],
+  "source_installations": [
+    {"tenant_id":"acme","source_installation_id":"laptop","workspace_id":"engineering","kind":"local","external_identity":{"provider":"agent-host","authority":"host-registration","object_id":"laptop-1"},"project_ids":["product"],"membership_ids":["product-api","product-web","product-fork"]},
+    {"tenant_id":"acme","source_installation_id":"connector","workspace_id":"engineering","kind":"connector","external_identity":{"provider":"git-host","authority":"git.example","object_id":"installation-1"},"project_ids":["product","shared"],"membership_ids":["product-api","product-web","shared-api","product-fork"]},
+    {"tenant_id":"acme","source_installation_id":"notes-host","workspace_id":"research","kind":"local","external_identity":{"provider":"agent-host","authority":"host-registration","object_id":"notes-1"},"project_ids":["notes"],"membership_ids":[]}
+  ],
+  "checkouts": [
+    {"tenant_id":"acme","checkout_id":"api-clone-a","repository_id":"api","source_installation_id":"laptop","attributes":{"path":"/synthetic/clone-a"}},
+    {"tenant_id":"acme","checkout_id":"api-clone-b","repository_id":"api","source_installation_id":"laptop","attributes":{"path":"/synthetic/clone-b"}},
+    {"tenant_id":"acme","checkout_id":"web-clone","repository_id":"web","source_installation_id":"laptop"}
+  ],
+  "worktrees": [
+    {"tenant_id":"acme","worktree_id":"feature-a","checkout_id":"api-clone-a","attributes":{"path":"/synthetic/feature","branch":"feature"}},
+    {"tenant_id":"acme","worktree_id":"feature-b","checkout_id":"api-clone-a","attributes":{"path":"/synthetic/other-feature","branch":"other-feature"}},
+    {"tenant_id":"acme","worktree_id":"clone-b-main","checkout_id":"api-clone-b","attributes":{"branch":"main"}},
+    {"tenant_id":"acme","worktree_id":"web-main","checkout_id":"web-clone"}
+  ],
+  "sessions": [
+    {"tenant_id":"acme","session_id":"session-a","project_id":"product","source_installation_id":"laptop","worktree_id":"feature-a","attributes":{"host_conversation_id":"conversation-1"}},
+    {"tenant_id":"acme","session_id":"notes-session","project_id":"notes","source_installation_id":"notes-host"}
+  ],
+  "executions": [
+    {"tenant_id":"acme","execution_id":"attempt-a","session_id":"session-a","repository_id":"api","worktree_id":"feature-a"},
+    {"tenant_id":"acme","execution_id":"notes-attempt","session_id":"notes-session"}
+  ]
+}

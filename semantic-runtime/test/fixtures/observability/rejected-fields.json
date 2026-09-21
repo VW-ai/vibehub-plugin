@@ -1,0 +1,12 @@
+[
+  {"target": "root", "field": "authorization", "value": "Bearer synthetic-secret"},
+  {"target": "root", "field": "payload", "value": {"text": "synthetic raw message"}},
+  {"target": "root", "field": "prompt", "value": "synthetic prompt"},
+  {"target": "root", "field": "reason", "value": "unbounded generated explanation"},
+  {"target": "root", "field": "stack", "value": "synthetic stack with local path"},
+  {"target": "root", "field": "chain_of_thought", "value": "never retained"},
+  {"target": "correlation", "field": "api_key", "value": "synthetic-secret"},
+  {"target": "correlation", "field": "source_url", "value": "https://example.invalid/private?token=synthetic"},
+  {"target": "measurements", "field": "provider_response", "value": "synthetic body"},
+  {"target": "measurements", "field": "error_message", "value": "synthetic provider error"}
+]

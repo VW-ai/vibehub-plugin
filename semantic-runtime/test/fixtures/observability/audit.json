@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "stream_id": "audit_project_alpha",
+  "sequence": 1,
+  "previous_digest": null,
+  "audit_id": "audit_000001",
+  "recorded_at": "2026-09-21T12:00:00.000Z",
+  "subject": "node_attempt",
+  "status": "succeeded",
+  "reason_code": "completed",
+  "correlation": {
+    "tenant_id": "tenant_synthetic",
+    "project_id": "project_alpha",
+    "source_id": "source_git_a",
+    "event_id": "event_000001",
+    "policy_run_id": "run_000001",
+    "policy_revision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "node_id": "durability",
+    "node_attempt_id": "attempt_000001"
+  },
+  "measurements": {
+    "duration_ms": 12.5,
+    "queue_age_ms": 3,
+    "input_tokens": 1024,
+    "output_tokens": 128,
+    "cached_input_tokens": 512,
+    "retry_count": 0,
+    "stable_prefix_bytes": 1200,
+    "total_prefix_bytes": 2048
+  }
+}

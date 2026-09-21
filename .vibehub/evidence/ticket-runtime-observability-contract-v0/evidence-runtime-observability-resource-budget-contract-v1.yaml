@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "resource-budget-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "resource-budget-contract",
+      "identity": "sha256:ac7d714e99d0d98d4806f031976b009faa5b5ec00328b10c48486749fe5950eb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-runtime-observability-resource-budget-contract-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:26:32.863Z",
+  "refs": [
+    "semantic-runtime/src/core/observability-contract.mjs",
+    "semantic-runtime/docs/observability-contract-v0.md",
+    "semantic-runtime/test/observability-contract.test.mjs",
+    "semantic-runtime/test/fixtures/observability/audit.json",
+    "semantic-runtime/test/fixtures/observability/rejected-fields.json",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "command: cd semantic-runtime && node --test test/observability-contract.test.mjs test/foundation-integration.test.mjs (14 passed)",
+    "command: cd semantic-runtime && npm run check:boundaries (45 files passed)",
+    "command: vh context guard --repo . (zero violations)"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented validated configurable event/worker queues, project/global concurrency, model call/token/proxy/window/retry/per-run budgets and pure reservation-admission decisions. Saturation diagnostics and safe reject-before-ACK/defer/keep-unresolved actions are executable. Usage observations distinguish account availability, tokens/proxies and monetary estimates; unknown values cannot masquerade as zero. Documented atomic multidimensional reservation responsibility, ordinary crash acknowledged-event RPO 0, separate disaster RPO 300s/RTO 900s, and backlog recovery 300s. Synthetic exact-limit, saturation, retry, unknown/exhausted-account tests passed; production enforcement and restore remain future Tickets.",
+  "ticket_id": "ticket-runtime-observability-contract-v0"
+}

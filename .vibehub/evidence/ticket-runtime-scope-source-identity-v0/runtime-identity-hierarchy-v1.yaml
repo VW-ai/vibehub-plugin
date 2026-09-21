@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "identity-hierarchy"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "identity-hierarchy",
+      "identity": "sha256:1dc66e45819b53312bfa745e529e639a11c7675c4dde93dfa8926927664eb32c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-identity-hierarchy-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:23:51.199Z",
+  "refs": [
+    "semantic-runtime/src/core/identity.mjs",
+    "semantic-runtime/docs/identity-contract-v0.md",
+    "semantic-runtime/test/identity.test.mjs",
+    "semantic-runtime/test/fixtures/identity/multi-source.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented schema_version 1 complete catalog validation for Tenant, Workspace, Project, RepositoryIdentity, explicit ProjectRepositoryMembership, SourceInstallation, Checkout, Worktree, Session and Execution. Tenant-scoped tuple keys and same-tenant ownership, source mapping and relation consistency are executable; source project-only mappings permit non-repository work. node --test semantic-runtime/test/identity.test.mjs passed 14 tests. context governing returned zero applicable authorities; context guard passed with zero violations. This is contract implementation evidence, not online authentication or persistence.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0"
+}

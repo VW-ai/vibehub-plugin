@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "policy-schema-covers-node-model"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "policy-schema-covers-node-model",
+      "identity": "sha256:5cb45559d0bfaa45b4e6b584e9ccdf4a9f026593870e40c9ed75a2a415f87483",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-schema-covers-node-model-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:26.717Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-artifacts.mjs",
+    "semantic-runtime/test/policy-artifacts.test.mjs",
+    "semantic-runtime/test/fixtures/policy-artifacts/ingress.json",
+    "semantic-runtime/docs/policy-artifacts-v0.md",
+    "command:cd semantic-runtime && node --test test/policy-artifacts.test.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented closed schema version 2 and pure compiler for all seven Policy node types, exact trusted versioned operation descriptors, typed opaque reference ports, named branches and any/all joins, terminal action intents, safe explicit error edges and finite per-node/aggregate budgets. Focused policy-artifacts suite passes 8 tests, including all node kinds, all five terminal intents, structured independent-signal joins and malformed declaration rejection. No operations/providers are executed by compilation.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

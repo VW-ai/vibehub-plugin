@@ -1,0 +1,574 @@
+{
+  "operations": [
+    {
+      "id": "scope",
+      "version": "1",
+      "type": "deterministic",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "inside",
+        "outside"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:341329f71f116748ed6beb6d03dd8167763f077e09c336fc01cae683efc80ba3"
+    },
+    {
+      "id": "durability",
+      "version": "1",
+      "type": "judge",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "signal": "signal_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "high",
+        "uncertain",
+        "low"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "implementation_hash": "sha256:76367e400d5cc4215b27016c22ce4eac3f55d811e8035765ea8de2fb6323157f"
+    },
+    {
+      "id": "related",
+      "version": "1",
+      "type": "retrieve",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "candidates": "candidates_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "found"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:916062d2e64facefb52aaa66ddc8027481c5efd1d391e480f903ab6884174f9d"
+    },
+    {
+      "id": "combine",
+      "version": "1",
+      "type": "aggregate",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "candidates": "candidates_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "signal": "signal_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "combined"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:1a4473e4b9ffb627c5bea0b5256f2157a45ae7305d38de8b038f9c6b6c92f8a5"
+    },
+    {
+      "id": "impact",
+      "version": "1",
+      "type": "guard",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "signal": "signal_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "allow",
+        "deny"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:db379d576cb19924ab0330e3da589c6ce93f6179382a295a16ff5bf47241bb21"
+    },
+    {
+      "id": "submit",
+      "version": "1",
+      "type": "worker",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref",
+        "job": "job_ref"
+      },
+      "error_outputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "branches": [
+        "submitted"
+      ],
+      "branch_mode": "exclusive",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:147165a38c32d015f7963e383d8f15ee0d8565c794a842de570c0737dae5c53f"
+    },
+    {
+      "id": "emit",
+      "version": "1",
+      "type": "action",
+      "inputs": {
+        "event": "event_ref",
+        "snapshot": "snapshot_ref"
+      },
+      "outputs": {},
+      "error_outputs": {},
+      "branches": [],
+      "branch_mode": "terminal",
+      "config_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "implementation_hash": "sha256:e0552a027681a6c2acb1130b3a7aca8f7878c2ed9f7299a76e5aa7a3407c438a"
+    }
+  ],
+  "definition": {
+    "schema_version": 2,
+    "policy_id": "synthetic-ingress",
+    "version": "1",
+    "compatibility": {
+      "min_runtime_version": 1,
+      "max_runtime_version": 1
+    },
+    "rollback_predecessor": null,
+    "entry": "scope",
+    "inputs": {
+      "event": "event_ref",
+      "snapshot": "snapshot_ref"
+    },
+    "limits": {
+      "max_nodes": 128,
+      "timeout_ms": 10000,
+      "max_attempts": 1280,
+      "max_tokens": 100000,
+      "max_cost_microunits": 1000000
+    },
+    "nodes": {
+      "scope": {
+        "type": "deterministic",
+        "operation": {
+          "id": "scope",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "inside": {
+            "target": "durability",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          },
+          "outside": {
+            "target": "ignore",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        }
+      },
+      "durability": {
+        "type": "judge",
+        "operation": {
+          "id": "durability",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "signal": "signal_ref"
+        },
+        "config": {
+          "question": "Is this durable context?"
+        },
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "high": {
+            "target": "related",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          },
+          "uncertain": {
+            "target": "related",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          },
+          "low": {
+            "target": "ignore",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        }
+      },
+      "related": {
+        "type": "retrieve",
+        "operation": {
+          "id": "related",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "candidates": "candidates_ref"
+        },
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "found": {
+            "target": "combine",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot",
+              "candidates": "candidates"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        },
+        "join": {
+          "name": "durability-route",
+          "mode": "any"
+        }
+      },
+      "combine": {
+        "type": "aggregate",
+        "operation": {
+          "id": "combine",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "candidates": "candidates_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "signal": "signal_ref"
+        },
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "combined": {
+            "target": "impact",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot",
+              "signal": "signal"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        }
+      },
+      "impact": {
+        "type": "guard",
+        "operation": {
+          "id": "impact",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "signal": "signal_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "allow": {
+            "target": "submit",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          },
+          "deny": {
+            "target": "ignore",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        }
+      },
+      "submit": {
+        "type": "worker",
+        "operation": {
+          "id": "submit",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref",
+          "job": "job_ref"
+        },
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {
+          "submitted": {
+            "target": "ingest",
+            "ports": {
+              "event": "event",
+              "snapshot": "snapshot"
+            }
+          }
+        },
+        "on_error": {
+          "target": "defer",
+          "ports": {
+            "event": "event",
+            "snapshot": "snapshot"
+          }
+        }
+      },
+      "ingest": {
+        "type": "action",
+        "operation": {
+          "id": "emit",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {},
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {},
+        "action": "INGEST"
+      },
+      "ignore": {
+        "type": "action",
+        "operation": {
+          "id": "emit",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {},
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {},
+        "action": "IGNORE",
+        "join": {
+          "name": "ignored",
+          "mode": "any"
+        }
+      },
+      "defer": {
+        "type": "action",
+        "operation": {
+          "id": "emit",
+          "version": "1"
+        },
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "outputs": {},
+        "config": {},
+        "budget": {
+          "timeout_ms": 50,
+          "max_attempts": 1,
+          "max_tokens": 32,
+          "max_cost_microunits": 100
+        },
+        "next": {},
+        "action": "DEFER",
+        "join": {
+          "name": "errors",
+          "mode": "any"
+        }
+      }
+    }
+  }
+}

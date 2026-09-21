@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "identity-hierarchy",
+    "identity-stability",
+    "multi-repo-and-fork-mapping",
+    "identity-resolution-api"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "identity-hierarchy",
+      "identity": "sha256:1dc66e45819b53312bfa745e529e639a11c7675c4dde93dfa8926927664eb32c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "identity-stability",
+      "identity": "sha256:d7543d09cf3f5723c9c93c78d321f2d973378acd4f5b2cfe12fe27d389c75d14",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "multi-repo-and-fork-mapping",
+      "identity": "sha256:f387903ef4fa39e70525a07e8dcdbda36cf3b6996a4bab5a524f7115da3412c3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "identity-resolution-api",
+      "identity": "sha256:69d1f5070f2cd713c59a35b0fffa19f46b7455aa68634c7e443e09c259f39a07",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-scope-source-identity-v0-integrated-regression-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:02.191Z",
+  "refs": [
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Integration verification for the first three Runtime foundation contracts: npm run verify in semantic-runtime passed its dependency/import boundary check and all 92 tests; npm run verify:standalone installed a copy outside the parent repository and passed the same boundary check and 92 tests. Root npm run verify:artifact passed and excluded semantic-runtime from the shipped Skill artifact. The two public-entry integration tests connect resolved scoped identity (including punctuation in logical IDs), typed audit aliases and exact published Policy content hash; reject cross-project audit continuation and identity metric labels; and carry a resource-saturation reason into a valid audit record. These are executable contract and synthetic integration results, not deployed-service, capacity or provider-quality proof.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0"
+}

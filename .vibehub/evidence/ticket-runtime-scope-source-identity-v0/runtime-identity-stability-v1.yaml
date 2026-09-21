@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "identity-stability"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "identity-stability",
+      "identity": "sha256:d7543d09cf3f5723c9c93c78d321f2d973378acd4f5b2cfe12fe27d389c75d14",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-identity-stability-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:23:52.101Z",
+  "refs": [
+    "semantic-runtime/src/core/identity.mjs",
+    "semantic-runtime/docs/identity-contract-v0.md",
+    "semantic-runtime/test/identity.test.mjs",
+    "semantic-runtime/test/fixtures/identity/multi-source.json"
+  ],
+  "schema_version": 2,
+  "summary": "Documented identity continuity and renewal rules for path moves, branch changes, remote target/spelling changes, repository rename/transfer, clone/worktree recreation, session restart, execution retry and installation replacement. Synthetic lifecycle tests prove mutable attributes do not change resolved identities and replaced worktree/session/execution IDs become unmapped. Enrollment persistence and historical reuse prevention remain explicit caller responsibilities. node --test semantic-runtime/test/identity.test.mjs passed 14 tests.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0"
+}

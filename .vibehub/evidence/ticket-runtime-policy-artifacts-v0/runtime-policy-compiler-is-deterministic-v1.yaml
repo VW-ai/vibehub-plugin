@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "policy-compiler-is-deterministic"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "policy-compiler-is-deterministic",
+      "identity": "sha256:6a2ed073d4fcad6d8b748de818b546ccccec5b47d21a6321a58116ada93b2e04",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-compiler-is-deterministic-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:27.647Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-artifacts.mjs",
+    "semantic-runtime/test/policy-artifacts.test.mjs",
+    "semantic-runtime/test/fixtures/policy-artifacts/ingress.json",
+    "semantic-runtime/docs/policy-artifacts-v0.md",
+    "command:cd semantic-runtime && node --test test/policy-artifacts.test.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Focused conformance tests pass for missing/unreachable nodes, cycles, incomplete branch/error/port declarations, unknown operations/config, non-finite or over-budget paths, ambiguous joins and closed-schema prototype-name bypass. Declaration/key/operation order and presentation metadata preserve executable/content identities; operation implementation identity and question changes alter executable identity. Runtime boundary check passes. Compiler uses conservative all-node resource bounds and documents schema 2 structured-join/error restrictions.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "phase-zero-policy-compatibility",
+    "policy-artifacts-are-immutable",
+    "policy-compiler-is-deterministic",
+    "policy-schema-covers-node-model"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T22:31:10.961Z",
+  "contract_revision": {
+    "identity": "sha256:cf83676053b5ba8059d9f05421d51401d48d2e3acd470d0bddaa77393573d6c9",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-policy-schema-covers-node-model-v1",
+    "runtime-policy-compiler-is-deterministic-v1",
+    "runtime-policy-artifacts-are-immutable-v1",
+    "runtime-phase-zero-policy-compatibility-v1",
+    "runtime-policy-artifacts-v0-integrated-regression-v1"
+  ],
+  "independence": {
+    "note": "Fresh closeout subagent, independent of the executor; did not implement or modify Runtime code or Evidence. Read current artifacts and independently reran checks before adjudication.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four Contract v1 criteria after reading the complete Ticket, current Acceptance revisions, all five bound Evidence records, compiler/registry implementation, synthetic fixture, focused and public-entry integration tests, and relevant architecture/compatibility documentation. Verified the seven typed node kinds, named success/error branches and structured joins; rejection of missing/unreachable/cyclic/ill-typed/incomplete/unknown/over-budget declarations; deterministic executable/content identities; exact immutable publication, compatible CAS activation, predecessor rollback, retirement and frozen result isolation. Independently reproduced npm run verify and npm run verify:standalone: dependency/import boundaries and 92/92 offline tests passed in both, including unchanged Phase 0 judge inputs/input hashes/results/candidate IDs and replay/provider-adapter checks. Additional independent probes passed enum ordering and unused-operation identity invariance, exact token/cost boundaries, retry multiplication, and trusted-operation/activation/ref mutation isolation. Root npm run verify:artifact also passed with its required loopback permission; Runtime files remain excluded from the shipped Skill artifact. Context guard passed with no violations and ticket validate passed. Acceptance is limited to artifact/compiler/reference-registry contracts; execution, hosted persistence, live provider quality and online service capacity remain outside this Ticket.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0",
+  "unresolved_acceptance_ids": []
+}

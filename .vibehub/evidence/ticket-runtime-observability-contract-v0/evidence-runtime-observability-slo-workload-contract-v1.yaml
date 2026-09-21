@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "slo-workload-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "slo-workload-contract",
+      "identity": "sha256:83b22a9e12d801d691113aa523e897317d332b0f62bba97f9d59a682ea3497fe",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-runtime-observability-slo-workload-contract-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:26:32.862Z",
+  "refs": [
+    "semantic-runtime/src/core/observability-contract.mjs",
+    "semantic-runtime/docs/observability-contract-v0.md",
+    "semantic-runtime/test/observability-contract.test.mjs",
+    "semantic-runtime/test/fixtures/observability/audit.json",
+    "semantic-runtime/test/fixtures/observability/rejected-fields.json",
+    "semantic-runtime/test/foundation-integration.test.mjs",
+    "command: cd semantic-runtime && node --test test/observability-contract.test.mjs test/foundation-integration.test.mjs (14 passed)",
+    "command: cd semantic-runtime && npm run check:boundaries (45 files passed)",
+    "command: vh context guard --repo . (zero violations)"
+  ],
+  "schema_version": 2,
+  "summary": "Published deeply frozen alpha-synthetic-v1 workload and unproven engineering SLO targets: 2 tenants/4 projects/12 sources, seeded graph dimensions, payload/concurrency limits, 80/20 event-query mix, 20-minute steady + 60-second burst + 300-second recovery, bounded worker/model shape. Documented ACK/candidate/query/queue/worker timing endpoints, P95/P99 gates, failure denominators, distinct node aspirations and capacity-drill proof boundary. Synthetic tests check workload budget consistency and immutable unproven status; no capacity measurement or product-value result is claimed.",
+  "ticket_id": "ticket-runtime-observability-contract-v0"
+}

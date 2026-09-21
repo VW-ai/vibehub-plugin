@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "policy-artifacts-are-immutable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "policy-artifacts-are-immutable",
+      "identity": "sha256:2357c1a3593b79641bfe6d43a5ef3cec2d4dc949cee0abd18c32272fbb74434e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-artifacts-are-immutable-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:27:28.590Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-artifacts.mjs",
+    "semantic-runtime/test/policy-artifacts.test.mjs",
+    "semantic-runtime/test/fixtures/policy-artifacts/ingress.json",
+    "semantic-runtime/docs/policy-artifacts-v0.md",
+    "command:cd semantic-runtime && node --test test/policy-artifacts.test.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "In-memory registry contract compiles before publication, pins logical ID/exact version/schema/content/executable/compatibility/rollback metadata, idempotently returns duplicate publications and rejects version redefinition. Tests pass for activation compatibility, exact-hash lookup, compare-and-swap, predecessor rollback, irreversible retirement, append-only lifecycle history and deeply frozen returned copies that cannot mutate stored activated artifacts. Hosted persistence and authorization remain separate adapter work.",
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

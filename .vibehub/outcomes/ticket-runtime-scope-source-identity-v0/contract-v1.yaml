@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "identity-hierarchy",
+    "identity-resolution-api",
+    "identity-stability",
+    "multi-repo-and-fork-mapping"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T22:27:56.047Z",
+  "contract_revision": {
+    "identity": "sha256:f13806848b990c7fcc27351689d4b9bb68aea4e8f0ed912432b3ccca45218de0",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-identity-hierarchy-v1",
+    "runtime-identity-stability-v1",
+    "runtime-multi-repo-and-fork-mapping-v1",
+    "runtime-identity-resolution-api-v1",
+    "runtime-scope-source-identity-v0-integrated-regression-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_identity did not execute this Ticket or modify implementation, fixtures, tests, docs or Evidence; it read the exact Contract and Evidence, inspected the source and public interfaces, and independently reran tests and adversarial probes before recording this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout of Contract v1 accepts all four current Acceptance revisions. The versioned executable catalog validates all ten identity kinds, collision-free tenant-scoped keys, explicit many-to-many Project repository memberships, source mappings and ownership consistency. The lifecycle contract explicitly separates mutable paths, branches, names and remote URLs from identities and documents preservation or renewal for relocation, rename/transfer, recreation and restart; cross-snapshot enrollment continuity remains the caller responsibility, not an implemented storage service. Synthetic fixtures and tests distinguish multiple repositories, clones/worktrees and fork/upstream objects, including shared repositories and repository-free Projects. The pure no-I/O resolver exposes deterministic resolved, ambiguous or unmapped results with categorical confidence and tenant-scoped evidence, rejects contradictory facts and unknown IDs, and never selects scope from mutable hints. Independently ran node --test test/identity.test.mjs test/foundation-integration.test.mjs from semantic-runtime: 16/16 passed; npm run check:boundaries: 45 files, zero errors. Additional independent probes evaluated 2300 one/two/three-ID observations and reversed catalog orders: 323 resolved, 1855 ambiguous and 122 unmapped, all with consistent scope, asserted IDs and tenant evidence; three negative catalog/unmapped checks passed. Current context guard passed with zero authorities and zero violations, and ticket validate passed. Public exports and the integration fixture were reviewed for interface consistency. No blocking findings. This adjudicates the identity protocol slice only, not live authorization, online persistence, provider behavior or capacity results; parent release composition owns standalone/plugin artifact verification.",
+  "ticket_id": "ticket-runtime-scope-source-identity-v0",
+  "unresolved_acceptance_ids": []
+}
