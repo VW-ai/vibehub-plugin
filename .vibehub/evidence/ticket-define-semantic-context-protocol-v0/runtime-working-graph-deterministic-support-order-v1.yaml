@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-deterministic-support-order-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:35:33.798Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Final deterministic support-list hardening after parent pre-review: provenance ordering uses explicit code-unit comparisons, avoiding host locale/ICU collation dependency. Assertion constructors normalize only set-like event, parent, canonical-association and access-revision lists before immutable hashing; ordered semantic payload arrays and chronological snapshot/conflict histories remain untouched. New regression proves reversed supporting-event and canonical-association order yields identical full revisions, GraphRevision pins and snapshots. Targeted graph/public integration suite now passes 18/18; boundary check passes 60 files with zero errors. Context guard passed with zero violations before append. Earlier proof records remain historical; final implementation is frozen for parent combined release checks and independent V2 closeout.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

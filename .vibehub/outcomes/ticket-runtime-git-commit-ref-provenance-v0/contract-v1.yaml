@@ -1,0 +1,34 @@
+{
+  "accepted_acceptance_ids": [
+    "commit-object-contract",
+    "multi-path-correlation",
+    "rebase-force-push-behavior",
+    "ref-movement-contract"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T23:48:42.135Z",
+  "contract_revision": {
+    "identity": "sha256:fcb77817ff3f09e69304a5c779e0c93ca631a0388fe7aa8b94d8d2bb24a62768",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-git-provenance-commit-object-contract-v1",
+    "runtime-git-provenance-multi-path-correlation-v1",
+    "runtime-git-provenance-readonly-promisor-and-diff-boundary-repair-v1",
+    "runtime-git-provenance-rebase-force-push-behavior-v1",
+    "runtime-git-provenance-ref-movement-contract-v1",
+    "runtime-git-public-integration-release-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_git_provenance had no execution context and did not implement this Ticket. It read the exact Contract, resolved Context, prerequisite Outcome/Evidence and actual source/tests; independently reproduced behavior, reported two concrete defects and re-reviewed the corrected frozen source. It changed no implementation, tests, fixtures, documentation, Evidence or Git, and persisted only this exact Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts every Acceptance revision in Contract v1. GitCommit snapshots bind tenant/repository/object-format/full-OID identity to verified raw object hashes and retain tree, ordered parents, authored/committed byte-preserving metadata, message digest and explicit root/each-parent changed-path provenance. Deterministic real SHA-1/SHA-256 repositories cover roots, merges, raw filename bytes, Gitlinks, missing trees and exact tree comparisons unaffected by shallow/graft/replacement traversal. RefMovement retains immutable endpoints, ancestry evidence, event pins and reported operation while classifying create, fast-forward, rewind, force, delete, unchanged or unknown without rewriting commit objects. Actual synthetic rebase and local bare force-push fixtures create distinct commit/ref observations, preserve old audit content and propose staleness only for the same ref and exact prior head; immutable historical claims remain unaffected. Four normalized local/fetch/push/PR observer paths correlate one commit with distinct observation refs, complete event/access provenance and source positions; missing, shallow, non-commit and garbage-collected objects remain unresolved without erasing earlier content. Independent review reproduced two adapter defects: older Git could fetch missing promisor objects despite generic transport denial, and valid over-limit Git paths escaped diff failure containment. Executor repairs and supplemental Evidence were re-adjudicated: disposable minimal metadata with the explicit source object directory, no source remotes/config and an empty transport allowlist prevents source writes and helper execution; per-base validation preserves commit metadata with unresolved limit_exceeded for 4225-byte paths. Final independent affected Git/public/event/causal/identity suite passed 83/83 and boundary checks passed 60 files. Independent probes confirmed entire source metadata byte equality across missing commit/ancestry/tree reads, no configured ext helper invocation, oversized-path degradation and equal linked-worktree/bare/ordinary checkout reads. All seven reviewed Git artifact hashes remained unchanged. The final release Evidence and inspected logs show full verification and an actual isolated standalone install each passing 186/186 plus the separate 79-file Skill artifact check; this reviewer reproduced the affected suite and boundary checks, not those whole-wave release commands. Exact Context references resolved and matched consumed files; prerequisite successful Outcome/Evidence, current six Evidence records, Ticket validation and zero-violation Context guard were reviewed. No blocking finding remains. This accepts the bounded offline contract, not a deployed Git service: source authentication, authorized repository mapping, consumer access enforcement, durable storage, current source ordering/concurrency and canonical application remain owning integration responsibilities. Parallel Working Graph acceptance is outside this Outcome.",
+  "ticket_id": "ticket-runtime-git-commit-ref-provenance-v0",
+  "unresolved_acceptance_ids": []
+}

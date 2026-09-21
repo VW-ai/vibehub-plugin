@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-public-integration-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:47:24.793Z",
+  "refs": [
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Public-entry integration combines accepted normalized events, two repository/execution identities and source-watermark vectors with immutable Graph revisions. Relations retain exact endpoint versions and complete access closure; current revocation denies historical reads while unaffected sources remain readable; stale Worker pins reject; local and connector observations of the same immutable commit retain independent ACL proof. Final repaired component verification and actual isolated standalone install each passed 186/186 tests (22 Graph/public cases); boundary check passed 60 files, Skill artifact verification passed 79 files excluding Runtime. Synthetic conformance only, not production storage/capacity/authentication proof.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

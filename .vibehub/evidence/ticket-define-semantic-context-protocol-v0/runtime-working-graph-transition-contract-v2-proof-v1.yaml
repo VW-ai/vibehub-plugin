@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "working-graph-transition-contract-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-transition-contract-v2-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:34:12.141Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/test/fixtures/working-graph/scenario.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Pure transitions append derived candidate/validated/rejected/stale/superseded assertions, create contested projections without overwriting competing assertions on semantic base mismatch, and require explicit resolved revisions preserving all competing parents. Transaction expected GraphRevision mismatch is separately unapplied and retains the proposal. Immutable canonical artifact associations inherit provenance and grant no external write authority. Source lifecycle changes quarantine descendants before recomputation; exact old snapshots recheck current authorization. Explicit recomputation pins latest relevant lifecycle digests; stale ancestors/endpoints and unpinned old observations cannot reopen state. Tombstones remain closed within a generation. Final targeted verification passed 17/17 graph/public-entry tests; boundary check passed 60 files with zero errors. All Ticket Context resolved, direct causal prerequisite successful Outcome/Evidence consumed, fresh frontier confirmed EXECUTE before implementation, and context guard passed with zero authorities/violations before this append. Parent owns combined full/standalone/plugin-artifact release verification. These are synthetic pure-contract results, not a deployed service or authenticated durable implementation.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

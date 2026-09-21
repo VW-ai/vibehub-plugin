@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "ref-movement-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ref-movement-contract",
+      "identity": "sha256:bb418cc9eee47f8196411abeba05aefbcbf6dc384be3e7771801d90f289832ff",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-git-provenance-ref-movement-contract-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:32:17.536Z",
+  "refs": [
+    "semantic-runtime/src/core/git-provenance.mjs",
+    "semantic-runtime/src/adapters/git-provenance.mjs",
+    "semantic-runtime/test/git-provenance.test.mjs",
+    "semantic-runtime/test/git-provenance-integration.test.mjs",
+    "semantic-runtime/test/fixtures/git-provenance/observers.json",
+    "semantic-runtime/test/fixtures/git-provenance/repository.mjs",
+    "semantic-runtime/docs/git-provenance-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "command:cd semantic-runtime && node --test test/git-provenance.test.mjs test/git-provenance-integration.test.mjs test/event-provenance.test.mjs test/causal-ordering.test.mjs test/causal-integration.test.mjs test/identity.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Public createRefMovement/validateRefMovement and GitProvenance.readRefMovement delegate immutable DAG classification to the accepted causal contract. Real temporary Git history covers create, fast-forward including merge ancestry, rewind, divergent force, delete, unchanged and unknown. Branch/tag/PR full ref names, exact old/new OIDs, immutable ancestry/event pins and reported update/force_push/rebase remain distinct: reported force_push can still be fast-forward, and topology never infers the actual CLI command. Bounded/missing ancestry returns unknown. Reading leaves real fixture refs/worktree/config unchanged, including replacement and graft interference. Final validation: 80/80 affected identity/event/causal/Git tests passed, including 13/13 Git and public integration cases; component boundary check passed 60 files with zero errors. Every Ticket Context was resolved, prerequisite successful Outcome/Evidence consumed, and Context guard passed with zero authorities/violations before this append. These are bounded offline contract proofs; deployment, authentication, durable storage, live source ordering and ACL enforcement remain integration responsibilities.",
+  "ticket_id": "ticket-runtime-git-commit-ref-provenance-v0"
+}

@@ -1,0 +1,37 @@
+{
+  "accepted_acceptance_ids": [
+    "working-graph-boundary-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T23:53:46.298Z",
+  "contract_revision": {
+    "identity": "sha256:4e4d1752c389ac589909f3f5b22fa8d75a87cf7b2aa906e1cf6a1b1db5cb737d",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "runtime-working-graph-boundary-v2-proof-v1",
+    "runtime-working-graph-conformance-fixture-v2-proof-v1",
+    "runtime-working-graph-deterministic-support-order-v1",
+    "runtime-working-graph-final-historical-admission-release-v1",
+    "runtime-working-graph-historical-epoch-admission-repair-v1",
+    "runtime-working-graph-independent-review-history-epoch-repair-v1",
+    "runtime-working-graph-public-integration-release-v1",
+    "runtime-working-graph-revision-contract-v2-proof-v1",
+    "runtime-working-graph-transition-contract-v2-proof-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_working_graph received no execution context, did not implement this Ticket or author its tests, documentation or Evidence, independently inspected and reproduced its behavior, reported concrete repair findings to the executor, and rereviewed the corrected frozen implementation. Its only repository write is this exact Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four active Acceptance revisions in Contract V2; retired V1 is not adjudicated. Revision contract: strict wire-v1 semantic/entity/relation revisions, exact scoped addresses, immutable GraphRevision snapshots, full provenance closure and accepted identity/event/causal watermark contracts are executable through the public entry. Transitions: graph compare-and-set mismatch preserves the unapplied proposal; semantic base mismatch retains competing revisions with derived contested state; explicit resolution preserves all competing parents; derived lifecycle and canonical artifact association grant no external write authority. Conformance: one Project, two repositories and two executions demonstrate compatible and contradictory assertions, deterministic historical snapshots, exact relation endpoints and inherited ACLs, cross-scope/generation rejection, stale Worker fencing, tombstones, ACL tightening, independent observer restrictions and explicit resolution. Boundary: state is derived/recomputable, fast judges have attention rather than truth authority, canonical promotion remains a separate authorized operation, and source vectors fabricate no cross-repository order. Independent review found implicit lifecycle epoch admission and rehashed head/conflict projection forgeries, then a follow-on rejection of historically admitted epochs when later watermark requirements changed. Executor fixes were independently reproduced: heads/conflicts/resolutions rederive from ordered assertions, complete histories replay one mutation per predecessor snapshot, lifecycle events cannot introduce their own source epoch, and accepted old-epoch restrictions survive later requirement changes. Final independent probes pass four repaired cases, 64 ACL intersections/192 principal reads and 12 accessor-safe entrypoints. Independent npm run verify passes 187/187 with 60-file boundary checks, including 23 graph/public cases. Final exact-bound release Evidence and inspected logs show actual isolated standalone verification passing 187/187 and the unchanged 79-file Skill artifact excluding Runtime; this agent did not independently rerun standalone/artifact. All five Context references resolve, the successful causal prerequisite Outcome/Evidence were consumed, current Ticket validation and Context guard pass with zero authorities or violations, and no blocking findings remain. Acceptance is for the bounded pure reference contract, not a deployed service, authenticated durable store or Git adapter certification. Trusted adapters still own producer/lifecycle authority authentication, current authorization selection, source-byte availability, atomic transactions, retention and canonical writes; standalone snapshot structural validation does not replace complete-history temporal validation.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0",
+  "unresolved_acceptance_ids": []
+}

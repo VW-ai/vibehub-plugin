@@ -1,0 +1,6 @@
+[
+  {"channel":"local_git","installation":"laptop","event_id":"git-local-1","producer_id":"local-git","source_native_event_id":"local-commit-1"},
+  {"channel":"fetch","installation":"laptop","event_id":"git-fetch-1","producer_id":"fetch-sensor","source_native_event_id":"fetch-1"},
+  {"channel":"push","installation":"connector","event_id":"git-push-1","producer_id":"push-webhook","source_native_event_id":"webhook-1"},
+  {"channel":"pull_request","installation":"connector","event_id":"git-pr-1","producer_id":"pr-poll","source_native_event_id":"pr-update-1"}
+]

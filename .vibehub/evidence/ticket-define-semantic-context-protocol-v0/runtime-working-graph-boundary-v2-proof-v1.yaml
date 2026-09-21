@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-boundary-v2-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:34:14.107Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/test/fixtures/working-graph/scenario.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Documented derived/recomputable graph semantics, attention-only fast-judge authority, separate canonical truth and explicit future promotion, catalog/current-authorization/lifecycle-target attestation duties, per-source sequence/epoch access ordering without fabricated cross-repository total order, and conservative independent-observer restriction intersection. Core imports sibling contract modules only; no provider/host/store branching, database/server, external canonical writes, live calls, secrets, deployment or Phase 0 changes. Bounded reference state and exact replay GraphRevision pin interop are explicit. Final targeted verification passed 17/17 graph/public-entry tests; boundary check passed 60 files with zero errors. All Ticket Context resolved, direct causal prerequisite successful Outcome/Evidence consumed, fresh frontier confirmed EXECUTE before implementation, and context guard passed with zero authorities/violations before this append. Parent owns combined full/standalone/plugin-artifact release verification. These are synthetic pure-contract results, not a deployed service or authenticated durable implementation.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

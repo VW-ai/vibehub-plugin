@@ -32,3 +32,18 @@ export {
   projectFreshness, classifyGitRefMovement, createReplayManifest,
   validateReplayManifest, assertReplayEffect, createReplayState, applyReplayEffect,
 } from './core/causal-ordering.mjs';
+export {
+  GIT_PROVENANCE_VERSION, validateGitCommit, createGitCommit,
+  createGitCommitObservation, correlateGitCommitObservations, createRefMovement,
+  validateRefMovement, assessGitClaimAfterMovement,
+} from './core/git-provenance.mjs';
+export { GitProvenance } from './adapters/git-provenance.mjs';
+export {
+  WORKING_GRAPH_CONTRACT_VERSION, SEMANTIC_STATES, SEMANTIC_RELATIONS,
+  validateSemanticAddress, semanticAddress, exactRevisionAddress,
+  validateGraphRevisionAddress, graphRevisionAddress, canonicalArtifactAddress,
+  validateProvenanceClosure, validateSemanticRevision, validateGraphConflict,
+  validateGraphRevision, validateWorkingGraph, createWorkingGraph,
+  applyGraphAssertion, resolveGraphConflict, updateGraphSourceAccess,
+  resolveWorkingGraphAddress, validateWorkerGraphInput,
+} from './core/working-graph.mjs';

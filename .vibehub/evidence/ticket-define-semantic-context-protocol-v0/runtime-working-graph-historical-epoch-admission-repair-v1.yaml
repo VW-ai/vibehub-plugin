@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-historical-epoch-admission-repair-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:49:36.732Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Corrected independent rereview finding: aggregate snapshot validation no longer rechecks an already accepted lifecycle source against the latest captured watermark requirements. Its original temporal admission remains strictly proved by validateSnapshotStep against the exact predecessor. A later unrelated assertion may omit a formerly pinned epoch from its current requirements without invalidating source-access history or dropping restrictions. Regression covers watermark-only explicit admission, ACL update, unrelated web assertion dropping that epoch, immutable original snapshot/access history, continued old-revision denial, explicitly pinned restricted recomputation, same-epoch sequenced continuation, stale same-epoch refusal and unadmitted new-epoch refusal. Existing future-source and stale-parent admission attacks remain rejected. Final focused graph/public-entry tests pass 23/23; all six independent probe groups pass including four repaired cases, 64 ACL combinations/192 reads and 12 accessor entrypoints. Boundary check passes 60 files/zero errors; context guard passed with zero violations before append. Source/docs/tests frozen for independent rereview; prior Evidence preserved, API/wire unchanged, no self Outcome or Git operations.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

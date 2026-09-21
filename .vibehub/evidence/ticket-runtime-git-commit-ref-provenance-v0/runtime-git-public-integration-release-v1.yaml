@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "commit-object-contract",
+    "ref-movement-contract",
+    "rebase-force-push-behavior",
+    "multi-path-correlation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "commit-object-contract",
+      "identity": "sha256:b67e93bb8496d0ba8a2b929ff5f4013aee0756eb8d75895ebf99cfff6818dd62",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ref-movement-contract",
+      "identity": "sha256:bb418cc9eee47f8196411abeba05aefbcbf6dc384be3e7771801d90f289832ff",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "rebase-force-push-behavior",
+      "identity": "sha256:55220c1a58669303b42584145f13cc4833b147d268eb9cc547377b73991e09b9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "multi-path-correlation",
+      "identity": "sha256:1d3c0640fb085735db30411f66cbe4e6bac4740c56c8a8cd6a651e46524d5115",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-git-public-integration-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:47:24.792Z",
+  "refs": [
+    "semantic-runtime/test/git-provenance-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Public-entry integration uses a real disposable Git repository to verify exact commit bytes/digests, four distinct normalized observations of one commit, captured-head source freshness, ref-head staleness proposals, immutable historical claims and fork identity separation. Final repaired component verification and real isolated standalone install each passed 186/186 tests (16 Git/public cases); boundary check passed 60 files. The existing Skill release artifact passed 79 files, excluding Runtime. No private source input, provider calls or deployment used.",
+  "ticket_id": "ticket-runtime-git-commit-ref-provenance-v0"
+}

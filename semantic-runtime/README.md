@@ -191,6 +191,11 @@ contracts through the package's public entry:
 - [Causal ordering and replay](docs/causal-ordering-v0.md): per-source receipt and
   projection cursors, explicit gaps and captured-head freshness, immutable Git
   ancestry versus ref movement, and isolated replay generations.
+- [Git provenance](docs/git-provenance-v0.md): read-only local commit inspection,
+  explicit diff bases, correlated source observations and scoped ref movement.
+- [Working Graph](docs/working-graph-v0.md): immutable semantic revisions and
+  snapshots, explicit competing assertions, exact relation endpoints and
+  provenance-based access checks.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

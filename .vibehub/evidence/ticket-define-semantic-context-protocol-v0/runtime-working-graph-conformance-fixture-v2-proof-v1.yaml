@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "working-graph-conformance-fixture-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-conformance-fixture-v2-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:34:13.132Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/test/fixtures/working-graph/scenario.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Store-independent fixture reuses accepted normalized-event/identity/causal APIs for one Project, two repositories and two registered executions. Tests prove compatible independent assertions, contradictory revisions and multiple explicit conflicts/resolution, immutable snapshots/addresses, exact relation endpoints with inherited ACLs, cross-tenant/project/generation rejection, worker graph/input/source fencing, tombstone closure, ACL tightening/unknown access and historical-read denial. Multi-observer same-commit test preserves local/connector observations and per-delivery ACLs, meets their restrictions, quarantines all descendants on restrictive connector updates, rejects old-event reopening, and permits explicit restricted recomputation. Root public-entry integration reproduces both multi-observer and two-repository authorization paths. Final targeted verification passed 17/17 graph/public-entry tests; boundary check passed 60 files with zero errors. All Ticket Context resolved, direct causal prerequisite successful Outcome/Evidence consumed, fresh frontier confirmed EXECUTE before implementation, and context guard passed with zero authorities/violations before this append. Parent owns combined full/standalone/plugin-artifact release verification. These are synthetic pure-contract results, not a deployed service or authenticated durable implementation.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

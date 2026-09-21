@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-final-historical-admission-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:52:34.889Z",
+  "refs": [
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/src/core/working-graph.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "After the final historical watermark-only epoch admission repair, npm run verify and actual npm run verify:standalone each passed 187/187 tests with zero failures; component boundaries passed 60 files. This supersedes the historical 186-test release count without changing that earlier evidence. Public integration still proves endpoint provenance, current ACL on historical reads, independent source observation pins and stale Worker rejection. Existing 79-file Skill artifact verification remains valid because Runtime and its dependencies are excluded from the plugin artifact; no plugin release files changed. Synthetic contract and isolated package proof only, not production durability, authenticated source admission or throughput proof.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}

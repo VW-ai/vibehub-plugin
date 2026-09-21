@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "multi-path-correlation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "multi-path-correlation",
+      "identity": "sha256:1d3c0640fb085735db30411f66cbe4e6bac4740c56c8a8cd6a651e46524d5115",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-git-provenance-multi-path-correlation-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:32:19.264Z",
+  "refs": [
+    "semantic-runtime/src/core/git-provenance.mjs",
+    "semantic-runtime/src/adapters/git-provenance.mjs",
+    "semantic-runtime/test/git-provenance.test.mjs",
+    "semantic-runtime/test/git-provenance-integration.test.mjs",
+    "semantic-runtime/test/fixtures/git-provenance/observers.json",
+    "semantic-runtime/test/fixtures/git-provenance/repository.mjs",
+    "semantic-runtime/docs/git-provenance-v0.md",
+    "semantic-runtime/src/index.mjs",
+    "command:cd semantic-runtime && node --test test/git-provenance.test.mjs test/git-provenance-integration.test.mjs test/event-provenance.test.mjs test/causal-ordering.test.mjs test/causal-integration.test.mjs test/identity.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Four synthetic local-commit, fetch, push-webhook and PR-update observer fixtures mechanically normalize actual temporary-repository commit pins into distinct event identities. Public correlation produces one sourceObjectKey with four observation refs/full event provenance, retains per-observation ACL/access and changed-path availability, deduplicates exact repeats, and rejects changed observation pins/conflicting immutable content. Public integration independently composes these with source cursors and captured-head freshness without collapsing observation positions. Actual shallow clone, missing OID, non-commit OID, garbage collection and absent tree fixtures preserve explicit unresolved pointers/diff results. A later garbage-collected observation never deletes earlier retained commit content or audit observations. No remote service, credential or hosted webhook was involved. Final validation: 80/80 affected identity/event/causal/Git tests passed, including 13/13 Git and public integration cases; component boundary check passed 60 files with zero errors. Every Ticket Context was resolved, prerequisite successful Outcome/Evidence consumed, and Context guard passed with zero authorities/violations before this append. These are bounded offline contract proofs; deployment, authentication, durable storage, live source ordering and ACL enforcement remain integration responsibilities.",
+  "ticket_id": "ticket-runtime-git-commit-ref-provenance-v0"
+}

@@ -1,0 +1,48 @@
+{
+  "acceptance_ids": [
+    "working-graph-revision-contract-v2",
+    "working-graph-transition-contract-v2",
+    "working-graph-conformance-fixture-v2",
+    "working-graph-boundary-v2"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-working-graph-independent-review-history-epoch-repair-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T23:47:22.240Z",
+  "refs": [
+    "semantic-runtime/src/core/working-graph.mjs",
+    "semantic-runtime/docs/working-graph-v0.md",
+    "semantic-runtime/test/working-graph.test.mjs",
+    "semantic-runtime/test/working-graph-integration.test.mjs",
+    "semantic-runtime/test/fixtures/working-graph/scenario.mjs",
+    "command:node --test semantic-runtime/test/working-graph.test.mjs semantic-runtime/test/working-graph-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Addressed three independent-closeout findings without overwriting earlier Evidence or changing active Contract V2. Snapshot validators now reconstruct heads and every implied conflict/resolution from immutable ordered assertions, rejecting rehashed head rollback or omitted mismatched-base conflicts. Full Working Graph validation admits exactly one mutation per successor from empty genesis and reconstructs each step using predecessor-only source/access facts; tests reject invented source registration, stale relation admission after revocation, no-op/batched history and hidden resolution records. Lifecycle events must match an exact source tuple already explicitly admitted by predecessor watermark requirements or trusted observed source registration; an ACL event cannot mint an epoch/observer. Explicit admission of a new epoch is supported without dropping old-epoch provenance or independently retained restrictions. This refines the earlier overly broad new-generation-only documentation into an executable explicit-admission boundary, preserving accepted causal epoch separation without inferred supersession. Public API and wire shapes remain unchanged. Final focused graph/public-entry suite passes 22/22 and boundary check passes 60 files/zero errors. All original independent probes now pass: 3 repaired failures, 64 ACL combinations/192 principal reads and 12 accessor entrypoints. Context guard passed with zero violations before append. Source, tests and docs frozen for renewed independent adjudication and parent combined release verification; no self Outcome or Git operation.",
+  "ticket_id": "ticket-define-semantic-context-protocol-v0"
+}
