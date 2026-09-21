@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-project-is-semantic-scope-repository-is-source",
+  "detail": "The online service must not equate a Project with one Git repository. A Tenant or Workspace owns Projects; a Project represents the product or human goal and may include multiple Repository memberships; a Repository contributes code, commits, pull requests, and source identity; Workstreams or Tickets express bounded work across those repositories; Executions identify the agent, session, branch, or worktree that performed an action. Every Event, State, Decision, Context reference, and audit record needs explicit tenant_id and project_id plus repo_id, workstream_id, execution_id, and source revision where applicable. Project-level Context may omit repo_id. The storage model should use explicit ProjectRepositoryMembership so it can later represent controlled many-to-many membership even if the first release restricts one repository to one active Project.",
+  "evidence": [
+    {
+      "note": "The technical design already introduces tenant, workspace, project, repository, session, and worktree identity but does not yet implement their online lifecycle.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "note": "Phase 0 currently scopes records only by tenant and project, making the missing repository and execution dimensions concrete.",
+      "ref": "semantic-runtime/src/core/contracts.mjs"
+    },
+    {
+      "note": "Existing domain semantics already distinguish Project, Repository references, Rooms, Context, Tasks, and replaceable executors.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-semantic-runtime-strong-service-boundary",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "一个项目有多个 repo",
+    "ref": "conversation:2026-09-21-multi-project-multi-repo-service"
+  },
+  "state": "active",
+  "summary": "Project is the semantic aggregation boundary and Repository is a versioned source of code facts",
+  "tags": [
+    "semantic-runtime",
+    "project",
+    "repository",
+    "multi-repo",
+    "multi-tenant",
+    "scope"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-addressable-versioned-context-identity",
+  "detail": "The online service's core experience is that every Context and change can be linked precisely. A logical Context URL resolves to the current accepted view and visibly reports newer versions or conflicts; an immutable version URL always resolves to the exact content that a person or agent consumed; a Proposal URL identifies one working variation. Citations store both context_id and version_id, not only a moving alias. Opening an older version shows its relationship to current canonical state and any active conflict. Context identity therefore survives content evolution, while immutable revisions preserve reproducibility, audit, rollback, and point-in-time agent behavior.",
+  "evidence": [
+    {
+      "note": "The design requires semantic pointers, immutable provenance, explicit promotion, and conflict visibility but does not yet specify the user-facing identity protocol.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "note": "Existing governed writeback semantics establish that durable Context changes need provenance and an explicit management layer.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-semantic-runtime-strong-service-boundary",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "我们可以把一切都可以具体地去 reference 到",
+    "ref": "conversation:2026-09-21-addressable-context-experience"
+  },
+  "state": "active",
+  "summary": "Every online Context has a stable logical identity, immutable versions, and separately referenceable proposals",
+  "tags": [
+    "semantic-runtime",
+    "context",
+    "identity",
+    "versioning",
+    "reference",
+    "provenance"
+  ],
+  "type": "decision"
+}

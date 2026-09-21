@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-realtime-context-variations-and-reconciliation",
+  "detail": "Realtime team awareness and canonical mutation are separate operations. Each Agent or workstream may publish an immediately visible sparse Proposal based on base_version_id without rewriting the shared Context. Its effective view is accepted Project Context plus its own workstream overlay and relevant conflict headlines from other workstreams. Promotion uses optimistic concurrency: unchanged bases can advance; orthogonal changes may auto-rebase; semantically equivalent changes may collapse while retaining provenance; contradictory changes remain multiple candidate heads and create a first-class Conflict. The last accepted canonical version stays stable but becomes contested until a reconciliation worker or authorized human produces a resolution version with all relevant parents. JEV or another fast judge may detect relation, contradiction, impact, and escalation need, but it does not silently choose high-impact truth. This applies score frequently, mutate rarely to both agent context and shared project state.",
+  "evidence": [
+    {
+      "note": "The design principle score frequently, mutate rarely separates continuous semantic perception from structural context mutation.",
+      "ref": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
+    },
+    {
+      "note": "The architecture already requires unresolved conflicts to remain visible and fast judges to stop short of canonical truth.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "note": "The owner explicitly identified concurrent agent and human changes, contradictory variations, live awareness, and eventual resolution as the key online-service tradeoff.",
+      "ref": "conversation:2026-09-21-concurrent-context-variations"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-addressable-versioned-context-identity",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "constraint-cross-repo-state-uses-causal-watermarks",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "一个 context，它可能可以有两个 variation，两个 branch",
+    "ref": "conversation:2026-09-21-concurrent-context-variations"
+  },
+  "state": "active",
+  "summary": "Realtime awareness uses sparse Context variations; canonical Context changes only through explicit promotion and reconciliation",
+  "tags": [
+    "semantic-runtime",
+    "collaboration",
+    "concurrency",
+    "proposal",
+    "conflict",
+    "canonicalization"
+  ],
+  "type": "decision"
+}

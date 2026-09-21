@@ -1,0 +1,38 @@
+{
+  "context_id": "finding-jev-haiku-routing-shape",
+  "detail": "The accepted 20-event and 80-decision Peel comparison found that Claude Haiku had higher recall and coverage in every family and was clearly stronger on Context relevance, while JEV retained higher acceptance target precision and independently schedulable-work precision. Durable-value evidence was too sparse for a broad conclusion. The observed Claude CLI route was much slower and more expensive than JEV, but CLI process latency is not Haiku API latency. The working routing hypothesis is a cascade: JEV handles the fast first pass and high-precision gate, while low-confidence, ambiguous, Context-heavy, or durable-value cases may escalate to a stronger model. This is a corpus-scoped hypothesis, not a permanent model choice; family-specific thresholds and downstream outcomes need continued calibration.",
+  "evidence": [
+    {
+      "note": "Independent closeout accepts the exact-input comparison, per-family quality findings, transport caveats, and unchanged productization gate.",
+      "ref": ".vibehub/outcomes/ticket-compare-jev-with-claude-haiku/contract-v1.yaml"
+    },
+    {
+      "note": "The ignored local report contains the complete bounded comparison and 36 decision disagreements.",
+      "ref": "semantic-runtime/.local/peel-jev-vs-haiku-v1.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-semantic-judgeops-continuous-evaluation",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "让 claude haiku 来做判断看看有没有区别，哪一个在哪些方面上更好",
+    "ref": "conversation:2026-09-21-jev-haiku-comparison"
+  },
+  "state": "active",
+  "summary": "On the first Peel corpus, Haiku improves recall and Context coverage while JEV retains useful high-precision gating behavior",
+  "tags": [
+    "semantic-runtime",
+    "jev",
+    "haiku",
+    "routing",
+    "quality",
+    "cascade"
+  ],
+  "type": "note"
+}

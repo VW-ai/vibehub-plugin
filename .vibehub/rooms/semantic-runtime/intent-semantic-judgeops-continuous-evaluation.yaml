@@ -1,0 +1,42 @@
+{
+  "context_id": "intent-semantic-judgeops-continuous-evaluation",
+  "detail": "Fast semantic policy nodes are product behavior and must evolve through a repeatable CI/CD-like method rather than ad hoc prompt testing. Each evaluation pins the sanitized corpus and point-in-time state, evaluator-only labels, semantic questions and thresholds, model behavior descriptor, transport, and normalized input hashes. Runs record action distribution, per-family precision/recall/coverage and target metrics, abstention, latency, tokens, cost when available, route, rate limits, retries, cache behavior, and downstream consequences. Successful decisions checkpoint by behavior descriptor and input hash so interrupted runs resume safely. Model or policy upgrades replay the same inputs, expose disagreements, keep calibration and productization claims explicit, and advance only through defined gates. The long-term goal is measurable agent development: semantic nodes are tested like software components while downstream task success and repeated-work reduction remain the decisive product metrics.",
+  "evidence": [
+    {
+      "note": "The executable Phase 0 contract now fixes inputs, audit shape, replay behavior, comparison integrity, and productization limits.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "note": "The independently accepted JEV/Haiku comparison demonstrates restartable cross-model evaluation.",
+      "ref": ".vibehub/outcomes/ticket-compare-jev-with-claude-haiku/contract-v1.yaml"
+    },
+    {
+      "note": "The independently accepted route comparison demonstrates exact-input transport evaluation and bounded operational telemetry.",
+      "ref": ".vibehub/outcomes/ticket-benchmark-typesafe-direct-with-peel/contract-v1.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-semantic-runtime-strong-service-boundary",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "持续的检测/维护/升级这些快模型节点，也就是 jev 模型节点的工作方法/CI/CD",
+    "ref": "conversation:2026-09-21-continuous-jev-node-evaluation"
+  },
+  "state": "active",
+  "summary": "Semantic model nodes need a continuous JudgeOps method for detection, maintenance, comparison, calibration, and safe upgrade",
+  "tags": [
+    "semantic-runtime",
+    "judgeops",
+    "evaluation",
+    "ci-cd",
+    "model-routing",
+    "replay"
+  ],
+  "type": "intent"
+}

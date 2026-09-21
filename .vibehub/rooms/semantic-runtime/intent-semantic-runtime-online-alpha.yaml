@@ -1,0 +1,49 @@
+{
+  "context_id": "intent-semantic-runtime-online-alpha",
+  "detail": "The immediate product goal is to put a minimal Semantic Runtime service online quickly, measured in days rather than a long platform build. The smallest valuable slice should prove stable Context and version links, Project and Repository registration, ContextVersion and Proposal creation, optimistic promotion, visible Conflict state, and a realtime activity feed or pull surface for multiple agents. It should reuse the existing provider-independent policy and audit core, use official direct JEV as the initial fast-route candidate with fallback, and preserve ignored/private data boundaries. The alpha should avoid a general graph database, generic CRDT, full enterprise administration, every external connector, and automatic high-impact canonicalization. Those are follow-up capabilities only after the addressable collaboration loop works end to end.",
+  "evidence": [
+    {
+      "note": "The owner made addressability, concurrent awareness, contradictory variations, and resolution the central service experience to settle before routine engineering work.",
+      "ref": "conversation:2026-09-21-concurrent-context-variations"
+    },
+    {
+      "note": "The current executable component and tests provide a working isolated base but remain offline replay without service endpoints or canonical writes.",
+      "ref": "semantic-runtime/README.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-addressable-versioned-context-identity",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-realtime-context-variations-and-reconciliation",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-project-is-semantic-scope-repository-is-source",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "finding-typesafe-direct-route-performance",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "我们的目标其实是我们尽快，就是说在可能这两天就可以把这个服务给上线",
+    "ref": "conversation:2026-09-21-semantic-runtime-online-alpha"
+  },
+  "state": "active",
+  "summary": "Move rapidly from offline replay to a small online alpha centered on referenceable shared Context and safe concurrent work",
+  "tags": [
+    "semantic-runtime",
+    "online-service",
+    "alpha",
+    "mvp",
+    "collaboration"
+  ],
+  "type": "intent"
+}

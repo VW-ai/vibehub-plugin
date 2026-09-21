@@ -1,0 +1,45 @@
+{
+  "context_id": "decision-semantic-runtime-strong-service-boundary",
+  "detail": "VibeHub's next product layer moves beyond a weak harness that attaches Skills or plugins to individual sessions. Semantic Runtime is the service/kernel that continuously accepts work signals, maintains derived semantic working state, executes provider-independent policy, exposes referenceable query and context-compilation surfaces, and schedules bounded reconciliation work. It is developed in this repository under semantic-runtime/ so existing project history stays available, but it owns separate dependencies, tests, release boundaries, and provider adapters; the shipped Skill plugin must remain independently installable and ordinary agent work must continue when Runtime is unavailable. Git remains code and artifact truth. Whether durable Context eventually becomes cloud-owned or hybrid remains an explicit later decision rather than an assumption of this direction.",
+  "evidence": [
+    {
+      "note": "The PRD defines the Runtime as the product kernel for policy, semantic working state, retrieval, context compilation, and workers.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "note": "The component contract makes Runtime isolated and preserves graceful degradation and provider-independent core boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "note": "The first Runtime checkpoint established the isolated executable component and offline evaluation surface.",
+      "ref": "commit:d7ff3b2eb924c98dd85a8ea2992e18b26366b72f"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "用 JEV 这个模型给了我们一个机会，把它从弱 harness 变成强 harness",
+    "ref": "conversation:2026-09-21-semantic-runtime-service-direction"
+  },
+  "state": "active",
+  "summary": "Semantic Runtime is a strong semantic service with an isolated kernel, while the existing Skill plugin remains independently usable",
+  "tags": [
+    "semantic-runtime",
+    "service",
+    "strong-harness",
+    "isolation",
+    "product-boundary"
+  ],
+  "type": "decision"
+}

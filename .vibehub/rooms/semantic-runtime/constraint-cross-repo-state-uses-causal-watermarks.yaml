@@ -1,0 +1,37 @@
+{
+  "context_id": "constraint-cross-repo-state-uses-causal-watermarks",
+  "detail": "A multi-repository Project has no natural total commit order. Runtime may keep one append-only ingest ledger, but the project semantic projection must state the source cursor or watermark through which each Repository, connector, and Execution has been observed. Causal links and per-source ordering are preserved; observed_at is not treated as truth order. A materialized Project view therefore says which repository revisions and connector cursors it reflects. Eventual semantic consistency is acceptable, while canonical promotion still requires explicit authority and provenance. This makes staleness inspectable and prevents an apparently current project graph from hiding lag in one source.",
+  "evidence": [
+    {
+      "note": "The design selects eventual semantic consistency with strict canonical boundaries and an append-only event/audit plane.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "note": "The thought log records eventual consolidation rather than continuous mutation of a single supposedly authoritative context.",
+      "ref": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-is-semantic-scope-repository-is-source",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "一个项目有多个 repo",
+    "ref": "conversation:2026-09-21-multi-project-multi-repo-service"
+  },
+  "state": "active",
+  "summary": "Cross-repository project state must expose per-source causality and freshness instead of inventing one Git-like global order",
+  "tags": [
+    "semantic-runtime",
+    "causality",
+    "watermark",
+    "multi-repo",
+    "eventual-consistency"
+  ],
+  "type": "constraint"
+}

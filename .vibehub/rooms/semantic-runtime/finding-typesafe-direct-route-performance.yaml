@@ -1,0 +1,42 @@
+{
+  "context_id": "finding-typesafe-direct-route-performance",
+  "detail": "The explicitly authorized official-direct run completed 20 events and 80 decisions with zero judge errors, rate limits, retries, or transient failures. Across 77 actual provider calls, direct median latency was 141.568 ms and P95 228.749 ms versus Gateway median 303.622 ms and P95 543.311 ms. All dataset, state, label, semantic policy, decision key, and 80 input hashes matched. Five outputs differed and only one changed the final action; direct improved Acceptance recall at unchanged precision, while Gateway retained slightly better Context target precision and recall. Because the routes expose different API/model identifiers and include adapter behavior, this is a full-route observation rather than proof of pure Vercel network overhead or a provider-wide result. Official direct is the current primary-route candidate for the online alpha, with Gateway retained as fallback and continuing telemetry required.",
+  "evidence": [
+    {
+      "note": "Independent closeout verifies the authorization, exact-input audit comparison, route metrics, five disagreements, and bounded conclusion.",
+      "ref": ".vibehub/outcomes/ticket-benchmark-typesafe-direct-with-peel/contract-v1.yaml"
+    },
+    {
+      "note": "The committed comparator, tests, Evidence, and Outcome make the route result reproducible without another model request.",
+      "ref": "commit:c2600b910d512b28021a5bd46fc8bd2a9389da15"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-semantic-judgeops-continuous-evaluation",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "finding-jev-haiku-routing-shape",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-21T08:24:45Z",
+    "quote": "我们 vercel 是不是太慢了，我们搞了一个 typesafe 官方的 key",
+    "ref": "conversation:2026-09-21-typesafe-peel-explicit-authorization"
+  },
+  "state": "active",
+  "summary": "Official TypeSafe direct JEV was materially faster than Gateway on the exact Peel audit, with small but nonzero output differences",
+  "tags": [
+    "semantic-runtime",
+    "typesafe",
+    "vercel",
+    "jev",
+    "latency",
+    "route"
+  ],
+  "type": "note"
+}

@@ -1,0 +1,257 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "ec97410830d9ae12846e200a67bba222c4bae77f",
+        "path": "semantic-runtime/.env.example"
+      },
+      {
+        "blob": "5a8a5f8d36fb78db6c32e7fe5f3642a2dfc0d20a",
+        "path": "semantic-runtime/.gitignore"
+      },
+      {
+        "blob": "d3ef21272ab31f1037e37c5eed17ec459f37d02d",
+        "path": "semantic-runtime/AGENTS.md"
+      },
+      {
+        "blob": "f1a743026708dde5b8354c0ae12423eb6d0f02cd",
+        "path": "semantic-runtime/README.md"
+      },
+      {
+        "blob": "c9a4225ed166f045d3c77f335d470f7b887c9a25",
+        "path": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
+      },
+      {
+        "blob": "e0c2c4046f0e71a1880a70d87e112d264711b5c2",
+        "path": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+      },
+      {
+        "blob": "494508454c04b67d2cfe05fc7eec8982723eb3a7",
+        "path": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      },
+      {
+        "blob": "95d3ebd03a199a2008824a749818d50638eeac28",
+        "path": "semantic-runtime/docs/phase0-contracts.md"
+      },
+      {
+        "blob": "87b091203b62a18940ba4395890d84385271c0df",
+        "path": "semantic-runtime/index.ts"
+      },
+      {
+        "blob": "1fcfd88f20d94213b691e99927fcc9506e52e0bc",
+        "path": "semantic-runtime/package-lock.json"
+      },
+      {
+        "blob": "356c6c828d6456ac50647cc2284337e2bfb7f0ed",
+        "path": "semantic-runtime/package.json"
+      },
+      {
+        "blob": "86f3bc56fc1ce4d7d403d88c8c68696c4c22b04c",
+        "path": "semantic-runtime/policies/peel-benchmark.json"
+      },
+      {
+        "blob": "089f5e449244de79c4c14a0c5e6b9f39551613a1",
+        "path": "semantic-runtime/policies/phase0.json"
+      },
+      {
+        "blob": "7924a79e9371d1edc749c8cd3f8349d550f5f9be",
+        "path": "semantic-runtime/scripts/benchmark-peel-jev.mjs"
+      },
+      {
+        "blob": "8b880f53e7e74861b9bbe68c9aa3907fc10dc58d",
+        "path": "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs"
+      },
+      {
+        "blob": "c709b8d091692f0b5f828a04ee1d2c0c26319e70",
+        "path": "semantic-runtime/scripts/check-boundaries.mjs"
+      },
+      {
+        "blob": "44630a27eb8f160883798e2b127844fbb1d2a7f7",
+        "path": "semantic-runtime/scripts/compare-peel-jev-routes.mjs"
+      },
+      {
+        "blob": "c311ef7729b91626e95c33296c3b609c9909ce5a",
+        "path": "semantic-runtime/scripts/compare-peel-judges.mjs"
+      },
+      {
+        "blob": "9dd6592aea0ba1b48a5163b02d04882c1e569a63",
+        "path": "semantic-runtime/scripts/smoke-jev.mjs"
+      },
+      {
+        "blob": "bde24b4973486ca9afb462590d4e3296e9de4b79",
+        "path": "semantic-runtime/scripts/smoke-typesafe-direct.mjs"
+      },
+      {
+        "blob": "00b00ccb871fede2d993a3fd06b8d10b85227d62",
+        "path": "semantic-runtime/scripts/verify-peel-provenance.mjs"
+      },
+      {
+        "blob": "ec3797e378b55a3bbc1103daf6fb459dc5666c6c",
+        "path": "semantic-runtime/scripts/verify-standalone.mjs"
+      },
+      {
+        "blob": "bbdf414e6dcc182eaad4c00ad20c5287a18c2039",
+        "path": "semantic-runtime/src/adapters/cached-judge.mjs"
+      },
+      {
+        "blob": "00db1dd3c390ee94151ec7273e9e3359a1739369",
+        "path": "semantic-runtime/src/adapters/claude-cli-judge.mjs"
+      },
+      {
+        "blob": "14efc0a9ae2defbd00ba86f3bf5d6f510558bad3",
+        "path": "semantic-runtime/src/adapters/haiku-judge.mjs"
+      },
+      {
+        "blob": "2a98223837f13e55084193462a2e3fe1e4588f38",
+        "path": "semantic-runtime/src/adapters/heuristic-judge.mjs"
+      },
+      {
+        "blob": "0bb2780fd3122a901161880650efe053fac69489",
+        "path": "semantic-runtime/src/adapters/jev-judge.mjs"
+      },
+      {
+        "blob": "92be1965e40889767e986096aea0555c13de6778",
+        "path": "semantic-runtime/src/adapters/judge-input.mjs"
+      },
+      {
+        "blob": "c38400e51d5b9ec03df189e65520e5a2271157db",
+        "path": "semantic-runtime/src/adapters/recorded-judge.mjs"
+      },
+      {
+        "blob": "60b5843f6f49fcaba7946753c3cf5f3c6380a938",
+        "path": "semantic-runtime/src/adapters/resilient-judge.mjs"
+      },
+      {
+        "blob": "d8048bf083c41f22648612290c97c6066463c438",
+        "path": "semantic-runtime/src/adapters/sqlite-store.mjs"
+      },
+      {
+        "blob": "5043b7850a5a082d336578e287bb827c86f5bc47",
+        "path": "semantic-runtime/src/adapters/typesafe-jev-judge.mjs"
+      },
+      {
+        "blob": "cc41146eec6a15c5678233aadc4cf1ec19860ba9",
+        "path": "semantic-runtime/src/cli.mjs"
+      },
+      {
+        "blob": "39c82e6b40c24bdf49d9f9b514d25cb7a1085f4f",
+        "path": "semantic-runtime/src/core/contracts.mjs"
+      },
+      {
+        "blob": "f415c5acde261ab958e9c1203cfba8e96afdf652",
+        "path": "semantic-runtime/src/core/evaluation.mjs"
+      },
+      {
+        "blob": "9345c2ff5cfadb88d1962d1c849b72ab777fc5cf",
+        "path": "semantic-runtime/src/core/policy.mjs"
+      },
+      {
+        "blob": "55ce0848ac0d03bff221e9e6b7d17e53ee9a6376",
+        "path": "semantic-runtime/src/core/replay.mjs"
+      },
+      {
+        "blob": "b2604a0baee00de8f7b8907a800e75a54a52fdac",
+        "path": "semantic-runtime/src/index.mjs"
+      },
+      {
+        "blob": "8b6d67b04f2c3a2408c1a0d82f81de1e47f9c192",
+        "path": "semantic-runtime/test/boundaries.test.mjs"
+      },
+      {
+        "blob": "4767d0ff695cf9eb3877051d43394dc4d941379b",
+        "path": "semantic-runtime/test/claude-cli-judge.test.mjs"
+      },
+      {
+        "blob": "e1a11ad2701ddd451a6734098bfacc664908d4fe",
+        "path": "semantic-runtime/test/cli.test.mjs"
+      },
+      {
+        "blob": "9094eaff2468321b25c72c714941ed5d80a693bc",
+        "path": "semantic-runtime/test/fixtures/README.md"
+      },
+      {
+        "blob": "63658ef39a151897ddfda239cdddfe021831b326",
+        "path": "semantic-runtime/test/fixtures/events.jsonl"
+      },
+      {
+        "blob": "50a7ccdb6e2d49e35a8e46714e201f3feb959b3f",
+        "path": "semantic-runtime/test/fixtures/labels.json"
+      },
+      {
+        "blob": "459ace858871c160a7771565592fd03f7d77e69f",
+        "path": "semantic-runtime/test/fixtures/peel/README.md"
+      },
+      {
+        "blob": "3383dacdd3e51326373570bf3d5f7303d6fd7af9",
+        "path": "semantic-runtime/test/fixtures/peel/curation.json"
+      },
+      {
+        "blob": "f1ddc653ca107508c57d9cf62009bb36071bba6b",
+        "path": "semantic-runtime/test/fixtures/peel/events.jsonl"
+      },
+      {
+        "blob": "f3593c0480a80db48af7cb7db2ae4d0f490aaaa0",
+        "path": "semantic-runtime/test/fixtures/peel/labels.json"
+      },
+      {
+        "blob": "73e6bf13d3d86aa76d80b19d99e3eb3c8d207d96",
+        "path": "semantic-runtime/test/fixtures/peel/provenance.json"
+      },
+      {
+        "blob": "31fc88a7aa0d421a8e26236bd53a4ef4198b974f",
+        "path": "semantic-runtime/test/fixtures/peel/state.json"
+      },
+      {
+        "blob": "bd64e00c00bc5885f1b9905da7455a972b51c2f9",
+        "path": "semantic-runtime/test/fixtures/state.json"
+      },
+      {
+        "blob": "4102bba27fc30cc3bd244e75e95aa9d80b02c28d",
+        "path": "semantic-runtime/test/haiku-judge.test.mjs"
+      },
+      {
+        "blob": "90f00522bdbb959a2f92f3441aa93f799f6926c1",
+        "path": "semantic-runtime/test/helpers.mjs"
+      },
+      {
+        "blob": "37cbfee98b57c558a5ff6dc5aff1522e0f5ce252",
+        "path": "semantic-runtime/test/jev-judge.test.mjs"
+      },
+      {
+        "blob": "b40e1197e754c2a739398185ffb9d40a691fe73d",
+        "path": "semantic-runtime/test/jev-route-comparison.test.mjs"
+      },
+      {
+        "blob": "01baf8bb13d67241c853683aeae70fba5dc9d0e4",
+        "path": "semantic-runtime/test/judge-comparison.test.mjs"
+      },
+      {
+        "blob": "29b5282c5bd0064d5cc2a2f45d6750246b69e5eb",
+        "path": "semantic-runtime/test/judge-resilience.test.mjs"
+      },
+      {
+        "blob": "dc398124b3f61082c39663777feb5809c8862778",
+        "path": "semantic-runtime/test/peel-fixture.test.mjs"
+      },
+      {
+        "blob": "31b1b8e2d4b58e85b905efebd1d1cf7c62a621a7",
+        "path": "semantic-runtime/test/replay.test.mjs"
+      },
+      {
+        "blob": "702673704a2fe50c58f349bc98e924c17d49ca17",
+        "path": "semantic-runtime/test/typesafe-jev-judge.test.mjs"
+      }
+    ],
+    "checked_at": "2026-09-21T08:23:36.961Z",
+    "last_aligned_commit": "c2600b910d512b28021a5bd46fc8bd2a9389da15"
+  },
+  "anchors": [
+    "semantic-runtime/"
+  ],
+  "boundary": "Owns the isolated semantic-runtime/ component, its product contracts, service architecture, provider adapters, evaluation corpus, and rollout evidence. It does not own the independently shipped VibeHub Skill plugin, the existing Git-native knowledge lifecycle, the Workbench UI, or the public site.",
+  "description": "The product and engineering workspace for VibeHub's Semantic Runtime: semantic perception, policy execution, context compilation, judge evaluation, and the path from offline replay to a multi-project online service.",
+  "kind": "room",
+  "room_id": "semantic-runtime",
+  "schema_version": 1,
+  "stale": false
+}
