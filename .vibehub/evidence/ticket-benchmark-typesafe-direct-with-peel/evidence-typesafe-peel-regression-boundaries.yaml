@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "typesafe-peel-regression-boundaries"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-peel-regression-boundaries",
+      "identity": "sha256:0c75749a849ab5134a95abcdfab30ff635fc1a05f518f761ab58c3b453d13a57",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-peel-regression-boundaries",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T08:13:17Z",
+  "refs": [
+    "command:npm-run-verify-56-of-56",
+    "command:npm-run-verify-standalone-56-of-56",
+    "command:npm-run-verify-peel-provenance-36-of-36",
+    "command:node-scripts-verify-plugin-artifact-79-files",
+    "command:vibehub-context-guard-passed",
+    "command:vibehub-ticket-validate-passed",
+    "semantic-runtime/.gitignore"
+  ],
+  "schema_version": 2,
+  "summary": "Current-tree verification passes the 38-file dependency boundary scan and all 56 tests; a fresh standalone copy passes the same checks and 56 tests. Peel provenance resolves all 20 events and 16 state records (36/36), plugin artifact isolation passes with 79 files, Context guard reports no authority violation, and VibeHub validation passes before Evidence append. The direct database, cache, direct report, route comparison report, and credential environment remain ignored and untracked; Git diff checking will be repeated after Evidence and staging before delivery.",
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel"
+}

@@ -155,6 +155,14 @@ retry only when a transport exposes 429 or 5xx status, and checkpoints validated
 model behavior descriptor plus normalized input hash. Generated reports, caches,
 and SQLite audits remain ignored local state.
 
+The Gateway-versus-official-direct JEV comparator reuses two completed audits
+and performs no model request. It requires identical tenant, project, dataset,
+point-in-time state, labels, semantic policy, and all 80 normalized decision
+input hashes. Its bounded ignored report includes action and quality changes,
+decision disagreements, route-specific latency, direct retry/rate-limit/token
+observations, requested and resolved model identifiers, and an explicit caveat
+that adapter/API behavior is part of the measured route.
+
 ## State and failures
 
 Confident positives become candidates. Confident negatives are ignored.

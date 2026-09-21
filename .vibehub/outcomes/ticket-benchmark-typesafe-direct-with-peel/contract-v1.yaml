@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "typesafe-peel-destination-authorization",
+    "typesafe-peel-complete-direct-run",
+    "typesafe-gateway-direct-comparability",
+    "typesafe-route-conclusion",
+    "typesafe-peel-regression-boundaries"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T08:17:14Z",
+  "contract_revision": {
+    "identity": "sha256:d2b1f219d562216ca90a38b5f88e4edc001076b42020b45ab459a76844fcf5b3",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "evidence-typesafe-peel-destination-authorization",
+    "evidence-typesafe-peel-direct-live-run",
+    "evidence-typesafe-jev-route-comparison",
+    "evidence-typesafe-peel-regression-boundaries"
+  ],
+  "independence": {
+    "note": "Independent subagent did not implement or execute the live benchmark. It inspected exact bound Evidence, read both existing SQLite audits and ignored reports, rebuilt the comparison locally, reproduced all offline checks, and issued no network request.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Contract v1 is successful. ACCEPTED typesafe-peel-destination-authorization: human-origin Evidence is bound to the exact v1 identity and records explicit authorization for the sanitized 20-event Peel fixture plus point-in-time visible state to api.typesafe.ai for 80 jev-latest decisions, excluding labels, curation, provenance, raw traces, local IDs, and credentials. ACCEPTED typesafe-peel-complete-direct-run: independent read-only inspection of run d7fb03d5-d369-423a-adb2-0c2028f046da confirms a complete typesafe-direct/jev-latest audit with 20 events, 80 decisions, 16 candidates, zero judge errors, 77 provider requests plus three deterministic no-target decisions, 57,054 reported tokens, 80 validated cache entries, and zero retries, rate limits, or transient failures. The adapter payload is constructed only from event type, timestamp, sanitized text, point-in-time candidate IDs/types/text, and the policy question; evaluator labels remain local to scoring and the runner never loads curation or provenance ledgers. No credential value or model prose appears in result or cache fields. ACCEPTED typesafe-gateway-direct-comparability: Gateway run b6854e64-6104-4ee3-8cb2-84a054c84a44 and the direct run match tenant, project, dataset hash, state hash, labels hash, semantic policy, all 80 decision keys, and all 80 normalized input hashes. Rebuilding the bounded comparison from both SQLite audits exactly reproduces the ignored saved report. ACCEPTED typesafe-route-conclusion: five of 80 outputs differ. Observed direct median latency is 141.568 ms versus Gateway 303.622 ms, with P95 228.749 ms versus 543.311 ms. Direct acceptance recall is 0.667 versus 0.500 at precision 1.0; Context decision precision, recall, and coverage tie while Gateway retains higher Context target precision and recall. The report is explicitly uncalibrated, attributes observations to the full route including adapter/API behavior, reports unavailable historical Gateway transport counters honestly, leaves downstream success and repeated-work reduction null, and keeps productization_gate not_evaluated. ACCEPTED typesafe-peel-regression-boundaries: independent verification passes 38 boundary files and 56/56 tests, standalone 56/56, provenance 36/36, plugin isolation at 79 files, Git diff checks, Context guard, and VibeHub validation. Direct audit, cache, database, comparison report, and credential state remain ignored and untracked. This closeout issued no network request.",
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel",
+  "unresolved_acceptance_ids": []
+}

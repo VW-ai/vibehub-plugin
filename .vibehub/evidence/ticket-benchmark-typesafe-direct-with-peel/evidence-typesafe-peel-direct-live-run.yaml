@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "typesafe-peel-complete-direct-run"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-peel-complete-direct-run",
+      "identity": "sha256:3ab58b0b5b97f150a73ef83a013236851f88caf255fd7d50d5777eeb17f8a685",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-peel-direct-live-run",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T08:13:17Z",
+  "refs": [
+    "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs",
+    "run:d7fb03d5-d369-423a-adb2-0c2028f046da",
+    "local-report:semantic-runtime/.local/peel-jev-direct-v1.json",
+    "local-audit:semantic-runtime/.local/peel-jev-direct-v1.sqlite",
+    "local-cache:semantic-runtime/.local/peel-jev-direct-v1-cache.jsonl",
+    "observation:20-events-80-decisions-0-judge-errors",
+    "observation:77-requests-0-retries-0-rate-limits-0-transient-failures",
+    "resolved-model:jev-1.13.0"
+  ],
+  "schema_version": 2,
+  "summary": "The explicitly authorized official TypeSafe run d7fb03d5-d369-423a-adb2-0c2028f046da completed the full sanitized Peel corpus: 20 events, 80 decisions, 0 judge errors, and 16 candidates. It made 77 provider requests plus 3 deterministic no-target decisions, resolved live requests to jev-1.13.0, used 57,054 reported tokens, recorded 0 retries, 0 rate limits, and 0 transient failures, and checkpointed all 80 validated decisions. The ignored audit, cache, database, and bounded report contain no credential value or model prose; only events and point-in-time visible state entered the adapter request path.",
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel"
+}

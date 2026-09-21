@@ -25,6 +25,7 @@
     "replay:peel": "node src/cli.mjs replay --events test/fixtures/peel/events.jsonl --state test/fixtures/peel/state.json --labels test/fixtures/peel/labels.json --tenant benchmark --project peel --dataset-kind real --db .local/peel-replay-v3.sqlite",
     "benchmark:peel:jev": "node --env-file=.env.local scripts/benchmark-peel-jev.mjs",
     "benchmark:peel:jev:direct": "node --env-file=.env.local scripts/benchmark-peel-typesafe-direct.mjs",
+    "benchmark:peel:jev:routes": "node scripts/compare-peel-jev-routes.mjs",
     "benchmark:peel:compare": "node scripts/compare-peel-judges.mjs --transport claude-cli",
     "benchmark:peel:compare:gateway": "node --env-file=.env.local scripts/compare-peel-judges.mjs --transport gateway",
     "audit": "node src/cli.mjs audit",

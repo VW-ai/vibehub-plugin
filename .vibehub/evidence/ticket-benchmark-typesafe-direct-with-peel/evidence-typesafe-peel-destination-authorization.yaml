@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "typesafe-peel-destination-authorization"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-peel-destination-authorization",
+      "identity": "sha256:7af49e69eb99bf71747d18b4a0c21f9020ff104936186500427c38b43af12799",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-peel-destination-authorization",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-09-21T08:13:17Z",
+  "refs": [
+    "conversation:2026-09-21-typesafe-peel-explicit-authorization",
+    "destination:https://api.typesafe.ai",
+    "semantic-runtime/test/fixtures/peel/events.jsonl",
+    "semantic-runtime/test/fixtures/peel/state.json"
+  ],
+  "schema_version": 2,
+  "summary": "The owner explicitly replied ‘授权！！’ to sending the same sanitized 20 Peel events and each decision point's visible state to api.typesafe.ai for 80 official jev-latest decisions. The authorization explicitly excludes labels, curation, provenance, raw traces, local IDs, and credentials, and also authorizes appropriate commit and push checkpoints.",
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel"
+}

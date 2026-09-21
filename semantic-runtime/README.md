@@ -135,9 +135,22 @@ The real Peel benchmark is restartable through an ignored decision cache:
 npm run benchmark:peel:jev:direct
 ```
 
-That command sends the checked-in sanitized Peel event and point-in-time state
-fixture to the TypeSafe API. Run it only when that destination is explicitly
-authorized. It never sends labels, curation, provenance, or credentials.
+That benchmark command sends the checked-in sanitized Peel event and
+point-in-time state fixture to the TypeSafe API. Run it only when that
+destination is explicitly authorized. It never sends labels, curation,
+provenance, or credentials.
+
+After an authorized direct run, compare it with the accepted Gateway audit:
+
+```sh
+npm run benchmark:peel:jev:routes
+```
+
+The comparator requires the same dataset, point-in-time state, labels, semantic
+policy, and all 80 normalized decision inputs. Its ignored report treats latency
+and output differences as observations of the two complete routes, including
+their adapter/API behavior, rather than a provider-wide speed or calibration
+claim.
 
 Use JEV for an offline replay explicitly:
 

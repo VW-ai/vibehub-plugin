@@ -1,0 +1,122 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "typesafe-peel-destination-authorization",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records explicit authorization to send exactly the checked-in sanitized 20-event Peel fixture and point-in-time visible state to api.typesafe.ai for 80 official jev-latest decisions, while excluding labels, curation, provenance, raw traces, local IDs, and every credential.",
+      "identity": "sha256:7af49e69eb99bf71747d18b4a0c21f9020ff104936186500427c38b43af12799",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-peel-complete-direct-run",
+      "criterion": "The authorized official-direct audit completes all 20 events and 80 decisions with zero judge errors, uses the shared serialized pacing, bounded transient retry, ignored successful-decision cache and SQLite audit, and records bounded action, quality, token, provider-route, rate-limit, retry, and latency observations without storing model prose or credential values.",
+      "identity": "sha256:3ab58b0b5b97f150a73ef83a013236851f88caf255fd7d50d5777eeb17f8a685",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-gateway-direct-comparability",
+      "criterion": "A deterministic comparator rejects mismatched tenant, project, dataset, point-in-time state, evaluator labels, semantic questions, thresholds, graph, or any of the 80 normalized decision input hashes, then emits a bounded ignored report covering actions, per-family quality, route latency, operational observations, and decision disagreements.",
+      "identity": "sha256:af3b381992f217a00f9e3b3debdac502a7033ddec061aab0199a33d2de067a4f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-route-conclusion",
+      "criterion": "The comparison states only what the observed runs support: route-specific latency and reliability, any output differences despite identical semantic inputs, the complete absence or presence of rate limits and retries, calibration limitations, and productization_gate not_evaluated; it does not generalize one corpus into a permanent provider or routing decision.",
+      "identity": "sha256:e8940d966ac5bad629ceaefeb2e7af8e0cd878eb1b42506c7921ead3a86e2b01",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "typesafe-peel-regression-boundaries",
+      "criterion": "Semantic Runtime verification, standalone verification, Peel provenance, plugin artifact isolation, Git diff checking, Context guard, and VibeHub record validation pass after the reusable comparison path and its tests are added; all generated direct audit, cache, database, and comparison artifacts remain ignored local state.",
+      "identity": "sha256:0c75749a849ab5134a95abcdfab30ff635fc1a05f518f761ab58c3b453d13a57",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Send only the already authorized sanitized Peel events and point-in-time visible state to api.typesafe.ai; never send labels, curation, provenance, raw traces, local IDs, or credentials.",
+    "Never read, expose, serialize, print, log, or commit TYPESAFE_API_KEY; the SDK may consume it only for authentication from ignored local environment state.",
+    "Reuse the accepted Gateway audit without sending another Gateway request.",
+    "Keep generated reports, caches, SQLite audits, and all credential state ignored and untracked.",
+    "Treat route outputs as uncalibrated observations and leave downstream task success, repeated-work reduction, and productization gate unresolved."
+  ],
+  "context": "The owner explicitly authorized sending the same 20 sanitized Peel events and each decision point's visible state to api.typesafe.ai for 80 official jev-latest decisions. Labels, curation, provenance, raw traces, local IDs, and credentials remain excluded. The accepted Gateway audit is the fixed baseline; the direct run is an observed route comparison, not a provider-wide latency claim or productization decision.",
+  "context_refs": [
+    {
+      "purpose": "Authorized direct runner and its exact input/output boundary.",
+      "ref": "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs"
+    },
+    {
+      "purpose": "Existing exact-input comparability checks and bounded comparison conventions.",
+      "ref": "semantic-runtime/scripts/compare-peel-judges.mjs"
+    },
+    {
+      "purpose": "Successful official TypeSafe adapter, credential, retry, cache, and synthetic-smoke prerequisite.",
+      "ref": ".vibehub/outcomes/ticket-connect-jev-through-typesafe-direct/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted complete Gateway JEV Peel baseline used without rerunning the provider.",
+      "ref": ".vibehub/outcomes/ticket-benchmark-semantic-runtime-with-peel-trace/contract-v2.yaml"
+    },
+    {
+      "purpose": "Sanitized corpus and destination-authorization boundary.",
+      "ref": "semantic-runtime/test/fixtures/peel/README.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "typesafe-gateway-direct-comparability",
+          "identity": "sha256:af3b381992f217a00f9e3b3debdac502a7033ddec061aab0199a33d2de067a4f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-peel-complete-direct-run",
+          "identity": "sha256:3ab58b0b5b97f150a73ef83a013236851f88caf255fd7d50d5777eeb17f8a685",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-peel-destination-authorization",
+          "identity": "sha256:7af49e69eb99bf71747d18b4a0c21f9020ff104936186500427c38b43af12799",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-peel-regression-boundaries",
+          "identity": "sha256:0c75749a849ab5134a95abcdfab30ff635fc1a05f518f761ab58c3b453d13a57",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typesafe-route-conclusion",
+          "identity": "sha256:e8940d966ac5bad629ceaefeb2e7af8e0cd878eb1b42506c7921ead3a86e2b01",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d2b1f219d562216ca90a38b5f88e4edc001076b42020b45ab459a76844fcf5b3",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reproducible exact-input comparison quantifies official TypeSafe direct JEV versus the accepted Vercel AI Gateway JEV baseline across the complete sanitized Peel corpus without exceeding the destination-specific authorization.",
+  "provenance_refs": [
+    "conversation:2026-09-21-typesafe-peel-explicit-authorization",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The accepted direct SDK adapter, credential boundary, retry layer, and checkpoint runner are the exact causal prerequisite for this authorized live corpus benchmark.",
+      "target_ticket_id": "ticket-connect-jev-through-typesafe-direct",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel"
+}

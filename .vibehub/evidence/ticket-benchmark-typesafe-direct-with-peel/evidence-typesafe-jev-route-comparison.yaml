@@ -1,0 +1,38 @@
+{
+  "acceptance_ids": [
+    "typesafe-gateway-direct-comparability",
+    "typesafe-route-conclusion"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "typesafe-gateway-direct-comparability",
+      "identity": "sha256:af3b381992f217a00f9e3b3debdac502a7033ddec061aab0199a33d2de067a4f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "typesafe-route-conclusion",
+      "identity": "sha256:e8940d966ac5bad629ceaefeb2e7af8e0cd878eb1b42506c7921ead3a86e2b01",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "evidence-typesafe-jev-route-comparison",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T08:13:17Z",
+  "refs": [
+    "semantic-runtime/scripts/compare-peel-jev-routes.mjs",
+    "semantic-runtime/test/jev-route-comparison.test.mjs",
+    "local-report:semantic-runtime/.local/peel-jev-gateway-vs-direct-v1.json",
+    "gateway-run:b6854e64-6104-4ee3-8cb2-84a054c84a44",
+    "direct-run:d7fb03d5-d369-423a-adb2-0c2028f046da",
+    "observation:80-identical-decision-input-hashes",
+    "observation:5-of-80-output-disagreements",
+    "observation:direct-median-ratio-0.466",
+    "observation:productization-gate-not-evaluated"
+  ],
+  "schema_version": 2,
+  "summary": "The deterministic route comparator accepted Gateway run b6854e64-6104-4ee3-8cb2-84a054c84a44 and direct run d7fb03d5-d369-423a-adb2-0c2028f046da only after matching tenant, project, dataset, point-in-time state, evaluator labels, semantic graph/questions/thresholds, and all 80 decision input hashes. Direct observed median latency was 141.568 ms versus Gateway 303.622 ms (46.6% ratio); direct P95 was 228.749 ms versus Gateway 543.311 ms. Five of 80 decisions differed. Direct improved acceptance recall from 0.50 to 0.667 at unchanged 1.0 precision, while Context decision precision/recall/coverage tied and Gateway retained higher target precision/recall. The report explicitly includes adapter/API behavior in each route, keeps probabilities uncalibrated, and leaves downstream success, repeated-work reduction, and productization_gate not_evaluated.",
+  "ticket_id": "ticket-benchmark-typesafe-direct-with-peel"
+}
