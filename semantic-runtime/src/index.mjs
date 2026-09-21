@@ -20,3 +20,8 @@ export {
   normalizeResourceBudgets, normalizeUsageObservation, decideResourceAdmission,
   selectAlphaWorkloadEvent,
 } from './core/observability-contract.mjs';
+export {
+  EVENT_CONTRACT_VERSION, EVENT_TYPES, validateRawEvent, validateNormalizedEvent,
+  normalizeRawEvent, sourceObjectKey, eventObservationKey, eventIdempotencyKey,
+  effectiveEventAccess, verifyEventPayload,
+} from './core/event-provenance.mjs';

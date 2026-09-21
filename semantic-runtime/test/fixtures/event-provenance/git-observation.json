@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "raw_event",
+  "event_id": "observation-local-1",
+  "partition": {
+    "tenant_id": "acme",
+    "project_id": "product",
+    "source_installation_id": "laptop",
+    "partition_id": "git-api-events"
+  },
+  "source_native_event_id": "native-1",
+  "idempotency_key": "retry-1",
+  "source_event_type": "git.commit.created",
+  "occurred_at": "2026-09-21T10:00:00.000Z",
+  "observed_at": "2026-09-21T10:00:01.000Z",
+  "producer": {
+    "producer_id": "git-sensor",
+    "epoch": "startup-1",
+    "sequence": 0
+  },
+  "causal_parents": [],
+  "identity": {
+    "worktree_id": "feature-a"
+  },
+  "payload": {
+    "kind": "git_revision",
+    "object": {
+      "kind": "git_commit",
+      "tenant_id": "acme",
+      "repository_id": "api",
+      "object_format": "sha1",
+      "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "path": null,
+    "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda"
+  },
+  "provenance": {
+    "delivery": {
+      "channel": "local_git",
+      "delivery_id": "local-delivery-1"
+    },
+    "source_objects": [
+      {
+        "object": {
+          "kind": "git_commit",
+          "tenant_id": "acme",
+          "repository_id": "api",
+          "object_format": "sha1",
+          "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "acl": {
+          "revision": "repo-acl-3",
+          "allowed_principal_ids": [
+            "alice",
+            "carol"
+          ]
+        },
+        "sensitivity": "sensitive"
+      }
+    ]
+  },
+  "acl": {
+    "revision": "acl-7",
+    "allowed_principal_ids": [
+      "alice",
+      "bob"
+    ]
+  },
+  "sensitivity": "normal"
+}

@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "raw-normalized-schemas"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "raw-normalized-schemas",
+      "identity": "sha256:cb731f1ebe259785c47be5e393ce90c6e3557ccc6a015b76d166ad9b09957c8d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-event-provenance-raw-normalized-schemas-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:48:09.342Z",
+  "refs": [
+    "semantic-runtime/src/core/event-provenance.mjs",
+    "semantic-runtime/docs/event-provenance-v0.md",
+    "semantic-runtime/test/event-provenance.test.mjs",
+    "semantic-runtime/test/fixtures/event-provenance/git-observation.json",
+    "semantic-runtime/test/fixtures/event-provenance/mapping.json",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/event-integration.test.mjs",
+    "command:node --test semantic-runtime/test/event-provenance.test.mjs semantic-runtime/test/event-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented strict version-1 RawEvent and NormalizedEvent validators with explicit tenant/Project/installation/stream partition, native event and retry IDs, occurred/observed times, producer incarnation and nullable sequence, scoped causal parents, payload pins, delivery/source provenance, ACL revisions and sensitivity. Bounded JSON rejects unknown fields/versions, accessors, malformed timestamps, unsafe sequences and cross-tenant metadata. Snapshot/current access claims remain authenticated adapter obligations. 23 event contract tests plus 2 public-entry integration tests passed; boundary check passed with 48 files and zero errors. All Context references resolved through shared engine; governing returned no applicable authorities; context guard passed with zero violations before Evidence. Parent integration report and saved logs show full npm run verify and independent-copy npm run verify:standalone both passed 118/118 tests, preserving Phase 0. These are contract/synthetic results, not a deployed service.",
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0"
+}

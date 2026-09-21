@@ -1,0 +1,32 @@
+{
+  "accepted_acceptance_ids": [
+    "immutable-replay-input",
+    "normalization-boundary",
+    "observation-object-separation",
+    "raw-normalized-schemas"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-21T22:52:31.783Z",
+  "contract_revision": {
+    "identity": "sha256:fd1f0a84e0499d5a6e03eb8b486e8dba8305b91bb2268358dbeda114807b814a",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-event-provenance-raw-normalized-schemas-v1",
+    "runtime-event-provenance-normalization-boundary-v1",
+    "runtime-event-provenance-observation-object-separation-v1",
+    "runtime-event-provenance-immutable-replay-input-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_events did not execute this Ticket or modify implementation, fixtures, tests, documentation or Evidence. It read the exact active Contract, all four native Evidence records, accepted identity dependency, relevant architecture and component contracts, then independently inspected code, reran tests and exercised adversarial cases before recording this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts every Acceptance revision in Contract v1. Versioned strict RawEvent and NormalizedEvent executable validators carry event/native/retry IDs, tenant/Project/installation/stream partition, occurrence/observation times, producer epoch and nullable sequence, scoped causal parents, payload/source provenance, ACL revisions and sensitivity. Normalization is pure one-to-one mechanical identity enrichment and exact taxonomy mapping with pinned raw/catalog/mapping inputs; contradictory or ambiguous identities and unsupported types produce no normalized event, and no semantic durability, relevance, truth or canonical status is asserted. Tenant/repository/provider/authority-scoped source-object identities correlate separate local/fetch/push/PR observations while preserving each delivery and retry identity; effective access intersects all supporting allowlists with maximum sensitivity. Replay eligibility requires an immutable Git/native object pin with digest or an exact separately supplied immutable-snapshot attestation. Mutable pointers remain non-replayable, and payload-byte verification does not upgrade them. Snapshot principal sets and sensitivity must exactly equal effective access, including explicit deny-all. Independently reproduced 41/41 event, identity and public-integration tests; boundary check passed with 48 files and zero errors; full Runtime npm test passed 118/118, preserving legacy replay/provider behavior. Additional independent probes passed 512 exact snapshot grant cases, 3584 principal mismatch rejections, 1024 sensitivity mismatch rejections, 192 source-scope combinations with 10 normalized and all other cases unresolved, 32 distinct retry tuples with receipt/enrichment stability, and object-key-order determinism. All three Ticket Context references resolved through the shared engine; ticket validate passed and context guard reported zero authorities and zero violations. No blocking findings. This accepts the protocol slice, not authenticated ingestion, current authorization, actual storage immutability, historical epoch continuity or live replay availability; those obligations are explicitly assigned to future adapters/protocols. Parent release composition separately reports standalone verification; it was not rerun by this closeout agent.",
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0",
+  "unresolved_acceptance_ids": []
+}

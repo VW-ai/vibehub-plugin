@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "immutable-replay-input"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "immutable-replay-input",
+      "identity": "sha256:27928f98ade94cd9bbfe28bf14ca05ee51b451378e56affeaacb1fd92fb802c3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-event-provenance-immutable-replay-input-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:48:12.331Z",
+  "refs": [
+    "semantic-runtime/src/core/event-provenance.mjs",
+    "semantic-runtime/docs/event-provenance-v0.md",
+    "semantic-runtime/test/event-provenance.test.mjs",
+    "semantic-runtime/test/fixtures/event-provenance/git-observation.json",
+    "semantic-runtime/test/fixtures/event-provenance/mapping.json",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/event-integration.test.mjs",
+    "command:node --test semantic-runtime/test/event-provenance.test.mjs semantic-runtime/test/event-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Payload discriminants require full format-matching Git OID or adapter-guaranteed immutable native object revision plus SHA-256; mutable pointers are always non-replayable even with a digest. Snapshots require a separately trusted attestation pinning resolved partition, immutable storage, purpose, snapshot and bytes; grant principal set and sensitivity must exactly match effective access or fail closed. Missing grants remain non-replayable; duplicate, mismatched, narrower/broader and deny-all cases are tested. verifyEventPayload verifies exact supplied bytes without fetching or upgrading pointers. Actual authentication, storage immutability and current authorization are explicitly external obligations. 25 targeted tests passed. All Context references resolved through shared engine; governing returned no applicable authorities; context guard passed with zero violations before Evidence. Parent integration report and saved logs show full npm run verify and independent-copy npm run verify:standalone both passed 118/118 tests, preserving Phase 0. These are contract/synthetic results, not a deployed service.",
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0"
+}

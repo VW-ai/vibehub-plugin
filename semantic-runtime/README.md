@@ -185,6 +185,9 @@ contracts through the package's public entry:
 - [Identity and source resolution](docs/identity-contract-v0.md): tenant/project
   scope, repository membership, stable checkout/worktree/session identities,
   and explicit ambiguous or unmapped results.
+- [Events and provenance](docs/event-provenance-v0.md): mechanically normalized
+  observations, source-object identity, access restrictions and immutable replay
+  inputs, with mutable pointers explicitly marked non-replayable.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

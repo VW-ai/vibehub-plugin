@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "mapping_id": "synthetic-git-adapter",
+  "revision": "mapping-1",
+  "event_types": {
+    "git.commit.created": "GIT_COMMIT",
+    "host.message": "AGENT_MESSAGE",
+    "source.deleted": "SOURCE_TOMBSTONE"
+  }
+}

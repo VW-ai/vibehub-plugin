@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "observation-object-separation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "observation-object-separation",
+      "identity": "sha256:051850add0212b1b49caa6e809c789c2f48562c39d04ca575f619f5108cbde5a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-event-provenance-observation-object-separation-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:48:11.288Z",
+  "refs": [
+    "semantic-runtime/src/core/event-provenance.mjs",
+    "semantic-runtime/docs/event-provenance-v0.md",
+    "semantic-runtime/test/event-provenance.test.mjs",
+    "semantic-runtime/test/fixtures/event-provenance/git-observation.json",
+    "semantic-runtime/test/fixtures/event-provenance/mapping.json",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/event-integration.test.mjs",
+    "command:node --test semantic-runtime/test/event-provenance.test.mjs semantic-runtime/test/event-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented distinct tenant-scoped observation/retry tuple keys and sourceObjectKey for full-OID Git commits or provider/authority/native external objects. Synthetic local_git, fetch, push and pull_request observations all reference one commit while retaining four event IDs, delivery provenance and idempotency identities; forks/tenants stay distinct. Receipt retries preserve idempotency key despite attempt metadata changes; changed payload digest remains observable, and no dedup/equality decision is made by this key helper. Supporting-source ACL propagation intersects all source and envelope principals, including explicit deny-all, and uses maximum sensitivity. 25 targeted tests passed. All Context references resolved through shared engine; governing returned no applicable authorities; context guard passed with zero violations before Evidence. Parent integration report and saved logs show full npm run verify and independent-copy npm run verify:standalone both passed 118/118 tests, preserving Phase 0. These are contract/synthetic results, not a deployed service.",
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0"
+}

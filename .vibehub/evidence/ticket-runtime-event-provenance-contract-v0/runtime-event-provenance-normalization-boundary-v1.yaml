@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "normalization-boundary"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "normalization-boundary",
+      "identity": "sha256:0ff61586e64a34b249256f9a5e2173f7ad9473c7550830e4c2737b7949bb5588",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-event-provenance-normalization-boundary-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-21T22:48:10.310Z",
+  "refs": [
+    "semantic-runtime/src/core/event-provenance.mjs",
+    "semantic-runtime/docs/event-provenance-v0.md",
+    "semantic-runtime/test/event-provenance.test.mjs",
+    "semantic-runtime/test/fixtures/event-provenance/git-observation.json",
+    "semantic-runtime/test/fixtures/event-provenance/mapping.json",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/event-integration.test.mjs",
+    "command:node --test semantic-runtime/test/event-provenance.test.mjs semantic-runtime/test/event-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented pure one-to-one normalizeRawEvent using accepted resolveIdentity and explicit versioned exact event mapping; results preserve raw identity/partition, full raw/catalog/mapping SHA-256 pins, source fields and immutable replay classification. Ambiguous, unmapped, conflicting source/Project identities and unknown native types yield no normalized event. No split semantics, I/O, semantic inference, durability/relevance/truth/canonical flags or changes to Phase 0. Tests cover deterministic nonmutation and pin/taxonomy tampering. 25 targeted contract/public-entry tests passed. All Context references resolved through shared engine; governing returned no applicable authorities; context guard passed with zero violations before Evidence. Parent integration report and saved logs show full npm run verify and independent-copy npm run verify:standalone both passed 118/118 tests, preserving Phase 0. These are contract/synthetic results, not a deployed service.",
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0"
+}
