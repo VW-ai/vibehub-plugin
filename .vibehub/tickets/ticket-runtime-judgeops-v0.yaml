@@ -1,0 +1,122 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "replay-manifest-is-complete-and-leakage-safe",
+      "criterion": "Manifest pins sanitized corpus and point-in-time visible state, labels/curation separately, initial Graph snapshot, event order/watermarks, Policy/node/compiler/Runtime versions, recorded Judge/Worker results, provider boundary, partitions, and redaction profile; judges never receive labels or later state.",
+      "identity": "sha256:75a462261ae9719c1a33494eebdf02044a0ab01fde00d6451893175485b2e0c8",
+      "presentation": {
+        "label": "replay-manifest-is-complete-and-leakage-safe"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "full-replay-is-side-effect-free-and-resumable",
+      "criterion": "Replay ingress, mutations, escalation, retrieval and compilation against recorded judge/worker outputs in an isolated store with all external effects disabled. Identical retained manifests yield identical semantic traces excluding timestamps and measured durations; optional separately authorized live comparison is isolated, quota-bounded and checkpointed by exact input/behavior hash.",
+      "identity": "sha256:efca98689889dd0b539f26594df112adc53d215eb9200ddc140cc86dbd4f4e94",
+      "presentation": {
+        "label": "full-replay-is-side-effect-free-and-resumable"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "comparison-covers-node-system-and-downstream",
+      "criterion": "Comparison locates first divergence and reports labeled precision/recall/calibration/disagreement, relation and lifecycle/conflict accuracy, escalation precision, context relevance, false hard action, downstream proxy/repeated work, latency, token/cost, and provider failure.",
+      "identity": "sha256:02c8918a06c23706db60fc0ff8f05fe991a18573b130cbe28b93906081ff4036",
+      "presentation": {
+        "label": "comparison-covers-node-system-and-downstream"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "regression-gate-cannot-pass-on-missing-data",
+      "criterion": "Checked-in gates define blocking regression, uncertainty, minimum samples, retention/reproducibility tier, and not-evaluated behavior; missing metrics, rate limits, pruned inputs, or silently failed slices cannot pass or substitute current source content.",
+      "identity": "sha256:8827cf52ae259a567cbf2e2682a6b61f664d7c8ae6808b4280b38159cb9e044d",
+      "presentation": {
+        "label": "regression-gate-cannot-pass-on-missing-data"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build full Policy replay and JudgeOps evaluation gates. Delivery slice: alpha. Architecture: . Scope: Full replay manifest and isolated/resumable runner, recorded external-result adapters, corpus/label leakage guard, comparison metrics, divergence report, retention tiers, and CI release gate.. Excluded: Repeating completed Phase 0/provider benchmarks, live provider calls during replay, online training, automatic golden labels, and production rollout..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Versioned leakage-resistant input/state/label comparisons and guarded upgrades.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-judgeops-continuous-evaluation.yaml"
+    },
+    {
+      "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "comparison-covers-node-system-and-downstream",
+          "identity": "sha256:02c8918a06c23706db60fc0ff8f05fe991a18573b130cbe28b93906081ff4036",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "full-replay-is-side-effect-free-and-resumable",
+          "identity": "sha256:efca98689889dd0b539f26594df112adc53d215eb9200ddc140cc86dbd4f4e94",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "regression-gate-cannot-pass-on-missing-data",
+          "identity": "sha256:8827cf52ae259a567cbf2e2682a6b61f664d7c8ae6808b4280b38159cb9e044d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "replay-manifest-is-complete-and-leakage-safe",
+          "identity": "sha256:75a462261ae9719c1a33494eebdf02044a0ab01fde00d6451893175485b2e0c8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c70a8d122b79d152baf9cf65f4332f5d471bade2edfb19a180dfceecb4903b33",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Versioned leakage-resistant corpora can replay complete Policy Graph behavior against frozen state, compare semantic and downstream effects, and block unsafe Policy or Judge changes before release candidacy.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Replay consumes immutable inputs, attempt results, Graph consequences and compiled-context audit.",
+      "target_ticket_id": "ticket-runtime-decision-audit-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-judgeops-v0"
+}

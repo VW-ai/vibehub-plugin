@@ -1,0 +1,103 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "value-study-design",
+      "criterion": "Before running, version the task cohort, consent/data destinations, no-runtime/current-workflow and retrieval baseline, assignment procedure, sample size rationale, stopping rule and task-success/repeated-work/forgotten-constraint metrics; freeze evaluator-only labels and account for model/host differences.",
+      "identity": "sha256:58ac9f051418543622523ac5d3b8b65ff14fe83af23c33c87c8499cbc1bbf3b6",
+      "presentation": {
+        "label": "value-study-design"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "value-study-results",
+      "criterion": "Run matched authorized tasks with and without the integrated Runtime and report downstream outcomes, confidence/uncertainty, latency, token/cost proxy and injection corrections; expose failures and inconclusive results rather than defining passing as a positive result.",
+      "identity": "sha256:cfa8e630852fd85d221545606f97d4a967f2f2778fc01ca3b0608be77745b005",
+      "presentation": {
+        "label": "value-study-results"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "value-gate",
+      "criterion": "Record separately whether the PRD product-value and rollout gates are met; a technically successful private alpha or the existing 80-decision benchmark cannot mark downstream success as proven.",
+      "identity": "sha256:33e0d2aa554f14ebd21c7568fdeae32689b76b0b2dec7765ae6686aa56e2f0f8",
+      "presentation": {
+        "label": "value-gate"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "真实任务受控下游收益评测. Delivery slice: post-alpha. Architecture: PRD §§13,15,19; Tech Design §§27,30. Scope: Experimental design and controlled evaluation of the accepted vertical slice.. Excluded: No automatic productization claim or repeated provider benchmark without a comparison question..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "value-gate",
+          "identity": "sha256:33e0d2aa554f14ebd21c7568fdeae32689b76b0b2dec7765ae6686aa56e2f0f8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "value-study-design",
+          "identity": "sha256:58ac9f051418543622523ac5d3b8b65ff14fe83af23c33c87c8499cbc1bbf3b6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "value-study-results",
+          "identity": "sha256:cfa8e630852fd85d221545606f97d4a967f2f2778fc01ca3b0608be77745b005",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d1a8b0c8e8bea610f30730efde2ff8999826fa65223a2b9012f754f8e6b2f9cf",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A controlled study determines whether the integrated Runtime improves task outcomes and repeated work beyond semantic-score accuracy.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Controlled user-task evaluation uses the actual bounded integrated alpha, not isolated classification scores.",
+      "target_ticket_id": "ticket-launch-semantic-runtime-online-alpha",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-downstream-value-v0"
+}

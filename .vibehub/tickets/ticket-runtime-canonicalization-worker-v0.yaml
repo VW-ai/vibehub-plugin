@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonicalization-bundle",
+      "criterion": "Publish a versioned job instruction/output schema for validated-claim synthesis into canonical Context/Decision/Evidence proposals with exact input revisions, complete provenance, intended public record schema and expected canonical/Git base. This bundle owns semantic synthesis; the bridge owns deterministic validation/materialization.",
+      "identity": "sha256:2351b30ee838a7faa3e8748d1359ce9f0e5b01c75272becb49affb071472cb26",
+      "presentation": {
+        "label": "canonicalization-bundle"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonicalization-guarded-return",
+      "criterion": "Run the bundle through scoped context access and the common result/continuation path; stale, unsupported, conflicting or human-protected claims abstain or yield an explicitly unresolved proposal. No direct Git/database write, automatic acceptance Outcome or permission escalation is granted to the worker.",
+      "identity": "sha256:c5d0da53dbf150f63c97a2e0a8818bdf7280cc583577a67eb34ae8675170071e",
+      "presentation": {
+        "label": "canonicalization-guarded-return"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonicalization-evaluation",
+      "criterion": "Recorded and authorized synthetic live cases cover redundant claims, changing source authority, incompatible parents, unsupported facts and already-canonical duplicates. Report fidelity and operator correction/abstention; generated artifacts pass canonical bridge conformance before any opt-in use.",
+      "identity": "sha256:5c9d14e8219d11941e2871474ab7019a38babe085b2984a6fb25b66f4163f714",
+      "presentation": {
+        "label": "canonicalization-evaluation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "把 validated candidates 综合成 canonical proposal. Delivery slice: post-alpha. Architecture: Tech Design §14.1. Scope: A specialized slow worker synthesizes reviewable Context/Decision/Evidence proposals from validated claims through the established canonical bridge, preserving authority and exact source versions.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: runtime-canonical-git-bridge-v0: Output uses the single canonical proposal/base/authority and materialization contract. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonicalization-bundle",
+          "identity": "sha256:2351b30ee838a7faa3e8748d1359ce9f0e5b01c75272becb49affb071472cb26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonicalization-evaluation",
+          "identity": "sha256:5c9d14e8219d11941e2871474ab7019a38babe085b2984a6fb25b66f4163f714",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonicalization-guarded-return",
+          "identity": "sha256:c5d0da53dbf150f63c97a2e0a8818bdf7280cc583577a67eb34ae8675170071e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:258bb7ddc2dacc6f40d84d4d87bb99373433ce18242ce4534e7093de9d501f97",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A specialized slow worker synthesizes reviewable Context/Decision/Evidence proposals from validated claims through the established canonical bridge, preserving authority and exact source versions.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The specialization consumes a proven bounded executor and guarded job lifecycle.",
+      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Synthesis behavior must be replayable and regression-tested.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-canonicalization-worker-v0"
+}

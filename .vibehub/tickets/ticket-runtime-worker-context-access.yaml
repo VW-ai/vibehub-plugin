@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "worker-context-capability",
+      "criterion": "Issue a short-lived token bound to job, attempt, worker, tenant, project, allowed operations, Context refs, sensitivity ceiling, and expiry; deny enumeration and access outside that capability.",
+      "identity": "sha256:f74f9dad79515e420feb21a83895cd4ea5375db59f0ca4f3821a77b7929b5a83",
+      "presentation": {
+        "label": "worker-context-capability"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-context-package",
+      "criterion": "Materialize consumer-readable Context using canonical, validated, candidate, conflict, authority, provenance, token-budget, and host-capability rules, while preserving exact versions and source watermarks for reproducibility.",
+      "identity": "sha256:a6c9c1fc19d53ca663c2cc33778f718ddd36986325eb0a60ce1463edecaf981d",
+      "presentation": {
+        "label": "worker-context-package"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-payload-minimization",
+      "criterion": "Use pointers, redacted fragments, or sanitized artifacts instead of full raw payloads when sufficient; enforce secret scanning and provider/local-only policy before any content reaches a cloud or external-model worker.",
+      "identity": "sha256:c8d860058c0c03e628a583e81fc80c107bc6201087ff258e69e02d8868cc1f20",
+      "presentation": {
+        "label": "worker-payload-minimization"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-git-boundary",
+      "criterion": "Materialize immutable code in a confined job workspace using a scoped read capability; reject path/symlink escape, disable executable repository hooks/filters and automatic submodule traversal, restrict tools/network to declared job grants and prevent reads of other jobs or host credentials. Verify malicious repository fixtures; code-writing execution is deferred and no user-wide PAT is exposed.",
+      "identity": "sha256:74014818dce0932053d732a7162b11e124ee249e8177c583cce2aaf04dbdeb93",
+      "presentation": {
+        "label": "worker-git-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement job-scoped Context and Git materialization. Delivery slice: alpha. Architecture: §12 Egress / Retrieval Pipeline; §13 Context Compiler; §20 Git Integration; §21.2 ACL propagation; §22 Security & Privacy. Scope: Job-scoped Context query and materialization; Snapshot and watermark semantics; Payload minimization and redaction; Optional Git snapshot or isolated checkout. Excluded: Unbounded database access; Full semantic-store dumps; Long-lived user Git credentials; Runtime-owned source-control history.  Required transitive artifacts: runtime-git-commit-ref-provenance-v0: Optional source access resolves an immutable Git snapshot through the shared Git adapter. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "worker-context-capability",
+          "identity": "sha256:f74f9dad79515e420feb21a83895cd4ea5375db59f0ca4f3821a77b7929b5a83",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-context-package",
+          "identity": "sha256:a6c9c1fc19d53ca663c2cc33778f718ddd36986325eb0a60ce1463edecaf981d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-git-boundary",
+          "identity": "sha256:74014818dce0932053d732a7162b11e124ee249e8177c583cce2aaf04dbdeb93",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-payload-minimization",
+          "identity": "sha256:c8d860058c0c03e628a583e81fc80c107bc6201087ff258e69e02d8868cc1f20",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8eebf72fe7544dd58ca5e7807f2af8b680cc67ab1fbcd3bc7d1afce9cffc70d3",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A leased worker can obtain only the Context package, source pointers, and optional Git material it needs for one job, through revocable job-scoped authorization and reproducible snapshot semantics.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Job capabilities bind the registered worker identity and current project grant.",
+      "target_ticket_id": "ticket-runtime-byo-worker-enrollment",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Scoped worker packages reuse the accepted compiler instead of reimplementing ranking/authority/budgeting.",
+      "target_ticket_id": "ticket-runtime-context-compiler-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-worker-context-access"
+}

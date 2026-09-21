@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonical-reader-contract",
+      "criterion": "Implement a read-only adapter for explicitly configured project paths and a versioned public VibeHub record schema subset (Context/Decision/Constraint, Ticket/Acceptance, Room/Authority and accepted Evidence/Outcome). Read by immutable commit/blob reference, validate structure/revision bindings and source authority, and map exact canonical references into the derived Graph.",
+      "identity": "sha256:d49120b2f32ea10814a895d1dcba34ae040cac18c9af5fbd3620f06ca86e2fd3",
+      "presentation": {
+        "label": "canonical-reader-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-reader-lifecycle",
+      "criterion": "Initial import and subsequent commit changes deterministically refresh projections with source watermark, content hash and ACL; update/delete/invalid or unsupported records yield explicit stale/tombstone/unavailable states without rewriting their canonical source or inventing acceptance.",
+      "identity": "sha256:1f7dcaabe5f298c29808a4cb5750915dd446fadb58d539f8e1bf5986387a92f5",
+      "presentation": {
+        "label": "canonical-reader-lifecycle"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-reader-fixtures",
+      "criterion": "A temporary existing-project fixture proves bootstrap, changed authority/acceptance, invalid Outcome binding, deleted Context and branch divergence while keeping historical citations resolvable. The adapter runs standalone with caller-supplied paths and public formats, with no import of sibling plugin implementations or this repository-specific records.",
+      "identity": "sha256:b1f3bf12d955779528cf56f8d8d5056918c1e71c15abf2a9afeeefa7c67c078a",
+      "presentation": {
+        "label": "canonical-reader-fixtures"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "读取并投影已有 canonical Git 记录. Delivery slice: alpha. Architecture: Tech Design §§6.3,10,12,20,28. Scope: An existing project can seed and refresh canonical-reference projections from verified immutable Git records without a judge assigning truth authority to arbitrary source text.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-reader-contract",
+          "identity": "sha256:d49120b2f32ea10814a895d1dcba34ae040cac18c9af5fbd3620f06ca86e2fd3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-reader-fixtures",
+          "identity": "sha256:b1f3bf12d955779528cf56f8d8d5056918c1e71c15abf2a9afeeefa7c67c078a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-reader-lifecycle",
+          "identity": "sha256:1f7dcaabe5f298c29808a4cb5750915dd446fadb58d539f8e1bf5986387a92f5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e531b18bf49720a047432e381a7a770687d1c1175b84468b0ec13c9242aa9a85",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "An existing project can seed and refresh canonical-reference projections from verified immutable Git records without a judge assigning truth authority to arbitrary source text.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Existing record reads must resolve exact Git objects rather than mutable working-tree text.",
+      "target_ticket_id": "ticket-runtime-git-commit-ref-provenance-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Canonical-reference projections obey the shared Graph revision and source-access rules.",
+      "target_ticket_id": "ticket-runtime-source-access-invalidation-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-canonical-source-reader-v0"
+}

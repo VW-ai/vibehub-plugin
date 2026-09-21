@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "compaction-trigger-is-cost-aware",
+      "criterion": "A versioned policy considers utilization, future turns, removable semantic mass, phase boundary, host signal, cache-rebuild proxy, compaction cost, risk margin, and hysteresis rather than one token threshold.",
+      "identity": "sha256:668116dc2775b00b4009df2cc78a9a236498824ea13660b7dfed1e1237fec6e2",
+      "presentation": {
+        "label": "compaction-trigger-is-cost-aware"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "compaction-output-is-recoverable",
+      "criterion": "Output preserves goal, contract, decisions, constraints, unresolved questions, critical evidence, implementation state, and exact source pointers from one ContextPackage/GraphRevision, with omissions recorded.",
+      "identity": "sha256:9d4318f68e839657bee1707d0b3900affcf451a54262edb930084b4a0d1595ed",
+      "presentation": {
+        "label": "compaction-output-is-recoverable"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "host-boundary-remains-explicit",
+      "criterion": "Consumer returns a compaction proposal for a declared safe checkpoint and host capability; it never rewrites host history or stable prefix without a host action boundary and ordinary work continues if unavailable.",
+      "identity": "sha256:aab3b77f85f9a0ee048f40f1b7566e7b8d2d8281a4e2fda0a5fef42cb3042e63",
+      "presentation": {
+        "label": "host-boundary-remains-explicit"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "compaction-value-is-measured",
+      "criterion": "Offline and controlled fixtures compare token/prefill savings, retrieval recovery, task continuity, repeated work, and semantic loss before any default-on rollout.",
+      "identity": "sha256:d6a676605009efc29702167a441d0991e53a447e9eb9f325f7b7a602f389f1d1",
+      "presentation": {
+        "label": "compaction-value-is-measured"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build semantic compaction as an independent Context consumer. Delivery slice: post-alpha. Architecture: . Scope: Trigger policy, compact artifact compiler, recovery pointers, host-neutral proposal contract, and offline/controlled evaluation.. Excluded: Private-alpha launch dependency, direct prompt surgery, host-specific history mutation, and replacement of general retrieval/compiler behavior..  Required transitive artifacts: context-compiler: Compaction consumes a reproducible ContextPackage rather than raw conversation text. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "compaction-output-is-recoverable",
+          "identity": "sha256:9d4318f68e839657bee1707d0b3900affcf451a54262edb930084b4a0d1595ed",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compaction-trigger-is-cost-aware",
+          "identity": "sha256:668116dc2775b00b4009df2cc78a9a236498824ea13660b7dfed1e1237fec6e2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compaction-value-is-measured",
+          "identity": "sha256:d6a676605009efc29702167a441d0991e53a447e9eb9f325f7b7a602f389f1d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "host-boundary-remains-explicit",
+          "identity": "sha256:aab3b77f85f9a0ee048f40f1b7566e7b8d2d8281a4e2fda0a5fef42cb3042e63",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5de96a27cd6cdb0fb3410988cb9b6e878857bb5034c981dc6cd32da5e8b8d08e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "After the private alpha core is validated, a host-neutral compaction consumer can decide when and how to produce a recoverable compact continuation artifact without making compaction part of Runtime truth or the alpha launch critical path.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Compaction value and semantic-loss risk require the same replayable evaluation and gating discipline.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-compaction-v0"
+}

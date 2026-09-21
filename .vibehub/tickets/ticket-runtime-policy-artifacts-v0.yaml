@@ -1,0 +1,112 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "policy-schema-covers-node-model",
+      "criterion": "A typed declarative schema covers Deterministic, Judge, Retrieve, Aggregate, Guard, Action, and Worker nodes; typed ports, named branches and joins, terminal actions, explicit error edges, and per-node budgets validate before publication.",
+      "identity": "sha256:5cb45559d0bfaa45b4e6b584e9ccdf4a9f026593870e40c9ed75a2a415f87483",
+      "presentation": {
+        "label": "policy-schema-covers-node-model"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "policy-compiler-is-deterministic",
+      "criterion": "Compilation rejects missing or unreachable nodes, incompatible ports, unsupported cycles, incomplete action/error branches, unbounded paths, and unknown operations, and produces the same executable hash from semantically identical input.",
+      "identity": "sha256:6a2ed073d4fcad6d8b748de818b546ccccec5b47d21a6321a58116ada93b2e04",
+      "presentation": {
+        "label": "policy-compiler-is-deterministic"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "policy-artifacts-are-immutable",
+      "criterion": "Every publication has logical policy ID, exact version, schema version, content hash, compatibility range, activation metadata, and rollback predecessor; duplicate publication is idempotent and an activated artifact cannot mutate.",
+      "identity": "sha256:2357c1a3593b79641bfe6d43a5ef3cec2d4dc949cee0abd18c32272fbb74434e",
+      "presentation": {
+        "label": "policy-artifacts-are-immutable"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "phase-zero-policy-compatibility",
+      "criterion": "Existing Phase 0 decision families translate or load without changing recorded judge inputs/results, and current standalone, replay, and provider-adapter checks pass.",
+      "identity": "sha256:55a508d30565c6b0a1b3b2f5ceb5687fc7c55a0c3b513605b2e5db58cc35d476",
+      "presentation": {
+        "label": "phase-zero-policy-compatibility"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Compile typed opaque event/snapshot references; do not implement hosted registry persistence or assign canonical authority here. Online publication transport is supplied by the release/adapter layer."
+  ],
+  "context": "Build the versioned Policy Graph artifact registry and compiler. Delivery slice: contracts. Architecture: . Scope: Policy schema, compiler, immutable artifact identity, registry contract/reference implementation, and conformance tests.. Excluded: Policy execution, authoring UI, provider benchmarks, and rollout automation..",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "phase-zero-policy-compatibility",
+          "identity": "sha256:55a508d30565c6b0a1b3b2f5ceb5687fc7c55a0c3b513605b2e5db58cc35d476",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "policy-artifacts-are-immutable",
+          "identity": "sha256:2357c1a3593b79641bfe6d43a5ef3cec2d4dc949cee0abd18c32272fbb74434e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "policy-compiler-is-deterministic",
+          "identity": "sha256:6a2ed073d4fcad6d8b748de818b546ccccec5b47d21a6321a58116ada93b2e04",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "policy-schema-covers-node-model",
+          "identity": "sha256:5cb45559d0bfaa45b4e6b584e9ccdf4a9f026593870e40c9ed75a2a415f87483",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:cf83676053b5ba8059d9f05421d51401d48d2e3acd470d0bddaa77393573d6c9",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Runtime can validate, compile, content-address, publish, resolve, activate, and retire immutable Policy Graph versions without binding definitions to a judge provider or deployment host.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-policy-artifacts-v0"
+}

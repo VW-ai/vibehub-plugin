@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "host-capabilities",
+      "criterion": "Inspect the supported Codex integration surface and check in a capability matrix distinguishing observed events, user-triggered query, callbacks and safe turn boundaries. A fixture plus a local real-host smoke proves the chosen event/query integration; unsupported hooks are reported rather than assumed.",
+      "identity": "sha256:447aa578792823f4485dbf913349e97f69863108da2a0e70778dec66c0395d43",
+      "presentation": {
+        "label": "host-capabilities"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "bounded-sensor",
+      "criterion": "The adapter emits normalized tenant/project/session/execution/worktree events with redaction, source sequence and idempotency; bounded local buffering and reconnect reuse the ingress contract without duplicate semantic effects or unapproved raw trace export.",
+      "identity": "sha256:e1eed39d931637af8fcc47c94b8adcd910a7e39e6e825f24115c0a69dbbf9f09",
+      "presentation": {
+        "label": "bounded-sensor"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "host-query-degrade",
+      "criterion": "An Agent can request a compiled package with immutable citations and obtain a soft pointer when supported; process/network outage and unsupported callback tests prove Agent work proceeds and notices remain queryable at the next supported boundary.",
+      "identity": "sha256:eb3e17ebe6a7bc00cbae7032dcfcfdb9c90f92e2cf66f16f9ec488d2b327a2d0",
+      "presentation": {
+        "label": "host-query-degrade"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Codex host sensor / query adapter. Delivery slice: alpha. Architecture: PRD §5.1; Tech Design §§7,15,24,26,28. Scope: One explicit Codex sensor/query integration and its independent install/smoke path.. Excluded: No implementation imports from existing Skills; no Claude/Cursor adapters, required plugin daemon, or hard injection..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-sensor",
+          "identity": "sha256:e1eed39d931637af8fcc47c94b8adcd910a7e39e6e825f24115c0a69dbbf9f09",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "host-capabilities",
+          "identity": "sha256:447aa578792823f4485dbf913349e97f69863108da2a0e70778dec66c0395d43",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "host-query-degrade",
+          "identity": "sha256:eb3e17ebe6a7bc00cbae7032dcfcfdb9c90f92e2cf66f16f9ec488d2b327a2d0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b319def72a62dd4df20e123bb8e23ad6c3fb509eda127120b0881770af843fc1",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "One verified Codex integration emits bounded work signals and retrieves compiled Context while ordinary coding survives Runtime outage.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "One real host consumes the published query/session/soft-delivery API.",
+      "target_ticket_id": "ticket-runtime-session-delivery-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Host events bind to the same proven local worktree identity/diff observations.",
+      "target_ticket_id": "ticket-runtime-local-git-worktree-sensor-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-host-adapter-v0"
+}

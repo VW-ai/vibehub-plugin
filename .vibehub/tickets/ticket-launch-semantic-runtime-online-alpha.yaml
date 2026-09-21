@@ -5,49 +5,103 @@
       "criterion": "Deploy the selected build behind the chosen authenticated alpha boundary with tenant/project isolation, managed secrets, bounded provider routing, retention settings, and no credential or private fixture in build artifacts or logs.",
       "identity": "sha256:c896e7f32ffd5ef7afc30781087366f90b49a4c1292c19a9f1fbd1d331c65f26",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "alpha-live-journey",
       "criterion": "Run the accepted synthetic or explicitly authorized live journey through Project and Repository setup, two concurrent agent proposals, exact Context links, visible conflict, resolution, realtime propagation, and immutable version retrieval.",
       "identity": "sha256:2e5f77b8053fb061fc63819ae917924f1f885b72abe8e197a83ec6da97ab246d",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "alpha-observability-and-rollback",
       "criterion": "Record health, error, latency, provider-route, retry, rate-limit, conflict, promotion, and realtime delivery signals; document and verify rollback without corrupting accepted Context versions or blocking ordinary plugin work.",
       "identity": "sha256:1f8a36c9d9be92fe52ed0175d5b3e510c4ec68198dc29ebd8e116e7b9e81a265",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "alpha-release-evidence",
       "criterion": "Version the final deployment contract, endpoint and access instructions, known limitations, verification evidence, and an independently adjudicated Outcome; generated logs, credentials, private payloads, and temporary provider artifacts remain outside Git.",
       "identity": "sha256:edba828f5663d75ab85fdd6ec59b6920fe92828d0116103df4a36db68298faeb",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "alpha-exact-build-release",
+      "criterion": "Deploy the tested manifest to the owner-selected target under its approved cost/data boundary, with managed secrets and explicit feature toggles. Verify auth, health, version identity and no public unauthenticated project data access.",
+      "derived_from": [
+        {
+          "acceptance_id": "alpha-protected-deployment",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:63c65d490c023db894e45bedf060541db4e9e6bdfc68fc0ab466ca7c8ffd4666",
+      "presentation": {
+        "label": "alpha-exact-build-release"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "alpha-live-loop",
+      "criterion": "Run a synthetic or separately authorized live journey through event admission, policy decision, candidate/conflict, one working asynchronous reconciliation route, exact Context query and soft delivery; record retained IDs/hashes and live observations without private raw payloads.",
+      "derived_from": [
+        {
+          "acceptance_id": "alpha-live-journey",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3e102ded004589277120cfd80aca0ea1fb9e2871a5904d32164bae0d5e4d86f0",
+      "presentation": {
+        "label": "alpha-live-loop"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "alpha-handoff",
+      "criterion": "Publish endpoint/access instructions, operator commands, SLI dashboard, current limits, rollback/restore references and owner runbook. Engineering readiness and still-open downstream productization metrics remain separate; do not require this Ticket to create its own independent Outcome before closeout.",
+      "derived_from": [
+        {
+          "acceptance_id": "alpha-release-evidence",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b75b62c8bd328eb8ff0f96ce046ff4d9bf3003f65141ef4be5ff19a6ca9e1cbc",
+      "presentation": {
+        "label": "alpha-handoff"
+      },
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
-    "Refine this Ticket after the collaboration surface Outcome exists; do not execute it while maturity remains draft.",
-    "Do not send any real repository, agent, or team data to an external model or connector without explicit destination-specific authorization.",
-    "Do not advance productization claims from one alpha journey; keep downstream user-value and repeated-work metrics explicit."
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "This is the terminal alpha delivery Ticket. It remains draft until the selected platform, service, and collaboration surface define the real deploy target, health checks, user boundary, and release evidence.",
+  "context": "上线受保护的 internal alpha 并验证边界. Delivery slice: release. Architecture: Tech Design §§5,19,23,24. Scope: The exact staged and rehearsed build is deployed to the owner-selected protected destination, passes a live bounded journey and has an actionable recovery handoff.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: explorer: The chosen release includes usable version/audit references. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
   "context_refs": [
     {
-      "purpose": "The rapid but bounded alpha objective.",
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Earlier fast-alpha goal, refined by this plan with the restored Policy Graph architecture and operational gates.",
       "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
-    },
-    {
-      "purpose": "The live model-node observability and upgrade discipline.",
-      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-judgeops-continuous-evaluation.yaml"
-    },
-    {
-      "purpose": "The isolation and graceful-degradation boundary that launch must preserve.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-semantic-runtime-strong-service-boundary.yaml"
     }
   ],
   "contract_revisions": [
@@ -76,19 +130,43 @@
       ],
       "identity": "sha256:cc184e3cbda979e75e2043cefbbfb7c46c3b8508361e41c4e68586a2ed6d6ff0",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "alpha-exact-build-release",
+          "identity": "sha256:63c65d490c023db894e45bedf060541db4e9e6bdfc68fc0ab466ca7c8ffd4666",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "alpha-handoff",
+          "identity": "sha256:b75b62c8bd328eb8ff0f96ce046ff4d9bf3003f65141ef4be5ff19a6ca9e1cbc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "alpha-live-loop",
+          "identity": "sha256:3e102ded004589277120cfd80aca0ea1fb9e2871a5904d32164bae0d5e4d86f0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0a1fe65730bc925a3a547392865aa295325f6d58d8cf9bb8f72204b5648cc69c",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "A protected Semantic Runtime online alpha is deployed, observable, rollback-ready, and verified through the complete referenceable multi-agent collaboration journey.",
+  "outcome": "The exact staged and rehearsed build is deployed to the owner-selected protected destination, passes a live bounded journey and has an actionable recovery handoff.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "target_ticket_id": "ticket-build-semantic-collaboration-surface-v0",
+      "rationale": "Live deployment consumes measured passing capacity, isolation, outage and rollback evidence.",
+      "target_ticket_id": "ticket-runtime-staged-rollout-degradation",
       "type": "depends_on"
     }
   ],

@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "byo-worker-identity",
+      "criterion": "Create a revocable worker identity separate from human, service, Git, and model-provider identities, using short-lived Runtime credentials with explicit audience and no storage of the worker's Codex or other model account secret.",
+      "identity": "sha256:78e62669b6632b84c56ca948c519856375ec66a183d49669569b610dfc9f9cc8",
+      "presentation": {
+        "label": "byo-worker-identity"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "byo-worker-capabilities",
+      "criterion": "Registration records owner, permitted tenant/project scopes, supported worker types, data-classification ceiling, region, model and tool capability claims, Git mode, concurrency, protocol versions, health, and last-seen time.",
+      "identity": "sha256:6f6c281956a7001b5162bd8e16441f025bbdd3e568d86c9ab089dfec8a0b3fc9",
+      "presentation": {
+        "label": "byo-worker-capabilities"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "byo-worker-grants-revocation",
+      "criterion": "Only an authorized owner can grant projects or raise sensitivity and concurrency limits; revoke and credential rotation stop new claims promptly while preserving immutable audit and allowing already-returned results to be adjudicated safely.",
+      "identity": "sha256:23b912e445d73e1695f4f498414ed11b52664ef5c35044806d92dc29164b6c92",
+      "presentation": {
+        "label": "byo-worker-grants-revocation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "byo-worker-isolation-tests",
+      "criterion": "Tests reject unregistered, expired, revoked, wrong-tenant, wrong-project, unsupported-protocol, and over-capability claims, and prove one private worker is not implicitly available to other tenants.",
+      "identity": "sha256:daaeb1a52aaf362bfe1254d07a6cb21e4801264d789fb1da9c91f7ecc565a340",
+      "presentation": {
+        "label": "byo-worker-isolation-tests"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement BYO worker enrollment and capability identity. Delivery slice: alpha. Architecture: §7.3 Cloud Runtime; §14 Worker Slow Path; §22 Security & Privacy; §25 Enterprise Multi-tenancy. Scope: Worker registration and ownership; Capability advertisement; Tenant/project grants; Credential rotation, revocation, and health. Excluded: Reading or storing a user's Codex credential; Assuming subscription terms, quota, or concurrency; Automatic sharing of a private worker across tenants; Executing a worker job.  Required transitive artifacts: runtime-worker-job-protocol: Enrollment negotiates actual job protocol and worker-type capabilities. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "byo-worker-capabilities",
+          "identity": "sha256:6f6c281956a7001b5162bd8e16441f025bbdd3e568d86c9ab089dfec8a0b3fc9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "byo-worker-grants-revocation",
+          "identity": "sha256:23b912e445d73e1695f4f498414ed11b52664ef5c35044806d92dc29164b6c92",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "byo-worker-identity",
+          "identity": "sha256:78e62669b6632b84c56ca948c519856375ec66a183d49669569b610dfc9f9cc8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "byo-worker-isolation-tests",
+          "identity": "sha256:daaeb1a52aaf362bfe1254d07a6cb21e4801264d789fb1da9c91f7ecc565a340",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1a5ed5158a292f60540bf96bf4d76a03c7a7e22c8308980e7c8634d395d32a83",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "An owner-managed worker can register, authenticate, advertise bounded capabilities, receive explicit tenant/project grants, rotate credentials, report health, and be revoked without revealing its local model account credentials to Runtime.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Worker tokens/grants specialize the accepted service authorization layer.",
+      "target_ticket_id": "ticket-runtime-service-auth-isolation",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-byo-worker-enrollment"
+}

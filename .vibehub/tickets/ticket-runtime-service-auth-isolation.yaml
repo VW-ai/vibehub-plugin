@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "auth-identity-contract",
+      "criterion": "Define and implement separate human, host-adapter, connector, service, and worker identities with short-lived credentials, explicit audience, revocation, and no model-provider credential reuse.",
+      "identity": "sha256:a6b841acf060614ab110f8cc12b8a8997ac91a55467c90dc277d53ac3e727dcd",
+      "presentation": {
+        "label": "auth-identity-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-tenant-enforcement",
+      "criterion": "Implement a reusable authorization evaluator and request middleware with scoped reference/key constructors and adapter conformance fixtures for HTTP, object pointers, queues and subscriptions; deny cross-tenant/project and confused-deputy requests. Each later adapter must run these fixtures rather than this Ticket implementing every future endpoint.",
+      "identity": "sha256:0666332bd9f3bcf8e5a3b7397e7f79ba2e9666673093cb4d0e1ef403a1ceb6ef",
+      "presentation": {
+        "label": "auth-tenant-enforcement"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-acl-routing",
+      "criterion": "Define and implement deterministic access/sensitivity/provider-allowlist decisions and safe materialization contracts, including fail-closed unknown ACL and source-content trust boundaries; later source invalidation and judge/worker adapters enforce them at their dispatch/read boundaries.",
+      "identity": "sha256:6e268e418be26e95efde78e0908eefa5750caed0eed4b206f1d44abba6e3bce4",
+      "presentation": {
+        "label": "auth-acl-routing"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-secret-boundary",
+      "criterion": "Keep service, Git, connector, deployment, and model credentials out of events, semantic entities, prompts, audit payloads, logs, fixtures, and build artifacts; verification includes redaction and negative leak tests.",
+      "identity": "sha256:1d1dcb1910c760cbdbe71611a348bba197c03058e0668a39ab4887d7e9c11408",
+      "presentation": {
+        "label": "auth-secret-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement service identity, authorization, and tenant isolation. Delivery slice: alpha. Architecture: §8.1 Event Gateway; §21.2 ACL propagation; §22 Security & Privacy; §25 Enterprise Multi-tenancy; §26 API Surface. Scope: Service and worker authentication; Tenant/project namespace isolation; ACL, sensitivity, and provider-routing enforcement; Secret handling contract. Excluded: Enterprise SSO administration UI; External connector implementation; Cross-project retrieval enablement.  Required transitive artifacts: runtime-scope-source-identity-v0: The evaluator consumes explicit actor, tenant, Project and source scope identities. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "auth-acl-routing",
+          "identity": "sha256:6e268e418be26e95efde78e0908eefa5750caed0eed4b206f1d44abba6e3bce4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "auth-identity-contract",
+          "identity": "sha256:a6b841acf060614ab110f8cc12b8a8997ac91a55467c90dc277d53ac3e727dcd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "auth-secret-boundary",
+          "identity": "sha256:1d1dcb1910c760cbdbe71611a348bba197c03058e0668a39ab4887d7e9c11408",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "auth-tenant-enforcement",
+          "identity": "sha256:0666332bd9f3bcf8e5a3b7397e7f79ba2e9666673093cb4d0e1ef403a1ceb6ef",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:531d5cf830685525b0b63d68cd5ad1ee5794d34279ad1cde76a1ca71d5e2a6a3",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A reusable authenticated service boundary enforces scoped identities, revocation and explicit access decisions; module adapters consume its conformance contract.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Concrete credential verification and hosted middleware use the selected auth/runtime primitives.",
+      "target_ticket_id": "ticket-select-semantic-runtime-alpha-platform",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-service-auth-isolation"
+}

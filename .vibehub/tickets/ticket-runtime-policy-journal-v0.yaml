@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "run-journal-pins-replay-inputs",
+      "criterion": "PolicyRun/NodeAttempt pin event, policy hash, GraphRevision/watermarks, DecisionSchema/handler versions, budget consumption, branch state, idempotency keys, and result refs before external or mutating boundaries.",
+      "identity": "sha256:2a448d42cb477167ce1b663597bbac8d7426d0e52ada2f42c287eed295c85e3e",
+      "presentation": {
+        "label": "run-journal-pins-replay-inputs"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resume-does-not-repeat-effects",
+      "criterion": "Restart resumes only pending work; completed results and committed actions are reused, and duplicate delivery or concurrent resume cannot create a second graph revision, notification, or job.",
+      "identity": "sha256:156764b5b347434fd0c0525bd064bb4b0bb08fb53e5204af263562a9fd3bc3b4",
+      "presentation": {
+        "label": "resume-does-not-repeat-effects"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "leases-and-fencing-prevent-split-brain",
+      "criterion": "Leases, heartbeat, attempt number, and fencing token reclaim abandoned work while rejecting late superseded writes; cancellation and original wall-clock/cost limits survive resume.",
+      "identity": "sha256:d4d9840c1797a7d2b6f23c64f62e3c10200cda2df77d0c115aef19c20fbca870",
+      "presentation": {
+        "label": "leases-and-fencing-prevent-split-brain"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "crash-matrix-proves-recovery",
+      "criterion": "Fault injection before/after each durable boundary, during judge timeout/fallback, and around graph commit always ends in one explainable terminal or resumable state without duplicate effect.",
+      "identity": "sha256:94fbe2f70a258fb0ada61028a065d379c49c8237546902d8e3cb0abe329551d1",
+      "presentation": {
+        "label": "crash-matrix-proves-recovery"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build durable PolicyRun journaling, idempotency, and crash resume. Delivery slice: alpha. Architecture: . Scope: Run/attempt journal, scheduler integration, leases/fencing, idempotency ledger, cancellation, recovery scanner, and crash tests.. Excluded: Worker executor internals, cross-region DR, and transport-level exactly-once claims..  Required transitive artifacts: graph-store: Journal/action/outbox transactions integrate the accepted real Graph repository. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "crash-matrix-proves-recovery",
+          "identity": "sha256:94fbe2f70a258fb0ada61028a065d379c49c8237546902d8e3cb0abe329551d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "leases-and-fencing-prevent-split-brain",
+          "identity": "sha256:d4d9840c1797a7d2b6f23c64f62e3c10200cda2df77d0c115aef19c20fbca870",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resume-does-not-repeat-effects",
+          "identity": "sha256:156764b5b347434fd0c0525bd064bb4b0bb08fb53e5204af263562a9fd3bc3b4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "run-journal-pins-replay-inputs",
+          "identity": "sha256:2a448d42cb477167ce1b663597bbac8d7426d0e52ada2f42c287eed295c85e3e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b5516889565e8acc433649872b0b5f7d66c8cfcc4467fe7b2eae2cd61d3eb86e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A Policy run survives process loss, duplicate delivery, lease expiry, and bounded retry while preserving its original artifact, snapshot, budget, decisions, and exactly-once logical effects.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Durable NodeAttempt replay must preserve judge fallback, cache and original budgets.",
+      "target_ticket_id": "ticket-runtime-judge-runtime-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-policy-journal-v0"
+}

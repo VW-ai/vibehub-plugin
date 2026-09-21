@@ -1,0 +1,93 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "telemetry-contract",
+      "criterion": "Publish versioned Event/PolicyRun/NodeAttempt/GraphRevision/Job/Query/Package correlation fields, bounded reason codes, append-only audit envelopes, redaction rules and cardinality limits; executable fixtures reject secrets/raw payload fields.",
+      "identity": "sha256:7de54bc0c9746e89c86ed642e5288cef9e143237a0cb3d148c6c8ec4045519a5",
+      "presentation": {
+        "label": "telemetry-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "slo-workload-contract",
+      "criterion": "Define a concrete initial workload with tenant/project/source counts, payload limits, concurrency, event/query mix, burst duration and worker duration; assign numerical engineering targets and measurement windows for durable ACK, event-to-candidate, query, queue age, worker completion and recovery. Targets remain unproven until the capacity drill.",
+      "identity": "sha256:83b22a9e12d801d691113aa523e897317d332b0f62bba97f9d59a682ea3497fe",
+      "presentation": {
+        "label": "slo-workload-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resource-budget-contract",
+      "criterion": "Specify configurable queue, per-project concurrency, model-call/retry/token or usage-proxy budgets, saturation actions, diagnostics and alpha RPO/RTO targets. Separate account usage availability from estimated monetary cost.",
+      "identity": "sha256:ac7d714e99d0d98d4806f031976b009faa5b5ec00328b10c48486749fe5950eb",
+      "presentation": {
+        "label": "resource-budget-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Deliver executable schemas/validators or pure transitions plus conformance fixtures and documentation for this protocol; proposals remain hypotheses until verified."
+  ],
+  "context": "定义可观测性、SLO 与资源预算契约. Delivery slice: contracts. Architecture: Tech Design §§17,23,24,27,30. Scope: All modules share correlation, safe audit fields, stage SLIs, resource budgets and a reproducible workload definition before implementation.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "resource-budget-contract",
+          "identity": "sha256:ac7d714e99d0d98d4806f031976b009faa5b5ec00328b10c48486749fe5950eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "slo-workload-contract",
+          "identity": "sha256:83b22a9e12d801d691113aa523e897317d332b0f62bba97f9d59a682ea3497fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "telemetry-contract",
+          "identity": "sha256:7de54bc0c9746e89c86ed642e5288cef9e143237a0cb3d148c6c8ec4045519a5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:bc6fe542ded6290c6f29f39d4a42a9f4f03f694efefd455cafb9ca5fc93e9016",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "All modules share correlation, safe audit fields, stage SLIs, resource budgets and a reproducible workload definition before implementation.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-observability-contract-v0"
+}

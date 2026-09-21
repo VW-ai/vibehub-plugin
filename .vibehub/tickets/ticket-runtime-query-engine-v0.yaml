@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "query-pins-consumer-and-snapshot",
+      "criterion": "QueryRequest identifies tenant/project/principal, consumer/session/task, exact/current GraphRevision, watermarks, overlay, result/token budget, and staleness tolerance; result records the resolved snapshot.",
+      "identity": "sha256:d4407ee3131035ca9c3f3bfa4f0047a53f8202a411868574356c7d57e506b6a2",
+      "presentation": {
+        "label": "query-pins-consumer-and-snapshot"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "candidate-generation-is-bounded",
+      "criterion": "Exact IDs, project/room/ticket/repository scope, graph traversal, FTS, optional embeddings, recency, lifecycle, and conflicts feed one bounded candidate set with per-source limits and deterministic deduplication.",
+      "identity": "sha256:1b493ce7ab7ba4fcbba5753399b56ae4d7277336c11b480855818b5b594be3d8",
+      "presentation": {
+        "label": "candidate-generation-is-bounded"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ranking-is-explainable",
+      "criterion": "Relevance, consequence, novelty, authority, redundancy, freshness, and optional Judge decisions produce a versioned rank trace; similarity alone never grants governing status.",
+      "identity": "sha256:a93adcb16bcc398c164f359ebd0b2a3007ffea371f4d8a009be7af956e0adb45",
+      "presentation": {
+        "label": "ranking-is-explainable"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-degrades-safely",
+      "criterion": "ACL filters precede ranking, conflicts remain multi-valued, unavailable embedding/judge falls back to exact/graph/text, and fixtures cover stale snapshots, overlay reads, denial, and deterministic pagination.",
+      "identity": "sha256:4bf909f85a9ee84f4b1b0abfd0e4ba6a98b5b04308fd84f29c42e979c57d525a",
+      "presentation": {
+        "label": "query-degrades-safely"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "candidate-generation-is-bounded",
+          "identity": "sha256:1b493ce7ab7ba4fcbba5753399b56ae4d7277336c11b480855818b5b594be3d8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-degrades-safely",
+          "identity": "sha256:4bf909f85a9ee84f4b1b0abfd0e4ba6a98b5b04308fd84f29c42e979c57d525a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-pins-consumer-and-snapshot",
+          "identity": "sha256:d4407ee3131035ca9c3f3bfa4f0047a53f8202a411868574356c7d57e506b6a2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ranking-is-explainable",
+          "identity": "sha256:a93adcb16bcc398c164f359ebd0b2a3007ffea371f4d8a009be7af956e0adb45",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5c73c11ae2b99a22c56d6c03452c6f21064820e4fd48c654860f964863d9a8fb",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "An authorized consumer queries one exact Graph snapshot and receives explainable ranked candidates from exact scope, graph relations, text/vector indexes, recency, authority, conflict, and freshness.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Semantic ranking consumes the tested bounded judge/access/materialization path and its Graph prerequisite.",
+      "target_ticket_id": "ticket-runtime-judge-runtime-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Exact Ticket/Room/Authority/task-contract retrieval needs an actual initial canonical-reference projection.",
+      "target_ticket_id": "ticket-runtime-canonical-source-reader-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-query-engine-v0"
+}

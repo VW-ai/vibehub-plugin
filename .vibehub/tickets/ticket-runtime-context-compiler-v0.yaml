@@ -1,0 +1,113 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "compiler-enforces-layer-order",
+      "criterion": "Compilation orders governing context, task contract, decisions/constraints, working state, evidence, unresolved conflicts, and source pointers; canonical outranks validated/candidate and authority outranks prior-art similarity.",
+      "identity": "sha256:1a4d54fb31d34ebbc2064119bee1854604f739958c926882fb13552fb2ef276d",
+      "presentation": {
+        "label": "compiler-enforces-layer-order"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "budgeting-preserves-semantics",
+      "criterion": "Hard token budget drives deterministic deduplication, relation expansion, pointer substitution, and omission while preserving authority, conflict plurality, critical provenance, and an explicit omission record.",
+      "identity": "sha256:8aa8bca21df261d23e036156472f268d513754ffbd9f2226d98dedc58161571b",
+      "presentation": {
+        "label": "budgeting-preserves-semantics"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "package-is-reproducible",
+      "criterion": "Package identity binds QueryResult, GraphRevision/watermarks, compiler policy/version, capabilities, model-window profile, and budget; exact links resolve after later graph change and provenance explains inclusion.",
+      "identity": "sha256:051e26096092dba3265c3f5599d9ce5248c0b20bd5f9a06d3412966152368616",
+      "presentation": {
+        "label": "package-is-reproducible"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "compiler-does-not-own-delivery",
+      "criterion": "Output includes content and silent/soft/hard recommendation but never edits a host prompt; fixtures cover two window profiles, conflict, stale state, and no-callback consumer.",
+      "identity": "sha256:c4636a4799464ddd5350b31f6092536d65116dad640739154d8ce45f80b60727",
+      "presentation": {
+        "label": "compiler-does-not-own-delivery"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations."
+  ],
+  "context": "Build reproducible consumer-specific Context compilation. Delivery slice: alpha. Architecture: . Scope: ContextPackage schema/reference, layering, dedup, budget allocator, pointers, policy/version, capability profiles, and fixtures.. Excluded: Session transport, automatic hard injection, host conversation mutation, and general answer synthesis..",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "budgeting-preserves-semantics",
+          "identity": "sha256:8aa8bca21df261d23e036156472f268d513754ffbd9f2226d98dedc58161571b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compiler-does-not-own-delivery",
+          "identity": "sha256:c4636a4799464ddd5350b31f6092536d65116dad640739154d8ce45f80b60727",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compiler-enforces-layer-order",
+          "identity": "sha256:1a4d54fb31d34ebbc2064119bee1854604f739958c926882fb13552fb2ef276d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "package-is-reproducible",
+          "identity": "sha256:051e26096092dba3265c3f5599d9ce5248c0b20bd5f9a06d3412966152368616",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:27c1d5df385d87db3e8a6c853eafa0b9749cf617b89e004c80a22114b8c896f9",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Runtime compiles an immutable addressable ContextPackage for a consumer from one Query snapshot while respecting authority, conflict, provenance, host capability, and hard token budget.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Compiler consumes scoped ranked snapshot results with conflict and provenance retained.",
+      "target_ticket_id": "ticket-runtime-query-engine-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-context-compiler-v0"
+}

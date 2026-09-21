@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "semantic-api-public-contract",
+      "criterion": "Publish and implement versioned request/response/error contracts for Project/Repository membership and Execution registration, exact/current entity/revision/conflict lookup, query/context materialization and proposal submission. Enforce payload/page limits, request idempotency, opaque cursors and scoped object authorization.",
+      "identity": "sha256:dd0c7bf1c3bfeafdfd979bd2998801c4786ac383fbf7d29245f2a043da9b2304",
+      "presentation": {
+        "label": "semantic-api-public-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-api-concurrency",
+      "criterion": "Proposal and conflict-resolution commands carry expected base revisions and explicit authority; stale bases preserve alternatives and return a structured conflict. Canonical Git materialization remains an explicit adapter proposal/application path rather than implicit cloud canonical ownership.",
+      "identity": "sha256:7332442f4dd4d62e55b354ace9f4dc6f43a921247ca608ca6cd423a4f4a4e64f",
+      "presentation": {
+        "label": "semantic-api-concurrency"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-api-conformance",
+      "criterion": "HTTP contract tests cover immutable links after later mutation, two-project membership, idempotent retries, stale concurrent edits, malformed/oversize requests, ACL revocation and denied cross-tenant traversal. Publish a minimal client example consumed unchanged by host/worker/surface integrations.",
+      "identity": "sha256:d9368ae7f296c5f45b27ecf3ae77683d1251e3977ae99166d4ae3666cb9965d5",
+      "presentation": {
+        "label": "semantic-api-conformance"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "提供 Project / semantic reference / proposal 命令 API. Delivery slice: alpha. Architecture: Tech Design §§19,25,26. Scope: Authenticated clients register projects and sources, resolve exact semantic versions, query/materialize Context and submit guarded semantic proposals through versioned public APIs.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "semantic-api-concurrency",
+          "identity": "sha256:7332442f4dd4d62e55b354ace9f4dc6f43a921247ca608ca6cd423a4f4a4e64f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-api-conformance",
+          "identity": "sha256:d9368ae7f296c5f45b27ecf3ae77683d1251e3977ae99166d4ae3666cb9965d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-api-public-contract",
+          "identity": "sha256:dd0c7bf1c3bfeafdfd979bd2998801c4786ac383fbf7d29245f2a043da9b2304",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:02afe56d1eab9ccfd603f196df6fa7794ffef4729e4f0c9675241da09de82f0b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Authenticated clients register projects and sources, resolve exact semantic versions, query/materialize Context and submit guarded semantic proposals through versioned public APIs.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Public query/materialization wraps the actual compiler and its graph/access prerequisites.",
+      "target_ticket_id": "ticket-runtime-context-compiler-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Proposal API delegates authority/base checks to the single canonical bridge contract.",
+      "target_ticket_id": "ticket-runtime-canonical-git-bridge-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-semantic-api-v0"
+}

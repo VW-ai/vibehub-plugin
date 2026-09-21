@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "store-schema-integrity",
+      "criterion": "Implement the selected store adapter with transaction/CAS/unique-key primitives, tenant/project scope checks, rollback and a minimal durable outbox, verified against a real local or isolated selected backend. Publish domain repository interfaces without implementing every domain table here.",
+      "identity": "sha256:a2a074ef17fb0178fef56b6aee08cc9f93bb9abe3d30d70eda063be73513c497",
+      "presentation": {
+        "label": "store-schema-integrity"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-migration-runner",
+      "criterion": "Provide versioned migrations with dry-run or plan output, forward application, restart-safe recovery, compatibility checks, and a documented rollback or forward-fix rule for every destructive transition.",
+      "identity": "sha256:ee8dd884ef6c0fe27d5a91442c4925015ff82adeabcb025d7610c0041efe4e82",
+      "presentation": {
+        "label": "store-migration-runner"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-rebuild-derived-state",
+      "criterion": "Publish a schema/projection versioning convention and demonstrate rebuilding one disposable derived index from retained immutable source rows; subsequent modules use that mechanism for their actual projections.",
+      "identity": "sha256:aa510c020dad9040dcfd0b6342387458bcb54f506a58769243fa92d910bf958f",
+      "presentation": {
+        "label": "store-rebuild-derived-state"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-concurrency-fixtures",
+      "criterion": "Concurrent adapter tests prove one CAS winner, duplicate-key handling, transactional outbox atomicity, rollback after interruption and tenant isolation. Domain-specific promotion, event cursor and worker-lease tests belong to their owning Tickets.",
+      "identity": "sha256:b091ee2f394d45f6b580bb23d408155d56a90b232dc11a1d71728fd410737947",
+      "presentation": {
+        "label": "store-concurrency-fixtures"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "建立事务存储适配与 migration 基础. Delivery slice: alpha. Architecture: §6 Logical Planes; §10 Semantic Working Graph; §18 Storage Design; §19 Consistency Model; §25 Enterprise Multi-tenancy. Scope: Connection lifecycle; tenant-scoped transaction/CAS and unique keys; migration runner and compatibility contract; outbox primitives and adapter conformance. Excluded: No all-domain database implementation; event, graph, policy and worker Tickets own their schemas and repositories.; No universal persistence framework or premature index tuning..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "store-concurrency-fixtures",
+          "identity": "sha256:b091ee2f394d45f6b580bb23d408155d56a90b232dc11a1d71728fd410737947",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-migration-runner",
+          "identity": "sha256:ee8dd884ef6c0fe27d5a91442c4925015ff82adeabcb025d7610c0041efe4e82",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-rebuild-derived-state",
+          "identity": "sha256:aa510c020dad9040dcfd0b6342387458bcb54f506a58769243fa92d910bf958f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-schema-integrity",
+          "identity": "sha256:a2a074ef17fb0178fef56b6aee08cc9f93bb9abe3d30d70eda063be73513c497",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f2b5d0b8ff943ea9659e34d12d2616a800c1dff775e474b176a44d044a466ed9",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The chosen store exposes tested transaction/CAS, uniqueness, scoped-key and outbox primitives plus restart-safe schema migrations; domain modules can add their own isolated schemas.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Store boundary conformance consumes the scoped key/access contract and the selected platform from that prerequisite.",
+      "target_ticket_id": "ticket-runtime-service-auth-isolation",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-store-schema-migrations"
+}

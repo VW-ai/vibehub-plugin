@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "raw-normalized-schemas",
+      "criterion": "Versioned RawEvent and NormalizedEvent schemas include event ID, schema version, tenant/project/source partition, source-native event ID, idempotency key, occurredAt, observedAt, producer sequence, causal parents, payload digest/reference, provenance, ACL, and sensitivity.",
+      "identity": "sha256:cb731f1ebe259785c47be5e393ce90c6e3557ccc6a015b76d166ad9b09957c8d",
+      "presentation": {
+        "label": "raw-normalized-schemas"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "normalization-boundary",
+      "criterion": "Normalization is deterministic and mechanical: it may split or enrich an event using identity resolution, but it cannot assert semantic durability, relevance, truth, or canonical status.",
+      "identity": "sha256:0ff61586e64a34b249256f9a5e2173f7ad9473c7550830e4c2737b7949bb5588",
+      "presentation": {
+        "label": "normalization-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "observation-object-separation",
+      "criterion": "The contract allows several observations from local Git, fetch, push, and PR delivery to reference one GitCommit or SourceObject while retaining each observation's distinct delivery provenance.",
+      "identity": "sha256:051850add0212b1b49caa6e809c789c2f48562c39d04ca575f619f5108cbde5a",
+      "presentation": {
+        "label": "observation-object-separation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "immutable-replay-input",
+      "criterion": "Each replay-eligible payload is either pinned to an immutable Git/object revision or stored as an authorized immutable snapshot with digest; mutable pointers are classified as non-replayable until snapshotted.",
+      "identity": "sha256:27928f98ade94cd9bbfe28bf14ca05ee51b451378e56affeaacb1fd92fb802c3",
+      "presentation": {
+        "label": "immutable-replay-input"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Deliver executable schemas/validators or pure transitions plus conformance fixtures and documentation for this protocol; proposals remain hypotheses until verified."
+  ],
+  "context": "Specify versioned raw and normalized event envelopes with immutable provenance. Delivery slice: contracts. Architecture: 6 Logical Planes; 8.1 Event Gateway; 8.2 Normalizer; 11 Ingress Pipeline; 20 Git Integration; 21 External Connector Architecture. Scope: Raw and normalized event contracts; Provenance and ACL metadata; Schema evolution; Observation-to-source-object correlation. Excluded: Semantic classification; Policy Graph implementation; Concrete queue or database selection; Full external connector implementation.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "immutable-replay-input",
+          "identity": "sha256:27928f98ade94cd9bbfe28bf14ca05ee51b451378e56affeaacb1fd92fb802c3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "normalization-boundary",
+          "identity": "sha256:0ff61586e64a34b249256f9a5e2173f7ad9473c7550830e4c2737b7949bb5588",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "observation-object-separation",
+          "identity": "sha256:051850add0212b1b49caa6e809c789c2f48562c39d04ca575f619f5108cbde5a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "raw-normalized-schemas",
+          "identity": "sha256:cb731f1ebe259785c47be5e393ce90c6e3557ccc6a015b76d166ad9b09957c8d",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fd1f0a84e0499d5a6e03eb8b486e8dba8305b91bb2268358dbeda114807b814a",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every observation entering the Runtime has a replayable, mechanically normalized, ACL-bearing event representation that preserves source identity and separates an observed occurrence from the underlying Git or external object.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The envelope cannot define source partitions or durable provenance until project, repository, worktree, session, and connector identities are stable.",
+      "target_ticket_id": "ticket-runtime-scope-source-identity-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-event-provenance-contract-v0"
+}

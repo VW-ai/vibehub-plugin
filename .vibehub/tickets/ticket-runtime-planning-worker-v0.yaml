@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "planning-job-bundle",
+      "criterion": "A versioned job consumes bounded work-discovery evidence and existing task references, identifies duplicates and proposes only independently schedulable outcomes with explicit uncertainty and provenance.",
+      "identity": "sha256:7f29bdcec7f8cc0f1da16a6342915473d7be1ac054230896dcd7cc3263325f34",
+      "presentation": {
+        "label": "planning-job-bundle"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "planning-proposal-boundary",
+      "criterion": "Results are proposals through the shared guarded result path; no worker can silently create an accepted plan, assign users, fabricate human decisions or close an acceptance criterion. Any VibeHub integration uses a public documented record interface.",
+      "identity": "sha256:e414d9a0725fd7f933c548ada6557879c25f29faf4988642ddb524eb31803a79",
+      "presentation": {
+        "label": "planning-proposal-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "planning-evaluation",
+      "criterion": "Replay fixtures cover duplicate discoveries, coupled work, missing authority, cross-project prior art and stale task state; evaluation reports useful proposals, duplicate rate, missed dependencies and operator dismissal before enabling the job type.",
+      "identity": "sha256:6ed3d9fc63b4ae15274d65c3370050f8b6b86c141bf4127dd995b4c15edaffcf",
+      "presentation": {
+        "label": "planning-evaluation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "发现可独立执行工作的 planning proposal worker. Delivery slice: post-alpha. Architecture: Tech Design §14.1. Scope: High-value work discovery can produce a reviewable task proposal while preserving the existing Ticket and human-authority contracts.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "planning-evaluation",
+          "identity": "sha256:6ed3d9fc63b4ae15274d65c3370050f8b6b86c141bf4127dd995b4c15edaffcf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "planning-job-bundle",
+          "identity": "sha256:7f29bdcec7f8cc0f1da16a6342915473d7be1ac054230896dcd7cc3263325f34",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "planning-proposal-boundary",
+          "identity": "sha256:e414d9a0725fd7f933c548ada6557879c25f29faf4988642ddb524eb31803a79",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b86307f110591b740c2035fdb2104544fa8bdab4b8d47e3bf20abd5df07652e5",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "High-value work discovery can produce a reviewable task proposal while preserving the existing Ticket and human-authority contracts.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Planning is a typed specialization of the existing executor, not another orchestration platform.",
+      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Work-discovery changes need independent labels and regression evidence.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-planning-worker-v0"
+}

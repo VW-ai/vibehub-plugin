@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "github-installation-repo-lifecycle",
+      "criterion": "Installation and repository mapping handles webhook signature verification, tenant-bound credentials, repository rename/transfer/archive/delete, installation suspension/uninstall, and permission changes without leaking data across Projects.",
+      "identity": "sha256:274a89d4230a237da900ccbb90a74c6d7907138072fa7209a02b64e3d834922a",
+      "presentation": {
+        "label": "github-installation-repo-lifecycle"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "github-event-taxonomy",
+      "criterion": "Normalized events cover push/ref changes and PR opened, reopened, synchronized/head-changed, base-changed, reviewed, check/status-changed, merged, closed, and deleted/inaccessible states with provider delivery provenance.",
+      "identity": "sha256:2427f8971708caaac49910dd1f3d5dc00373b807914ad551b895a5c6104cf523",
+      "presentation": {
+        "label": "github-event-taxonomy"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "pr-version-provenance",
+      "criterion": "Each PR revision pins distinct head and base repository identities, PR identity, head/base/merge-base SHAs where available and source ACL/timestamps. Reviews and check/status observations bind the reviewed/tested commit and check attempt; fork PRs and stale green checks after force-push cannot be projected as current-head approval.",
+      "identity": "sha256:ee68a5869fdb93a3c627021c7d25263964ea9126f73619522a80018a49519949",
+      "presentation": {
+        "label": "pr-version-provenance"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "github-resilience-fixtures",
+      "criterion": "Integration fixtures cover webhook redelivery, out-of-order review/check updates, force-push, backfill/live overlap, secondary rate limits, missing commits, repo transfer, permission revocation, and correlation of a remote commit with a prior local observation.",
+      "identity": "sha256:93181e8d6967d0d296b272a6147f978c10fbfb175c3ae096f4ef884c6209dd9a",
+      "presentation": {
+        "label": "github-resilience-fixtures"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement GitHub repository, push, ref, pull-request, review, check, and permission ingestion. Delivery slice: post-alpha. Architecture: 5 Macro Architecture; 6.1 Raw Event Plane; 20 Git Integration; 21 External Connector Architecture; 22 Security & Privacy; 24 Failure Handling. Scope: GitHub App/webhook and backfill adapter; Repository and installation lifecycle; Push, ref, PR, review, and check events; Local/remote Git observation correlation. Excluded: Blocking the initial local-only internal alpha; Automatic PR creation, merge, or review submission; GitHub Issues beyond references required by PR provenance; General Git hosting provider abstraction beyond connector substrate.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "github-event-taxonomy",
+          "identity": "sha256:2427f8971708caaac49910dd1f3d5dc00373b807914ad551b895a5c6104cf523",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "github-installation-repo-lifecycle",
+          "identity": "sha256:274a89d4230a237da900ccbb90a74c6d7907138072fa7209a02b64e3d834922a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "github-resilience-fixtures",
+          "identity": "sha256:93181e8d6967d0d296b272a6147f978c10fbfb175c3ae096f4ef884c6209dd9a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "pr-version-provenance",
+          "identity": "sha256:ee68a5869fdb93a3c627021c7d25263964ea9126f73619522a80018a49519949",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:18186c00a330541eeb45b8389630c3fadab1b1ad27e3709af224f690b6b83a1e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A later-wave GitHub connector maps installation-scoped repository and PR activity into the shared event/provenance contracts and correlates remote observations with local Git truth without blocking the earliest local internal alpha.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "GitHub must satisfy common webhook/backfill/idempotency/ACL conformance.",
+      "target_ticket_id": "ticket-runtime-connector-substrate-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "PR/push revisions use shared immutable commit and mutable ref identities; full derived-state replication is not a prerequisite.",
+      "target_ticket_id": "ticket-runtime-git-commit-ref-provenance-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-github-connector-v0"
+}

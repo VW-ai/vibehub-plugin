@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "result-auth-validation",
+      "criterion": "Accept results only from the worker and active or safely-late attempt authorized for the job, validate protocol and output schema, enforce tenant/project/ACL/authority ceilings, and reject unreferenced artifacts or unsupported actions.",
+      "identity": "sha256:c7bd484ed0bcef58c22e8c0e7480ae995119b1bb3ba5e1f7f73aee08d8805d24",
+      "presentation": {
+        "label": "result-auth-validation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "result-policy-continuation",
+      "criterion": "Persist structured result and audit, then create a distinct pinned-policy continuation run after schema, fencing, source ACL and freshness checks. Resume logical work via this new input event rather than mutating the original run snapshot; workers cannot bypass guarded Graph writes or promotion.",
+      "identity": "sha256:eb62fe758c073ae385a91a316da465ee9ee24f13422ee9c57ab7b21cc7d236a0",
+      "presentation": {
+        "label": "result-policy-continuation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "result-freshness-reconciliation",
+      "criterion": "Compare consumed Context versions and source watermarks with current state; mark late or changed-base output stale and route it to revalidation or reconciliation rather than silently applying it.",
+      "identity": "sha256:b336d89ba1edbc32366c38e0a0389e572eb0d42b3665f60db15351092da5e25f",
+      "presentation": {
+        "label": "result-freshness-reconciliation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "result-idempotency-delivery",
+      "criterion": "Duplicate/reordered/cancelled/superseded result submissions cannot commit twice; an expired attempt may append a late-result audit only and never mutate Graph state. Valid results emit a durable notification intent; the separate delivery module owns callback/pull transport.",
+      "identity": "sha256:4c3e5009b10f3af487fa38716c0b649f07eb132ba8f4efd66c41118cc27132dc",
+      "presentation": {
+        "label": "result-idempotency-delivery"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement worker result validation and Policy Graph resumption. Delivery slice: alpha. Architecture: §11 Ingress Pipeline; §14 Worker Slow Path; §15 Agent-to-Runtime Communication; §19 Consistency Model; §23.2 Decision audit. Scope: Result Gateway; Schema, ACL, provenance, and authority validation; Policy Graph continuation; Stale, duplicate, and late result handling. Excluded: Trusting free-form worker text as state; Direct worker writes to the semantic store; Silent canonical promotion; Hidden chain-of-thought storage.  Required transitive artifacts: runtime-source-access-invalidation-v0: Result ingestion checks current source visibility and freshness as well as original job authority. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "result-auth-validation",
+          "identity": "sha256:c7bd484ed0bcef58c22e8c0e7480ae995119b1bb3ba5e1f7f73aee08d8805d24",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "result-freshness-reconciliation",
+          "identity": "sha256:b336d89ba1edbc32366c38e0a0389e572eb0d42b3665f60db15351092da5e25f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "result-idempotency-delivery",
+          "identity": "sha256:4c3e5009b10f3af487fa38716c0b649f07eb132ba8f4efd66c41118cc27132dc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "result-policy-continuation",
+          "identity": "sha256:eb62fe758c073ae385a91a316da465ee9ee24f13422ee9c57ab7b21cc7d236a0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c7771659df6e2284464363236ca05f64824e6387cc716bbde947ec41c5f9886c",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "External worker output re-enters Runtime as an authenticated, schema-valid, provenance-complete candidate input; it cannot write Semantic Working Store or canonical state directly, and stale or conflicting results are explicitly reconciled.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Results bind a persisted job/attempt/lease and declared continuation.",
+      "target_ticket_id": "ticket-runtime-worker-scheduler",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-worker-result-ingress"
+}

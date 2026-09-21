@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-reproducible-artifacts",
+      "criterion": "CI builds versioned Runtime and worker artifacts from a clean checkout, runs component-boundary, contract, migration, tenant-isolation, worker-protocol, failure, and standalone checks, and emits dependency and source provenance without embedding credentials.",
+      "identity": "sha256:e6308033132037818c6ef081c52bca507a1d1fa93924cdfdaa8b1617180248d3",
+      "presentation": {
+        "label": "release-reproducible-artifacts"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-staging-promotion",
+      "criterion": "Provision an isolated staging environment through the selected deployment contract, run compatible migrations and synthetic service/worker/query smoke checks, and emit a reproducible manifest. Backup/restore and full capacity/rollback rehearsals consume this staging target in separate Tickets before live launch.",
+      "identity": "sha256:f9ffb48819c4ef984693bd3475734365366fe4ce306e8c7a2372e7355a0539f3",
+      "presentation": {
+        "label": "release-staging-promotion"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-secret-config",
+      "criterion": "Environment and secret names, ownership, rotation, least privilege, and deployment injection are documented and validated; secret values never enter Git, build output, command logs, audit payloads, or semantic state.",
+      "identity": "sha256:253196c2a2abd5faaae6cf99a5cf1d7cef2700f51d34f337d3386c6c13d5ec51",
+      "presentation": {
+        "label": "release-secret-config"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "release-deployment-contract-manifest",
+      "criterion": "Check in and verify the engineering deployment contract covering selected topology, environment and secret names without values, tenant/project isolation, locality assumptions, local and staging commands, deploy and health checks, protocol/policy/schema/worker/model-route versions, and exact compatible rollback or forward-fix target.",
+      "identity": "sha256:8f7551538bf2f500dc5dfb0f33a512260e4c262ef07d3f7b0396c2205c4b1309",
+      "presentation": {
+        "label": "release-deployment-contract-manifest"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build the reproducible service and worker release pipeline. Delivery slice: release. Architecture: §22 Security & Privacy; §23 Observability; §24 Failure Handling; §28 Migration from Current VibeHub Plugin; §30 Prototype Success Gate. Scope: Build and verification CI; Staging promotion; Managed configuration and secrets; Release manifests and compatibility; Checked-in engineering deployment contract. Excluded: Unreviewed direct production deploys; Credentials or private fixtures in artifacts; External connectors; Product-value claims from deployment alone.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "release-deployment-contract-manifest",
+          "identity": "sha256:8f7551538bf2f500dc5dfb0f33a512260e4c262ef07d3f7b0396c2205c4b1309",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-reproducible-artifacts",
+          "identity": "sha256:e6308033132037818c6ef081c52bca507a1d1fa93924cdfdaa8b1617180248d3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-secret-config",
+          "identity": "sha256:253196c2a2abd5faaae6cf99a5cf1d7cef2700f51d34f337d3386c6c13d5ec51",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "release-staging-promotion",
+          "identity": "sha256:f9ffb48819c4ef984693bd3475734365366fe4ce306e8c7a2372e7355a0539f3",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4bb6bf409f8c074e96673c30585e6d67f63c15bf120bbcd559c2d6912a279c02",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Runtime API, migrations, and worker runner are built, verified, signed or provenance-recorded, promoted through an isolated staging environment, and deployed with managed secrets and an auditable release manifest.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Release packages the actual integrated Runtime, worker and minimal surface build.",
+      "target_ticket_id": "ticket-build-semantic-collaboration-surface-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Staging smoke checks and manifests use measurable operational health.",
+      "target_ticket_id": "ticket-runtime-telemetry-slo",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "CI includes bounded offline policy regression with required gate results.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-release-pipeline"
+}

@@ -1,0 +1,131 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "judge-input-is-pinned-and-minimal",
+      "criterion": "Each JudgeNode materializes only authorized event/state references from the exact GraphRevision, records deterministic input hash and DecisionSchema version, and rejects invisible target IDs.",
+      "identity": "sha256:2af14c0ff155a3032a02066097e0360efd1e4e94047d17990a69bc2339030353",
+      "presentation": {
+        "label": "judge-input-is-pinned-and-minimal"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "routing-policy-controls-provider-use",
+      "criterion": "Sensitivity, provider allowlist, local-only requirement, redaction, latency/cost budget, and node policy select existing adapters and fallbacks without provider-specific semantic-core branches.",
+      "identity": "sha256:729dc87b8138bbaec17d33a7523c8bbc82683fa7de69cd5a83e87f1f6eae910b",
+      "presentation": {
+        "label": "routing-policy-controls-provider-use"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "judge-failure-is-explicit",
+      "criterion": "Timeout, cancellation, transport error, rate limit, invalid schema, low confidence, and exhausted fallback produce bounded audit results; high-impact action DEFERs or ESCALATEs and never promotes truth.",
+      "identity": "sha256:c72d994ed65c678da337dda1aa2ef554d4004058ee2bef1ff7f24f78d7d58a94",
+      "presentation": {
+        "label": "judge-failure-is-explicit"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "recorded-fixtures-cover-routing",
+      "criterion": "Recorded-adapter tests cover primary success, permitted fallback, provider denial, local-only routing, retry exhaustion, and decision-cache reuse while preserving completed Phase 0 benchmarks.",
+      "identity": "sha256:b9cbe1b7b6dbe1e17eed1cbf472dc8a2259e9cb8342a72ff07ccf168aaef84d1",
+      "presentation": {
+        "label": "recorded-fixtures-cover-routing"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build bounded JudgeNode routing and fallback execution. Delivery slice: alpha. Architecture: . Scope: JudgeNode handler, DecisionSchema binding, input materialization, route/fallback policy, bounded attempts, cache identity, and recorded tests.. Excluded: New provider adapters, new provider benchmark, online training, and canonical promotion authority..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Direct JEV is a measured initial routing candidate; no unqualified provider-wide claim.",
+      "ref": ".vibehub/rooms/semantic-runtime/finding-typesafe-direct-route-performance.yaml"
+    },
+    {
+      "purpose": "Measured family-specific routing hypothesis, not fixed provider authority.",
+      "ref": ".vibehub/rooms/semantic-runtime/finding-jev-haiku-routing-shape.yaml"
+    },
+    {
+      "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
+      "ref": "semantic-runtime/docs/phase0-contracts.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "judge-failure-is-explicit",
+          "identity": "sha256:c72d994ed65c678da337dda1aa2ef554d4004058ee2bef1ff7f24f78d7d58a94",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "judge-input-is-pinned-and-minimal",
+          "identity": "sha256:2af14c0ff155a3032a02066097e0360efd1e4e94047d17990a69bc2339030353",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "recorded-fixtures-cover-routing",
+          "identity": "sha256:b9cbe1b7b6dbe1e17eed1cbf472dc8a2259e9cb8342a72ff07ccf168aaef84d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "routing-policy-controls-provider-use",
+          "identity": "sha256:729dc87b8138bbaec17d33a7523c8bbc82683fa7de69cd5a83e87f1f6eae910b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b08915bfbcc305265c4ad6f6bad1b4c2a68e012161f883a8326d07c6862f76b5",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Judge nodes invoke existing SemanticJudge adapters through policy-controlled, ACL-safe, budgeted routing and emit replayable decisions without truth authority.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Judge execution implements the typed handler/budget/error interface.",
+      "target_ticket_id": "ticket-runtime-policy-kernel-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Inputs must be materialized with current source-access checks, even for historical snapshots.",
+      "target_ticket_id": "ticket-runtime-source-access-invalidation-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-judge-runtime-v0"
+}

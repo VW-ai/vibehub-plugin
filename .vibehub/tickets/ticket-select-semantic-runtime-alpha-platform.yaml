@@ -5,14 +5,14 @@
       "criterion": "A bounded comparison evaluates at least Cloudflare Worker plus per-Project Durable Object and a conventional Node service plus Postgres against the two-day alpha constraint, project-scoped serialization, stable HTTP links, realtime fanout, TypeSafe outbound calls, authentication, secret management, local testing, operational complexity, cost visibility, and rollback.",
       "identity": "sha256:7781ead40842fd2871d6c3aeca115c56e407c1d189ba950a92775931e377b636",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "platform-synthetic-spike",
       "criterion": "The recommended target has a disposable synthetic spike proving one authenticated Project, durable write/read, an atomic compare-and-set style update, one realtime subscriber notification or the target-equivalent mechanism, and one synthetic TypeSafe call without sending real project data or exposing credentials.",
       "identity": "sha256:8e90d703e9e8be633b850958ddbc2ab31ae4ce857abcb0269e8ea12b18bb19ec",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "platform-owner-selection",
@@ -20,40 +20,48 @@
       "criterion": "Human-origin Evidence records the owner selecting the exact alpha runtime, persistence, realtime, and deployment target after reviewing the comparison and spike, including any cost or operational tradeoff the owner accepts.",
       "identity": "sha256:d37938e3f3d1e2f46028e56f2532d8a54932bd8cd85a3e38d0ff8a3551e2d1a8",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "platform-deployment-contract",
       "criterion": "A checked-in deployment contract records the selected service topology, environment and secret names without values, tenant/project isolation boundary, data locality assumptions, local development command, deploy command, health check, rollback path, and what remains deliberately deferred.",
       "identity": "sha256:b31f2ac6761025fa5c4901cb528309e7d233a7dea2350180bcdc2c22138e33c7",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "platform-owner-selection",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records the exact runtime, persistence, queue, delivery/auth primitives, region/deployment destination and accepted cost/operational envelope selected from the completed comparison and synthetic spike. Local/cloud and private BYO worker boundaries are explicit.",
+      "identity": "sha256:256f0f8c4e26a513031f486ed91dbe35207be401169dd7ac14630b20370b08cc",
+      "presentation": {
+        "label": "platform-owner-selection"
+      },
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
-    "Use synthetic data only during platform evaluation and spike work.",
-    "Never expose, print, log, or commit provider, platform, or deployment credentials.",
-    "Do not make the Skill plugin depend on the selected online service.",
-    "Prefer the smallest topology that proves the collaboration loop; do not add enterprise connectors or a general graph database."
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "This is the preserved owner decision boundary. Complete the upstream evaluation before requesting a choice; routine engineering does not acquire human authority."
   ],
-  "context": "The online alpha is intended to ship quickly, but its service/storage target is still open. A Cloudflare Worker plus per-Project Durable Object is a strong hypothesis because it serializes concurrent Project writes and supports realtime fanout; a conventional Node service plus Postgres is the comparison baseline. This Ticket turns that hypothesis into a bounded technical and human decision rather than letting platform assumptions leak into core contracts.",
+  "context": "选择具体 alpha 平台与部署边界. Delivery slice: contracts. Architecture: Tech Design §§7,18,22,31. Scope: The owner chooses a concrete runtime/store/queue/auth/delivery target, region and accepted cost envelope from a completed engineering recommendation.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..",
   "context_refs": [
     {
-      "purpose": "The service and component boundary the platform must preserve.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-semantic-runtime-strong-service-boundary.yaml"
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
     },
     {
-      "purpose": "The rapid online-alpha intent and deliberate scope exclusions.",
-      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
-    },
-    {
-      "purpose": "The current primary-route hypothesis and exact operational caveat.",
-      "ref": ".vibehub/rooms/semantic-runtime/finding-typesafe-direct-route-performance.yaml"
-    },
-    {
-      "purpose": "The isolation, private-state, and graceful-degradation contract.",
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
       "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
     }
   ],
   "contract_revisions": [
@@ -82,17 +90,36 @@
       ],
       "identity": "sha256:71f5ceecc8cf512d73b44a7cfffe21647b64b13ed5b5cdd54dc7200a78374e4e",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "platform-owner-selection",
+          "identity": "sha256:256f0f8c4e26a513031f486ed91dbe35207be401169dd7ac14630b20370b08cc",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:736a1e445ca2d132f406abbd9962bc12007f81d6b213716871ad8d28f6903680",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner selects one concrete online-alpha deployment contract covering runtime, persistence, realtime delivery, authentication, secret handling, local development, release, and rollback, backed by a synthetic working spike.",
+  "outcome": "The owner chooses a concrete runtime/store/queue/auth/delivery target, region and accepted cost envelope from a completed engineering recommendation.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
     "plan-validation:independent"
   ],
-  "relations": [],
+  "relations": [
+    {
+      "rationale": "The owner decides a concrete, tested recommendation rather than funding unfinished exploratory work.",
+      "target_ticket_id": "ticket-runtime-platform-evaluation-spike",
+      "type": "depends_on"
+    }
+  ],
   "revision_state": "bound",
   "schema_version": 3,
   "ticket_id": "ticket-select-semantic-runtime-alpha-platform"

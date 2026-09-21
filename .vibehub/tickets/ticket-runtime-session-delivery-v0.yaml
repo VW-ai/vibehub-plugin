@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "session-contract",
+      "criterion": "Implement a versioned session registration/heartbeat/expiry and subscription API scoped by authenticated tenant/project/execution; sessions declare callback/query/checkpoint capabilities and reconnect using an opaque delivery cursor.",
+      "identity": "sha256:b61435ed0d16fd001072f269dbd8ae50c200462285de0ee4fb979298874bb010",
+      "presentation": {
+        "label": "session-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "delivery-recovery",
+      "criterion": "Publish notifications only after durable semantic writes through an outbox; a disconnect/reconnect fixture proves missed notices are recovered, duplicate deliveries have stable IDs, expired sessions stop receiving content, and unsupported callbacks fall back to pull/next-turn delivery.",
+      "identity": "sha256:6fa67c96d803a4a8bcc55711678de7146245b559e3cdc077f990c5e6ae8aae3a",
+      "presentation": {
+        "label": "delivery-recovery"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "delivery-policy",
+      "criterion": "Deliver only audience-relevant soft pointers or explicitly queried packages; recheck ACL at delivery, bound queue growth and per-session frequency, coalesce redundant notices, and expose delivery lag/drop/coalescing counters without raw content.",
+      "identity": "sha256:62cd380a583a83f21fa5450f0944b413cbd19f7ec54de3607612dabc144d02c7",
+      "presentation": {
+        "label": "delivery-policy"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Session registration 与可恢复 soft delivery. Delivery slice: alpha. Architecture: Tech Design §§15,17,24,26. Scope: Session API, notification outbox consumer, callback/pull transport and soft-delivery policy.. Excluded: No host-specific hooks, hard injection, or new chat UI..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "delivery-policy",
+          "identity": "sha256:62cd380a583a83f21fa5450f0944b413cbd19f7ec54de3607612dabc144d02c7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-recovery",
+          "identity": "sha256:6fa67c96d803a4a8bcc55711678de7146245b559e3cdc077f990c5e6ae8aae3a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-contract",
+          "identity": "sha256:b61435ed0d16fd001072f269dbd8ae50c200462285de0ee4fb979298874bb010",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a3d424aec2f8d5bbbf2b4313a0d04d602561d7901875f44531c280790bd84b15",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Active consumers register capabilities and receive scoped, recoverable context notices without coupling event producers to recipient identities.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Session delivery exposes queryable stable references through the versioned public command/query API.",
+      "target_ticket_id": "ticket-runtime-semantic-api-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "It consumes post-guard result outbox intents rather than untrusted direct worker callbacks.",
+      "target_ticket_id": "ticket-runtime-worker-result-ingress",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-session-delivery-v0"
+}

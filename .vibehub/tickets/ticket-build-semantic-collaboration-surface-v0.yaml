@@ -5,49 +5,99 @@
       "criterion": "Provide stable Project, logical Context, exact ContextVersion, Proposal, and Conflict links that clearly show accepted, contested, superseded, and working states plus provenance and freshness watermarks.",
       "identity": "sha256:d7f43cb2881a105ceedd57f1bfc67c40ae95760130a0bfeaf3ac6afb03c4bfd1",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "surface-realtime-awareness",
       "criterion": "Expose the selected realtime or near-realtime mechanism so agents and people see who is changing which Context, from what base version, in which workstream and repositories, without automatically injecting every draft into every agent.",
       "identity": "sha256:cf93dfd5289f177fb6083bbf77a254592c9687faef813d0aaad507b222fbf739",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "surface-agent-overlay",
       "criterion": "Provide an agent-facing query and proposal path that materializes accepted Project Context plus the current workstream overlay and relevant conflict headlines, with exact version references in every returned citation.",
       "identity": "sha256:346e2280793e9e99955be0187c8def8e1b99807acb8f31ee12bf250eb412d0d4",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "surface-resolution-journey",
       "criterion": "An end-to-end two-agent, two-repository journey demonstrates compatible auto-promotion, a contradictory variation becoming a visible Conflict, an authorized resolution producing a new immutable version, and both agents observing the result.",
       "identity": "sha256:d196189701616535af1948bde7744f5d09d3b2c550947fc8d72d2b1517d82d39",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "explorer-addressable-views",
+      "criterion": "Provide authorized logical-current and immutable-version links for entities/Context packages, proposal and conflict detail; clearly distinguish candidate, validated, canonical reference, contested, stale, superseded and unavailable/removed source states.",
+      "derived_from": [
+        {
+          "acceptance_id": "surface-stable-context-pages",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:07769bcac9c6c244c44ad3bc19ee9a85a1fc32df7376daf7df920b28b4871e76",
+      "presentation": {
+        "label": "explorer-addressable-views"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explorer-causal-inspection",
+      "criterion": "Show producer/execution, source watermarks, policy/node/provider, relations, unresolved alternatives and audit/provenance links for a selected change. Use the accepted query/audit APIs; do not copy semantic decisions into UI state.",
+      "derived_from": [
+        {
+          "acceptance_id": "surface-stable-context-pages",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4e014e423a29e58944dc5127cca57bf66308622c2cdf11030b88ef1a9c0fc72f",
+      "presentation": {
+        "label": "explorer-causal-inspection"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explorer-feedback-and-delivery",
+      "criterion": "Expose the existing correction command and soft activity stream; reconnect does not duplicate cards, ACL revocation removes access and old exact links remain valid or explicitly tombstoned. Verify keyboard navigation, empty/error/loading/denied states and the two-agent fixture.",
+      "derived_from": [
+        {
+          "acceptance_id": "surface-realtime-awareness",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f0f1d0a9122801f84d35477ade8cdbd05842646ea3c043cbc62e68e78b953a76",
+      "presentation": {
+        "label": "explorer-feedback-and-delivery"
+      },
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
-    "Refine this Ticket after the online service Outcome exists; do not execute it while maturity remains draft.",
-    "Do not build a general collaborative text editor or expose internal Ticket graph mechanics as the primary user mental model.",
-    "Default to quiet availability and relevant conflict headlines rather than context spam."
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "The service becomes a product only when addressability and concurrent awareness are usable. This Ticket remains draft until the service and selected realtime mechanism make its exact UI and agent integration contract concrete.",
+  "context": "提供最小 semantic activity 与精确引用页面. Delivery slice: alpha. Architecture: Tech Design §§5,19,23,24. Scope: People inspect the integrated service through authenticated Project/entity/revision/proposal/conflict links and a causal audit view with honest freshness.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
   "context_refs": [
     {
-      "purpose": "The stable-link and exact-version user experience.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-addressable-versioned-context-identity.yaml"
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
     },
     {
-      "purpose": "The realtime overlay, conflict, and resolution behavior.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-realtime-context-variations-and-reconciliation.yaml"
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
     },
     {
-      "purpose": "The Project, Repository, Workstream, and Execution vocabulary shown by the surface.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-project-is-semantic-scope-repository-is-source.yaml"
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
     }
   ],
   "contract_revisions": [
@@ -76,19 +126,48 @@
       ],
       "identity": "sha256:0579f8931f37ebec76bd3cb02b1ca19393da80012459452510c23c8944710fdd",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explorer-addressable-views",
+          "identity": "sha256:07769bcac9c6c244c44ad3bc19ee9a85a1fc32df7376daf7df920b28b4871e76",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "explorer-causal-inspection",
+          "identity": "sha256:4e014e423a29e58944dc5127cca57bf66308622c2cdf11030b88ef1a9c0fc72f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "explorer-feedback-and-delivery",
+          "identity": "sha256:f0f1d0a9122801f84d35477ade8cdbd05842646ea3c043cbc62e68e78b953a76",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0c3e0611fa6dd34a4920b0dff2c7d7c6acec7022300baab125d48d2705e137ff",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "People and agents can open stable Context links, inspect exact versions and active variations, observe relevant concurrent work, submit proposals, and resolve conflicts through the online alpha without treating every draft as canonical.",
+  "outcome": "People inspect the integrated service through authenticated Project/entity/revision/proposal/conflict links and a causal audit view with honest freshness.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
     "plan-validation:independent"
   ],
   "relations": [
     {
+      "rationale": "The surface consumes stable proven end-to-end APIs.",
       "target_ticket_id": "ticket-build-semantic-runtime-service-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Causal inspection uses the shared audit API.",
+      "target_ticket_id": "ticket-runtime-decision-audit-v0",
       "type": "depends_on"
     }
   ],

@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "cursor-handshake",
+      "criterion": "Local and cloud endpoints exchange source-partition cursors, watermark vectors, known gaps, schema versions, and bounded batch acknowledgements so reconnect resumes rather than restarts.",
+      "identity": "sha256:55596a7f018e57eb2cd5f802fef766dca93613a2fa4e5c13f086108a9b3bf31b",
+      "presentation": {
+        "label": "cursor-handshake"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "idempotent-offline-recovery",
+      "criterion": "Repeated reconnect, partial batch ACK, process restart, and duplicate upload preserve each legitimate observation once logically while allowing at-least-once transport.",
+      "identity": "sha256:84020b898e93e75c11bc646f115126e7e7dc466fefa7ab8276bbff55f6dda8ac",
+      "presentation": {
+        "label": "idempotent-offline-recovery"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "derived-generation-safety",
+      "criterion": "Derived state carries policy/model/graph generation and is recomputed or explicitly reconciled when generations differ; no timestamp-based last-write-wins merge can replace newer canonical or derived meaning.",
+      "identity": "sha256:e84ccc0f8a7a2347ff0f28c6f118c93a1d685a4ce4b4be12067cea307ed56cb9",
+      "presentation": {
+        "label": "derived-generation-safety"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "security-priority-and-gaps",
+      "criterion": "Revocation/tombstone events are prioritized and fail closed; tests cover prolonged offline work, local buffer pressure, cloud cursor rollback, missing batches, schema skew, two local runtimes, and source access changing while offline.",
+      "identity": "sha256:8136cd4dc6602c89d2bec71937baa9dbf549b1c5c3fd7a76cb54d0ce512c4970",
+      "presentation": {
+        "label": "security-priority-and-gaps"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement resumable offline local-to-cloud event and semantic-state synchronization. Delivery slice: post-alpha. Architecture: 7.2 Local Sidecar / Daemon Mode; 7.3 Cloud Runtime; 18 Storage Design; 19 Consistency Model; 24 Failure Handling; 31 Open Technical Questions. Scope: Local/cloud synchronization protocol; Offline cursor and gap recovery; Generation-aware derived-state handling; Bounded buffering and security-event precedence. Excluded: A general CRDT framework; Canonical Git history replication; Cross-tenant synchronization; Cloud platform selection.  Required transitive artifacts: runtime-causal-ordering-watermarks-v0: Offline convergence requires causal cursors, gaps, and watermark vectors rather than wall-clock ordering. runtime-durable-ingress-v0: Both sides require durable inbox/outbox and idempotent delivery behavior. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cursor-handshake",
+          "identity": "sha256:55596a7f018e57eb2cd5f802fef766dca93613a2fa4e5c13f086108a9b3bf31b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "derived-generation-safety",
+          "identity": "sha256:e84ccc0f8a7a2347ff0f28c6f118c93a1d685a4ce4b4be12067cea307ed56cb9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "idempotent-offline-recovery",
+          "identity": "sha256:84020b898e93e75c11bc646f115126e7e7dc466fefa7ab8276bbff55f6dda8ac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "security-priority-and-gaps",
+          "identity": "sha256:8136cd4dc6602c89d2bec71937baa9dbf549b1c5c3fd7a76cb54d0ce512c4970",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e2da7f38ef35acaa0e29e4c3e8a165c9c174fe8e22a862004286b234cf15c8af",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Local coding continues through cloud outages and later converges by causal cursor and watermark without last-write-wins corruption of raw observations, derived generations, or access invalidations.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The sync protocol must carry permission revocation and tombstones with fail-closed precedence.",
+      "target_ticket_id": "ticket-runtime-source-access-invalidation-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-cloud-sync-v0"
+}

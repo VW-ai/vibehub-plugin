@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "query-worker-bundle",
+      "criterion": "Define a specialized job bundle for bounded query decomposition, ACL-safe graph/provenance retrieval and structured answer/citations; it consumes the common compiler rather than implementing a second retrieval store.",
+      "identity": "sha256:f2d91ecc36433fd4b6f1bd97e8f2bc81eef7882e5db369547dfb39d7763ae4cc",
+      "presentation": {
+        "label": "query-worker-bundle"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-worker-return",
+      "criterion": "Explicit complex queries may use a measured bounded wait then return a job handle; worker result policy rechecks freshness and source access before query/soft delivery.",
+      "identity": "sha256:2eee00005d844b2f85d4ad40c7151213bd9cb228fba7ecd80e4d5c6fc4322854",
+      "presentation": {
+        "label": "query-worker-return"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-worker-evaluation",
+      "criterion": "Authorized fixtures test conflicting sources, missing evidence, outdated snapshots, resource exhaustion and injected source instructions; unsupported factual answers abstain and quality is compared against the existing direct-query baseline.",
+      "identity": "sha256:5a73384cbae02e6c96194e22dcddc1434491902609f5bd0f0d108951a5ffd870",
+      "presentation": {
+        "label": "query-worker-evaluation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "复杂 query 的异步 synthesis worker. Delivery slice: post-alpha. Architecture: Tech Design §14.1. Scope: Complex user queries can decompose retrieval and synthesize an evidence-linked answer through the bounded Worker path.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: context-compiler: Synthesis uses the shared ranked snapshot and compiler. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "query-worker-bundle",
+          "identity": "sha256:f2d91ecc36433fd4b6f1bd97e8f2bc81eef7882e5db369547dfb39d7763ae4cc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-worker-evaluation",
+          "identity": "sha256:5a73384cbae02e6c96194e22dcddc1434491902609f5bd0f0d108951a5ffd870",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-worker-return",
+          "identity": "sha256:2eee00005d844b2f85d4ad40c7151213bd9cb228fba7ecd80e4d5c6fc4322854",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c193cbfe971eeda9f737cdcaee4c6f313a1a7a28ddada9a6cfe9c3b24a0a1274",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Complex user queries can decompose retrieval and synthesize an evidence-linked answer through the bounded Worker path.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Specialization reuses the measured executor and guarded job lifecycle.",
+      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "New synthesis behavior has replay/regression coverage.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-query-synthesis-worker-v0"
+}

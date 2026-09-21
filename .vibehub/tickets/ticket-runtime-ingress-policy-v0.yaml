@@ -1,0 +1,99 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ingress-policy-composition",
+      "criterion": "Author and compile a concrete graph for mechanical scope/duplicate checks, semantic typing, related-entity retrieval, orthogonal durability/evidence/current-context/work-discovery signals, relation ranking and impact/conflict guards. A negative durability decision must not suppress useful current-task evidence/context relevance.",
+      "identity": "sha256:46114f76d4ce099bb7a66c7d3e681daa40d6afc7c3fd4d7f816ff7ef0562fd38",
+      "presentation": {
+        "label": "ingress-policy-composition"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ingress-policy-effects",
+      "criterion": "Map typed signals to candidate assertions/relations and explicit IGNORE/INGEST/DEFER/ESCALATE actions; preserve multiple relevant targets and provenance, reject invented IDs and keep high-impact authority decisions outside the fast path.",
+      "identity": "sha256:41a24d0bfcf3444707a21f7c886d2d2e003275bf1b9bd31daf228e9762416a65",
+      "presentation": {
+        "label": "ingress-policy-effects"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ingress-policy-behavior",
+      "criterion": "A frozen synthetic/authorized corpus with point-in-time state covers transient chatter, real evidence, changed constraints, duplicate observation, conflicting source, low confidence, quota timeout and malicious source instructions. Recorded execution shows expected actions, bounded escalation, relations and no canonical write; thresholds remain experimental until calibrated.",
+      "identity": "sha256:ef48cbc36095a54e4c229c9f653fa93bf8b0e8bda83de560c1bde5e1c357e4d0",
+      "presentation": {
+        "label": "ingress-policy-behavior"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "交付第一套可回放 ingress 业务 Policy. Delivery slice: alpha. Architecture: Tech Design §§9,10,11; PRD §9.1. Scope: A versioned ingress policy converts meaningful Git/Agent observations into typed candidates and multiple grounded relations, escalating only bounded ambiguous/high-impact cases.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: policy-journal: The business graph executes through real bounded, durable handlers and snapshot semantics. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ingress-policy-behavior",
+          "identity": "sha256:ef48cbc36095a54e4c229c9f653fa93bf8b0e8bda83de560c1bde5e1c357e4d0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ingress-policy-composition",
+          "identity": "sha256:46114f76d4ce099bb7a66c7d3e681daa40d6afc7c3fd4d7f816ff7ef0562fd38",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ingress-policy-effects",
+          "identity": "sha256:41a24d0bfcf3444707a21f7c886d2d2e003275bf1b9bd31daf228e9762416a65",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c7d73c6489f725436f7d5eed6fc0985c6996968da43521809aec963170707917",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A versioned ingress policy converts meaningful Git/Agent observations into typed candidates and multiple grounded relations, escalating only bounded ambiguous/high-impact cases.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "ESCALATE uses the accepted asynchronous job boundary.",
+      "target_ticket_id": "ticket-runtime-worker-scheduler",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-ingress-policy-v0"
+}

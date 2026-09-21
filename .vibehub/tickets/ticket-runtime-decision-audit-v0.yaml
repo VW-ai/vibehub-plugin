@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "audit-links-complete-causal-trace",
+      "criterion": "Trace links Event, PolicyRun/artifact, NodeAttempt, authorized input refs/hashes, Graph snapshot/writes, judge route/result, Worker continuation, QueryRun, ContextPackage, action, and known downstream consequence.",
+      "identity": "sha256:c4716f5a94757857ebec5d24317f3026f47b7ad3607a02a13d558559df11139b",
+      "presentation": {
+        "label": "audit-links-complete-causal-trace"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "audit-is-safe-and-immutable",
+      "criterion": "Decision records are append-only, tenant-scoped and retention-classified, with immutable hashes for retained artifacts and inputs; scoped access and bounded reasons exclude hidden chain-of-thought, secrets and unauthorized raw copies. State precisely what integrity these hashes prove; do not claim cryptographic tamper-proof storage.",
+      "identity": "sha256:ff03c9d9446479bb59dc4aec1f6c18de0bd680037643e17f546cbb01827cd241",
+      "presentation": {
+        "label": "audit-is-safe-and-immutable"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "audit-api-explains-operational-outcomes",
+      "criterion": "Authorized lookup traverses upstream/downstream trace, distinguishes fallback/stale/conflict/denial/error, and identifies exact policy, route, Runtime build, source watermarks, and unavailable retained material.",
+      "identity": "sha256:120271d3fc4ce1fe6ddc214cb550417ad9362179851f133c2d3b2b09b04d6c73",
+      "presentation": {
+        "label": "audit-api-explains-operational-outcomes"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "audit-survives-incomplete-work",
+      "criterion": "Crash-resumed runs, timed-out Workers, cancelled queries, rejected promotion, tombstones, and retention-pruned payloads remain explicitly explainable.",
+      "identity": "sha256:587a8fa4593acace5107b798b71dd3dba66c93c6f364890447b8049d0b06f852",
+      "presentation": {
+        "label": "audit-survives-incomplete-work"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build end-to-end semantic decision audit and explanation. Delivery slice: alpha. Architecture: . Scope: Audit schema, trace projection, retention redaction, tamper evidence, lookup API, and explanation fixtures.. Excluded: Hidden chain of thought, enterprise analytics UI, and unapproved raw retention..  Required transitive artifacts: observability-contract: Audit uses agreed IDs, privacy/retention classes and reason vocabulary. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "audit-api-explains-operational-outcomes",
+          "identity": "sha256:120271d3fc4ce1fe6ddc214cb550417ad9362179851f133c2d3b2b09b04d6c73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audit-is-safe-and-immutable",
+          "identity": "sha256:ff03c9d9446479bb59dc4aec1f6c18de0bd680037643e17f546cbb01827cd241",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audit-links-complete-causal-trace",
+          "identity": "sha256:c4716f5a94757857ebec5d24317f3026f47b7ad3607a02a13d558559df11139b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audit-survives-incomplete-work",
+          "identity": "sha256:587a8fa4593acace5107b798b71dd3dba66c93c6f364890447b8049d0b06f852",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:790bffe19a5d6230d4cc660eb334661ec41fde7a2307077d086961d05e1021d1",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Authorized operators reconstruct why an event, claim, Worker result, query candidate, ContextPackage, or promotion recommendation occurred without storing hidden chain of thought or restricted payloads.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Causal explanation crosses the actual asynchronous worker result boundary.",
+      "target_ticket_id": "ticket-runtime-worker-result-ingress",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Audit links candidate selection through compiled package/omission.",
+      "target_ticket_id": "ticket-runtime-context-compiler-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Promotion proposals and guarded outcomes remain inspectable in the same causal trace.",
+      "target_ticket_id": "ticket-runtime-canonical-git-bridge-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-decision-audit-v0"
+}

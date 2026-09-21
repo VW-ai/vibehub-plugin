@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "source-lifecycle-events",
+      "criterion": "Normalized source lifecycle events cover update, deletion/tombstone, repository removal, installation revocation, visibility change, and author/access redaction with immutable audit provenance.",
+      "identity": "sha256:b6ceeebb3a7e047b25aa03881985f88277f04adffe86298abd865a13407b6b00",
+      "presentation": {
+        "label": "source-lifecycle-events"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "derived-acl-rule",
+      "criterion": "Implement provenance-closure access checks and invalidation hooks for Graph reads, traversal and downstream cache/index/package consumers. Effective permission is the intersection of allowed principals across all supporting sources plus sensitivity policy, not merely the maximum sensitivity label; an authorized sanitized artifact is an explicit exception.",
+      "identity": "sha256:d2aede66957757780ec6d16ad4668b1d4b9badcbc91ee244b8d4dd01a990d543",
+      "presentation": {
+        "label": "derived-acl-rule"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "fail-closed-invalidation",
+      "criterion": "On ACL uncertainty or revocation, affected derived state is quarantined from query/injection before asynchronous recomputation; stale caches and vector/search indexes are included in invalidation.",
+      "identity": "sha256:65bf70fde51f0cbe6cf85686163542eaf1740b8e806866778dca332963852be4",
+      "presentation": {
+        "label": "fail-closed-invalidation"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "invalidation-fixtures",
+      "criterion": "Tests cover tombstone arriving before content, out-of-order permission changes, replay of an old permissive event, connector uninstall, and a multi-source entity where only one supporting source is revoked.",
+      "identity": "sha256:8ddab85b01c7f68d4fc72af1c75d3b454b8ecd8161ab310ef047801b88090251",
+      "presentation": {
+        "label": "invalidation-fixtures"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Propagate source tombstones, ACL changes, and permission revocation through derived state. Delivery slice: alpha. Architecture: 11 Ingress Pipeline; 12 Egress / Retrieval Pipeline; 21 External Connector Architecture; 22 Security & Privacy; 25 Enterprise Multi-tenancy. Scope: Tombstone and permission-change events; Derived ACL propagation; Cache/index quarantine and recomputation triggers; Auditable sanitized-artifact exception. Excluded: Organization identity provider integration; End-user permissions administration UI; Legal retention policy definition; Provider-specific GitHub implementation.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "derived-acl-rule",
+          "identity": "sha256:d2aede66957757780ec6d16ad4668b1d4b9badcbc91ee244b8d4dd01a990d543",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fail-closed-invalidation",
+          "identity": "sha256:65bf70fde51f0cbe6cf85686163542eaf1740b8e806866778dca332963852be4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "invalidation-fixtures",
+          "identity": "sha256:8ddab85b01c7f68d4fc72af1c75d3b454b8ecd8161ab310ef047801b88090251",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "source-lifecycle-events",
+          "identity": "sha256:b6ceeebb3a7e047b25aa03881985f88277f04adffe86298abd865a13407b6b00",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:67cb33a7f05610901fc274793dd2b92a1a094f5f728cd5cb4fac3d603adf24be",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Deleting a source object or revoking access cannot leave retrievable semantic state with broader visibility than its current supporting sources.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Invalidation must traverse real revision/provenance closure and quarantine its derived projections.",
+      "target_ticket_id": "ticket-runtime-graph-store-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Tombstone and revocation events use durable ingestion and source sequence/gap semantics.",
+      "target_ticket_id": "ticket-runtime-durable-ingress-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0"
+}

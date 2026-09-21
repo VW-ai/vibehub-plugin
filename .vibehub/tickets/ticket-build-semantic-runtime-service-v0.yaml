@@ -5,49 +5,99 @@
       "criterion": "Implement authenticated Project, Repository membership, Execution, Context, ContextVersion, Proposal, Conflict, exact-reference, and source-watermark APIs on the selected platform in conformance with the accepted v0 protocol.",
       "identity": "sha256:1d2ceaa4712d4a662ddab67cc486c27eebfd1bf0225eafb4c6caa1c3f3ef871f",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "service-atomic-promotion",
       "criterion": "Persist idempotent events and enforce atomic base-version comparison, compatible promotion, contested canonical state, explicit resolution, immutable provenance, and tenant/project isolation under concurrent requests.",
       "identity": "sha256:26b9e4c6a31917be94b2cd1837d8cead6a3fe7d1a6ccf59bb618ddf5b6afa679",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "service-semantic-policy-path",
       "criterion": "Integrate bounded asynchronous conflict/relevance judgment with official TypeSafe direct JEV as the initial primary-route candidate, Gateway fallback, timeout and retry limits, route telemetry, and no authority to silently resolve protected conflicts.",
       "identity": "sha256:62cedcd4564e0115a49becf456337ecb356b8f07b6735b5f912c218439360d22",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "service-contract-verification",
       "criterion": "Run contract and integration tests for two Projects, multiple Repositories, concurrent agents, stale proposals, conflicting variations, cross-tenant rejection, provider degradation, and exact-version retrieval; preserve all existing offline replay and plugin-isolation checks.",
       "identity": "sha256:01a7c272b6b6e3a6a9c90555d8418eaf34a50cb9793740d6b5f1568777ba9eb2",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "loop-composition",
+      "criterion": "Wire accepted module APIs and configuration only; two projects, two repos in one project and two concurrent executions produce durable normalized events, candidate/relation updates and immutable compiled Context references. Do not reimplement modules in this integration Ticket.",
+      "derived_from": [
+        {
+          "acceptance_id": "service-project-and-context-api",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8c9d75c85c6e3c35fbf5e5dfb54b0284270eeac89f70ff743bd1e2484426a057",
+      "presentation": {
+        "label": "loop-composition"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "loop-worker-conflict",
+      "criterion": "A declared synthetic scenario creates incompatible candidate claims, dispatches one supported live Codex reconciliation job, ingests its guarded result and exposes a multi-parent resolution proposal plus unresolved/human-protected alternatives; verify deduplication, stale attempt rejection and preserved citations.",
+      "derived_from": [
+        {
+          "acceptance_id": "service-semantic-policy-path",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:be143fedcc97dbfee9d9f2750a5e6c428f238fc0a0cd68f335bd0b9aae5f55a1",
+      "presentation": {
+        "label": "loop-worker-conflict"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "loop-agent-degradation",
+      "criterion": "A real supported host query retrieves the expected compiled context/soft pointer. API/judge/worker outage leaves ordinary coding operational, while pending or stale semantic work remains inspectable. Record exact build/policy/input hashes and endpoints.",
+      "derived_from": [
+        {
+          "acceptance_id": "service-contract-verification",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:529140c529e3fe97d4e7a88d2afd13abc4f48afcec2c65fca6ab207afed35716",
+      "presentation": {
+        "label": "loop-agent-degradation"
+      },
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
-    "Refine this Ticket after the platform selection and protocol Outcome exist; do not execute it while maturity remains draft.",
-    "Keep raw source payload retention explicit and minimal; no private project data leaves its authorized provider boundary.",
-    "Runtime failure must not corrupt canonical records or prevent ordinary plugin and Agent work."
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "This is the service implementation after the protocol and platform decisions. It remains draft because the selected persistence, realtime, authentication, and release target determine its exact acceptance and validation commands.",
+  "context": "组合并验收 Git → Policy → Context 在线闭环. Delivery slice: alpha. Architecture: Tech Design §§5,19,23,24. Scope: Existing Runtime modules compose into one authenticated multi-project Git/Agent loop with live bounded judgments, asynchronous reconciliation and reproducible Context delivery.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: runtime-canonical-git-bridge-v0: Resolution is represented as a guarded canonical proposal with Git provenance. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
   "context_refs": [
     {
-      "purpose": "The minimum service slice and excluded platform scope.",
-      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-runtime-online-alpha.yaml"
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
     },
     {
-      "purpose": "The evaluation and route-observability discipline for live semantic nodes.",
-      "ref": ".vibehub/rooms/semantic-runtime/intent-semantic-judgeops-continuous-evaluation.yaml"
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
     },
     {
-      "purpose": "The current direct-primary and Gateway-fallback hypothesis.",
-      "ref": ".vibehub/rooms/semantic-runtime/finding-typesafe-direct-route-performance.yaml"
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
     }
   ],
   "contract_revisions": [
@@ -76,23 +126,58 @@
       ],
       "identity": "sha256:614577fd9b9b794db87be9ee4d72fb49953f19a0aeb5ac73572c623f8f14d354",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "loop-agent-degradation",
+          "identity": "sha256:529140c529e3fe97d4e7a88d2afd13abc4f48afcec2c65fca6ab207afed35716",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "loop-composition",
+          "identity": "sha256:8c9d75c85c6e3c35fbf5e5dfb54b0284270eeac89f70ff743bd1e2484426a057",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "loop-worker-conflict",
+          "identity": "sha256:be143fedcc97dbfee9d9f2750a5e6c428f238fc0a0cd68f335bd0b9aae5f55a1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1aa9d158e3a7adcb6424f355737770f858497b28f297debdb73c40e6215e00f5",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "The selected platform hosts an authenticated, tenant-isolated Semantic Runtime service that persists Projects, Repository memberships, Executions, Context versions, Proposals, Conflicts, watermarks, and auditable promotion transitions through stable APIs.",
+  "outcome": "Existing Runtime modules compose into one authenticated multi-project Git/Agent loop with live bounded judgments, asynchronous reconciliation and reproducible Context delivery.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "target_ticket_id": "ticket-define-semantic-context-protocol-v0",
+      "rationale": "The journey uses a real observed host event/query boundary.",
+      "target_ticket_id": "ticket-runtime-host-adapter-v0",
       "type": "depends_on"
     },
     {
-      "target_ticket_id": "ticket-select-semantic-runtime-alpha-platform",
+      "rationale": "The journey requires a demonstrated supported worker route, not only a capability claim.",
+      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The journey must allow an incorrect association to be corrected.",
+      "target_ticket_id": "ticket-runtime-semantic-feedback-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The loop must use a real business policy with typed candidate/relation effects, not only an execution framework.",
+      "target_ticket_id": "ticket-runtime-ingress-policy-v0",
       "type": "depends_on"
     }
   ],

@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "durable-ack-boundary",
+      "criterion": "EventGateway ACKs acceptance only after the raw envelope/inbox record and downstream outbox intent are durably committed; validation rejection and transient failure have distinct responses.",
+      "identity": "sha256:bb1f2093366c3e90b8d0efe0181554da8b6dd6baecf9a5535ce187e8a22ddb0b",
+      "presentation": {
+        "label": "durable-ack-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "idempotent-redelivery",
+      "criterion": "Uniqueness and correlation rules handle webhook redelivery, polling overlap, local producer retries, and repeated discovery of the same commit while preserving distinct legitimate observations.",
+      "identity": "sha256:ad701f9379322b93da4ef7725717e0c5105627af85d1b4d5df332fc5a8927073",
+      "presentation": {
+        "label": "idempotent-redelivery"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "delivery-state-machine",
+      "criterion": "An implementation-neutral delivery state machine covers pending, leased, succeeded, retryable failure, deferred, and dead-letter states with lease expiry, bounded backoff, poison-event isolation, and operator replay.",
+      "identity": "sha256:db46fb7da69f4bb246f3e9342aef985e27c4aec9042ca3a02f91ba945ff0b991",
+      "presentation": {
+        "label": "delivery-state-machine"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "fault-injection-proof",
+      "criterion": "Automated fault scenarios prove no accepted event is lost when failure occurs before persistence, after persistence before ACK, after ACK before consumer completion, or during duplicate consumer execution.",
+      "identity": "sha256:f4ce7d2074da1aaed74bf467669b14038f681c87eb4afd7953f1cd853b08f0ac",
+      "presentation": {
+        "label": "fault-injection-proof"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build durable idempotent event ingress with explicit ACK and delivery semantics. Delivery slice: alpha. Architecture: 8.1 Event Gateway; 11 Ingress Pipeline; 18 Storage Design; 19 Consistency Model; 23 Observability; 24 Failure Handling. Scope: Gateway acceptance contract; Durable inbox/outbox semantics; At-least-once delivery and idempotent consumption; Retry, lease recovery, dead-letter, and backpressure behavior. Excluded: Tenant authentication UI; Platform and queue vendor selection; Semantic Policy Graph node behavior; General-purpose workflow orchestration.  Required transitive artifacts: runtime-causal-ordering-watermarks-v0: Durable ingestion implements ordering/gap/idempotency semantics and its event schema prerequisites. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "delivery-state-machine",
+          "identity": "sha256:db46fb7da69f4bb246f3e9342aef985e27c4aec9042ca3a02f91ba945ff0b991",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "durable-ack-boundary",
+          "identity": "sha256:bb1f2093366c3e90b8d0efe0181554da8b6dd6baecf9a5535ce187e8a22ddb0b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fault-injection-proof",
+          "identity": "sha256:f4ce7d2074da1aaed74bf467669b14038f681c87eb4afd7953f1cd853b08f0ac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "idempotent-redelivery",
+          "identity": "sha256:ad701f9379322b93da4ef7725717e0c5105627af85d1b4d5df332fc5a8927073",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b50c4d7c0aad15947087784b30744ae9b6741c27341c7dc8c913bcbb0ce990ca",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Accepted source events survive process failure and are delivered to downstream Policy Graph consumers at least once without producing duplicate semantic effects.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Inbox/outbox ACK semantics require the tested selected transaction and migration adapter.",
+      "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-durable-ingress-v0"
+}

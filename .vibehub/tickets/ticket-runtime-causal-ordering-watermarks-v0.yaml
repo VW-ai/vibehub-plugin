@@ -1,0 +1,118 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "source-partition-order",
+      "criterion": "The contract defines per-source-partition sequences, contiguous cursors, gaps, causal parent references, and late-event handling; timestamps are explicitly insufficient as an ordering guarantee.",
+      "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+      "presentation": {
+        "label": "source-partition-order"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "git-causality",
+      "criterion": "Git commit DAG ancestry and immutable commit identity are distinct from mutable ref movement observations, including create, advance, rewind, delete, force-push, and rebase cases.",
+      "identity": "sha256:1b4c888d1b5dc0522c3de7669cfeca308f5b3d31c31540187451bb1ed97a0332",
+      "presentation": {
+        "label": "git-causality"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "watermark-vector",
+      "criterion": "Project and Context freshness can be represented as a vector of per-source watermarks with unknown, caught-up, and known-gap states rather than a single global latest timestamp.",
+      "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+      "presentation": {
+        "label": "watermark-vector"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "replay-generation",
+      "criterion": "Replay runs pin normalized inputs, policy/model descriptors, and a graph generation; replay output is isolated from live derived state, callbacks, connector cursors, and canonical side effects.",
+      "identity": "sha256:df10b5e81f1123044b31531edc6a9d7e7b601fe267b3d5180ad474e0145f9fc7",
+      "presentation": {
+        "label": "replay-generation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Deliver executable schemas/validators or pure transitions plus conformance fixtures and documentation for this protocol; proposals remain hypotheses until verified."
+  ],
+  "context": "Define causal ordering, source cursors, freshness watermarks, and replay generations. Delivery slice: contracts. Architecture: 6 Logical Planes; 19 Consistency Model; 20 Git Integration; 27 Policy Evaluation & Offline Replay; 31 Open Technical Questions. Scope: Per-source ordering contract; Git DAG and ref-movement semantics; Freshness watermark vectors; Side-effect-free replay generations. Excluded: Distributed global consensus; A cross-repository total order; Policy quality evaluation; Concrete replication technology.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Per-source freshness and no fabricated global ordering.",
+      "ref": ".vibehub/rooms/semantic-runtime/constraint-cross-repo-state-uses-causal-watermarks.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "git-causality",
+          "identity": "sha256:1b4c888d1b5dc0522c3de7669cfeca308f5b3d31c31540187451bb1ed97a0332",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "replay-generation",
+          "identity": "sha256:df10b5e81f1123044b31531edc6a9d7e7b601fe267b3d5180ad474e0145f9fc7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "source-partition-order",
+          "identity": "sha256:da0d0139616985b60bed97f08095c5407a331e69d2f030d956831d71589e7708",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "watermark-vector",
+          "identity": "sha256:9d94ed82bc8a4453b6e94aaa347045ccd981639e962387872e0e38fcea0ea613",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6f57ce3788ee36ff959159400ccb0b5cae200c7479a799fc9ccc2fb696e51aa6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Runtime can explain what each derived result had observed without inventing a total order across repositories, worktrees, local runtimes, and cloud connectors.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Ordering and replay require stable event identity, provenance, causal metadata, and immutable input references.",
+      "target_ticket_id": "ticket-runtime-event-provenance-contract-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-causal-ordering-watermarks-v0"
+}

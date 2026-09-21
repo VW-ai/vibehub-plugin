@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "restore-scope-objectives",
+      "criterion": "Define backup scope, encryption and access, retention, RPO and RTO targets, tenant deletion interaction, and which derived indexes may be recomputed instead of backed up; record these as alpha targets until measured.",
+      "identity": "sha256:20e920d1fcec0150fd08f442b03edb1ff1c00f8709da6c8c24c86c7732c145ba",
+      "presentation": {
+        "label": "restore-scope-objectives"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "restore-clean-environment",
+      "criterion": "Restore a versioned backup into a clean isolated environment using documented commands, apply only compatible migrations, and verify tenant counts, immutable Context versions, provenance, watermarks, audit chain, job terminal states, and object pointers.",
+      "identity": "sha256:06dced8804d76c0378860bd4801ad5b405a59a66292166de56c185bd8cbb9d4b",
+      "presentation": {
+        "label": "restore-clean-environment"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "restore-inflight-jobs",
+      "criterion": "After restore, leased or running jobs become safely expired, cancelled, or requeued according to protocol; completed results remain idempotent, and no job is silently promoted from unresolved to validated.",
+      "identity": "sha256:f1227972034e64312c8896b221de29ebc87044c51a6363f42f32e9448f6f0d2e",
+      "presentation": {
+        "label": "restore-inflight-jobs"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "restore-isolation-drill",
+      "criterion": "A repeatable disaster-recovery drill records measured recovery time, data loss window, failed checks, and cleanup, and proves one tenant cannot restore, enumerate, or decrypt another tenant's data.",
+      "identity": "sha256:d3027294f56b2190d5b8683437491b1048f9c1cdd076f8979d0c0995b611f98d",
+      "presentation": {
+        "label": "restore-isolation-drill"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Prove backup, point-in-time recovery, and clean-environment restore. Delivery slice: release. Architecture: §6 Logical Planes; §18 Storage Design; §19 Consistency Model; §22 Security & Privacy; §24 Failure Handling. Scope: Backup policy and encryption; Clean-environment restore; Inflight job recovery semantics; Tenant-isolated recovery drill. Excluded: Undefined best-effort backups; Restoring credentials from semantic data; Treating recomputable caches as canonical; Unmeasured disaster-recovery claims.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "restore-clean-environment",
+          "identity": "sha256:06dced8804d76c0378860bd4801ad5b405a59a66292166de56c185bd8cbb9d4b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "restore-inflight-jobs",
+          "identity": "sha256:f1227972034e64312c8896b221de29ebc87044c51a6363f42f32e9448f6f0d2e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "restore-isolation-drill",
+          "identity": "sha256:d3027294f56b2190d5b8683437491b1048f9c1cdd076f8979d0c0995b611f98d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "restore-scope-objectives",
+          "identity": "sha256:20e920d1fcec0150fd08f442b03edb1ff1c00f8709da6c8c24c86c7732c145ba",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e4026dbb40387e1a63e44b908d4764bce36348c79fac971246aa05234cfafc2e",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The online Runtime can restore durable canonical-adjacent records, semantic working state, queue state, and audit history into a clean environment within declared alpha recovery objectives without crossing tenants or inventing validated results.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Restore uses an exact clean deployment artifact and schema manifest.",
+      "target_ticket_id": "ticket-runtime-release-pipeline",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Restore applies deletion/tombstone barriers before any data is made accessible.",
+      "target_ticket_id": "ticket-runtime-retention-pruning-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-backup-restore"
+}

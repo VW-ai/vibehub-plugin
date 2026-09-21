@@ -1,0 +1,113 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "commit-object-contract",
+      "criterion": "GitCommit identity includes repository identity, object format/OID, tree, ordered parent OIDs, authored/committed metadata, and changed-path provenance; merge commits and root commits are covered.",
+      "identity": "sha256:b67e93bb8496d0ba8a2b929ff5f4013aee0756eb8d75895ebf99cfff6818dd62",
+      "presentation": {
+        "label": "commit-object-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ref-movement-contract",
+      "criterion": "RefMovement records old/new OIDs and create, fast-forward, rewind, force, delete, or unknown classification without mutating or deleting the referenced commit objects.",
+      "identity": "sha256:bb418cc9eee47f8196411abeba05aefbcbf6dc384be3e7771801d90f289832ff",
+      "presentation": {
+        "label": "ref-movement-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "rebase-force-push-behavior",
+      "criterion": "Fixtures prove rebase and force-push create new commit/ref observations, mark affected derived claims stale or superseded where justified, and retain the old audit/provenance chain.",
+      "identity": "sha256:55220c1a58669303b42584145f13cc4833b147d268eb9cc547377b73991e09b9",
+      "presentation": {
+        "label": "rebase-force-push-behavior"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "multi-path-correlation",
+      "criterion": "The same commit discovered from a local commit, fetch, push webhook, and PR update resolves to one GitCommit identity with multiple observation refs; missing or garbage-collected objects degrade to an unresolved pointer rather than fabricated content.",
+      "identity": "sha256:1d3c0640fb085735db30411f66cbe4e6bac4740c56c8a8cd6a651e46524d5115",
+      "presentation": {
+        "label": "multi-path-correlation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations."
+  ],
+  "context": "Model immutable Git commits and mutable ref movements as canonical provenance. Delivery slice: alpha. Architecture: 6.3 Canonical Plane; 19 Consistency Model; 20 Git Integration; 27 Policy Evaluation & Offline Replay. Scope: Git commit object and ref movement schemas; Commit DAG provenance; Rebase and force-push semantics; Cross-observer commit correlation; Public GitProvenance adapter plus deterministic temporary-repository tests; remote observer payloads are fixtures in this Ticket.. Excluded: Git merge execution; Repository hosting; PR review/check semantics; Semantic conflict resolution.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "commit-object-contract",
+          "identity": "sha256:b67e93bb8496d0ba8a2b929ff5f4013aee0756eb8d75895ebf99cfff6818dd62",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "multi-path-correlation",
+          "identity": "sha256:1d3c0640fb085735db30411f66cbe4e6bac4740c56c8a8cd6a651e46524d5115",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "rebase-force-push-behavior",
+          "identity": "sha256:55220c1a58669303b42584145f13cc4833b147d268eb9cc547377b73991e09b9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ref-movement-contract",
+          "identity": "sha256:bb418cc9eee47f8196411abeba05aefbcbf6dc384be3e7771801d90f289832ff",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fcb77817ff3f09e69304a5c779e0c93ca631a0388fe7aa8b94d8d2bb24a62768",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Runtime can correlate local and remote observations of Git history while preserving the distinction between immutable commit truth and mutable branch, tag, and PR refs.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The Git adapter implements immutable object/ref and causal semantics with temp Git fixtures; it does not require a hosted Gateway.",
+      "target_ticket_id": "ticket-runtime-causal-ordering-watermarks-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-git-commit-ref-provenance-v0"
+}

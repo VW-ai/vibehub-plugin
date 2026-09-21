@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "connector-contract",
+      "criterion": "A provider-neutral connector interface covers installation/source identity, credential handle, webhook verification result, poll/backfill cursor, page/batch boundaries, source-object references, tombstones, and permission snapshots.",
+      "identity": "sha256:bed936dcb6286aefc1dfb88842c4e4928fdf18412a30f5f9c966424d8e749bd4",
+      "presentation": {
+        "label": "connector-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "backfill-live-overlap",
+      "criterion": "The contract reconciles webhook/poll/backfill overlap, out-of-order update/delete delivery, cursor expiry, known gaps, and provider replay without bypassing Gateway idempotency.",
+      "identity": "sha256:91adb1a8b2148576bb63865938f797025dd192db3a39663c27379668d4c6d3f2",
+      "presentation": {
+        "label": "backfill-live-overlap"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "quota-and-failure-behavior",
+      "criterion": "Rate limits, retry-after, credential revocation, partial pages, provider outage, and poison objects produce observable deferred/gap states and bounded retries rather than blocking unrelated projects or sources.",
+      "identity": "sha256:89a56ff71680f3de445ebea69e469b05a4621636a200dfc0444db091dd7d14ef",
+      "presentation": {
+        "label": "quota-and-failure-behavior"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "fake-connector-conformance",
+      "criterion": "A deterministic fake connector passes conformance fixtures for create/update/delete, permission loss, backfill plus live events, duplicate delivery, late delivery, and tenant/project isolation and proves it cannot write Semantic Working Graph state directly.",
+      "identity": "sha256:e4498e8bcd732206985f36764c6b4cdb9a6511d66fb94fa12f0f8b7bf497b791",
+      "presentation": {
+        "label": "fake-connector-conformance"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Define a connector substrate for webhook, polling, backfill, lifecycle, and quota handling. Delivery slice: post-alpha. Architecture: 5 Macro Architecture; 8.1 Event Gateway; 21 External Connector Architecture; 22 Security & Privacy; 24 Failure Handling; 25 Enterprise Multi-tenancy. Scope: Provider-neutral connector lifecycle; Webhook, polling, and backfill convergence; Cursor, quota, retry, and gap behavior; Connector conformance harness. Excluded: Concrete GitHub/Slack/Docs implementation; Credential provisioning UI; Platform-specific secret manager; Direct Semantic Working Graph writes.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "backfill-live-overlap",
+          "identity": "sha256:91adb1a8b2148576bb63865938f797025dd192db3a39663c27379668d4c6d3f2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "connector-contract",
+          "identity": "sha256:bed936dcb6286aefc1dfb88842c4e4928fdf18412a30f5f9c966424d8e749bd4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fake-connector-conformance",
+          "identity": "sha256:e4498e8bcd732206985f36764c6b4cdb9a6511d66fb94fa12f0f8b7bf497b791",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "quota-and-failure-behavior",
+          "identity": "sha256:89a56ff71680f3de445ebea69e469b05a4621636a200dfc0444db091dd7d14ef",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f58e5430c0986968b1868802c5aa622e89912cf36baa402fd904eabc5e186c42",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "External source adapters can deliver normalized, tenant-bound events through the same durable ingress path without writing the semantic graph or embedding provider-specific behavior in the Policy Graph.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Connector conformance requires durable source lifecycle and access-revocation handling.",
+      "target_ticket_id": "ticket-runtime-source-access-invalidation-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-connector-substrate-v0"
+}

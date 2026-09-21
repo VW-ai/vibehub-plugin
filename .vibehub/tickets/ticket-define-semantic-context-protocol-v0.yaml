@@ -5,65 +5,130 @@
       "criterion": "Core contracts define and validate tenant, project, repository membership, workstream, execution, source revision, and per-source cursor/watermark identities without adding host, provider, or storage branches to semantic core; project-level records may omit repository identity only where the contract explicitly allows it.",
       "identity": "sha256:9c2af7ef01187fe89de822ec6e1474b343752491ee479b47fa0c0224c6d78d80",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "protocol-addressable-context",
       "criterion": "Core contracts define stable Context identity, immutable ContextVersion identity, canonical and exact-version references, Proposal identity with base_version_id and workstream scope, Conflict identity, provenance, authority, and lifecycle states; references are deterministic and remain resolvable after later versions exist.",
       "identity": "sha256:c736bb6dceaa4887dbef8c480a9818a1786b899ac6949b6346596ab8d4572cc5",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "protocol-promotion-reconciliation",
       "criterion": "A pure transition layer implements optimistic promotion semantics for unchanged, orthogonal, equivalent, stale, contradictory, and authority-protected proposals. Contradictions preserve both candidate heads, mark the accepted Context contested, and require an explicit resolution version rather than silent last-write-wins.",
       "identity": "sha256:8e62c932f293c695155f9d1f8ded1b714b3eaf2ef4dbf85a9fbf4493e2f0309b",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "protocol-multi-agent-fixture",
       "criterion": "A deliberately small fixture with one Project, two Repositories, two concurrent Executions, compatible changes, a contradictory Context variation, per-repository watermarks, and a resolution proves the contract end to end and rejects cross-tenant, cross-project, stale-base, and unauthorized promotion.",
       "identity": "sha256:c358d3989bbae6b1d545d8f223dc119854f6eeaed1b66a320832ac14e2b591da",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "protocol-runtime-boundaries",
       "criterion": "The protocol is documented as the online v0 handoff, existing offline replay and provider adapters remain compatible, Semantic Runtime verification and standalone verification pass, and the existing Skill plugin artifact remains isolated.",
       "identity": "sha256:3e34128d449d429a0d5285290270e7b4efd5045cc4c7bf9740a1289f74b1ecf8",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "working-graph-revision-contract-v2",
+      "criterion": "Implement versioned schemas and validators for semantic entities and immutable revisions, relation assertions/revisions, conflict, GraphRevision, provenance closure, source-watermark references and exact-version addresses; reuse the accepted source/identity contracts instead of defining parallel types.",
+      "derived_from": [
+        {
+          "acceptance_id": "protocol-addressable-context",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+      "presentation": {
+        "label": "working-graph-revision-contract-v2"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "working-graph-transition-contract-v2",
+      "criterion": "Pure transitions cover candidate/validated/rejected/stale/superseded/contested/resolved and canonical-reference association, preserving competing assertions on expected-base mismatch. Separate status of the derived claim from authority of an external canonical artifact; no transition performs external canonical writes.",
+      "derived_from": [
+        {
+          "acceptance_id": "protocol-promotion-reconciliation",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+      "presentation": {
+        "label": "working-graph-transition-contract-v2"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "working-graph-conformance-fixture-v2",
+      "criterion": "A store-independent fixture proves two repositories and two executions with compatible and contradictory changes, reproducible snapshots, cross-tenant rejection, stale Worker input, source tombstone, ACL tightening, and explicit conflict resolution.",
+      "derived_from": [
+        {
+          "acceptance_id": "protocol-multi-agent-fixture",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+      "presentation": {
+        "label": "working-graph-conformance-fixture-v2"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "working-graph-boundary-v2",
+      "criterion": "The protocol states that Working Graph state is derived and recomputable, fast judges have attention rather than truth authority, canonical writes require explicit promotion, and no global order is fabricated across repositories.",
+      "derived_from": [
+        {
+          "acceptance_id": "protocol-runtime-boundaries",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+      "presentation": {
+        "label": "working-graph-boundary-v2"
+      },
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
-    "Keep semantic core independent of HTTP frameworks, database clients, deployment hosts, model providers, and existing plugin implementation code.",
-    "Do not implement a general CRDT or branch the whole project graph; version and reconcile the smallest Context object that changed.",
-    "Do not let a fast judge silently create or replace canonical truth.",
-    "Preserve the existing Phase 0 audit and evaluation contracts while adding the online protocol as a separate layer."
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Deliver executable schemas/validators or pure transitions plus conformance fixtures and documentation for this protocol; proposals remain hypotheses until verified."
   ],
-  "context": "The offline replay proves bounded semantic judgment, but the online alpha needs a stable domain and concurrency protocol before storage or UI choices become implementation facts. This Ticket owns that protocol and its executable core tests; it does not deploy a service.",
+  "context": "Working Graph revision / assertion / conflict 可执行契约. Delivery slice: contracts. Architecture: . Scope: Append-only revision of the already-planned Ticket's active Contract; executable pure contracts and fixtures.. Excluded: Database implementation, service API, graph database, broad ontology, provider integration, and canonical ownership migration..",
   "context_refs": [
     {
-      "purpose": "The Project and Repository scope model the protocol must encode.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-project-is-semantic-scope-repository-is-source.yaml"
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
     },
     {
-      "purpose": "The source ordering and freshness constraint.",
-      "ref": ".vibehub/rooms/semantic-runtime/constraint-cross-repo-state-uses-causal-watermarks.yaml"
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
     },
     {
-      "purpose": "The stable logical and immutable version reference contract.",
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Stable logical and immutable exact-version links.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-addressable-versioned-context-identity.yaml"
     },
     {
-      "purpose": "The proposal, conflict, promotion, and reconciliation semantics.",
+      "purpose": "Sparse variations, explicit conflicts and guarded promotion.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-realtime-context-variations-and-reconciliation.yaml"
-    },
-    {
-      "purpose": "The existing candidate/canonical planes, service API direction, and eventual consistency baseline.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
     }
   ],
   "contract_revisions": [
@@ -97,17 +162,51 @@
       ],
       "identity": "sha256:249a3658e557d559e63bfdcd7c07704a62264037c0cce7d8957cb09cd9e2f4a5",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "working-graph-boundary-v2",
+          "identity": "sha256:4768e48004a76f83cc5508eadf052c47abb8a4e588379f7e03f08b561adc252e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "working-graph-conformance-fixture-v2",
+          "identity": "sha256:defed9da408b953a33377be6158599ba2462745214e9e67cae78394f6163c786",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "working-graph-revision-contract-v2",
+          "identity": "sha256:2994e942d39f9b177816ee8efd2d5f083c22e32d38424222d46ba83f54566c37",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "working-graph-transition-contract-v2",
+          "identity": "sha256:e37aba9b36999401addb4009da9c338f7feb09883981db14d60c5af07c161c19",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4e4d1752c389ac589909f3f5b22fa8d75a87cf7b2aa906e1cf6a1b1db5cb737d",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "Semantic Runtime has an executable provider-, host-, and store-independent v0 protocol for multi-project scope, addressable Context versions, concurrent proposals, conflicts, promotion, and source freshness.",
+  "outcome": "A provider-, host- and store-independent protocol defines revisioned semantic entities, relations, assertions, conflicts, snapshots and canonical-reference boundaries.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
     "plan-validation:independent"
   ],
-  "relations": [],
+  "relations": [
+    {
+      "rationale": "Working snapshots reuse accepted source identities, event provenance and causal watermark definitions.",
+      "target_ticket_id": "ticket-runtime-causal-ordering-watermarks-v0",
+      "type": "depends_on"
+    }
+  ],
   "revision_state": "bound",
   "schema_version": 3,
   "ticket_id": "ticket-define-semantic-context-protocol-v0"

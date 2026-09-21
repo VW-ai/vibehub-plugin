@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "worker-job-state-machine",
+      "criterion": "Specify executable transitions for queued, leased, running, succeeded, failed, expired, cancelled, superseded, and dead-letter states, including legal actors, lease ownership, heartbeat, deadline, attempt count, and terminal-state invariants.",
+      "identity": "sha256:1ff9f055222424b2a9498ddc5fa06e798ddc72be55e256e200ef8a58bab7e8ef",
+      "presentation": {
+        "label": "worker-job-state-machine"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-job-envelope",
+      "criterion": "Define a versioned job envelope carrying tenant/project scope, worker type, triggering policy and node version, immutable input refs, source watermarks or snapshot identity, ACL and sensitivity ceiling, allowed operations, output schema, deadline, retry budget, and idempotency key.",
+      "identity": "sha256:d4958c8cd500184c81e10eb55782bc046e02fa47553b4eeaf186af9a39cdfaa9",
+      "presentation": {
+        "label": "worker-job-envelope"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-result-envelope",
+      "criterion": "Define a versioned result envelope carrying job and attempt identity, consumed refs and versions, structured candidate findings or proposals, confidence, provenance, artifact refs, executor/provider/model identity, usage, timings, and classified failure without hidden chain-of-thought.",
+      "identity": "sha256:68fd7d5f7cb3cf198378ff868fd00c0403ef17250009f08b3539c67d66bf433a",
+      "presentation": {
+        "label": "worker-result-envelope"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "worker-protocol-conformance",
+      "criterion": "Provider-neutral contract tests reject invalid transitions, expired or wrong-worker leases, authority elevation, out-of-scope refs, duplicate terminal effects, unversioned payloads, and results that omit required provenance.",
+      "identity": "sha256:9606eb8f9f3454f83d45d87899751fab814c4ba121fbbe1db61db8a9db0ed8b7",
+      "presentation": {
+        "label": "worker-protocol-conformance"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Deliver executable schemas/validators or pure transitions plus conformance fixtures and documentation for this protocol; proposals remain hypotheses until verified."
+  ],
+  "context": "Define and verify the durable worker job protocol. Delivery slice: contracts. Architecture: §9 Policy Graph, especially WorkerNode; §14 Worker Slow Path; §15 Agent-to-Runtime Communication; §19 Consistency Model; §24.4 Worker timeout. Scope: Logical job and result contracts; State-machine semantics; Authority ceiling and provenance; Provider-neutral conformance suite. Excluded: Queue vendor SDK; Codex-specific behavior; Scheduler policy implementation; Direct canonical writes.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "worker-job-envelope",
+          "identity": "sha256:d4958c8cd500184c81e10eb55782bc046e02fa47553b4eeaf186af9a39cdfaa9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-job-state-machine",
+          "identity": "sha256:1ff9f055222424b2a9498ddc5fa06e798ddc72be55e256e200ef8a58bab7e8ef",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-protocol-conformance",
+          "identity": "sha256:9606eb8f9f3454f83d45d87899751fab814c4ba121fbbe1db61db8a9db0ed8b7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worker-result-envelope",
+          "identity": "sha256:68fd7d5f7cb3cf198378ff868fd00c0403ef17250009f08b3539c67d66bf433a",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:d812b7946514c4963c8c707149a304fdbe350f0f7a50dc65047c5f784b272a10",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Runtime and executor implementations share a provider-independent, versioned protocol for durable job creation, leasing, bounded Context access, cancellation, structured results, and policy continuation.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Worker envelopes use exact Graph revisions, source watermarks and authority ceilings.",
+      "target_ticket_id": "ticket-define-semantic-context-protocol-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Trigger and continuation references bind an immutable policy/node artifact.",
+      "target_ticket_id": "ticket-runtime-policy-artifacts-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "store-implements-revision-protocol",
+      "criterion": "The selected adapter implements the accepted Contract V2 entities, relations, assertions, conflicts, lifecycle projections, provenance closure, GraphRevision, per-source watermarks, exact references, and migrations.",
+      "identity": "sha256:00370aef36d026a88400132f78d716df143577417e3aa5603f25743bc7c42dad",
+      "presentation": {
+        "label": "store-implements-revision-protocol"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-mutation-is-atomic",
+      "criterion": "A mutation atomically commits immutable revisions, current projections, audit references, and outbox intent; idempotency prevents duplicates and expected-base failure surfaces conflict rather than overwriting concurrent state.",
+      "identity": "sha256:c5ef005b533c5010a1b413e4da797e3453349ea43c4e22c710120b2070abdf11",
+      "presentation": {
+        "label": "graph-mutation-is-atomic"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "snapshot-read-is-reproducible",
+      "criterion": "An exact GraphRevision resolves the revisions, unresolved conflicts, provenance, and source watermarks visible at that point, including after later writes or projection rebuild.",
+      "identity": "sha256:9f9eb84968c5d306e4e621b5a6e00376b4783c6fdc6220955d0093c9fedd2d4d",
+      "presentation": {
+        "label": "snapshot-read-is-reproducible"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-survives-isolation-and-crash-tests",
+      "criterion": "Integration tests prove tenant/project isolation, concurrent compare-and-set behavior, restart durability, tombstones, projection rebuild, and transaction interruption immediately before and after commit.",
+      "identity": "sha256:8f38633e45951fb6c05578c233e9716f37e226fdf909798b284737e07f54af30",
+      "presentation": {
+        "label": "store-survives-isolation-and-crash-tests"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement the transactional Semantic Working Graph store. Delivery slice: alpha. Architecture: . Scope: Schema, migrations, transactional adapter, current projections, snapshot reads, outbox coupling, and adapter conformance.. Excluded: Dedicated graph database, unrestricted ontology, canonical code history, ranking, and connector ingestion..  Required transitive artifacts: graph-contract: The Graph adapter implements the accepted revision/assertion/snapshot contract. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-mutation-is-atomic",
+          "identity": "sha256:c5ef005b533c5010a1b413e4da797e3453349ea43c4e22c710120b2070abdf11",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "snapshot-read-is-reproducible",
+          "identity": "sha256:9f9eb84968c5d306e4e621b5a6e00376b4783c6fdc6220955d0093c9fedd2d4d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-implements-revision-protocol",
+          "identity": "sha256:00370aef36d026a88400132f78d716df143577417e3aa5603f25743bc7c42dad",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-survives-isolation-and-crash-tests",
+          "identity": "sha256:8f38633e45951fb6c05578c233e9716f37e226fdf909798b284737e07f54af30",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e0d55a5c99412a67ddc7c732416cd60deb5bd1c010b95d2c592e39cdff4756ee",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The selected platform persists tenant-isolated immutable Working Graph revisions and serves reproducible point-in-time snapshots with atomic idempotent mutations.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Graph schemas and projection migrations consume the selected transactional store foundation.",
+      "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-graph-store-v0"
+}

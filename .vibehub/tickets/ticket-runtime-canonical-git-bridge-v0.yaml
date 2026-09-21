@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonical-proposal-contract",
+      "criterion": "Implement a proposal envelope and deterministic materializer for Context/Decision/Evidence changes pinning candidate versions, expected canonical reference/base Git commit, confined path, required authority, watermarks and provenance. Outcome success is never generated from a model suggestion; any Outcome proposal remains subject to its existing independent acceptance contract.",
+      "identity": "sha256:91c8d3348b7ff930b6d90d7ad0e8290887b35242beab93174595db06b7555d72",
+      "presentation": {
+        "label": "canonical-proposal-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "promotion-cas",
+      "criterion": "Promotion returns promoted, conflict, stale, rejected, or deferred through a compare-and-swap boundary; a changed canonical head or Git base cannot be silently overwritten or auto-rebased.",
+      "identity": "sha256:d3fb2dc2e8099e89480b373d380f0ecc8e22867c4167c5ef71710c7e7d8fe73c",
+      "presentation": {
+        "label": "promotion-cas"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "git-materialization-boundary",
+      "criterion": "Produce deterministic reviewable patches and reverse provenance links; separately authorized local apply checks expected Git head and exact target index/worktree content plus confined paths before writing. Temporary-repository tests prove clean-base success, duplicate idempotency and refusal after concurrent/dirty changes or path/symlink escape without damaging user work; no Git merge, remote push or implicit approval.",
+      "identity": "sha256:da14b11c46895e403a894e1cccaea5e972f8bd4151c492b02066a3d3bfe685c6",
+      "presentation": {
+        "label": "git-materialization-boundary"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "failure-and-authority-proof",
+      "criterion": "Tests prove judge/worker timeout, stale base, insufficient authority, write failure, and conflicting proposals leave canonical Git state unchanged and expose a resolvable conflict or deferred state.",
+      "identity": "sha256:5ce4bc55ba13ab2893ad500bfdc850bb55ab906de17c7cdd6a47e6aba1bace3a",
+      "presentation": {
+        "label": "failure-and-authority-proof"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Define explicit proposal and compare-and-swap promotion into Git-backed canonical records. Delivery slice: alpha. Architecture: 6.3 Canonical Plane; 14 Worker Slow Path; 19 Consistency Model; 20 Git Integration; 28 Migration from Current VibeHub Plugin. Scope: CanonicalProposal and PromotionResult contracts; Optimistic concurrency and explicit conflicts; Git patch/commit materialization adapter; Promotion audit and reverse provenance. Excluded: Automatic Git branch merge; Automatic push or PR creation; Fast-model truth authority; Cloud-owned canonical identity decision.  Required transitive artifacts: runtime-git-commit-ref-provenance-v0: Canonical proposals pin immutable Git bases and safe path/symlink resolution. runtime-source-access-invalidation-v0: Proposals cannot reveal content whose current source grant was revoked. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-proposal-contract",
+          "identity": "sha256:91c8d3348b7ff930b6d90d7ad0e8290887b35242beab93174595db06b7555d72",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "failure-and-authority-proof",
+          "identity": "sha256:5ce4bc55ba13ab2893ad500bfdc850bb55ab906de17c7cdd6a47e6aba1bace3a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "git-materialization-boundary",
+          "identity": "sha256:da14b11c46895e403a894e1cccaea5e972f8bd4151c492b02066a3d3bfe685c6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "promotion-cas",
+          "identity": "sha256:d3fb2dc2e8099e89480b373d380f0ecc8e22867c4167c5ef71710c7e7d8fe73c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e106a08cc0e6114ea856945a93b8373ff8f977f13fbbb23c5ee7ed587b5d39e6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Validated semantic candidates can become reviewable Git-backed Context, Decision, Evidence, or Outcome proposals without giving the fast path authority to overwrite canonical project truth.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Canonical proposal validation consumes explicit resolution parents/authority and abstention outcomes.",
+      "target_ticket_id": "ticket-runtime-reconciliation-worker-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Writeback compares against the same verified existing canonical identity/schema used for reads.",
+      "target_ticket_id": "ticket-runtime-canonical-source-reader-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-canonical-git-bridge-v0"
+}

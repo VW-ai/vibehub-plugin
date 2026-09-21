@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "scheduler-transactional-enqueue",
+      "criterion": "Implement WorkerNode dispatch as one journal transaction recording an idempotent durable job/outbox command with pinned input snapshot, policy/node/continuation, deadline and permission ceiling; current ingress yields or ends without waiting for worker reasoning.",
+      "identity": "sha256:1c9feed1fa0105092ae8f93125598c03312abadefdc25b701125a01d82fcf5f0",
+      "presentation": {
+        "label": "scheduler-transactional-enqueue"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scheduler-eligibility-routing",
+      "criterion": "Route only to workers whose tenant/project grants, worker types, data-classification ceiling, region, provider policy, Git capability, model capability, and health satisfy the job; local-only jobs never reach a cloud executor.",
+      "identity": "sha256:ab437cc9d099459bce9dbe9b536d1e1638c53438d1a2778ade09c72ea89f655c",
+      "presentation": {
+        "label": "scheduler-eligibility-routing"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scheduler-fairness-budgets",
+      "criterion": "Enforce per-tenant, per-project, per-worker, and worker-type concurrency; priority and starvation bounds; wall-clock and attempt budgets; queue backpressure; cancellation; and explicit DEFER when no eligible capacity exists.",
+      "identity": "sha256:a693adcadcb24bb4587365d89e70b9fa5695705c18e7c7531d080a9eda7e3903",
+      "presentation": {
+        "label": "scheduler-fairness-budgets"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scheduler-lease-integration",
+      "criterion": "Integration tests prove exclusive claim, lease renewal, lease expiry and requeue, cancellation race handling, supersession, and at-least-once delivery with exactly-once semantic effects.",
+      "identity": "sha256:43a1adb819ab9b449e097a4adb59d21850a7e5719da852ddb38f05886edfe7a0",
+      "presentation": {
+        "label": "scheduler-lease-integration"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Implement the durable multi-tenant Worker Scheduler. Delivery slice: alpha. Architecture: §5 Macro Architecture; §9 Policy Graph; §14 Worker Slow Path; §22.2 Model routing policy; §24 Failure Handling. Scope: Durable enqueue and claim; Eligibility and model-route filtering; Priority, quota, concurrency, and cancellation; Lease recovery. Excluded: Worker reasoning implementation; General agent swarm orchestration; Synchronous dependence from the local coding hot path.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "scheduler-eligibility-routing",
+          "identity": "sha256:ab437cc9d099459bce9dbe9b536d1e1638c53438d1a2778ade09c72ea89f655c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scheduler-fairness-budgets",
+          "identity": "sha256:a693adcadcb24bb4587365d89e70b9fa5695705c18e7c7531d080a9eda7e3903",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scheduler-lease-integration",
+          "identity": "sha256:43a1adb819ab9b449e097a4adb59d21850a7e5719da852ddb38f05886edfe7a0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scheduler-transactional-enqueue",
+          "identity": "sha256:1c9feed1fa0105092ae8f93125598c03312abadefdc25b701125a01d82fcf5f0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ceca23085ad3f18a64453c2222fccd8925d6a463d6273b37fdc4a96125a0d2f2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "WorkerNode escalation becomes a durable, fair, budget-aware scheduling path that selects only eligible executors and survives process or queue failure without duplicate semantic effects.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Eligibility and claim use registered private workers and project grants.",
+      "target_ticket_id": "ticket-runtime-byo-worker-enrollment",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "WorkerNode durably enqueues from journal/outbox and yields without awaiting reasoning.",
+      "target_ticket_id": "ticket-runtime-policy-journal-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-worker-scheduler"
+}

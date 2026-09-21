@@ -1,0 +1,118 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "core-node-semantics-execute",
+      "criterion": "Deterministic, Retrieve, Aggregate, Guard, and Action handlers use typed contracts; fan-out/join ordering is deterministic and the same artifact plus snapshot yields the same non-model trace.",
+      "identity": "sha256:71c28f52b501ca352e069d174d83fa2a3b8a7e06b04015c51a7b9d958cf5259d",
+      "presentation": {
+        "label": "core-node-semantics-execute"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "run-budget-is-enforced",
+      "criterion": "Total and node deadlines, node-visit, retrieval, output, token/cost proxy, and cancellation budgets terminate through explicit DEFER, ESCALATE, or error edges with no unbounded retry.",
+      "identity": "sha256:4773ecfff09832e3de7121638d22390501ba91d5d8330cceb22d36d52faaf909",
+      "presentation": {
+        "label": "run-budget-is-enforced"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "actions-use-atomic-contract",
+      "criterion": "INGEST, IGNORE, INJECT recommendation, DEFER and ESCALATE emit typed commands through transaction/outbox ports with idempotency and expected GraphRevision. An in-memory transactional conformance double proves command atomicity; the selected store adapter is integrated by the journal Ticket.",
+      "identity": "sha256:0bd437da3b2e68fec354081e4503b15b622bc4dcd77b5bf6b7c4b8bfad668157",
+      "presentation": {
+        "label": "actions-use-atomic-contract"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "executor-failure-is-bounded",
+      "criterion": "Behavior tests cover invalid handler output, retrieval timeout, failed guard, join failure, cancellation, budget exhaustion, concurrent revision change, and duplicate invocation without hidden partial effects.",
+      "identity": "sha256:43406cba6fdc2a9d61736e21ee1dbc54e0cfbefe43cf6c51d11c712d9359a131",
+      "presentation": {
+        "label": "executor-failure-is-bounded"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations."
+  ],
+  "context": "Build the bounded Policy Graph execution kernel. Delivery slice: contracts. Architecture: . Scope: Executor state machine, non-Judge/non-Worker handlers, branching/join, RunBudget, typed actions, and transactional action boundary.. Excluded: Remote judge routing, Worker execution, crash resume, rollout, and consumer query API..",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "actions-use-atomic-contract",
+          "identity": "sha256:0bd437da3b2e68fec354081e4503b15b622bc4dcd77b5bf6b7c4b8bfad668157",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "core-node-semantics-execute",
+          "identity": "sha256:71c28f52b501ca352e069d174d83fa2a3b8a7e06b04015c51a7b9d958cf5259d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "executor-failure-is-bounded",
+          "identity": "sha256:43406cba6fdc2a9d61736e21ee1dbc54e0cfbefe43cf6c51d11c712d9359a131",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "run-budget-is-enforced",
+          "identity": "sha256:4773ecfff09832e3de7121638d22390501ba91d5d8330cceb22d36d52faaf909",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7d56b6bf889510e83d39f3bb733434d6640611a6d35640df11d3f98a1bbf4fd7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Runtime executes a compiled policy against one fixed event and Graph snapshot with deterministic branching, bounded resource use, typed node results, and atomic idempotent actions.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The execution kernel consumes typed immutable artifacts and their bounded branch/join semantics.",
+      "target_ticket_id": "ticket-runtime-policy-artifacts-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Pure execution runs against Graph port conformance doubles and expected-revision mutation commands.",
+      "target_ticket_id": "ticket-define-semantic-context-protocol-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}

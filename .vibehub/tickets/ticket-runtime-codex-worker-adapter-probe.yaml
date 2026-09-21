@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-runner-adapter",
+      "criterion": "Implement a runner that enrolls as a private BYO worker, claims and renews leased jobs, fetches job-scoped Context, executes only declared worker types, submits structured results, handles cancellation, and never exports or logs its local Codex credential.",
+      "identity": "sha256:59ca0acf25c66bc6cc37b459dcfd9c0be5193fc3d4b599e5384a0a2c1b134a3e",
+      "presentation": {
+        "label": "codex-runner-adapter"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "codex-capability-probe",
+      "criterion": "Probe actual authentication longevity, model availability, noninteractive execution, tool and Git support, output structure, context limits, concurrency, rate-limit behavior, cancellation, and process restart recovery; record measured results without assuming subscription protocol, terms, quota, or unlimited capacity.",
+      "identity": "sha256:c38aef20c6f9975d0a11367b074d4ab5016433e116db56cb52e8b36d52bd4c3d",
+      "presentation": {
+        "label": "codex-capability-probe"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "codex-synthetic-e2e",
+      "criterion": "Using synthetic data, complete at least one reconciliation or context-query job from Scheduler claim through scoped Context retrieval and validated Policy Graph result ingestion, including provenance and usage telemetry.",
+      "identity": "sha256:d93b7b3ba5e9a3df8881bcabcb01215859ca144cd5d3fdee90bcf62868ef3f3b",
+      "presentation": {
+        "label": "codex-synthetic-e2e"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "codex-unavailable-degradation",
+      "criterion": "When enrollment, authentication, quota, capability, or execution is unavailable, Scheduler marks the worker ineligible or unhealthy, jobs defer or route to an allowed alternative, and no product claim or canonical result is fabricated.",
+      "identity": "sha256:821d073b2016c68b912ea3db16dd948b114648312f6a8ca5f9c261d9a3994b86",
+      "presentation": {
+        "label": "codex-unavailable-degradation"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Build and probe the user-managed Codex worker adapter. Delivery slice: alpha. Architecture: §7.3 Cloud Runtime; §14 Worker Slow Path; §15 Agent-to-Runtime Communication; §22 Security & Privacy; §24 Failure Handling. Scope: Private Codex worker runner; Protocol adapter; Capability and limit probing; Synthetic end-to-end worker job. Excluded: Reading, copying, transmitting, or committing the Codex credential; Assuming unlimited quota, concurrency, or stable undocumented behavior; Real project data before destination-specific authorization; General coding-agent orchestration; Canonical authority.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "codex-capability-probe",
+          "identity": "sha256:c38aef20c6f9975d0a11367b074d4ab5016433e116db56cb52e8b36d52bd4c3d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "codex-runner-adapter",
+          "identity": "sha256:59ca0acf25c66bc6cc37b459dcfd9c0be5193fc3d4b599e5384a0a2c1b134a3e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "codex-synthetic-e2e",
+          "identity": "sha256:d93b7b3ba5e9a3df8881bcabcb01215859ca144cd5d3fdee90bcf62868ef3f3b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "codex-unavailable-degradation",
+          "identity": "sha256:821d073b2016c68b912ea3db16dd948b114648312f6a8ca5f9c261d9a3994b86",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5ee8c31ae0db83da44b4fcb61bba0ec9d2266ed16be97440262d438661fcc4c2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A cloud-hosted Codex runner using the owner's locally held subscription credential is either proven as an eligible bounded worker for named job types or explicitly classified as unavailable or constrained with measured evidence.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The executor can obtain only job-authorized compiled Context and optional pinned Git input.",
+      "target_ticket_id": "ticket-runtime-worker-context-access",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Synthetic end-to-end evidence returns through the actual guarded continuation path.",
+      "target_ticket_id": "ticket-runtime-worker-result-ingress",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The first live job exercises a defined business bundle, not an unbounded generic prompt.",
+      "target_ticket_id": "ticket-runtime-reconciliation-worker-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-codex-worker-adapter-probe"
+}

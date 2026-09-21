@@ -30,6 +30,10 @@
         "path": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
       },
       {
+        "blob": "42804545030aefc1d2f5c365d7a9fa3bebbbc46b",
+        "path": "semantic-runtime/docs/online-delivery-plan.md"
+      },
+      {
         "blob": "95d3ebd03a199a2008824a749818d50638eeac28",
         "path": "semantic-runtime/docs/phase0-contracts.md"
       },
@@ -242,8 +246,8 @@
         "path": "semantic-runtime/test/typesafe-jev-judge.test.mjs"
       }
     ],
-    "checked_at": "2026-09-21T08:23:36.961Z",
-    "last_aligned_commit": "c2600b910d512b28021a5bd46fc8bd2a9389da15"
+    "checked_at": "2026-09-21T09:24:49.220Z",
+    "last_aligned_commit": "187366c9a456c111fe748c75f6122d844df6b22f"
   },
   "anchors": [
     "semantic-runtime/"

@@ -1,0 +1,99 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "retention-classification",
+      "criterion": "Implement configurable retention classes for raw payload, immutable sanitized replay input, derived projection, operational audit and canonical pointer; define deletion/tombstone, legal source revocation and backup expiry interactions without deleting external canonical Git history.",
+      "identity": "sha256:ca0b9ea8857c38c35bba64a866acaa0e566f9fd4b8fb97f179b95f1f6352942d",
+      "presentation": {
+        "label": "retention-classification"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "retention-pruner",
+      "criterion": "An idempotent bounded pruner supports dry-run, scope limits, progress/resume and audit; derived objects quarantine on unavailable source and replay reports missing/non-replayable material rather than fetching a mutable replacement.",
+      "identity": "sha256:c30f1606044d5516c451bb0d22745ab6946f81fc440606fe9426e1aef5e86f9b",
+      "presentation": {
+        "label": "retention-pruner"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "retention-fixtures",
+      "criterion": "Tests cover partial prune failure, restarted job, revoked multi-source input, exact-link tombstone response, query-cache invalidation and backup restore of an older tombstoned state. No deleted payload is re-exposed after restore reconciliation.",
+      "identity": "sha256:6669c916f6bb7ab01a0d54293ea1da6a657bacdaf54723541b904c98e1ad5750",
+      "presentation": {
+        "label": "retention-fixtures"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "执行 raw/derived/audit 保留与删除策略. Delivery slice: alpha. Architecture: Tech Design §§5,19,23,24. Scope: Stored payloads, replay inputs, derived indexes and audits follow explicit retention classes without reviving revoked content or falsely claiming replayability.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: runtime-source-access-invalidation-v0: Deletion and revocation use existing fail-closed provenance closure. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "retention-classification",
+          "identity": "sha256:ca0b9ea8857c38c35bba64a866acaa0e566f9fd4b8fb97f179b95f1f6352942d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retention-fixtures",
+          "identity": "sha256:6669c916f6bb7ab01a0d54293ea1da6a657bacdaf54723541b904c98e1ad5750",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "retention-pruner",
+          "identity": "sha256:c30f1606044d5516c451bb0d22745ab6946f81fc440606fe9426e1aef5e86f9b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5594bc799090162dce24317d225f759dcc5accf08c1c7ae5c90d746e61b5e746",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Stored payloads, replay inputs, derived indexes and audits follow explicit retention classes without reviving revoked content or falsely claiming replayability.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Retention must respect stored causal refs and distinguish replay proof from absent content.",
+      "target_ticket_id": "ticket-runtime-decision-audit-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-retention-pruning-v0"
+}

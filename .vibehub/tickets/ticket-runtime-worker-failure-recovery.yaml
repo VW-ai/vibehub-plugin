@@ -1,0 +1,115 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "failure-taxonomy-retry",
+      "criterion": "Classify transient, permanent, policy, authentication, quota, cancellation, timeout, and invalid-result failures; apply bounded exponential backoff with jitter only where safe, enforce maximum attempts, and dead-letter poison jobs with reason and recovery action.",
+      "identity": "sha256:f51daa47ef326cb6efbd148f555d76831581fcbccf3f85ab1cee2330621209d2",
+      "presentation": {
+        "label": "failure-taxonomy-retry"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "failure-crash-duplicates",
+      "criterion": "Fault-injection tests cover scheduler crash before and after enqueue, worker crash before and after result submission, lease expiry, duplicate claim, delayed result, network partition, and result-ingress restart without duplicate semantic or canonical effects.",
+      "identity": "sha256:5a6ec31ad1ffcf1eb0d52d19ca4418a1e8213ebfa62eb866018f72a25f631940",
+      "presentation": {
+        "label": "failure-crash-duplicates"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "failure-circuit-breakers",
+      "criterion": "Provider, executor, and queue health drive circuit breakers and eligibility; high-impact actions DEFER rather than guess, and exhausted or unavailable workers do not block the local coding path.",
+      "identity": "sha256:e8aeafb1272090e45f017da27d45d61a1f7c41d7f1b511c335a929d6630777ff",
+      "presentation": {
+        "label": "failure-circuit-breakers"
+      },
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "failure-operator-recovery",
+      "criterion": "Provide audited controls to inspect, retry, cancel, supersede, or quarantine a job and to return a worker to service, with tenant scope and no manual database mutation required.",
+      "identity": "sha256:4b916e4e52c1d41a06f8c9e6ce6d8ea840cd90abd71d03708e3efe7796c9d429",
+      "presentation": {
+        "label": "failure-operator-recovery"
+      },
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
+    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
+    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
+    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
+    "Keep recovery CLI/API scoped to operators with immutable action audit; never make manual DB editing the normal retry path.",
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+  ],
+  "context": "Harden worker execution failure recovery. Delivery slice: alpha. Architecture: §19 Consistency Model; §23 Observability; §24 Failure Handling; §30 Prototype Success Gate; §32 AP8 Local development must survive cloud failure. Scope: Failure taxonomy; Retry, dead-letter, and circuit breakers; Crash and duplicate fault injection; Operator recovery controls. Excluded: Infinite retry; Guessing high-impact results; Blocking ordinary Agent work on Runtime or cloud availability; Automatic online model training.  Required transitive artifacts: runtime-worker-scheduler: Recovery behavior exercises queue, lease, routing, and cancellation semantics. runtime-worker-result-ingress: Duplicate, stale, late, and partial results must preserve semantic consistency. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context_refs": [
+    {
+      "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "failure-circuit-breakers",
+          "identity": "sha256:e8aeafb1272090e45f017da27d45d61a1f7c41d7f1b511c335a929d6630777ff",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "failure-crash-duplicates",
+          "identity": "sha256:5a6ec31ad1ffcf1eb0d52d19ca4418a1e8213ebfa62eb866018f72a25f631940",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "failure-operator-recovery",
+          "identity": "sha256:4b916e4e52c1d41a06f8c9e6ce6d8ea840cd90abd71d03708e3efe7796c9d429",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "failure-taxonomy-retry",
+          "identity": "sha256:f51daa47ef326cb6efbd148f555d76831581fcbccf3f85ab1cee2330621209d2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:da335973cfb2813d051ef33ff7b32a64e03f241f559e6f4557ae3e09ce5b527c",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Worker scheduling and result processing tolerate crashes, timeouts, transient providers, duplicate delivery, quota exhaustion, poison jobs, and partial outages while preserving unresolved truth and ordinary Agent operation.",
+  "provenance_refs": [
+    "conversation:2026-09-21-industrial-runtime-ticket-plan",
+    "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The real executor's measured failure and quota behavior must enter the recovery tests.",
+      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-worker-failure-recovery"
+}
