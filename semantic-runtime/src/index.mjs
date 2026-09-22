@@ -56,3 +56,9 @@ export {
   workerResultDigest, validateWorkerJob, validateWorkerResult, createWorkerJobState,
   validateWorkerJobState, validateWorkerAdmission, transitionWorkerJob,
 } from './core/worker-protocol.mjs';
+export {
+  RECONCILIATION_VERSION, RECONCILIATION_ISSUES, RECONCILIATION_STATUSES,
+  RECONCILIATION_OUTPUT_SCHEMA, RECONCILIATION_BUNDLE, RECONCILIATION_CONFIG_SCHEMA,
+  reconciliationPolicyConfig, createReconciliationInput, validateReconciliationProposal,
+  encodeReconciliationProposal, validateReconciliationResult,
+} from './core/reconciliation.mjs';

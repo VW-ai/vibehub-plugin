@@ -1,0 +1,43 @@
+{
+  "acceptance_ids": [
+    "reconciliation-job-behavior",
+    "reconciliation-authority",
+    "reconciliation-corpus"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reconciliation-job-behavior",
+      "identity": "sha256:45c733b7108cd4e35378d8bb0175167a2e09bdfce5fe6cd5e3739c92f52d2fc0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "reconciliation-authority",
+      "identity": "sha256:bfdf7098dceb5038825471f084a717eb602ba826e0c5e92d3417ae49a679f648",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "reconciliation-corpus",
+      "identity": "sha256:7590c50424d60a63d23a7d71b6c93c1cccbb4747b8b1019540a48b1b49ff4a15",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-reconciliation-public-integration-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:32:34.093381+00:00",
+  "refs": [
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/reconciliation-integration.test.mjs",
+    "semantic-runtime/test/reconciliation.test.mjs",
+    "semantic-runtime/docs/reconciliation-v0.md",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "The public package entry composes a real two-source Working Graph conflict, a bundle/request-bound compiled Worker policy, fenced Worker completion and canonical UTF-8 proposal materialization. Three integration cases prove all-parent/citation preservation with zero Graph or canonical effects, transport-valid rehashed parent omission rejected by business validation, and actual source revocation after completion rejected at current admission. Final npm run verify and actual standalone install/verification both passed283/283 tests; dependency boundaries passed72 files; independent existing Skill artifact passed79 files with Runtime excluded. The focused reconciliation suite passed27/27 including the3 public integration cases. These are synthetic structural, authority, freshness and release-boundary checks, not a live-model semantic-quality, cloud deployment or capacity claim.",
+  "ticket_id": "ticket-runtime-reconciliation-worker-v0"
+}

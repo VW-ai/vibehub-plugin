@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "reconciliation-job-behavior"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reconciliation-job-behavior",
+      "identity": "sha256:45c733b7108cd4e35378d8bb0175167a2e09bdfce5fe6cd5e3739c92f52d2fc0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-reconciliation-bundle-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:31:54.815Z",
+  "refs": [
+    "semantic-runtime/src/core/reconciliation.mjs",
+    "semantic-runtime/docs/reconciliation-v0.md",
+    "semantic-runtime/test/reconciliation.test.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/scenario.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/cases.json",
+    "semantic-runtime/test/fixtures/reconciliation/labels.json",
+    "command:node --test semantic-runtime/test/reconciliation.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented frozen wire-v1 instruction/output-schema bundle, exact canonical UTF-8 JSON artifact encoding/digest helper, and compiled Worker config pinning instruction/schema/request digests. Trusted request selects issue and Agent/Human boundary; Job pins exact Graph/revision/source inputs. Current Worker admission and open-conflict closure construct immutable model input with exact original assertion content and complete provenance. Structured statuses cover compatible/equivalence proposals, unresolved contradiction/scope/source disagreement, stale abstention and human-decision-required. Conservative resolved proposals preserve per-parent scope and all originals; no generalized replacement assertion, canonical state, acceptance success or silent authority elevation. Business artifact validation materializes exact bytes separately from fixed Worker transport summaries and leaves all effects empty. Later ingress owns legal new PolicyRun routing, and separate transport completion still owns leases/fences/CAS. Focused suite passed24/24; component dependency/import boundaries passed72 files/zero errors and git diff --check passed. Exact Ticket Context refs resolved; accepted direct Worker Contract V1 and transitive Working Graph Contract V2 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Governing Context returned no authorities and fresh pre-append Context guard passed zero violations. Parent owns final public integration/full/actual standalone/plugin artifact release checks and a separate reviewer owns Outcome.",
+  "ticket_id": "ticket-runtime-reconciliation-worker-v0"
+}

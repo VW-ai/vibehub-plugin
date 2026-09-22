@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "reconciliation-authority"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reconciliation-authority",
+      "identity": "sha256:bfdf7098dceb5038825471f084a717eb602ba826e0c5e92d3417ae49a679f648",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-reconciliation-authority-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:31:56.006Z",
+  "refs": [
+    "semantic-runtime/src/core/reconciliation.mjs",
+    "semantic-runtime/docs/reconciliation-v0.md",
+    "semantic-runtime/test/reconciliation.test.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/scenario.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/cases.json",
+    "semantic-runtime/test/fixtures/reconciliation/labels.json",
+    "command:node --test semantic-runtime/test/reconciliation.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Executable validation rejects missing/duplicate/reordered/foreign generation/project parents, invented or omitted exact source citations, weakened per-claim source indexes, synthesized source scope, unsupported commands/capabilities/authority, altered human boundaries and wrong executor descriptors. Jobs omitting a competing assertion fail even if ordinary Worker read admission allows their selected subset. Current Graph movement, actual ACL/tombstone changes and current grant revocation prevent admitting the proposal. Canonical byte verification rejects rehashed noncanonical and duplicate-key JSON. Accessor tests confirm no getter invocation. Source/tool content and generated explanations remain untrusted data: a semantic lie or quoted command may remain display text but gains no effect or authority. Strict structure alone does not prove semantic correctness. Focused suite passed24/24; component dependency/import boundaries passed72 files/zero errors and git diff --check passed. Exact Ticket Context refs resolved; accepted direct Worker Contract V1 and transitive Working Graph Contract V2 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Governing Context returned no authorities and fresh pre-append Context guard passed zero violations. Parent owns final public integration/full/actual standalone/plugin artifact release checks and a separate reviewer owns Outcome.",
+  "ticket_id": "ticket-runtime-reconciliation-worker-v0"
+}

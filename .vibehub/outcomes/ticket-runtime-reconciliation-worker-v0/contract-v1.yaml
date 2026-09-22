@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "reconciliation-authority",
+    "reconciliation-corpus",
+    "reconciliation-job-behavior"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T00:33:32.030Z",
+  "contract_revision": {
+    "identity": "sha256:2c00943bc5ec00058936f63421b91ef281fd85027c96696e1f50879ebcca6097",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-reconciliation-authority-v1-proof-v1",
+    "runtime-reconciliation-bundle-v1-proof-v1",
+    "runtime-reconciliation-corpus-v1-proof-v1",
+    "runtime-reconciliation-public-integration-release-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_reconciliation did not execute this Ticket or author its implementation, tests, documentation or Evidence. It read exact contract and prerequisite records, independently inspected frozen source and artifacts, and ran private adversarial probes and focused/public tests. Its sole repository write is this exact Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active Acceptance revisions in exact Contract V1. The frozen wire-v1 instruction/output-schema bundle and trusted request digest are pinned in compiled Worker configuration. Input construction carries exact original Graph assertion content, complete provenance, every consumed revision and all open-conflict parents. Canonical UTF-8 artifact bytes are separately digest-verified and business-validated through the fixed Worker Result envelope. Structured compatible/equivalent relationships preserve each original scope and claim; contradiction, scope ambiguity and source disagreement conservatively retain alternatives, and all four statuses remain proposals. Executable checks reject missing, duplicate, reordered, foreign or fabricated parents/citations, weakened per-claim provenance, unsupported scope/commands/capabilities, human-authority downgrade, mismatched executor descriptors and noncanonical duplicate-key JSON. Current Graph/source movement and authorization changes prevent admission with no Graph or canonical effects. Eight deliberately synthetic recorded-reference cases cover compatible changes, equivalence, contradiction, ambiguous scope, source disagreement, human protection, malicious instructions and stale abstention; evaluator labels stay outside constructed Job/model input. Independently reran the frozen focused/public suite: 27/27 pass. Twenty-nine private adversarial checks pass, including 40 issue/status/authority combinations, exact original content/provenance, three-parent conflict closure, malicious nested source data alongside a human-protected request, six executor identity fields and nine accessor-safe API positions. A deliberately false high-confidence compatibility claim remains structurally valid inert proposal data with zero effects and unchanged Graph, confirming that schema validity is not semantic quality. Inspected all four exact-bound Evidence records and final release logs: full verification and actual isolated standalone installation each pass 283/283 with 72-file boundary checks; the existing 79-file Skill artifact excludes Runtime. Those full/standalone/artifact commands were not independently rerun by this reviewer. All three required Context references resolve, successful Worker V1 and Working Graph V2 prerequisite Outcomes/Evidence were consumed, and fresh Ticket validation, diff check and Context guard pass with no governing authorities or violations. No blocking findings remain. Acceptance is bounded synthetic protocol conformance, not live executor reliability, useful semantic conflict resolution, production capacity or canonical truth. Trusted composition still owns issue/decision-boundary selection, source/actor authentication and current-state reads; transport completion still owns lease/fence/time/CAS; later ingress owns legal new PolicyRun routing and any separately authorized Graph or canonical promotion.",
+  "ticket_id": "ticket-runtime-reconciliation-worker-v0",
+  "unresolved_acceptance_ids": []
+}

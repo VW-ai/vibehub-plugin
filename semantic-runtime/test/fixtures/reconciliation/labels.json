@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "dataset_kind": "synthetic",
+  "measurement": "recorded_structure_and_abstention_conformance",
+  "live_model_evaluated": false,
+  "cases": {
+    "compatible": {"status":"resolved","resolution_kind":"compatible","parent_count":2},
+    "equivalent": {"status":"resolved","resolution_kind":"equivalent","parent_count":2},
+    "contradiction": {"status":"unresolved","resolution_kind":"retain_alternatives","parent_count":2},
+    "scope-ambiguity": {"status":"unresolved","resolution_kind":"retain_alternatives","parent_count":2},
+    "source-disagreement": {"status":"unresolved","resolution_kind":"retain_alternatives","parent_count":2},
+    "human-protected": {"status":"human-decision-required","resolution_kind":"none","parent_count":2},
+    "malicious-source": {"status":"unresolved","resolution_kind":"retain_alternatives","parent_count":2},
+    "reported-stale": {"status":"stale","resolution_kind":"none","parent_count":2}
+  }
+}

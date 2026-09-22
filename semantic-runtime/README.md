@@ -203,6 +203,9 @@ contracts through the package's public entry:
   deterministic joins and atomic, idempotent action commands.
 - [Worker protocol](docs/worker-protocol-v0.md): pinned job inputs, permission
   ceilings, fenced attempts and structured proposal results.
+- [Reconciliation](docs/reconciliation-v0.md): a pinned instruction and output
+  schema bundle that preserves all competing claims and citations, with
+  explicit unresolved, stale and human-decision-required proposals.
 - [Observability and budgets](docs/observability-contract-v0.md): safe audit and
   metric contracts, a reproducible alpha workload, numerical SLO targets and
   bounded resource admission.

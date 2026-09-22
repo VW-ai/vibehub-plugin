@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "reconciliation-corpus"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "reconciliation-corpus",
+      "identity": "sha256:7590c50424d60a63d23a7d71b6c93c1cccbb4747b8b1019540a48b1b49ff4a15",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-reconciliation-corpus-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:31:57.070Z",
+  "refs": [
+    "semantic-runtime/src/core/reconciliation.mjs",
+    "semantic-runtime/docs/reconciliation-v0.md",
+    "semantic-runtime/test/reconciliation.test.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/scenario.mjs",
+    "semantic-runtime/test/fixtures/reconciliation/cases.json",
+    "semantic-runtime/test/fixtures/reconciliation/labels.json",
+    "command:node --test semantic-runtime/test/reconciliation.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Added eight deliberately synthetic recorded/reference-executor cases with evaluator-only labels separate from constructed Job/model input: compatible changes, equivalent time units, direct contradiction, ambiguous audience, source disagreement, Human authority, malicious source instructions and reported-stale abstention. Exact source text and provenance are checked against pinned Graph assertions. Expected structure reports two resolved proposals, four unresolved proposals, one human-decision-required and one stale abstention. Additional actual Graph/ACL/source mutation and adversarial artifact tests verify deterministic refusal without Graph effects. These are recorded contract/conformance results only: no live model, real private input, provider call, semantic reliability measurement or downstream value claim. Focused suite passed24/24; component dependency/import boundaries passed72 files/zero errors and git diff --check passed. Exact Ticket Context refs resolved; accepted direct Worker Contract V1 and transitive Working Graph Contract V2 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Governing Context returned no authorities and fresh pre-append Context guard passed zero violations. Parent owns final public integration/full/actual standalone/plugin artifact release checks and a separate reviewer owns Outcome.",
+  "ticket_id": "ticket-runtime-reconciliation-worker-v0"
+}
