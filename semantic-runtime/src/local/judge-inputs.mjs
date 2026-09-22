@@ -4,10 +4,8 @@ import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { LocalExplorationStore } from './exploration-store.mjs';
 import { LocalContextStore } from './context-store.mjs';
-import { ContextInputs } from './context-inputs.mjs';
 import { readContextSelection } from './context-reader.mjs';
-import { ExplorationInputs } from './exploration-inputs.mjs';
-import { ExplorationCanonical } from './exploration-canonical.mjs';
+import { composeLocalServices } from './local-runtime-composition.mjs';
 import { GraphStorage } from './graph-storage.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';
 import { GraphInputs, graphInput, graphFields, graphEqual, graphHash, graphId, graphErrorCode } from './graph-inputs.mjs';
@@ -43,11 +41,12 @@ export class JudgeInputs {
     check(this.#config.egress_policy && Array.isArray(this.#config.egress_policy.sources) && this.#config.egress_policy.sources.length <= 32);
     this.#store = store; this.#authority = authority;
     this.#graph = new GraphInputs({ store, authority });
-    this.#canonical = new ExplorationCanonical({ store, authority, canonical_reader });
-    this.#metadata = new ExplorationInputs({ store, authority, config_digest: this.#canonical.config_digest });
+    const services = composeLocalServices({ store, authority, canonical_reader });
+    this.#canonical = services.canonical;
+    this.#metadata = services.inputs;
     this.#explorations = new LocalExplorationStore({ store, authority, canonical_reader });
     this.#contexts = new LocalContextStore({ store, authority, canonical_reader });
-    this.#contextInputs = new ContextInputs({ authority, canonical: this.#canonical });
+    this.#contextInputs = services.contexts;
     this.#ingress = new DurableIngress({ store, authority }); this.#feed = new SourceInvalidationFeed({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
   }

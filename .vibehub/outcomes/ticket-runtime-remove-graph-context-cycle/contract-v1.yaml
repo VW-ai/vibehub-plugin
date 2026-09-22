@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "graph-context-canonical-scc-is-zero",
+    "trusted-capability-and-proof-identity-hold",
+    "atomic-runtime-behavior-is-unchanged"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T22:35:01.000Z",
+  "contract_revision": {
+    "identity": "sha256:428e5689793d0c06b70ff0f9193acc8c3bee2d48f54c31e9ae5056f71661fa17",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-remove-graph-context-cycle-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/cycle_independent_closeout did not participate in implementation or Evidence authoring and made no production-code changes. It inspected the exact Ticket, bound Evidence, dirty diff, composition and transaction seams, and independently reran the acceptance checks before recording this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent subagent adjudication accepted all three exact Contract v1 Acceptance revisions. The Ticket, native Evidence and Contract identities match the requested immutable bindings; ticket and project validation pass, the dirty-worktree context guard reports no violations, and the semantic-runtime Room is FRESH. Direct diff inspection confirmed that the canonical reader implementation moved intact behind an opaque module-branded Graph capability; CanonicalSourceReader, ExplorationCanonical and ContextInputs no longer import or construct LocalGraphStore; capability lookup checks the exact Graph, DomainStore and authority identities on every bundle lookup including cache hits; same-object configuration mutation changes its fingerprint and replaces the proof-owning bundle; plain objects, clones, proxies and mismatched bindings are rejected; and existing WeakMap proof ownership remains instance-scoped. Graph still owns coordinated writes and its withAdmission/transaction paths; no root export or npm-command diff exists. The boundary checker reports production_sccs: [] with the same 15 direction exceptions. Independently rerun Runtime verification passed 1029 total / 1027 passed / 0 failed / 2 expected Keychain skips; standalone locked-install verification independently passed the same suite outside the repository; plugin artifact verification passed with 79 files and 3670088 bytes; project validation and git diff --check passed. The full Runtime coverage includes Graph, canonical, exploration, Context, Query, source-fence, crash/restart and atomic transaction behavior. No blocking finding remains.",
+  "ticket_id": "ticket-runtime-remove-graph-context-cycle",
+  "unresolved_acceptance_ids": []
+}

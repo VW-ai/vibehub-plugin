@@ -2,13 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
 import { CanonicalSourceReader } from '../src/local/canonical-source-reader.mjs';
+import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { readerFixture, records, writeRecords, git, READER_ACTIONS } from './helpers/canonical-reader-fixture.mjs';
 import { mutation } from './helpers/graph-store-fixture.mjs';
 
 const config = f => ({ repository_path: f.folder, execution: f.execution, registration_id: f.source.registration_id, selection: f.selection });
-const helper = (f, canonical_reader = config(f)) => new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader });
+const helper = (f, canonical_reader = config(f)) => composeLocalServices({
+  store: f.store,
+  authority: f.authority,
+  canonical_reader,
+}).canonical;
 const pin = (f, read, record_keys = f.selection.records.map(record => record.key)) => ({ at: read.graph_revision, address: read.address, record_keys });
 const code = (fn, expected) => assert.throws(fn, error => error.code === expected);
 function view(f, canonical, proof, keys = null, snapshot = f.store.readSnapshot.bind(f.store)) {

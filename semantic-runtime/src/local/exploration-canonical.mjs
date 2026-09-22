@@ -1,7 +1,7 @@
 import { DomainStore } from './domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
-import { CanonicalSourceReader } from './canonical-source-reader.mjs';
-import { LocalGraphStore } from './graph-store.mjs';
+import { CanonicalSourceReaderService } from './canonical-source-reader-service.mjs';
+import { graphCapabilityFrom, graphGetHead, withGraphCapability } from './graph-capability.mjs';
 import { GraphStorage } from './graph-storage.mjs';
 import { GraphInputs, GRAPH_NS, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphErrorCode } from './graph-inputs.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
@@ -35,17 +35,19 @@ const sameActor = (left, right) => graphEqual(scopeOf(left), scopeOf(right)) && 
 /** Fixed, owner-composed reader capability. Proofs never cross the public wire. */
 export class ExplorationCanonical {
   #store; #authority; #reader; #graph; #inputs; #ingress; #feed; #config; #digest; #keys; #proofs = new WeakMap();
-  constructor({ store, authority, canonical_reader }) {
+  constructor(options) {
+    const { store, authority, canonical_reader } = options;
     check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority, 'invalid_canonical_reader_input');
+    this.#graph = graphCapabilityFrom(options, { store, authority });
     // Inspect/copy the complete configuration before destructuring any caller data.
     const config = graphInput(canonical_reader);
     graphFields(config, ['repository_path', 'execution', 'registration_id', 'selection']);
-    this.#reader = new CanonicalSourceReader({ store, authority, ...config });
+    this.#reader = new CanonicalSourceReaderService(withGraphCapability({ store, authority, ...config }, this.#graph));
     config.selection.records.sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
     this.#config = freeze(config); this.#digest = graphHash(config);
     this.#keys = freeze(config.selection.records.map(record => record.key));
     this.#store = store; this.#authority = authority;
-    this.#graph = new LocalGraphStore({ store, authority }); this.#inputs = new GraphInputs({ store, authority });
+    this.#inputs = new GraphInputs({ store, authority });
     this.#ingress = new DurableIngress({ store, authority }); this.#feed = new SourceInvalidationFeed({ store, authority });
   }
   get config_digest() { return this.#digest; }
@@ -133,9 +135,9 @@ export class ExplorationCanonical {
       let result = { status: 'unavailable', selection: null }, head = null;
       if (pin !== null) {
         check(graphEqual(pin.at.scope, scopeOf(grant)));
-        head = this.#graph.getHead(context, { generation_id: pin.at.generation_id });
+        head = graphGetHead(this.#graph, context, { generation_id: pin.at.generation_id });
         result = this.#reader.resolve(context, { at: pin.at, address: pin.address });
-        check(graphEqual(head, this.#graph.getHead(context, { generation_id: pin.at.generation_id })), 'canonical_graph_changed');
+        check(graphEqual(head, graphGetHead(this.#graph, context, { generation_id: pin.at.generation_id })), 'canonical_graph_changed');
       }
       this.#feed.assertFence(context, { sequence: fence }); check(sameActor(grant, this.#grant(context)), 'canonical_reader_unauthorized');
       if (opts.requireCurrent) check(result.status === 'current', result.status === 'quarantined' ? 'stale_invalidation_fence' : 'canonical_selection_mismatch');

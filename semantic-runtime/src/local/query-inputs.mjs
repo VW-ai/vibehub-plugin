@@ -2,9 +2,8 @@ import { DomainStore } from './domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
 import { GraphInputs, graphHash, graphEqual, graphErrorCode } from './graph-inputs.mjs';
 import { GraphStorage } from './graph-storage.mjs';
-import { ExplorationInputs, readExplorationOwner } from './exploration-inputs.mjs';
-import { ExplorationCanonical } from './exploration-canonical.mjs';
-import { ContextInputs } from './context-inputs.mjs';
+import { readExplorationOwner } from './exploration-inputs.mjs';
+import { composeLocalServices } from './local-runtime-composition.mjs';
 import { planContextSelection, readContextSelection } from './context-reader.mjs';
 import { verifyExplorationPublication } from './exploration-adoption.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';
@@ -35,9 +34,8 @@ export class QueryInputs {
     check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority, 'invalid_query_configuration');
     this.#store = store; this.#authority = authority;
     this.#graph = new GraphInputs({ store, authority });
-    this.#canonical = new ExplorationCanonical({ store, authority, canonical_reader });
-    this.#metadata = new ExplorationInputs({ store, authority, config_digest: this.#canonical.config_digest });
-    this.#contexts = new ContextInputs({ authority, canonical: this.#canonical });
+    const services = composeLocalServices({ store, authority, canonical_reader });
+    this.#canonical = services.canonical; this.#metadata = services.inputs; this.#contexts = services.contexts;
     this.#feed = new SourceInvalidationFeed({ store, authority });
   }
   get config_digest() { return this.#canonical.config_digest; }

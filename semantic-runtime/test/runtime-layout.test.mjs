@@ -21,7 +21,7 @@ test('checked Runtime layout baseline matches the complete component', () => {
   assert.deepEqual(result.errors, []);
 });
 
-test('layout inspection captures public surface, command modes, constants and the known SCC', () => {
+test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);
   const expectedRootFiles = ['.env.example', '.gitignore', 'AGENTS.md', 'index.ts', 'package-lock.json', 'package.json', 'README.md']
@@ -32,12 +32,7 @@ test('layout inspection captures public surface, command modes, constants and th
   );
   assert.equal(current.root_exports.length, 206);
   assert.equal(current.npm_commands.find(item => item.name === 'check:jev:query')?.mode, 'explicit-live');
-  assert.deepEqual(current.production_sccs, [[
-    'src/local/canonical-source-reader.mjs',
-    'src/local/context-inputs.mjs',
-    'src/local/exploration-canonical.mjs',
-    'src/local/graph-store.mjs',
-  ]]);
+  assert.deepEqual(current.production_sccs, []);
   assert.ok(current.production_import_edges.some(edge =>
     edge.from === 'src/local/cli.mjs' && edge.to === 'src/local/service.mjs'));
   assert.ok(current.production_import_edges.some(edge =>

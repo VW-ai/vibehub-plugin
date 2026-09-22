@@ -17,15 +17,10 @@ function repository(t, source) {
 test('actual component imports and dependency ownership pass', () => {
   const result = checkBoundaries();
   assert.deepEqual(result.errors, []);
-  assert.deepEqual(result.production_sccs, [[
-    'src/local/canonical-source-reader.mjs',
-    'src/local/context-inputs.mjs',
-    'src/local/exploration-canonical.mjs',
-    'src/local/graph-store.mjs',
-  ]]);
+  assert.deepEqual(result.production_sccs, []);
   assert.equal(result.baselined_direction_exceptions.length, 15);
   assert.deepEqual(result.baselined_direction_exceptions[0], {
-    from: 'src/local/canonical-source-reader.mjs',
+    from: 'src/local/canonical-source-reader-service.mjs',
     to: 'src/local/auth.mjs',
     reason: 'application cannot import app-local: ./auth.mjs',
   });

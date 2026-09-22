@@ -1,0 +1,48 @@
+{
+  "acceptance_ids": [
+    "graph-context-canonical-scc-is-zero",
+    "trusted-capability-and-proof-identity-hold",
+    "atomic-runtime-behavior-is-unchanged"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-context-canonical-scc-is-zero",
+      "identity": "sha256:9eaeb49f96317c9cf3eae11a33c35e01a0dccfa57a56419816ae630d8b79e9f9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "trusted-capability-and-proof-identity-hold",
+      "identity": "sha256:1d8ac48c9cc2ad074b26f9bc180cb0f9bbd1e0e1c3aa2ed67c14ecc148598363",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "atomic-runtime-behavior-is-unchanged",
+      "identity": "sha256:aa6400debeea7acf69daf2da1d6a6f8ac282b7114f54ffb4cbead0e8b9c8017b",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-remove-graph-context-cycle-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T22:22:18Z",
+  "refs": [
+    "semantic-runtime/src/local/graph-capability.mjs",
+    "semantic-runtime/src/local/graph-service-bundle.mjs",
+    "semantic-runtime/src/local/local-runtime-composition.mjs",
+    "semantic-runtime/src/local/canonical-source-reader-service.mjs",
+    "semantic-runtime/src/local/canonical-source-reader.mjs",
+    "semantic-runtime/src/local/exploration-canonical.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "The four-module Graph/Context/Canonical import cycle is removed without moving production directories or changing root exports and npm commands. CanonicalSourceReader is now a nominal public facade over an internal service; ExplorationCanonical and ContextInputs receive an opaque module-branded Graph capability and no longer import or construct LocalGraphStore. The capability is bound to the exact Graph, DomainStore and authority identities, forwards only getHead/getReceipt/resolve/mutate, and rejects plain objects, clones, proxies and mismatched bindings. A graph-service bundle reuses one canonical/context/exploration service set for the exact Graph plus unchanged configuration object, verifies bindings even on cache hits, fingerprints inert configuration to replace a bundle after same-object mutation, and keeps WeakMap proofs scoped to their producing instance. Local Context, Exploration, Query and Judge composition uses this seam while Graph still owns the original DomainStore transaction and authorization order. Structural tests prove zero production SCCs, absence of LocalGraphStore construction in Canonical/Exploration/Context services, one-options-object constructor arity, exact cache binding, mutable-configuration refresh and CanonicalSourceReader error-code compatibility. Independent review found three concrete compatibility gaps in the first implementation (cache-hit binding, mutable config reuse and overbroad error translation); all were fixed, re-reviewed and the reviewer reported no remaining finding after 107 focused tests passed. Full Runtime verification passed 1029 tests with 1027 passed, zero failed and two expected Keychain skips, including synthetic JEV/Judge/Query, crash/restart, source-fence and atomic transaction coverage. Standalone locked-dependency installation and the same complete suite passed outside the repository. Plugin artifact verification passed with 79 files and 3670088 bytes, proving the Runtime remains outside the independently installable Skill artifact. Boundary check reports zero production SCCs and the same 15 exact pre-existing direction exceptions; Context guard, Ticket validation and semantic-runtime Room alignment pass.",
+  "ticket_id": "ticket-runtime-remove-graph-context-cycle"
+}

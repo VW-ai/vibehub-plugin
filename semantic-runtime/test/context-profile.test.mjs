@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateContextContent1, validateContextOperation1, isContextContent1 } from '../src/core/context-profile.mjs';
 import { ContextInputs } from '../src/local/context-inputs.mjs';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
+import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
 import { exactRevisionAddress } from '../src/core/working-graph.mjs';
 import { readerFixture, records, READER_ACTIONS, SCOPE } from './helpers/canonical-reader-fixture.mjs';
@@ -22,9 +22,9 @@ const code = (fn, expected) => assert.throws(fn, error => { if (expected) assert
 const actions = [...READER_ACTIONS, 'context:read', 'context:write'];
 function fixture(t) {
   const f = readerFixture(t); f.context = f.issue({ actions }).context;
-  const canonical = new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader: {
+  const { canonical, contexts: inputs } = composeLocalServices({ store: f.store, authority: f.authority, canonical_reader: {
     repository_path: f.folder, execution: f.execution, registration_id: f.source.registration_id, selection: f.selection } });
-  const inputs = new ContextInputs({ authority: f.authority, canonical }), first = f.reader.refresh(f.context, f.request);
+  const first = f.reader.refresh(f.context, f.request);
   const entry = first.selection.assertion.content.data.records.find(record => record.key === 'ticket');
   const artifact = first.selection.assertion.canonical_refs[entry.canonical_ref_index];
   const selected = content(); selected.data.applicability.tickets = { mode: 'exact', refs: [{ at: first.graph_revision, address: first.address, record_key: 'ticket' }] };

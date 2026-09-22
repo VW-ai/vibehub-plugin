@@ -1,5 +1,5 @@
 import { exactRevisionAddress } from '../core/working-graph.mjs';
-import { ContextInputs, CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
+import { CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
 import { validateContextContent1, validateContextOperation1 } from '../core/context-profile.mjs';
 import { planContextSelection, readContextSelection, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
 import { selectGraph } from './graph-selected.mjs';
@@ -14,9 +14,11 @@ import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncre
 import { eventObservationKey, sourceObjectKey } from '../core/event-provenance.mjs';
 import { validateSourceCursor } from '../core/causal-ordering.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';
-import { ExplorationInputs, readExplorationOwner, EXPLORATION_ERROR_CODES } from './exploration-inputs.mjs';
-import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
+import { readExplorationOwner, EXPLORATION_ERROR_CODES } from './exploration-inputs.mjs';
+import { EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
 import { materializeExplorationAdoption, verifyExplorationAdoptionResult, verifyExplorationPublication } from './exploration-adoption.mjs';
+import { registerGraphCapability } from './graph-capability.mjs';
+import { graphServiceBundle } from './graph-service-bundle.mjs';
 
 export { WORKING_GRAPH_NAMESPACE };
 export const GRAPH_ERROR_CODES = Object.freeze(['invalid_graph_input', 'graph_capacity', 'graph_unauthorized', 'graph_access_denied',
@@ -29,7 +31,12 @@ export const GRAPH_ERROR_CODES = Object.freeze(['invalid_graph_input', 'graph_ca
   'invalid_store_input', 'unknown_namespace', 'cas_conflict', 'duplicate_identity', 'async_transaction', 'stale_transaction',
   'nested_transaction', 'migration_required', 'incompatible_store', 'store_page_too_large',
   ...EXPLORATION_ERROR_CODES, 'exploration_route_required']);
-const CODES = new Set(GRAPH_ERROR_CODES);
+const CODES = new Set([
+  ...GRAPH_ERROR_CODES,
+  ...EXPLORATION_CANONICAL_ERROR_CODES,
+  ...CONTEXT_INPUT_ERROR_CODES,
+  ...CONTEXT_READER_ERROR_CODES,
+]);
 const scopeOf = g => ({ tenant_id: g.tenant_id, project_id: g.project_id });
 const commandKey = (g, generation, key) => graphKey('command', [1, scopeOf(g), g.principal_id, generation, key]);
 const receiptKey = (g, generation, key) => graphKey('receipt', [1, scopeOf(g), g.principal_id, generation, key]);
@@ -40,12 +47,11 @@ const planner = fn => { try { return fn(); } catch (error) { if (CODES.has(graph
 export class LocalGraphStore {
   #store; #authority; #inputs; #activation; #invalidations;
   constructor({ store, authority }) {
-    // The selected reader also composes this Graph class; resolve its codes after module initialization.
-    for (const code of [...EXPLORATION_CANONICAL_ERROR_CODES, ...CONTEXT_INPUT_ERROR_CODES, ...CONTEXT_READER_ERROR_CODES]) CODES.add(code);
     graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
     this.#store = store; this.#authority = authority; this.#inputs = new GraphInputs({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
     this.#invalidations = new SourceInvalidationFeed({ store, authority });
+    registerGraphCapability(this, { store, authority });
   }
   #call(fn) {
     try { return graphInput(fn()); } catch (error) {
@@ -261,8 +267,8 @@ export class LocalGraphStore {
     });
   }
   #explorationServices(canonical_reader, domain = false) {
-    const canonical = new ExplorationCanonical({ store: this.#store, authority: this.#authority, canonical_reader });
-    return { canonical, contexts: domain ? new ContextInputs({ authority: this.#authority, canonical }) : null, inputs: new ExplorationInputs({ store: this.#store, authority: this.#authority, config_digest: canonical.config_digest }) };
+    const services = graphServiceBundle({ graph: this, store: this.#store, authority: this.#authority, canonical_reader });
+    return domain ? services : { ...services, contexts: null };
   }
   #contextOperation(context, tx, services, operation, at, write = true) {
     if (!services.contexts) return;

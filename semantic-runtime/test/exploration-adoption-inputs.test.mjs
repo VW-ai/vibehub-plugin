@@ -2,14 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { ExplorationInputs, EXPLORATION_NAMESPACE } from '../src/local/exploration-inputs.mjs';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
+import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { graphHash, graphErrorCode } from '../src/local/graph-inputs.mjs';
 import { fixture, adoption, ADOPTION_ACTIONS } from './helpers/adoption-fixture.mjs';
 import { bind, mutation, pin, rows } from './helpers/exploration-fixture.mjs';
 
 function inputs(f) {
-  const canonical = new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader: f.config });
-  return new ExplorationInputs({ store: f.store, authority: f.authority, config_digest: canonical.config_digest });
+  return composeLocalServices({ store: f.store, authority: f.authority, canonical_reader: f.config }).inputs;
 }
 function read(f, callback, context = f.context) {
   let code;

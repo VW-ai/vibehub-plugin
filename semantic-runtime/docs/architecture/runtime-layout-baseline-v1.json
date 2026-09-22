@@ -852,6 +852,11 @@
       "intended_destination": "src/app/local/auth.mjs"
     },
     {
+      "path": "src/local/canonical-source-reader-service.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/sources/canonical-source-reader-service.mjs"
+    },
+    {
       "path": "src/local/canonical-source-reader.mjs",
       "current_role": "production",
       "intended_destination": "src/application/sources/canonical-source-reader.mjs"
@@ -922,6 +927,11 @@
       "intended_destination": "src/adapters/git/git-worktree-sensor.mjs"
     },
     {
+      "path": "src/local/graph-capability.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-capability.mjs"
+    },
+    {
       "path": "src/local/graph-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-inputs.mjs"
@@ -930,6 +940,11 @@
       "path": "src/local/graph-selected.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-selected.mjs"
+    },
+    {
+      "path": "src/local/graph-service-bundle.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-service-bundle.mjs"
     },
     {
       "path": "src/local/graph-storage.mjs",
@@ -965,6 +980,11 @@
       "path": "src/local/keychain-helper.swift",
       "current_role": "production",
       "intended_destination": "src/adapters/secrets/keychain-helper.swift"
+    },
+    {
+      "path": "src/local/local-runtime-composition.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/support/local-runtime-composition.mjs"
     },
     {
       "path": "src/local/macos-secret-store.mjs",
@@ -1655,6 +1675,11 @@
       "path": "test/judge-runtime.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/judge-runtime.test.mjs"
+    },
+    {
+      "path": "test/local-composition.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/local-composition.test.mjs"
     },
     {
       "path": "test/local-service.test.mjs",
@@ -2798,56 +2823,60 @@
       "to": "src/core/service-access.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/adapters/git-provenance.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/core/canonical-records.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/core/incremental-graph.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/core/working-graph.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/auth.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/domain-store.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/git-projects.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
-      "to": "src/local/graph-store.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/project-activation.mjs"
     },
     {
-      "from": "src/local/canonical-source-reader.mjs",
+      "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/local/source-invalidation.mjs"
+    },
+    {
+      "from": "src/local/canonical-source-reader.mjs",
+      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/cli.mjs",
@@ -2915,15 +2944,11 @@
     },
     {
       "from": "src/local/context-store.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/context-store.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
     {
       "from": "src/local/context-store.mjs",
-      "to": "src/local/graph-store.mjs"
+      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/domain-store.mjs",
@@ -3007,7 +3032,7 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/canonical-source-reader.mjs"
+      "to": "src/local/canonical-source-reader-service.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
@@ -3019,15 +3044,15 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/local/exploration-canonical.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
       "to": "src/local/graph-storage.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/graph-store.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
@@ -3067,10 +3092,6 @@
     },
     {
       "from": "src/local/exploration-store.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/exploration-store.mjs",
       "to": "src/local/exploration-inputs.mjs"
     },
     {
@@ -3079,7 +3100,7 @@
     },
     {
       "from": "src/local/exploration-store.mjs",
-      "to": "src/local/graph-store.mjs"
+      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/git-projects.mjs",
@@ -3174,6 +3195,26 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
+      "from": "src/local/graph-service-bundle.mjs",
+      "to": "src/local/context-inputs.mjs"
+    },
+    {
+      "from": "src/local/graph-service-bundle.mjs",
+      "to": "src/local/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/local/graph-service-bundle.mjs",
+      "to": "src/local/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/local/graph-service-bundle.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/local/graph-service-bundle.mjs",
+      "to": "src/local/graph-inputs.mjs"
+    },
+    {
       "from": "src/local/graph-storage.mjs",
       "to": "src/core/contracts.mjs"
     },
@@ -3231,11 +3272,19 @@
     },
     {
       "from": "src/local/graph-store.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/local/graph-store.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
       "to": "src/local/graph-selected.mjs"
+    },
+    {
+      "from": "src/local/graph-store.mjs",
+      "to": "src/local/graph-service-bundle.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
@@ -3307,10 +3356,6 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
       "to": "src/local/context-reader.mjs"
     },
     {
@@ -3327,14 +3372,6 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
       "to": "src/local/exploration-store.mjs"
     },
     {
@@ -3344,6 +3381,10 @@
     {
       "from": "src/local/judge-inputs.mjs",
       "to": "src/local/graph-storage.mjs"
+    },
+    {
+      "from": "src/local/judge-inputs.mjs",
+      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/judge-inputs.mjs",
@@ -3412,6 +3453,22 @@
     {
       "from": "src/local/judge-runtime.mjs",
       "to": "src/local/provider-settings.mjs"
+    },
+    {
+      "from": "src/local/local-runtime-composition.mjs",
+      "to": "src/local/canonical-source-reader-service.mjs"
+    },
+    {
+      "from": "src/local/local-runtime-composition.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/local/local-runtime-composition.mjs",
+      "to": "src/local/graph-service-bundle.mjs"
+    },
+    {
+      "from": "src/local/local-runtime-composition.mjs",
+      "to": "src/local/graph-store.mjs"
     },
     {
       "from": "src/local/project-activation.mjs",
@@ -3495,10 +3552,6 @@
     },
     {
       "from": "src/local/query-inputs.mjs",
-      "to": "src/local/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/query-inputs.mjs",
       "to": "src/local/context-reader.mjs"
     },
     {
@@ -3511,10 +3564,6 @@
     },
     {
       "from": "src/local/query-inputs.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/query-inputs.mjs",
       "to": "src/local/exploration-inputs.mjs"
     },
     {
@@ -3524,6 +3573,10 @@
     {
       "from": "src/local/query-inputs.mjs",
       "to": "src/local/graph-storage.mjs"
+    },
+    {
+      "from": "src/local/query-inputs.mjs",
+      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/query-inputs.mjs",
@@ -3574,12 +3627,5 @@
       "to": "src/local/domain-store.mjs"
     }
   ],
-  "production_sccs": [
-    [
-      "src/local/canonical-source-reader.mjs",
-      "src/local/context-inputs.mjs",
-      "src/local/exploration-canonical.mjs",
-      "src/local/graph-store.mjs"
-    ]
-  ]
+  "production_sccs": []
 }

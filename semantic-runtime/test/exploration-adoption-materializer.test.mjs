@@ -7,7 +7,7 @@ import { GraphInputs, graphKey, graphHash } from '../src/local/graph-inputs.mjs'
 import { GraphStorage } from '../src/local/graph-storage.mjs';
 import { materializeExplorationAdoption } from '../src/local/exploration-adoption.mjs';
 import { ExplorationInputs } from '../src/local/exploration-inputs.mjs';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
+import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { canonicalArtifactAddress } from '../src/core/working-graph.mjs';
 import { sourceLifecycleInvalidationId } from '../src/local/source-invalidation.mjs';
 
@@ -17,7 +17,7 @@ function selected(f, request) {
       { at: request.destination.expected_graph, address: pair.destination }) })) };
 }
 function materialize(f, request, selections = selected(f, request)) {
-  const config_digest = new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader: f.config }).config_digest;
+  const config_digest = composeLocalServices({ store: f.store, authority: f.authority, canonical_reader: f.config }).canonical.config_digest;
   const inputs = new ExplorationInputs({ store: f.store, authority: f.authority, config_digest });
   const normalized = inputs.parse('adopt', request);
   let code;

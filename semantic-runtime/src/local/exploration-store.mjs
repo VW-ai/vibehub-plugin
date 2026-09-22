@@ -1,6 +1,5 @@
-import { LocalGraphStore } from './graph-store.mjs';
-import { ExplorationCanonical } from './exploration-canonical.mjs';
 import { graphInput } from './graph-inputs.mjs';
+import { composeLocalServices } from './local-runtime-composition.mjs';
 
 export { EXPLORATION_NAMESPACE } from './exploration-inputs.mjs';
 
@@ -10,8 +9,7 @@ export class LocalExplorationStore {
   constructor({ store, authority, canonical_reader }) {
     // Validate the inert owner configuration even before the first operation.
     this.#config = graphInput(canonical_reader);
-    new ExplorationCanonical({ store, authority, canonical_reader: this.#config });
-    this.#graph = new LocalGraphStore({ store, authority });
+    this.#graph = composeLocalServices({ store, authority, canonical_reader: this.#config }).graph;
   }
   bind(context, options) { return this.#graph.bindExploration(context, options, this.#config); }
   mutate(context, options) { return this.#graph.mutateExploration(context, options, this.#config); }

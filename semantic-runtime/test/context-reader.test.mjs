@@ -2,16 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture, contextRequest, selectedInput, head, content, canonicalRefs, CONTEXT_ACTIONS } from './helpers/context-fixture.mjs';
 import { GraphInputs } from '../src/local/graph-inputs.mjs';
-import { ExplorationInputs } from '../src/local/exploration-inputs.mjs';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
-import { ContextInputs } from '../src/local/context-inputs.mjs';
+import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { readContextSelection, planContextSelection, validateContextReadRequest } from '../src/local/context-reader.mjs';
 
 const append = (f, name, options = {}) => f.explorations.mutate(f.context, contextRequest(f, f.a, name, options));
 function reader(f) {
-  const canonical = new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader: f.config });
+  const { canonical, inputs: explorations } = composeLocalServices({
+    store: f.store,
+    authority: f.authority,
+    canonical_reader: f.config,
+  });
   const inputs = new GraphInputs({ store: f.store, authority: f.authority });
-  const explorations = new ExplorationInputs({ store: f.store, authority: f.authority, config_digest: canonical.config_digest });
   return { inputs, run(kind, request, planning = false) {
     const source_fence = f.feed.head(f.context).sequence;
     let domainError;
@@ -86,8 +87,7 @@ test('read wire and cursors reject hidden fields, getters, proxies and mismatche
 
 test('selected Ticket proof is reused per opaque context and pin while each content checks only its own support', t => {
   const f = fixture(t, { canonical: true }), refs = canonicalRefs(f);
-  const canonical = new ExplorationCanonical({ store: f.store, authority: f.authority, canonical_reader: f.config });
-  const contexts = new ContextInputs({ authority: f.authority, canonical });
+  const { canonical, contexts } = composeLocalServices({ store: f.store, authority: f.authority, canonical_reader: f.config });
   const prepare = canonical.prepare; let reads = 0;
   canonical.prepare = function (...args) { reads++; return prepare.apply(this, args); };
   const applicability = { project: 'owning', exploration: 'owning', tickets: { mode: 'exact', refs: [refs.ticket] }, code: { mode: 'unspecified', refs: [] } };
