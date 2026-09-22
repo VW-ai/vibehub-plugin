@@ -5,42 +5,87 @@
       "criterion": "Validate typed semantic role, applicable Project/exploration/Ticket/code version, exact sources and rationale alongside lifecycle state; incomplete applicability is explicitly uncertain. Shared governing claims remain visible unless superseded/retracted through the authorized domain path, not because someone hid a card.",
       "identity": "sha256:ea1f65ef0dcab73f943642cd80ca8d2118ab7ecac164fc8dabd32fb2c769050d",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "scoped-lineage",
       "criterion": "Persist exact parent/reason links for creation, derivation, revision, branching, explicit adoption, supersession, invalidation and conflict resolution using existing immutable Graph commands. A is superseded locally while B remains valid when appropriate; relation traversal cannot collapse branch alternatives or grant canonical authority.",
       "identity": "sha256:ac731d919842506825a985564b9bc8b94e343c6d7e0cc1ebb6531949785ebfcf",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "lifecycle-read-contract",
       "criterion": "Expose reproducible current/as-of lineage and applicability reads with current authorization, selected shared base, stale/unavailable/tombstone behavior and bounded traversal. UI archive/hide is orthogonal; worktree removal, code merge or Ticket closeout cannot silently delete or promote Context.",
       "identity": "sha256:c9ffa8e3aeeeb27d570d840bc3e7476e632be5da0062f2e002771e4e8de76081",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "lifecycle-conformance",
       "criterion": "Real-store cases cover A-origin/B-adoption/A-supersession/B-still-current, source revocation, stale parent, repeated transition, restart, corrected meaning and denied history. Query selection preserves active governing Context while returning superseded material only with its explicit historical role.",
       "identity": "sha256:029e454d6572c13e980c919e201912db452c0737dea5fc4bd7d748a25de3c60b",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "meaning-and-applicability",
+      "criterion": "Implement the exact Runtime Context content profile and fixed LocalContextStore facade over actual exploration-owned immutable Graph entities. Validate semantic role, meaning, change rationale and explicit applicability to the authenticated owning Project/exploration, at most eight exact configured CanonicalSourceReader Ticket records and eight admitted Git code revision refs. Verify cited versions/source support from actual records, not caller labels; explicitly unspecified applicability remains uncertain. Shared configured usable active canonical Authorities remain separately included on every successful domain read, with exact pins/status/coverage; local constraint/validated claims cannot grant governing or canonical authority. No hide/archive state, semantic relation, code merge or Ticket closeout retracts governing Context.",
+      "identity": "sha256:3a4fc51f0ae856c71a47333baef4547be5b122c1dbeadb3d30a00969ace417bc",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scoped-lineage",
+      "criterion": "Persist typed create, derive, same-exploration branch, revise, supersede, semantic invalidate and conflict-resolution reasons in existing immutable Context assertions, and expose their exact actual base/support/conflict/publication links. Cross-exploration branching/adoption uses the accepted unchanged adoption command and verified A revision-origin -> Graph receipt -> exploration operation-origin chain, including exact A/B source/base/owner facts. Adoption provides the recorded structural reason explicit_adoption; missing historical free-form rationale stays not_recorded. Never invent foreign parents or historical origin. Preserve core lifecycle/access semantics, corrected meaning, explicit competing variants and complete authorized conflict resolution; A local supersession does not change B adopted state or grant canonical authority.",
+      "identity": "sha256:591681e0c9f7d9282a4577fb2dbd6ca3f39f1fd295748b60a15d126b43b97397",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-read-contract",
+      "criterion": "Expose authenticated current/as-of Context point, bounded heads/history/conflict pages and one-hop outgoing-lineage reads through the fixed six-method in-process facade. Pin exact local Graph and immutable origin base, identify the separate read-time current Project declaration and current access/fence, label selected historical revisions independently from current projection lifecycle, and never fall forward from an exact miss. Use real selected publication and source facts; keep denied/unavailable/quarantined and unspecified applicability honest without revealing protected history. Bound candidates, targets, cursors and aggregate material; recheck current authority and selected facts before return. UI archive/hide, worktree loss, Git merge or Ticket completion cannot erase or promote Context.",
+      "identity": "sha256:4910a2fdb8d03bfcefcd41cb90a57e185ac2c11cef4d1dec06a11a0df8c628d3",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-conformance",
+      "criterion": "Real disposable Git/SQLite fixtures through the public facade prove typed meaning/applicability validation and correction, current/as-of selection, A-origin/B-adoption/A-supersession/B-still-current, same-generation derivation/branch and foreign-parent denial, stale Graph versus stale semantic-base conflict, complete conflict resolution, semantic invalidation versus real source revocation/tombstone, exact retries and changed-operation conflicts, restart, denied historical material and forged/rewound selected lineage. Verify bounded one-hop and page continuation, changed grant/head/base/Project/fence refusal, exact Ticket/code sources, active shared Authority inclusion, explicit historical canonical roles and unknown coverage. Check atomic receipt/origin/outbox consistency and zero rejected-command delta. Affected Runtime, full verify, fresh standalone verify and unchanged shipped plugin artifact checks pass; deterministic acceptance requires no model, credential, cloud or host integration.",
+      "identity": "sha256:00977ad9ef22af5e99a9145d47c90cf24d6e925b634f83c28187553645e2ad7e",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
     "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
     "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
-    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution.",
     "Workspace in this product discussion means an execution work area; do not overload administrative Workspace identity or infer historical origin from the current file path.",
-    "No record deletion or existing Ticket completion is authorized by view filtering or this planning change."
+    "No record deletion or existing Ticket completion is authorized by view filtering or this planning change.",
+    "Scope: implement only inside semantic-runtime/. Add a pure typed Context validator/projection and LocalContextStore({store,authority,canonical_reader}) over the actual existing DomainStore/LocalGraphStore/LocalExplorationStore. No new database table/namespace/dependency, generic graph/lifecycle engine, journal, recursive walker, public transaction callback, filesystem discovery, extraction/model call, automatic source event or ACK, canonical write, App/HTTP/Worker/plugin wiring or background process. Existing lower-level Graph and exploration behavior remains compatible.",
+    "Fixed six public methods: mutate(context,request) takes the exact current LocalExplorationStore.mutate request; adopt(context,request) takes the exact unchanged LocalExplorationStore.adopt request and requires a typed entity source with empty endpoint_map. resolve(context,{exploration_id,at,address,mode}); page(context,{exploration_id,at,mode,collection,cursor,limit}); lineage(context,{exploration_id,at,address,mode,cursor,limit}); getReceipt(context,{idempotency_key}). mode is current|as_of. Read addresses are existing entity-kind logical or exact SemanticAddresses; at is GraphCommitAddress2. Page selectors are heads, one entity history, or conflicts for one explicitly selected entity. limit is integer1..16. No local-role filter, shared_keys, archive/hide, transition executor or other unlisted public parameter.",
+    "Domain authorization: every method requires a current opaque LOCAL_AUDIENCE grant with context:read; mutate/adopt additionally require context:write and human/service actor, plus all underlying exploration/Graph/store/publisher/ingress/source-invalidation/Project/activation actions. adopt also requires explicit exploration:adopt and source:read. getReceipt remains actor-scoped and rechecks current input authorization; reading a retained adoption still requires its adoption/source permissions. Scope derives from grant, not request metadata. These are fixed facade grants, not a claim that previously authorized lower-level Graph/store principals lose their broader capabilities.",
+    "Exact content profile: entity_kind entity, content {semantic_type:context,data:{schema_version:1,kind:runtime_context,role,summary,detail,applicability:{project:owning,exploration,tickets:{mode,refs},code:{mode,refs}},change:{kind,reason}}}. role is decision|constraint|observation|evidence|question; exploration is owning|unspecified; tickets/code mode is unspecified|any|exact; change.kind is create|derive|branch|revise|supersede|invalidate|resolve. summary and reason are nonempty strings at most512 and2048 characters; detail is a string at most8192. Reject unknown fields, getters/proxies, unsupported versions and invalid inert JSON. No canonical/governing/ACL/actor/origin field is inferred from this payload.",
+    "Applicability: owning Project/exploration comes from actual grant and generation owner. Owning exploration means the explicitly owned/adopted instance; A publication remains A origin after B adoption. Unspecified exploration/Ticket/code dimensions produce explicit uncertain applicability; no omission becomes any. Exact refs are nonempty/unique/sorted; any/unspecified refs are empty. Do not infer scope, Ticket, current HEAD, paths or code ancestry. A Ticket ref is exactly {at,address,record_key}: an exact configured reader-issued selection and usable kind:ticket record; derive actual Ticket ID/Contract revision/identity and supporting canonical event. Bound Ticket refs to8. A code ref is exactly {event_digest}, matching an actual assertion canonical_refs event with payload.kind git_revision; derive repository/commit/path under actual retained source/catalog facts. Bound code refs to8. Include actual selected canonical source support in admitted provenance; copied JSON/digests/bare IDs prove no authority. Historical exact Ticket/commit is labelled as that selection, never silently upgraded to current.",
+    "Typed changes match actual operation, base, parents and status. Create: new entity,candidate,null base,no parent. Derive: new candidate,null base,one or more exact supporting parents. Branch: new candidate,null base,one exact same-generation typed Context parent. Revise: exact same-entity base and candidate|validated|rejected status. Supersede/invalidate: exact same-entity base and superseded/stale status. Resolve: actual core resolve operation, exact conflict_digest,current base,resolved status and all current competitor parents. Current Graph with stale semantic base retains a conflict; stale expected Graph refuses without effects. A supporting parent propagates source ACL; a base is lineage/concurrency only. Fresh-source corrected meaning may use an exact unreadable old base without reading/copying/inheriting its content. Never silently collapse a variant or change old exact revision bytes.",
+    "Sources/rationale: use existing actual assertion events, canonical_refs, parents and explicit access_revisions; do not create a second unverified source list or promote a brief rationale into semantic truth. Ordinary semantic invalidation is a typed stale assertion with reason. Security invalidation remains the existing separately authorized LocalGraphStore source_access operation using a real sequenced admitted access/tombstone event and graph:lifecycle. It may quarantine or deny old claims without a new Context revision and never invents a source event or restores denied history.",
+    "Adoption remains the accepted unchanged wire and content-copy semantics. Typed Context adoption validates actual source profile and uses the actual atomic adoption command, preserving exact A/B pins, current source closure, owner and canonical/source checks. Actual B transition is adopt from the verified origin; copied data.change describes the A assertion, not a fresh B creation. Structural reason is explicit_adoption; unrecorded prose is not_recorded, never guessed. Do not modify historical origins or add an adoption reason parameter. A later explicit B revision may record new rationale/applicability. Cross-generation parents remain prohibited, and bind alone creates no semantic branch.",
+    "Write integration: validate the typed operation and actual selected Ticket/canonical/source facts inside the existing activation-admitted Graph-owned writer, with fixed internal proof paths and no caller hook. Prepare canonical reads outside; never nest public Graph/exploration/canonical snapshots inside a DomainStore callback. Reuse one atomic Graph/source-retention/publication-origin/receipt/outbox effect and existing actor-scoped bind/mutate/selection/adopt idempotency namespace. Exact committed retries precede fresh physical checks and retain original current-input authorization; no post-commit metadata write or second Context receipt store. Reject changed same-key underlying operation; no duplicate effect through a facade alias.",
+    "Current/as-of read contract: at always pins the local committed Graph. current additionally requires at equal current local head at final read; as_of reads exactly its local commit. Return selected exact ref and at, observed current local head, projection head/status/competitors at at, selected immutable assertion status and explicit historical role, typed meaning/applicability, authenticated publication facts and separate shared origin/current-Project views. As-of applies to local Graph and immutable origin base; current Project declaration/version and ACLs are read-time facts and explicitly separate. This is not global point-in-time Project/ACL replay. No exact miss falls forward; mutation/read races fail closed when required pins/fence/current grants change.",
+    "Governing selection: every successful domain read returns the actual separate shared view, including configured usable active type:authority canonical records and their actual artifacts regardless of local page selection. Keep source historical/current/partial/quarantined/unavailable status, fixed origin pin and single current Project declaration/version distinct. Preserve other selected canonical Context records and explicit historical roles. Local role constraint, validated state, matching text, relation GOVERNS/SUPERSEDES, adoption or model confidence grants no canonical authority. Coverage is only the configured selection; null or incomplete coverage is not proof that no rules exist. New canonical source state/declaration does not silently advance an immutable origin base.",
+    "Lineage implementation: use a fixed selected reader inside the existing Graph snapshot to verify actual revision origin -> commit-receipt -> Graph receipt/command -> exploration operation-origin, reusing/factoring the existing adoption publication verifier. No actor-private getReceipt lookup to traverse another authorized actor publication. One-hop outgoing links only: exact base, supporting parents, stored conflict/resolution facts, actual adoption source/publication and captured source lifecycle facts; preserve structural link roles and brief recorded reason/not_recorded distinction. Forward transitions use existing per-entity history paging. No reverse-neighborhood Project scan, recursive frontier, fabricated foreign parent or origin inferred from present folder/branch.",
+    "Selected read authorization: validate every materialized direct target against current actual access. Root and target payloads never leak on denied/unknown/revoked/tombstoned inputs. A still-readable independent root may retain a target ref already present in that root with availability unavailable and no protected target text/actor/rationale. Do not promise a tombstone explanation to an unauthorized caller. Missing/rewound/corrupt required owner, origin, receipt or index facts fail closed; old untyped/unsupported Graph payload is not migrated or given invented profile/origin. Current permission loss may withhold history/receipts without deleting immutable metadata.",
+    "Bounds: retain inert JSON <=1MiB, depth<16, <=50000 nodes, core support<=32 and selected-port ceilings. Typed pages examine at most limit (1..16) underlying candidates, can return an empty page plus continuation, and never scan to fill it. One-hop lineage enumerates at most128 direct edge candidates from its bounded root, returns/materializes at most16 targets per call, and rejects overflow without truncating provenance. At most17 selected semantic point reads per lineage call (root+16), each retaining existing256-port-call ceiling; no false claim of one global256-call budget. Shared and Ticket proof reads remain bounded by configured<=16 records and requested<=8 distinct Ticket selection pins. Enforce one aggregate1MiB output bound before returning; do not add a Project lifetime limit.",
+    "Cursors: fixed inert schema with kind/version, scope, configuration identity, exploration, exact at, resolved root ref for lineage or exact collection for page, mode, continuation position and read-time Project declaration/source fence pins. Cursors are locators, never authority. Recompute and validate selected facts under current grants on every continuation; mismatched root/collection/scope/version/pins rejects. Explicit current mode rejects local head movement; as_of preserves its exact historical local view. No hidden latest substitution or unbounded page fill.",
+    "Conformance must include all domain transitions and old four responsibilities: actual A-origin/B-adoption/A-supersession/B-current, role/applicability correction, unknown/forged/foreign Ticket/code refs, active Authority inclusion without a fictional filter API, historical canonical roles, current/as-of local selection and read-time shared distinction, distinct stale Graph/base behavior, complete competitor resolution, denied parent/history, semantic stale versus real source revocation/tombstone, repeated transition/exact retry/changed request or operation, restart, bounded128-candidate/16-target continuation/1MiB overflow, corrupted selected lineage, and current grant/head/base/declaration/fence races. Assert exact zero row delta on rejection and atomic receipt/origin/outbox equality on retry. Reuse real disposable Git/SQLite and existing process/CAS/SIGKILL harness for materially changed commit boundaries; no fake public success or new recovery framework.",
+    "Existing Judge boundary remains unchanged: JudgeInputs currently requires semantic_type judge-target and data.kind judge_target for selected candidates. runtime_context is not a supported Judge target and this Ticket must not claim that it is, copy its text into an unverified caller target, or broaden the accepted Judge wire. A later explicit consumer/bridge refinement must validate and map actual authorized typed Context through real selected pins before using it with Judge. This is a known integration boundary, not a causal dependency or additional implementation in this slice.",
+    "Verification commands: node --test test/context-*.test.mjs; affected existing Graph/exploration/adoption/canonical/source test files selected with rg; npm run verify and npm run verify:standalone from semantic-runtime/; npm run verify:artifact from repository root. Preserve existing provider/replay/Judge and shipped plugin behavior. Tests use synthetic fixtures only. No live model or secret is required; local App/plugins consume this API in their own later integration scope."
   ],
-  "context": "Local stage L1/L3. Consume branch Graph primitives to implement the domain lifecycle/meaning projection and read contract; no new generic graph engine, automatic semantic merge or UI-only truth. Canonical promotion remains separately authorized. Responsibility-transfer update: branch-graph-projection now owns guarded local enrollment/writes/views only; ticket-runtime-exploration-adoption-v0 retains the actual explicit-adoption and adoption-recovery obligations. This Ticket directly consumes that command or its persisted lineage, so remains blocked on its successful Outcome. Existing Acceptance/Contract history and all existing dependency edges are unchanged.",
+  "context": "Local stage L1/L3. Consume branch Graph primitives to implement the domain lifecycle/meaning projection and read contract; no new generic graph engine, automatic semantic merge or UI-only truth. Canonical promotion remains separately authorized. Responsibility-transfer update: branch-graph-projection now owns guarded local enrollment/writes/views only; ticket-runtime-exploration-adoption-v0 retains the actual explicit-adoption and adoption-recovery obligations. This Ticket directly consumes that command or its persisted lineage, so remains blocked on its successful Outcome. Existing Acceptance/Contract history and all existing dependency edges are unchanged. Refined concrete local library slice: six thin typed Context methods over the existing Graph/exploration/adoption transaction and current canonical/source proofs. No new Graph engine, table, namespace, lifecycle journal, recursive traversal, extraction, entity resolver, query ranker, automatic policy, App/HTTP/plugin wiring or canonical writeback. All four original logical obligations remain active at revision2; none is transferred or waived. The direct adoption dependency is exact Contract2 sha256:4a316f2ea99023fc5f73379e8cbb94002e68d249ac7edf82cf8bea573d96e091. Its independently successful exact Outcome is included below.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -55,7 +100,7 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "purpose": "Superseded historical local-first direction; active local-app-product below governs the current App/plugin/local-worker product scope.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     },
     {
@@ -69,6 +114,106 @@
     {
       "purpose": "Immutable original branch Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c and exact moved adoption/recovery responsibilities; no old coverage is silently treated as complete.",
       "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Original proposed product §7.3/7.4: active entities, decisions/constraints/conflicts, exact provenance and Context query; no extra product scope is inferred.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Active local App/plugin/local-worker product direction; supersedes the old local-first scheduling assumption without making host wiring prerequisite to this domain library.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Exact immutable versions versus logical current identity; preserve reproducibility without claiming canonical truth.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-addressable-versioned-context-identity.yaml"
+    },
+    {
+      "purpose": "Separate visible variations/conflicts from canonical promotion; future auto-rebase/equivalence is not implemented by this conservative slice.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-realtime-context-variations-and-reconciliation.yaml"
+    },
+    {
+      "purpose": "Actual v2 assert/resolve/source_access operations, immutable revision/provenance, selected current/as-of port and bounded pages.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "purpose": "Actual authenticated atomic Graph/publication/receipt/outbox, source access, current history authorization, retry and repair.",
+      "ref": "semantic-runtime/docs/graph-store-v0.md"
+    },
+    {
+      "purpose": "Actual owner routing, worktree/Graph pins, immutable origin base and read-time current Project selection.",
+      "ref": "semantic-runtime/docs/exploration-projection-v0.md"
+    },
+    {
+      "purpose": "Actual unchanged per-item adoption wire/content-copy/publication chain and current-authorized retry; successful prerequisite still requires its exact Outcome.",
+      "ref": "semantic-runtime/docs/exploration-adoption-v0.md"
+    },
+    {
+      "purpose": "Actual mutation planner, selected materialize/current versus exact reads, same-generation support and conflict/lifecycle bounds.",
+      "ref": "semantic-runtime/src/core/incremental-graph.mjs"
+    },
+    {
+      "purpose": "Actual lifecycle/address/revision validators and distinction between concurrency base and supporting parents.",
+      "ref": "semantic-runtime/src/core/working-graph.mjs"
+    },
+    {
+      "purpose": "Configured Context/Ticket record validation, usable/historical source status and exact Ticket Contract identities.",
+      "ref": "semantic-runtime/src/core/canonical-records.mjs"
+    },
+    {
+      "purpose": "Actual single transaction owner, fixed exploration write/read composition, selected-source reauthorization and retained receipt path.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Existing public exploration mutation/adoption/read/receipt requests; reuse rather than invent an outer transaction API.",
+      "ref": "semantic-runtime/src/local/exploration-store.mjs"
+    },
+    {
+      "purpose": "Actual owned exploration/origin/route/action/idempotency/binding/declaration metadata guards.",
+      "ref": "semantic-runtime/src/local/exploration-inputs.mjs"
+    },
+    {
+      "purpose": "Existing private actual CanonicalSourceReader issuance/ACL/fence proofs and forced active Authority material.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Actual publication-chain verifier and source/B immutable adoption facts for selected lineage; no caller receipt proof.",
+      "ref": "semantic-runtime/src/local/exploration-adoption.mjs"
+    },
+    {
+      "purpose": "Known downstream boundary: selected Judge candidates require judge-target/judge_target; this runtime_context profile does not change that contract or imply direct Judge usability.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Existing source invalidation authority/fence/notice boundary; Context semantic invalidation must not fabricate lifecycle authority.",
+      "ref": "semantic-runtime/src/local/source-invalidation.mjs"
+    },
+    {
+      "purpose": "Successful exact branch Contract2 supplies the owned-generation/route/origin/canonical-view causal input.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual public branch/route/canonical and metadata corruption fixtures accepted by the prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-branch-graph-projection-v0/exploration-projection-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Accepted real Git/SQLite, process/recovery, bounds and independent component/plugin verification baseline.",
+      "ref": ".vibehub/evidence/ticket-runtime-branch-graph-projection-v0/exploration-projection-verification-20260922.yaml"
+    },
+    {
+      "purpose": "Direct prerequisite exact Contract2 sha256:4a316f2ea99023fc5f73379e8cbb94002e68d249ac7edf82cf8bea573d96e091; current explicit-adoption/recovery obligations are required causal inputs.",
+      "ref": ".vibehub/tickets/ticket-runtime-exploration-adoption-v0.yaml"
+    },
+    {
+      "purpose": "Confirmed independently successful exact adoption Contract2 sha256:4a316f2ea99023fc5f73379e8cbb94002e68d249ac7edf82cf8bea573d96e091; supplies actual A/B lineage, atomicity and current-authorized retry.",
+      "ref": ".vibehub/outcomes/ticket-runtime-exploration-adoption-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked adoption Evidence referenced by the independently successful exact prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-exploration-adoption-v0/exploration-adoption-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked adoption Evidence referenced by the independently successful exact prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-exploration-adoption-v0/exploration-adoption-verification-20260922.yaml"
     }
   ],
   "contract_revisions": [
@@ -97,12 +242,38 @@
       ],
       "identity": "sha256:fe2261ca499af1b0f35ad39b9c5dfba0a5a3201e5b3e85d594f05df945e0af48",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "lifecycle-conformance",
+          "identity": "sha256:00977ad9ef22af5e99a9145d47c90cf24d6e925b634f83c28187553645e2ad7e",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "lifecycle-read-contract",
+          "identity": "sha256:4910a2fdb8d03bfcefcd41cb90a57e185ac2c11cef4d1dec06a11a0df8c628d3",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "meaning-and-applicability",
+          "identity": "sha256:3a4fc51f0ae856c71a47333baef4547be5b122c1dbeadb3d30a00969ace417bc",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "scoped-lineage",
+          "identity": "sha256:591681e0c9f7d9282a4577fb2dbd6ca3f39f1fd295748b60a15d126b43b97397",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Maintain scoped Context lifecycle and semantic lineage as reproducible queryable state.",
+  "maturity": "firm",
+  "outcome": "Maintain typed exploration-scoped Context meaning, applicability and immutable lifecycle lineage through bounded authenticated current/as-of APIs.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
