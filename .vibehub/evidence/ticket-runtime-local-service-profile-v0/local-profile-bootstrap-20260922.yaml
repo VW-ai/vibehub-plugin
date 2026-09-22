@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "local-profile"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "local-profile",
+      "identity": "sha256:cc8232ad62d70f2df5b275d57d1964e2268ec08fd2935956f9c02c9f5b074eff",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-profile-bootstrap-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:31:52.622598+00:00",
+  "refs": [
+    "semantic-runtime/package.json",
+    "semantic-runtime/src/local/cli.mjs",
+    "semantic-runtime/src/local/service.mjs",
+    "semantic-runtime/docs/local-service-profile.md",
+    "semantic-runtime/scripts/verify-standalone.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented npm start/status using one Node loopback process and bundled SQLite WAL bootstrap, with no new dependency. Documented supported Node, explicit data path, shutdown and independent component setup. Actual local start/status succeeded; npm run verify:standalone freshly installed the copied component outside the repo and passed all 288 tests. This proves bootstrap only, not domain APIs or full app readiness.",
+  "ticket_id": "ticket-runtime-local-service-profile-v0"
+}

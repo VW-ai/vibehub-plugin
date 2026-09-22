@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "ff5175ec41ad9c549544d99faa032efbfc678cde",
+        "blob": "76a1b4394f757d2aa4e324ba166492090e01c673",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -50,11 +50,15 @@
         "path": "semantic-runtime/docs/local-app-integration-notes.md"
       },
       {
+        "blob": "4c8505f25e39ed85fa000e56b32e645657e1776f",
+        "path": "semantic-runtime/docs/local-service-profile.md"
+      },
+      {
         "blob": "4a67a8f5e42755c70e5541b56311b81e17958b9a",
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "6c10def6e279fc544b0fc414bd1bb5ed96976b95",
+        "blob": "5afca1cbba7f1285ad18a4ba5dd69c5155d829f3",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -94,7 +98,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "356c6c828d6456ac50647cc2284337e2bfb7f0ed",
+        "blob": "acc40ba6557cd0a8924ce9c69a1af95fbea6bf97",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -310,6 +314,14 @@
         "path": "semantic-runtime/src/index.mjs"
       },
       {
+        "blob": "69958407d777891d8c678de889c06405bc9e17d2",
+        "path": "semantic-runtime/src/local/cli.mjs"
+      },
+      {
+        "blob": "e41a2d932445636da09f2061fbea2074106c8ba8",
+        "path": "semantic-runtime/src/local/service.mjs"
+      },
+      {
         "blob": "8b6d67b04f2c3a2408c1a0d82f81de1e47f9c192",
         "path": "semantic-runtime/test/boundaries.test.mjs"
       },
@@ -478,6 +490,10 @@
         "path": "semantic-runtime/test/judge-resilience.test.mjs"
       },
       {
+        "blob": "4c5f428734da307d7c7c26afb1a01ac4cce00763",
+        "path": "semantic-runtime/test/local-service.test.mjs"
+      },
+      {
         "blob": "d2f939ca86f58ad18c85b49ec7650e17ae49fbaa",
         "path": "semantic-runtime/test/observability-contract.test.mjs"
       },
@@ -530,8 +546,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T06:41:41.720Z",
-    "last_aligned_commit": "17299b4548aa99d4f136f9ea7e9161d361a30c8e"
+    "checked_at": "2026-09-22T07:34:17.013Z",
+    "last_aligned_commit": "75272dab23f81201e4c296c0c30182b0ea160ae7"
   },
   "anchors": [
     "semantic-runtime/"

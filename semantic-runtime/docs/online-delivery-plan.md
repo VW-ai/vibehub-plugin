@@ -34,6 +34,12 @@ placement does not mean all inference or every data destination is local.
 
 ## Current readiness
 
+Local bootstrap delivered 2026-09-22: `npm start` now serves a loopback status
+page with SQLite readiness, `npm run status` checks it, and SIGINT/SIGTERM stop
+the process while preserving data. This is the local-service-profile slice only;
+app onboarding, project activation, providers, collection and Workers remain
+pending. [Run instructions and boundaries](local-service-profile.md).
+
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20
 sanitized Peel events / 80 decisions. This proves the current mechanisms, not

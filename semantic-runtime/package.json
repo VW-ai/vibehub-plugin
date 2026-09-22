@@ -12,6 +12,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "start": "node src/local/cli.mjs",
+    "status": "node src/local/cli.mjs --status",
     "test": "node --test test/*.test.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "verify": "npm run check:boundaries && npm test",

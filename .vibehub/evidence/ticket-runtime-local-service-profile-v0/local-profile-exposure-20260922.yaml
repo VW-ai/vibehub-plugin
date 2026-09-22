@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "local-exposure"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "local-exposure",
+      "identity": "sha256:da5ff9f79cddd89c41e5115a5d73d43f59ca735463f71f131a5120645cd0a049",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-profile-exposure-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:31:53.756389+00:00",
+  "refs": [
+    "semantic-runtime/test/local-service.test.mjs",
+    "semantic-runtime/src/local/service.mjs",
+    "semantic-runtime/src/local/cli.mjs",
+    "semantic-runtime/.gitignore"
+  ],
+  "schema_version": 2,
+  "summary": "Five focused synthetic tests and full npm run verify (288 passing, boundary check 75 files) prove loopback-only bind, wrong Host/Origin rejection, no CORS, no file serving/writes, actionable storage/config/port failure and unknown database preservation. Generated .local/app/bootstrap.sqlite is Git-ignored. No provider secret, env file, model or trace was accessed.",
+  "ticket_id": "ticket-runtime-local-service-profile-v0"
+}

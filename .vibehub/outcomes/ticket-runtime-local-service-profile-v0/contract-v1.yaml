@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "local-exposure",
+    "local-lifecycle",
+    "local-profile"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T07:34:19.700Z",
+  "contract_revision": {
+    "identity": "sha256:e92f749629a99228d052f5f14706e009b04ae92895af5a44238a369dac438c14",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "local-profile-bootstrap-20260922",
+    "local-profile-exposure-20260922",
+    "local-profile-lifecycle-20260922"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent /root/closeout_runtime_events was uninvolved in execution of this Ticket. It inspected the exact active Contract, all three native Evidence records, source, tests, configuration, Context and standalone verification log, then independently reproduced focused tests and adversarial lifecycle/exposure probes. Its only project-record write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three current criteria in Contract v1. The isolated component now has documented npm start/status, supported Node versions and bundled SQLite WAL bootstrap, explicit/default data location, signal shutdown, clean-install verification and clearly stated absence of domain APIs or production guarantees. The listener is fixed to 127.0.0.1; only a nonsensitive status page and liveness/readiness endpoints are served, with exact Host/Origin restrictions, no CORS or arbitrary file/database exposure. Storage identity checks reject foreign/corrupt files, startup failure closes the database, and shutdown/restart preserves bootstrap state and unrelated user data. No new dependency, hook, model call, collection or cloud resource was introduced. Independently reproduced all 5 focused synthetic tests after granting the loopback permission denied by the initial sandbox; component boundary check passed with 75 files and zero errors. Additional independent probes passed 18 path/Host/Origin/method cases, shutdown with an incomplete HTTP request and immediate same-port reuse, and SQLite write-lock rejection followed by successful recovery without changing the bootstrap timestamp. Disabling Node SQLite produced the actionable unavailable-module error without allocating a data directory; help still worked, invalid port/host settings created nothing, and Git ignore checks covered the default DB, WAL/SHM and .env.local names without reading secrets. Reviewed the actual fresh-copy standalone log: 288 tests passed and standalone installation/boundaries completed successfully; that full run was executed by the parent, not repeated by this reviewer. All five Ticket Context references resolved through the shared engine, current superseding local-App and SQLite decisions were checked, context guard passed with zero violations, ticket validate passed and git diff --check was clean. No blocking findings. This adjudicates only the local bootstrap profile; authentication, domain schema migration, project enrollment, collectors, providers and complete App behavior remain their separately planned work.",
+  "ticket_id": "ticket-runtime-local-service-profile-v0",
+  "unresolved_acceptance_ids": []
+}

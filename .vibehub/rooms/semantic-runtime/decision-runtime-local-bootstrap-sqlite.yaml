@@ -1,0 +1,38 @@
+{
+  "context_id": "decision-runtime-local-bootstrap-sqlite",
+  "detail": "在用户要求开动且避免 over-engineering 后，按已有 local-service-profile Ticket 实现单进程 loopback HTTP 状态入口与 Node 内置 SQLite bootstrap。此为 Agent 在既有技术授权内的工程选择，遵循 Tech Design §18.1；不是用户选择云端平台。无新增生产依赖，无 Docker/数据库 daemon/桌面壳；bootstrap 数据库与 replay、未来域存储隔离，HTTP 仅暴露非敏感状态。Auth、项目注册/开关、provider、Collector、Policy/Graph、Worker 留在各自已规划 Ticket。完成的 Node/Postgres spike 仍是未来 hosted 方案输入，不能强制本地安装 PostgreSQL。",
+  "evidence": [
+    {
+      "note": "用户要求开始执行，并明确“警惕，不要over-engineering.”；具体 bootstrap 技术选择由 Agent 作出。",
+      "ref": "conversation:2026-09-22-start-without-overengineering"
+    },
+    {
+      "note": "只读本地 HTTP bootstrap、数据库身份校验及生命周期实现。",
+      "ref": "semantic-runtime/src/local/service.mjs"
+    },
+    {
+      "note": "§18.1 推荐本地 embedded SQLite/WAL。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T07:30:19.991255+00:00",
+    "ref": "semantic-runtime/docs/local-service-profile.md"
+  },
+  "state": "active",
+  "summary": "本地启动基础采用单个 Node 进程和内置 SQLite，域服务另行接入",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "sqlite"
+  ],
+  "type": "decision"
+}

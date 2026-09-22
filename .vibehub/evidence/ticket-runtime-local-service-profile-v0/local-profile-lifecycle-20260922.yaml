@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "local-lifecycle"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "local-lifecycle",
+      "identity": "sha256:79f7018d2774c38c2a94cd3d146535d9b85639c8f19a797a32cd77effe18cc3c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-profile-lifecycle-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:31:54.767717+00:00",
+  "refs": [
+    "semantic-runtime/test/local-service.test.mjs",
+    "semantic-runtime/docs/local-service-profile.md"
+  ],
+  "schema_version": 2,
+  "summary": "Real child-process and SQLite tests cover startup/readiness, SIGINT/SIGTERM exit, restart on the released port, persistent timestamp and unrelated-file preservation, port-in-use, invalid storage, corrupt/foreign DB refusal and liveness versus storage readiness. All 5 focused tests and 288 standalone checks passed on Node 23.9.0. No global daemon, hooks, cloud or model calls required.",
+  "ticket_id": "ticket-runtime-local-service-profile-v0"
+}

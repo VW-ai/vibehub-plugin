@@ -15,6 +15,11 @@ The included synthetic fixture still proves pipeline behavior only.
 
 ## Run the prototype
 
+For the local service bootstrap, run `npm start` in this directory and open the
+printed URL; `npm run status` checks readiness and Ctrl+C stops it. This starts
+only a local status page and SQLite bootstrap, with no collection or model calls.
+See the [local service profile](docs/local-service-profile.md) for setup and limits.
+
 Use Node.js 22.13+ (23.x requires 23.4+); CI targets Node 22 and 24. The SQLite
 adapter uses Node's built-in `node:sqlite`. The pinned AI SDK is the Runtime's
 only production dependency; Acorn is a pinned development dependency for
