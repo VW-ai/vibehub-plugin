@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-eight-v1",
+  "measured_at": "2026-09-22T08:15:51.963Z",
+  "completed": 8,
+  "matched": 8,
+  "total": 8,
+  "rows": [
+    {
+      "id": "durable-yes",
+      "family": "durable_cross_ticket_value",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [],
+      "confidence": 0.82,
+      "model": "jev-1.13.0",
+      "latency_ms": 369
+    },
+    {
+      "id": "durable-no",
+      "family": "durable_cross_ticket_value",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.95,
+      "model": "jev-1.13.0",
+      "latency_ms": 335
+    },
+    {
+      "id": "work-yes",
+      "family": "independently_schedulable_work",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [],
+      "confidence": 0.96,
+      "model": "jev-1.13.0",
+      "latency_ms": 420
+    },
+    {
+      "id": "work-no",
+      "family": "independently_schedulable_work",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "latency_ms": 519
+    },
+    {
+      "id": "acceptance-yes",
+      "family": "acceptance_relevance",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "logout"
+      ],
+      "confidence": 0.95,
+      "model": "jev-1.13.0",
+      "latency_ms": 515
+    },
+    {
+      "id": "acceptance-no",
+      "family": "acceptance_relevance",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "latency_ms": 541
+    },
+    {
+      "id": "context-yes",
+      "family": "context_relevance",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "login"
+      ],
+      "confidence": 0.87,
+      "model": "jev-1.13.0",
+      "latency_ms": 416
+    },
+    {
+      "id": "context-no",
+      "family": "context_relevance",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.97,
+      "model": "jev-1.13.0",
+      "latency_ms": 550
+    }
+  ],
+  "operational": {
+    "requests": 8,
+    "retries": 0,
+    "rate_limited": 0,
+    "transient_failures": 0,
+    "wait_ms": 2206
+  }
+}

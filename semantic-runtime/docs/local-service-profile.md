@@ -2,8 +2,10 @@
 
 This is a working local process/storage entry point, not the complete VibeHub
 App. It exposes a small status page, process health and database readiness.
-Project registration, authentication, domain migrations, collection, semantic
+Project registration, domain migrations, collection, semantic
 processing, provider keys and Workers remain in their own Tickets.
+The [authentication foundation](service-auth-v0.md) now adds an authenticated
+identity inspection endpoint; App pairing and plugin enrollment are still pending.
 
 ## Run, check and stop
 
@@ -48,10 +50,11 @@ directory. The default always resolves beside the component, not the caller's cw
 - `GET /healthz` reports process liveness. `GET /readyz` checks the bootstrap row
   is readable and returns 503 on failure. Readiness is not a capacity, permission
   or semantic-quality guarantee. No filesystem paths or credentials are returned.
-- `GET /` is a read-only status page. Unknown paths are 404, other methods 405.
+- `GET /` is a read-only status page. `/v1/session` is the authenticated inspection
+  endpoint described above. Unknown paths are 404, other methods 405.
   Host/Origin validation rejects rebinding and cross-origin reads; no CORS is
-  enabled. These checks are not identity/authentication. Only nonsensitive
-  bootstrap status is exposed until the separate local service-auth Ticket lands.
+  enabled. These checks complement bearer authentication; nonsensitive bootstrap
+  status remains public.
 
 Default generated state and SQLite sidecars are ignored by Git. Store provider
 credentials separately through the forthcoming secure-settings interface, never

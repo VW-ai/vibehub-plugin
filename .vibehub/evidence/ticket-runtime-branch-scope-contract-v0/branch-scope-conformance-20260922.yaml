@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "scope-identity",
+    "view-and-authority",
+    "scope-conformance",
+    "participation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "scope-identity",
+      "identity": "sha256:8094a0bfebb9251d43dd6bb9c64d65eeba83807fd3bc5ef888bcb0d14272d9e0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "view-and-authority",
+      "identity": "sha256:039b7df88fd74e29af176746a2d7c65691519bb7c4450367bf680a33fb43ec48",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "scope-conformance",
+      "identity": "sha256:0a30d1351059054a469cc7bbbf57a0cf0c58d73fa2c63b3acb03eafc4927b524",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "participation",
+      "identity": "sha256:fd6f0f38f0046ad0ca3f9abfe01296ad569d9227152618a45c04cb31a33a5874",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "branch-scope-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:22:24.304Z",
+  "refs": [
+    "semantic-runtime/src/core/branch-scope.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/branch-scope.test.mjs",
+    "semantic-runtime/docs/branch-scope-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented pure version-1 exploration scope registry, explicit checkout/ref-incarnation enrollment, rename/deletion/retirement transitions, stable execution-workspace provenance, exact Acceptance/Evidence references, and scope-aware view selection. Nine public-entry synthetic tests prove same-name branches across repositories/clones do not unify; shared enrollment ambiguity stays explicit; branch rename/switch, detached HEAD, delete/recreate and repository-free work preserve identity; multiple Sessions and explorations can progress one Ticket without an additional completion state machine; cross-Project references and malformed inputs are rejected. Independent acceptance origin remains a recorded fact, never acceptance authority. Selected shared Context, branch-local assertions, other-exploration notices, same-scope concurrency and governing violations remain distinct. Ran node --test test/branch-scope.test.mjs test/identity.test.mjs test/working-graph.test.mjs test/working-graph-integration.test.mjs: 46/46 passed. npm run check:boundaries: 88 files, zero errors. Documentation states immutable-catalog generation and current single-lineage Working Graph migration requirements. No persistence, model calls, live host integration, secret access or automatic adoption.",
+  "ticket_id": "ticket-runtime-branch-scope-contract-v0"
+}

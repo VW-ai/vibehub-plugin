@@ -18,7 +18,7 @@
         "label": "auth-tenant-enforcement"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "auth-acl-routing",
@@ -28,7 +28,7 @@
         "label": "auth-acl-routing"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "auth-secret-boundary",
@@ -38,17 +38,45 @@
         "label": "auth-secret-boundary"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "auth-identity-contract",
       "criterion": "Implement local human/host-adapter/service authentication, credential audience, expiry/revocation and no model-provider credential reuse on the accepted local profile. Define connector/Worker identity kinds and conformance rules for later enrollment without requiring their live infrastructure. Localhost is not itself sufficient authentication.",
       "identity": "sha256:dff5bc80467a1bfc649a8c648ab63a22d17f06dd343aad2ea4baf3464416752e",
       "revision": 2,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "auth-identity-contract",
+      "criterion": "On the accepted single-process loopback profile, implement a local-process issuer of opaque 256-bit bearer credentials for distinct human, host-adapter and service principals. Bind each to an exact tenant/project, audience and explicit action set with a maximum one-hour expiry; store only a digest in process memory. Revocation is immediate and process restart invalidates all tokens. Provide no unauthenticated HTTP mint or model-key reuse. Define connector/worker kind conformance for later enrollment without building their infrastructure.",
+      "identity": "sha256:323621b1d5b927d513732fdfc2da5381fef5bf1d79191bdd308a5a4442426e5b",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-tenant-enforcement",
+      "criterion": "Implement reusable exact-scope authorization and collision-safe typed reference/key constructors for http, object, queue and subscription boundaries. Wire a real GET /v1/session conformance endpoint into the local service using Bearer authentication and explicit tenant/project headers, audience and session:read action. Temporary loopback tests reject missing/forged/expired/revoked credentials, wrong audience/action/kind/scope, cross-origin requests and mismatched scoped object/queue/subscription refs. No JWT, OAuth or cross-process enrollment server is required.",
+      "identity": "sha256:80eb07324b15198345de30dac15b7d32b0e33e3e4b6f6be2814d2d642ed30868",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-acl-routing",
+      "criterion": "Implement a deterministic materialization gate consuming an authenticated principal plus current source descriptors: exact tenant/project, ACL revision/allowed_principal_ids, sensitivity, local-only flag and explicit provider allowlist. Every supporting source must authorize the principal; unknown/malformed ACL or classification fails closed, highest sensitivity applies, and external dispatch requires each source allowlist and the tenant allowlist. Return only bounded decisions and selected scoped pointers marked untrusted; no source text, model judgment or pointer implies instruction or authority. Source adapters remain responsible for current ACL/revocation and actual secret scanning before dispatch.",
+      "identity": "sha256:0db9b0b969c01da6e26e4930f86b29736a402b979a916e29a5c27b6234d2f08b",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "auth-secret-boundary",
+      "criterion": "Token values are returned only to the trusted local-process issuer caller, never retained in SQLite, URLs, logs, service responses or ordinary diagnostics. Expose an allowlisted diagnostic projection that excludes headers/body/errors/credentials and provide synthetic canary tests proving supplied bearer/model/Git/connector/deployment secrets cannot appear through these new boundaries. Preserve nonsensitive health/status checks. Do not claim arbitrary secret recognition inside future raw payloads; adapters must use the documented secret-scanning boundary and provenance gate before model materialization.",
+      "identity": "sha256:de7e675fa78cc157d975bb465ae8e64330df0a6c3c50e7c29514e52b9646ff51",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -56,7 +84,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Local stage L1. Implement service authorization on the accepted loopback local profile; the human, host and service identities work locally first. Define connector/Worker identity kinds and conformance without requiring cloud enrollment or enterprise SSO. Hosted deployment selection remains a later explicit decision.",
+  "context": "Local stage L1. Implement service authorization on the accepted loopback local profile; the human, host and service identities work locally first. Define connector/Worker identity kinds and conformance without requiring cloud enrollment or enterprise SSO. Hosted deployment selection remains a later explicit decision. Refined 2026-09-22 against successful SQLite bootstrap: ephemeral capability Map and one authenticated HTTP conformance route, pure ACL/reference helpers, no additional database or infrastructure. UI pairing and durable plugin enrollment remain later composition work.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -77,6 +105,14 @@
     {
       "purpose": "Completed scope identities consumed by authorization.",
       "ref": "semantic-runtime/docs/identity-contract-v0.md"
+    },
+    {
+      "purpose": "Accepted exact local HTTP and SQLite bootstrap boundary consumed by authentication.",
+      "ref": ".vibehub/outcomes/ticket-runtime-local-service-profile-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Supersedes earlier local experience note: local App with plugins and local subscription Workers.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
     }
   ],
   "contract_revisions": [
@@ -131,11 +167,37 @@
       ],
       "identity": "sha256:6bda9f1edc68d1bd9411710bc8bb7678890ee427ff174f59592724db6c4465fb",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "auth-acl-routing",
+          "identity": "sha256:0db9b0b969c01da6e26e4930f86b29736a402b979a916e29a5c27b6234d2f08b",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "auth-identity-contract",
+          "identity": "sha256:323621b1d5b927d513732fdfc2da5381fef5bf1d79191bdd308a5a4442426e5b",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "auth-secret-boundary",
+          "identity": "sha256:de7e675fa78cc157d975bb465ae8e64330df0a6c3c50e7c29514e52b9646ff51",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "auth-tenant-enforcement",
+          "identity": "sha256:80eb07324b15198345de30dac15b7d32b0e33e3e4b6f6be2814d2d642ed30868",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:1a5c142e8c85e9059ba1e4a8cdeb5c4a462b958f961af2758e9f85a6b0404758",
+      "revision": 3
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "A reusable authenticated service boundary enforces scoped identities, revocation and explicit access decisions; module adapters consume its conformance contract.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",

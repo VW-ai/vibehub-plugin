@@ -22,6 +22,7 @@
     "example:gateway": "node --experimental-strip-types --env-file=.env.local index.ts",
     "smoke:jev": "node --env-file=.env.local scripts/smoke-jev.mjs",
     "smoke:jev:direct": "node --env-file=.env.local scripts/smoke-typesafe-direct.mjs",
+    "check:jev:synthetic": "node scripts/check-jev-synthetic.mjs",
     "smoke:jev:openrouter": "node scripts/smoke-openrouter-jev.mjs",
     "replay": "node src/cli.mjs replay",
     "replay:jev": "node --env-file=.env.local src/cli.mjs replay --judge jev",

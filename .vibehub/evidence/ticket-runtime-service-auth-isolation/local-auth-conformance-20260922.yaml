@@ -1,0 +1,46 @@
+{
+  "acceptance_ids": [
+    "auth-identity-contract",
+    "auth-tenant-enforcement",
+    "auth-acl-routing",
+    "auth-secret-boundary"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "auth-identity-contract",
+      "identity": "sha256:323621b1d5b927d513732fdfc2da5381fef5bf1d79191bdd308a5a4442426e5b",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "auth-tenant-enforcement",
+      "identity": "sha256:80eb07324b15198345de30dac15b7d32b0e33e3e4b6f6be2814d2d642ed30868",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "auth-acl-routing",
+      "identity": "sha256:0db9b0b969c01da6e26e4930f86b29736a402b979a916e29a5c27b6234d2f08b",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "auth-secret-boundary",
+      "identity": "sha256:de7e675fa78cc157d975bb465ae8e64330df0a6c3c50e7c29514e52b9646ff51",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-auth-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:23:01.104Z",
+  "refs": [
+    "semantic-runtime/src/core/service-access.mjs",
+    "semantic-runtime/src/local/auth.mjs",
+    "semantic-runtime/src/local/service.mjs",
+    "semantic-runtime/test/service-auth.test.mjs",
+    "semantic-runtime/docs/service-auth-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Exact Contract v3 implemented on accepted single-process loopback bootstrap: digest-only ephemeral credentials, expiry/revocation/restart, unforgeable in-process contexts, scoped HTTP/object/queue/subscription access, all-source ACL and provider/sensitivity gate returning untrusted pointers, allowlisted diagnostics. Focused actual loopback/auth suite 10/10 passes; integrated npm run verify 317 pass, 0 fail, 1 opt-in Keychain test skipped (separately exercised by provider-settings Ticket). HTTP probes cover duplicate bearer headers, missing/forged token, cross-project/browser Origin, URL token rejection and no mint route; SQLite contains no bearer. Provider/Git/connector/deployment canaries do not enter new diagnostics. Source freshness and content scanning remain documented adapter obligations; endpoint does not enroll host Sessions. No model or credentials used for authentication tests.",
+  "ticket_id": "ticket-runtime-service-auth-isolation"
+}

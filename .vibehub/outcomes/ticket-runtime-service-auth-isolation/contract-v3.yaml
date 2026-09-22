@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "auth-acl-routing",
+    "auth-identity-contract",
+    "auth-secret-boundary",
+    "auth-tenant-enforcement"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T08:26:20.319Z",
+  "contract_revision": {
+    "identity": "sha256:1a5c142e8c85e9059ba1e4a8cdeb5c4a462b958f961af2758e9f85a6b0404758",
+    "revision": 3
+  },
+  "evidence_ids": [
+    "local-auth-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Independent review by /root/provider_settings, which did not author or edit this Ticket implementation, tests or Evidence. It began this authentication review from the parent handoff and read-only repository artifacts; its only write for this Ticket is this Outcome. Its earlier implementation work concerned the separate provider-settings Ticket.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v3",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts exact Contract v3. LocalCredentialAuthority issues random 256-bit bearer tokens scoped to principal kind, tenant/project, audience and explicit actions, retains digest plus grant in memory, limits TTL to one hour and invalidates prior contexts on expiry, revocation or close/restart. Context identities are WeakMap-bound and inspected grants are copies; API provider credentials are not service credentials. The real loopback GET /v1/session verifies exact scope, audience, action and kind and rejects duplicate bearer fields, cross-origin access, token URLs and unauthenticated minting while preserving public nonsensitive readiness. Typed tuple references prevent object/queue/subscription scope collisions and confused-deputy acceptance. Materialization requires every current source ACL, exact scoped pointers, classification and local-only/provider rules, applies the highest sensitivity, and returns untrusted pointers rather than source instructions. Allowlisted diagnostics exclude arbitrary request/error/secret material; service tokens never enter SQLite. Independently reproduced 10/10 focused service-auth and local-service tests and 16 additional synthetic probes covering actual HTTP principal kind, audience/action/tenant/project denial, absent/expired/revoked credentials, post-authorization request mutation, mixed sensitivity, ACL intersection and close invalidation. Reviewed the parent full verification log with 317 passed, zero failures and one explicitly opt-in Keychain test skipped; that broad run was not repeated by this reviewer. All seven Context refs resolved, active superseding local-App direction and accepted bootstrap Outcome were checked, context guard had zero violations, ticket validation passed and git diff --check was clean. No blocking findings. This accepts a local-process auth foundation, not UI pairing, persistent host enrollment, current-source discovery, arbitrary secret scanning or a deployed multi-process security service; those remain explicit adapter/composition obligations.",
+  "ticket_id": "ticket-runtime-service-auth-isolation",
+  "unresolved_acceptance_ids": []
+}

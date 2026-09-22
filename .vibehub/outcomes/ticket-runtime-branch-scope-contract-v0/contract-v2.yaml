@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "scope-identity",
+    "participation",
+    "view-and-authority",
+    "scope-conformance"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T08:27:19.252Z",
+  "contract_revision": {
+    "identity": "sha256:a801545ea89239a0c5ae0298c3e64bf64b01d8cf5279bace06e760b90afccc28",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "branch-scope-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/auth_review was not involved in this Ticket implementation. It inspected active Contract v2, exact Evidence, source/public exports/tests/documentation and Context, reproduced the related suite and ran separate adversarial probes. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four active criteria in exact Contract v2. The pure bounded registry binds stable Project exploration, checkout/ref incarnation, immutable bases and execution-workspace identity independently from branch/path names. Explicit enrollment disambiguates same-name branches and cloned refs, rename preserves identity, deletion/retirement retain history, and branch switch/recreation use new bindings while old executions cannot be rebound. Repository-free work has explicit null Git identity. Provenance supports many Sessions/executions and explorations for one Ticket with exact Contract/Acceptance/Evidence references, separate creation/completion/acceptance origins and explicit unknown legacy origin; it creates no acceptance authority or Ticket lifecycle. View partition keeps selected shared/governing Context, local hypotheses, other-exploration awareness, same-scope issues and governing violations distinct; cross-scope hypotheses do not silently change Project truth, and overview selects no main lineage. Independently reproduced 46/46 affected public-entry, identity and Working Graph tests; six additional probes verified prototype-like opaque IDs, cross-tenant rejection, failed transition immutability, mandatory governing visibility and deep freezing, rejection of local governing claims, and accessor rejection without execution. Reviewed documented 512-record bounds, immutable catalog successor requirement and the explicit absence of branch isolation in the existing single-lineage Working Graph. All ten Ticket Context refs resolved through the shared engine, governing authorities were empty and guard passed; component boundary check passed 88 files with zero errors, ticket validate passed, git diff --check was clean. Parent full verification log has 317 pass, 1 explicit native-Keychain skip and zero failures. This accepts a reference contract, not persistence, real host collection, concurrent catalog migration, synchronization, semantic contradiction detection or production branch Graph integration.",
+  "ticket_id": "ticket-runtime-branch-scope-contract-v0",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "provider-config",
+    "credential-lifecycle",
+    "settings-conformance"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T08:25:01.668Z",
+  "contract_revision": {
+    "identity": "sha256:817d642f2f65a0f39b363b267301a8f8533620c87b597c5befc13aca2a8262f2",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "provider-settings-config-20260922",
+    "provider-settings-keychain-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/auth_review had no involvement in provider-settings planning or implementation. It read the complete active Contract and Evidence, inspected JavaScript, Swift helper, public exports, tests and docs, then independently executed synthetic tests and the temporary app-owned Keychain lifecycle. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "All three criteria in exact Contract v1 are accepted for the documented local-process settings module. Explicit existing OpenRouter/Vercel/TypeSafe JEV routes, capability, fallback allowlist and budgets validate without automatic substitution or CLI credential reuse. SQLite persists only validated non-secret config and deterministic opaque Project/provider references; serialized writes, restart lookup, Project/route separation, replacement and deletion are covered. Security.framework helper takes secret input through stdin and returns bytes only over private inherited descriptor 3 to a trusted runtime callback, never argv, inherited provider environment or standard output; fixed status output and bounded errors omit secret values, and locked/denied/missing store has no plaintext fallback. Independently reproduced ordinary focused tests: 7 passed, 1 explicitly skipped native test; separately ran VIBEHUB_TEST_KEYCHAIN=1 node --test test/macos-secret-store.test.mjs: 2 passed, no skips. The native test created only a fresh random app-owned entry with synthetic text, replaced it, read it inside the trusted callback after fresh instance lookup, deleted it and completed finally cleanup; no existing user entries or real credentials were accessed. An additional independent foreign-SQLite rejection probe preserved the user-owned table. Boundary check passed 88 files, no errors; ticket validate passed and git diff --check was clean. All six Context refs resolved, governing authorities were empty and context guard passed. Reviewed parent full verification log: 318 tests, 317 passed, 1 intentional OS-store skip, zero failures. Budget dispatch enforcement, authenticated UI/HTTP composition, collision-safe tenant-to-Project mapping for future multi-tenant integration and live provider availability remain later responsibilities; no completed app UI, model call or universal secret-recognition claim is made.",
+  "ticket_id": "ticket-runtime-provider-settings-v0",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "credential-lifecycle",
+    "settings-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "credential-lifecycle",
+      "identity": "sha256:952e4c9364f3ee7321d3c4d0b7e4a99a86e99c25ff74984f4a7dea7142372975",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "settings-conformance",
+      "identity": "sha256:f99930969ff10cc9eb402f9e0358840a8c466155222c4a02d9bf449971148a3f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "provider-settings-keychain-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:21:10.168Z",
+  "refs": [
+    "semantic-runtime/src/local/keychain-helper.swift",
+    "semantic-runtime/src/local/macos-secret-store.mjs",
+    "semantic-runtime/test/macos-secret-store.test.mjs",
+    "semantic-runtime/docs/provider-settings-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Ran VIBEHUB_TEST_KEYCHAIN=1 node --test test/macos-secret-store.test.mjs on macOS; 2/2 passed, no skips. Fresh random app-owned Keychain entry containing synthetic text only: missing -> create -> read inside trusted callback -> replace -> fresh instance lookup -> delete -> missing. finally cleanup completed. No existing user entries or real credentials read. Security.framework helper receives keys through stdin and returns them only on private inherited descriptor 3 for internal SDK use; stdout is fixed status, stderr ignored, no key argv/environment. Compiler output/helper reside under ignored .local. Documented unsupported OS, absent compiler, denied/locked Keychain behavior as explicit error without plaintext fallback. Follow-up focused tests passed after callback errors were reduced to bounded codes.",
+  "ticket_id": "ticket-runtime-provider-settings-v0"
+}

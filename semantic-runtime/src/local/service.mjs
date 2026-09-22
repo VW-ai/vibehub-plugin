@@ -2,6 +2,8 @@ import { createServer } from 'node:http';
 import { mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { LocalCredentialAuthority, authorizeLocalRequest, LOCAL_AUDIENCE } from './auth.mjs';
+import { scopedReference, accessDiagnostic } from '../core/service-access.mjs';
 
 const APPLICATION_ID = 0x56484253; // VHBS: bootstrap store, separate from replay/domain databases.
 const SERVICE = 'vibehub-runtime';
@@ -50,12 +52,13 @@ const PAGE = `<!doctype html>
 <p>关闭页面不会停止服务。在启动它的终端按 <code>Ctrl+C</code> 退出；已保存的数据会保留。</p>
 </html>`;
 
-/** Bootstrap only. No source access, collection, model execution or domain API. */
+/** Local status and authenticated identity boundary; no source/model execution. */
 export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
   validatePort(port);
   if (typeof dataDir !== 'string' || !dataDir.trim()) throw new Error('An explicit dataDir is required.');
   const storagePath = resolve(dataDir);
   const db = openStorage(storagePath);
+  const auth = new LocalCredentialAuthority();
   let origin;
   let closing;
   const server = createServer((request, response) => {
@@ -73,6 +76,20 @@ export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
       send(403, { error: 'Local origin required' }); return;
     }
     if (request.method !== 'GET') { send(405, { error: 'GET required' }); return; }
+    if (request.url === '/v1/session') {
+      try {
+        const scope = { tenant_id: request.headers['x-vibehub-tenant'], project_id: request.headers['x-vibehub-project'] };
+        const decision = authorizeLocalRequest(auth, request, {
+          scope, audience: LOCAL_AUDIENCE, action: 'session:read', kinds: ['human', 'host-adapter', 'service'],
+          boundary: 'http', reference: scopedReference('http', scope, 'session'),
+        });
+        if (!decision.allowed) { send(decision.reason === 'unauthenticated' ? 401 : 403, accessDiagnostic(decision)); return; }
+        const principal = auth.inspect(decision.context);
+        send(200, { principal_id: principal.principal_id, kind: principal.kind,
+          tenant_id: principal.tenant_id, project_id: principal.project_id, expires_at: principal.expires_at });
+      } catch { send(400, { error: 'Invalid authentication scope' }); }
+      return;
+    }
     if (request.url === '/healthz') { send(200, { service: SERVICE, status: 'alive' }); return; }
     if (request.url !== '/' && request.url !== '/readyz') { send(404, { error: 'Not found' }); return; }
     try {
@@ -98,16 +115,17 @@ export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
       });
     });
   } catch (error) {
+    auth.close();
     db.close();
     if (error.code === 'EADDRINUSE') throw new Error('Port already in use. Choose --port 0 or another local port.');
     throw new Error('Could not bind the local listener. Allow loopback networking and retry.');
   }
   return {
-    url: origin, dataDir: storagePath,
+    url: origin, dataDir: storagePath, auth,
     close() {
       if (!closing) closing = new Promise((resolveClose, reject) => {
         server.close(() => {
-          try { db.close(); resolveClose(); } catch (error) { reject(error); }
+          try { auth.close(); db.close(); resolveClose(); } catch (error) { reject(error); }
         });
         server.closeAllConnections();
       });

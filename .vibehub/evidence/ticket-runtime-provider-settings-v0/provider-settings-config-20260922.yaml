@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "provider-config",
+    "settings-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "provider-config",
+      "identity": "sha256:a125caec313cb8cc8ade3ede3b22ef90a52b1d7cb32d9f041f59f6b44e64aa91",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "settings-conformance",
+      "identity": "sha256:f99930969ff10cc9eb402f9e0358840a8c466155222c4a02d9bf449971148a3f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "provider-settings-config-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:21:09.163Z",
+  "refs": [
+    "semantic-runtime/src/local/provider-settings.mjs",
+    "semantic-runtime/test/provider-settings.test.mjs",
+    "semantic-runtime/docs/provider-settings-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented per-project SQLite settings and explicit OpenRouter typesafe/jev-1.13, Vercel typesafe-ai/jev, TypeSafe jev-latest semantic-judge-v0 allowlist. Config validation rejects unknown capabilities/models/providers, arbitrary fields including API keys and executor login, duplicate/unapproved fallbacks and invalid timeout/attempt budgets. Focused command node --test test/provider-settings.test.mjs test/macos-secret-store.test.mjs passed 7 tests, with 1 explicit OS Keychain test skipped in ordinary run. Covers restart, isolation, callback-error redaction including provider 401, missing and externally removed keys, store unavailability and concurrent settings updates. npm run check:boundaries passed 87 files; no live model request made. Budget settings are validated inputs; dispatch enforcement belongs to the subsequent Judge runtime.",
+  "ticket_id": "ticket-runtime-provider-settings-v0"
+}

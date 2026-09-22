@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "5308a2b28509a72a376889c7bfd4863a17bd6fff",
+        "blob": "7831f112745d82ef4dad82c0c37bbcd91cf3d247",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -28,6 +28,10 @@
       {
         "blob": "494508454c04b67d2cfe05fc7eec8982723eb3a7",
         "path": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      },
+      {
+        "blob": "ed813d76a44a2a9d981f1bc865e975b2e77243c8",
+        "path": "semantic-runtime/docs/branch-scope-v0.md"
       },
       {
         "blob": "b8959a00d9ab262e21e90ea0fba3a4f8faf633ba",
@@ -46,19 +50,27 @@
         "path": "semantic-runtime/docs/identity-contract-v0.md"
       },
       {
+        "blob": "66cf95ee28925df5e2ef14ec4caa7fdba1b9eefc",
+        "path": "semantic-runtime/docs/jev-synthetic-check.md"
+      },
+      {
         "blob": "ded3ba71e74d23daabd112909246572369321259",
         "path": "semantic-runtime/docs/local-app-integration-notes.md"
       },
       {
-        "blob": "4c8505f25e39ed85fa000e56b32e645657e1776f",
+        "blob": "23776a8fbb96de69f7bc2349066ecfb9ff26ef57",
         "path": "semantic-runtime/docs/local-service-profile.md"
+      },
+      {
+        "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
+        "path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json"
       },
       {
         "blob": "4a67a8f5e42755c70e5541b56311b81e17958b9a",
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "4a64e3dd45ab7ab214a6addb478989ef8c962c27",
+        "blob": "396176894b7305f7451f0c768faa1f1549d38cbd",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -82,8 +94,16 @@
         "path": "semantic-runtime/docs/policy-kernel-v0.md"
       },
       {
+        "blob": "33618cf864ff66c53dad0a3ce1112818b33114f4",
+        "path": "semantic-runtime/docs/provider-settings-v0.md"
+      },
+      {
         "blob": "2b272fec3ed7199d8e87bab67dfcfe8128c5e369",
         "path": "semantic-runtime/docs/reconciliation-v0.md"
+      },
+      {
+        "blob": "2e0f10ef0a7d13b988e0453df43bea19aef283e7",
+        "path": "semantic-runtime/docs/service-auth-v0.md"
       },
       {
         "blob": "f2ce8c2888265bc56bd5c2fdf9216bba5a053672",
@@ -102,7 +122,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "3265055a6400086b4060a53f3388c9afd8e604f4",
+        "blob": "03cf182bd6c6ca80bf62b671eba0c1c303f50b35",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -124,6 +144,10 @@
       {
         "blob": "c709b8d091692f0b5f828a04ee1d2c0c26319e70",
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
+      },
+      {
+        "blob": "5610214c3090c4625a62c5d61ae2746265f98515",
+        "path": "semantic-runtime/scripts/check-jev-synthetic.mjs"
       },
       {
         "blob": "44630a27eb8f160883798e2b127844fbb1d2a7f7",
@@ -266,6 +290,10 @@
         "path": "semantic-runtime/src/cli.mjs"
       },
       {
+        "blob": "d8f3fae6ae73ec033170ac11dca5cd1d19244379",
+        "path": "semantic-runtime/src/core/branch-scope.mjs"
+      },
+      {
         "blob": "4185a5000b92b287f1a65324b759e49b2ba05d03",
         "path": "semantic-runtime/src/core/causal-ordering.mjs"
       },
@@ -314,6 +342,10 @@
         "path": "semantic-runtime/src/core/replay.mjs"
       },
       {
+        "blob": "f01dbec19334dd7e0fda6078217ab152858286ae",
+        "path": "semantic-runtime/src/core/service-access.mjs"
+      },
+      {
         "blob": "eb1326a105c066b8d2b80b593f71d8cdfc666b67",
         "path": "semantic-runtime/src/core/worker-protocol.mjs"
       },
@@ -322,20 +354,40 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "545ee967e7d295f3754306eef3efb13acfd25110",
+        "blob": "69243b6d57f7e0d0ca3e8b63dccd258bda663cce",
         "path": "semantic-runtime/src/index.mjs"
+      },
+      {
+        "blob": "152bb214f0e63fb717cecb885db7987a3bc860bb",
+        "path": "semantic-runtime/src/local/auth.mjs"
       },
       {
         "blob": "69958407d777891d8c678de889c06405bc9e17d2",
         "path": "semantic-runtime/src/local/cli.mjs"
       },
       {
-        "blob": "e41a2d932445636da09f2061fbea2074106c8ba8",
+        "blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
+        "path": "semantic-runtime/src/local/keychain-helper.swift"
+      },
+      {
+        "blob": "80aa48bb142dcd72330d2905c51668df0d64d069",
+        "path": "semantic-runtime/src/local/macos-secret-store.mjs"
+      },
+      {
+        "blob": "accb01dd44ef0a536a1720be3fead20807c69603",
+        "path": "semantic-runtime/src/local/provider-settings.mjs"
+      },
+      {
+        "blob": "c6dc27cc4855544438851863ff4f32089fbef6ed",
         "path": "semantic-runtime/src/local/service.mjs"
       },
       {
         "blob": "8b6d67b04f2c3a2408c1a0d82f81de1e47f9c192",
         "path": "semantic-runtime/test/boundaries.test.mjs"
+      },
+      {
+        "blob": "1c7bf1e963a957610913c799af0055bd88b5b729",
+        "path": "semantic-runtime/test/branch-scope.test.mjs"
       },
       {
         "blob": "245235e678bf71aa0ae4cc20c8479a66935ac036",
@@ -506,6 +558,10 @@
         "path": "semantic-runtime/test/local-service.test.mjs"
       },
       {
+        "blob": "ef9cf9f696b9f4c3fd9a7b40e4a52a08339daaa2",
+        "path": "semantic-runtime/test/macos-secret-store.test.mjs"
+      },
+      {
         "blob": "d2f939ca86f58ad18c85b49ec7650e17ae49fbaa",
         "path": "semantic-runtime/test/observability-contract.test.mjs"
       },
@@ -530,6 +586,10 @@
         "path": "semantic-runtime/test/policy-kernel.test.mjs"
       },
       {
+        "blob": "a81479507d816d03587b13df74b46c72aa40898e",
+        "path": "semantic-runtime/test/provider-settings.test.mjs"
+      },
+      {
         "blob": "56d59fa62345c761619e76067e4d6a17dd66d6f0",
         "path": "semantic-runtime/test/reconciliation-integration.test.mjs"
       },
@@ -540,6 +600,14 @@
       {
         "blob": "31b1b8e2d4b58e85b905efebd1d1cf7c62a621a7",
         "path": "semantic-runtime/test/replay.test.mjs"
+      },
+      {
+        "blob": "0a04cb1ed708923b0e9e24ee2ec4f7a9fcf26fff",
+        "path": "semantic-runtime/test/service-auth.test.mjs"
+      },
+      {
+        "blob": "c2d4ec72f5cfbe2e0d8ef4ca8d809b7c088c062f",
+        "path": "semantic-runtime/test/synthetic-jev-check.test.mjs"
       },
       {
         "blob": "702673704a2fe50c58f349bc98e924c17d49ca17",
@@ -562,8 +630,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T07:51:33.258Z",
-    "last_aligned_commit": "2b2366b5adefd718ebc070f6a3c2d6c59fa935aa"
+    "checked_at": "2026-09-22T08:28:00.342Z",
+    "last_aligned_commit": "040d5994f070fa8d9ebbd6545a9a30ee08be418a"
   },
   "anchors": [
     "semantic-runtime/"

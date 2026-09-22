@@ -8,7 +8,7 @@
         "label": "store-schema-integrity"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "store-migration-runner",
@@ -18,7 +18,7 @@
         "label": "store-migration-runner"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "store-rebuild-derived-state",
@@ -28,7 +28,7 @@
         "label": "store-rebuild-derived-state"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "store-concurrency-fixtures",
@@ -38,10 +38,38 @@
         "label": "store-concurrency-fixtures"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "store-schema-integrity",
+      "criterion": "Implement an isolated Node built-in SQLite domain-store adapter with its own application ID/file under an explicit data path, consuming the accepted local credential authority. All read/write methods revalidate an opaque authenticated context and derive exact tenant/project scope; no raw SQL or unscoped query API. Provide versioned JSON records with CAS, append-only immutable source rows with unique IDs, and durable outbox enqueue/ack in one synchronous transaction. Unknown namespace/key/value and malformed JSON are bounded/rejected; no complete graph/event/job domain schemas here.",
+      "identity": "sha256:a19b78b0ffe925706a87b4a6630982ea91156a0e9bb4bc87666fc88613c3ce52",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-migration-runner",
+      "criterion": "Provide an inspectable migration plan that does not create or modify the selected database, explicit application of versioned SQLite migrations in transactions, application/schema compatibility checks rejecting foreign/newer/corrupt stores without replacement, and restart-safe recovery. Demonstrate v1 core tables to v2 disposable derived index; no destructive downgrade, document backup/forward-fix and that future destructive transitions need their own migration policy.",
+      "identity": "sha256:8ee0dc16594ee5c131557c7ee252e380d6e68c77cfb40b79361eeb7a3d3d0b29",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-rebuild-derived-state",
+      "criterion": "Retain immutable scoped source rows and rebuild one versioned disposable source-kind index/count projection deterministically in a transaction. Tests prove dropping/corrupting and rebuilding this projection does not alter source bytes or leak another Project; domain modules add their own projection/version contracts rather than treating this index as the Semantic Graph.",
+      "identity": "sha256:dbea9b117ae3929010373185b7ed61e1de44535e8c50bc6001e48de742fe637c",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-concurrency-fixtures",
+      "criterion": "Use real temporary SQLite databases and two independent connections/processes to prove exactly one CAS winner, duplicate source/outbox identity rejection, successful atomic record+outbox writes, rollback of both on callback exception and process interruption before commit, restart durability and tenant/project isolation. Reject async transaction callbacks and stale transaction handles; revoked/expired/forged auth contexts fail before reads or writes. Local busy/closed/store errors remain bounded, with no credentials/source payload echoed.",
+      "identity": "sha256:c7598993510af369c7b8ece29aa8ae6b7819213dbea569fa9adc4cae8439813b",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -49,7 +77,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Local stage L1. Use the concrete backend chosen by local-service-profile, implementing transaction/CAS/outbox and migration primitives under service authorization. Domain tables belong to separate Tickets. The completed platform spike is evidence, not this production adapter.",
+  "context": "Local stage L1. Use the concrete backend chosen by local-service-profile, implementing transaction/CAS/outbox and migration primitives under service authorization. Domain tables belong to separate Tickets. The completed platform spike is evidence, not this production adapter. Refined for accepted Node SQLite/local credential capability design: one small independent domain DB and transactional repository primitives, not an ORM, migration service or every future domain table. Reuse the service-auth context and scoped-reference contract. Implementation starts only after the existing direct auth prerequisite closes successfully.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -66,6 +94,14 @@
     {
       "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Concrete opaque local auth context and exact scoped reference boundary consumed by repository methods.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Accepted built-in SQLite runtime and local path/lifecycle baseline.",
+      "ref": "semantic-runtime/docs/local-service-profile.md"
     }
   ],
   "contract_revisions": [
@@ -94,11 +130,37 @@
       ],
       "identity": "sha256:f2b5d0b8ff943ea9659e34d12d2616a800c1dff775e474b176a44d044a466ed9",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "store-concurrency-fixtures",
+          "identity": "sha256:c7598993510af369c7b8ece29aa8ae6b7819213dbea569fa9adc4cae8439813b",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "store-migration-runner",
+          "identity": "sha256:8ee0dc16594ee5c131557c7ee252e380d6e68c77cfb40b79361eeb7a3d3d0b29",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "store-rebuild-derived-state",
+          "identity": "sha256:dbea9b117ae3929010373185b7ed61e1de44535e8c50bc6001e48de742fe637c",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "store-schema-integrity",
+          "identity": "sha256:a19b78b0ffe925706a87b4a6630982ea91156a0e9bb4bc87666fc88613c3ce52",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:3d5c0456f4a0a55cae93e88b91b7e0f9e2e8e84122d6b2dfacb2d96e260eb36d",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "The chosen store exposes tested transaction/CAS, uniqueness, scoped-key and outbox primitives plus restart-safe schema migrations; domain modules can add their own isolated schemas.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",

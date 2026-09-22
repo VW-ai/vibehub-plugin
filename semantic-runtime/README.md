@@ -20,6 +20,15 @@ printed URL; `npm run status` checks readiness and Ctrl+C stops it. This starts
 only a local status page and SQLite bootstrap, with no collection or model calls.
 See the [local service profile](docs/local-service-profile.md) for setup and limits.
 
+The local modules now also provide [scoped authentication](docs/service-auth-v0.md),
+[provider settings with macOS Keychain](docs/provider-settings-v0.md) and the
+[exploration/worktree scope contract](docs/branch-scope-v0.md). Project onboarding
+and the settings UI still need composition; installing these modules does not
+enable collection or background work.
+
+For a small real JEV check, run `npm run check:jev:synthetic` with the TypeSafe key
+configured locally. [Inputs, results and limits](docs/jev-synthetic-check.md).
+
 Use Node.js 22.13+ (23.x requires 23.4+); CI targets Node 22 and 24. The SQLite
 adapter uses Node's built-in `node:sqlite`. Production dependencies are the pinned
 AI SDK, official TypeSafe SDK and OpenRouter AI SDK provider; Acorn is a pinned

@@ -46,6 +46,13 @@ cancellation coverage. Full component verification passes 296 tests. No live
 OpenRouter request has been run; route availability remains unverified until the
 synthetic smoke succeeds. [Adapter contract and smoke](openrouter-jev-adapter.md).
 
+Local foundation checkpoint 2026-09-22 adds scoped local authentication,
+provider/Keychain settings and pure exploration/worktree scope contracts. These
+are modules awaiting App composition; there is no project picker or activation
+UI yet. The [real synthetic JEV check](jev-synthetic-check.md) completed 8/8 cases
+through TypeSafe with 8/8 expected classifications and no observed rate limit.
+It is a basic route check, not evidence of nuanced semantic quality.
+
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20
 sanitized Peel events / 80 decisions. This proves the current mechanisms, not
@@ -62,7 +69,9 @@ Still missing: real Collector and durable service composition, typed extraction
 and entity resolution, production Graph persistence/enrollment, branch-aware
 views/adoption, integrated Judge runtime, query/compiler, actionable Agent
 request delivery, bidirectional awareness, local app/provider settings, project
-activation, two plugins and local Worker orchestration. Address resolution is
+activation, two plugins and local Worker orchestration. Provider settings exist
+as a local module; their App form and runtime dispatch integration remain pending.
+Address resolution is
 not semantic entity resolution. Same-entity concurrent assertions
 in the current one-lineage Graph are not branch-local hypotheses.
 

@@ -5,6 +5,12 @@ export { normalizeEvent, normalizeState, judgeInputHash } from './core/contracts
 export { JevJudge } from './adapters/jev-judge.mjs';
 export { TypeSafeJevJudge } from './adapters/typesafe-jev-judge.mjs';
 export { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from './adapters/openrouter-jev-judge.mjs';
+export { BRANCH_SCOPE_VERSION, createBranchScope, validateBranchScope, applyBranchScopeChange,
+  resolveExploration, recordTicketWorkspaceProvenance, selectExplorationView } from './core/branch-scope.mjs';
+export { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from './local/provider-settings.mjs';
+export { MacOSSecretStore } from './local/macos-secret-store.mjs';
+export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMaterialization, accessDiagnostic } from './core/service-access.mjs';
+export { LOCAL_AUDIENCE, LocalCredentialAuthority, authorizeLocalRequest } from './local/auth.mjs';
 export {
   IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity,
 } from './core/identity.mjs';
