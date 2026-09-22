@@ -8,7 +8,7 @@
         "label": "ingress-policy-composition"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "ingress-policy-effects",
@@ -18,7 +18,7 @@
         "label": "ingress-policy-effects"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "ingress-policy-behavior",
@@ -29,9 +29,23 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "ingress-policy-composition",
+      "criterion": "Compile a concrete graph for scope/duplicate checks, typed extraction, scoped entity resolution, durability/evidence/current-context/work-discovery signals, relation ranking and impact/conflict guards. Consume extraction/resolution operations rather than implementing them here. Negative durability cannot suppress useful current-task evidence or relevance.",
+      "identity": "sha256:e6a2d88fb1ca3ab4470cb334db3b11d2a03ee12cf6734516a86b2a68d6ecf7bf",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ingress-policy-effects",
+      "criterion": "Map signals to exploration-scoped assertions/relations and IGNORE/INGEST/DEFER/ESCALATE intents. When synthesis is needed, offer a versioned tool-bearing work request through the local bridge or leave pending; a missing separate Worker never authorizes fabricated results. Preserve multiple targets, sources and protected authority.",
+      "identity": "sha256:a310db8d88618053cd6b99e09a7b4d472e9e975fee805da1d25fcdb5ab54722c",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -39,7 +53,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "交付第一套可回放 ingress 业务 Policy. Delivery slice: alpha. Architecture: Tech Design §§9,10,11; PRD §9.1. Scope: A versioned ingress policy converts meaningful Git/Agent observations into typed candidates and multiple grounded relations, escalating only bounded ambiguous/high-impact cases.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: policy-journal: The business graph executes through real bounded, durable handlers and snapshot semantics. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L2. Compose durable policy, extraction, resolution and existing fast signals into candidate updates. ESCALATE may offer a structured task to the current Agent or remain visibly pending; an independent persistent Worker is optional. No global canonical update from a fast signal.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -52,6 +66,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -75,6 +93,27 @@
       ],
       "identity": "sha256:c7d73c6489f725436f7d5eed6fc0985c6996968da43521809aec963170707917",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ingress-policy-behavior",
+          "identity": "sha256:ef48cbc36095a54e4c229c9f653fa93bf8b0e8bda83de560c1bde5e1c357e4d0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ingress-policy-composition",
+          "identity": "sha256:e6a2d88fb1ca3ab4470cb334db3b11d2a03ee12cf6734516a86b2a68d6ecf7bf",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ingress-policy-effects",
+          "identity": "sha256:a310db8d88618053cd6b99e09a7b4d472e9e975fee805da1d25fcdb5ab54722c",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:152ca792919b85cff64c6057f64584d9090780caa9005d5b6135a8de5f3efbe4",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -84,12 +123,18 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "ESCALATE uses the accepted asynchronous job boundary.",
-      "target_ticket_id": "ticket-runtime-worker-scheduler",
+      "rationale": "Durable bounded policy execution and idempotent action boundary.",
+      "target_ticket_id": "ticket-runtime-policy-journal-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Source-grounded extraction and resolution operations.",
+      "target_ticket_id": "ticket-runtime-entity-resolution-v0",
       "type": "depends_on"
     }
   ],

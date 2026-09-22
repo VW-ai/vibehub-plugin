@@ -1,0 +1,39 @@
+{
+  "context_id": "decision-runtime-project-overview-and-room-lineage",
+  "detail": "Project 级视图回答谁在推进什么、关联哪些 Ticket、各探索有什么进展和变化；它不是 main 分支的别名，也不把所有探索折叠成一份最新真相。Room 按主题聚合来源、context 创建、分叉、变体、引用、采纳与合并历史。执行位置可以消失，持久历史和精确版本引用仍要可追溯。代码 merge 是语义复核信号，不自动批准所有上下文变更；第一版不承诺自动语义 merge。具体导航、交互与布局留给 UX 方案任务。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-branch-exploration-scope",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-addressable-versioned-context-identity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "可能就是我们看一个就是 Project 级别的这个视图",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "Project 视图汇总探索与参与者，Room 展示同一主题的语义演变",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "decision"
+}

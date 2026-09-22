@@ -1,0 +1,35 @@
+{
+  "context_id": "contract-runtime-agent-work-request-tool-return",
+  "detail": "ContextPackage 用于辅助当前任务；WorkRequest 要求执行明确工作并回传结果，二者不能混为一种 prompt 注入。工作请求至少绑定任务身份、Project/探索/worktree/session 适用范围、精确输入和基础版本、指令版本、实际可用工具及参数 schema/示例、输出 schema/来源要求、允许动作及结果回执。记录领取/完成/过期和重试语义，重复投递不能重复写入，stale result 不静默应用。Host 必须实际注册或提供可调用接口，仅在 prompt 中列工具名不能声称工具可用。具体 API/tool 名称尚未定稿。没有可用接收 Agent 时保持 pending，不假装已经完成；独立 reviewer 的验收权限保持。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-internal-capabilities-and-host-bridge",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "然后这里头要包含我们怎么样把这个东西放进我们的 Vibe Up 这里面去，tool",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "工作请求必须携带实际可用的工具、schema 和可确认的回传路径",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "contract"
+}

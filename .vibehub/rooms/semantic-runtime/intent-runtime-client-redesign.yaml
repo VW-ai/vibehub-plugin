@@ -1,0 +1,35 @@
+{
+  "context_id": "intent-runtime-client-redesign",
+  "detail": "用户允许重新设计客户端，而不是必须在现有页面附加几个面板。近期设计需要覆盖 Project 全局感知、探索分支及 session/Ticket 归属、Room/context 演变、准确引用、相关变化提示、工作请求与回传、明确采纳以及离线/过期状态。先验证信息结构和关键流程，再实现最小可用页面；保持 semantic-runtime 的独立依赖和发布边界，不导入现有前端内部实现。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-project-overview-and-room-lineage",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "或者可以重新设计。是吧。",
+    "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+  },
+  "state": "active",
+  "summary": "本地客户端可以重新设计，现有前端作为质量和交互参考",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "intent"
+}

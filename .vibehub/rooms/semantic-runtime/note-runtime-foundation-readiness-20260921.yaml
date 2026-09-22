@@ -1,0 +1,35 @@
+{
+  "context_id": "note-runtime-foundation-readiness-20260921",
+  "detail": "Agent 在本次讨论前核验当前 codex/semantic-runtime 的 f10a055 基线：npm run verify 283 项通过；已脱敏 Peel fixture 以 heuristic 回放 20 events/80 判定成功，只证明线路，不证明语义质量或 downstream 收益。已有离线 JEV/Haiku/TypeSafe 适配、SQLite 回放审计，身份/来源/因果水位/Working Graph/Policy artifacts 与非模型 kernel/Worker 和 reconciliation reference contracts，以及 51 项局部 Node/Postgres spike 检查。新 kernel 尚不执行 Judge/Worker，完整采集、实体抽取及语义归一、持久化图服务、query/compiler、Host 双向交付和 branch-aware projection 未完成；地址解析不能称作实体归一，schema 通过不能称作真实推理通过。原始 PRD/Tech Design 保持 proposed；productization gate 仍未评估。",
+  "evidence": [
+    {
+      "note": "实现范围与缺失闭环的现状说明。",
+      "ref": "semantic-runtime/README.md"
+    },
+    {
+      "note": "当前核验的工程基线；283 项验证与 heuristic 回放结果见同日对话中的工具输出。",
+      "ref": "commit:f10a0552448ec271ff05a383d86b57a4e549ef9a"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-experience-first",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "目前我们的propotype is ready for testing了吗？",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "现阶段可测离线机制和基础契约，完整本地产品体验尚未连通",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "note"
+}

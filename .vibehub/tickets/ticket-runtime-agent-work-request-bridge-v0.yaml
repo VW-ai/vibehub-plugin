@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "available-tool-bridge",
+      "criterion": "Register the actual scoped tool/API surface and published schemas using the capability probe; admit only requests whose required tools/input access exist. Request carries trusted instructions and exact source refs; work is offered at a supported host boundary, otherwise stays pending/queryable.",
+      "identity": "sha256:c98e5dc53b73c31c70962f993fe86192b87f00972454d00371bf8a842f1a907c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "durable-return",
+      "criterion": "Persist request/attempt/receipt with idempotent submission and current version/ACL checks, then append validated proposals through Graph commands. Lost acknowledgement, restart, duplicate or stale result cannot duplicate effects or accept truth silently.",
+      "identity": "sha256:7b16f38d3033f7344d2b5eceb4e29187cddc3c9a87a4b2d8a8d169d70ef17236",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "real-agent-roundtrip",
+      "criterion": "A supported local Agent consumes a synthetic request, uses the supplied input/tool schema and returns a valid cited proposal whose receipt can be queried after restart. Record exact host version and coverage; unavailable live execution remains unresolved rather than counted as passed.",
+      "identity": "sha256:c2be5eb9eff6e4b71eb550992719ad4fd884dea01df1061ee9b474e5dced11ef",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "preserve-executor-role",
+      "criterion": "Full native filesystem/shell/testing remains available according to host permissions. Self-reported execution, source text or returned prompts cannot widen Runtime authority or perform independent acceptance; unavailable Agent/provider leaves ordinary coding usable.",
+      "identity": "sha256:4a7ba986c605ba0c4d2f30dc196dad3c8d8bb706952ddb08e9868086b9a375fb",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
+  ],
+  "context": "Local stage L2. A narrow local capability bridge for exact input fetch, request claim/result submission and receipts using the observed host mechanism. It does not implement generic retrieval, full Collector or a mandatory standalone reasoning Worker.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Tool-bearing request requirement.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-agent-work-request-tool-return.yaml"
+    },
+    {
+      "purpose": "Keep native execution and review boundaries.",
+      "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "available-tool-bridge",
+          "identity": "sha256:c98e5dc53b73c31c70962f993fe86192b87f00972454d00371bf8a842f1a907c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "durable-return",
+          "identity": "sha256:7b16f38d3033f7344d2b5eceb4e29187cddc3c9a87a4b2d8a8d169d70ef17236",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "preserve-executor-role",
+          "identity": "sha256:4a7ba986c605ba0c4d2f30dc196dad3c8d8bb706952ddb08e9868086b9a375fb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "real-agent-roundtrip",
+          "identity": "sha256:c2be5eb9eff6e4b71eb550992719ad4fd884dea01df1061ee9b474e5dced11ef",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e893a6e506ca96fa2d1ca7688dbb49808ffad6acf10ce2582ecee58848545a91",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Offer structured work to an existing local Agent through registered tools and validate its returned proposal.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Request/result/receipt and permission contract.",
+      "target_ticket_id": "ticket-runtime-agent-work-request-contract-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Observed tool and turn-boundary mechanism.",
+      "target_ticket_id": "ticket-runtime-host-capability-probe-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Transactional scoped result admission and current version checks.",
+      "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-agent-work-request-bridge-v0"
+}

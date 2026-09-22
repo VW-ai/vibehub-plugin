@@ -1,0 +1,39 @@
+{
+  "context_id": "decision-runtime-local-experience-first",
+  "detail": "近期顺序调整为本地采集、语义沉淀、检索回送和跨 session 接手，然后增加分支内隔离与项目内双向感知。开发 Agent 留在本机并保留真实文件系统、shell、测试和工具环境；服务负责 context 管理并在其上管理 Ticket。云端数据服务、用户自管或托管 Worker 是后续可选部署能力，不能反向阻塞本地体验。原来尽快上线的意图保留为后续交付方向，不再把远端部署或独立后台 reasoning Worker 当作近期必经步骤。这里改变交付顺序，不削减来源、权限、审计、可靠接收、独立验收等能力要求。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-semantic-runtime-online-alpha",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-semantic-runtime-strong-service-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "我们本地可能能够把这个 app 给起来，那也不错了。",
+    "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+  },
+  "state": "active",
+  "summary": "先验证本地完整体验，云端和独立常驻 Worker 不再是近期闭环前提",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "decision"
+}

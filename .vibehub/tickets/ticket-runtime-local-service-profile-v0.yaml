@@ -1,0 +1,91 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "local-profile",
+      "criterion": "Check in a local run/stop/health configuration for the isolated component, selected backend/runtime versions, data location, dependency setup and clean-environment reproduction. State that domain APIs and production guarantees are not provided by this skeleton.",
+      "identity": "sha256:cc8232ad62d70f2df5b275d57d1964e2268ec08fd2935956f9c02c9f5b074eff",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-exposure",
+      "criterion": "Default service binding is loopback; configuration cannot silently expose a database or whole filesystem. Missing dependencies/config produce actionable errors and never block normal Agent/Git work. Secrets and generated state remain ignored.",
+      "identity": "sha256:da5ff9f79cddd89c41e5115a5d73d43f59ca735463f71f131a5120645cd0a049",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-lifecycle",
+      "criterion": "A synthetic startup, stop/restart and dependency-unavailable smoke demonstrates the documented lifecycle and cleanup without deleting pre-existing user data. Subsequent auth/migration modules consume this profile; no cloud Worker, Tailscale or hosting purchase is required.",
+      "identity": "sha256:79f7018d2774c38c2a94cd3d146535d9b85639c8f19a797a32cd77effe18cc3c",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption."
+  ],
+  "context": "Local stage L0. Build local bootstrap/health/readiness/configuration only. Reuse the measured Node/Postgres spike as engineering input; select and document the concrete local backend and commands with no paid/cloud deployment decision. Domain schemas and service auth remain separate Tickets.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Completed measured comparison is input, not a new hosting gate.",
+      "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "local-exposure",
+          "identity": "sha256:da5ff9f79cddd89c41e5115a5d73d43f59ca735463f71f131a5120645cd0a049",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-lifecycle",
+          "identity": "sha256:79f7018d2774c38c2a94cd3d146535d9b85639c8f19a797a32cd77effe18cc3c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-profile",
+          "identity": "sha256:cc8232ad62d70f2df5b275d57d1964e2268ec08fd2935956f9c02c9f5b074eff",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e92f749629a99228d052f5f14706e009b04ae92895af5a44238a369dac438c14",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Provide a reproducible local Runtime bootstrap profile with explicit process, storage and shutdown boundaries.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-service-profile-v0"
+}

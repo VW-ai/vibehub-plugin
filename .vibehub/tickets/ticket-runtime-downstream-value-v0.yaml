@@ -39,7 +39,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "真实任务受控下游收益评测. Delivery slice: post-alpha. Architecture: PRD §§13,15,19; Tech Design §§27,30. Scope: Experimental design and controlled evaluation of the accepted vertical slice.. Excluded: No automatic productization claim or repeated provider benchmark without a comparison question..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L5. Controlled evaluation after the local product loop exists; cloud deployment is not a prerequisite. Plan/freeze authorized cohort, compare current Skill workflow and retrieval baseline, measure long-task stability, session handoff, repeated work and branch-awareness errors without assuming a positive result.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -56,6 +56,14 @@
     {
       "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
       "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Preserve and measure long-task/acceptance behavior.",
+      "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
     }
   ],
   "contract_revisions": [
@@ -88,12 +96,18 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Controlled user-task evaluation uses the actual bounded integrated alpha, not isolated classification scores.",
-      "target_ticket_id": "ticket-launch-semantic-runtime-online-alpha",
+      "rationale": "Actual local integration, including real host and actionable requests.",
+      "target_ticket_id": "ticket-build-semantic-runtime-service-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Frozen replay/evaluation gates and input comparability.",
+      "target_ticket_id": "ticket-runtime-judgeops-v0",
       "type": "depends_on"
     }
   ],

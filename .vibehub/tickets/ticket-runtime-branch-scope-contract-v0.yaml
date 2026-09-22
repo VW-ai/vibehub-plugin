@@ -1,0 +1,115 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "scope-identity",
+      "criterion": "A stable Project-scoped exploration identity binds an explicit repository/ref incarnation and selected base revisions; branch names and filesystem paths are attributes. Fixtures distinguish same-name branches across repositories/clones, explicit shared exploration enrollment versus merely matching refs, rename, branch switch, detached HEAD, delete/recreate and non-Git Project work. Mapping ambiguity is explicit, never guessed from main or timestamp.",
+      "identity": "sha256:8094a0bfebb9251d43dd6bb9c64d65eeba83807fd3bc5ef888bcb0d14272d9e0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "participation",
+      "criterion": "Model many Sessions/executions per worktree and multiple exploration executions of one Ticket while preserving exact Acceptance/Evidence association. Worktree deletion or Session restart does not erase exploration lineage or silently rebind another execution.",
+      "identity": "sha256:3a7f7a48157a8bcdfdca9bb677c3f8cbe301bf89cf4bd521039ff0e02b291cd4",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "view-and-authority",
+      "criterion": "Executable view selection separates selected shared Project Context, local exploration assertions, and other-exploration notices. Incompatible hypotheses in separately scoped explorations do not automatically contest Project truth; same-scope concurrent changes and violation of governing constraints remain explicit. Project overview is an aggregate, not main.",
+      "identity": "sha256:039b7df88fd74e29af176746a2d7c65691519bb7c4450367bf680a33fb43ec48",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scope-conformance",
+      "criterion": "Synthetic public-entry tests prove the mapping/lifecycle/view invariants plus denied cross-Project references. Run affected tests and component boundary checks; publish extension/migration requirements for current single-lineage Graph and immutable catalog bounds.",
+      "identity": "sha256:0a30d1351059054a469cc7bbbf57a0cf0c58d73fa2c63b3acb03eafc4927b524",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption."
+  ],
+  "context": "Local stage L0. Deliver pure versioned constructors/validators/transitions and docs/branch-scope-v0.md. This extends the accepted identity/Working Graph baseline without rewriting their successful Outcomes. No persistence, UI or distributed replication.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "User direction and deliberately open mapping details.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
+    },
+    {
+      "purpose": "Many-to-many participation invariants.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-exploration-participation.yaml"
+    },
+    {
+      "purpose": "Existing stable identity semantics remain valid.",
+      "ref": "semantic-runtime/docs/identity-contract-v0.md"
+    },
+    {
+      "purpose": "One existing Project lineage must not be falsely claimed to provide branch isolation.",
+      "ref": "semantic-runtime/docs/working-graph-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "participation",
+          "identity": "sha256:3a7f7a48157a8bcdfdca9bb677c3f8cbe301bf89cf4bd521039ff0e02b291cd4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scope-conformance",
+          "identity": "sha256:0a30d1351059054a469cc7bbbf57a0cf0c58d73fa2c63b3acb03eafc4927b524",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scope-identity",
+          "identity": "sha256:8094a0bfebb9251d43dd6bb9c64d65eeba83807fd3bc5ef888bcb0d14272d9e0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "view-and-authority",
+          "identity": "sha256:039b7df88fd74e29af176746a2d7c65691519bb7c4450367bf680a33fb43ec48",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3c5d4f9d958220499a124d1792d1a37a74622e242ccf23c67a8ecc400aba52ad",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Define executable exploration/branch scope without conflating Git refs, worktrees, Sessions or Ticket identity.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-branch-scope-contract-v0"
+}

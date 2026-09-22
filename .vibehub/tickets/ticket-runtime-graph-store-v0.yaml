@@ -18,7 +18,7 @@
         "label": "graph-mutation-is-atomic"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "snapshot-read-is-reproducible",
@@ -38,10 +38,24 @@
         "label": "store-survives-isolation-and-crash-tests"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "graph-mutation-is-atomic",
+      "criterion": "A mutation atomically commits immutable revisions, projections, audit and outbox intent. Exact retry returns the same receipt. Stale GraphRevision CAS applies nothing and returns the unapplied proposal; semantic base mismatch is a separate admitted conflict path preserving competing revisions. Never claim a conflict record exists after a rejected transaction.",
+      "identity": "sha256:712741b45441d159692b235b4af4e4e380023347172084d92e58ba5d52c3d915",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "store-survives-isolation-and-crash-tests",
+      "criterion": "Real-backend integration tests prove tenant/project isolation, concurrent CAS, restart durability, tombstones, projection rebuild and pre/post-commit interruption. Publish indexing/paging/retention and enrollment extension points; do not persist bounded cumulative reference fixtures as an unbounded production database.",
+      "identity": "sha256:eb20c4d13e3f214b87c3f79561f5963a2026d506ed332bfd39f7501e99aa28c7",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -62,6 +76,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,6 +108,32 @@
       ],
       "identity": "sha256:e0d55a5c99412a67ddc7c732416cd60deb5bd1c010b95d2c592e39cdff4756ee",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-mutation-is-atomic",
+          "identity": "sha256:712741b45441d159692b235b4af4e4e380023347172084d92e58ba5d52c3d915",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "snapshot-read-is-reproducible",
+          "identity": "sha256:9f9eb84968c5d306e4e621b5a6e00376b4783c6fdc6220955d0093c9fedd2d4d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-implements-revision-protocol",
+          "identity": "sha256:00370aef36d026a88400132f78d716df143577417e3aa5603f25743bc7c42dad",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "store-survives-isolation-and-crash-tests",
+          "identity": "sha256:eb20c4d13e3f214b87c3f79561f5963a2026d506ed332bfd39f7501e99aa28c7",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:4cc50c98c766f8e324a9803bf39cf8c7636756cea75e082908bde68bae576c5f",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -99,6 +143,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [

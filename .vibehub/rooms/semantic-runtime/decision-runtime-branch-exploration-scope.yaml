@@ -1,0 +1,39 @@
+{
+  "context_id": "decision-runtime-branch-exploration-scope",
+  "detail": "用户接受按 branch 或 worktree 分开探索，同时明确一个 worktree 可有多个 session、一个 Ticket 可由多个 worktree 推进。产品隔离单位是可持续追溯的一条探索；Git branch/ref 是其代码关联，worktree 是本地执行实例，session/execution 是参与记录，不能把名字或目录当作全局语义身份。稳定 exploration ID、branch rename/switch/delete/recreate、同名分支跨 repo/clone、detached HEAD 以及非 Git 工作的具体映射是下一项契约任务要验证的工程方案，尚未宣称现有实现支持。不同探索可对同一主题保留不同假设；只有作用域及共同义务重合时才判断业务冲突。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-is-semantic-scope-repository-is-source",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-realtime-context-variations-and-reconciliation",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "或者说，就是branch。",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "以 branch / 探索分支组织局部语义，以 worktree 和 session 记录执行位置",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "decision"
+}

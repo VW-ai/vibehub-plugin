@@ -8,7 +8,7 @@
         "label": "judge-input-is-pinned-and-minimal"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "routing-policy-controls-provider-use",
@@ -39,9 +39,16 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "judge-input-is-pinned-and-minimal",
+      "criterion": "Each JudgeNode materializes only authorized event/state refs from the exact GraphRevision and exploration view, records deterministic input/schema identity and rejects invisible/invented target IDs. Other-branch hypotheses are labeled candidates/notices, not imported governing context.",
+      "identity": "sha256:3ff6a223afbff5b9c03b3523124ded035f9ca6d8bab5e3cbb1f4938e1aba4e27",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -74,6 +81,14 @@
     {
       "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
       "ref": "semantic-runtime/docs/phase0-contracts.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Branch-scoped model inputs.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
     }
   ],
   "contract_revisions": [
@@ -102,6 +117,32 @@
       ],
       "identity": "sha256:b08915bfbcc305265c4ad6f6bad1b4c2a68e012161f883a8326d07c6862f76b5",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "judge-failure-is-explicit",
+          "identity": "sha256:c72d994ed65c678da337dda1aa2ef554d4004058ee2bef1ff7f24f78d7d58a94",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "judge-input-is-pinned-and-minimal",
+          "identity": "sha256:3ff6a223afbff5b9c03b3523124ded035f9ca6d8bab5e3cbb1f4938e1aba4e27",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "recorded-fixtures-cover-routing",
+          "identity": "sha256:b9cbe1b7b6dbe1e17eed1cbf472dc8a2259e9cb8342a72ff07ccf168aaef84d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "routing-policy-controls-provider-use",
+          "identity": "sha256:729dc87b8138bbaec17d33a7523c8bbc82683fa7de69cd5a83e87f1f6eae910b",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6405e1b31d58fada6e149f31df4e124c08e4d81c2065093fa5246ed568e0fc8e",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -111,6 +152,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
@@ -122,6 +164,11 @@
     {
       "rationale": "Inputs must be materialized with current source-access checks, even for historical snapshots.",
       "target_ticket_id": "ticket-runtime-source-access-invalidation-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Real exploration-aware reads and source/base version checks.",
+      "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
       "type": "depends_on"
     }
   ],

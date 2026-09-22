@@ -1,0 +1,115 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "bidirectional-relevance",
+      "criterion": "A and B changes yield symmetric eligible recipient consideration by Project/Room/Ticket/entity relevance; include producer and receiving people/Session context and respect current source ACL. Unrelated changes stay quiet; notices link exact source revision and affected scope.",
+      "identity": "sha256:10efeaaa04e57c3e8dc1a07fa509e85d3504c616d67fafdd5840670f43d4de9f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "seen-is-not-adopted",
+      "criterion": "Persist unseen/seen/deferred/handled meaning separately from adoption receipts. Inspect/continue/defer do not alter the receiving exploration; explicit per-item adoption uses the accepted command and surfaces stale/conflicting destinations.",
+      "identity": "sha256:1f8cc3e58e36e49b583731b3064e28ea74d269799fe534d185f506fc4cbeaea6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "offline-and-restart",
+      "criterion": "Durable outbox/cursors recover missed eligible changes on reconnect or next supported turn; expiry, acknowledgement loss and duplicate delivery do not duplicate notices or rerun work. Coalescing is bounded and preserves pointers to affected versions; no absent session is marked notified.",
+      "identity": "sha256:2e8de421bd83bb4eb92e0540f3c79b1ccbf07b7c1069265c929690a465afa954",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "awareness-scenario",
+      "criterion": "Integration scenario demonstrates A→B→A, simultaneous alternative hypotheses, selected shared-base update notification, source revocation, continued independent work and one explicit adoption with lineage, with no automatic cross-branch canonical writes.",
+      "identity": "sha256:2e1fd958f5fea40b5bc505bb11c94c37c0b3794be4193ac33bc99021c08b158a",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
+  ],
+  "context": "Local stage L3. Policy-driven relevance, recipient selection, notice lifecycle and explicit adoption interaction through existing commands. No raw-message broadcast, Agent-to-Agent control or full distributed sync.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Requested minimum collaboration behavior.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "awareness-scenario",
+          "identity": "sha256:2e1fd958f5fea40b5bc505bb11c94c37c0b3794be4193ac33bc99021c08b158a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "bidirectional-relevance",
+          "identity": "sha256:10efeaaa04e57c3e8dc1a07fa509e85d3504c616d67fafdd5840670f43d4de9f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "offline-and-restart",
+          "identity": "sha256:2e8de421bd83bb4eb92e0540f3c79b1ccbf07b7c1069265c929690a465afa954",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "seen-is-not-adopted",
+          "identity": "sha256:1f8cc3e58e36e49b583731b3064e28ea74d269799fe534d185f506fc4cbeaea6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:66cdf7ab90f55584243bab16531ddc8921b3fdaec4f9bbea9ca01ca2cfc332b6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Deliver relevant semantic changes bidirectionally between explorations without adopting them implicitly.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Authorized relevance candidates and branch view selection.",
+      "target_ticket_id": "ticket-runtime-query-engine-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Recoverable per-session delivery transport.",
+      "target_ticket_id": "ticket-runtime-session-delivery-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-branch-awareness-v0"
+}

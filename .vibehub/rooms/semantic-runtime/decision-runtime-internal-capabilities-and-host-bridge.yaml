@@ -1,0 +1,35 @@
+{
+  "context_id": "decision-runtime-internal-capabilities-and-host-bridge",
+  "detail": "Policy Graph 决定何时做什么；Semantic Working Graph 保存实体、关系、候选、证据、来源和版本。将现有 Skill 能力分别实现为确定性操作、bounded Judge 和需要推理的结构化工作流，不能以万能 prompt 代替执行架构。查询服务承担 scope、检索、关联、过滤和 context 编译；写入先可靠接收 event，再按 policy 抽取、归一、关联及安排必要的沉淀。用户无需反复手动唤醒领域 Skill，但宿主仍须接入采集、query/tool 注册和实际支持的交付时点。API/MCP/tool 描述本身不能保证逐条采集所有消息或主动唤醒任意宿主。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-semantic-runtime-strong-service-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "不需要就是说去主动去唤醒这个 skill这样子。",
+    "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+  },
+  "state": "active",
+  "summary": "服务内化 Skill 的领域能力，Host 接入仍负责真实采集和工具连接",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "decision"
+}

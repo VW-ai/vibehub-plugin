@@ -8,7 +8,7 @@
         "label": "host-capabilities"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "bounded-sensor",
@@ -18,7 +18,7 @@
         "label": "bounded-sensor"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "host-query-degrade",
@@ -29,9 +29,23 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "host-capabilities",
+      "criterion": "Consume the pinned capability matrix and reuse decision from host-capability-probe. Provide one install/setup path and real synthetic-host smoke demonstrating actual captured units plus query delivery, explicitly retaining unsupported lifecycle gaps. The standalone work-request bridge remains a separate component.",
+      "identity": "sha256:49a4a3ecd380b647deed9345dfb5c5dfb481b9fd2c41d685865827339ccf923d",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "bounded-sensor",
+      "criterion": "Emit normalized Project/exploration/session/execution/worktree events with explicit source unit, redaction, source sequence and idempotency. Durable cursor/buffer handling covers crash between read and ACK, replay after restart, duplicate/reordered/partial input and compaction without silent loss claims or unapproved raw export.",
+      "identity": "sha256:d74bfa19a2ded79fca0042e9edb5f7802e7fc5e943cafa437a50a4b9e5f8b3f7",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -39,7 +53,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Codex host sensor / query adapter. Delivery slice: alpha. Architecture: PRD §5.1; Tech Design §§7,15,24,26,28. Scope: One explicit Codex sensor/query integration and its independent install/smoke path.. Excluded: No implementation imports from existing Skills; no Claude/Cursor adapters, required plugin daemon, or hard injection..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L3. Implement the Collector and context-query/delivery integration using the already measured host capability matrix. Do not redo host discovery or own work-request tools; compose the separate bridge when needed. No arbitrary private trace capture, imports from sibling plugin internals, or assumed every-message hook.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -52,6 +66,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Collect only demonstrated units.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-collector-reuse-and-coverage.yaml"
     }
   ],
   "contract_revisions": [
@@ -75,6 +97,27 @@
       ],
       "identity": "sha256:b319def72a62dd4df20e123bb8e23ad6c3fb509eda127120b0881770af843fc1",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-sensor",
+          "identity": "sha256:d74bfa19a2ded79fca0042e9edb5f7802e7fc5e943cafa437a50a4b9e5f8b3f7",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "host-capabilities",
+          "identity": "sha256:49a4a3ecd380b647deed9345dfb5c5dfb481b9fd2c41d685865827339ccf923d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "host-query-degrade",
+          "identity": "sha256:eb3e17ebe6a7bc00cbae7032dcfcfdb9c90f92e2cf66f16f9ec488d2b327a2d0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:114575b7e9f068505c5b78a058f5e2f3d811c481fc298997efc4abaf40b70b3a",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -84,6 +127,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
@@ -95,6 +139,11 @@
     {
       "rationale": "Host events bind to the same proven local worktree identity/diff observations.",
       "target_ticket_id": "ticket-runtime-local-git-worktree-sensor-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Measured surface and reusable Collector mechanism.",
+      "target_ticket_id": "ticket-runtime-host-capability-probe-v0",
       "type": "depends_on"
     }
   ],

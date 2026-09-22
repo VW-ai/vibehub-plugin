@@ -1,0 +1,35 @@
+{
+  "context_id": "contract-runtime-ticket-exploration-participation",
+  "detail": "一个 Ticket 可以在多个探索或 worktree 中推进，一个 worktree 可以有多个 session，也可承载多个 Ticket 的执行。不要机械复制 Ticket 或把整个 Ticket 的完成状态绑定到某个临时目录。每次执行的进展、Evidence、proposal 与其 Ticket/Acceptance 版本及探索/来源关联；不同探索的证据不能无条件替代另一版本的验收。项目级共享约束仍可约束多个探索，局部隔离也不能消除同一探索内多 session 的并发。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-branch-exploration-scope",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "一个 ticket，可能就是两个 worksheet 都在推进吧",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "Ticket 目标、探索分支、worktree 和 session 是不同实体",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "contract"
+}

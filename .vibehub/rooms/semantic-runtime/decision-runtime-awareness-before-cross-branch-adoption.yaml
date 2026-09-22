@@ -1,0 +1,39 @@
+{
+  "context_id": "decision-runtime-awareness-before-cross-branch-adoption",
+  "detail": "相关变化需要 A→B 和 B→A 双向可见，让接收侧的人或 Agent 决定查看、继续自己的探索、稍后处理或明确采纳某条结果。默认有效 context 包含已选版本的共享项目背景、本探索局部状态和其他探索的相关提示；提示不能悄悄成为本地 governing context。项目级背景的新版本同样要明确显示当前采用版本及更新状态。第一版提供有限相关提醒、来源和差异，以及明确的逐条采纳；不做频繁互相唤醒、自动跨分支写入、完整自动语义 merge 或 Agent 间隐式控制。离线/休眠 session 的通知可恢复，seen、deferred、adopted 是不同产品状态。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-branch-exploration-scope",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-realtime-context-variations-and-reconciliation",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "如果比如说在 Session B 这边有一个 decision，我们需要能够传递回 Session A。",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "跨探索先提供双向感知，接收或看到变化不等于采纳",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "decision"
+}

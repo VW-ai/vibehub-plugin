@@ -1,0 +1,35 @@
+{
+  "context_id": "intent-runtime-collector-reuse-and-coverage",
+  "detail": "按用户要求先研究和验证成熟 hooks、宿主事件接口、usage/trace 解析及 checkpoint 机制，分别记录可以采集的 message/tool 单元、时点、顺序、重启行为、脱敏、遗漏和读取范围。不能把 token 统计粒度或某个 hook 覆盖等同于每个模型 message；不能以扫描任意私有 trace 代替明确接入。返还 context 也需实际验证宿主 query/callback/next-turn 能力；不支持的主动注入应诚实降级为可查询或下次交付。评测既看采集可靠性，也看返回的 context 是否改善真实接手和长程执行。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-internal-capabilities-and-host-bridge",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "我们不可能从零开始做嘛",
+    "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+  },
+  "state": "active",
+  "summary": "Collector 先验证宿主覆盖并复用已有机制，再谈无感采集",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "intent"
+}

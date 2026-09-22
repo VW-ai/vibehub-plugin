@@ -8,7 +8,7 @@
         "label": "compiler-enforces-layer-order"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "budgeting-preserves-semantics",
@@ -28,7 +28,7 @@
         "label": "package-is-reproducible"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "compiler-does-not-own-delivery",
@@ -38,10 +38,31 @@
         "label": "compiler-does-not-own-delivery"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "compiler-enforces-layer-order",
+      "criterion": "Within explicit applicability, compile selected shared governing context, task/acceptance, own exploration decisions and working state, evidence, unresolved issues and source pointers. Other-exploration changes occupy a labeled awareness section and never acquire governing status by ranking/confidence; preserve selected shared-base version and update availability.",
+      "identity": "sha256:6e7602a1a8f6a599cd82f1fc1446994f9b32488a8ab8e958c08d00457b0b4f1c",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "package-is-reproducible",
+      "criterion": "Package identity binds QueryResult, graph/source pins, exploration and selected shared base, compiler/policy versions, host capabilities, window profile and budget. Source and adoption lineage explain inclusion after later changes; exact retrieval still checks current permissions.",
+      "identity": "sha256:80e843ac3f5d3064dec54989504e0b73cbee3cefc6dc39e72b1b7787633d8f5a",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "compiler-does-not-own-delivery",
+      "criterion": "Output is an informational ContextPackage with silent/soft/hard recommendation, never an executable WorkRequest or direct prompt mutation. Tests cover two window profiles, branch alternatives, stale shared base, unavailable sources and no-callback consumers; active hard injection remains outside the first local loop.",
+      "identity": "sha256:7dcae33fce61e2fb1f26a56131d61aaf12b4654db1ec2f78147e4cbb81ef279d",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -61,6 +82,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Keep informational and actionable envelopes distinct.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-agent-work-request-tool-return.yaml"
     }
   ],
   "contract_revisions": [
@@ -89,6 +118,32 @@
       ],
       "identity": "sha256:27c1d5df385d87db3e8a6c853eafa0b9749cf617b89e004c80a22114b8c896f9",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "budgeting-preserves-semantics",
+          "identity": "sha256:8aa8bca21df261d23e036156472f268d513754ffbd9f2226d98dedc58161571b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "compiler-does-not-own-delivery",
+          "identity": "sha256:7dcae33fce61e2fb1f26a56131d61aaf12b4654db1ec2f78147e4cbb81ef279d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "compiler-enforces-layer-order",
+          "identity": "sha256:6e7602a1a8f6a599cd82f1fc1446994f9b32488a8ab8e958c08d00457b0b4f1c",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "package-is-reproducible",
+          "identity": "sha256:80e843ac3f5d3064dec54989504e0b73cbee3cefc6dc39e72b1b7787633d8f5a",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:7b6065a636e9f0fe8e4f67ce2b13298dfed35453bd0b54587ae6a6bfdebcb02a",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -98,6 +153,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [

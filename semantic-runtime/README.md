@@ -177,6 +177,16 @@ judge adapters, metrics, and remaining work. Only an explicit `--judge jev`
 selection makes network/model calls. No host hooks, background capture, context
 injection, worker execution, or canonical writes occur in this prototype.
 
+## Current product checkpoint
+
+The owner now prioritizes a complete local experience, with branch/exploration
+isolation and bidirectional Project awareness, before choosing hosted deployment
+or requiring a persistent reasoning Worker. The [delivery plan](docs/online-delivery-plan.md)
+links the captured decisions and separates runnable foundations from missing
+Collector, extraction/resolution, scoped query/compiler, Agent tools and client
+integration. Project overview is not the main Git branch. This is planned work;
+the current prototype still has the offline boundaries stated above.
+
 ## Online foundation contracts
 
 The first online delivery slice adds executable, host- and store-independent

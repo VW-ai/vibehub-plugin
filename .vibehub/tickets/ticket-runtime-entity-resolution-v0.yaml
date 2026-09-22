@@ -1,0 +1,103 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "resolution-scope",
+      "criterion": "Use accepted IDs/source anchors before semantic match; distinguish same-name distinct entities, aliases, continuation versus replacement, cross-repo names and same-theme A/B hypotheses. Preserve subject association without collapsing branch-local revisions into one governing claim.",
+      "identity": "sha256:6ba1cb47fc48353a1cf32aecf0ec65ace4e2e21d81072e64fab546d621e72280",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resolution-actions",
+      "criterion": "Emit create/link/same-as-candidate/ambiguous or correction proposals with exact parents, confidence/route and provenance. Low confidence and conflicting authority defer; JEV target selection alone cannot assert equivalence or merge canonical records.",
+      "identity": "sha256:c1aff4200fec8e33f81d1a04947dc1e7314b23f375bba7fceeda251979d3ef3e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "resolution-evaluation",
+      "criterion": "Version a labeled frozen corpus and test false merges, missed matches, branch isolation, repeated input, stale target and user correction after later events. Report quality separately from adapter/schema success and retain reversible original assertions.",
+      "identity": "sha256:041b43884886891f40fb172d488b47684bcd634f6c850b5be4139be2bee9b4b5",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
+  ],
+  "context": "Local stage L2. Own exact identity linkage, candidate retrieval for semantic equivalence/aliases and validated resolution proposals. No silent global entity merge, general knowledge ontology or invented target IDs.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Alternatives can share a subject without sharing an accepted head.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "resolution-actions",
+          "identity": "sha256:c1aff4200fec8e33f81d1a04947dc1e7314b23f375bba7fceeda251979d3ef3e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resolution-evaluation",
+          "identity": "sha256:041b43884886891f40fb172d488b47684bcd634f6c850b5be4139be2bee9b4b5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resolution-scope",
+          "identity": "sha256:6ba1cb47fc48353a1cf32aecf0ec65ace4e2e21d81072e64fab546d621e72280",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:23467aa48e300f7d5300763c20fd38a64cd69a8c91a6f1bcba218b542e2394b9",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Resolve extracted candidates against existing scoped entities with conservative ambiguity and reversible corrections.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Typed source-grounded candidates.",
+      "target_ticket_id": "ticket-runtime-entity-extraction-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Bounded routing/lookup with current permissions.",
+      "target_ticket_id": "ticket-runtime-judge-runtime-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-entity-resolution-v0"
+}

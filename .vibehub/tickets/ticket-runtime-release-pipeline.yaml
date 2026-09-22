@@ -49,7 +49,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Build the reproducible service and worker release pipeline. Delivery slice: release. Architecture: §22 Security & Privacy; §23 Observability; §24 Failure Handling; §28 Migration from Current VibeHub Plugin; §30 Prototype Success Gate. Scope: Build and verification CI; Staging promotion; Managed configuration and secrets; Release manifests and compatibility; Checked-in engineering deployment contract. Excluded: Unreviewed direct production deploys; Credentials or private fixtures in artifacts; External connectors; Product-value claims from deployment alone.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Later hosted/deployment expansion. Build tested packaging, deployment and rollback for the explicitly selected destination after the local product works; local bootstrap is owned by local-service-profile. No selection, hosting or remote publication occurs during this planning turn.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -62,6 +62,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -99,6 +103,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
@@ -115,6 +120,11 @@
     {
       "rationale": "CI includes bounded offline policy regression with required gate results.",
       "target_ticket_id": "ticket-runtime-judgeops-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Explicit owner-approved hosted destination and cost boundary; no longer blocks local auth/store.",
+      "target_ticket_id": "ticket-select-semantic-runtime-alpha-platform",
       "type": "depends_on"
     }
   ],

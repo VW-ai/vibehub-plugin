@@ -1,0 +1,99 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "observed-capture",
+      "criterion": "For the installed host record exact version/integration surface and observed user/assistant/tool units, lifecycle timing, stable event identity, ordering, compaction/restart and known gaps. Exercise a synthetic session fixture; never infer every-message coverage from usage statistics or one stop hook.",
+      "identity": "sha256:027ade8f63824248e7d51acd46e15235bf282f6ffe375b049cf38df760daa068",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "observed-delivery",
+      "criterion": "Independently test supported query/tool registration, callback or next-turn delivery and acknowledgement using synthetic local payloads. Publish runnable probes and observed supported/unsupported results; an unavailable required path remains an explicit downstream gap, not a successful integrated product.",
+      "identity": "sha256:4f19cba29b7b4a01fdb11e36ac728ec051238909cee6aefd5c5e66224ca812a0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "capture-boundaries",
+      "criterion": "Inspect available primary host documentation/code and candidate reusable mechanisms; record local collection scope, redaction, cursor/crash behavior and dependency/license implications. No private trace scan, provider call, hard injection or environment change is implied.",
+      "identity": "sha256:c948a05ea78431acf0d447058ed655cc2fc3c6c217c5ac4745fdb1691c50c4e1",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption."
+  ],
+  "context": "Local stage L0. Deliver an observed capability matrix and a minimal reproducible synthetic-host probe inside Runtime. Reuse supported hooks/events or selected parsers after checking their unit, lifecycle and license; do not silently install a broad recorder.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Requested research and coverage discipline.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-collector-reuse-and-coverage.yaml"
+    },
+    {
+      "purpose": "Tool availability must be observed.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-agent-work-request-tool-return.yaml"
+    },
+    {
+      "purpose": "Native coding capabilities and independent reviewer remain.",
+      "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "capture-boundaries",
+          "identity": "sha256:c948a05ea78431acf0d447058ed655cc2fc3c6c217c5ac4745fdb1691c50c4e1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "observed-capture",
+          "identity": "sha256:027ade8f63824248e7d51acd46e15235bf282f6ffe375b049cf38df760daa068",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "observed-delivery",
+          "identity": "sha256:4f19cba29b7b4a01fdb11e36ac728ec051238909cee6aefd5c5e66224ca812a0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:33400861176571d9af939cc760708f7ff58e1378670fa4278039e7a37ee9dc80",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Measure one real host integration for capture, query/tools and safe delivery before implementing its Collector.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-host-capability-probe-v0"
+}

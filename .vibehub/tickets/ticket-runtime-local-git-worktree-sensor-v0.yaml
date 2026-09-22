@@ -8,7 +8,7 @@
         "label": "worktree-state-model"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "bounded-diff-capture",
@@ -39,9 +39,16 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "worktree-state-model",
+      "criterion": "Observations distinguish HEAD, index, working tree and untracked state and bind repository/checkout/worktree/session/execution, immutable code base and explicit exploration mapping. Checkout/ref movement cannot retroactively move old events to another exploration; uncertain mapping is surfaced.",
+      "identity": "sha256:d2f990697240ed107f2b88b9e05811072150656787a357dc178f50f39d0d2d2c",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -62,6 +69,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,6 +101,32 @@
       ],
       "identity": "sha256:970b9bfc5a081736471c8921e40bec5273f76030caa082444ed6dd7b5ae9ecc1",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-diff-capture",
+          "identity": "sha256:ec3224be1fb52b1d81b1107233e09cbed4ddea3eeca92a8a2eb11fc4e010a24d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "duplicate-and-race-fixtures",
+          "identity": "sha256:bc4c8e7417a64ac63c10b0ad4a6bae558fb71e5a0defc303dc939ff5de09584f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "offline-nonblocking",
+          "identity": "sha256:7f3b5357102610ced085ce0521c507f84803f3070ddb6f6679120d132b6982b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worktree-state-model",
+          "identity": "sha256:d2f990697240ed107f2b88b9e05811072150656787a357dc178f50f39d0d2d2c",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:e908de846f4a40d73ff936c487772383e1317cfbc07d6b82be84b24e7783502a",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -99,12 +136,18 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "The local sensor needs a defined acceptance, retry, duplicate, and outage contract before it can safely emit high-churn observations.",
+      "rationale": "Durable event acceptance and buffering contract.",
       "target_ticket_id": "ticket-runtime-durable-ingress-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Observed ref/worktree changes map to explicit exploration identity.",
+      "target_ticket_id": "ticket-runtime-branch-scope-contract-v0",
       "type": "depends_on"
     }
   ],

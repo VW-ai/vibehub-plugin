@@ -8,7 +8,7 @@
         "label": "session-contract"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "delivery-recovery",
@@ -29,9 +29,16 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "session-contract",
+      "criterion": "Implement session registration/heartbeat/expiry/subscription scoped by authenticated Project/exploration/execution and optional worktree. Multiple Sessions may share a worktree; reconnect uses a stable delivery cursor without pretending the new registration is the old Session. Capabilities come from the host probe.",
+      "identity": "sha256:67dfc638ce48516ea50e5a846db6c772209380b7be4190bb4959f147b89f1eee",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -39,7 +46,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Session registration 与可恢复 soft delivery. Delivery slice: alpha. Architecture: Tech Design §§15,17,24,26. Scope: Session API, notification outbox consumer, callback/pull transport and soft-delivery policy.. Excluded: No host-specific hooks, hard injection, or new chat UI..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L3. Recoverable informational notice/query delivery for registered local Sessions using observed host capabilities. Context notices are not executable work requests; the local request bridge owns task claim/result/receipt. No dependency on an independently enrolled Worker.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -52,6 +59,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Multiple Sessions and worktrees per Ticket.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-exploration-participation.yaml"
     }
   ],
   "contract_revisions": [
@@ -75,6 +90,27 @@
       ],
       "identity": "sha256:a3d424aec2f8d5bbbf2b4313a0d04d602561d7901875f44531c280790bd84b15",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "delivery-policy",
+          "identity": "sha256:62cd380a583a83f21fa5450f0944b413cbd19f7ec54de3607612dabc144d02c7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-recovery",
+          "identity": "sha256:6fa67c96d803a4a8bcc55711678de7146245b559e3cdc077f990c5e6ae8aae3a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-contract",
+          "identity": "sha256:67dfc638ce48516ea50e5a846db6c772209380b7be4190bb4959f147b89f1eee",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:22eea04f7c769c8eca0a5e8c5eeca043e74ec862a2f86f2d68bf013a04c1e21a",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -84,17 +120,18 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Session delivery exposes queryable stable references through the versioned public command/query API.",
+      "rationale": "Scoped query/reference APIs and authorized session identity.",
       "target_ticket_id": "ticket-runtime-semantic-api-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "It consumes post-guard result outbox intents rather than untrusted direct worker callbacks.",
-      "target_ticket_id": "ticket-runtime-worker-result-ingress",
+      "rationale": "Observed callback/pull/next-turn constraints.",
+      "target_ticket_id": "ticket-runtime-host-capability-probe-v0",
       "type": "depends_on"
     }
   ],

@@ -8,7 +8,7 @@
         "label": "semantic-api-public-contract"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "semantic-api-concurrency",
@@ -18,7 +18,7 @@
         "label": "semantic-api-concurrency"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "semantic-api-conformance",
@@ -29,9 +29,23 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-api-public-contract",
+      "criterion": "Implement versioned scoped APIs for Project/Repository and exploration enrollment, Session/Execution registration, exact/current revision lookup, query/context materialization, candidate submission and explicit per-item adoption. Contracts enforce schema/size limits, idempotency, opaque cursors and object authorization; do not treat a branch name or worktree path as a credential.",
+      "identity": "sha256:0e9b3eabe31e76030e45e014a403bd828a8fe4f8f3c9827280958ad9f817bb71",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "semantic-api-concurrency",
+      "criterion": "Mutation commands pin source/destination/base revisions and authority. Stale GraphRevision CAS applies nothing; a separately admitted semantic conflict preserves alternatives. Per-exploration adoption does not promote Project canonical truth. Canonical Git materialization remains explicit and does not follow automatically from a Git merge.",
+      "identity": "sha256:83ecb04fd10eb85116654c499257ffa6d986833c992d9d07fd4e50aa1d8229ee",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -52,6 +66,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Public scope and mapping.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
     }
   ],
   "contract_revisions": [
@@ -75,6 +97,27 @@
       ],
       "identity": "sha256:02afe56d1eab9ccfd603f196df6fa7794ffef4729e4f0c9675241da09de82f0b",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "semantic-api-concurrency",
+          "identity": "sha256:83ecb04fd10eb85116654c499257ffa6d986833c992d9d07fd4e50aa1d8229ee",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "semantic-api-conformance",
+          "identity": "sha256:d9368ae7f296c5f45b27ecf3ae77683d1251e3977ae99166d4ae3666cb9965d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-api-public-contract",
+          "identity": "sha256:0e9b3eabe31e76030e45e014a403bd828a8fe4f8f3c9827280958ad9f817bb71",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:43d1586323ec04b3abc576266543848dedbc1f14733b1b84d222a4b1c9be1041",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -84,6 +127,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [

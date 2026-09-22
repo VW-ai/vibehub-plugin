@@ -42,7 +42,7 @@
         "label": "loop-composition"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "loop-worker-conflict",
@@ -58,7 +58,7 @@
         "label": "loop-worker-conflict"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "loop-agent-degradation",
@@ -74,10 +74,31 @@
         "label": "loop-agent-degradation"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "loop-composition",
+      "criterion": "Compose accepted APIs/configuration only. A synthetic Project with two repos, two explorations, multiple Sessions in one worktree and one Ticket across two worktrees produces durable events, extracted/resolved candidates and exact Context packages; project overview is independent of main.",
+      "identity": "sha256:1442421e3f59486e520f03d3ffb68ef8a1dafe5d5861dee2ca39df879e8d3fb5",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "loop-worker-conflict",
+      "criterion": "Exercise one real supported local Agent work request with supplied tools/schema and cited returned proposal. Demonstrate A→B→A relevant notices, independent continued hypotheses, one explicit per-item adoption and stale/duplicate result handling. Received/seen never means adopted; canonical promotion and independent Ticket acceptance remain separate.",
+      "identity": "sha256:5391318a1923e56262b8645ab13bd3de85927c9b8793887dd1c480ca8b1c3a19",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "loop-agent-degradation",
+      "criterion": "A supported real host captures selected synthetic events and queries the expected context after restart/session handoff. Runtime/judge/Agent unavailability leaves coding usable and pending work inspectable. Record exact build/policy/input/host profile and demonstrate bounded backlog, source revocation and recovery without claiming distributed or production SLO proof.",
+      "identity": "sha256:873f6a748170fa91a0ea7edae00313c6af1030a56dd041fad616687f6af9210d",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -85,7 +106,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "组合并验收 Git → Policy → Context 在线闭环. Delivery slice: alpha. Architecture: Tech Design §§5,19,23,24. Scope: Existing Runtime modules compose into one authenticated multi-project Git/Agent loop with live bounded judgments, asynchronous reconciliation and reproducible Context delivery.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Required transitive artifacts: runtime-canonical-git-bridge-v0: Resolution is represented as a guarded canonical proposal with Git provenance. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L4 integration only. Reuse delivered modules to prove one-person multi-session and two-exploration behavior on the local profile. No hosted deployment, separate persistent Worker, full P2P or automatic semantic merge prerequisite.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -98,6 +119,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Long-running native execution and independent review.",
+      "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
     }
   ],
   "contract_revisions": [
@@ -147,37 +176,64 @@
       ],
       "identity": "sha256:1aa9d158e3a7adcb6424f355737770f858497b28f297debdb73c40e6215e00f5",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "loop-agent-degradation",
+          "identity": "sha256:873f6a748170fa91a0ea7edae00313c6af1030a56dd041fad616687f6af9210d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "loop-composition",
+          "identity": "sha256:1442421e3f59486e520f03d3ffb68ef8a1dafe5d5861dee2ca39df879e8d3fb5",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "loop-worker-conflict",
+          "identity": "sha256:5391318a1923e56262b8645ab13bd3de85927c9b8793887dd1c480ca8b1c3a19",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:cc74a7302d71f028a399b77549736d841b57dbe7e9a86bcc39fa867d9c19e3ca",
+      "revision": 3
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "Existing Runtime modules compose into one authenticated multi-project Git/Agent loop with live bounded judgments, asynchronous reconciliation and reproducible Context delivery.",
+  "outcome": "Compose and verify the local capture → semantic state → context loop with branch isolation and bidirectional awareness.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "The journey uses a real observed host event/query boundary.",
+      "rationale": "Actual Collector and context delivery.",
       "target_ticket_id": "ticket-runtime-host-adapter-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "The journey requires a demonstrated supported worker route, not only a capability claim.",
-      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
+      "rationale": "Actual typed candidate processing.",
+      "target_ticket_id": "ticket-runtime-ingress-policy-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "The journey must allow an incorrect association to be corrected.",
+      "rationale": "Bidirectional notice and explicit adoption behavior.",
+      "target_ticket_id": "ticket-runtime-branch-awareness-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "User correction of wrong associations.",
       "target_ticket_id": "ticket-runtime-semantic-feedback-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "The loop must use a real business policy with typed candidate/relation effects, not only an execution framework.",
-      "target_ticket_id": "ticket-runtime-ingress-policy-v0",
+      "rationale": "Supported live actionable request roundtrip.",
+      "target_ticket_id": "ticket-runtime-agent-work-request-bridge-v0",
       "type": "depends_on"
     }
   ],

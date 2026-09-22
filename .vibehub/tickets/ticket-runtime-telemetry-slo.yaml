@@ -8,7 +8,7 @@
         "label": "telemetry-stage-instrumentation"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "telemetry-slo-contract",
@@ -28,7 +28,7 @@
         "label": "telemetry-cost-capacity"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "telemetry-audit-privacy",
@@ -39,9 +39,23 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "telemetry-stage-instrumentation",
+      "criterion": "Instrument admission, policy/judge/store, extraction/resolution, local Agent request wait/execution/receipt, query/compilation, awareness, adoption/promotion and delivery with privacy-safe bounded IDs/versions. Optional Worker stages are explicitly unavailable until installed, never fake zero-success metrics.",
+      "identity": "sha256:aad60f4bb0a0c59dc06637c8a48cbc7999104ae4016038e8a934e0ffb00660c4",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "telemetry-cost-capacity",
+      "criterion": "Report Project/policy/operation calls, available token/cost proxies, retries, rate limits, queue saturation and outcome counts for the selected local profile. User/session wait is distinguishable from service processing and observed provider latency; unavailable usage data stays unknown.",
+      "identity": "sha256:d7a2d78b5cf4bd965623fe5aca00a6df97d56e7700c1ca5d05a12f38a2a3da8c",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -49,7 +63,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Establish Runtime telemetry, audit, budgets, and SLOs. Delivery slice: alpha. Architecture: §23 Observability; §27 Policy Evaluation & Offline Replay; §30 Prototype Success Gate; PRD §11 Non-functional Requirements; PRD §13 Success Metrics; PRD §19 Launch / Rollout Gates. Scope: Metrics, traces, audit, and dashboards; Alpha SLI/SLO and error-budget definition; Cost and capacity attribution; Privacy-safe operational alerts. Excluded: Raw prompt or source-content logging; Hidden chain-of-thought retention; Unvalidated production SLO claims; Business intelligence warehouse.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L3 and later hosted extension. Instrument the actual local path and measure bounded collection/delivery/retrieval/model behavior. Preserve existing alpha SLO targets as versioned hosted workload goals; do not claim they were measured by a local functional smoke.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -62,6 +76,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,6 +108,32 @@
       ],
       "identity": "sha256:c091ec02dfd74283c2ce35e925cf4f1ea3552859b3b93ff67e67f4f72745eb0f",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "telemetry-audit-privacy",
+          "identity": "sha256:926cf3324b19c5ff6e3a28dcf8ea13ddd2caf0de6320e41a90a7500df32fa412",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "telemetry-cost-capacity",
+          "identity": "sha256:d7a2d78b5cf4bd965623fe5aca00a6df97d56e7700c1ca5d05a12f38a2a3da8c",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "telemetry-slo-contract",
+          "identity": "sha256:423ea200a56a6ec8aef293c163cb66e9765c138d2221072fd7a6e1a2a682a7c1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "telemetry-stage-instrumentation",
+          "identity": "sha256:aad60f4bb0a0c59dc06637c8a48cbc7999104ae4016038e8a934e0ffb00660c4",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:bcde799e0acdabcfb802a98e5180fb0ef926bb223bf3c34fc0a878c99d7b69f0",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -99,21 +143,17 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Metrics and diagnostics correlate through the implemented semantic audit chain.",
+      "rationale": "Actual local causal events to instrument.",
       "target_ticket_id": "ticket-runtime-decision-audit-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "Observed worker usage/quota signals must be represented honestly.",
-      "target_ticket_id": "ticket-runtime-codex-worker-adapter-probe",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "The instrumentation includes delivery lag, retry and quiet-notification behavior.",
+      "rationale": "Delivery lag/reconnect metrics.",
       "target_ticket_id": "ticket-runtime-session-delivery-v0",
       "type": "depends_on"
     }

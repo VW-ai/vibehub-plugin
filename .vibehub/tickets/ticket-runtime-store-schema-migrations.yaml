@@ -49,7 +49,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "建立事务存储适配与 migration 基础. Delivery slice: alpha. Architecture: §6 Logical Planes; §10 Semantic Working Graph; §18 Storage Design; §19 Consistency Model; §25 Enterprise Multi-tenancy. Scope: Connection lifecycle; tenant-scoped transaction/CAS and unique keys; migration runner and compatibility contract; outbox primitives and adapter conformance. Excluded: No all-domain database implementation; event, graph, policy and worker Tickets own their schemas and repositories.; No universal persistence framework or premature index tuning..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L1. Use the concrete backend chosen by local-service-profile, implementing transaction/CAS/outbox and migration primitives under service authorization. Domain tables belong to separate Tickets. The completed platform spike is evidence, not this production adapter.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -62,6 +62,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -99,6 +103,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [

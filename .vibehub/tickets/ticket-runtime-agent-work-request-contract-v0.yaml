@@ -1,0 +1,107 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "request-is-actionable",
+      "criterion": "Versioned request pins job/attempt, Project/exploration/session applicability, exact input refs/base versions, trusted instruction bundle version, required available tools with parameter schemas/examples, output schema/provenance requirements and allowed actions. Tool availability is verified by host admission, never created by mentioning a name.",
+      "identity": "sha256:f5e22b7d8f68b99121c301564e07408efa4e117a22149b3a72337643d3c5d9ae",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "result-and-receipt",
+      "criterion": "Define offered/claimed/pending/completed/expired/cancelled and stale/invalid result behavior; exact repeated submissions return one receipt, changed content under the same key rejects. A proposal receipt proves accepted submission only, not canonical adoption or Ticket acceptance.",
+      "identity": "sha256:db5e5a07b0ebe4b34c4e153c48a3a0a773444620d8ee980445acd8ae1b831cd2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "host-and-authority",
+      "criterion": "Fixtures distinguish informational Context from actionable requests, unavailable tools, dormant/no-callback hosts, denied scope, stale base, duplicate/late result and source-text prompt injection. Native developer tools remain native; executor self-test cannot masquerade as independent closeout.",
+      "identity": "sha256:f9cc4d27340a8475f7825d0e554f3ca7b59335097e6691a5c1e03b7b7d0deba8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "request-contract-tests",
+      "criterion": "Expose constructors/validators and reference transitions through the isolated public entry, document the relation to existing Worker protocol without requiring a separate Worker and pass synthetic conformance plus boundary checks.",
+      "identity": "sha256:1106d855e366ab6e2b2bd53f8bfc8ecfe8bf1d3beee33c40aedc5ddd27ea3f12",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption."
+  ],
+  "context": "Local stage L0. Provider-independent request/result/receipt validators and pure lifecycle transitions. Distinct from ContextPackage and from a model-generated instruction embedded in source content. No scheduler or live host implementation.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Exact user requirement for interface/format and return path.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-agent-work-request-tool-return.yaml"
+    },
+    {
+      "purpose": "Reuse relevant proposal/fencing principles without claiming this schema is a running Worker.",
+      "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "host-and-authority",
+          "identity": "sha256:f9cc4d27340a8475f7825d0e554f3ca7b59335097e6691a5c1e03b7b7d0deba8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "request-contract-tests",
+          "identity": "sha256:1106d855e366ab6e2b2bd53f8bfc8ecfe8bf1d3beee33c40aedc5ddd27ea3f12",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "request-is-actionable",
+          "identity": "sha256:f5e22b7d8f68b99121c301564e07408efa4e117a22149b3a72337643d3c5d9ae",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "result-and-receipt",
+          "identity": "sha256:db5e5a07b0ebe4b34c4e153c48a3a0a773444620d8ee980445acd8ae1b831cd2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:062f0db17f7a51171ba908767d8bbecccd0cffb899128ee1d5e3f7ad58e81504",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Define an executable work request that includes tools, input/output schemas and a verifiable result receipt.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-agent-work-request-contract-v0"
+}

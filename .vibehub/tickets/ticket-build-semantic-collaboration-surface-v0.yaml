@@ -42,7 +42,7 @@
         "label": "explorer-addressable-views"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "explorer-causal-inspection",
@@ -58,7 +58,7 @@
         "label": "explorer-causal-inspection"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "explorer-feedback-and-delivery",
@@ -74,10 +74,31 @@
         "label": "explorer-feedback-and-delivery"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "explorer-addressable-views",
+      "criterion": "Provide Project overview distinct from main, branch/exploration selection, Ticket participation across worktrees, multiple Sessions and Room lineage. Exact entity/package/proposal links distinguish origin, candidate/validated/canonical reference, branch-local alternatives, stale/denied/deleted state and adoption history.",
+      "identity": "sha256:f3d2ba187075eb73f211eb9bdcc89bf5c1570d79ba86b77f7cdb78d29053cdbb",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explorer-causal-inspection",
+      "criterion": "Show producer/session/worktree/ref and code revision, selected shared base, semantic origins/variants/adoptions, evidence/source watermarks and policy/audit links. A Git merge signal is not displayed as automatic semantic acceptance; retain history after worktree deletion.",
+      "identity": "sha256:5365286d380595e07d914056eca8d45a1eacc00ecf80d9e60337978089f41805",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explorer-feedback-and-delivery",
+      "criterion": "Implement actual inspect/continue/defer/explicit per-item adoption and correction commands; show informational notices separately from work requests and receipts. Verify A→B→A, reconnect dedup, current access, keyboard navigation and empty/loading/error/offline states against the real local APIs.",
+      "identity": "sha256:4ef48ca86c4675ea3813370405d11541caf1f1917cb9daa271de9d98e5682384",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -85,7 +106,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "提供最小 semantic activity 与精确引用页面. Delivery slice: alpha. Architecture: Tech Design §§5,19,23,24. Scope: People inspect the integrated service through authenticated Project/entity/revision/proposal/conflict links and a causal audit view with honest freshness.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local stage L4. Implement the accepted Project/exploration UX using actual query/audit/command APIs. Existing frontend is inspiration, not a required layout or imported implementation. Do not synthesize accepted decisions in UI state.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -98,6 +119,14 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Permission to redesign within component boundaries.",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-client-redesign.yaml"
     }
   ],
   "contract_revisions": [
@@ -147,16 +176,38 @@
       ],
       "identity": "sha256:0c3e0611fa6dd34a4920b0dff2c7d7c6acec7022300baab125d48d2705e137ff",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explorer-addressable-views",
+          "identity": "sha256:f3d2ba187075eb73f211eb9bdcc89bf5c1570d79ba86b77f7cdb78d29053cdbb",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "explorer-causal-inspection",
+          "identity": "sha256:5365286d380595e07d914056eca8d45a1eacc00ecf80d9e60337978089f41805",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "explorer-feedback-and-delivery",
+          "identity": "sha256:4ef48ca86c4675ea3813370405d11541caf1f1917cb9daa271de9d98e5682384",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:b3bb7b0c8531285dac8c653418e924313525c98611757da71a1e836b5b1f1b01",
+      "revision": 3
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "People inspect the integrated service through authenticated Project/entity/revision/proposal/conflict links and a causal audit view with honest freshness.",
+  "outcome": "Implement the local Project/exploration/Room client with exact references, bidirectional awareness and inspectable work requests.",
   "provenance_refs": [
     "conversation:2026-09-21-semantic-runtime-context-and-next-plan",
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-branch-experience",
     "plan-validation:independent"
   ],
   "relations": [
@@ -168,6 +219,11 @@
     {
       "rationale": "Causal inspection uses the shared audit API.",
       "target_ticket_id": "ticket-runtime-decision-audit-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Reviewable information architecture and interaction contract.",
+      "target_ticket_id": "ticket-runtime-project-exploration-ux-v0",
       "type": "depends_on"
     }
   ],

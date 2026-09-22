@@ -1,0 +1,35 @@
+{
+  "context_id": "note-runtime-private-network-collaboration-option",
+  "detail": "用户提出团队设备通过 Tailscale 访问各自数据服务，利用本地数据和私有组网协作。当前是候选部署方向，尚未选择或配置。私有互联、单协调节点加本地缓存、可离线多写副本是不同工程深度；Tailscale 解决连接，不自动解决应用数据复制、一致性、版本冲突或离线可用性。完整 P2P/重连同步后续独立验证，不阻塞单机多 session/多探索的产品验证。模型调用的数据去向仍单独受授权约束，不因为传输私有就声称全部推理本地化。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-experience-first",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "或者是不是可以有另一种模式，就是用什么 Tailscale",
+    "ref": "conversation:2026-09-21-runtime-local-branch-experience"
+  },
+  "state": "active",
+  "summary": "Tailscale 私有组网是待验证的小团队部署选项",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "note"
+}

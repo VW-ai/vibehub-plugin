@@ -1,0 +1,103 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "typed-extraction",
+      "criterion": "Produce bounded candidate decisions, constraints, observations/evidence and task proposals from authorized event groups; each output binds Project/exploration and exact supporting source spans/refs. Event storage, task acceptance and canonical writes are not extraction.",
+      "identity": "sha256:b1ccc962d4e0d293df3de97264c018829e71ed8dd31c975d2263f3c9c5cd91b3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "extraction-integration",
+      "criterion": "Version and execute the extraction bundle through the accepted local Agent bridge; submit through typed Graph commands with input/base pins and idempotency. Preserve multiple claims from one event and abstain on ambiguous/truncated/unavailable inputs.",
+      "identity": "sha256:687a60cf399bf48e67ce1de20261e7a9abdd64529a5421d1148c5686de002b96",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "extraction-evaluation",
+      "criterion": "Frozen synthetic/authorized cases cover negation, changed decisions, transient chat, quoted instructions, code/tool evidence, duplicate delivery and stale results. Separate evaluator labels from input; report omission/unsupported-claim rates and failures. A selected synthetic live roundtrip proves integration without asserting calibrated quality.",
+      "identity": "sha256:c6d60d811c532ff1fd5048ef873820cd4c003a1234e1885f43cb795d9a0bae00",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
+  ],
+  "context": "Local stage L2. Own extraction schema, trusted instruction bundle, runtime invocation and candidate validation. Use the current local Agent work-request bridge for synthesis when needed; bounded JEV decisions may route but are not presumed to generate semantic entities.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Extraction belongs in the service workflow.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-internal-capabilities-and-host-bridge.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "extraction-evaluation",
+          "identity": "sha256:c6d60d811c532ff1fd5048ef873820cd4c003a1234e1885f43cb795d9a0bae00",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "extraction-integration",
+          "identity": "sha256:687a60cf399bf48e67ce1de20261e7a9abdd64529a5421d1148c5686de002b96",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typed-extraction",
+          "identity": "sha256:b1ccc962d4e0d293df3de97264c018829e71ed8dd31c975d2263f3c9c5cd91b3",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:4e16ceb6d910592da6aa818ae071be6eb9be9bb7e9defab482ffdefd46f8a08a",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Extract typed semantic candidates from selected real event units with exact supporting sources.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Actual synthesis task delivery and validated return path.",
+      "target_ticket_id": "ticket-runtime-agent-work-request-bridge-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Durably accepted, exact source event units.",
+      "target_ticket_id": "ticket-runtime-durable-ingress-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-entity-extraction-v0"
+}

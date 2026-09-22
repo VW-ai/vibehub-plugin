@@ -36,7 +36,7 @@
     "quote": "我们的目标其实是我们尽快，就是说在可能这两天就可以把这个服务给上线",
     "ref": "conversation:2026-09-21-semantic-runtime-online-alpha"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Move rapidly from offline replay to a small online alpha centered on referenceable shared Context and safe concurrent work",
   "tags": [
     "semantic-runtime",

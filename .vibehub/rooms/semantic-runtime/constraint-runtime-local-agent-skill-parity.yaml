@@ -1,0 +1,35 @@
+{
+  "context_id": "constraint-runtime-local-agent-skill-parity",
+  "detail": "ContextPackage 可以包括相关对话和代码引用，但不把本地开发 Agent 降格为只能读快照的执行器。开发 Agent 继续使用真实本地文件系统、工具、运行环境与测试，长任务和接手能力是需要保留并评测的产品价值。开发者自测产生 Evidence，独立 reviewer 负责相应验收，用户保留的判断仍属用户。将沉淀工作交给当前 Agent 不意味着它能自行批准自己的实现。无需先有云端 Worker；本地或按需执行器可以在闭环证明需要后加入。",
+  "evidence": [
+    {
+      "note": "用户在本次产品讨论中给出的方向及批注；detail 明确区分已确认意图、Agent 工程解释和待验证实现。",
+      "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+    },
+    {
+      "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-experience-first",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:26:56.502Z",
+    "quote": "不要就是把我们目前的 skill 有的这个能力有太多的损失",
+    "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
+  },
+  "state": "active",
+  "summary": "本地 Agent 的执行能力和独立验收语义随交付形态保留",
+  "tags": [
+    "semantic-runtime",
+    "local-first",
+    "branch-aware"
+  ],
+  "type": "constraint"
+}
