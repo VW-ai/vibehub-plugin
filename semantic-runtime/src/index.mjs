@@ -88,3 +88,6 @@ export {
 export { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './local/git-projects.mjs';
 export { ProjectActivation, ACTIVATION_NAMESPACE, ACTIVATION_STAGES } from './local/project-activation.mjs';
 export { DurableIngress, INGRESS_NAMESPACE } from './local/durable-ingress.mjs';
+export { SourceInvalidationFeed, SOURCE_INVALIDATION_NAMESPACE, sourceLifecycleInvalidationId } from './local/source-invalidation.mjs';
+export { LocalGitWorktreeSensor, GIT_SENSOR_ERROR_CODES } from './local/git-worktree-sensor.mjs';
+export { validateGitWorktreeObservation, GIT_SENSOR_LIMITS } from './core/git-worktree-observation.mjs';

@@ -25,7 +25,7 @@ export function connect(filePath, { clock = { now: 1000 } } = {}) {
     const result = authority.authorize(issued.credential, { scope, audience: LOCAL_AUDIENCE, action: actions[0], kinds: [kind], boundary: 'object', reference: scopedReference('object', scope, 'graph-test') });
     assert(result.allowed); return { context: result.context, issued };
   };
-  const store = new DomainStore({ filePath, authority, namespaces: [NS, 'git-enrollment', 'project-activation', 'durable-ingress'] });
+  const store = new DomainStore({ filePath, authority, namespaces: [NS, 'git-enrollment', 'project-activation', 'durable-ingress', 'source-invalidation'] });
   return { filePath, clock, authority, issue, store, ...issue(), graph: new LocalGraphStore({ store, authority }),
     ingress: new DurableIngress({ store, authority, snapshotPolicy: ({ text }) => text }),
     registry: new GitProjectRegistry({ store, authority }), activation: new ProjectActivation({ store, authority }) };

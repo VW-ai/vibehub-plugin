@@ -1,0 +1,57 @@
+{
+  "acceptance_ids": [
+    "worktree-state-model",
+    "bounded-diff-capture",
+    "duplicate-and-race-fixtures",
+    "offline-nonblocking",
+    "enrolled-project-sensor"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worktree-state-model",
+      "identity": "sha256:d1473df7e5988f6f8f82bcfe16705e354701e9ff01bb7d465b04a4781e7e8520",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "bounded-diff-capture",
+      "identity": "sha256:d7f15ba87404018577ff75a3927786f4ec5d0e5230cecbe070ba900edc2c9f88",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "duplicate-and-race-fixtures",
+      "identity": "sha256:a2fda11780b3e82357215ac5d8a2556f0e15adc769906479fa87516920520c59",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "offline-nonblocking",
+      "identity": "sha256:27286f56c64fe2eaa6b8423cb0bde9dfcef5e4b25219ddc5c232a1ae4b71ce30",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "enrolled-project-sensor",
+      "identity": "sha256:37328b1087034b0539c61997f3a8032d6a2306c8fe280a4e9aca8b1bea750e89",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "git-worktree-sensor-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T14:13:56.854Z",
+  "refs": [
+    "semantic-runtime/docs/local-git-worktree-sensor-v0.md",
+    "semantic-runtime/src/core/git-worktree-observation.mjs",
+    "semantic-runtime/src/adapters/git-worktree-observer.mjs",
+    "semantic-runtime/src/local/git-worktree-sensor.mjs",
+    "semantic-runtime/test/git-worktree-sensor.test.mjs",
+    "semantic-runtime/test/helpers/git-sensor-fixture.mjs",
+    "semantic-runtime/test/fixtures/git-sensor/measurement.json",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/src/index.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implements exact Contract4 as a callable LocalGitWorktreeSensor, strict metadata v1 and isolated observer, composing existing Git registry, activation and DurableIngress; no new namespace, dependency, watcher, timer or durable queue. bind selects the actual current owner-bound execution registration, including linked worktrees, and never invents host Session/Execution/exploration. hint/drain coalesce bounded in-memory work; actual epoch/current source access fences admission and retries preserve the first bytes/receipt. Captures HEAD/index/staged/unstaged/untracked metadata with path bytes and digests, explicit gaps and null producer sequence. Isolated Git reads use a bounded scratch index/object view, no inherited helper config or network, maximum8MiB index/2MiB output/256 paths/48KiB metadata/5s child/15s sample, one resample and bounded submissions. Nonregular metadata including index/config/HEAD FIFOs returns unsupported_profile through nonblocking nofollow reads. Prior independent findings were reproduced and fixed: same-size binary edits with restored mtime remain visible through Git racy-index checks, staged Gitlink OIDs retained, assume-unchanged/skip-worktree produce explicit unsupported gap, scope keys are tuples, Proxy/getter inputs remain inert, capacity stops rather than rescans, and source config is never loaded by discovery Git commands. Reproduce with node --test test/git-worktree-sensor.test.mjs: final author28/28 and independent28/28 passed; independent FIFO repro fell from blocked>16s to20ms gap. Earlier affected151/151 passed. Final clean npm run verify:standalone installs locked dependencies in a temporary copy and passes585 total583pass2 intentional native skips,0fail plus144 boundary files/0 errors. Root npm run verify:artifact also passed and Git diff check is clean. The checked-in synthetic32tracked8untracked measurement records16 staged/16 unstaged/8untracked,8135-byte metadata,30 commands,69822 output bytes,2passes,360ms,one receipt,zero model calls; timing is not an SLA. Tests cover real temporary Git/SQLite, restart retained metadata, races, gaps, exact lost-response retry, helper-config isolation and no source mutation. App/plugin automatic capture and product-level end-to-end context delivery remain separate work.",
+  "ticket_id": "ticket-runtime-local-git-worktree-sensor-v0"
+}

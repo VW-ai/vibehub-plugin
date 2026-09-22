@@ -8,7 +8,7 @@
         "label": "source-lifecycle-events"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "derived-acl-rule",
@@ -18,7 +18,7 @@
         "label": "derived-acl-rule"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "fail-closed-invalidation",
@@ -28,7 +28,7 @@
         "label": "fail-closed-invalidation"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "invalidation-fixtures",
@@ -38,18 +38,65 @@
         "label": "invalidation-fixtures"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "source-lifecycle-events",
+      "criterion": "Add the fixed local source-invalidation domain and three exact DurableIngress commands: submitSourceLifecycle atomically admits one fresh SOURCE_ACCESS_CHANGED or SOURCE_TOMBSTONE metadata event and applies its guard/policy/fence; applyAdmittedSourceLifecycle applies an exact already-admitted event without rereading private payload; applyAdministrativeInvalidation records repository_removed, installation_revoked, visibility_changed or author_access_redacted without fabricating an event. Every event-backed command writes the deterministic scope+event_id invalidation ID consumed by the unchanged Graph source_access operation, with no scan or caller locator. Existing updateSourceAccess keeps its request/result shape and atomically emits a direct_access_update fence notice. Per-(sourceObjectKey,sourcePartitionKey) rows compare sequence only within one partition/producer epoch, while an O(1) per-object summary maintains blocking-stream count plus irreversible tombstone. Only a strictly newer sequenced active event in the same authoritative stream may clear that stream's unknown guard; cross-stream integers are never compared, null order never reopens, other blocking streams still deny, and a tombstone never reopens. Exact retry returns the original bounded receipt and changed reuse rejects. All concrete Runtime composition sites include the new namespace; missing namespace fails closed rather than disabling guards.",
+      "identity": "sha256:428fad9a465d6c93d31e341a9cac1d59c361ed145a05c65192027e729dac34c7",
+      "presentation": {
+        "label": "source-lifecycle-events"
+      },
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "derived-acl-rule",
+      "criterion": "DurableIngress ordinary submit, event/receipt/snapshot/cursor reads, pending inspection and handoff consult current registration policy plus the O(1) source-object summary before accepting or returning content; one denied provenance support denies the full result while unrelated objects remain usable. repository_removed and installation_revoked atomically install the exact deny-all historical-read policy enabled:false, allowed_principal_ids:[], sensitivity:restricted, allow_snapshots:false. visibility_changed and author_access_redacted must preserve all no-broadening dimensions together: requested principals are a subset of current principals, sensitivity is nondecreasing, enabled and allow_snapshots cannot change false to true, and at least one historical-read dimension (principal set or sensitivity) is strict; enabled:false alone is never accepted as proof of historical-read denial. The privileged submitSourceLifecycle path remains ProjectActivation capture-gated and producer/catalog/identity/causal validated, accepts no snapshot bytes or mutable payload, and bypasses current registration/object content denial only to atomically capture normalized lifecycle metadata and install its guard. For an exact Graph source_access mutation only, LocalGraphStore's selected accepted_event port derives the deterministic invalidation ID from the operation/prior event and authenticated scope, then may resolve the current retained invalidation event and exact prior lifecycle events referenced by current Graph projections after ordinary ingress access denies them; it still enforces graph:lifecycle authority, captured event ACL, target, digest, producer epoch and sequence checks. Assertions, resolve/query, receipts, pages and ordinary ingress APIs never use this path. A target absent from Graph remains only a durable guard/notice and never creates a fake Graph observation.",
+      "identity": "sha256:cb88a3747832c0743796f4cc5d8b5eae3a0d363f75dcd332a63e0f6dbf96f722",
+      "presentation": {
+        "label": "derived-acl-rule"
+      },
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "fail-closed-invalidation",
+      "criterion": "SourceInvalidationFeed({store,authority}) exposes only scoped head(), page({after,limit}), assertFence({sequence}) and readLifecycleEvent({invalidation_id}). Every applied policy/object change commits its monotonic Project fence, immutable notice, command receipt, stream guard and object summary with its DurableIngress changes. Administrative restrictions and restrictive application of already-admitted lifecycle metadata remain available while Project capture is disabled; fresh lifecycle capture and active reopening remain activation-gated. Denial takes effect without a Graph commit, ACK or downstream completion. Indexed notice pages use fixed-width sequence ranges, limit1..64 and the existing1MiB response cap. Later canonical reader, query/index/cache/compiler code must pin and recheck the Project fence and may page notices, but this Ticket creates no consumer registry, ACK/checkpoint protocol, cache, index, compiler, recomputation worker or scheduler and never claims a consumer processed a notice.",
+      "identity": "sha256:b0e4840f8a33f15b4ee07de1493f8018b3939932ffe717b5b5eed348caf549fb",
+      "presentation": {
+        "label": "fail-closed-invalidation"
+      },
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "invalidation-fixtures",
+      "criterion": "Real temporary SQLite/ingress/Graph tests prove: atomic fresh lifecycle capture leaves no admitted-but-unguarded window; ordinary content is denied after a guard while an authorized producer can submit a metadata-only newer active event after Project re-enable; fresh lifecycle capture while disabled and disguised snapshot/mutable content reject with zero effects. Prove tombstone-before-content creates no Graph revision, same-stream0/2/1 and replay behavior, incomparable registrations/producer epochs, null-order permanent denial, other-stream blocking intersection and irreversible tombstone with O(1) materialization reads. Prove repository/installation removal denies historical event/snapshot/cursor/Graph reads while enabled:false alone does not and cannot satisfy administrative invalidation. Prove an exact captured-authorized graph:lifecycle principal can plan current plus prior lifecycle events after current registration revocation, while a never-captured principal and assertion/resolve/receipt/page paths cannot use the bypass. Also cover administrative notices without fake events, disabled historical reads, multi-source closure, exact/changing retry, source-version races,32 targets,64-page bounds, stale fences, missing namespace, restart and SIGKILL before/after commit, malformed/foreign events and unchanged completion/ACK semantics. Run affected event/causal/auth/store/activation/ingress/Graph/boundary tests with synthetic data only.",
+      "identity": "sha256:82bc6cfce92bafa7992df1c3b91b1cc42006fce13fd28c5c39f64cbafdca6a0a",
+      "presentation": {
+        "label": "invalidation-fixtures"
+      },
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
     "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization.",
+    "Keep one fixed local source-invalidation domain in the existing DomainStore; do not add a generic registry, event bus, scheduler, callback trust hook, second database or migration.",
+    "Use per-object/per-sourcePartition rows plus an atomically maintained O(1) object summary; do not cap lifetime source streams, compare sequence across streams or scan all guards during materialization.",
+    "Never let lifecycle handling expose raw content. The selected Graph path is exact retained normalized security metadata only, preserves captured ACL checks and is unreachable from all ordinary reads and non-source_access operations.",
+    "Immediate denial must work while Project capture is disabled and before any Graph lifecycle mutation; fresh capture and reopening stay activation-gated, and absence of an admitted Graph target never authorizes fabricating one.",
+    "repository_removed and installation_revoked must install deny-all current read policy; enabled:false alone is capture control and must never be represented as historical-read invalidation.",
+    "Explicitly compose the source-invalidation namespace. Missing support fails closed; no compatibility fallback may silently skip guard checks.",
+    "Do not claim nonexistent cache, index, compiler, connector or Worker state was recomputed. Supply only the bounded fence/feed contract their later Tickets must consume."
   ],
-  "context": "Propagate source tombstones, ACL changes, and permission revocation through derived state. Delivery slice: alpha. Architecture: 11 Ingress Pipeline; 12 Egress / Retrieval Pipeline; 21 External Connector Architecture; 22 Security & Privacy; 25 Enterprise Multi-tenancy. Scope: Tombstone and permission-change events; Derived ACL propagation; Cache/index quarantine and recomputation triggers; Auditable sanitized-artifact exception. Excluded: Organization identity provider integration; End-user permissions administration UI; Legal retention policy definition; Provider-specific GitHub implementation.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Executable local invalidation refinement 2026-09-22. The accepted DurableIngress Contract3 and LocalGraphStore Contract3 are the exact direct prerequisites and their historical dependency edges remain unchanged. Current Graph reads already re-run DurableIngress current registration ACL/sensitivity through retained admitted-event provenance, including while Project capture is disabled. This Ticket fills the remaining local gap: constant-time object denial, an atomic source-policy invalidation fence/feed, and a narrowly authorized lifecycle-metadata path that cannot become a general private-content bypass.\n\nIMPLEMENTATION AND COMPOSITION. Add semantic-runtime/src/local/source-invalidation.mjs with the fixed DomainStore namespace source-invalidation. DurableIngress remains the sole mutation owner because it owns registrations, admitted events and their private storage keys; the new module supplies fixed keys, validation, transaction helpers and SourceInvalidationFeed, not a callback or generic event bus. Extend the public Runtime exports, durable-ingress and graph-store fixtures/examples, and every composition that constructs those services so its explicit DomainStore namespace allowlist contains source-invalidation. DomainStore schema2 already supports the rows, sources and indexed source ranges, so add no table or migration. A missing namespace or corrupt/missing guard/summary fails with bounded unknown_namespace/corrupt state; it never silently restores unguarded behavior. The concurrently maintained JEV smoke remains outside this Ticket; coordinate before touching its composition.\n\nCOMMANDS AND AUTHORITY. submitSourceLifecycle(context,{registration_id,epoch,event,expectedVersion,access_state,access}) accepts exact fields, requires source:invalidation:capture plus ingress:submit/store:read/store:write/project:inspect, and requires the authenticated principal to be the registration's producer. It uses ProjectActivation stage capture and in one existing DurableIngress transaction validates the current registration/version, event ID, mapping/catalog/identity, exact partition and producer epoch, causal cursor, at most32 distinct source objects, and event type. access_state is exactly active, unknown or tombstoned: SOURCE_ACCESS_CHANGED permits active/unknown and SOURCE_TOMBSTONE requires tombstoned. No snapshot_text argument exists; payload must be an immutable object_revision or git_revision, never snapshot or mutable_pointer. This path may bypass registration enabled/current allowed-principal and object-summary content checks only for this lifecycle envelope, then atomically admits the normalized event/cursor/outbox and applies the policy/guards/fence. It never returns or accepts provider body bytes.\n\napplyAdmittedSourceLifecycle(context,{registration_id,event_id,expectedVersion,idempotency_key,access_state,access,activation_epoch}) is the migration/retry path for an exact immutable event already admitted by DurableIngress. It resolves the stored event, receipt, catalog and captured registration link internally without public readEvent and never reads raw body or snapshot bytes. active requires a current non-null activation_epoch and ProjectActivation result admission; unknown/tombstoned require activation_epoch null and may strengthen denial while capture is disabled. applyAdministrativeInvalidation(context,{registration_id,expectedVersion,idempotency_key,reason,access}) is limited to repository_removed, installation_revoked, visibility_changed or author_access_redacted and creates a notice/registration restriction but no event/object observation. The first two reasons require the exact deny-all policy {enabled:false,allowed_principal_ids:[],sensitivity:'restricted',allow_snapshots:false}. For the latter two, and for optional access on unknown/tombstoned lifecycle commands, apply one shared conjunctive no-broadening validator: requested allowed principals are a subset of current, sensitivity is nondecreasing, enabled and allow_snapshots cannot change false to true; administrative visibility/redaction also requires at least one historical-read dimension (principal set or sensitivity) to be strict, so enabled:false alone is insufficient. This is necessary because existing historical read authorization intentionally ignores enabled and checks current principals/sensitivity. These apply APIs require source:invalidate plus ingress:read/store:read/store:write and human/service kind. Existing updateSourceAccess retains its exact public request/result and ingress:register authority while atomically emitting reason direct_access_update; setting enabled:false there blocks capture but does not claim historical reads are invalidated. Optional lifecycle access is null for object-only guarding or the complete registration access shape; active broadening is governed separately below and every registration change uses its expectedVersion CAS. Captured event ACL always remains an independent upper bound.\n\nSTREAM ORDER AND SUMMARY INVARIANT. Define streamKey as sourcePartitionKey({partition,event.producer without sequence}); DurableIngress already prevents two live registrations from owning the same exact partition/producer epoch, and every guard also pins registration_id for audit. Persist one unbounded fixed row per (sourceObjectKey,streamKey), not a lifetime array: {object,stream,registration_id,state,event_id,event_digest,sequence,notice_sequence}. Persist one summary per object: {blocking_stream_count,tombstoned,version}. active contributes zero blockers, unknown contributes one, and tombstoned sets the irreversible global bit. Replacing a same-stream row atomically adjusts the count by the old/new contribution. A non-null sequence may replace only a lower non-null sequence in that same stream; equal exact input is retry, equal changed input conflicts, lower is superseded, and a prior null sequence is permanently incomparable. A new stream creates its own row. Its active state cannot remove another stream's blocker; effective access is allowed only when tombstoned=false and blocking_stream_count=0. No timestamp, arrival order, registration version or bare sequence across streams decides precedence. A tombstone summary bit never clears. Corrupt count/row transitions reject the transaction rather than recomputing with an unbounded scan.\n\nMULTI-TARGET AND POLICY EFFECTS. A lifecycle event has at most32 unique targets. Restrictive unknown/tombstoned input may atomically strengthen targets whose same-stream position is not newer and reports applied/superseded target references in its bounded receipt; it never weakens a newer row or widens any registration-policy dimension. An active input may clear only its same-stream comparable unknown rows and registration broadening is refused unless every requested target transition is comparable and every resulting object summary is unblocked and not tombstoned. Exact command identity is scoped actor+registration+event/idempotency key and retains an inert request digest. Event-backed commands also write exactly one deterministic invalidation record whose ID is sourceLifecycleInvalidationId(authenticated scope,event_id); export that pure bounded helper so GraphInputs derives the lookup from its unchanged source_access event rather than scanning or accepting a caller locator. Changed reuse or an existing event ID with a different digest/state rejects. Fresh submit always keeps its normal cursor/outbox admission in the same transaction; historical/admin application changes no source cursor, ingress completion or ACK. Failed auth/version/digest/size/transaction writes nothing. A stale but valid fresh event may retain its ordinary ingress receipt plus a superseded lifecycle result, but cannot change guard, policy or fence.\n\nREAD AND MATERIALIZATION FENCES. Every ordinary DurableIngress materialization path performs current registration/captured ACL checks and one summary lookup for each provenance source object: submit, getReceipt, readEvent, readSnapshot, getSource cursor expansion, listPending and handoff. Any tombstoned, blocking or corrupt summary denies the whole item; there is no filtered cursor, partial result or sanitized-snapshot exception. Events with no invalidation row use an initialized zero-blocker summary created on first admission; after this Ticket a missing required summary is corruption, not active. At most32 provenance targets keeps event checks bounded; summaries make each target O(1), independent of retained stream count. Registration reads additionally obey current allowed principals and sensitivity. repository_removed/installation_revoked therefore deny every historical read through their forced deny-all registration policy even when no object guard exists; enabled:false by itself blocks only future capture. LocalGraphStore ordinary accepted-event reads continue through this exact boundary, so historical resolve/receipt/page fail closed immediately after the invalidation transaction even when no Graph lifecycle mutation exists. One denied support denies a multi-source derived revision; unrelated objects remain usable.\n\nGRAPH LIFECYCLE SELECTION. SourceInvalidationFeed.readLifecycleEvent requires store:read, source:invalidation:read, source:invalidation:consume and service/worker kind and accepts only the deterministic invalidation_id; callers cannot supply a registration, path or arbitrary locator. It returns only normalized SOURCE_ACCESS_CHANGED/SOURCE_TOMBSTONE metadata, admitted receipt/digest, captured access and invalidation reference; no raw envelope, snapshot bytes, provider token or arbitrary source content. In LocalGraphStore, enable a special selected accepted_event resolver only when write=true and operation.kind=source_access. It derives the current ID with sourceLifecycleInvalidationId(scope,operation.event.event_id). For prior lifecycle observations, the resolver authorizes only observations encountered through the current head's source_access projection rows for the current at-most32 targets and matches their immutable graph-accepted-event/access_update facts; no feed scan or general fallback is allowed. Ordinary acceptedEvent remains first choice and the special current/prior path is attempted only for source_access_denied. The selected resolver and authorizeLifecycle share the exact cached record and still require graph:lifecycle, source:invalidation:consume, current publisher/activation authority, matching target set, captured effective ACL containing the Graph principal, producer epoch and advancing sequence. It bypasses only current registration/object denial for these lifecycle metadata lookups. If the caller never had captured access, Graph mutation remains unavailable while the ingress guard still protects reads. Assertions, resolution, coverage, normal reads, stored receipt validation and pages always use ordinary acceptedEvent. Unknown/tombstoned Graph targets and core ordering checks remain unchanged, so a tombstone-before-content produces a guard/notice but no fabricated Graph object, assertion, catalog or observation.\n\nATOMIC FEED AND DISABLE SEMANTICS. Each effective policy/object change writes its command receipt, stream guards, object summaries, immutable notice and one Project-scoped monotonic fence in the same transaction as its registration/event changes. Fence sequence is a safe integer and fixed-width notice IDs support indexed getSourceRange pages. Administrative restriction and unknown/tombstoned application of already-admitted events bypass ProjectActivation solely so denial works while disabled. Fresh submitSourceLifecycle is capture-gated even when restrictive, and active historical reopening is result-gated; disabling a Project never authorizes fresh capture or reopening. Denial requires no Graph commit, ACK or completion. Retention is append-only here; no pruning or legal-erasure claim.\n\nCONSUMER CONTRACT. SourceInvalidationFeed head(context) returns the Project fence; page(context,{after,limit}) returns immutable bounded notices and a locator; assertFence(context,{sequence}) succeeds only while the exact scoped fence is current; readLifecycleEvent is the narrow security metadata operation above. page uses limit1..64, fixed-width sequence bounds and the existing1MiB complete-response cap, with no OFFSET/full scan. A later canonical reader/query/index/cache/compiler must pin before building and recheck before serving; mismatch quarantines the output and the consumer may page notices. This Ticket implements no such consumer, checkpoint, ACK, cache, index, compiler, vector deletion, recomputation worker or scheduler and claims no downstream refresh.\n\nFIXTURES. Use actual temporary SQLite, real DurableIngress and LocalGraphStore, and admitted synthetic events. Include atomic crash tests around fresh lifecycle admission+guard/fence, admin/historical application and summary count changes. Prove normal producer lifecycle admission after current registration/object denial succeeds only through the explicit capture-gated metadata method, while ordinary content and disguised snapshot/mutable payload fail. Cover same-stream0/2/1, exact replay, null order, two registrations/producer epochs targeting one object, permanent tombstone, multi-target partial restrictive effects and all-target active broadening. Instrument summary reads to show O(targets), not retained-stream scans. Prove repository/installation forced deny-all blocks historical ingress and Graph reads; enabled:false alone still permits an otherwise authorized historical read and applyAdministrativeInvalidation rejects that insufficient policy. For Graph, prove current and prior lifecycle selection for a captured-authorized service after current revocation, and negatives for a never-captured principal and every non-source_access path. Also cover namespace omission, Project disabled behavior, multi-source closure, source-version races,32-target/64-page/1MiB bounds, stale fence, restart and SIGKILL before/after commit. Run event, causal, auth, DomainStore, ProjectActivation, DurableIngress, GraphStore and boundary suites. All fixtures are synthetic; no model/network call, repository content, credential, Peel trace or connector is used.\n\nEXCLUSIONS. No provider connector, organization IdP, permissions UI, host/session enrollment, Policy worker, generic event bus, cache/index/compiler implementation, vector erasure, legal retention, cloud sync, canonical Git write, source completion or automatic semantic mutation. Existing downstream Tickets retain those responsibilities. This Ticket supplies the bounded local security substrate without weakening local-first privacy or ordinary Agent/plugin availability.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -62,6 +109,74 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Accepted registration CAS, current ACL/sensitivity, admitted event and disabled-read behavior extended in place.",
+      "ref": "semantic-runtime/docs/durable-ingress-v0.md"
+    },
+    {
+      "purpose": "Actual transaction owner, producer checks, activation-gated submit and private registration/event storage.",
+      "ref": "semantic-runtime/src/local/durable-ingress.mjs"
+    },
+    {
+      "purpose": "Successful exact DurableIngress prerequisite and immutable receipt/current-access boundary.",
+      "ref": ".vibehub/outcomes/ticket-runtime-durable-ingress-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Accepted authenticated Graph read/lifecycle behavior and explicit no-completion boundary.",
+      "ref": "semantic-runtime/docs/graph-store-v0.md"
+    },
+    {
+      "purpose": "Actual selected-port operation seam and ordinary receipt/read paths that must never use the lifecycle bypass.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Actual admitted-event and authorizeLifecycle authority implementation extended for exact metadata-only selection.",
+      "ref": "semantic-runtime/src/local/graph-inputs.mjs"
+    },
+    {
+      "purpose": "Successful exact GraphStore prerequisite including current-ACL reads, retained selected events and real lifecycle authority.",
+      "ref": ".vibehub/outcomes/ticket-runtime-graph-store-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Executable source_access planner: current and prior lifecycle events are selected before authorizeLifecycle and wire states are active/unknown/tombstoned.",
+      "ref": "semantic-runtime/src/core/incremental-graph.mjs"
+    },
+    {
+      "purpose": "Normalized lifecycle taxonomy, sourceObject identity, captured ACL intersection and payload boundaries.",
+      "ref": "semantic-runtime/docs/event-provenance-v0.md"
+    },
+    {
+      "purpose": "Executable normalized-event/sourceObject validators and immutable payload kinds; event shape alone is never authority.",
+      "ref": "semantic-runtime/src/core/event-provenance.mjs"
+    },
+    {
+      "purpose": "sourcePartitionKey and per-producer-epoch ordering; timestamps and cross-stream integers cannot reopen restrictions.",
+      "ref": "semantic-runtime/docs/causal-ordering-v0.md"
+    },
+    {
+      "purpose": "Exact sourcePartitionKey and cursor semantics used as the authoritative guard stream identity.",
+      "ref": "semantic-runtime/src/core/causal-ordering.mjs"
+    },
+    {
+      "purpose": "Explicit namespace allowlists, scoped CAS/source/range primitives and bounded unknown_namespace failure.",
+      "ref": "semantic-runtime/src/local/domain-store.mjs"
+    },
+    {
+      "purpose": "Fresh capture and active reopening are gated while already-admitted/admin restriction remains fail closed.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Opaque local authority, principal kinds, captured/current access and credential privacy boundary.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "First concrete later fence consumer; remains draft and is not implemented here.",
+      "ref": ".vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml"
+    },
+    {
+      "purpose": "Later provider delivery/replay owner; this Ticket supplies no connector or scheduler.",
+      "ref": ".vibehub/tickets/ticket-runtime-connector-substrate-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,15 +205,42 @@
       ],
       "identity": "sha256:67cb33a7f05610901fc274793dd2b92a1a094f5f728cd5cb4fac3d603adf24be",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "derived-acl-rule",
+          "identity": "sha256:cb88a3747832c0743796f4cc5d8b5eae3a0d363f75dcd332a63e0f6dbf96f722",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "fail-closed-invalidation",
+          "identity": "sha256:b0e4840f8a33f15b4ee07de1493f8018b3939932ffe717b5b5eed348caf549fb",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "invalidation-fixtures",
+          "identity": "sha256:82bc6cfce92bafa7992df1c3b91b1cc42006fce13fd28c5c39f64cbafdca6a0a",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "source-lifecycle-events",
+          "identity": "sha256:428fad9a465d6c93d31e341a9cac1d59c361ed145a05c65192027e729dac34c7",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:0d6027aac84459b1c41a2f4c927a62d9d448bdc8c49783095c3f73a0128cd578",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "Deleting a source object or revoking access cannot leave retrievable semantic state with broader visibility than its current supporting sources.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-22-source-invalidation-refinement",
     "plan-validation:independent"
   ],
   "relations": [

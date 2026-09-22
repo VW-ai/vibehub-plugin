@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIENCE,
   scopedReference, GitProjectRegistry, ProjectActivation, ACTIVATION_NAMESPACE,
-  GIT_ENROLLMENT_NAMESPACE, DurableIngress, INGRESS_NAMESPACE,
+  GIT_ENROLLMENT_NAMESPACE, DurableIngress, INGRESS_NAMESPACE, SOURCE_INVALIDATION_NAMESPACE,
   verifyEventPayload, TypeSafeJevJudge, LocalGraphStore, WORKING_GRAPH_NAMESPACE } from '../src/index.mjs';
 import { validateDecision, canonical } from '../src/core/contracts.mjs';
 import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
@@ -43,7 +43,7 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000, graphRoundT
     const context = localContext(authority, graphRoundTrip), filePath = join(root, 'domain.sqlite');
     migrateDomainStore({ filePath });
     const options = { filePath, authority,
-      namespaces: [INGRESS_NAMESPACE, ACTIVATION_NAMESPACE, GIT_ENROLLMENT_NAMESPACE, ...(graphRoundTrip ? [WORKING_GRAPH_NAMESPACE] : [])] };
+      namespaces: [INGRESS_NAMESPACE, SOURCE_INVALIDATION_NAMESPACE, ACTIVATION_NAMESPACE, GIT_ENROLLMENT_NAMESPACE, ...(graphRoundTrip ? [WORKING_GRAPH_NAMESPACE] : [])] };
     const permitted = new Set([...selectedTexts, ...(graphRoundTrip ? edgeCases.flatMap(entry => entry[3].map(ref => ref.text)) : [])]);
     const open = () => {
       store = new DomainStore(options);

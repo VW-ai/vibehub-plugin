@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "source-lifecycle-events",
+    "derived-acl-rule",
+    "fail-closed-invalidation",
+    "invalidation-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "source-lifecycle-events",
+      "identity": "sha256:428fad9a465d6c93d31e341a9cac1d59c361ed145a05c65192027e729dac34c7",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "derived-acl-rule",
+      "identity": "sha256:cb88a3747832c0743796f4cc5d8b5eae3a0d363f75dcd332a63e0f6dbf96f722",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "fail-closed-invalidation",
+      "identity": "sha256:b0e4840f8a33f15b4ee07de1493f8018b3939932ffe717b5b5eed348caf549fb",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "invalidation-fixtures",
+      "identity": "sha256:82bc6cfce92bafa7992df1c3b91b1cc42006fce13fd28c5c39f64cbafdca6a0a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "source-invalidation-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T14:10:11.834Z",
+  "refs": [
+    "semantic-runtime/docs/source-invalidation-v0.md",
+    "semantic-runtime/src/local/source-invalidation.mjs",
+    "semantic-runtime/src/local/durable-ingress.mjs",
+    "semantic-runtime/src/local/graph-inputs.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/source-invalidation.test.mjs",
+    "semantic-runtime/test/source-invalidation-crash.test.mjs",
+    "semantic-runtime/test/helpers/source-invalidation-process.mjs",
+    "semantic-runtime/test/graph-source-invalidation.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implements exact Contract2 using a fixed source-invalidation namespace in the existing scoped DomainStore. Three DurableIngress commands atomically bind lifecycle/admin input, registration CAS, immutable receipts, stream guards, object summaries, notices and Project fence. Ordering is local to partition/producer/epoch; incomparable/null streams remain restrictive and tombstones cannot reopen. All ordinary content and handoff paths check every supporting object. Metadata-only lifecycle capture remains activation-gated; narrowly selected Graph source_access metadata can resolve captured-authorized current/prior lifecycle records after revocation without opening assertions, queries or receipts. Administrative removal/revocation uses exact deny-all, and visibility/redaction are conjunctively non-broadening. The bounded feed provides head/page/assertFence/readLifecycleEvent without a new scheduler, consumer checkpoint, or database migration. Reproduce with npm run verify from semantic-runtime: final current source run passed 584 tests, 582 pass, 2 intentional native opt-in skips, 0 failures; boundary144 files,0 errors. Independent reviewer reran source/crash/ingress/Graph suites63/63 and six adversarial probes. Fixed regressions include missing/rewound fences, corrupted stream tuple, unsafe counts, inert Proxy/error handling, changed historical idempotency-key reuse, and required namespace even for valid zero-provenance events. Four real-process tests prove rollback on precommit SIGKILL, durable exact replay after postcommit SIGKILL, one receipt for concurrent exact requests, and one winner for version competitors. Graph tests prove captured/current ACL separation, prior lifecycle selection, no fake Graph object on tombstone-before-content, and denial of non-lifecycle paths. Tests use temporary synthetic Git/SQLite only. This evidence does not claim automatic host collection, query consumers, recomputation, or canonical acceptance.",
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0"
+}

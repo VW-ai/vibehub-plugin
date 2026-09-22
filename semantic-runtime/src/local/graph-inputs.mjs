@@ -4,9 +4,10 @@ import { DomainStore } from './domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { DurableIngress, INGRESS_NAMESPACE } from './durable-ingress.mjs';
+import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from './source-invalidation.mjs';
 import { canonical, fingerprint } from '../core/contracts.mjs';
 import { validateIdentityCatalog } from '../core/identity.mjs';
-import { validateNormalizedEvent, eventObservationKey } from '../core/event-provenance.mjs';
+import { validateNormalizedEvent, eventObservationKey, effectiveEventAccess } from '../core/event-provenance.mjs';
 import { projectFreshness, sourcePartitionKey } from '../core/causal-ordering.mjs';
 
 // Internal fixed domain helpers, shared only with the authenticated facade.
@@ -64,12 +65,13 @@ function publisherShape(run) {
 
 /** Actual local authority, Git enrollment and ingress facts; never a client-supplied oracle. */
 export class GraphInputs {
-  #store; #authority; #registry; #ingress;
+  #store; #authority; #registry; #ingress; #invalidations;
   constructor({ store, authority }) {
     graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
     this.#store = store; this.#authority = authority;
     this.#registry = new GitProjectRegistry({ store, authority });
     this.#ingress = new DurableIngress({ store, authority });
+    this.#invalidations = new SourceInvalidationFeed({ store, authority });
   }
   grant(context, action, { write = false, owner = false } = {}) {
     const g = this.#authority.inspect(context);
@@ -130,8 +132,40 @@ export class GraphInputs {
     let bundle;
     try { bundle = this.#ingress.readEvent(context, { event_id: tuple[3] }); }
     catch (error) { if (graphErrorCode(error) === 'source_access_denied') throw graphFail('graph_access_denied'); throw error; }
+    return this.#acceptedBundle(context, observation, bundle);
+  }
+  // Called only by the source_access planner's selected port. Prior metadata
+  // must additionally be selected from current Graph access projections there.
+  lifecycleEvent(context, event, { prior = false, access_state = null } = {}) {
+    const g = this.grant(context, 'graph:lifecycle', { write: true, owner: true });
+    this.grant(context, 'source:invalidation:read'); this.grant(context, 'source:invalidation:consume');
+    graphAssert(g.kind === 'service', 'graph_unauthorized');
+    validateNormalizedEvent(event);
+    graphAssert(['SOURCE_ACCESS_CHANGED', 'SOURCE_TOMBSTONE'].includes(event.event_type)
+      && event.partition.tenant_id === g.tenant_id && event.partition.project_id === g.project_id, 'graph_unauthorized');
+    graphAssert(effectiveEventAccess(event).allowed_principal_ids.includes(g.principal_id), 'graph_access_denied');
+    const observation = eventObservationKey(event);
+    let bundle;
+    if (prior) {
+      const source = this.#store.getSource(context, GRAPH_NS, admittedKey(observation));
+      graphAssert(source?.kind === 'graph-accepted-event' && source.value.observation === observation
+        && graphEqual(source.value.fact.event, event), 'graph_corrupt');
+      bundle = { event: source.value.fact.event, receipt: source.value.receipt };
+    } else {
+      const selected = this.#invalidations.readLifecycleEvent(context, {
+        invalidation_id: sourceLifecycleInvalidationId(scopeOf(g), event.event_id),
+      });
+      graphAssert(selected.status === 'applied' && selected.access_state === access_state && graphEqual(selected.event, event)
+        && selected.event_digest === graphHash(event), 'graph_access_denied');
+      bundle = { event: selected.event, receipt: selected.receipt };
+    }
+    return this.#acceptedBundle(context, observation, bundle);
+  }
+  #acceptedBundle(context, observation, bundle) {
+    const g = this.#authority.inspect(context);
     const { event, receipt } = bundle; validateNormalizedEvent(event);
-    graphAssert(eventObservationKey(event) === observation && event.partition.project_id === g.project_id
+    graphAssert(eventObservationKey(event) === observation && event.partition.tenant_id === g.tenant_id
+      && event.partition.project_id === g.project_id && receipt.event_id === event.event_id
       && graphHash(event) === receipt.event_digest, 'graph_corrupt');
     const original = this.#store.getSource(context, INGRESS_NAMESPACE, receipt.catalog_ref);
     graphAssert(original?.kind === 'identity-catalog' && graphHash(original.value) === event.normalization.catalog_digest, 'graph_corrupt');
@@ -170,9 +204,9 @@ export class GraphInputs {
     }
     return { watermarks: projectFreshness({ scope, requirements, cursors }), pins, facts };
   }
-  lifecycle(context, { at, current_head, access_view, event, targets, epoch }) {
+  lifecycle(context, { at, current_head, access_view, event, targets, epoch }, selected = null) {
     const g = this.grant(context, 'graph:lifecycle', { write: true, owner: true });
-    const admitted = this.acceptedEvent(context, eventObservationKey(event)); graphAssert(graphEqual(admitted.fact.event, event), 'graph_corrupt');
+    const admitted = selected ?? this.acceptedEvent(context, eventObservationKey(event)); graphAssert(graphEqual(admitted.fact.event, event), 'graph_corrupt');
     const sorted = event.provenance.source_objects.map(x => x.object).sort((a, b) => canonical(a).localeCompare(canonical(b)));
     graphAssert(graphEqual(sorted, [...targets].sort((a, b) => canonical(a).localeCompare(canonical(b)))));
     const value = { schema_version: 1, scope: scopeOf(g), actor: g.principal_id, actor_kind: g.kind, epoch,

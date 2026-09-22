@@ -27,7 +27,7 @@ export function connect(filePath, { snapshotPolicy = ({ text }) => text, clock =
       action: actions[0], kinds: [kind], boundary: 'http', reference: scopedReference('http', scope, 'ingress') });
     assert(allowed); return { context, issued };
   };
-  const store = new DomainStore({ filePath, authority, namespaces: [NS, WORK, 'git-enrollment', 'project-activation'] });
+  const store = new DomainStore({ filePath, authority, namespaces: [NS, WORK, 'git-enrollment', 'project-activation', 'source-invalidation'] });
   return { filePath, clock, authority, issue, store, ...issue(),
     ingress: new DurableIngress({ store, authority, snapshotPolicy, now: () => clock.now }),
     activation: new ProjectActivation({ store, authority, now: () => clock.now }), registry: new GitProjectRegistry({ store, authority }) };

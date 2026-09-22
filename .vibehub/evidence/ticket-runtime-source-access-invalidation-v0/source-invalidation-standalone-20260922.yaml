@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "invalidation-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "invalidation-fixtures",
+      "identity": "sha256:82bc6cfce92bafa7992df1c3b91b1cc42006fce13fd28c5c39f64cbafdca6a0a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "source-invalidation-standalone-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T14:13:56.856Z",
+  "refs": [
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/package.json",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/test/source-invalidation.test.mjs",
+    "semantic-runtime/test/source-invalidation-crash.test.mjs",
+    "semantic-runtime/test/graph-source-invalidation.test.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final combined source-invalidation plus sensor milestone verified from a clean temporary component outside the repository using npm run verify:standalone: locked npm ci,144 boundary files/0 errors,585 tests total,583 passed,2 intentional native opt-in skips,0fail. This includes the final sensor FIFO regression added after the earlier584-test run; source-invalidation production files remained frozen. Root npm run verify:artifact passed, demonstrating existing Skill artifact isolation. project validate returned valid:true with209 Tickets,502 Evidence at the time of validation and149 prior Outcomes, and context guard passed with no governing authority violations. Commands are reproducible from checked-in source/tests; no private repository capture or model call is performed by these checks.",
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0"
+}

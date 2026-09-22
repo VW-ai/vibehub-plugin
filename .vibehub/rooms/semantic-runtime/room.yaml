@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "053a4935466b91603ff77f74e19ff573a34a0d6f",
+        "blob": "4024c5cdb1e67a1869f216b48c5a832ca7420e28",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -54,7 +54,7 @@
         "path": "semantic-runtime/docs/domain-store-v0.md"
       },
       {
-        "blob": "588ca5064fea84a115f9ab2e895c6273400bd949",
+        "blob": "22c55adb6c2837f2432d54ae12682e5dd0fc9b65",
         "path": "semantic-runtime/docs/durable-ingress-v0.md"
       },
       {
@@ -70,7 +70,7 @@
         "path": "semantic-runtime/docs/git-provenance-v0.md"
       },
       {
-        "blob": "0ede7e7bc7f80cd724a10b498301f20824536e63",
+        "blob": "38045d9d374de7b4c328dae7b777fb165039d01b",
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
@@ -92,6 +92,10 @@
       {
         "blob": "df19260c9100ec1fa384d4df46e77d197183d041",
         "path": "semantic-runtime/docs/local-app-setup-v0.md"
+      },
+      {
+        "blob": "7ef5c97c199a87ac73ccc8b283d630c042464839",
+        "path": "semantic-runtime/docs/local-git-worktree-sensor-v0.md"
       },
       {
         "blob": "23776a8fbb96de69f7bc2349066ecfb9ff26ef57",
@@ -126,8 +130,20 @@
         "path": "semantic-runtime/docs/measurements/jev-graph-round-trip-20260922.json"
       },
       {
+        "blob": "8da8cbcc51e8d8454b4f9e56c4951a1a1df5757f",
+        "path": "semantic-runtime/docs/measurements/jev-graph-source-closure-20260922.json"
+      },
+      {
+        "blob": "1ce0e52ad4e6b1b8352d63795c0e0361ae6247a6",
+        "path": "semantic-runtime/docs/measurements/jev-inflight-source-fence-20260922.json"
+      },
+      {
         "blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
         "path": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+      },
+      {
+        "blob": "c13e6a8ebc1b5c94e3745794b271e7d693bf659e",
+        "path": "semantic-runtime/docs/measurements/jev-invalidation-composition-final-20260922.json"
       },
       {
         "blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
@@ -190,6 +206,10 @@
         "path": "semantic-runtime/docs/service-auth-v0.md"
       },
       {
+        "blob": "89464e06f284aa6066ce62e1bffdfd8e55cab470",
+        "path": "semantic-runtime/docs/source-invalidation-v0.md"
+      },
+      {
         "blob": "f2ce8c2888265bc56bd5c2fdf9216bba5a053672",
         "path": "semantic-runtime/docs/worker-protocol-v0.md"
       },
@@ -206,7 +226,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "98644dd49d8819f1d4f721db282fdc134242240c",
+        "blob": "86a993ff07f41410c5d99b7f10384cb101399243",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -254,8 +274,12 @@
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
       },
       {
-        "blob": "c16c8dd74628d6a0589ac59cab26f561cba3c193",
+        "blob": "a9e26ad295e9d779cd830a0e57b7c5e7858bbd70",
         "path": "semantic-runtime/scripts/check-jev-ingress.mjs"
+      },
+      {
+        "blob": "4a9a61255baac89fece49f24689c3540e0a7fbb7",
+        "path": "semantic-runtime/scripts/check-jev-source-fence.mjs"
       },
       {
         "blob": "589a10e5bb71677eeb985263150e3ee76c2651c3",
@@ -370,6 +394,10 @@
         "path": "semantic-runtime/src/adapters/git-provenance.mjs"
       },
       {
+        "blob": "1bba81fb925dbd2127805a8fe4352c3ce4f23d8c",
+        "path": "semantic-runtime/src/adapters/git-worktree-observer.mjs"
+      },
+      {
         "blob": "14efc0a9ae2defbd00ba86f3bf5d6f510558bad3",
         "path": "semantic-runtime/src/adapters/haiku-judge.mjs"
       },
@@ -438,6 +466,10 @@
         "path": "semantic-runtime/src/core/git-provenance.mjs"
       },
       {
+        "blob": "3463a9d46e77a8455aa607a721334683a2336844",
+        "path": "semantic-runtime/src/core/git-worktree-observation.mjs"
+      },
+      {
         "blob": "204737beb850d8bfdc05a4575a898af71558b334",
         "path": "semantic-runtime/src/core/identity.mjs"
       },
@@ -482,7 +514,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "a034eec2840edfdd05d0a612ddd811e377f84bac",
+        "blob": "abb06506c17120abcaa401e2aaad242b190daa23",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -506,7 +538,7 @@
         "path": "semantic-runtime/src/local/domain-store.mjs"
       },
       {
-        "blob": "5cb3d512b66f632a04df5daac7def738e7a108e2",
+        "blob": "d77bde1ac686150c009c0bebb7f2305ca605a879",
         "path": "semantic-runtime/src/local/durable-ingress.mjs"
       },
       {
@@ -514,7 +546,11 @@
         "path": "semantic-runtime/src/local/git-projects.mjs"
       },
       {
-        "blob": "d2dc316dda70d42ee9b8c61671bb5970fed01ccc",
+        "blob": "db3b8f5c27c999f21d1ae114ddd3915febce3ba2",
+        "path": "semantic-runtime/src/local/git-worktree-sensor.mjs"
+      },
+      {
+        "blob": "cfede54bc6cfc9ab8fda44ec8a1d281c6e211ea2",
         "path": "semantic-runtime/src/local/graph-inputs.mjs"
       },
       {
@@ -522,7 +558,7 @@
         "path": "semantic-runtime/src/local/graph-storage.mjs"
       },
       {
-        "blob": "9ed551a20ecafd15ddd6f49dc70d69ad6c89b302",
+        "blob": "789b436a3a98284b0d89c5b40f4a40e5aa045dbc",
         "path": "semantic-runtime/src/local/graph-store.mjs"
       },
       {
@@ -560,6 +596,10 @@
       {
         "blob": "18b97707705a7821cc76cf16a0b9c97b4638592b",
         "path": "semantic-runtime/src/local/setup-ui/style.css"
+      },
+      {
+        "blob": "f018e7908caeb41df2f9e8ec75afacd16818c277",
+        "path": "semantic-runtime/src/local/source-invalidation.mjs"
       },
       {
         "blob": "e5738814c843cd8a1509754653ceca88a01d7eeb",
@@ -650,7 +690,7 @@
         "path": "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json"
       },
       {
-        "blob": "962037e8b9096c9304e798f4985fe6410d81a331",
+        "blob": "0ce5e44563427e4240a028f24d018e6e49a075f5",
         "path": "semantic-runtime/test/fixtures/durable-ingress/scenario.mjs"
       },
       {
@@ -676,6 +716,10 @@
       {
         "blob": "5dac7965c6df675659e32b1cc588218e3a9073d4",
         "path": "semantic-runtime/test/fixtures/git-provenance/repository.mjs"
+      },
+      {
+        "blob": "54e9bb74af236eefb886c12456c77734bb22cd21",
+        "path": "semantic-runtime/test/fixtures/git-sensor/measurement.json"
       },
       {
         "blob": "7aed9fbcbe8bb7f82ab22ad42902c6d1b5a75ad0",
@@ -770,6 +814,14 @@
         "path": "semantic-runtime/test/git-provenance.test.mjs"
       },
       {
+        "blob": "209d674727e10813200ea43400d84107981b9aa3",
+        "path": "semantic-runtime/test/git-worktree-sensor.test.mjs"
+      },
+      {
+        "blob": "9430dc16fe7140be40fd6caa39815352bdeaa2ab",
+        "path": "semantic-runtime/test/graph-source-invalidation.test.mjs"
+      },
+      {
         "blob": "084caf2d0e61fae99b00f1155347b2e3e33fe608",
         "path": "semantic-runtime/test/graph-storage.test.mjs"
       },
@@ -794,7 +846,11 @@
         "path": "semantic-runtime/test/helpers.mjs"
       },
       {
-        "blob": "594bc2c5458d305c7b5c733f30e27bc0a7e6deec",
+        "blob": "e629577e1e2b00ec158aeb964742c0e9926ca5e2",
+        "path": "semantic-runtime/test/helpers/git-sensor-fixture.mjs"
+      },
+      {
+        "blob": "9989b48ab34c6e20faa68350704cfac13b710382",
         "path": "semantic-runtime/test/helpers/graph-store-fixture.mjs"
       },
       {
@@ -804,6 +860,10 @@
       {
         "blob": "015cc55783a014638ef3d95d697dfa24e1cd0da5",
         "path": "semantic-runtime/test/helpers/incremental-graph-fixture.mjs"
+      },
+      {
+        "blob": "7f6a30eb0811717753f445fdfdbd05abc37dc35b",
+        "path": "semantic-runtime/test/helpers/source-invalidation-process.mjs"
       },
       {
         "blob": "552b9e1dcfc19904725829340d3024c1a3276051",
@@ -818,7 +878,7 @@
         "path": "semantic-runtime/test/incremental-graph.test.mjs"
       },
       {
-        "blob": "33eeab278d4c7c3e56443b1fed3a372e3473533b",
+        "blob": "e51b5aeeee9af1738f8263d3ab9efc3ac4de2898",
         "path": "semantic-runtime/test/jev-ingress-check.test.mjs"
       },
       {
@@ -828,6 +888,10 @@
       {
         "blob": "b40e1197e754c2a739398185ffb9d40a691fe73d",
         "path": "semantic-runtime/test/jev-route-comparison.test.mjs"
+      },
+      {
+        "blob": "dc6e6015d750023a5bc34e67ccbe3060a96a9f68",
+        "path": "semantic-runtime/test/jev-source-fence-check.test.mjs"
       },
       {
         "blob": "01baf8bb13d67241c853683aeae70fba5dc9d0e4",
@@ -898,6 +962,14 @@
         "path": "semantic-runtime/test/setup-ui.test.mjs"
       },
       {
+        "blob": "10b71920b28a0ce51779f82311e0c7a6c7153d3c",
+        "path": "semantic-runtime/test/source-invalidation-crash.test.mjs"
+      },
+      {
+        "blob": "d88ed7ef68c43b6acc8dae8473c56c985c047fbc",
+        "path": "semantic-runtime/test/source-invalidation.test.mjs"
+      },
+      {
         "blob": "3dda90fbcdecdbe48a3807ede10b9cf8b523f7e8",
         "path": "semantic-runtime/test/synthetic-jev-check.test.mjs"
       },
@@ -922,8 +994,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T12:58:50.964Z",
-    "last_aligned_commit": "5884acd46ab1f50e43ffc0837cb41051ab982460"
+    "checked_at": "2026-09-22T14:17:35.614Z",
+    "last_aligned_commit": "5171cf474211035976e0f966f826b622bcb1a784"
   },
   "anchors": [
     "semantic-runtime/"

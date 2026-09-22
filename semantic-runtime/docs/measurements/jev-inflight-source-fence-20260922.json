@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-inflight-source-revocation-v1",
+  "measured_at": "2026-09-22T13:39:41.068Z",
+  "model": "jev-1.13.0",
+  "model_completed": true,
+  "matched": true,
+  "successful_attempt_ms": 296,
+  "elapsed_ms": 328,
+  "source_revoked_after_dispatch": true,
+  "direct_event_still_readable": true,
+  "state_parent_denied": true,
+  "result_publication": "rejected",
+  "rejection_code": "graph_access_denied",
+  "graph_unchanged": true,
+  "result_receipt_absent": true,
+  "retries": 0,
+  "canonical_promotion": false,
+  "ingress_acknowledged": false
+}

@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "derived-acl-rule",
+    "invalidation-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "derived-acl-rule",
+      "identity": "sha256:cb88a3747832c0743796f4cc5d8b5eae3a0d363f75dcd332a63e0f6dbf96f722",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "invalidation-fixtures",
+      "identity": "sha256:82bc6cfce92bafa7992df1c3b91b1cc42006fce13fd28c5c39f64cbafdca6a0a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "jev-final-invalidation-composition-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T14:16:32.041Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/jev-invalidation-composition-final-20260922.json",
+    "semantic-runtime/scripts/check-jev-source-fence.mjs",
+    "semantic-runtime/scripts/check-jev-ingress.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Supplemental authorized final-code live check using official TypeSafe jev-1.13.0 and fixed synthetic inputs only. One in-flight source-revocation request matched in344ms model/373ms elapsed and candidate publication rejected graph_access_denied without Graph change or receipt. Eight Graph roundtrip edge judgments matched8/8 with107–241ms successful-attempt model latency,17 retained support pins,17 historical reads and17 exact retries after reopening;17 ingress intents remain pending and no canonical promotion is claimed. Both commands completed with0retries; eight-call route reports0rate limits. Credentials passed privately from Keychain to process environment, never emitted or persisted. No new private corpus, background model dispatcher or product-quality claim. Earlier reports are preserved as earlier measurements.",
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0"
+}

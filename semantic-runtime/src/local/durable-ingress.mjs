@@ -7,6 +7,8 @@ import { canonical, fingerprint } from '../core/contracts.mjs';
 import { EVENT_TYPES, validateRawEvent, normalizeRawEvent, effectiveEventAccess,
   verifyEventPayload, eventIdempotencyKey } from '../core/event-provenance.mjs';
 import { sourcePartitionKey, sourceEventFingerprint, createSourceCursor, acceptSourceEvent } from '../core/causal-ordering.mjs';
+import { SourceInvalidationDomain } from './source-invalidation.mjs';
+import { types as utilTypes } from 'node:util';
 
 export const INGRESS_NAMESPACE = 'durable-ingress';
 const NS = INGRESS_NAMESPACE;
@@ -16,6 +18,8 @@ const ownCodes = new Set(['ingress_unauthorized', 'invalid_ingress_input', 'unkn
   'unmapped_event', 'invalid_event', 'sanitization_required', 'invalid_snapshot', 'snapshot_conflict',
   'observation_conflict', 'cursor_capacity', 'ingress_capacity', 'missing_event', 'corrupt_ingress_state',
   'async_ingress_callback', 'consumer_failed', 'project_disabled', 'stale_activation_epoch']);
+const invalidationCodes = new Set(['invalidation_unauthorized', 'invalid_invalidation_input', 'missing_invalidation',
+  'invalidation_corrupt', 'invalidation_conflict', 'stale_invalidation_fence']);
 const upstreamCodes = new Set(['activation_unauthorized', 'invalid_activation_input', 'invalid_activation_state',
   'project_not_enrolled', 'invalid_execution_membership', 'async_activation_callback', 'project_unauthorized',
   'store_closed', 'store_busy', 'store_unavailable', 'store_unauthorized', 'invalid_store_input',
@@ -33,6 +37,14 @@ const equal = (a, b) => canonical(a) === canonical(b);
 const hash = value => `sha256:${fingerprint(value)}`;
 const key = (kind, value) => `${kind}-${fingerprint(value)}`;
 const copy = value => JSON.parse(canonical(value));
+function errorCode(value) {
+  try {
+    if ((typeof value !== 'object' && typeof value !== 'function') || value === null || utilTypes.isProxy(value)) return null;
+    const descriptor = Object.getOwnPropertyDescriptor(value, 'code');
+    return descriptor && Object.hasOwn(descriptor, 'value') && typeof descriptor.value === 'string'
+      ? descriptor.value : null;
+  } catch { return null; }
+}
 function freeze(value) {
   if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); }
   return value;
@@ -44,6 +56,7 @@ function input(value, maximum = 131072) {
     assert(++count <= 25000 && depth <= 16, 'ingress_capacity');
     if (item === null || typeof item === 'boolean' || typeof item === 'string') return;
     if (typeof item === 'number') { assert(Number.isFinite(item)); return; }
+    assert(!utilTypes.isProxy(item));
     assert((plain(item) || Array.isArray(item) && Object.getPrototypeOf(item) === Array.prototype) && !ancestors.has(item));
     assert(!Object.getOwnPropertySymbols(item).length);
     for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(item))) {
@@ -67,6 +80,17 @@ function access(value) {
   assert(Array.isArray(value.allowed_principal_ids) && value.allowed_principal_ids.length <= 128
     && value.allowed_principal_ids.every(id) && new Set(value.allowed_principal_ids).size === value.allowed_principal_ids.length);
 }
+const denyAllAccess = Object.freeze({ enabled: false, allowed_principal_ids: Object.freeze([]),
+  sensitivity: 'restricted', allow_snapshots: false });
+function narrowingAccess(current, next, { strictRead = false } = {}) {
+  access(next);
+  const subset = next.allowed_principal_ids.every(principal => current.allowed_principal_ids.includes(principal));
+  const sensitivity = levels.indexOf(next.sensitivity) >= levels.indexOf(current.sensitivity);
+  const capture = current.enabled || !next.enabled, snapshots = current.allow_snapshots || !next.allow_snapshots;
+  const readStrict = next.allowed_principal_ids.length < current.allowed_principal_ids.length
+    || levels.indexOf(next.sensitivity) > levels.indexOf(current.sensitivity);
+  assert(subset && sensitivity && capture && snapshots && (!strictRead || readStrict), 'source_access_denied');
+}
 function mapping(value) {
   fields(value, ['schema_version', 'mapping_id', 'revision', 'event_types']);
   assert(value.schema_version === 1 && id(value.mapping_id) && id(value.revision) && plain(value.event_types)
@@ -86,17 +110,21 @@ const outboxKey = event_id => key('pending', event_id);
 
 /** Local durable intake. Trusted callbacks may compose writes, never network/model work. */
 export class DurableIngress {
-  #store; #authority; #registry; #activation; #policy; #now;
+  #store; #authority; #registry; #activation; #invalidation; #policy; #now;
   constructor({ store, authority, snapshotPolicy, now = () => Date.now() }) {
     assert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority
       && (snapshotPolicy === undefined || typeof snapshotPolicy === 'function') && typeof now === 'function');
     this.#store = store; this.#authority = authority; this.#policy = snapshotPolicy; this.#now = now;
     this.#registry = new GitProjectRegistry({ store, authority });
     this.#activation = new ProjectActivation({ store, authority, now });
+    this.#invalidation = new SourceInvalidationDomain({ store, authority });
   }
   #call(operation) {
     try { return operation(); } catch (error) {
-      throw fail(ownCodes.has(error?.code) || upstreamCodes.has(error?.code) ? error.code : 'invalid_ingress_input');
+      const code = errorCode(error);
+      if (code === 'source_invalidation_denied') throw fail('source_access_denied');
+      throw fail(ownCodes.has(code) || upstreamCodes.has(code) || invalidationCodes.has(code)
+        ? code : 'invalid_ingress_input');
     }
   }
   #grant(context, action, { write = false, owner = false, project = false } = {}) {
@@ -110,7 +138,11 @@ export class DurableIngress {
   #transaction(context, operation, admission) {
     let domainCode;
     const guarded = tx => { try { return operation(tx); } catch (error) {
-      if (ownCodes.has(error?.code)) domainCode = error.code; throw error;
+      const code = errorCode(error);
+      if (ownCodes.has(code) || invalidationCodes.has(code) || code === 'source_invalidation_denied') {
+        domainCode = code;
+      }
+      throw error;
     } };
     try {
       if (!admission) return this.#store.transaction(context, guarded);
@@ -147,6 +179,7 @@ export class DurableIngress {
   #readFence(context, bundle) {
     const grant = this.#grant(context, 'ingress:read');
     this.#readAllowed(grant, this.#source(context, bundle.receipt.registration_id).value, bundle.event);
+    this.#invalidation.assertEventAllowed(context, bundle.event);
   }
   #writeAllowed(grant, registration, event, producer = false) {
     assert(registration.access.enabled, 'source_disabled');
@@ -193,6 +226,9 @@ export class DurableIngress {
         const version = tx.compareAndSwap(NS, registrationKey(value.registration_id), value.expectedVersion, registration);
         tx.appendSource(NS, key('source-access', [value.registration_id, version]), 'source-access', {
           registration_id: value.registration_id, version, access: value.access, actor: grant.principal_id, at: this.#time() });
+        this.#invalidation.recordPolicyChange(context, tx, { action: 'ingress:register',
+          registration_id: value.registration_id, registration_version: version, reason: 'direct_access_update',
+          access: value.access, request_digest: hash({ kind: 'direct_access_update', ...value }) });
         return { registration_id: value.registration_id, version, registration };
       });
     });
@@ -239,6 +275,7 @@ export class DurableIngress {
         const grant = this.#grant(context, 'ingress:submit', { write: true, project: true });
         const row = this.#source(context, value.registration_id, tx), registration = row.value;
         this.#writeAllowed(grant, registration, raw, true);
+        this.#invalidation.assertEventAllowed(context, raw, { tx, initialize: true });
         assert(equal(raw.partition, registration.partition)
           && raw.producer.producer_id === registration.producer.producer_id && raw.producer.epoch === registration.producer.epoch, 'source_mismatch');
         assert(raw.event_id === this.#eventId(grant, value.registration_id, raw.idempotency_key), 'invalid_event_identity');
@@ -299,12 +336,204 @@ export class DurableIngress {
       }, { epoch: value.epoch, stage: 'capture' });
     });
   }
+  submitSourceLifecycle(context, options) {
+    return this.#call(() => {
+      const initial = this.#grant(context, 'ingress:submit', { write: true, project: true });
+      assert(initial.actions.includes('source:invalidation:capture'), 'ingress_unauthorized');
+      const value = input(options);
+      fields(value, ['registration_id', 'epoch', 'event', 'expectedVersion', 'access_state', 'access']);
+      assert(id(value.registration_id) && integer(value.epoch) && integer(value.expectedVersion) && value.expectedVersion > 0
+        && ['active', 'unknown', 'tombstoned'].includes(value.access_state));
+      if (value.access !== null) access(value.access);
+      try { validateRawEvent(value.event); } catch { throw fail('invalid_event'); }
+      const raw = value.event;
+      assert(['object_revision', 'git_revision'].includes(raw.payload.kind), 'invalid_event');
+      const request_digest = hash({ kind: 'submit_source_lifecycle', ...value });
+      return this.#transaction(context, tx => {
+        const grant = this.#grant(context, 'ingress:submit', { write: true, project: true });
+        assert(grant.actions.includes('source:invalidation:capture'), 'ingress_unauthorized');
+        const row = this.#source(context, value.registration_id, tx), registration = row.value;
+        assert(grant.principal_id === registration.producer_principal_id, 'ingress_unauthorized');
+        assert(equal(raw.partition, registration.partition)
+          && raw.producer.producer_id === registration.producer.producer_id
+          && raw.producer.epoch === registration.producer.epoch, 'source_mismatch');
+        assert(raw.event_id === this.#eventId(grant, value.registration_id, raw.idempotency_key), 'invalid_event_identity');
+        if (registration.execution) assert(Object.entries(registration.execution).every(([k, v]) => raw.identity[k] === v), 'source_mismatch');
+        const priorInvalidation = this.#invalidation.lifecycle(context, raw.event_id,
+          { action: 'source:invalidation:capture', tx });
+        if (priorInvalidation) {
+          assert(priorInvalidation.kind === 'source_lifecycle_invalidation'
+            && priorInvalidation.request_digest === request_digest, 'invalidation_conflict');
+          return { status: 'duplicate', receipt: priorInvalidation.receipt, invalidation: priorInvalidation };
+        }
+        assert(row.version === value.expectedVersion, 'source_changed');
+        const catalog = this.#live(context, registration), accepted_at = this.#time();
+        let normalized;
+        try { normalized = normalizeRawEvent(raw, { catalog, mapping: registration.mapping }); }
+        catch { throw fail('invalid_event'); }
+        assert(normalized.status === 'normalized', 'unmapped_event');
+        const event = normalized.event;
+        assert(event.event_type === 'SOURCE_TOMBSTONE' ? value.access_state === 'tombstoned'
+          : event.event_type === 'SOURCE_ACCESS_CHANGED' && ['active', 'unknown'].includes(value.access_state), 'invalid_event');
+        const cursorId = cursorKey({ partition: registration.partition, producer: registration.producer });
+        const cursor = tx.getRecord(NS, cursorId); assert(cursor, 'corrupt_ingress_state');
+        let accepted;
+        try { accepted = acceptSourceEvent(cursor.value, event); }
+        catch { throw fail(cursor.value.entries.length >= 4096 ? 'cursor_capacity' : 'observation_conflict'); }
+        this.#stableSource(context, registration.registration_id, row.version, tx, 'ingress:submit', { write: true, project: true });
+        let receipt;
+        if (accepted.status === 'duplicate') {
+          const stored = tx.getSource(NS, eventKey(event.event_id));
+          assert(stored?.kind === 'admitted-event' && stored.value.receipt.source_fingerprint === sourceEventFingerprint(event)
+            && equal(stored.value.event, event), 'corrupt_ingress_state');
+          receipt = stored.value.receipt;
+        } else {
+          const catalog_ref = key('catalog', catalog), mapping_ref = key('mapping', registration.mapping);
+          receipt = { schema_version: 1, event_id: event.event_id, registration_id: registration.registration_id,
+            registration_version: row.version, source_access_ref: row.version === 1 ? key('source-origin', registration.registration_id)
+              : key('source-access', [registration.registration_id, row.version]), activation_epoch: value.epoch,
+            accepted_at, event_digest: hash(event), source_fingerprint: sourceEventFingerprint(event),
+            idempotency_key: eventIdempotencyKey(event), cursor_status: accepted.status,
+            catalog_ref, mapping_ref, snapshot_ref: null, snapshot_authorization_ref: null };
+          const pin = (ref, kind, data) => {
+            const prior = tx.getSource(NS, ref);
+            if (prior) assert(equal(prior.value, data), 'snapshot_conflict');
+            else tx.appendSource(NS, ref, kind, data);
+          };
+          pin(catalog_ref, 'identity-catalog', catalog); pin(mapping_ref, 'event-mapping', registration.mapping);
+          tx.appendSource(NS, eventKey(event.event_id), 'admitted-event', { raw, event, receipt });
+          try { tx.compareAndSwap(NS, cursorId, cursor.version, accepted.state); }
+          catch (error) { if (error?.code === 'invalid_store_input') throw fail('ingress_capacity'); throw error; }
+          tx.enqueue(NS, outboxKey(event.event_id), { schema_version: 1, event_id: event.event_id,
+            registration_id: registration.registration_id, activation_epoch: value.epoch, event_digest: receipt.event_digest });
+        }
+        const invalidation = this.#invalidation.applyLifecycle(context, tx, { action: 'source:invalidation:capture',
+          registration_id: value.registration_id, event, receipt, access_state: value.access_state,
+          access: value.access, request_digest });
+        let registrationResult = registration, version = row.version;
+        if (invalidation.status === 'applied' && value.access !== null) {
+          if (value.access_state === 'active') {
+            assert(invalidation.target_refs.every(target => target.applied), 'source_access_denied');
+            this.#invalidation.assertEventAllowed(context, event, { tx });
+          }
+          else narrowingAccess(registration.access, value.access);
+          registrationResult = { ...registration, access: value.access };
+          version = tx.compareAndSwap(NS, registrationKey(value.registration_id), value.expectedVersion, registrationResult);
+          tx.appendSource(NS, key('source-access', [value.registration_id, version]), 'source-access', {
+            registration_id: value.registration_id, version, access: value.access, actor: grant.principal_id, at: this.#time() });
+        }
+        return { status: accepted.status === 'duplicate' ? 'duplicate' : 'accepted', receipt,
+          invalidation, registration_id: value.registration_id, version, registration: registrationResult };
+      }, { epoch: value.epoch, stage: 'capture' });
+    });
+  }
+  applyAdmittedSourceLifecycle(context, options) {
+    return this.#call(() => {
+      const initial = this.#grant(context, 'ingress:read');
+      assert(initial.actions.includes('source:invalidate') && initial.actions.includes('store:write')
+        && ['human', 'service'].includes(initial.kind), 'ingress_unauthorized');
+      const value = input(options);
+      fields(value, ['registration_id', 'event_id', 'expectedVersion', 'idempotency_key', 'access_state', 'access', 'activation_epoch']);
+      assert(id(value.registration_id) && id(value.event_id) && id(value.idempotency_key)
+        && integer(value.expectedVersion) && value.expectedVersion > 0
+        && ['active', 'unknown', 'tombstoned'].includes(value.access_state));
+      if (value.access !== null) access(value.access);
+      if (value.access_state === 'active') assert(integer(value.activation_epoch));
+      else assert(value.activation_epoch === null);
+      const request_digest = hash({ kind: 'apply_admitted_source_lifecycle', ...value });
+      return this.#transaction(context, tx => {
+        const grant = this.#grant(context, 'ingress:read');
+        assert(grant.actions.includes('source:invalidate') && grant.actions.includes('store:write')
+          && ['human', 'service'].includes(grant.kind), 'ingress_unauthorized');
+        const row = this.#source(context, value.registration_id, tx), registration = row.value;
+        const priorCommand = this.#invalidation.command(context, value, { tx });
+        if (priorCommand) {
+          assert(priorCommand.kind === 'source-invalidation-command'
+            && priorCommand.value.request_digest === request_digest, 'invalidation_conflict');
+          return priorCommand.value.result;
+        }
+        const priorInvalidation = this.#invalidation.lifecycle(context, value.event_id, { action: 'source:invalidate', tx });
+        if (priorInvalidation) {
+          assert(priorInvalidation.kind === 'source_lifecycle_invalidation'
+            && priorInvalidation.request_digest === request_digest, 'invalidation_conflict');
+          return { status: 'duplicate', invalidation: priorInvalidation,
+            registration_id: value.registration_id, version: row.version, registration };
+        }
+        assert(row.version === value.expectedVersion, 'source_changed');
+        const stored = tx.getSource(NS, eventKey(value.event_id));
+        assert(stored?.kind === 'admitted-event' && stored.value.receipt.registration_id === value.registration_id,
+          'missing_event');
+        const { event, receipt } = stored.value;
+        assert(['object_revision', 'git_revision'].includes(event.payload.kind), 'invalid_event');
+        const invalidation = this.#invalidation.applyLifecycle(context, tx, { action: 'source:invalidate',
+          registration_id: value.registration_id, event, receipt, access_state: value.access_state,
+          access: value.access, request_digest });
+        let registrationResult = registration, version = row.version;
+        if (invalidation.status === 'applied' && value.access !== null) {
+          if (value.access_state === 'active') {
+            assert(invalidation.target_refs.every(target => target.applied), 'source_access_denied');
+            this.#invalidation.assertEventAllowed(context, event, { tx });
+          }
+          else narrowingAccess(registration.access, value.access);
+          registrationResult = { ...registration, access: value.access };
+          version = tx.compareAndSwap(NS, registrationKey(value.registration_id), value.expectedVersion, registrationResult);
+          tx.appendSource(NS, key('source-access', [value.registration_id, version]), 'source-access', {
+            registration_id: value.registration_id, version, access: value.access, actor: grant.principal_id, at: this.#time() });
+        }
+        const result = { status: 'applied', invalidation, registration_id: value.registration_id,
+          version, registration: registrationResult };
+        this.#invalidation.recordCommand(context, tx, { registration_id: value.registration_id,
+          idempotency_key: value.idempotency_key, request_digest, result });
+        return result;
+      }, value.access_state === 'active' ? { epoch: value.activation_epoch, stage: 'result' } : undefined);
+    });
+  }
+  applyAdministrativeInvalidation(context, options) {
+    return this.#call(() => {
+      const initial = this.#grant(context, 'ingress:read');
+      assert(initial.actions.includes('source:invalidate') && initial.actions.includes('store:write')
+        && ['human', 'service'].includes(initial.kind), 'ingress_unauthorized');
+      const value = input(options);
+      fields(value, ['registration_id', 'expectedVersion', 'idempotency_key', 'reason', 'access']);
+      assert(id(value.registration_id) && integer(value.expectedVersion) && value.expectedVersion > 0
+        && id(value.idempotency_key) && ['repository_removed', 'installation_revoked', 'visibility_changed',
+          'author_access_redacted'].includes(value.reason));
+      access(value.access);
+      const request_digest = hash({ kind: 'apply_administrative_invalidation', ...value });
+      return this.#transaction(context, tx => {
+        const grant = this.#grant(context, 'ingress:read');
+        assert(grant.actions.includes('source:invalidate') && grant.actions.includes('store:write')
+          && ['human', 'service'].includes(grant.kind), 'ingress_unauthorized');
+        const prior = this.#invalidation.command(context, value, { tx });
+        if (prior) {
+          assert(prior.kind === 'source-invalidation-command' && prior.value.request_digest === request_digest,
+            'invalidation_conflict');
+          const current = this.#source(context, value.registration_id, tx);
+          return { status: 'duplicate', invalidation: prior.value.result, registration_id: value.registration_id,
+            version: current.version, registration: current.value };
+        }
+        const row = this.#source(context, value.registration_id, tx), registration = row.value;
+        assert(row.version === value.expectedVersion, 'source_changed');
+        if (['repository_removed', 'installation_revoked'].includes(value.reason)) assert(equal(value.access, denyAllAccess), 'source_access_denied');
+        else narrowingAccess(registration.access, value.access, { strictRead: true });
+        const next = { ...registration, access: value.access };
+        const version = tx.compareAndSwap(NS, registrationKey(value.registration_id), value.expectedVersion, next);
+        tx.appendSource(NS, key('source-access', [value.registration_id, version]), 'source-access', {
+          registration_id: value.registration_id, version, access: value.access, actor: grant.principal_id, at: this.#time() });
+        const invalidation = this.#invalidation.recordPolicyChange(context, tx, { action: 'source:invalidate',
+          registration_id: value.registration_id, registration_version: version, reason: value.reason,
+          access: value.access, idempotency_key: value.idempotency_key, request_digest });
+        return { status: 'applied', invalidation, registration_id: value.registration_id, version, registration: next };
+      });
+    });
+  }
   #bundle(context, event_id, grant, { optional = false, tx } = {}) {
-    assert(id(event_id)); const stored = this.#store.getSource(context, NS, eventKey(event_id));
+    assert(id(event_id)); const stored = tx ? tx.getSource(NS, eventKey(event_id)) : this.#store.getSource(context, NS, eventKey(event_id));
     if (!stored && optional) return null;
     assert(stored, 'missing_event');
     const row = this.#source(context, stored.value.receipt.registration_id, tx);
     this.#readAllowed(grant, row.value, stored.value.event);
+    this.#invalidation.assertEventAllowed(context, stored.value.event, { tx });
     return { bundle: stored.value, row };
   }
   getReceipt(context, options) {
@@ -337,7 +566,10 @@ export class DurableIngress {
       assert(Number.isInteger(value.limit) && value.limit >= 1 && value.limit <= 64);
       return this.#store.pendingOutbox(context, NS, { limit: value.limit }).filter(item => {
         try { const { bundle } = this.#bundle(context, item.value.event_id, grant); this.#readFence(context, bundle); return true; }
-        catch (error) { if (error?.code === 'source_access_denied') return false; throw error; }
+        catch (error) {
+          if (['source_access_denied', 'source_invalidation_denied'].includes(errorCode(error))) return false;
+          throw error;
+        }
       });
     });
   }
@@ -364,6 +596,7 @@ export class DurableIngress {
         const receipt = { schema_version: 1, event_id: value.event_id, event_digest: bundle.receipt.event_digest,
           activation_epoch: bundle.receipt.activation_epoch, handed_off_at: this.#time(), consumer: 'ingress-policy' };
         this.#stableSource(context, row.value.registration_id, row.version, tx, 'ingress:handoff', { write: true, owner: true, project: true });
+        this.#invalidation.assertEventAllowed(context, bundle.event, { tx });
         tx.appendSource(NS, handoffKey(value.event_id), 'ingress-handoff', receipt);
         assert(tx.ack(NS, outboxKey(value.event_id)), 'corrupt_ingress_state');
         return { status: 'handed_off', receipt };

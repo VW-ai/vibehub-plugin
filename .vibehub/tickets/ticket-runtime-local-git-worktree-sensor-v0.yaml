@@ -18,7 +18,7 @@
         "label": "bounded-diff-capture"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "duplicate-and-race-fixtures",
@@ -28,7 +28,7 @@
         "label": "duplicate-and-race-fixtures"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "offline-nonblocking",
@@ -38,32 +38,67 @@
         "label": "offline-nonblocking"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "worktree-state-model",
       "criterion": "Observations distinguish HEAD, index, working tree and untracked state and bind repository/checkout/worktree/session/execution, immutable code base and explicit exploration mapping. Checkout/ref movement cannot retroactively move old events to another exploration; uncertain mapping is surfaced.",
       "identity": "sha256:d2f990697240ed107f2b88b9e05811072150656787a357dc178f50f39d0d2d2c",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "enrolled-project-sensor",
       "criterion": "Consume the enrolled common-repository/worktree registry and current activation generation; observe enabled linked worktrees even outside selected folder. Branch-only refs are not live execution locations. Stop on disable/revocation and record gaps; fresh membership does not backfill arbitrary history.",
       "identity": "sha256:b756b33bd5becb50c662784a8bea6fe648fdf602173dae1f4bd21a9f5e299571",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "worktree-state-model",
+      "criterion": "Deliver LocalGitWorktreeSensor with strict metadata v1 and the bind/hint/drain/status/close API specified in Context, composing the same actual Git registry, activation and DurableIngress. Execution-bound existing source registration resolves repository/checkout/worktree/installation; actual HEAD branch/detached/unborn and separate HEAD-to-index, index-to-working-tree and untracked metadata have exact digests/base provenance and path bytes. Real host Session/Execution stay unknown and exploration unmapped; no invented enrollment, retroactive checkout mapping or false atomic-snapshot assurance. Authorized admitted metadata reopens as the exact RawEvent/normalized GIT_DIFF/snapshot/first receipt/cursor/outbox through public ingress reads.",
+      "identity": "sha256:d1473df7e5988f6f8f82bcfe16705e354701e9ff01bb7d465b04a4781e7e8520",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "bounded-diff-capture",
+      "criterion": "Use an async fixed-argv isolated Git comparison profile, at most 8 MiB copied index, 2 MiB child output, 5-second child/15-second sample deadline, 256 paths, 48 KiB approved metadata and one bounded resample. Tiny scratch metadata/index reads existing objects without copying history or modifying source metadata; no external filters/process/fsmonitor/hooks/diff/textconv, lazy fetch, network or submodule recursion can execute, including a source-config change race. Unsupported conversion/index/path profiles and binary/oversize/unmerged cases are explicit; rename is D+A with detection disabled. Tracked dirty signature changes on further content edits despite unchanged status; no raw patch/file text is retained. Up to 128 bindings/hints coalesce with 250 ms quiet/2-second maximum debounce, one in-flight sample/one pending envelope, at most four per drain and no installed watcher or autonomous timer.",
+      "identity": "sha256:d7f15ba87404018577ff75a3927786f4ec5d0e5230cecbe070ba900edc2c9f88",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "duplicate-and-race-fixtures",
+      "criterion": "Only real temporary synthetic Git/SQLite fixtures prove stage-only, unstaged-only, staged-then-changed, binary, symlink/untracked, unmerged, unborn/detached and supported SHA-256 behavior; primary and external linked worktrees; repeated notifications/editor churn; mid-read file/index/checkout mutations; deletion/recreation; helper-config swaps; current source ACL/membership/activation/expiry races. Mixed/unsupported/oversize captures never masquerade as complete. Hostile helper markers stay absent and source index/ref/config unchanged. Deterministic scheduling proves debounce/bounds, real ingress lost-response retry preserves the first receipt/bytes, and restart reads retained metadata. Record a bounded workload measurement and pass focused plus affected ingress/Git/activation/provenance tests and component boundaries, without private-repo capture or model calls.",
+      "identity": "sha256:a2fda11780b3e82357215ac5d8a2556f0e15adc769906479fa87516920520c59",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "offline-nonblocking",
+      "criterion": "Use explicit drop/gap semantics, with no new durable sensor queue. Each fresh snapshot has producer.sequence:null and no fabricated causal parent or source completeness. Retain one exact in-memory envelope/epoch/retry key for at most three explicit submit attempts; reconcile real post-commit receipts before retry and preserve original pins. Store failures, queue/cursor capacity, process stop/restart, stale epoch or source/membership/ACL loss yield bounded gap/unknown-admission states, never success inferred from transport. A later authorized snapshot may carry in-memory gap summary; unavailable storage/process death cannot be claimed to have persisted a collector checkpoint or exact missed-change count. No automatic backfill, source completion, handoff, epoch rotation or coding/Git hook is introduced; existing ingress capacity remains visible and ordinary coding works independently.",
+      "identity": "sha256:27286f56c64fe2eaa6b8423cb0bde9dfcef5e4b25219ddc5c232a1ae4b71ce30",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "enrolled-project-sensor",
+      "criterion": "Only owner-bound actual source registrations and currently enrolled physical worktrees, including linked directories outside the selected folder, may be captured. Branch-only refs cannot supply paths. Opaque scope/actions/producer/current and captured ACLs and Project epoch are checked at real boundaries; binding while disabled performs no content read, expiry/revocation/disable stops further capture and late intake is fenced by actual ProjectActivation within ingress commit. Re-enable never relabels old pending events or scans disabled history. Observed registry continuity is preserved for ordinary unchanged rescans but stale/deleted/recreated membership is an explicit gap; cross-Project/private source data cannot leak through status, pending results or diagnostics. No arbitrary path, client catalog, host Session or exploration assertion can authorize capture.",
+      "identity": "sha256:37328b1087034b0539c61997f3a8032d6a2306c8fe280a4e9aca8b1bea750e89",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 3,
+  "active_contract_revision": 4,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
     "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "Implement only the local sensor/metadata adapter and synthetic composition tests/docs. No new daemon, generic watcher/queue/identity registry, automatic source enrollment, App UI/HTTP wiring, host session capture, Graph mutation or live model/private repository collection. All historical Ticket Contracts and Acceptance identities remain unchanged; this refinement appends the next revisions of the same five responsibilities."
   ],
-  "context": "Implement non-blocking local Git and worktree observation. Delivery slice: alpha. Architecture: 5 Macro Architecture; 6.1 Raw Event Plane; 7 Runtime Process Model; 20 Git Integration; 24 Failure Handling. Scope: Local Git repository and worktree sensing; Dirty diff snapshot metadata; Debounce and bounded buffering; Graceful degradation. Excluded: Blocking pre-commit hooks; Git history ownership or merge implementation; GitHub PR ingestion; Automatic Context canonicalization.  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Implement a composable local Git sensor, not a watcher daemon or installed host plugin. Its concrete useful path is selected synthetic worktree -> bounded approved metadata snapshot -> actual DurableIngress normalized GIT_DIFF, immutable snapshot/cursor/outbox and post-commit receipt -> authorized read after reopening the SQLite store. It performs no model call, semantic processing, source completion, canonical write, GitHub request, cloud send or automatic App capture. App/controller wiring and measured Codex/Claude session capture stay with their existing Tickets. Retain the same five responsibilities with executable scope; no additional database, scheduler, queue framework or identity registry is needed.\n\nPublic composition: LocalGitWorktreeSensor({store, authority, monotonicNow?}) internally constructs GitProjectRegistry, ProjectActivation and DurableIngress over the exact supplied handles. The constructor does not start filesystem observation, spawn Git, migrate a database or invent a source. Export strict inert-data validation for the metadata wire format and bounded error codes. Public methods are bind(context,{registration_id}), hint({registration_id}), async drain(context,{limit:1..4, force?:boolean}), status(context,{registration_id}), and close(). bind uses an actual owner-created DurableIngress registration whose immutable execution tuple exactly names an active repository/checkout/worktree from the actual enrolled catalog; its producer principal must equal the opaque caller, its actual installation must match, snapshots must be enabled, and its fixed source mapping maps git_worktree_snapshot to GIT_DIFF. A human/service owner uses existing ingress.registerSource first; the sensor does not add idempotent registration, search private ingress keys or self-certify a client-supplied catalog. The bound ID is that registration_id, not a second identity. bind returns {registration_id, repository_id, checkout_id, worktree_id, state:bound}. drain returns {status:drained|idle|paused, results:[{registration_id, status:accepted|duplicate|unchanged|pending|gap|paused, event_id?, receipt?, code?}], more_due:boolean}; only actual successful intake can carry a receipt. status returns {registration_id, state:bound|pending|closed, pending_event_id:null|id, last_receipt_event_id:null|id, gap_summary, counters}. These are scoped results; another Project cannot learn pending IDs/counters. close aborts the current child and clears retained bytes/bindings; no external state is deleted. The namespace requirements remain the existing Git/activation/ingress ones: this slice adds no durable sensor namespace. Up to 128 bindings are held in memory; binding and status do not read file content. The same source can be rebound by the same authorized owner after process restart. Multiple independent observers may produce independent snapshots; do not promise one global observation per content hash.\n\nAuthorization: bind/drain require sensor:capture plus the exact public ingress:read/submit, store:read/write, project:inspect, activation:read/admit actions used by the composed methods; no implicit wildcard or graph/publisher permission. status requires sensor:read, store:read and ingress:read, and returns only the current process's bounded counters/status for the caller's actual scope and source. Trusted monotonic scheduling time injection is a test/composition capability, never a JSON option. hint is an untrusted bounded wake-up hint for an already bound ID, contains no path/text/catalog/identity override, and cannot authorize capture. It performs no I/O and returns queued/coalesced/ignored/overflow. drain selects only bindings in the authenticated caller's scope, verifies actual producer/current source policy and activation before any content read, and checks them again between subprocesses and before intake. Authority expiry/revocation, disabled source, stale membership or disabled Project prevent new reads and acceptance. No action mints credentials or accepts an arbitrary transaction callback.\n\nActivation and membership: derive the epoch from actual ProjectActivation state, never from a hint. bind can record selected configuration while disabled but cannot read Git content; drain stays paused. The only paths eligible for content capture come from active worktrees in the actual enrolled catalog, including linked worktrees outside the originally selected folder. A branch-only ref is never a live location. Check actual common/admin directory identities and membership around capture; if a selected worktree was removed/recreated/moved without accepted continuity, return membership_gap and ask the existing owner refresh/re-enrollment flow to reconcile it. Do not search neighboring folders or auto-enroll a clone. A normal unchanged observation stays usable at the registry's documented observed assurance level; no routine mandatory re-enrollment. Physical stat, path, HEAD or stable before/after snapshots cannot certify an unobserved delete/recreate or A->B->A transition. Catalog drift is reported, not used to rewrite an old event. No Git I/O runs inside DomainStore transactions; actual ingress.submit supplies the final same-store epoch/Git/ACL/auth fence. Process stop can abort its own child and discard pending bytes; cross-process disable cannot recall an already started read, but no late old-epoch event can be accepted. Re-enable samples current state only after explicit new hint/drain and records a gap, with no historical scan or disabled-period backfill.\n\nMetadata wire v1: a strict, bounded JSON snapshot has kind git_worktree_snapshot, schema_version, comparison_profile, capture timestamps, catalog version and immutable source ref, actual repository/checkout/worktree/installation IDs, observed physical-identity pins, exact Git object format, HEAD {state:branch|detached|unborn, oid:null|fullOID, branch_base64:null|bytes}, index digest and status, separate staged and unstaged change metadata, untracked path/lstat metadata, capture consistency, interval/gap information, and explicit mapping status. Host Session/Execution IDs are omitted from RawEvent and represented as unknown in this metadata; exploration is unmapped because no production exploration enrollment exists. A ref incarnation can be shown only as an observed catalog association with its assurance and matching actual ref observation, never as an exploration. Immutable code base is the actual verified HEAD commit when present; unborn has null base, not an invented empty commit. Branch checkout cannot retarget earlier event identity, base or mapping. RawEvent has source_native_event_id:null, occurred_at:null, observed_at equal to the capture observation time, actual Git identity tuple, delivery channel local_git, and provenance for a service-owned local source object plus the exact Git commit when present. Current source ACL/sensitivity determine captured access without broadening; snapshot policy approves only exact metadata bytes built by this sensor in this operation, not arbitrary caller JSON or a sanitized flag. Filesystem paths in metadata are relative base64 byte strings, never coerced into lossy UTF-8 or diagnostic text. No absolute project path, commit message/author, environment, config content, file text, patch body, transcript or credential is retained in the event or logs. Relative filenames remain potentially sensitive source data under captured ACLs; this local capture approval grants no external model destination permission.\n\nComparison profile: implement one explicitly named safe bounded raw-byte comparison profile. Preserve HEAD->index and index->working-tree as distinct observations; retain modes/OIDs and conflict stages where supported. Changes A/D/M/T and unmerged state are explicit. Rename similarity is deliberately disabled; a rename is represented as deletion/addition with rename_detection:disabled, not silently missed or invented. Text/binary classification is bounded and may be unknown; binary changes retain metadata/digests without bytes. Untracked files expose bounded relative paths and lstat metadata only, never file content; consequently untracked content equality is not claimed. Gitlinks/submodules are metadata-only and never recursively scanned. The dirty signature must change for a further tracked text edit while status/path remain unchanged: hash a complete bounded raw diff/content-comparison stream and discard its bytes. Never use Git's all-zero unstaged OID or status/path alone as a content digest. Hash prefixes are not full digests; over-limit data yields explicit oversize/unknown coverage, no complete assertion. The profile does not emulate arbitrary Git user conversion/configuration. Reject unsupported filter, working-tree-encoding, EOL/ident conversion, split/sparse-index or unsafe path cases with a bounded unsupported_profile gap. Preserve a header-level observation only when it explicitly marks the missing comparison; it cannot be labeled a complete diff. A plain repository with no conversion features must succeed. Define exactly which source-local ignore rules the profile uses; do not imply global/info excludes were applied if isolation omitted them.\n\nSubprocess isolation is essential even for metadata: extend/reuse the existing tiny GitProvenance scratch-metadata pattern with a bounded copied index and read-only reference to the source object directory. No clone, object/history/ref-tree copy, conversion emulator or source metadata mutation. All commands use fixed argv, no shell; no inherited Git config/env/credentials, no pager, hooks, fsmonitor, external diff/textconv/filter process, submodule recursion, network transport or lazy fetch. Minimal private scratch config has no source remotes/config/includes, and command overrides/scratch attributes fix the comparison profile. Inspect/refuse unsupported source conversion semantics with bounded read-only checks, but safety must not depend on a check-then-use source-config race: worktree commands never load source execution config. Source index/ref/config bytes remain unchanged; temporary private index/config is cleaned on normal/error/cancel paths. Reject symlinked or unsafe index/metadata inputs instead of following an arbitrary target. A source-config swap after profile inspection must not execute any helper. Existing GitProvenance alone proves raw-object reads, not this new dirty/index surface, so add hostile-helper fixtures for it.\n\nBounds and scheduling: each child has a 5-second timeout and at most 2 MiB combined retained stdout/stderr; one sample has a 15-second deadline, at most one resample on detected race, and no unbounded retries. Input index copy <=8 MiB; at most 256 changed+untracked path entries, each <=4096 raw bytes; approved metadata text <=48 KiB, entire RawEvent/intake remains under existing 128 KiB limits. Excess is a bounded code/gap, not silent truncation or partial success. Up to 128 bound sources/hints, one in-flight sample per sensor instance, at most one exact pending intake envelope globally, and at most four due bindings per drain. No own timer/polling daemon: host calls hint and drain. hint coalesces per source with 250 ms quiet debounce and 2-second maximum wait measured by the injected monotonic scheduling clock; force skips debounce only, never authorization/bounds. Repeated hints before a due drain produce one sample. Within a running binding, an unchanged complete semantic signature suppresses another event; exclude observation timestamp from that signature. Restart or another observer may create a fresh independent observation, not a replay assertion. Test scheduling deterministically; deadlines are safety bounds, not real-time performance promises.\n\nSnapshot assurance: perform bounded before/after HEAD/ref/admin/index and content-signature checks around the work. On a detected mutation discard mixed results and retry at most once within the sample deadline, then record unstable_capture. Stable endpoints are observed consistency, not an atomic filesystem snapshot; document the remaining ABA/unobserved-write limitation. Filesystem traversal must stay in the registered worktree, never follow symlink directories or untracked-file targets; symlink changes may be represented by bounded link metadata. Permission failures, invalid path bytes, deletion/recreation, index locks and races are explicit unknown/gaps. This metadata is a work signal, not source completion or proof that a commit contains all changes.\n\nDelivery deliberately uses the original Ticket's explicit drop policy instead of adding another durable queue. Each snapshot is an independent source observation with producer.sequence:null and no fabricated causal parent; this cannot advance a contiguous source watermark or imply capture completeness. The running process retains one exact RawEvent/snapshot/epoch/retry key until actual ingress acceptance or explicit drop, and calls actual ingress.submit only outside filesystem work and outside another transaction. Its deterministic event ID comes from ingress.eventIdFor for the retained random observation key; source observation time and approved bytes stay unchanged on retry. drain makes at most one submit attempt for a pending envelope, up to three attempts across explicit calls. Temporary store failure retains that single envelope; further hints coalesce within the same fixed limits. Retry reconciles an existing receipt first when readable, including a lost response after commit, and returns the original first pins rather than claiming a new acceptance. A different process is not allowed to reconstruct a lost envelope from a path or digest. Exhaustion, process stop, changed activation epoch, membership/access change or capacity failure drops the local pending copy and records a bounded gap/unknown-delivery result; no new event can impersonate its old identity. If actual receipt status is unavailable or unreadable, distinguish unknown admission from confirmed non-admission.\n\nGap truth: status returns current-process reason counts (saturating), nullable observation interval, pending ID/state and last accepted receipt ID, never pending content. A later admitted snapshot includes bounded gap summary; every new process starts with an explicit unknown preceding interval because it has no durable collector offset. No claim to know how many changes occurred while offline or after a crash. If store/auth is unavailable, the gap exists only in the returned/in-memory diagnostic until a future authorized snapshot; do not claim it was durably recorded. The existing ingress cursor capacity (4096 entries and tighter 1 MiB record bound) remains explicit: stop that stream at capacity, no silent truncation, pruning, sequence reset or producer-epoch rotation. ACK means actual committed ingress receipt only, not downstream handoff/completion. This slice never invokes ingress.handoff, completeSourceEvent, Graph mutation or any model. Ordinary Git/editor/coding commands never depend on drain success, and no blocking hook is installed.\n\nVerification uses only newly created temporary synthetic repositories and SQLite databases. Include real primary and outside-folder linked worktrees; SHA-1 and supported SHA-256, unborn/detached/branch-switch, stage-only/worktree-only/staged-then-further-edit, deletion/addition(rename-disabled), binary, symlink/untracked and unmerged cases. Test current enrollment and captured base survive later checkout/ref changes without history rewrite. Bounded fake clock and controlled subprocess/file phase hooks may deterministically place editor churn, index changes, file changes during comparison, checkout change, source config swap, deletion/recreation and access/epoch changes; those hooks are trusted test internals, never public JSON or production untrusted callbacks. Hostile clean/process filter, fsmonitor, external diff/textconv, hook, promisor/remote and submodule fixtures leave invocation markers absent and source index/ref/config unchanged. Test exact retry/dedupe/lost response after real ingress commit, reopen and read approved metadata/event/cursor/outbox, malformed/oversize/getter rejection without execution, cross-Project/producer denial, captured ACL tightening and disabled binding, expiration during capture, no old-epoch replay after re-enable, closed/busy store/drop/capacity limits and cancellation cleanup. Record measured command count/bytes/duration for a fixed synthetic <=256-path workload without making a large-repository/native-filter fidelity claim. Run focused sensor plus affected ingress/Git/activation/core provenance tests and component boundaries; no live capture of this repository, private paths/traces, credentials or model calls belongs in acceptance.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -88,6 +123,58 @@
     {
       "purpose": "App 中按 Project 显式启停 VibeHub",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Actual enrolled producer/current policy, exact approved bytes, first receipt and cursor/outbox atomicity. Snapshot ACK is not semantic completion; null sequence remains unordered.",
+      "ref": ".vibehub/outcomes/ticket-runtime-durable-ingress-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Exact synthetic prerequisite conformance and limitations, not evidence that the sensor is already implemented.",
+      "ref": ".vibehub/evidence/ticket-runtime-durable-ingress-v0/local-durable-ingress-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Explicit scope/branch-incarnation/host identity and unknown-origin boundary; its bounded pure state is not production exploration enrollment.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-scope-contract-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Exact synthetic prerequisite conformance and limitations, not evidence that the sensor is already implemented.",
+      "ref": ".vibehub/evidence/ticket-runtime-branch-scope-contract-v0/branch-scope-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Actual Project epoch and live Git membership admission; disabled reads versus writes, late-result fencing and no backfill.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-activation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Exact synthetic prerequisite conformance and limitations, not evidence that the sensor is already implemented.",
+      "ref": ".vibehub/evidence/ticket-runtime-project-activation-v0/local-project-activation-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Public actual registration/read/submit APIs, sanitizer trust, retries/capacity and immutable payload ownership.",
+      "ref": "semantic-runtime/docs/durable-ingress-v0.md"
+    },
+    {
+      "purpose": "Actual active common-dir/worktree catalog, external worktrees, observed continuity and bounded discovery; no host Session registry.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Public action/epoch/cancellation boundaries composed by capture.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Exploration resolution requires enrollment, branch/path hints do not create it; preserve explicit unmapped origin.",
+      "ref": "semantic-runtime/docs/branch-scope-v0.md"
+    },
+    {
+      "purpose": "Small existing raw-object scratch isolation pattern to reuse/extend for dirty state, without claiming it already covers filters/index/worktree.",
+      "ref": "semantic-runtime/src/adapters/git-provenance.mjs"
+    },
+    {
+      "purpose": "Strict RawEvent, local_git source identity, GIT_DIFF mapping, ACL/sensitivity and payload digest semantics.",
+      "ref": "semantic-runtime/src/core/event-provenance.mjs"
+    },
+    {
+      "purpose": "Concrete same-store registration/receipt/snapshot-policy behavior and absence of registration idempotency API; do not invent private registry operations.",
+      "ref": "semantic-runtime/src/local/durable-ingress.mjs"
     }
   ],
   "contract_revisions": [
@@ -173,12 +260,43 @@
       ],
       "identity": "sha256:c0aaa0d764f4b595905aeaa0eb258628b55bbca6f72470a1db93a8fea36dc123",
       "revision": 3
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-diff-capture",
+          "identity": "sha256:d7f15ba87404018577ff75a3927786f4ec5d0e5230cecbe070ba900edc2c9f88",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "duplicate-and-race-fixtures",
+          "identity": "sha256:a2fda11780b3e82357215ac5d8a2556f0e15adc769906479fa87516920520c59",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "enrolled-project-sensor",
+          "identity": "sha256:37328b1087034b0539c61997f3a8032d6a2306c8fe280a4e9aca8b1bea750e89",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "offline-nonblocking",
+          "identity": "sha256:27286f56c64fe2eaa6b8423cb0bde9dfcef5e4b25219ddc5c232a1ae4b71ce30",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "worktree-state-model",
+          "identity": "sha256:d1473df7e5988f6f8f82bcfe16705e354701e9ff01bb7d465b04a4781e7e8520",
+          "revision": 3
+        }
+      ],
+      "identity": "sha256:6f0deb22ace672702c70d7ec8d10199be32a5106f9490c97fa82e62fde410d3e",
+      "revision": 4
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "A local host can emit bounded, content-addressed worktree and diff observations with correct repo, worktree, session, and base-commit provenance while ordinary coding continues through Runtime outages.",
+  "maturity": "firm",
+  "outcome": "A bounded callable local Git sensor emits authorized independent worktree metadata snapshots into real durable ingress, with explicit identity/coverage gaps and no blocking dependency on Runtime availability for ordinary coding.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",

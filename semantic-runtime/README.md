@@ -41,6 +41,17 @@ projection repair in SQLite. Its in-process API consumes actual admitted ingress
 sources. `npm run check:jev:graph` separately exercises a fixed synthetic Graph
 context → JEV → candidate/restart round trip with a locally supplied TypeSafe key.
 
+The [local Git worktree sensor](docs/local-git-worktree-sensor-v0.md) captures
+bounded HEAD/index/worktree metadata for an enrolled execution and submits it
+through durable ingress. It reports unsupported or racing observations as gaps.
+The caller drives capture; the setup App and host plugins do not yet run it.
+
+[Source invalidation](docs/source-invalidation-v0.md) blocks content reads across every supporting source,
+retains ordered lifecycle notices, and exposes a fence for future query consumers.
+`npm run check:jev:source-fence` tests a fixed synthetic JEV request whose source
+access is revoked while the model is running: publication must fail without
+changing the Graph. See [Graph access and lifecycle rules](docs/graph-store-v0.md).
+
 For the separate [synthetic App interaction preview](docs/project-exploration-ux-v0.md),
 run `node prototype/serve.mjs 51987` and open `http://127.0.0.1:51987/`.
 It demonstrates Project/Context/Ticket/setup flows using page-memory fixtures;
@@ -234,8 +245,8 @@ remote Workers remain later capabilities.
 
 The [delivery plan](docs/online-delivery-plan.md) and
 [integration research](docs/local-app-integration-notes.md) separate this goal
-from delivered foundations. Collector, extraction/resolution, scoped query/compiler,
-app onboarding, plugin coverage and Worker orchestration still require implementation.
+from delivered foundations. Automatic collection, extraction/resolution, scoped
+query/compiler, plugin integration and Worker orchestration still require implementation.
 Project overview is not the main Git branch. The current executable prototype
 retains the offline boundaries stated above.
 

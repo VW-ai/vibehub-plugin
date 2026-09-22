@@ -13,7 +13,7 @@ or an accepted Ticket. No Graph operation acknowledges an ingress event.
 
 ## Open and publish
 
-Open a migrated DomainStore with `working-graph`, `durable-ingress`,
+Open a migrated DomainStore with `working-graph`, `durable-ingress`, `source-invalidation`,
 `git-enrollment` and `project-activation` namespaces. Pass that store and its real
 `LocalCredentialAuthority` to `new LocalGraphStore({store, authority})`. Enroll an
 actual Git project and enable its current epoch before new publication.
@@ -36,6 +36,14 @@ Publisher registration uses `graph:publish`; maintenance uses `graph:rebuild`.
 Source lifecycle mutation additionally requires `graph:lifecycle`. Reads require
 `graph:read`, `store:read` and `ingress:read`, without an enabled Project or a
 currently accessible checkout directory.
+
+After current source access is denied, a service principal with
+`source:invalidation:read` and `source:invalidation:consume` may still apply an
+exact retained lifecycle event through `source_access`. This path reads only
+security metadata, checks the original captured ACL, and matches the retained
+invalidation state. Prior lifecycle proofs come only from the current target
+projections. Ordinary assertions, reads, receipts, pages and coverage never use
+this path. An absent Graph object is not created by a tombstone notification.
 
 Graph head CAS and semantic conflict are different outcomes. A stale
 `expected_graph` returns `graph_revision_mismatch`, the unchanged proposal and
@@ -134,3 +142,20 @@ no retries or rate limits. It verifies 17 supporting source pins across the
 eight judgment revisions after reopening the database. Both runs use the same
 small synthetic corpus; the follow-up corrects missing target-revision parents
 in the smoke harness, without changing the Graph Store or model adapter.
+
+`npm run check:jev:source-fence` tests a separate fixed synthetic case: materialize
+a Graph context, dispatch one JEV call, revoke that context's registration before
+awaiting the response, and attempt to publish the result with its exact parent.
+The [live source-fence run](measurements/jev-inflight-source-fence-20260922.json)
+completed a correct JEV judgment in 296 ms, then rejected publication with
+`graph_access_denied`. The direct event remained readable, the Graph head did
+not change and no result receipt was created. Automatic retries are disabled.
+This tests the local result fence; it does not recall already-dispatched input
+or implement production dispatch authorization, cancellation or a Policy loop.
+
+The [final invalidation composition run](measurements/jev-invalidation-composition-final-20260922.json)
+repeated both checks after the source-invalidation changes: 8/8 Graph judgments
+matched at 107–241 ms per successful attempt, and the in-flight revocation case
+completed at 344 ms but was rejected on publication. Both checks had no retries;
+the eight-call route reported no rate limits. These are fixed synthetic checks,
+with the same limits as the earlier runs.

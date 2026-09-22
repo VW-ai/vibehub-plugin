@@ -1,0 +1,32 @@
+{
+  "accepted_acceptance_ids": [
+    "derived-acl-rule",
+    "fail-closed-invalidation",
+    "invalidation-fixtures",
+    "source-lifecycle-events"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T14:18:50.365Z",
+  "contract_revision": {
+    "identity": "sha256:0d6027aac84459b1c41a2f4c927a62d9d448bdc8c49783095c3f73a0128cd578",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "source-invalidation-conformance-20260922",
+    "source-invalidation-standalone-20260922",
+    "jev-inflight-source-fence-20260922",
+    "jev-final-invalidation-composition-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_source_invalidation, with no executor turn history and no authored implementation, committed tests or executor Evidence. Read the exact current Ticket, referenced contracts/records, actual changed sources and all four Evidence records; independently reran selected existing tests and wrote only temporary review probes. Parent and prior implementation reviewer supplied leads, not acceptance decisions. This agent writes only this Outcome in the repository; parent owns presentation and publication. Reused parent dashboard entry; absent installed session reporter contract was not replaced with invented presence.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four active Acceptance revisions in exact Contract 2. source-lifecycle-events: reviewed the fixed source-invalidation domain, all three DurableIngress command implementations, unchanged updateSourceAccess request/result shape, deterministic scope/event lookup and every concrete composition. Fresh metadata capture, registration CAS, cursor/outbox admission, immutable lifecycle record, guard/summary and fence/notice share one existing SQLite transaction. Exact retry retains its receipt; changed identity rejects. Per-object/per-partition/producer-epoch rows never compare cross-stream integers; null-order blockers and other-stream blockers remain restrictive, same-stream newer sequenced active recovery is bounded, and the object tombstone is irreversible. Ordinary materialization selects O(1) summaries per bounded provenance target. derived-acl-rule: all ordinary event/receipt/snapshot/cursor/pending/handoff and Graph provenance reads check current source policy plus object guards. Independent temporary real-facade probes confirmed repository removal and installation revocation deny historical ingress and Graph reads while disabled, add no fake admitted event and preserve ingress ACK state. Conjunctive visibility/redaction narrowing rejects each broadened dimension and capture-disable alone. Multi-source Graph closure denies the complete derived revision when one source is guarded while unrelated events remain readable, before any Graph mutation. The selected Graph source_access fallback is confined to write planning: exact current deterministic lifecycle metadata and prior updates selected from current target projections, retained immutable access-update/event/catalog proofs, captured principal ACL, lifecycle authority, actual publisher/activation, producer epoch and advancing sequence remain enforced. Existing tests prove never-captured principals, assertions, resolve, receipt, page and retries cannot use that bypass, and tombstone-before-content creates no Graph observation. fail-closed-invalidation: administrative restrictions and restrictive already-admitted application remain available while Project capture is disabled; fresh capture and active recovery require current activation. The scoped feed has only head/page/assertFence/readLifecycleEvent, indexed fixed-width notice ranges, 1..64 bounds and real aggregate 1 MiB rejection. Missing namespace/summary/head and unsafe/corrupt selected state fail closed. No consumer ACK, cache/index/compiler, recomputation or scheduler was added. invalidation-fixtures: this fresh reviewer independently ran 168 selected event/causal/auth/store/activation/ingress/Graph/source-invalidation/JEV-fence tests. The first pass had 167 passes and one existing HTTP loopback-bind sandbox failure; rerunning only all five service-auth tests with loopback permission passed, covering the failed case. Seven additional temporary synthetic SQLite probes all passed for both removal reasons, conjunctive no-broadening, disabled historical restriction and gated recovery, fresh lifecycle re-enable/foreign/disguised-input rollback, multi-source closure and oversized notice pages. Read and reran the four real-process source invalidation tests covering precommit SIGKILL rollback, postcommit lost response/restart, concurrent exact retries and competing versions; reviewed Graph lifecycle and O(1) instrumentation tests. Independently reran boundary check: 144 files, zero errors; git diff --check, repository Ticket validation and Context guard pass with no governing authority violations. Inspected executor standalone log and exact Evidence: clean isolated npm ci plus 585 total tests, 583 passes, two intentional native opt-in skips, zero failures, and plugin artifact isolation passed; these broad runs were not rerun by this reviewer. Inspected both sanitized JEV reports and actual harnesses; latest supplemental parent-run synthetic measurements show eight of eight Graph judgments and one revoked-parent result correctly rejected with unchanged Graph and absent result receipt. This reviewer made no live model call or credential access. Supplemental live composition is not a quality benchmark or evidence that already-dispatched input was recalled. Direct prerequisite Contract 3 Outcomes are successful. No unresolved criterion remains; this Outcome accepts the bounded local security substrate and does not claim a production dispatcher, downstream consumer refresh, external connector, automatic collection, canonical promotion or complete App integration.",
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0",
+  "unresolved_acceptance_ids": []
+}

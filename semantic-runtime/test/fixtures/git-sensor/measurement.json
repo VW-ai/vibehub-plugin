@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "workload": "synthetic32tracked8untracked",
+  "staged_paths": 16,
+  "unstaged_paths": 16,
+  "untracked_paths": 8,
+  "snapshot_bytes": 8135,
+  "commands": 30,
+  "command_output_bytes": 69822,
+  "sample_passes": 2,
+  "capture_duration_ms": 360,
+  "receipt_count": 1,
+  "producer_sequence": null,
+  "actual_model_calls": 0,
+  "limits": {
+    "bindings": 128,
+    "paths": 256,
+    "path_bytes": 4096,
+    "index_bytes": 8388608,
+    "command_bytes": 2097152,
+    "snapshot_bytes": 49152,
+    "command_ms": 5000,
+    "sample_ms": 15000,
+    "debounce_ms": 250,
+    "maximum_wait_ms": 2000,
+    "submit_attempts": 3
+  },
+  "assurance": "observed stable endpoints; no atomic filesystem snapshot or native conversion fidelity"
+}

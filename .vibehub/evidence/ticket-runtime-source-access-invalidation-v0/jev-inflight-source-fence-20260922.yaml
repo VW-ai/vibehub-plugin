@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "derived-acl-rule",
+    "fail-closed-invalidation"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "derived-acl-rule",
+      "identity": "sha256:cb88a3747832c0743796f4cc5d8b5eae3a0d363f75dcd332a63e0f6dbf96f722",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "fail-closed-invalidation",
+      "identity": "sha256:b0e4840f8a33f15b4ee07de1493f8018b3939932ffe717b5b5eed348caf549fb",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "jev-inflight-source-fence-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T14:10:11.835Z",
+  "refs": [
+    "semantic-runtime/scripts/check-jev-source-fence.mjs",
+    "semantic-runtime/test/jev-source-fence-check.test.mjs",
+    "semantic-runtime/docs/measurements/jev-inflight-source-fence-20260922.json",
+    "semantic-runtime/docs/graph-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Supplemental authorized real-model composition check, not a quality benchmark or production dispatcher. Ran npm run check:jev:source-fence with official TypeSafe JEV against one fixed synthetic context-yes event and target through actual temporary ingress/SQLite/Graph. The key was privately supplied from Keychain without entering tool output or Git. Revoked the target source after dispatch while the direct event remained readable. jev-1.13.0 completed and matched the expected decision in296ms (328ms elapsed),0 retries; publication of the candidate with the retained state parent rejected graph_access_denied, left Graph unchanged and created no result receipt. Checked-in report contains only synthetic metrics/booleans. Two offline tests reproduce successful transport/revoked publication and bounded provider failure. No new submission after revocation, private trajectory, ingress ACK, canonical promotion, or automatic cancellation is claimed.",
+  "ticket_id": "ticket-runtime-source-access-invalidation-v0"
+}

@@ -7,16 +7,16 @@ ProjectActivation transaction. Its receipt means durable intake. It does not mea
 semantic processing, successful host delivery, or accepted project truth.
 
 This module adds no listener, Collector, polling loop, dependency, broker or Worker.
-The App composes it with the already accepted Git registry, local credentials and
+A caller composes it with the already accepted Git registry, local credentials and
 project switch. Ordinary coding remains independent of the service's availability.
 
 ## Construction and authority
 
 ```js
-import { DurableIngress, INGRESS_NAMESPACE } from './src/index.mjs';
+import { DurableIngress, INGRESS_NAMESPACE, SOURCE_INVALIDATION_NAMESPACE } from './src/index.mjs';
 
 // The same DomainStore includes git-enrollment, project-activation,
-// durable-ingress and the eventual consumer's own namespace.
+// durable-ingress, source-invalidation and the eventual consumer's own namespace.
 const ingress = new DurableIngress({ store, authority,
   snapshotPolicy: ({ text }) => explicitlyApprovedSyntheticTexts.has(text) ? text : null,
 });
@@ -26,6 +26,8 @@ Construction internally creates GitProjectRegistry and ProjectActivation using
 exactly that store and authority. It cannot accept an activation handle attached
 to a different database. Database initialization/migration remains an explicit
 owner operation. No namespace is automatically added to an existing store.
+The `source-invalidation` namespace is mandatory for current source guards;
+omitting it fails closed. It uses existing DomainStore rows, with no new table.
 
 Every method requires an opaque context issued by LocalCredentialAuthority for
 the local API audience and `store:read`. The caller's tenant and Project scope
