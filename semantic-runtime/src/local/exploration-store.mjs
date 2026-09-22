@@ -15,6 +15,7 @@ export class LocalExplorationStore {
   }
   bind(context, options) { return this.#graph.bindExploration(context, options, this.#config); }
   mutate(context, options) { return this.#graph.mutateExploration(context, options, this.#config); }
+  adopt(context, options) { return this.#graph.adoptExploration(context, options, this.#config); }
   setProjectSelection(context, options) { return this.#graph.setExplorationProjectSelection(context, options, this.#config); }
   getBinding(context, options) { return this.#graph.getExplorationBinding(context, options, this.#config); }
   getSelection(context, options) { return this.#graph.getExplorationSelection(context, options, this.#config); }

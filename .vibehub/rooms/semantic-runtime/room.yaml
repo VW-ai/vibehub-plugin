@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "4b5d678a745f1fa9c29fd478740a9ef6317b1c6a",
+        "blob": "29b9648d9aaa6484a9c23cb00d015cc02b44acb2",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -64,6 +64,10 @@
       {
         "blob": "1de631289ac07ebdf0eac599903f8a3d63a00097",
         "path": "semantic-runtime/docs/event-provenance-v0.md"
+      },
+      {
+        "blob": "53f9e892d8c215189d173a99ea65e70ca05cfd12",
+        "path": "semantic-runtime/docs/exploration-adoption-v0.md"
       },
       {
         "blob": "9890266269fc780f596911fa2eea2e465789f56b",
@@ -134,6 +138,10 @@
         "path": "semantic-runtime/docs/measurements/codex-host-20260922.json"
       },
       {
+        "blob": "597f5f60c77298b43adbfc57357ec432e9caceb8",
+        "path": "semantic-runtime/docs/measurements/exploration-adoption-verification-20260922.json"
+      },
+      {
         "blob": "25003f188a8ed67ad4f59ea7f346c1fb10aa709f",
         "path": "semantic-runtime/docs/measurements/exploration-projection-20260922.json"
       },
@@ -144,6 +152,10 @@
       {
         "blob": "5f4df0f4247c35e87958df63484a845ee3f3c45c",
         "path": "semantic-runtime/docs/measurements/graph-store-sqlite-20260922.json"
+      },
+      {
+        "blob": "98290a6989f5c41f4892c4c974efeb76500755f5",
+        "path": "semantic-runtime/docs/measurements/jev-adoption-20260922.json"
       },
       {
         "blob": "d7e190633968536f9500469ab7d475cba4101063",
@@ -270,7 +282,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "85b35b35f48b4769602e33b32d4bd1bf56d65f06",
+        "blob": "141446085dbeb4717b9841e6436e59dabdb4d945",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -316,6 +328,10 @@
       {
         "blob": "4641a80220c8545f045b875d0b2ff37468be6d90",
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
+      },
+      {
+        "blob": "2b30bcd3e828834a80f26b5dce2e34822dc67f5a",
+        "path": "semantic-runtime/scripts/check-jev-adoption.mjs"
       },
       {
         "blob": "27ae451a24cec8b98add4457319eb519a3e9ff85",
@@ -606,11 +622,15 @@
         "path": "semantic-runtime/src/local/durable-ingress.mjs"
       },
       {
+        "blob": "3e4a974c02c226c575c98d785a05be3e81e7f3ad",
+        "path": "semantic-runtime/src/local/exploration-adoption.mjs"
+      },
+      {
         "blob": "7482f8ec31f5c617e8997444fa437501cf02e677",
         "path": "semantic-runtime/src/local/exploration-canonical.mjs"
       },
       {
-        "blob": "a3c42891faa6d70cbc8648b2f000dedc13e29a98",
+        "blob": "f1d3d31daf521e21e6b95b808b6b7b5ac7f0d88d",
         "path": "semantic-runtime/src/local/exploration-inputs.mjs"
       },
       {
@@ -618,7 +638,7 @@
         "path": "semantic-runtime/src/local/exploration-physical.mjs"
       },
       {
-        "blob": "b3dc9a5c6fd5adf5d5a4013e0a77fafd8e8d65a4",
+        "blob": "6715060d9374e030d0cd3b700a38abdd3f5ffb07",
         "path": "semantic-runtime/src/local/exploration-store.mjs"
       },
       {
@@ -638,7 +658,7 @@
         "path": "semantic-runtime/src/local/graph-storage.mjs"
       },
       {
-        "blob": "43470edfd4a4934216d30399c47adb9f5ea6589d",
+        "blob": "a44383671f9a061fb24d13b762cbc03f25e08215",
         "path": "semantic-runtime/src/local/graph-store.mjs"
       },
       {
@@ -788,6 +808,30 @@
       {
         "blob": "f8881c48e94aba8235479445894d96f7366bee37",
         "path": "semantic-runtime/test/event-provenance.test.mjs"
+      },
+      {
+        "blob": "19903208348cd32d0030dccdec8eda94da057900",
+        "path": "semantic-runtime/test/exploration-adoption-independent-review.test.mjs"
+      },
+      {
+        "blob": "546dc6f51f7f2e49ea6c5bda4c164b002e4b05b6",
+        "path": "semantic-runtime/test/exploration-adoption-inputs.test.mjs"
+      },
+      {
+        "blob": "a1dcc49822e298fcb3e952a5b70e35c6130f9fcf",
+        "path": "semantic-runtime/test/exploration-adoption-materializer.test.mjs"
+      },
+      {
+        "blob": "50d126c8577344384ae762faf087332ae597ef49",
+        "path": "semantic-runtime/test/exploration-adoption-races.test.mjs"
+      },
+      {
+        "blob": "f7c7400705169211b7ad8e0af57c0afa33ce0ef7",
+        "path": "semantic-runtime/test/exploration-adoption-recovery.test.mjs"
+      },
+      {
+        "blob": "021952d213837069bc2cf07918877f7314cdc81f",
+        "path": "semantic-runtime/test/exploration-adoption.test.mjs"
       },
       {
         "blob": "6375b1ee118abd95d5abf13e787ce201f47d2c60",
@@ -986,6 +1030,14 @@
         "path": "semantic-runtime/test/helpers.mjs"
       },
       {
+        "blob": "c31c97dbc765839481612fa7aaea463ac03abff8",
+        "path": "semantic-runtime/test/helpers/adoption-fixture.mjs"
+      },
+      {
+        "blob": "03eca5ac8e429c299047ccb0075a4aab29902048",
+        "path": "semantic-runtime/test/helpers/adoption-process.mjs"
+      },
+      {
         "blob": "a854f515ffa2ddc018dd729cd33af747ee4ba2a6",
         "path": "semantic-runtime/test/helpers/canonical-fence-process.mjs"
       },
@@ -1044,6 +1096,10 @@
       {
         "blob": "c24794dc2c37e325028e0d9981279c221a22ea95",
         "path": "semantic-runtime/test/incremental-graph.test.mjs"
+      },
+      {
+        "blob": "06932fff0eba65a2eee8d05398aa5339c1697621",
+        "path": "semantic-runtime/test/jev-adoption-check.test.mjs"
       },
       {
         "blob": "9b6d3045c02cd507abc97d41b2045e6f8ff873d3",
@@ -1186,8 +1242,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T16:53:20.689Z",
-    "last_aligned_commit": "dd6638366b76642fc1ec55dee78125c2df0a173f"
+    "checked_at": "2026-09-22T17:27:17.112Z",
+    "last_aligned_commit": "a0cb60f3e7b79fa5cad383a04d2e0de4b883754b"
   },
   "anchors": [
     "semantic-runtime/"

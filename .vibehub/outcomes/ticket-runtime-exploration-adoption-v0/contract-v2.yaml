@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "explicit-adoption",
+    "adoption-recovery"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T17:26:29.408Z",
+  "contract_revision": {
+    "identity": "sha256:4a316f2ea99023fc5f73379e8cbb94002e68d249ac7edf82cf8bea573d96e091",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "exploration-adoption-conformance-20260922",
+    "exploration-adoption-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent reviewer /root/adoption_closeout began with a read-only handoff and no execution context. I did not author product code, the Ticket, documentation or Evidence. I inspected the exact contract and implementation, authored only the separate independent adversarial regression file, ran independent conformance/corruption checks, reported concrete findings for executor authors to repair, and verified the repairs and final raw test logs. This Outcome is my only canonical project-record write for this Ticket.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts both active v2 criteria in exact Contract 2 after inspecting its context references, implementation, selected storage/core contracts, deterministic fixtures, bound Evidence and raw verification logs. explicit-adoption: the authenticated public LocalExplorationStore.adopt pins the exact historical A selection and separately current A head, owned B generation/current Graph/workspace, immutable shared bases, Project declaration and source fence. The fixed server materializer creates a fresh B candidate with actual B publication and retained exact A origin, flattens ordinary support without foreign parents, keeps canonical associations and lifecycle restrictions, and verifies each semantic endpoint mapping against prior exact adoption through immutable revision, Graph receipt/command and exploration publication facts. Current grants and canonical/source proofs are checked through Graph-owned activation admission; B Graph/source retention/audit/receipts/outboxes and adoption origin commit together. No caller content or authority proof, model decision, view, Git merge or selection grants adoption or canonical promotion. adoption-recovery: independently ran the final 65-test focused suite, including real Git/SQLite, distinct actors/workspaces, identical and distinct-key process races, both SIGKILL boundaries, original-result retry after switching/deletion/disable, historical source selection, restrictive lifecycle preparation and missing-projection refusal, canonical and already-adopted relation endpoints, A-to-B-to-C lineage, 32/33 aggregate support bounds and authorization/pin races. Review reproduced missing consistency checks for one altered/resealed A publication route or B retained origin. Executors fixed these by tying selected origin facts to the retained normalized operation, Graph command/receipt, immutable workspace/version witness and publisher. All ten independent contradictory-origin variants now reject exploration_corrupt with exactly zero row effects; an additional independent first-admission case succeeds after deleting A's source worktree and branch. Public read-only receipt access remains usable without write/activation-admit/Project-inspect permissions. Independently reran the corrected B-only mapped-endpoint revocation case: A relation stays readable, fresh adoption uses the new fence and rejects graph_access_denied with zero effects. The initial fixture used capture disable, which intentionally preserves historical reads; the corrected fixture removes allowed principals. Full Runtime verify passed 850 tests, 848 passes, two pre-existing native Keychain opt-in skips and no failures; final standalone clean install/verify outside this repository passed the same counts and includes that corrected assertion. No product code changed after the full run. Boundary check covers 192 files with no errors. Separate shipped plugin artifact check passes unchanged at 79 files and 3670088 bytes. Inspected the optional minimized synthetic TypeSafe composition and retained report: four expected decisions across A/B, no model calls in adoption, foreign A target refusal before adoption and revocation refusal before another send; this is an integration measurement, not a general accuracy claim, and this reviewer made no model or credential call. Fresh Ticket validation, exact CLOSE_OUT readback, git diff check and Context guard with no authorities or violations pass. No criterion remains unresolved. This Outcome certifies the bounded local in-process adoption API, not App/HTTP/plugin wiring, recursive or automatic adoption, semantic merge, canonical promotion, distributed synchronization or production retention.",
+  "ticket_id": "ticket-runtime-exploration-adoption-v0",
+  "unresolved_acceptance_ids": []
+}

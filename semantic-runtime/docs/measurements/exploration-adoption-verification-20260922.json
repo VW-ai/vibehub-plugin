@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-09-22T17:24:51.036290+00:00",
+  "scope": "Contract2 per-item exploration adoption; real disposable Git/SQLite and synthetic model inputs",
+  "full": {
+    "command": "npm run verify",
+    "tests": 850,
+    "passed": 848,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 67931.786458
+  },
+  "standalone": {
+    "command": "npm run verify:standalone",
+    "tests": 850,
+    "passed": 848,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 66027.797833,
+    "clean_install": true,
+    "outside_parent_repository": true
+  },
+  "boundaries": {
+    "files": 192,
+    "errors": 0
+  },
+  "new_focused_cases": {
+    "total": 65,
+    "public_adoption": 6,
+    "input_routes": 5,
+    "materializer": 19,
+    "admission_races": 11,
+    "recovery": 10,
+    "independent_review": 13,
+    "synthetic_checker": 1
+  },
+  "independent_review": {
+    "focused_passed": 65,
+    "product_source_edits": false,
+    "resolved_findings": [
+      "A source publication route consistency",
+      "B retained result publication route consistency"
+    ],
+    "unresolved_findings": 0
+  },
+  "plugin_artifact": {
+    "command": "npm run verify:artifact",
+    "passed": true,
+    "files": 79,
+    "bytes": 3670088
+  },
+  "git_diff_check": true,
+  "skip_reason": "Two pre-existing native macOS Keychain opt-in integration tests.",
+  "verification_note": "Full and standalone suites ran sequentially. After the full suite, the existing extra-B-lifecycle test gained a mapped-endpoint revocation assertion. Its first fixture disabled capture rather than removing read access and failed as expected under the actual source semantics; corrected allowed_principal_ids removal passed both a targeted executor run and an independent targeted run. The final standalone suite includes that corrected assertion. No product code changed after the full suite. Deterministic verification uses no real credential or model.",
+  "live_jev_report": "jev-adoption-20260922.json",
+  "live_jev_calls": 4,
+  "live_expected_decisions": "4/4",
+  "live_model": "jev-1.13.0",
+  "adoption_model_calls": 0
+}

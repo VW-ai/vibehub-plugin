@@ -44,7 +44,9 @@ context → JEV → candidate/restart round trip with a locally supplied TypeSaf
 The [exploration projection](docs/exploration-projection-v0.md) adds explicit
 worktree bindings, one Graph generation per exploration, fixed canonical bases
 and a separate Project selection. Guarded writes preserve exact origins across
-switching and retry; App integration and adoption remain pending.
+switching and retry. [Per-item adoption](docs/exploration-adoption-v0.md) now copies
+an explicitly selected entity or relation into another exploration as a new
+candidate with retained lineage. App integration remains pending.
 
 The [selected Judge runtime](docs/judge-runtime-v0.md) now evaluates one compiled
 Judge node against exact admitted event/target revisions, using the configured

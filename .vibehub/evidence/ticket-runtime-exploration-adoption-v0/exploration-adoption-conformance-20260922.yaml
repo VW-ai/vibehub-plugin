@@ -1,0 +1,42 @@
+{
+  "acceptance_ids": [
+    "explicit-adoption",
+    "adoption-recovery"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "explicit-adoption",
+      "identity": "sha256:81dca391fb89f11936301a3c39f10b030f36e4527b0000f94286c50a78aba201",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "adoption-recovery",
+      "identity": "sha256:cedcf3477ca0d76775d6bd057a0befd564782b33299eead6069776427865a0e2",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "exploration-adoption-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T17:24:51.036290+00:00",
+  "refs": [
+    "semantic-runtime/src/local/exploration-store.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/exploration-inputs.mjs",
+    "semantic-runtime/src/local/exploration-adoption.mjs",
+    "semantic-runtime/docs/exploration-adoption-v0.md",
+    "semantic-runtime/test/exploration-adoption-independent-review.test.mjs",
+    "semantic-runtime/test/exploration-adoption-inputs.test.mjs",
+    "semantic-runtime/test/exploration-adoption-materializer.test.mjs",
+    "semantic-runtime/test/exploration-adoption-races.test.mjs",
+    "semantic-runtime/test/exploration-adoption-recovery.test.mjs",
+    "semantic-runtime/test/exploration-adoption.test.mjs",
+    "semantic-runtime/test/helpers/adoption-fixture.mjs",
+    "semantic-runtime/test/helpers/adoption-process.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented the authenticated per-item LocalExplorationStore.adopt command over the existing Graph-owned activation transaction. Exact historical A selection, separate current source head, B binding/Graph, Project/shared pins and source fence are verified. Server materialization creates a fresh B candidate, preserves original A and lifecycle access restrictions, and proves semantic relation mappings through actual prior adoption publication records. No caller content/proof, new table, model call, canonical promotion or App integration is introduced. Exact retry and actor-owned receipt reauthorize A/B and support while surviving restart, branch/worktree removal and Project disable. Independent review exposed missing route consistency in both source publication and retained B origins; fixed checks bind the immutable origin to actual request, Graph command/receipt, workspace/version witness and publisher. Thirteen independent adversarial cases now pass, including first historical adoption after source branch/worktree deletion. Deterministic cases also prove cross-actor endpoint mapping, A-to-B-to-C adoption, lifecycle preparation/refusal and extra B restrictions, aggregate32/33 boundary, fresh B-only endpoint revocation with A still readable, current grant/head/base/pointer races, two process writers and both SIGKILL boundaries.",
+  "ticket_id": "ticket-runtime-exploration-adoption-v0"
+}

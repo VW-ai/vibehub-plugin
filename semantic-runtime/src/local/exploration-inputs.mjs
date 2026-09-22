@@ -1,11 +1,12 @@
 /**
  * Fixed internal exploration metadata/route port. Never owns an outer transaction.
  * Construction: new ExplorationInputs({ store, authority, config_digest }).
- * parse(kind, options), grant(context,{write,inspect}), prior(view,context,{kind,request}),
+ * parse(kind, options), grant(context,{write,inspect,adopt}), prior(view,context,{kind,request}),
  * preflight(context,{kind,request}) -> instance-private physical-observation token;
  * bind(view,context,{request,observation,shared}) -> {route,created,generation_id,graph_request};
  * mutation(view,context,{request,observation,shared}) -> {route,graph_request};
- * assertUnchanged(view,context,route), retainOrigin(view,context,route,{previous_graph,next_graph});
+ * adoption(view,context,{request,observation,shared,adoption}) -> {route};
+ * assertUnchanged(view,context,route), retainOrigin(view,context,route,{previous_graph,next_graph,revision?});
  * finish(view,context,route,{result,graph_request}) -> {receipt,result};
  * getExploration/getBinding/projectSelection/setProjectSelection/list/receipt are metadata only.
  * `shared` is inert {source_fence,origin_base,project_selection:{version,pin}};
@@ -19,13 +20,14 @@ import { GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphUint, graphErrorCode } from './graph-inputs.mjs';
 import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
 import { validateSemanticAddress } from '../core/working-graph.mjs';
+import { canonical } from '../core/contracts.mjs';
 import { observeExplorationGit } from './exploration-physical.mjs';
 
 const NS = EXPLORATION_NAMESPACE, GRAPH = 'working-graph';
 export const EXPLORATION_ERROR_CODES = Object.freeze(['invalid_exploration_input', 'exploration_capacity', 'exploration_unauthorized',
   'exploration_unavailable', 'exploration_corrupt', 'unsupported_exploration_format', 'exploration_configuration_mismatch',
   'exploration_idempotency_conflict', 'exploration_binding_conflict', 'exploration_catalog_conflict', 'exploration_selection_conflict',
-  'exploration_physical_changed', 'exploration_owned_generation', 'exploration_rebind_required']);
+  'exploration_physical_changed', 'exploration_owned_generation', 'exploration_rebind_required', 'exploration_source_conflict']);
 const fail = code => Object.assign(new Error(`Exploration: ${code}`), { code });
 const check = (condition, code = 'invalid_exploration_input') => { if (!condition) throw fail(code); };
 const frozen = value => { if (value && typeof value === 'object') { Object.values(value).forEach(frozen); Object.freeze(value); } return value; };
@@ -34,6 +36,17 @@ const scopeOf = g => ({ tenant_id: g.tenant_id, project_id: g.project_id });
 const version = n => check(n === null || Number.isSafeInteger(n) && n > 0);
 const execShape = e => { graphFields(e, ['repository_id', 'checkout_id', 'worktree_id']); Object.values(e).forEach(graphId); };
 const digest = value => check(typeof value === 'string' && /^sha256:[0-9a-f]{64}$/.test(value));
+const exactAt = (ref, at) => {
+  validateSemanticAddress(ref);
+  check(ref.kind === 'semantic_revision' && ref.generation_id === at.generation_id && graphEqual(ref.scope, at.scope));
+};
+const normalizePin = pin => {
+  if (pin !== null) { validateExplorationPin(pin); pin.record_keys.sort(); }
+};
+const samePin = (left, right) => {
+  const a = graphInput(left), b = graphInput(right); normalizePin(a); normalizePin(b); return graphEqual(a, b);
+};
+const destinationOf = (kind, request) => kind === 'adopt' ? request.destination : request;
 export function validateExplorationPin(pin) {
   graphFields(pin, ['at', 'address', 'record_keys']); validateGraphCommitAddress2(pin.at); validateSemanticAddress(pin.address);
   check(pin.address.kind === 'semantic_revision' && graphEqual(pin.address.scope, pin.at.scope) && pin.address.generation_id === pin.at.generation_id);
@@ -96,20 +109,28 @@ export class ExplorationInputs {
     this.#store = store; this.#authority = authority; this.#config = config_digest;
     this.#graphInputs = new GraphInputs({ store, authority });
   }
-  grant(context, { write = false, inspect = false } = {}) {
+  grant(context, { write = false, inspect = false, adopt = false } = {}) {
     const g = this.#authority.inspect(context), actions = ['store:read', 'graph:read', 'ingress:read', 'source:invalidation:read', 'exploration:read'];
     if (write) actions.push('exploration:write', 'graph:write', 'store:write'); if (inspect) actions.push('project:inspect');
-    check(g && g.audience === LOCAL_AUDIENCE && actions.every(a => g.actions.includes(a)) && (!write || ['human', 'service'].includes(g.kind)), 'exploration_unauthorized'); return g;
+    if (adopt) actions.push('exploration:adopt', 'source:read');
+    check(g && g.audience === LOCAL_AUDIENCE && actions.every(a => g.actions.includes(a)) && (!(write || adopt) || ['human', 'service'].includes(g.kind)), 'exploration_unauthorized'); return g;
   }
   parse(kind, options) {
     const input = graphInput(options);
     const shapes = {
       bind: ['epoch', 'idempotency_key', 'publisher_ref', 'execution', 'expected_catalog_version', 'expected_binding_version', 'exploration_id', 'shared_base'],
       mutate: ['epoch', 'idempotency_key', 'publisher_ref', 'execution_workspace_id', 'expected_binding_version', 'expected_catalog_version', 'expected_project_selection_version', 'expected_graph', 'expected_source_fence', 'operation', 'coverage'],
+      adopt: ['epoch', 'idempotency_key', 'publisher_ref', 'expected_source_fence', 'source', 'destination', 'endpoint_map'],
       selection: ['epoch', 'idempotency_key', 'expected_version', 'pin']
     };
     check(Object.hasOwn(shapes, kind)); graphFields(input, shapes[kind]); graphUint(input.epoch); graphId(input.idempotency_key);
-    if (kind !== 'selection') { graphId(input.publisher_ref); version(input.expected_catalog_version); check(input.expected_catalog_version !== null); version(input.expected_binding_version); }
+    if (kind !== 'selection') {
+      graphId(input.publisher_ref);
+      const destination = destinationOf(kind, input);
+      if (kind === 'adopt') graphFields(destination, ['exploration_id', 'execution_workspace_id', 'expected_binding_version', 'expected_catalog_version',
+        'expected_project_selection_version', 'expected_graph', 'shared_base']);
+      version(destination.expected_catalog_version); check(destination.expected_catalog_version !== null); version(destination.expected_binding_version);
+    }
     if (kind === 'bind') {
       execShape(input.execution); if (input.exploration_id !== null) { graphId(input.exploration_id); check(input.shared_base === null); }
       if (input.shared_base !== null) validateExplorationPin(input.shared_base);
@@ -117,6 +138,26 @@ export class ExplorationInputs {
       graphId(input.execution_workspace_id); check(input.expected_binding_version !== null); version(input.expected_project_selection_version);
       validateGraphCommitAddress2(input.expected_graph); graphUint(input.expected_source_fence);
       check(['assert', 'resolve'].includes(input.operation?.kind)); check(input.coverage === null || Array.isArray(input.coverage) && input.coverage.length <= 8);
+    } else if (kind === 'adopt') {
+      const source = input.source, destination = input.destination;
+      graphFields(source, ['exploration_id', 'at', 'address', 'expected_head', 'shared_base']);
+      [source.exploration_id, destination.exploration_id, destination.execution_workspace_id].forEach(graphId);
+      check(source.exploration_id !== destination.exploration_id && destination.expected_binding_version !== null);
+      version(destination.expected_project_selection_version); graphUint(input.expected_source_fence);
+      [source.at, source.expected_head, destination.expected_graph].forEach(validateGraphCommitAddress2);
+      check(source.at.generation_id === source.expected_head.generation_id && graphEqual(source.at.scope, source.expected_head.scope)
+        && source.at.generation_id !== destination.expected_graph.generation_id && graphEqual(source.at.scope, destination.expected_graph.scope));
+      exactAt(source.address, source.at); normalizePin(source.shared_base); normalizePin(destination.shared_base);
+      for (const pin of [source.shared_base, destination.shared_base].filter(Boolean)) check(graphEqual(pin.at.scope, source.at.scope));
+      check(Array.isArray(input.endpoint_map) && input.endpoint_map.length <= 2);
+      check(source.address.entity_kind !== 'entity' || input.endpoint_map.length === 0);
+      for (const mapping of input.endpoint_map) {
+        graphFields(mapping, ['source', 'destination']); exactAt(mapping.source, source.at); exactAt(mapping.destination, destination.expected_graph);
+        check(mapping.source.entity_kind === mapping.destination.entity_kind);
+      }
+      check(new Set(input.endpoint_map.map(mapping => graphHash(mapping.source))).size === input.endpoint_map.length
+        && new Set(input.endpoint_map.map(mapping => graphHash(mapping.destination))).size === input.endpoint_map.length);
+      input.endpoint_map.sort((a, b) => canonical(a.source) < canonical(b.source) ? -1 : canonical(a.source) > canonical(b.source) ? 1 : 0);
     } else { version(input.expected_version); validateExplorationPin(input.pin); }
     return copy(input);
   }
@@ -158,35 +199,52 @@ export class ExplorationInputs {
     return copy(s);
   }
   prior(view, context, { kind, request }) {
-    const r = this.parse(kind, request), prior = this.receipt(view, context, { idempotency_key: r.idempotency_key }, { write: true });
+    const r = this.parse(kind, request); this.grant(context, { write: true, adopt: kind === 'adopt' });
+    const prior = this.receipt(view, context, { idempotency_key: r.idempotency_key }, { write: true });
     if (!prior) return null;
     check(prior.receipt.operation === kind && prior.receipt.request_digest === graphHash(r), 'exploration_idempotency_conflict'); return prior;
   }
   receipt(view, context, { idempotency_key }, { write = false } = {}) {
     graphId(idempotency_key); const g = this.grant(context, { write }); this.#format(view);
     const value = verified(view.getSource(NS, commandKey(g, idempotency_key)), 'exploration-operation'); if (!value) return null;
+    if (value.receipt.operation === 'adopt') {
+      this.grant(context, { write, adopt: true });
+      check(graphEqual(value.request, this.parse('adopt', value.request)), 'exploration_corrupt');
+    }
     check(value.receipt.actor_kind === g.kind, 'exploration_unauthorized');
     check(value.receipt.actor === g.principal_id && graphEqual(value.receipt.scope, scopeOf(g)) && value.receipt.idempotency_key === idempotency_key
       && value.receipt.config_digest === this.#config && value.receipt.result_digest === graphHash(value.result)
       && value.receipt.request_digest === graphHash(value.request), 'exploration_corrupt');
-    return copy({ receipt: value.receipt, result: value.result, graph_request: value.graph_request });
+    return copy({ receipt: value.receipt, result: value.result, graph_request: value.graph_request, request: value.request });
   }
   metadata(view, context, { kind, request }) {
-    const r = this.parse(kind, request); this.grant(context, { write: true }); this.#format(view);
-    let execution = null, exploration = null;
+    const r = this.parse(kind, request), g = this.grant(context, { write: true, adopt: kind === 'adopt' }); this.#format(view);
+    let execution = null, exploration = null, source = null;
     if (kind === 'bind') {
       execution = r.execution;
       if (r.exploration_id !== null) { exploration = this.getExploration(view, context, { exploration_id: r.exploration_id }, { write: true }); check(exploration, 'exploration_unavailable'); }
-    } else if (kind === 'mutate') {
-      const binding = verified(view.getSource(NS, r.execution_workspace_id), 'execution-workspace'); check(binding, 'exploration_unavailable');
+    } else if (kind === 'mutate' || kind === 'adopt') {
+      const destination = destinationOf(kind, r);
+      const binding = verified(view.getSource(NS, destination.execution_workspace_id), 'execution-workspace'); check(binding, 'exploration_unavailable');
       execution = binding.execution;
       exploration = this.getExploration(view, context, { exploration_id: binding.exploration_id }, { write: true }); check(exploration, 'exploration_corrupt');
+      if (kind === 'adopt') {
+        check(binding.execution_workspace_id === destination.execution_workspace_id && binding.generation_id === exploration.generation_id
+          && graphEqual(binding.scope, scopeOf(g)), 'exploration_corrupt');
+        check(exploration.exploration_id === destination.exploration_id && exploration.generation_id === destination.expected_graph.generation_id
+          && graphEqual(destination.expected_graph.scope, scopeOf(g)), 'exploration_binding_conflict');
+        check(samePin(exploration.origin.shared_base, destination.shared_base), 'exploration_selection_conflict');
+        source = this.getExploration(view, context, { exploration_id: r.source.exploration_id }, { write: true });
+        check(source && source.generation_id === r.source.at.generation_id && graphEqual(source.scope, scopeOf(g))
+          && samePin(source.origin.shared_base, r.source.shared_base), 'exploration_source_conflict');
+      }
     }
     return copy({ execution, origin_base: kind === 'bind' && r.exploration_id === null ? r.shared_base : exploration?.origin.shared_base ?? null,
-      project_selection: this.projectSelection(view, context) });
+      project_selection: this.projectSelection(view, context), ...(kind === 'adopt' ? { source_exploration: source, destination_exploration: exploration } : {}) });
   }
   preflight(context, { kind, request }) {
-    const r = this.parse(kind, request); check(kind === 'bind' || kind === 'mutate'); const g = this.grant(context, { write: true, inspect: true });
+    const r = this.parse(kind, request); check(['bind', 'mutate', 'adopt'].includes(kind));
+    const destination = destinationOf(kind, r), g = this.grant(context, { write: true, inspect: true, adopt: kind === 'adopt' });
     let execution, selected, metadata;
     let capturedCode;
     try { this.#store.readSnapshot(context, view => { try {
@@ -194,25 +252,25 @@ export class ExplorationInputs {
       metadata = this.metadata(view, context, { kind, request: r });
       if (kind === 'bind') execution = r.execution;
       else {
-        const b = verified(view.getSource(NS, r.execution_workspace_id), 'execution-workspace'); check(b, 'exploration_unavailable'); execution = b.execution;
-        const current = this.#binding(view, execution); check(current?.value.execution_workspace_id === r.execution_workspace_id && current.version === r.expected_binding_version, 'exploration_binding_conflict');
+        const b = verified(view.getSource(NS, destination.execution_workspace_id), 'execution-workspace'); check(b, 'exploration_unavailable'); execution = b.execution;
+        const current = this.#binding(view, execution); check(current?.value.execution_workspace_id === destination.execution_workspace_id && current.version === destination.expected_binding_version, 'exploration_binding_conflict');
       }
       selected = selectedCatalog(view.getRecord(GIT_ENROLLMENT_NAMESPACE, 'catalog'), execution);
-      check(selected.catalog_version === r.expected_catalog_version, 'exploration_catalog_conflict');
+      check(selected.catalog_version === destination.expected_catalog_version, 'exploration_catalog_conflict');
     } catch (error) { capturedCode = graphErrorCode(error); throw error; } }); }
     catch (error) { if (EXPLORATION_ERROR_CODES.includes(capturedCode)) throw fail(capturedCode); throw error; }
-    const observed = observeExplorationGit(selected); this.grant(context, { write: true, inspect: true });
+    const observed = observeExplorationGit(selected); this.grant(context, { write: true, inspect: true, adopt: kind === 'adopt' });
     const token = copy(metadata); this.#observations.set(token, copy({ kind, request_digest: graphHash(r), actor: g.principal_id, actor_kind: g.kind, scope: scopeOf(g), execution, observed, catalog_version: selected.catalog_version })); return token;
   }
   #observation(view, context, kind, request, token) {
-    const proof = this.#observations.get(token), g = this.grant(context, { write: true, inspect: true });
+    const proof = this.#observations.get(token), g = this.grant(context, { write: true, inspect: true, adopt: kind === 'adopt' });
     check(proof && proof.kind === kind && proof.actor === g.principal_id && proof.actor_kind === g.kind && graphEqual(proof.scope, scopeOf(g)) && proof.request_digest === graphHash(request), 'invalid_exploration_input');
     const selected = selectedCatalog(view.getRecord(GIT_ENROLLMENT_NAMESPACE, 'catalog'), proof.execution);
-    check(selected.catalog_version === proof.catalog_version && selected.catalog_version === request.expected_catalog_version, 'exploration_catalog_conflict');
+    check(selected.catalog_version === proof.catalog_version && selected.catalog_version === destinationOf(kind, request).expected_catalog_version, 'exploration_catalog_conflict');
     check(graphEqual(proof.observed, observedFrom(selected)), 'exploration_rebind_required'); return { proof, selected, grant: g };
   }
-  #route(value, request) {
-    const route = copy(value); this.#routes.set(route, { request: copy(request) }); return route;
+  #route(value, request, metadata = null) {
+    const route = copy(value); this.#routes.set(route, { request: copy(request), metadata: metadata === null ? null : copy(metadata) }); return route;
   }
   getExploration(view, context, { exploration_id }, { write = false } = {}) {
     graphId(exploration_id); const g = this.grant(context, { write }); this.#format(view);
@@ -320,8 +378,40 @@ export class ExplorationInputs {
       expected_graph: r.expected_graph, expected_source_fence: r.expected_source_fence, operation: r.operation, coverage: r.coverage };
     return { route, graph_request };
   }
+  adoption(view, context, { request, observation, shared, adoption }) {
+    const r = this.parse('adopt', request), { proof, selected, grant: g } = this.#observation(view, context, 'adopt', r, observation);
+    const metadata = this.metadata(view, context, { kind: 'adopt', request: r }), destination = r.destination;
+    check(graphEqual(metadata.source_exploration, observation.source_exploration), 'exploration_source_conflict');
+    check(graphEqual(metadata.destination_exploration, observation.destination_exploration), 'exploration_corrupt');
+    const current = this.#binding(view, proof.execution), exploration = metadata.destination_exploration;
+    check(current?.version === destination.expected_binding_version && current.value.execution_workspace_id === destination.execution_workspace_id
+      && current.value.exploration_id === destination.exploration_id, 'exploration_binding_conflict');
+    check(sameBinding(current.value, selected), 'exploration_rebind_required');
+    const publisher = this.#graphInputs.publisher(context, r.publisher_ref, { epoch: r.epoch });
+    const pins = this.#shared(view, context, shared, exploration.origin.shared_base);
+    check(pins.project_selection.version === destination.expected_project_selection_version, 'exploration_selection_conflict');
+    check(pins.source_fence === r.expected_source_fence, 'stale_invalidation_fence');
+    // Semantic/source proof belongs to the fixed materializer. This boundary checks
+    // that its documentary summary describes precisely this normalized request.
+    const summary = graphInput(adoption); graphFields(summary, ['source', 'endpoint_map']);
+    graphFields(summary.source, ['exploration_id', 'generation_id', 'at', 'address', 'expected_head', 'shared_base', 'operation_origin_ref']);
+    graphId(summary.source.operation_origin_ref); normalizePin(summary.source.shared_base);
+    const { operation_origin_ref, generation_id, ...source } = summary.source;
+    check(generation_id === r.source.at.generation_id && graphEqual(source, r.source), 'exploration_source_conflict');
+    check(Array.isArray(summary.endpoint_map) && summary.endpoint_map.length === r.endpoint_map.length);
+    summary.endpoint_map.forEach((mapping, index) => {
+      graphFields(mapping, ['source', 'destination', 'operation_origin_ref']); graphId(mapping.operation_origin_ref);
+      check(graphEqual({ source: mapping.source, destination: mapping.destination }, r.endpoint_map[index]), 'exploration_source_conflict');
+    });
+    const route = this.#route({ kind: 'adopt', scope: scopeOf(g), actor: g.principal_id, actor_kind: g.kind, epoch: r.epoch, idempotency_key: r.idempotency_key,
+      publisher_ref: r.publisher_ref, publisher_session_id: publisher.run.session_id, publisher_execution_id: publisher.run.execution_id,
+      request_digest: graphHash(r), execution: proof.execution, catalog_version: selected.catalog_version, execution_workspace_id: current.value.execution_workspace_id,
+      binding_version: current.version, exploration_id: exploration.exploration_id, generation_id: exploration.generation_id,
+      observed_git: proof.observed, shared: pins, adoption: summary }, r, metadata);
+    return { route };
+  }
   assertUnchanged(view, context, route) {
-    check(this.#routes.has(route)); const g = this.grant(context, { write: true });
+    check(this.#routes.has(route)); const g = this.grant(context, { write: true, adopt: route.kind === 'adopt' });
     check(g.principal_id === route.actor && g.kind === route.actor_kind && graphEqual(scopeOf(g), route.scope), 'exploration_unauthorized');
     this.#format(view);
     check(graphEqual(this.projectSelection(view, context), route.shared.project_selection), 'exploration_selection_conflict');
@@ -334,13 +424,23 @@ export class ExplorationInputs {
       const owner = readExplorationOwner(view, { scope: route.scope, generation_id: route.generation_id });
       check(owner?.exploration_id === route.exploration_id && owner.config_digest === this.#config, 'exploration_corrupt');
     }
+    if (route.kind === 'adopt') {
+      const stored = this.#routes.get(route), metadata = this.metadata(view, context, { kind: 'adopt', request: stored.request });
+      check(graphEqual(metadata.source_exploration, stored.metadata.source_exploration), 'exploration_source_conflict');
+      check(graphEqual(metadata.destination_exploration, stored.metadata.destination_exploration), 'exploration_corrupt');
+    }
     return true;
   }
-  retainOrigin(view, context, route, { previous_graph, next_graph }) {
+  retainOrigin(view, context, route, { previous_graph, next_graph, revision = null }) {
     this.assertUnchanged(view, context, route); check(route.kind !== 'selection');
     validateGraphCommitAddress2(next_graph); if (previous_graph !== null) validateGraphCommitAddress2(previous_graph);
     check(next_graph.generation_id === route.generation_id && graphEqual(next_graph.scope, route.scope), 'exploration_corrupt');
-    const value = seal({ schema_version: 1, ...route, kind: 'exploration-operation-origin', operation: route.kind, previous_graph, next_graph });
+    if (route.kind === 'adopt') {
+      exactAt(revision, next_graph);
+      check(graphEqual(previous_graph, this.#routes.get(route).request.destination.expected_graph), 'exploration_corrupt');
+    }
+    const value = seal({ schema_version: 1, ...route, kind: 'exploration-operation-origin', operation: route.kind, previous_graph, next_graph,
+      ...(route.kind === 'adopt' ? { revision } : {}) });
     const id = graphKey('exploration-operation-origin', [route.scope, route.actor, route.idempotency_key]);
     const old = verified(view.getSource(NS, id), 'exploration-operation-origin');
     if (old) check(graphEqual(old, value), 'exploration_corrupt'); else view.appendSource(NS, id, 'exploration-operation-origin', value);

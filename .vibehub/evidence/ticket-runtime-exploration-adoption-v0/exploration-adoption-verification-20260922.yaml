@@ -1,0 +1,35 @@
+{
+  "acceptance_ids": [
+    "explicit-adoption",
+    "adoption-recovery"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "explicit-adoption",
+      "identity": "sha256:81dca391fb89f11936301a3c39f10b030f36e4527b0000f94286c50a78aba201",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "adoption-recovery",
+      "identity": "sha256:cedcf3477ca0d76775d6bd057a0befd564782b33299eead6069776427865a0e2",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "exploration-adoption-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T17:24:51.036290+00:00",
+  "refs": [
+    "semantic-runtime/docs/measurements/exploration-adoption-verification-20260922.json",
+    "semantic-runtime/docs/measurements/jev-adoption-20260922.json",
+    "semantic-runtime/scripts/check-jev-adoption.mjs",
+    "semantic-runtime/test/jev-adoption-check.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Full Runtime verify and final clean standalone install each pass850tests:848pass,2pre-existing native Keychain opt-in skips,0fail. Boundary192files/0errors; unchanged shipped Skill artifact79files/3670088bytes passes its separate verification. The final standalone run contains the corrected mapped-endpoint read-revocation assertion added after full verify; targeted executor and independent checks also pass. All65new cases use actual synthetic local stores/worktrees or recorded transports. Authorized official TypeSafe live check made4calls through LocalJudgeRuntime, all4expected positive/negative decisions across A and adopted B, jev-1.13.0 at108–342ms model time. Foreign A revision in B is refused before adoption, adoption itself makes0model calls, and source revocation refuses another send. No private trace or credential appears in reports. Live results are integration checks, not a general accuracy claim.",
+  "ticket_id": "ticket-runtime-exploration-adoption-v0"
+}

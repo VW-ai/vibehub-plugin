@@ -5,28 +5,50 @@
       "criterion": "An authorized per-item adoption command pins source and destination revisions, selected shared base, current ACL and idempotency key; records new destination provenance rather than editing the source. Seen/deferred does not adopt. Shared Project promotion uses a separate authority boundary.",
       "identity": "sha256:8ef57f8fb90aa6f6fc82b98af30721f6212f4b5c1d56b6d82d22238946debe35",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "adoption-recovery",
       "criterion": "Real-store fixtures prove exact source/destination/shared-base and current-source authority checks, idempotent per-item adoption with new destination provenance and atomically committed destination Graph/lineage/receipt/outbox. Cover restart, duplicate and changed-key requests, two simultaneous local executions/adopters, stale destination and source/base changes, revoked source, exact historical source reads and SIGKILL before commit/after commit before reply. Retain A origin and B adoption separately through branch/worktree deletion and source supersession; no code merge, observation, seen/deferred state or Project view selection promotes or erases semantic content. Refine concrete supported relation-endpoint/closure and source reauthorization cases from the accepted branch implementation before execution.",
       "identity": "sha256:dd02a49d640e9ca9a4926c321b397b501ce56851f54a2a148ad4ba0a9628cf6b",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "explicit-adoption",
+      "criterion": "Implement actual LocalExplorationStore.adopt as one explicitly authorized per-item command. Pin the exact source/historical selection and separately observed source head, destination owned generation/current Graph/workspace, current Project declaration, both fixed shared bases and source fence. Server-materialize source content and the bounded entity/relation/lifecycle support profile; callers cannot supply content, ACL, lineage or authority proof. Atomically create a new destination candidate and actual B publication/adoption provenance linked to retained exact A publication. Preserve source and endpoint access evidence, same-generation Graph compatibility and separate canonical authority. Viewing, seen/deferred, Git merge, worktree deletion, Project selection or model confidence cannot adopt, overwrite the source or promote canonical truth.",
+      "identity": "sha256:81dca391fb89f11936301a3c39f10b030f36e4527b0000f94286c50a78aba201",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "adoption-recovery",
+      "criterion": "Real Git/SQLite and independent-process fixtures prove one atomic destination Graph/source-retention/A-B-lineage/receipt/outbox effect; exact current ACL/activation/base checks; authorized committed retry before fresh physical checks, restart and changed-body/method idempotency conflicts; two workspace/actor adopters, identical retry and distinct-key CAS races; exact historical source selection, later source supersession and worktree/ref deletion; source/mapped-endpoint revocation, lifecycle-closure positive and negative cases, stale source/destination/shared/Project pins, forged or foreign endpoint mappings, aggregate overflow and selected metadata corruption. SIGKILL before commit leaves no row/head/outbox delta; after commit before reply preserves one original result. Retain A origin and B adoption separately even when a current reader can no longer read their payloads. Full Runtime verify, standalone verify and unchanged shipped plugin artifact checks pass. No real credential or model is needed for deterministic acceptance.",
+      "identity": "sha256:cedcf3477ca0d76775d6bd057a0befd564782b33299eead6069776427865a0e2",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
     "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
     "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
-    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution.",
-    "Preserve the complete moved explicit-adoption responsibility and adoption-specific recovery cases; lack of implementation today keeps consumers blocked. Refine this same draft from its successful branch prerequisite before execution; do not predeclare a live adoption API or unsupported foreign-generation support.",
-    "No automatic adoption from viewing/seen/deferred, Git merge, workspace deletion, Project selection declaration or model confidence. Shared Project canonical promotion remains a separate authority boundary. No new framework/service/schema solely for Ticket lineage."
+    "No automatic adoption from viewing/seen/deferred, Git merge, workspace deletion, Project selection declaration or model confidence. Shared Project canonical promotion remains a separate authority boundary. No new framework/service/schema solely for Ticket lineage.",
+    "Bounded scope: one in-process authenticated per-item adoption API inside semantic-runtime/. Reuse existing DomainStore, exploration-projection namespace, Graph transaction owner and source/canonical/activation checks. No dependency, database table, generic callback, new lineage service, scheduler, App/HTTP/Worker/notification integration, model call, Git write, canonical promotion, automatic merge, recursive endpoint adoption or destination overwrite. Tests use disposable synthetic Git/SQLite only. The complete original two responsibilities remain here; none is waived or transferred by this refinement.",
+    "Public command: adopt(context,{epoch,idempotency_key,publisher_ref,expected_source_fence,source:{exploration_id,at,address,expected_head,shared_base},destination:{exploration_id,execution_workspace_id,expected_binding_version,expected_catalog_version,expected_project_selection_version,expected_graph,shared_base},endpoint_map:[{source,destination}]}). All fields are required; entity endpoint_map is empty. at/expected_head/expected_graph are actual GraphCommitAddress2; address and semantic map endpoints are exact SemanticRevisionAddress; bases are null or existing CanonicalPin. Actor/scope derive only from an opaque local human/service grant. Require explicit exploration:adopt and existing source:read, store/exploration/Graph write/read, ingress/source-invalidation read, Project inspect, publisher and activation actions at their actual boundaries. A and B must be different owned explorations/generations in the authenticated Project and configured reader scope. Destination workspace must actually bind to B. No caller assertion/content/events/ACL/status/actor/execution/source receipt/lineage proof or transaction callback.",
+    "New invocation pins: source.at may select an exact historical A revision; source.expected_head separately pins current A head. Destination expected_graph pins current B head, binding/catalog must match, and expected_project_selection_version pins the single Project declaration. Requested A/B shared_base must equal their respective immutable origin pins; actual canonical proofs are prepared and rechecked with existing usable current/historical/null/unavailable coverage rules. Do not advance a base or treat null as no governing rules. Use selected public reads and physical B observation outside final admission, then fixed private selected-proof checks under the existing Graph-owned writer transaction. Recheck source/head/fence/current grant/Project and B route endpoints before/after preparation and before/after effects. Never nest public resolve/getSelection snapshots or public mutate within a DomainStore callback. Reading historical A needs no live source worktree; first B write needs the actual current physical destination route.",
+    "Entity semantics: accept authorized ordinary exact entity assertions with status candidate, validated or resolved; exclude canonical-selection/service metadata. Rejected/stale/superseded selected assertions and quarantined/unavailable source material refuse. A historical eligible assertion may be explicitly selected after later semantic supersession, under current access and the separately current expected A head. Copy its actual content unchanged into a new B candidate with base_revision:null, parents:[], and service-derived assertion/entity ID from scope, actor, normalized request identity and idempotency key. Never import source status as authority or overwrite a same-named B item. An exact candidate in a readable contested view can be selected without resolving A contest. Flatten its bounded actual ordinary provenance events into B direct support and preserve actual canonical artifact refs; immutable adoption lineage separately retains the exact A revision/at/publication origin. Do not invent a cross-generation parent, DERIVED_FROM edge, ingress event or execution identity.",
+    "Relation semantics: retain supported core relation type/data and create a fresh candidate relation. Preserve same-scope canonical-artifact endpoints exactly under current admitted source checks. Each semantic A endpoint requires one explicit mapping to an authorized exact B endpoint whose immutable revision origin -> Graph receipt -> exploration operation origin proves prior successful adoption of that same exact A endpoint into B. Derive this proof from actual stored facts; equal text/IDs, caller receipt JSON or an ordinary B assertion do not qualify. Endpoints must be usable under the existing core endpoint rules and current access; never use foreign parents. Support at most two unique mappings, including a relation endpoint only if it was already adopted. Missing or extra/duplicate/wrong mappings refuse without recursively creating endpoints. Authorized prior endpoint adoption by another actor is usable without an actor-private getReceipt lookup.",
+    "Lifecycle closure: never put source provenance.access_events into ordinary assertion.events, and never silently drop their captured ACL restrictions. Compute actual current B source_access updates for the complete ordinary support plus mapped-endpoint support. Every source A access-event digest must be included in that actual active B access-event set; otherwise refuse without effects. Supply exactly the computed B access_revisions and let existing core verify admitted lifecycle events/projections and include their captured access. Extra B restrictions remain effective. The separately authorized existing lifecycle path may prepare B before a fresh adoption; this method cannot import lifecycle authority or grant its permissions. Recheck real ingress event/receipt/current registration and captured/current ACL for all ordinary and access events on every new write and retained-result read.",
+    "Bounds and errors: reuse inert JSON <=1MiB, <=50000 nodes, depth<=16 and existing tighter core selected closure bounds. Additionally bound aggregate distinct ordinary+access support events across source/mapped endpoints to32 and endpoint map to2; reject overflow without truncation. Use selected exact reads, no whole history/Project scans or full-Graph reconstruction. Normalize/sort set-like maps before hashing. Return bounded stable domain codes, no raw source text/path/exception on failure. Malformed/deleted/rewound selected source/destination origin, receipt or owner facts fail closed with no effects.",
+    "Atomic lineage and receipt: extend the existing exploration-operation-origin only for operation adopt with exact A exploration/generation/at/revision/current observed head, verified source publication operation_origin_ref, source origin base and verified endpoint map, plus actual B prior/next Graph/new revision. Existing actor/publisher/execution/workspace/catalog/epoch/shared pins remain server-derived route facts. Keep original A rows unchanged. Retain normalized public request in the existing actor-scoped operation record; return the usual applied/duplicate revision/receipt/operation_origin_ref plus bounded adoption summary. The actual ProjectActivation admission and Graph-owned BEGIN IMMEDIATE transaction commits B Graph/source retention/Graph audit+receipt+outbox and extended exploration origin/receipt+outbox together. Roll back everything on failure. No public transaction hooks or second post-mutate lineage write.",
+    "Idempotency and retained result authorization: reuse existing actor-scoped operation namespace across bind/mutate/selection/adopt. Exact retained key+normalized request returns original result; changed body or method conflicts. Distinct keys intentionally create distinct B candidates. New concurrent keys against one B head yield one commit and a no-effects CAS loser; identical requests yield one effect and duplicate. Exact committed retry/getReceipt is looked up before fresh physical Git/enrollment checks and skips current first-attempt source-head/B-head/binding/epoch CAS, permitting restart/switch/deletion/disable or later semantic supersession. It still authenticates original actor and reauthorizes retained exact A input and B result, all endpoint/inherited sources, actual shared pins and retained source fence. Actual revocation/tombstone or conservative Project-wide invalidation may block old content/receipt; never refresh or rebind it. Readability loss does not erase immutable metadata. No current payload substitution, new model result or automatic rebase on retry.",
+    "Verification: public entity current/historical adoption, explicit two-entity-then-relation mapping with canonical endpoint, same-generation/forged lineage refusals, restrictive lifecycle support preservation and missing-projection refusal, aggregate capacity, source/B endpoint/base/Project/source-fence and auth races, two independent writers/adopters, two SIGKILL boundaries, exact retry after A/B disappearance or switch and Project disable. Assert receipt/origin/outbox/Graph consistency and no rejected-command row delta. Run affected tests, npm run verify, npm run verify:standalone and root npm run verify:artifact. Existing unscoped Graph behavior, source invalidation, branch/Judge tests and independent plugin remain unchanged."
   ],
-  "context": "Responsibility transfer, not completion: ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c, explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924, and the adoption-specific portion of branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a, as preserved at commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml, move to ticket-runtime-exploration-adoption-v0 explicit-adoption@1 and adoption-recovery@1. Cross-Ticket derived_from is not supported; these exact Context citations and symmetric transfer notes are audit provenance, not formal cross-Ticket Acceptance lineage. No old Contract or Acceptance semantic identity changes, no old Evidence is rebound, and no adoption obligation is waived. This later independently schedulable command consumes the accepted real branch routing/view format. Seeing or selecting another branch is already useful before this command exists. Keep this Ticket draft until the real branch implementation and its exact Outcome settle the destination transaction entry, support/source authorization and row/receipt format. A later refinement must decide bounded entity/relation endpoint handling and the existing same-generation Graph compatibility without allowing foreign parents, copied caller proof or broad transaction callbacks. It must not infer Project promotion, automatic baseline refresh, source authority or a Git merge. Native v1 criteria below intentionally have no derived_from; source lineage is the immutable committed Ticket/Contract/Acceptance citation, not fabricated cross-Ticket formal lineage.",
+  "context": "Responsibility transfer, not completion: ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c, explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924, and the adoption-specific portion of branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a, as preserved at commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml, move to ticket-runtime-exploration-adoption-v0 explicit-adoption@1 and adoption-recovery@1. Cross-Ticket derived_from is not supported; these exact Context citations and symmetric transfer notes are audit provenance, not formal cross-Ticket Acceptance lineage. No old Contract or Acceptance semantic identity changes, no old Evidence is rebound, and no adoption obligation is waived. This later independently schedulable command consumes the accepted real branch routing/view format. Seeing or selecting another branch is already useful before this command exists. Keep this Ticket draft until the real branch implementation and its exact Outcome settle the destination transaction entry, support/source authorization and row/receipt format. A later refinement must decide bounded entity/relation endpoint handling and the existing same-generation Graph compatibility without allowing foreign parents, copied caller proof or broad transaction callbacks. It must not infer Project promotion, automatic baseline refresh, source authority or a Git merge. Native v1 criteria below intentionally have no derived_from; source lineage is the immutable committed Ticket/Contract/Acceptance citation, not fabricated cross-Ticket formal lineage. Refined after branch projection Contract2 successful Outcome and actual Graph-owned transaction/reader APIs. This Contract completes one explicit per-item entity or relation adoption with separately performed endpoint adoption and pre-existing authorized destination lifecycle projections; it does not promise bulk recursive copying or automatic semantic merge. The current source head is a race precondition distinct from the exact historical source selected by the user. Both original logical acceptance responsibilities remain active at their next revisions; no new prerequisite on Judge/model execution is introduced. The additive selected-metadata convenience shipped in Judge is a read API, not authority supplied by a model.",
   "context_refs": [
     {
       "purpose": "Exact immutable source ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c; explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924 transfers to this Ticket explicit-adoption@1; adoption cases from branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a transfer to adoption-recovery@1. This is documentary cross-Ticket provenance only.",
@@ -59,6 +81,30 @@
     {
       "purpose": "Local App useful experience before broad cross-branch/cloud work.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Exact successful owned-generation, origin, private route and atomic Graph/receipt contract.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual selected reads, shared/current versions, guarded write and committed retry behavior.",
+      "ref": "semantic-runtime/docs/exploration-projection-v0.md"
+    },
+    {
+      "purpose": "Retain captured/current ACL, lifecycle events and conservative invalidation-fence semantics.",
+      "ref": "semantic-runtime/docs/source-invalidation-v0.md"
+    },
+    {
+      "purpose": "Existing fixed private selected-read/mutation/receipt entry and transaction owner to extend narrowly.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Actual branded routes, physical preflight, immutable origin and actor-key receipt metadata.",
+      "ref": "semantic-runtime/src/local/exploration-inputs.mjs"
+    },
+    {
+      "purpose": "Actual same-generation support, relation endpoints and active source-access projection requirements.",
+      "ref": "semantic-runtime/src/core/incremental-graph.mjs"
     }
   ],
   "contract_revisions": [
@@ -77,11 +123,27 @@
       ],
       "identity": "sha256:f6fdb790a387baee47b71b0b3ae86b46502f019110221d02efc89ec8ddc40025",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "adoption-recovery",
+          "identity": "sha256:cedcf3477ca0d76775d6bd057a0befd564782b33299eead6069776427865a0e2",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "explicit-adoption",
+          "identity": "sha256:81dca391fb89f11936301a3c39f10b030f36e4527b0000f94286c50a78aba201",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:4a316f2ea99023fc5f73379e8cbb94002e68d249ac7edf82cf8bea573d96e091",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "Explicitly adopt one authorized exact semantic item into another exploration with new destination provenance and recoverable atomic lineage.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
