@@ -28,7 +28,7 @@
         "label": "judge-failure-is-explicit"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "recorded-fixtures-cover-routing",
@@ -38,32 +38,72 @@
         "label": "recorded-fixtures-cover-routing"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "judge-input-is-pinned-and-minimal",
       "criterion": "Each JudgeNode materializes only authorized event/state refs from the exact GraphRevision and exploration view, records deterministic input/schema identity and rejects invisible/invented target IDs. Other-branch hypotheses are labeled candidates/notices, not imported governing context.",
       "identity": "sha256:3ff6a223afbff5b9c03b3523124ded035f9ca6d8bab5e3cbb1f4938e1aba4e27",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "routing-policy-controls-provider-use",
       "criterion": "Consume explicit local provider settings to route eligible Judge requests through OpenRouter, Vercel or official TypeSafe adapters with model-specific capability/schema checks. Enforce Project activation, current access, redaction and latency/cost/attempt budgets. Only selected/explicitly allowed fallback routes may receive data; API keys remain in local secure storage. No provider-specific core branches or subscription-to-API substitution.",
       "identity": "sha256:22b6554857c582dc59619078480be2888dcb9f9dfe5599f009094206a0542e71",
       "revision": 2,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "judge-input-is-pinned-and-minimal",
+      "criterion": "Implement the documented LocalJudgeRuntime one-shot invocation and typed JudgeNode bridge against actual authenticated ingress and LocalExplorationStore v2 selected pins. Materialize only the selected event snapshot and at most 32 exact same-exploration typed candidate revisions, with bounded currently authorized provenance closure; caller text, target IDs, ACLs and governing booleans cannot establish authority. Bind the exact compiled node, four-family DecisionSchema, redacted/minimized input hash, source fence, exploration/workspace/catalog/Project selection pins and configured shared coverage. Keep origin/current canonical rules separately pinned and checked; no Authority text or other-exploration hypothesis enters the target array. Preserve no-authority/unknown-coverage distinctions. Validate visible target identity and return exact target-ref mappings. The narrow bridge returns the existing typed handler-style outputs, branch and conservative budget usage for the v2 selection; the legacy executePolicyRun remains unchanged and continues to reject Judge/Worker nodes. No full PolicyRun, promotion or acceptance-success claim follows from a positive judgment.",
+      "identity": "sha256:c53d0f15a6b1e2b212d6a2883c2cada242900b0d4ba7687288cd89f7b07252c2",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "routing-policy-controls-provider-use",
+      "criterion": "Compose actual LocalCredentialAuthority, ProviderSettings and the three existing OpenRouter/Vercel/official TypeSafe adapters under one inert trusted configuration binding exactly one tenant/Project to its settings Project ID. For each real supporting ingress registration combine current/captured principal ACL and actual source sensitivity with the explicit owner-configured local-only, provider allowlist and selected-fields-or-deny text policy; refuse missing policy and apply the documented conservative sensitivity mapping. Recheck current source, activation epoch, selected versions, live authority and settings identity immediately before each provider send and before accepting its result. Construct explicit-key SDK clients only inside useCredential; never use process-environment/default-Gateway/subscription fallback. Enforce one deadline and attempt/token/cost-reservation budget across primary and only configured/authorized transient retries/fallbacks; 401/403, schema errors and policy denial cannot broaden a route. Preserve bounded observed telemetry separately from validateDecision and report unknown cost as unknown.",
+      "identity": "sha256:c3003b529a5ab988530807c1d1e70828a296eb65dd4e82c5decfa3401553e899",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "judge-failure-is-explicit",
+      "criterion": "Return the documented bounded decision/deferred/cancelled/refused outcome for timeout, abort, transport failure, rate limit, invalid schema or target, low confidence, changed pins/access/activation/settings and exhausted routes/budgets. The original deadline and attempt reservations never restart inside the invocation; late completions cannot publish, cache or expose a decision after a failed final check. Low-confidence normal-impact results DEFER and high-impact results ESCALATE as recommendations, never acceptance or canonical truth. A bounded per-instance completed-decision cache permits same-actor reuse after current ACL/fence/policy checks; duplicate in-flight invocation keys refuse without another send; changed invocation reuse conflicts, rejected/failed work leaves no reusable success, and different scopes/actors cannot read cache entries. The cache is explicitly process-local, with bounded eviction and no durable attempt, restart, exactly-once model dispatch or PolicyRun journal claim.",
+      "identity": "sha256:34d6335769f6c8d6576ecebd07978f94a8d5cf70198dd19addbfe2390091bfed",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "recorded-fixtures-cover-routing",
+      "criterion": "Using actual temporary Git, SQLite, scoped grants, registered ingress sources, LocalExplorationStore and ProviderSettings with synthetic secret storage, prove all four existing decision families, all three configured adapters, exact candidate/pin identities, source closure and separate shared-rule metadata. Recorded adapter/transport cases cover primary success, permitted fallback, forbidden provider/local-only/missing policy, 401/403 no-fallback, transient retry exhaustion, timeout/cancellation, malformed/invented targets, low confidence, bounded telemetry, cache reuse/isolation/change/eviction, and source/credential/activation/binding/catalog/Project/settings races before send and before result. Assert zero sends for refused input and no late cache/result publication, no credential or structural private-path/identity metadata, no unrelated branch text, and no deliberately excluded synthetic canary in provider input or audit; owner-approved text is not claimed to be universally sanitized. A real synthetic TypeSafe JEV smoke must exercise this new public runtime, both A/B candidate views, all four families, explicit candidate publication through existing exploration mutate, and one in-flight revocation rejection; record actual result/latency and any not-run route honestly without changing Phase 0 benchmark claims. Run focused/affected tests, full Runtime verify, standalone verify and unchanged shipped plugin-artifact checks. Deterministic acceptance uses no real credential or model.",
+      "identity": "sha256:d17101bb50aa4cad96536821dcd82bd8ff7156ee9bfe35c5739622329408ec64",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 3,
+  "active_contract_revision": 4,
   "constraints": [
-    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
-    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
-    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
-    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "Component and scope: implement only inside semantic-runtime/ through documented public contracts; no sibling Skill/UI imports, new dependency, table, framework, generic registry or dispatcher. No App/HTTP/cloud, Collector, Worker/subscription execution, Policy DAG scheduling, durable PolicyRun journal, ingress handoff/ACK, canonical write, cross-exploration adoption, source refresh or Git mutation. Tests create only selected synthetic Git/state. Installing or constructing the runtime performs no enrollment, activation, source capture, credential lookup or network call.",
+    "Public construction: export LocalJudgeRuntime and JUDGE_NODE_OPERATION. new LocalJudgeRuntime({store,authority,provider_settings,canonical_reader,configuration}) requires actual DomainStore, LocalCredentialAuthority and ProviderSettings capabilities. canonical_reader is the unchanged inert LocalExplorationStore owner configuration. configuration is exact inert JSON {schema_version:1,scope:{tenant_id,project_id},settings_project_id,artifact,egress_policy}; it is copied/validated/frozen before reading. artifact must exactly match compilePolicyArtifact output and contain the exact pinned built-in Judge operation descriptor. Bind settings_project_id to this one authenticated scope in the trusted constructor, not in request data; no caller resolver, adapter instance, credential, arbitrary callback or process-environment fallback is accepted. A new composition may use another explicit scope/settings binding; settings IDs must never be inferred from caller scope strings or branch paths.",
+    "Owner egress configuration is exact {policy_id,revision,max_sensitivity,allowed_providers,sources}, with policy_id/revision existing opaque IDs, max_sensitivity one of PUBLIC/INTERNAL/CONFIDENTIAL/RESTRICTED, and providers drawn only from typesafe/vercel/openrouter. sources is at most 32 unique entries {registration_id,local_only,allowed_providers,text_policy}, keyed by actual admitted ingress registration IDs. text_policy is selected-fields or deny; missing entry, deny, or local_only refuses external dispatch. selected-fields sends only the approved stored snapshot text and exact typed target text after fixed structural minimization; it does not claim automatic PII/secret detection, arbitrary text sanitization, or permission broadening. Runtime has no discovery/registration UI or mutable policy registry.",
+    "Public invocation: await runtime.evaluate(context,{invocation_id,node_id,epoch,execution,exploration_id,execution_workspace_id,expected_binding_version,expected_catalog_version,expected_project_selection_version,at,event_id,target_refs,expected_source_fence},{signal}={}). Execution is the existing exact repository/checkout/worktree tuple; at is actual GraphCommitAddress2; target_refs are unique exact SemanticRevisionAddress values in at.scope/generation, at most 32. invocation_id/node_id/event_id use existing opaque ID grammar. All fields are required; target_refs may be empty. Request contains no text, model, route, policy, actor, output assertion, supplied ACL or claimed source metadata. node_id selects one configured artifact Judge node; all other selected nodes/types/operation identities reject. Invocation options accept only an AbortSignal; wire JSON excludes capabilities.",
+    "Actual selection validation: derive actor/scope from the opaque local-audience grant. Require human/service judge:execute, model:dispatch, source:read plus existing store:read/write, ingress:read, graph:read, exploration:read, source:invalidation:read, project:inspect and activation:admit actions. Read current registered getBinding and verify the exact execution/workspace, bound status and expected binding/catalog pins; verify at belongs to the selected exploration and is its current exact head for a new invocation. Recheck the declared current Project selection version and source fence. Get actual event/receipt/snapshot through DurableIngress and verifyEventPayload; reject absent/unusable snapshot or foreign scope. Resolve each exact local target through LocalExplorationStore; unavailable/denied/non-current local selection refuses. No whole-history reconstruction, event-name routing or host Session claim.",
+    "Small missing public read: add LocalExplorationStore.getSelection(context,{exploration_id,at}) returning {exploration_id,generation_id,graph_revision:at,shared:{origin_base,current_project,coverage},availability} under the same current authorization/reader/fence checks as resolve/page, with no local payload, Git read, source refresh or mutation. Expose current_project.version on that response and existing resolve/page shared.current_project. It supplies the exact current pointer version and shared status for zero-target/nonrelational Judge calls without reading unrelated local heads. It must remain a bounded point operation, keep prior public fields/behavior compatible, and reject foreign/corrupt selected pins.",
+    "Local target profile: only currently resolved ordinary local candidate entity revisions with content.semantic_type=judge-target and exact content.data={schema_version:1,kind:judge_target,target_kind:acceptance|context,text} are target material. status must be candidate; unknown/extra fields, empty text and oversized text reject. Runtime derives target ID as target- plus SHA256(canonical exact revision address), sorts targets by canonical exact address, and retains the ID-to-ref map outside the model input. These are explicitly local candidate texts; acceptance target_kind means a candidate criterion to compare, never a canonical acceptance decision. This profile is an ordinary candidate Graph payload, not a new entity registry or a change to canonical Context/Ticket schemas.",
+    "Four-family DecisionSchema: semantic-judge-boolean-targets-v1 is fixed {value:{relevant:boolean,target_ids:unique selected IDs[]},confidence:0..1,latency_ms:finite nonnegative,provider,model,reason_code}. Reuse validateDecision and existing adapter semantics. acceptance_relevance permits only acceptance targets; context_relevance only context targets. durable_cross_ticket_value and independently_schedulable_work require target_refs=[] and return no targets. Zero-target relational evaluation returns the existing deterministic no_visible_targets result without a credential lookup or send. The model envelope remains exactly {event:{type,timestamp,payload:{text}},stateRefs:[{id,type,text}],question:{family,text}}; IDs are derived aliases and type is acceptance/context. Event type and timestamp come from the admitted event, not caller overrides. No structural tenant/project/worktree/source IDs, paths, source ACLs, credentials, other-exploration text or entire records are appended to the model envelope. Owner-approved text is sent verbatim after structural minimization; no content-level PII/secret/path detection is claimed.",
+    "Node/typed bridge: publish one fixed operation descriptor id=semantic-judge version=1 type=judge, with inputs {event:event_ref,selection:signal_ref}, outputs {relevant:boolean,confidence:number,targets:candidates_ref,decision:signal_ref}, error_outputs {error:error_ref}, exclusive branches positive/negative/uncertain, and flat exact config {family,question_id,question_version,question_text,confidence_threshold,impact}. Family is one of the existing four; question ID/version are opaque; text <=4096 UTF-8 bytes; threshold finite 0..1; impact normal/high. Export executeJudgeNode({runtime,context,request,inputs,signal,deadline_ms}) as the narrow trusted bridge. It checks actual runtime capability, exact configured node/descriptor, event_ref digest from admitted event and selection signal digest from the normalized v2 request/pins; it invokes one evaluate operation and returns fixed typed handler-style outputs/branch or {outputs:{error:{kind:error_ref,code:handler_error,node_id}},error:{code:handler_error,retryable:false}}. decision signal binds the result digest; targets contain exact local semantic revision refs. deadline_ms is an optional finite same-process monotonic deadline that may only tighten the node deadline. No action command, Graph write or arbitrary handler is accepted. Keep legacy executePolicyRun and its v1 snapshot/Action protocol unchanged, including rejecting artifacts containing Judge or Worker nodes; document that this bridge is not full PolicyRun integration.",
+    "Shared rules: getSelection pins origin_base and current_project separately, including pointer version, configured/selected keys and coverage/status. Do not copy canonical Authority/other shared text into stateRefs or question_text, hide configured rules by target filtering, infer that null/unavailable coverage means no rules, or compare/promote canonical claims. A known nonnull origin must remain currently authorized current/historical; a known nonnull current Project selection must be current and authorized, otherwise refuse/defer. A null unconfigured selection may remain explicitly unavailable while local relevance is judged. Return governance_evaluated:false and shared_material_sent:false with exact pins/status/coverage; this one-node decision is not a policy-compliance judgment.",
+    "Provenance and destination authority: collect the bounded union of admitted input event plus every selected revision provenance.events/access_events, at most 32 distinct normalized events and 32 registrations. Each event is read from DurableIngress by real event_id, its normalized digest must equal the selected proof, and its receipt supplies registration_id; getRegistration supplies the current version/access. Require the current captured/effective principal ACL AND current registration principal ACL for every support; LocalExplorationStore continues to verify full inherited source access. Compute derived ACL identity from actual event digest/effective-access/current registration version and intersect the real allowed-principal sets; use scoped event pointers, never caller flags. Sensitivity mapping is conservative and fixed: ingress normal->INTERNAL, sensitive->CONFIDENTIAL, restricted->RESTRICTED; never invent PUBLIC from normal. Apply the highest captured/current classification and every supporting registration egress policy through authority.materialize/current service-access rules. Any unsupported/missing/oversized support fails closed; no truncation of proof.",
+    "Dispatch/result boundary: no SQLite snapshot/transaction spans await or a provider call. Before every send, after any awaited credential retrieval/backoff, recheck current grant, all actual input/source proofs and registration versions, selected binding/catalog/head/Project pins, source fence, frozen settings/config identity and ProjectActivation.withAdmission stage=dispatch for the exact epoch/execution; then send only while the signal/deadline remains current. The stage=result admission plus the same checks gate returned/cached successful decisions. Physical Git/SQLite/provider sends do not share an atomic lock; document the bounded observation/send race and inability to recall already-sent input. If a pinned value changes, refuse the late result without automatic rebase, another route or model retry under a fresh identity. Do not nest actual resolve/getSelection calls inside a DomainStore/activation callback. Materialize through bounded public reads outside the final admission, verify monotonic source/head/binding/catalog/selection endpoints before/after, then use a fixed internal selected-proof check in the admitted view; caller-supplied proof JSON or callbacks cannot bypass it.",
+    "Actual adapters: ProviderSettings supports only typesafe/jev-latest, vercel/typesafe-ai/jev and openrouter/typesafe/jev-1.13 with semantic-judge-v0. Read settings once per invocation and pin its non-secret digest, rechecking it before each send/result. Obtain the selected provider key only through provider_settings.useCredential(settings_project_id,provider,callback). Inside that callback construct an explicit-key TypeSafeClient with SDK logging/retries off; or createGateway({apiKey}).evaluationModel(...) via ai and the existing JevJudge evaluateFn seam; or OpenRouterJevJudge({apiKey,...}). Keep all SDK/provider retries/fallbacks disabled. Preserve bounded transport classification inside the trusted callback so useCredential cannot erase 429/5xx vs auth/schema distinctions; never persist or return raw exceptions, headers, bodies or keys. No new provider adapter, generalized model capability or benchmark is included.",
+    "Budgets and routing: outgoing minimized input <=65536 UTF-8 bytes; input event text <=16384 bytes, each target text <=4096, at most 32 targets and 32 support events; reject overflow without truncation. Requests/config/cache result values retain <=1MiB, <=50000 inert JSON nodes, depth<=16 and existing tighter downstream limits. One monotonic invocation deadline is min(artifact timeout,node timeout,ProviderSettings timeout 100..120000ms,optional bridge deadline). Total provider attempts are min(node max_attempts,artifact max_attempts,settings max_attempts 1..3). Reserve each full node-declared max_tokens and max_cost_microunits before each attempt against the configured artifact totals for this single invocation; no shared whole-run consumed-budget ledger is claimed; no refund/reset on failure/fallback. These are conservative admission proxies, not a claim that providers enforce billing/token caps. Preserve bounded observed tokens/cost separately, represent absent/unknown values as null, and defer on reported reservation overflow. Initially select configured primary; only 429/5xx may consume another attempt, taking the next explicitly configured and authorized fallback when present or retrying the current route otherwise. Backoff is bounded by remaining deadline and 1000ms; no auth/schema/target/policy/low-confidence fallback. 401/403 is credential_rejected. A denied/missing-key route stops rather than searching undeclared alternatives.",
+    "Public result: {schema_version:1,status:decision|deferred|cancelled|refused,invocation_id,node_id,input_hash,decision_schema:{id:semantic-judge-boolean-targets,version:1},selection,decision:null|validatedDecision,target_refs,branch:null|positive|negative|uncertain,recommendation:null|DEFER|ESCALATE,reason_code,attempts,usage,result_digest,cache:miss|hit}. selection records exact v2/workspace/source/settings/policy/shared pins and governance_evaluated:false/shared_material_sent:false but no source/model text. Attempts expose only route/model, ordinal and bounded status/latency, not secrets/input/output bodies; usage separates reserved from observed values. Below-threshold valid output takes uncertain and recommends DEFER(normal) or ESCALATE(high); terminal refusal/failure does not expose raw model output. Result target_refs are only the exact supplied local revisions corresponding to validated returned target IDs. Result hashes exclude observed timing/cache-hit decoration but include semantic outcome, exact pins and attempt route identity. No result is an acceptance or canonical authority.",
+    "Cache: keep only a bounded in-memory completed-success cache with capacity 128 entries and <=8MiB aggregate encoded data, plus at most 8 in-flight invocations per runtime; reject concurrency/capacity admission or evict least-recent completed entries deterministically, never silently evict in-flight work. Cache namespace is exact scope+authenticated actor+actor kind+invocation_id. Reuse requires equal normalized request and exact materialized-input hash, configured artifact/node/DecisionSchema/egress policy/settings identities, selected exploration/shared/source pins and current permissions/fence. Same-key changed reuse conflicts while retained; A duplicate in-flight key returns refused/invocation_in_progress with no extra send; cancellation belongs only to the original invocation. Failed/cancelled/refused outcomes do not become a reusable success. Repeated evaluate is the only cache lookup API and re-materializes/checks current inputs before reuse. Cache eviction/restart permits a new evaluation, not a claim of no prior model send. There is no durable receipt/attempt store, cross-process deduplication, restart replay or cost-budget recovery; the separate Policy journal owns those obligations.",
+    "Verification and live boundary: add synthetic fixture tests for the public evaluate/bridge APIs, real selected stores/settings and all three route compositions; use fixture-owned prototype/SDK transport stubs rather than a public arbitrary provider factory. Preserve previous provider/replay/kernel tests and show legacy executePolicyRun still refuses Judge. Add npm run check:jev:judge invoking this real service on temporary synthetic A/B explorations, all four families, at most 10 external calls, one explicit in-flight source revocation, and explicit public exploration mutate for accepted candidate results. Obtain the key through the selected local secure-store settings binding only; do not scan credentials or arbitrary repositories, change provider settings, expose keys or invoke a different route. The already-authorized selected TypeSafe synthetic test may run; other routes remain honestly recorded/not-live unless separately authorized. Print/save only minimized hashes, bounded decisions, actual model/latency, exact test outcome and no canonical/adoption/ACK claim. A missing selected credential is a recorded limitation, never simulated live success. Run focused and affected tests, npm run verify, npm run verify:standalone and the unchanged shipped Skill plugin artifact verification."
   ],
-  "context": "Build bounded JudgeNode routing and fallback execution. Delivery slice: alpha. Architecture: . Scope: JudgeNode handler, DecisionSchema binding, input materialization, route/fallback policy, bounded attempts, cache identity, and recorded tests.. Excluded: New provider adapters, new provider benchmark, online training, and canonical promotion authority..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Refine this same Ticket after its six exact causal prerequisite Outcomes. This is a one-node local invocation with a narrow typed handler bridge, not the complete Policy DAG executor or durable PolicyRun consumer. Keep all four existing logical Acceptance responsibilities in their next revisions; preserve every earlier Acceptance/Contract identity. The accepted Policy kernel provides handler shapes, deterministic budget/error principles and existing rejection behavior, but its full v1 snapshot/action API is not the v2 selected-store wire. The new bridge uses actual GraphCommitAddress2 pins and signal/candidates outputs rather than manufacturing a v1 Graph snapshot. Existing replay adapters, Phase 0 inputs/results and benchmarks remain baseline. Source egress policy is deliberately a finite immutable owner configuration keyed by real admitted registration IDs because existing ingress owns principal ACL/sensitivity but has no provider allowlist/local-only field. This configuration grants no source read permission. Shared canonical Authority remains separately pinned/checked/internal metadata and is not sent as candidate text; this relevance-only runtime does not evaluate compliance with those rules. The existing policy-journal Ticket retains all durable leases, retry/resume, poison-event isolation, operator replay, ACK/completed-through and transferred ingress-consumer-delivery-recovery obligations. No obligation is transferred or retired by this refinement.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -104,6 +144,70 @@
     {
       "purpose": "App 中按 Project 显式启停 VibeHub",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Exact successful non-Judge kernel handler/port/budget contract and deliberately preserved full-run exclusion.",
+      "ref": "semantic-runtime/docs/policy-kernel-v0.md"
+    },
+    {
+      "purpose": "Existing compiler/operation identity and flat configuration schema; reuse its actual artifact output.",
+      "ref": "semantic-runtime/docs/policy-artifacts-v0.md"
+    },
+    {
+      "purpose": "Accepted real v2 exploration bindings, selected canonical metadata, current source checks and candidate-only publication.",
+      "ref": "semantic-runtime/docs/exploration-projection-v0.md"
+    },
+    {
+      "purpose": "Actual source fence and ACL/lifecycle read boundaries for dispatch, result and cache reuse.",
+      "ref": "semantic-runtime/docs/source-invalidation-v0.md"
+    },
+    {
+      "purpose": "Real selected routes, settings limits and trusted secure-store callback; no automatic credential/provider substitution.",
+      "ref": "semantic-runtime/docs/provider-settings-v0.md"
+    },
+    {
+      "purpose": "Actual local grants and source/provider materialization policy, including upper-case sensitivity vocabulary.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Actual dispatch/result admission, epoch and observed registry fences; sends cannot be recalled.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Preserve four-family minimized input, exact visible targets and validateDecision behavior; telemetry is separate.",
+      "ref": "semantic-runtime/src/core/contracts.mjs"
+    },
+    {
+      "purpose": "Existing synthetic real exploration/JEV composition is reusable test input, not proof of the new service.",
+      "ref": "semantic-runtime/scripts/check-jev-exploration.mjs"
+    },
+    {
+      "purpose": "Accepted typed handler, budget and failure semantics consumed by the narrow bridge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-policy-kernel-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted actual current-source and invalidation substrate.",
+      "ref": ".vibehub/outcomes/ticket-runtime-source-access-invalidation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Accepted exact local branch/exploration view and write route.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Accepted provider setting/secret boundary and explicitly deferred tenant-to-settings binding.",
+      "ref": ".vibehub/outcomes/ticket-runtime-provider-settings-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted third adapter and explicit not-live status.",
+      "ref": ".vibehub/outcomes/ticket-runtime-openrouter-judge-adapter-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted epoch admission reused at each actual dispatch/result boundary.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-activation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Keep all durable attempts, scheduler/restart/lease/budget recovery and transferred ingress consumer obligations here; no completion claim in Judge service.",
+      "ref": ".vibehub/tickets/ticket-runtime-policy-journal-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -184,11 +288,37 @@
       ],
       "identity": "sha256:76dd68b893c0758e257606ab7e3e0c5dd59d27f24bc5b9e0d1d8f8a8eee1509a",
       "revision": 3
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "judge-failure-is-explicit",
+          "identity": "sha256:34d6335769f6c8d6576ecebd07978f94a8d5cf70198dd19addbfe2390091bfed",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "judge-input-is-pinned-and-minimal",
+          "identity": "sha256:c53d0f15a6b1e2b212d6a2883c2cada242900b0d4ba7687288cd89f7b07252c2",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "recorded-fixtures-cover-routing",
+          "identity": "sha256:d17101bb50aa4cad96536821dcd82bd8ff7156ee9bfe35c5739622329408ec64",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "routing-policy-controls-provider-use",
+          "identity": "sha256:c3003b529a5ab988530807c1d1e70828a296eb65dd4e82c5decfa3401553e899",
+          "revision": 3
+        }
+      ],
+      "identity": "sha256:79aee523c2dc54588cafffe0d213523526b035e1374d84318448c2413792c535",
+      "revision": 4
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "Judge nodes invoke existing SemanticJudge adapters through policy-controlled, ACL-safe, budgeted routing and emit replayable decisions without truth authority.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
