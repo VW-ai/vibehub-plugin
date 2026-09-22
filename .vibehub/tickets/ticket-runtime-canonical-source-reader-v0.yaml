@@ -8,7 +8,7 @@
         "label": "canonical-reader-contract"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "canonical-reader-lifecycle",
@@ -18,7 +18,7 @@
         "label": "canonical-reader-lifecycle"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "canonical-reader-fixtures",
@@ -28,18 +28,54 @@
         "label": "canonical-reader-fixtures"
       },
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "canonical-reader-contract",
+      "criterion": "Export CanonicalSourceReader and bounded GitProvenance.readFileAtCommit({commit_oid,path}) for an explicitly enrolled repository/execution and owner-configured canonical path/ID allowlist. Support profile vibehub-records-v1: UTF-8 JSON object text in .json/.yaml files using public Context v1, Room v1, bound Ticket v3 and native-bound Evidence/Outcome v2. Independently validate the referenced schemas, exact Acceptance/Contract identities, selected record IDs, revision membership, Evidence coverage and Outcome status; human acceptance requires exactly bound human-origin Evidence with its input citation. Record origin/independence remain checked-in claims, never authenticated approval or model-assigned authority. Verify full commit, selected tree-chain and regular blob hashes without source configuration, network, worktree text or source writes, retaining exact tree/blob/digest pins and distinguishing proved absence from unavailable objects. Canonical-path authority requires explicit trusted configuration plus actual caller/enrollment/source grants. Authority rules/artifact paths are validated at that same commit; Room stale/alignment metadata is retained as a freshness claim and cannot itself revoke valid governing rules. Map the complete bounded selected records and exact canonical refs into one actual Graph canonical-selection assertion, supported solely by actual DurableIngress normalized events; initial Graph lifecycle stays candidate and no canonical promotion occurs.",
+      "identity": "sha256:8788657cc930e447614fd0cc1c04e2dbca5ae8d2360cac7d2fb45baf8d1a2baf",
+      "presentation": {
+        "label": "canonical-reader-contract"
+      },
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-reader-lifecycle",
+      "criterion": "One explicit refresh revalidates the entire configured selected closure at one immutable commit, admits deterministic per-record git_revision observations, then publishes exactly one atomic LocalGraphStore assertion with expected_graph CAS. The bundle binds config/request identity, selected commit, exact per-record provenance, usability states, selected admitted-source positions and project fence; every selected binding input is a supporting event, while the prior bundle is base lineage only. Invalid/unsupported records cannot serve old text as current. Deleted files become tombstoned path projections with verified tree absence and whole-commit path:null/raw-commit-digest events, never fabricated blobs or Git-commit source tombstones. Same-selection refresh allows only the same commit or proven descendant of the exact prior selection; rewind/divergence/unknown ancestry leaves it unchanged, with historical/divergent reads requiring an independently explicit selection. Authorize before byte reads and content returns. Add fixed optional expected_source_fence to Graph mutation identity and check it inside the transaction before effects/precommit and on duplicate/reconcile paths; a changed fence conservatively rejects/quarantines. Consult Graph/ingress receipts before read/retry, reuse only exact deterministic pins under current ACL/fence, reject changed keys, and preserve admitted facts but no new selection on failed publication. Never ACK/complete ingress. Exact reads distinguish current, historical, quarantined and unavailable; retained structured citations survive restart/source GC under current permissions with no latest fallback.",
+      "identity": "sha256:850090b88539f087dc41c84aed7c10681dbbf67afe2f121a3639abd3ca0cff47",
+      "presentation": {
+        "label": "canonical-reader-lifecycle"
+      },
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-reader-fixtures",
+      "criterion": "Use temporary existing-project Git/SQLite fixtures and the actual enrollment, activation, ingress, Graph and invalidation APIs. Cover bootstrap/restart; changed authority/Acceptance and stable presentation-only hashes; valid historical versus forged/misbound Outcome; human-authority Evidence; stale Room retaining governing rules; unavailable support/artifact; unsupported source forms and duplicate JSON keys; deletion, symlink/gitlink, corrupt/missing objects and unchanged source metadata. Cover descendant/rewind/divergence/incomplete ancestry; captured/current ACL and a new allowed commit after an older object is revoked; revocation during reads and cross-process fence movement before publication; stale-fence retries/reconciliation/resolve; activation disable/re-enable; exact/changed retries; crash after partial ingress before publication and lost reply after atomic publication. Verify unchanged semantic selection on failure, historical citations and no ACK/completion. Exercise the documented record/path/byte/Git-I/O and existing Graph plan/closure limits without truncation or enlarged upstream caps. Adding at least 1000 unrelated files must not add selected file/blob reads or a recursive project scan. Run focused suites, full Runtime/boundary and clean standalone verification plus separate plugin artifact isolation; record bounded counts/bytes/local timings, with no model or live host/App integration claim.",
+      "identity": "sha256:26fbee68a85713ac6a9c603b6837ba290d18107486dec7783b754bc206d8540a",
+      "presentation": {
+        "label": "canonical-reader-fixtures"
+      },
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
     "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "Use existing Runtime namespaces and storage; no new dependency/table, generic registry or transaction callback API. Export CanonicalSourceReader({store,authority,repository_path,execution,registration_id,selection}), refresh(context,{epoch,publisher_ref,expected_graph,previous_selection,commit_oid,idempotency_key,observation}) and resolve(context,{at,address}). selection fixes schema_profile, selection_id, trusted source-policy identity and exact record/ID/path bindings. observation fixes producer sequence/timestamp pins; document its exact inert shape and derived retry-key algorithm in semantic-runtime/docs/canonical-source-reader-v0.md. Keep the optional Graph expected_source_fence extension compatible when omitted.",
+    "JSON-as-YAML supports the referenced schema versions only. Ordinary YAML, legacy/reconstructed acceptance bindings and unsupported governed segment forms are explicit unsupported states, not guessed conversions. Reject duplicate JSON keys, invalid UTF-8/nonfinite values, unknown fields and non-inert API inputs without payload diagnostics. Runtime owns independent validators and sanitized fixtures: no sibling implementation imports or hard-coded repository records. Room stale/alignment remain recorded freshness claims; inactive Authority or unavailable same-commit artifact proof affects governing usability, but stale Room alone does not.",
+    "Bounds: 1..16 record files; 32 total unique selected paths including Authority artifact entries; 64 KiB per record and 256 KiB aggregate record bytes; 16 path components; 1 MiB per tree and 4 MiB aggregate raw Git-object bytes; 128 Git subprocesses, 10 seconds each and 30 seconds cumulative Git-I/O time. Cache selected verified objects within a call; no recursive ls-tree/diff. All existing stricter ingress/DomainStore/Graph depth/node/32-support/1 MiB row-plan-response limits still apply, including overhead, and reject atomically rather than truncating or enlarging limits.",
+    "GitProvenance currently discovers its object directory through source rev-parse. The reader must enter the hardened scratch view immediately using actual enrolled checkout/common-dir/worktree metadata and known format (a narrowly trusted object-directory option is allowed), verify physical enrollment membership, and never accept an arbitrary client object path or load source include/helper configuration. Preserve the existing adapter API. Do not claim an OS sandbox against privileged filesystem swaps. Git payload remains {kind:git_revision,object:git_commit,path,digest}; tree/blob/artifact-entry and absence proofs belong in typed bundle data.",
+    "Provide a narrow authenticated DurableIngress.getRegistration(context,{registration_id}) if needed to read current registration/version without expanding cursor/events; retain existing getSource and source/object guards. Revoked historical objects must not be expanded merely to authorize a new allowed commit. Publish with coverage:null, preserving existing Graph coverage semantics and current authorization; never reset unrelated coverage or bypass it. Bundle source watermark means only exact selected admitted observation/receipt positions, with no new cursor completion or caught-up claim. Config policy changes use a new explicit selection identity; current/historical materialization still checks actual source access and typed fence freshness.",
+    "Each refresh has one Graph assertion, no per-record publication stages. events/canonical_refs include every current selected support; base_revision is lineage only, without accumulated prior parents. Durable ingress receipts may remain after failed publication; exact retry reuses them only after pin/access checks, without ACK. New refresh requires current activation; an already committed exact retry may follow existing authorized disabled-read semantics without fresh Git reads, but must still reject a stale fence as a successful current result. Generic receipt metadata is not a current-content claim. Reader current means the selected Graph revision, never proof of current filesystem/branch-tip freshness; resolve separately labels historical and quarantined results.",
+    "Run cd semantic-runtime && node --test test/canonical-source-reader*.test.mjs test/git-provenance*.test.mjs test/durable-ingress*.test.mjs test/graph-store*.test.mjs test/graph-source-invalidation.test.mjs test/source-invalidation*.test.mjs; npm run verify; npm run verify:standalone. From repository root run npm run verify:artifact and git diff --check. All acceptance fixtures use temporary selected synthetic projects with no provider call, source fetch, private trajectory or user repository mutation."
   ],
-  "context": "读取并投影已有 canonical Git 记录. Delivery slice: alpha. Architecture: Tech Design §§6.3,10,12,20,28. Scope: An existing project can seed and refresh canonical-reference projections from verified immutable Git records without a judge assigning truth authority to arbitrary source text.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "读取并投影已有 canonical Git 记录. Refine from successful Git provenance Contract 1 and source-invalidation Contract 2; consumed Graph Store/DurableIngress Contract 3 remain implementation context. Deliver one explicit selected commit -> actual immutable ingress observations -> one bounded atomic canonical-selection Graph assertion. The owner supplies repository/execution/source registration and a canonical path/ID allowlist. Existing sources and historical structured citations remain intact. Scope excludes recursive import, per-record Graph staging, a registry/scheduler/daemon, source ACK/completion, model inference, host/App wiring, branch adoption and canonical writes. The JSON-as-YAML source subset is deliberate; later consumers can use the typed bundle and exact canonical refs without a new ontology or persistence protocol.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -52,6 +88,102 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Accepted immutable commit/object contract and hardened no-fetch selected-read baseline.",
+      "ref": "semantic-runtime/docs/git-provenance-v0.md"
+    },
+    {
+      "purpose": "Extend the actual hardened Git adapter with bounded commit/tree/blob selected reads, without unrelated parent diff scans.",
+      "ref": "semantic-runtime/src/adapters/git-provenance.mjs"
+    },
+    {
+      "purpose": "Successful exact Git provenance prerequisite, including independently repaired promisor/read-only and per-base boundaries.",
+      "ref": ".vibehub/outcomes/ticket-runtime-git-commit-ref-provenance-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted source-object guard, project fence, current access, no-ACK and consumer recheck contract.",
+      "ref": "semantic-runtime/docs/source-invalidation-v0.md"
+    },
+    {
+      "purpose": "Actual head/assertFence implementation and namespace semantics used inside the Graph transaction.",
+      "ref": "semantic-runtime/src/local/source-invalidation.mjs"
+    },
+    {
+      "purpose": "Successful exact source-invalidation prerequisite whose feed/fence and read restrictions this reader consumes.",
+      "ref": ".vibehub/outcomes/ticket-runtime-source-access-invalidation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual registered producer, deterministic event/receipt, immutable git_revision, ACL and no-source-completion boundary.",
+      "ref": "semantic-runtime/docs/durable-ingress-v0.md"
+    },
+    {
+      "purpose": "Consumed successful ingress implementation baseline; already a prerequisite of source-invalidation, not a duplicated dependency edge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-durable-ingress-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Actual one-assertion transaction, publisher identity, exact receipts/CAS, inherited provenance and current-ACL Graph reads.",
+      "ref": "semantic-runtime/docs/graph-store-v0.md"
+    },
+    {
+      "purpose": "Bounded expected_source_fence integration in actual mutation, duplicate and reconcile paths.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Consumed successful Graph implementation baseline and retained historical read/atomic publication behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-graph-store-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Existing hard support/row/plan/response bounds and base-versus-support lineage; never enlarge them for reader bundles.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "purpose": "Actual canonicalArtifactAddress, candidate lifecycle and complete provenance closure contracts.",
+      "ref": "semantic-runtime/src/core/working-graph.mjs"
+    },
+    {
+      "purpose": "Exact Git payload/sourceObject/event taxonomy and source/digest identity reused without a new event type.",
+      "ref": "semantic-runtime/src/core/event-provenance.mjs"
+    },
+    {
+      "purpose": "Public Context v1 wire protocol only; independently validate Runtime-local selected Decision/Constraint/Authority data.",
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
+    },
+    {
+      "purpose": "Public Ticket v3 and Acceptance/Contract revision wire protocol only; no Runtime import of plugin implementation.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Public Room v1 anchor, stale/alignment and canonical territory syntax; supported subset must be explicit.",
+      "ref": "skills/vibehub-core/contracts/room.schema.json"
+    },
+    {
+      "purpose": "Public Evidence v2 native-bound revision/origin protocol only.",
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Public Outcome v2 native-bound contract/accepted/unresolved/evidence protocol only.",
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "Public exact Acceptance/Contract SHA-256 identity algorithm and historical binding rules.",
+      "ref": "skills/vibehub-core/contracts/revision-identity.md"
+    },
+    {
+      "purpose": "Human-authority evidence semantics and explicit boundary that checked-in claims do not authenticate identity/approval.",
+      "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "Project is not main; selected views preserve exact history and do not collapse exploration truth.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-project-overview-and-room-lineage.yaml"
+    },
+    {
+      "purpose": "Historical/divergent selection visibility does not silently adopt governing Context.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Actual enrolled checkout/common-dir/worktree identity and explicit path authority for hardened Git object access.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
     }
   ],
   "contract_revisions": [
@@ -75,11 +207,32 @@
       ],
       "identity": "sha256:e531b18bf49720a047432e381a7a770687d1c1175b84468b0ec13c9242aa9a85",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-reader-contract",
+          "identity": "sha256:8788657cc930e447614fd0cc1c04e2dbca5ae8d2360cac7d2fb45baf8d1a2baf",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "canonical-reader-fixtures",
+          "identity": "sha256:26fbee68a85713ac6a9c603b6837ba290d18107486dec7783b754bc206d8540a",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "canonical-reader-lifecycle",
+          "identity": "sha256:850090b88539f087dc41c84aed7c10681dbbf67afe2f121a3639abd3ca0cff47",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:970117d359b7f01da6e7b98c11d17df8f2f83a329c1c9715d848e333498d3288",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "An existing project can seed and refresh canonical-reference projections from verified immutable Git records without a judge assigning truth authority to arbitrary source text.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
