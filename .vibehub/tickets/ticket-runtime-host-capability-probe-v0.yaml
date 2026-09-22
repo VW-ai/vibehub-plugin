@@ -5,7 +5,7 @@
       "criterion": "For the installed host record exact version/integration surface and observed user/assistant/tool units, lifecycle timing, stable event identity, ordering, compaction/restart and known gaps. Exercise a synthetic session fixture; never infer every-message coverage from usage statistics or one stop hook.",
       "identity": "sha256:027ade8f63824248e7d51acd46e15235bf282f6ffe375b049cf38df760daa068",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "observed-delivery",
@@ -20,9 +20,16 @@
       "identity": "sha256:c948a05ea78431acf0d447058ed655cc2fc3c6c217c5ac4745fdb1691c50c4e1",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "observed-capture",
+      "criterion": "For the installed Codex host record exact version/integration surface and observed user/assistant/tool units, lifecycle timing, stable event identity, ordering, compaction/restart and known gaps. Exercise a synthetic session fixture; never infer every-message coverage from usage statistics or one stop hook. Claude coverage has its own parallel probe.",
+      "identity": "sha256:6fe96e31ad4cf210c89f59647c8e49a0ee1ece43f0fd60c3d36fb3fafb4271fd",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -45,10 +52,6 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Requested research and coverage discipline.",
       "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-collector-reuse-and-coverage.yaml"
     },
@@ -59,6 +62,14 @@
     {
       "purpose": "Native coding capabilities and independent reviewer remain.",
       "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "首版插件同时支持 Codex 与 Claude Code",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-codex-claude-first.yaml"
     }
   ],
   "contract_revisions": [
@@ -82,14 +93,36 @@
       ],
       "identity": "sha256:33400861176571d9af939cc760708f7ff58e1378670fa4278039e7a37ee9dc80",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "capture-boundaries",
+          "identity": "sha256:c948a05ea78431acf0d447058ed655cc2fc3c6c217c5ac4745fdb1691c50c4e1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "observed-capture",
+          "identity": "sha256:6fe96e31ad4cf210c89f59647c8e49a0ee1ece43f0fd60c3d36fb3fafb4271fd",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "observed-delivery",
+          "identity": "sha256:4f19cba29b7b4a01fdb11e36ac728ec051238909cee6aefd5c5e66224ca812a0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:575e3568fbfc454537b3e975c652ce380a0a88cbc68e51943ce5a2bc2bd9d27a",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "Measure one real host integration for capture, query/tools and safe delivery before implementing its Collector.",
+  "outcome": "Measure Codex capture, query/tools and safe delivery before implementing its Collector.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [],

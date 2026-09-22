@@ -1,0 +1,106 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "cli-execution",
+      "criterion": "Implement codex exec or app-server against the local runner contract with structured output, explicit cwd/input/tool limits and process-tree cancellation. Keep Worker role separate from interactive plugin sessions; classify unsupported capabilities, do not bypass host permissions.",
+      "identity": "sha256:1a33c97954d8663804a310df02d55e50b22d2e981f53eb8ee866031cae932cf9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "subscription-auth",
+      "criterion": "Use the CLI-owned existing subscription login and documented reauthentication flow; expose redacted ready/login-required/quota/unavailable states. Never copy/export OAuth tokens or implicitly switch billing to API keys. Authentication source must be verified without exposing secrets; do not promise unlimited usage.",
+      "identity": "sha256:e93b7f778dcef4eee91087d2afd4a46d8bdd3539f18b9a5b4c81e23f6d4c6d3c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "executor-roundtrip",
+      "criterion": "A synthetic real job must complete through the local runner to a validated cited proposal and durable receipt. Record exact CLI/model/auth-mode/build, requested limits, result and elapsed time; not-run or unavailable cannot pass this live criterion. Test timeout, malformed output, cancellation, reauth-needed and quota exhaustion with bounded fault fixtures.",
+      "identity": "sha256:6e5eab927d0e855981bf4837c64cb1aafe8769803cce7b871ad87acb68dffa17",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Concrete codex process adapter, login/health guidance and synthetic real roundtrip. Refine flags/sandbox/auth behavior from the installed version. No remote machine, credential extraction or user-wide config rewrite.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "本机订阅 Worker 承担 VibeHub 的重推理任务",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cli-execution",
+          "identity": "sha256:1a33c97954d8663804a310df02d55e50b22d2e981f53eb8ee866031cae932cf9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "executor-roundtrip",
+          "identity": "sha256:6e5eab927d0e855981bf4837c64cb1aafe8769803cce7b871ad87acb68dffa17",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "subscription-auth",
+          "identity": "sha256:e93b7f778dcef4eee91087d2afd4a46d8bdd3539f18b9a5b4c81e23f6d4c6d3c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fc3d89b771db131f0ebaabedb98903680d8e9655d4bfd83349fbae57c566b4c2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Run bounded local VibeHub jobs through the user's authenticated Codex CLI.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Durable local claim/result and scope contracts.",
+      "target_ticket_id": "ticket-runtime-local-worker-runner-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-codex-executor-v0"
+}

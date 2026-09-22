@@ -1,0 +1,116 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "claude-plugin-path",
+      "criterion": "One documented install/update/disable path plus health/status connects the measured hooks/tools to the local app. Activation is Project-scoped, new linked worktrees bind correctly, missing app/reload prerequisites are visible.",
+      "identity": "sha256:53c1310be48095ec6dd946bfd062a02b6f9b7681e8a2d37fd767d6d5424843e6",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "claude-events-context",
+      "criterion": "Emit actual measured units with stable source/order/redaction, durable ACK/cursor/replay and exact Project/exploration/session binding; retrieve cited compiled Context at supported boundaries. Exclude internal Worker events from recursive extraction; expose coverage gaps.",
+      "identity": "sha256:1d6a397fadae3d50c8b12887082e477de90ecd5157c05ce85f5e280014c6a9ba",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "claude-plugin-conformance",
+      "criterion": "Real synthetic host smoke proves capture-to-query and disable/re-enable across restart/compaction. Duplicate/partial events and app failure preserve ordinary coding and current activation; no unapproved historical backfill or transcript export.",
+      "identity": "sha256:a364114d8e647394962a1bd044690efa5009efb9143964e732ed0683497b18b0",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Interactive Claude Code Collector and query/delivery bridge; consume measured host interfaces. Independently installable counterpart to Codex, sharing public Runtime protocol rather than root Skill implementation.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "首版插件同时支持 Codex 与 Claude Code",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-codex-claude-first.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "claude-events-context",
+          "identity": "sha256:1d6a397fadae3d50c8b12887082e477de90ecd5157c05ce85f5e280014c6a9ba",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "claude-plugin-conformance",
+          "identity": "sha256:a364114d8e647394962a1bd044690efa5009efb9143964e732ed0683497b18b0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "claude-plugin-path",
+          "identity": "sha256:53c1310be48095ec6dd946bfd062a02b6f9b7681e8a2d37fd767d6d5424843e6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b1b4c4167f60d3e311787162ad17780de99568b5ef1a12e5e7329ff1f9fadde6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Ship a Claude Code plugin integration for enabled-project capture and compiled context.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Observed Claude interfaces and coverage.",
+      "target_ticket_id": "ticket-runtime-claude-host-capability-probe-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Compiled context query/delivery API.",
+      "target_ticket_id": "ticket-runtime-session-delivery-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Shared branch/worktree event binding.",
+      "target_ticket_id": "ticket-runtime-local-git-worktree-sensor-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-claude-host-adapter-v0"
+}

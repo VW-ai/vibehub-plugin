@@ -1,0 +1,31 @@
+{
+  "context_id": "decision-runtime-provider-and-worker-settings",
+  "detail": "本地 App 让用户选择至少 OpenRouter、Vercel AI Gateway、TypeSafe 官方三种 API 路由并在本机输入 key。优先复用现有 SDK 和仓库 adapter，保留各模型/路由能力、版本、限流和输出语义差异，不能把选择 provider 等同于获得全部模型能力。工程约定：凭据由本机安全存储持有，项目/Git/context/log 只保存非秘密引用；更换或 fallback 路由必须在用户选择范围内。Codex/Claude 订阅 Worker 使用各自 CLI 正常登录，是另一类 executor 配置，不把 OAuth credential 当 API key 复制。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:50.325Z",
+    "quote": "起码有openrouter，vercel，和官方的typesafe的这个adapter",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "模型 API provider 与订阅 Worker 分开配置",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "decision"
+}

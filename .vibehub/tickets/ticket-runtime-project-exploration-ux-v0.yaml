@@ -34,9 +34,23 @@
       "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "local-app-entry",
+      "criterion": "Prototype local launch, provider/key versus Worker subscription setup, folder/Git-init/linked-worktree selection, Codex and Claude plugin status, per-Project enable/disable, auth/quota/failure and restart. Explain app authority and live-versus-gap coverage without secret display; GitHub and advanced desktop polish are optional.",
+      "identity": "sha256:499f253452f7c4c4410cae4be619e44e883cb428441329d530e4a2203a2a86c9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "execution-method-choice",
+      "criterion": "Ticket views explain goal, constraints, Context and acceptance while allowing native coding or optional development skills. VibeHub background maintenance requests and their bounded tool contracts are distinct from prescribing the developer workflow.",
+      "identity": "sha256:1c8bdd5440aba7e4179726a2225d79b91bcf48186de9e99e8f31ff84c6b0217d",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -57,10 +71,6 @@
     {
       "purpose": "Current local-first delivery sequence and retained later hosting scope.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
-    },
-    {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
     },
     {
       "purpose": "Project is the top-level awareness view.",
@@ -85,6 +95,22 @@
     {
       "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Ticket 规定任务与验收，不规定开发方法",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-execution-neutral.yaml"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
     }
   ],
   "contract_revisions": [
@@ -139,6 +165,47 @@
       ],
       "identity": "sha256:27b543cd55481f5614448f34ddf427eb5051e4d1e0974c3c6581666efa0daf06",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "awareness-and-action",
+          "identity": "sha256:1287b1fb015369ed7e0aaa6a85f9db458c02868c228f67894f56fc6153ee3c9e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-lifecycle-meaning",
+          "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "execution-method-choice",
+          "identity": "sha256:1c8bdd5440aba7e4179726a2225d79b91bcf48186de9e99e8f31ff84c6b0217d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-app-entry",
+          "identity": "sha256:499f253452f7c4c4410cae4be619e44e883cb428441329d530e4a2203a2a86c9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "project-and-lineage",
+          "identity": "sha256:33e4ca2fa66eabca50ca95685d5f02b762e268a40c4c9f825bfc286f779199f3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ux-handoff",
+          "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workspace-ticket-management",
+          "identity": "sha256:34bc4611bbe29acb64edcf6db7687fe3167e50be716c0325d7f20a0309678b9e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:52a3ac3d9a340a9ad10c7be51c514c82a66e123581e976201b9f1e5f3186ab07",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -148,6 +215,7 @@
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [],

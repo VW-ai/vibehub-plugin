@@ -1,0 +1,35 @@
+{
+  "context_id": "decision-runtime-local-subscription-workers",
+  "detail": "用户选择复用本机 Codex 或 Claude 订阅执行器进行抽取、综合和其他 VibeHub 重任务；支持两种 executor，单个用户不必同时拥有两个订阅。当前交互开发 Agent 继续实际开发；服务按 policy 生成有边界的任务，Worker 返回有来源的结构化候选，由服务校验，不能自封 canonical 或独立验收。工程约定：复用官方登录流程，显式呈现未登录/失效/额度耗尽/取消状态，限制并发、预算、权限、输入和重试；不静默改走付费 API。Worker 在本机运行不意味着模型推理离线，发送内容仍受已选模型/项目范围约束。无需在云端放 Worker，亦不强制用户手动唤醒 skill。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-runtime-agent-work-request-tool-return",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:52.266Z",
+    "quote": "复用用户subscription的worker，比如说claude -p, codex server exec",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "本机订阅 Worker 承担 VibeHub 的重推理任务",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "decision"
+}

@@ -43,9 +43,16 @@
       "identity": "sha256:d74bfa19a2ded79fca0042e9edb5f7802e7fc5e943cafa437a50a4b9e5f8b3f7",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "project-plugin-gate",
+      "criterion": "Provide a Codex install/update/disable path with status visible to the local app. Enforce authoritative Project activation across all enrolled worktrees, fail inactive when uncertain, exclude Worker-origin events and demonstrate disable/re-enable without affecting unrelated projects or native coding.",
+      "identity": "sha256:7d12ec7ef74294f83b34979d6ad7546f4e5f7a6110106c78eb8e711ae421d7e1",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -68,12 +75,20 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Collect only demonstrated units.",
       "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-collector-reuse-and-coverage.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "首版插件同时支持 Codex 与 Claude Code",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-codex-claude-first.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
     }
   ],
   "contract_revisions": [
@@ -118,6 +133,32 @@
       ],
       "identity": "sha256:114575b7e9f068505c5b78a058f5e2f3d811c481fc298997efc4abaf40b70b3a",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-sensor",
+          "identity": "sha256:d74bfa19a2ded79fca0042e9edb5f7802e7fc5e943cafa437a50a4b9e5f8b3f7",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "host-capabilities",
+          "identity": "sha256:49a4a3ecd380b647deed9345dfb5c5dfb481b9fd2c41d685865827339ccf923d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "host-query-degrade",
+          "identity": "sha256:eb3e17ebe6a7bc00cbae7032dcfcfdb9c90f92e2cf66f16f9ec488d2b327a2d0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "project-plugin-gate",
+          "identity": "sha256:7d12ec7ef74294f83b34979d6ad7546f4e5f7a6110106c78eb8e711ae421d7e1",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:deaf280ed8d82fc2fa2e839c653b3d1c9f8ce8ea668422d0b01259e43e92ef58",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -128,6 +169,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [

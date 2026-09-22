@@ -12,7 +12,7 @@
       "criterion": "Version and execute the extraction bundle through the accepted local Agent bridge; submit through typed Graph commands with input/base pins and idempotency. Preserve multiple claims from one event and abstain on ambiguous/truncated/unavailable inputs.",
       "identity": "sha256:687a60cf399bf48e67ce1de20261e7a9abdd64529a5421d1148c5686de002b96",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "extraction-evaluation",
@@ -20,9 +20,16 @@
       "identity": "sha256:c6d60d811c532ff1fd5048ef873820cd4c003a1234e1885f43cb795d9a0bae00",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "extraction-integration",
+      "criterion": "Version and execute the extraction bundle through the accepted local subscription Worker runner with a verified executor; an interactive coding Agent is not required for background maintenance. Submit through typed Graph commands with input/base pins and idempotency. Preserve multiple claims and abstain on ambiguous/truncated/unavailable input; prevent Worker-origin feedback loops.",
+      "identity": "sha256:2243b99d016174ecda59eb01ed7cc5ccbbcebf8201293ffd38a2a7adca71dce4",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -31,7 +38,7 @@
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
     "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
   ],
-  "context": "Local stage L2. Own extraction schema, trusted instruction bundle, runtime invocation and candidate validation. Use the current local Agent work-request bridge for synthesis when needed; bounded JEV decisions may route but are not presumed to generate semantic entities.",
+  "context": "Local stage L2. Own typed extraction schema, trusted bundle and evaluation. Background synthesis uses the local Worker protocol; the selected Codex executor supplies the first verified implementation baseline and the Claude executor later proves interchangeable selection. Bounded JEV decisions route work but are not presumed to generate entities.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -46,12 +53,16 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Extraction belongs in the service workflow.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-internal-capabilities-and-host-bridge.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "本机订阅 Worker 承担 VibeHub 的重推理任务",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
     }
   ],
   "contract_revisions": [
@@ -75,6 +86,27 @@
       ],
       "identity": "sha256:4e16ceb6d910592da6aa818ae071be6eb9be9bb7e9defab482ffdefd46f8a08a",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "extraction-evaluation",
+          "identity": "sha256:c6d60d811c532ff1fd5048ef873820cd4c003a1234e1885f43cb795d9a0bae00",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "extraction-integration",
+          "identity": "sha256:2243b99d016174ecda59eb01ed7cc5ccbbcebf8201293ffd38a2a7adca71dce4",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "typed-extraction",
+          "identity": "sha256:b1ccc962d4e0d293df3de97264c018829e71ed8dd31c975d2263f3c9c5cd91b3",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:94458a1c8104c444c3f7641340a4365b9027e9bc1f8af4e11c6cc8ce783a8f33",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -83,17 +115,18 @@
   "outcome": "Extract typed semantic candidates from selected real event units with exact supporting sources.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Actual synthesis task delivery and validated return path.",
-      "target_ticket_id": "ticket-runtime-agent-work-request-bridge-v0",
+      "rationale": "Durably accepted, exact source event units.",
+      "target_ticket_id": "ticket-runtime-durable-ingress-v0",
       "type": "depends_on"
     },
     {
-      "rationale": "Durably accepted, exact source event units.",
-      "target_ticket_id": "ticket-runtime-durable-ingress-v0",
+      "rationale": "First concrete local synthesis executor, used to verify the provider-neutral bundle.",
+      "target_ticket_id": "ticket-runtime-local-codex-executor-v0",
       "type": "depends_on"
     }
   ],

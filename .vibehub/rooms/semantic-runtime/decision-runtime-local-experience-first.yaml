@@ -28,7 +28,7 @@
     "quote": "我们本地可能能够把这个 app 给起来，那也不错了。",
     "ref": "conversation:2026-09-21-runtime-local-collector-agent-boundaries"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "先验证本地完整体验，云端和独立常驻 Worker 不再是近期闭环前提",
   "tags": [
     "semantic-runtime",

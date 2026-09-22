@@ -1,0 +1,35 @@
+{
+  "context_id": "contract-runtime-git-project-enrollment",
+  "detail": "第一版本地 App 以用户选定文件夹作为项目入口；若不是 Git 仓库，提供保留已有文件的明确 Git 初始化步骤。GitHub 远端、初始提交、push 不是本地开始的必要条件。实现需依据 Git common directory/仓库身份及登记的 worktree 识别同一仓库在目录外的执行区；branch ref、工作目录、checkout incarnation 与 Session 不是同一个身份。无 checkout 的 branch 不能伪装成活跃 worktree。同 remote 的独立 clone 不自动合并为一个项目，精确绑定规则由 scope 契约定义。此入口限制不撤销底层 Project 可关联多 Repo 的架构。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-branch-exploration-scope",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-is-semantic-scope-repository-is-source",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:48.303Z",
+    "quote": "我们需要感知到同一个项目的所以branch/worktree哈",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "选择 Git 文件夹后识别同仓库的 branch 与所有登记 worktree",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "contract"
+}

@@ -42,10 +42,17 @@
       "criterion": "Map signals to exploration-scoped assertions/relations and IGNORE/INGEST/DEFER/ESCALATE intents. When synthesis is needed, offer a versioned tool-bearing work request through the local bridge or leave pending; a missing separate Worker never authorizes fabricated results. Preserve multiple targets, sources and protected authority.",
       "identity": "sha256:a310db8d88618053cd6b99e09a7b4d472e9e975fee805da1d25fcdb5ab54722c",
       "revision": 2,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "ingress-policy-effects",
+      "criterion": "Map signals to exploration-scoped assertions/relations and IGNORE/INGEST/DEFER/ESCALATE intents. When synthesis is needed, compose the local runner-owned WorkerNode dispatch/result-continuation adapter, supplying the pinned tool-bearing bundle/schema and yielding without waiting. Consume its new pinned-policy continuation after guarded proposal validation; do not implement a second scheduler or result gateway here. Missing auth/quota/capability or disabled Project remains pending/deferred/cancelled, not invented success. Preserve multiple targets, sources and protected authority; no interactive developer Session is required for background maintenance.",
+      "identity": "sha256:1ac92c0beb0c7f1dcdb675a6eb9a07383215ea59cf92bd92c5ae100bf3b285a1",
+      "revision": 3,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -53,7 +60,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Local stage L2. Compose durable policy, extraction, resolution and existing fast signals into candidate updates. ESCALATE may offer a structured task to the current Agent or remain visibly pending; an independent persistent Worker is optional. No global canonical update from a fast signal.",
+  "context": "Local stage L2. Compose durable policy, extraction, resolution and existing fast signals. Heavy synthesis uses the local subscription Worker path; interactive Agent requests are an additional optional route. No global canonical update from a fast signal.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -68,8 +75,12 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+      "purpose": "Background heavy work through local subscription executors.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Background heavy work through local subscription executors.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
     }
   ],
   "contract_revisions": [
@@ -114,6 +125,27 @@
       ],
       "identity": "sha256:152ca792919b85cff64c6057f64584d9090780caa9005d5b6135a8de5f3efbe4",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ingress-policy-behavior",
+          "identity": "sha256:ef48cbc36095a54e4c229c9f653fa93bf8b0e8bda83de560c1bde5e1c357e4d0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ingress-policy-composition",
+          "identity": "sha256:e6a2d88fb1ca3ab4470cb334db3b11d2a03ee12cf6734516a86b2a68d6ecf7bf",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ingress-policy-effects",
+          "identity": "sha256:1ac92c0beb0c7f1dcdb675a6eb9a07383215ea59cf92bd92c5ae100bf3b285a1",
+          "revision": 3
+        }
+      ],
+      "identity": "sha256:facf6cb5f62d4758897e636ac2c9692542f93efc347f476e03f465f0097c470f",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -124,6 +156,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [

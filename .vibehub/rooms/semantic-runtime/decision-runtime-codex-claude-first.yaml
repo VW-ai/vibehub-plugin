@@ -1,0 +1,31 @@
+{
+  "context_id": "decision-runtime-codex-claude-first",
+  "detail": "用户指定首批集成为 Codex 和 Claude Code，其他 coding harness 后续适配。用户在原宿主中照常开发；插件负责被启用项目的事件接入、工具/API、context 查询/送达，具体 hooks、message 单元和可注入时点需分别实测。安装成功、能调用 MCP 或 stop hook 均不等同于覆盖每个 message。宿主集成与后台 Worker 进程是不同角色，必须防止 Worker 自己生成的消息被重复当用户开发事件采集并自触发。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-runtime-collector-reuse-and-coverage",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:51.297Z",
+    "quote": "直接plugin到codex，claude code里面去",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "首版插件同时支持 Codex 与 Claude Code",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "decision"
+}

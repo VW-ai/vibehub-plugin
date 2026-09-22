@@ -1,0 +1,100 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "claude-capture",
+      "criterion": "Pin observed Claude Code version and plugin/hooks/MCP/transcript interfaces; exercise synthetic user/assistant/tool units across session end/resume/compaction and record timing, stable identity and unsupported gaps. Never infer every-message capture from usage counts.",
+      "identity": "sha256:483a9c1ecc931b813716e251202627f795990d8640761e010c4d62a99eab2e56",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "claude-delivery",
+      "criterion": "Verify supported tool registration, query/context return and next-turn delivery/acknowledgement using synthetic payloads; document reload/install requirements and unavailable live callbacks. Host truth and generated fixtures must be distinguished.",
+      "identity": "sha256:a9ed58f2c7938b89578493997e499b8c751009cf01f0cb5ae9bb59bbcb268faa",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "claude-scope",
+      "criterion": "Demonstrate project-scoped integration admission and how Worker-origin events are excluded from user-session collection; research maintained mechanisms/license and record failure recovery limits. No credentials/private traces are inspected.",
+      "identity": "sha256:231aaa7221e7d903ecce2db73c7678cb991df48f98ad7f1fc33663a2e4499480",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Claude Code counterpart to the Codex capability probe. Research plus bounded synthetic host fixture; no broad recorder installation. This is interactive-host coverage, separate from a -p Worker.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "首版插件同时支持 Codex 与 Claude Code",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-codex-claude-first.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "claude-capture",
+          "identity": "sha256:483a9c1ecc931b813716e251202627f795990d8640761e010c4d62a99eab2e56",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "claude-delivery",
+          "identity": "sha256:a9ed58f2c7938b89578493997e499b8c751009cf01f0cb5ae9bb59bbcb268faa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "claude-scope",
+          "identity": "sha256:231aaa7221e7d903ecce2db73c7678cb991df48f98ad7f1fc33663a2e4499480",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6ca1dbaf59681c4af79f1320971c370698f202ec5f0682d431c6a9097b8d3d4b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Measure Claude Code capture and context-delivery surfaces with a reproducible synthetic probe.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-claude-host-capability-probe-v0"
+}

@@ -46,9 +46,16 @@
       "identity": "sha256:d2f990697240ed107f2b88b9e05811072150656787a357dc178f50f39d0d2d2c",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "enrolled-project-sensor",
+      "criterion": "Consume the enrolled common-repository/worktree registry and current activation generation; observe enabled linked worktrees even outside selected folder. Branch-only refs are not live execution locations. Stop on disable/revocation and record gaps; fresh membership does not backfill arbitrary history.",
+      "identity": "sha256:b756b33bd5becb50c662784a8bea6fe648fdf602173dae1f4bd21a9f5e299571",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -71,8 +78,16 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "选择 Git 文件夹后识别同仓库的 branch 与所有登记 worktree",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-git-project-enrollment.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
     }
   ],
   "contract_revisions": [
@@ -127,6 +142,37 @@
       ],
       "identity": "sha256:e908de846f4a40d73ff936c487772383e1317cfbc07d6b82be84b24e7783502a",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "bounded-diff-capture",
+          "identity": "sha256:ec3224be1fb52b1d81b1107233e09cbed4ddea3eeca92a8a2eb11fc4e010a24d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "duplicate-and-race-fixtures",
+          "identity": "sha256:bc4c8e7417a64ac63c10b0ad4a6bae558fb71e5a0defc303dc939ff5de09584f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "enrolled-project-sensor",
+          "identity": "sha256:b756b33bd5becb50c662784a8bea6fe648fdf602173dae1f4bd21a9f5e299571",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "offline-nonblocking",
+          "identity": "sha256:7f3b5357102610ced085ce0521c507f84803f3070ddb6f6679120d132b6982b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "worktree-state-model",
+          "identity": "sha256:d2f990697240ed107f2b88b9e05811072150656787a357dc178f50f39d0d2d2c",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:c0aaa0d764f4b595905aeaa0eb258628b55bbca6f72470a1db93a8fea36dc123",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -137,6 +183,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
@@ -148,6 +195,11 @@
     {
       "rationale": "Observed ref/worktree changes map to explicit exploration identity.",
       "target_ticket_id": "ticket-runtime-branch-scope-contract-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Enrolled membership and authoritative capture admission.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
       "type": "depends_on"
     }
   ],

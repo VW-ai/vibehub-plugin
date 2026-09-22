@@ -1,0 +1,107 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "selected-folder",
+      "criterion": "Normalize an explicitly selected folder, detect its repository/common directory and linked worktrees via Git, including worktrees outside it. Dedupe main/linked selections; branches without checkouts remain refs. Do not scan unrelated home folders or conflate clones by remote URL.",
+      "identity": "sha256:fd6272325e6938ae327a223ca40f6965755051808b15f034170ab16dbab89f2c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "git-init-onboarding",
+      "criterion": "For non-Git input expose an explicit initialize action that preserves files, handles unborn HEAD/errors and does not create remote, initial commit or push. Persist project/repo/worktree bindings independently of path/ref rename and retain prior provenance.",
+      "identity": "sha256:2597f241f6f43c51470f6bf93cdd92b05d04763726a0bc6ae6a46c742ac6caf0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "enrollment-conformance",
+      "criterion": "Temporary Git fixtures cover external sibling worktrees, branch checkout, detached/unborn HEAD, spaces/symlinks, deletion/prune/recreate, independent clones and restart. Reconcile new/removed worktrees without rewriting old events; core multi-repo mapping remains supported.",
+      "identity": "sha256:e61aafdaeeaaaea0182d06d9ed97e2f55d2a463d5b1c0399300f4d0742cb93c4",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Own local project enrollment API and durable bindings, not file watcher/diff ingestion or UI. Refine exact identity/store calls after prerequisites.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "选择 Git 文件夹后识别同仓库的 branch 与所有登记 worktree",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-git-project-enrollment.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "enrollment-conformance",
+          "identity": "sha256:e61aafdaeeaaaea0182d06d9ed97e2f55d2a463d5b1c0399300f4d0742cb93c4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "git-init-onboarding",
+          "identity": "sha256:2597f241f6f43c51470f6bf93cdd92b05d04763726a0bc6ae6a46c742ac6caf0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selected-folder",
+          "identity": "sha256:fd6272325e6938ae327a223ca40f6965755051808b15f034170ab16dbab89f2c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:75f269d5baea918998a42b4ea6907994588724ca40c9e53c01d8444747522963",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Register a selected Git folder and discover linked worktrees and branch identities.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Stable repository/exploration/execution identities.",
+      "target_ticket_id": "ticket-runtime-branch-scope-contract-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Durable local registry and migration API.",
+      "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-git-project-enrollment-v0"
+}

@@ -36,9 +36,16 @@
       "identity": "sha256:67dfc638ce48516ea50e5a846db6c772209380b7be4190bb4959f147b89f1eee",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "activation-delivery",
+      "criterion": "Recheck current Project activation immediately before context injection or executable request dispatch, including replay/reconnect and cached notifications. Disable cancels unsent delivery, marks in-flight acknowledgements without reopening work and preserves history. Re-enable follows explicit gap/backlog policy; one Project switch does not affect others.",
+      "identity": "sha256:517128bb286a824f858a64e7fad670d5a7fc44a4c779dde2300c0176e3e0c8a1",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -61,12 +68,20 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Multiple Sessions and worktrees per Ticket.",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-exploration-participation.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
     }
   ],
   "contract_revisions": [
@@ -111,6 +126,32 @@
       ],
       "identity": "sha256:22eea04f7c769c8eca0a5e8c5eeca043e74ec862a2f86f2d68bf013a04c1e21a",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activation-delivery",
+          "identity": "sha256:517128bb286a824f858a64e7fad670d5a7fc44a4c779dde2300c0176e3e0c8a1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-policy",
+          "identity": "sha256:62cd380a583a83f21fa5450f0944b413cbd19f7ec54de3607612dabc144d02c7",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-recovery",
+          "identity": "sha256:6fa67c96d803a4a8bcc55711678de7146245b559e3cdc077f990c5e6ae8aae3a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "session-contract",
+          "identity": "sha256:67dfc638ce48516ea50e5a846db6c772209380b7be4190bb4959f147b89f1eee",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:fa67b4029903ca9874a17da7dff4c24150e0d8f1cee6f084aee03d72d341cacf",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -121,6 +162,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [

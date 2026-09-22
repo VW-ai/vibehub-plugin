@@ -110,9 +110,16 @@
       "identity": "sha256:85c3f24b8af6489da2bb7815f0b4b8a2dc2d658c853bcc52869a54eaf7475d2e",
       "revision": 3,
       "state": "active"
+    },
+    {
+      "acceptance_id": "local-app-composition",
+      "criterion": "Compose the delivered local app onboarding shell with actual Project/exploration/Room APIs: select enabled Project, inspect all linked branch/worktree contexts, Ticket origin/participation/completion and Worker processing status. Preserve goal/constraint/acceptance-focused Tickets with optional development skills, and show disabled/stale state without deleting history.",
+      "identity": "sha256:f42d8be942cf5df04c1760170c672b5e76194f81438ff052c2e54105eb2e96dc",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 4,
+  "active_contract_revision": 5,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -135,10 +142,6 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Permission to redesign within component boundaries.",
       "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-client-redesign.yaml"
     },
@@ -153,6 +156,14 @@
     {
       "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Ticket 规定任务与验收，不规定开发方法",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-execution-neutral.yaml"
     }
   ],
   "contract_revisions": [
@@ -249,6 +260,37 @@
       ],
       "identity": "sha256:35d8c6009e4e089dc164e9abc2563e9e53b8251c9f36164dd54411fd991f4ff0",
       "revision": 4
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explorer-addressable-views",
+          "identity": "sha256:f3d2ba187075eb73f211eb9bdcc89bf5c1570d79ba86b77f7cdb78d29053cdbb",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "explorer-causal-inspection",
+          "identity": "sha256:85c3f24b8af6489da2bb7815f0b4b8a2dc2d658c853bcc52869a54eaf7475d2e",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "explorer-feedback-and-delivery",
+          "identity": "sha256:4ef48ca86c4675ea3813370405d11541caf1f1917cb9daa271de9d98e5682384",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "local-app-composition",
+          "identity": "sha256:f42d8be942cf5df04c1760170c672b5e76194f81438ff052c2e54105eb2e96dc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workspace-ticket-lifecycle",
+          "identity": "sha256:105d04b0a4b46895e48959a09f391f9c2a1dda9d4cfd54e70ba4847e435fb8e0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a6c42a84b9eb2d5a549712d3a740d1075b71999bb041776ad007be51141f5c41",
+      "revision": 5
     }
   ],
   "deliveries": [],
@@ -261,6 +303,7 @@
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
@@ -277,6 +320,11 @@
     {
       "rationale": "Reviewable information architecture and interaction contract.",
       "target_ticket_id": "ticket-runtime-project-exploration-ux-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual locally launched app, configuration and activation UI.",
+      "target_ticket_id": "ticket-runtime-local-app-onboarding-v0",
       "type": "depends_on"
     }
   ],

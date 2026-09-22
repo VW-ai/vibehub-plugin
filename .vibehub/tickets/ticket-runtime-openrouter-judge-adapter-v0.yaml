@@ -1,0 +1,100 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "openrouter-contract",
+      "criterion": "Implement explicit OpenRouter evaluation routing using the maintained provider, preserving schema/output validation, question/result identity, probability/score semantics, uncertainty and provider metadata. Verify compatibility with the installed AI SDK version and pin it; never silently resolve through the default Gateway.",
+      "identity": "sha256:f5026a0da04d3623012be1ab9ded0dd7700f235ca38650cf24217f056c07ac4e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "openrouter-failures",
+      "criterion": "Recorded transport fixtures prove malformed result, unsupported question/model, timeout, cancellation, rate limit and bounded retry behavior. Reuse existing Vercel/TypeSafe tests without rewriting prior benchmark results.",
+      "identity": "sha256:bd3b79417f41b0351f552e7b84cbb6be988af722cc7d6ddbbb41dcc56ae78a50",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "openrouter-live-boundary",
+      "criterion": "Publish a synthetic local smoke command that obtains the selected key only inside the process and reports non-secret result/latency. Record run or not-run honestly; fixture conformance does not claim live success. Local app integration must run a synthetic request before advertising this route as verified.",
+      "identity": "sha256:7174e04143a31a5462ec61d3640597eb4da33544f8d3838c1e2874c542edd15c",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Reuse existing SemanticJudge and provider conformance fixtures; own OpenRouter Decisions mapping only. Pin compatible package/API versions and document alpha limitations. User settings wiring belongs to Judge integration.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "Current SDK dependency boundary.",
+      "ref": "semantic-runtime/package.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "openrouter-contract",
+          "identity": "sha256:f5026a0da04d3623012be1ab9ded0dd7700f235ca38650cf24217f056c07ac4e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "openrouter-failures",
+          "identity": "sha256:bd3b79417f41b0351f552e7b84cbb6be988af722cc7d6ddbbb41dcc56ae78a50",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "openrouter-live-boundary",
+          "identity": "sha256:7174e04143a31a5462ec61d3640597eb4da33544f8d3838c1e2874c542edd15c",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fae35f6376493f47cc69c4df7ba66d8206e78ce5a2d3a77c72f0fa2951d9ce87",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Add an OpenRouter SemanticJudge adapter using the maintained AI SDK provider.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0"
+}

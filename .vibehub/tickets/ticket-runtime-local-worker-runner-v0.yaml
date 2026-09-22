@@ -1,0 +1,153 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "local-job-contract",
+      "criterion": "Map actionable request and existing Worker protocol identities explicitly; persist bounded job/attempt/input/bundle/schema/Project/exploration/base pins, current source access and activation generation. Expose executor admission/claim/result/receipt via local authenticated interfaces without depending on an interactive coding Session.",
+      "identity": "sha256:35fcd82e655e40103528ef60a1686673ee0fc47de0e211936a80a808604a20eb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-job-controls",
+      "criterion": "Enforce concurrency, deadline, retry/queue budget, permission/tool/source ceilings, cancellation and pause for missing login/quota. Inputs are selected refs/fragments and explicit filesystem grants, not arbitrary host access. No silent paid-API or remote-executor fallback.",
+      "identity": "sha256:9ea5e99b1a0fbfdf069be2f24ccaafd56872c317bf9735532a04921d7d898403",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-result-admission",
+      "criterion": "Accept only schema-valid cited candidate results with current access/base/activation checks; duplicates have one receipt, stale/late/revoked output cannot mutate Graph. Worker cannot independently accept its own Ticket or write canonical state. Use existing guarded Graph commands and continuation semantics.",
+      "identity": "sha256:3a29d7209011a7a366d6cd5efc6e4428b1c4055d3ddea91659454f78ad2274fd",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "local-runner-recovery",
+      "criterion": "Real-store/fake-executor fault tests prove crash before/after claim/result/ACK, restart, duplicate execution, disable/cancel race, bounded backlog, unavailable inputs and unknown executor. Mark internal Worker origin so capture cannot trigger recursive jobs; native coding stays usable.",
+      "identity": "sha256:b780ef64f688787b59cdb988040c19236d59193c513987493e324ee66715ad70",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "policy-worker-integration",
+      "criterion": "Implement the local WorkerNode dispatch and result-continuation adapter against the durable Policy journal: extend/register the bounded kernel handler so a supported WorkerNode atomically enqueues one pinned local job/outbox effect and yields without waiting. After guarded result admission, append a new explicit input and pinned-policy run/snapshot, never mutate the old run. Prove dispatch/restart/double-result/cancel/disable races using the real journal; the current non-model kernel alone does not provide this behavior. This adapter requires no remote BYO enrollment or old remote scheduler/result service.",
+      "identity": "sha256:4099e45d9a8d94f590a59541285cbb3aea7084f754f64ac2e11df2e4490cc97a",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Local transport/composition of existing Worker protocol and actionable WorkRequest contracts, not a second lifecycle or cloud BYO service. Own queue/admission/attempt/cancel/result persistence with fake executors; concrete CLI execution is separate.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "本机订阅 Worker 承担 VibeHub 的重推理任务",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Ticket 规定任务与验收，不规定开发方法",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-execution-neutral.yaml"
+    },
+    {
+      "purpose": "Completed reusable job protocol, not a new lifecycle.",
+      "ref": ".vibehub/tickets/ticket-runtime-worker-job-protocol.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "local-job-contract",
+          "identity": "sha256:35fcd82e655e40103528ef60a1686673ee0fc47de0e211936a80a808604a20eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-job-controls",
+          "identity": "sha256:9ea5e99b1a0fbfdf069be2f24ccaafd56872c317bf9735532a04921d7d898403",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-result-admission",
+          "identity": "sha256:3a29d7209011a7a366d6cd5efc6e4428b1c4055d3ddea91659454f78ad2274fd",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "local-runner-recovery",
+          "identity": "sha256:b780ef64f688787b59cdb988040c19236d59193c513987493e324ee66715ad70",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "policy-worker-integration",
+          "identity": "sha256:4099e45d9a8d94f590a59541285cbb3aea7084f754f64ac2e11df2e4490cc97a",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:93c7d6fdd5a991c47ff4404989debbdb397b1f78f7b65ea8ea918888eb650bbc",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Provide a durable local job runner with bounded inputs and validated proposal returns.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Actionable tool/schema/result contract mapped onto existing job protocol.",
+      "target_ticket_id": "ticket-runtime-agent-work-request-contract-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Persistent scoped candidate commands and source/base checks.",
+      "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Authoritative project admission and disable fence.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual durable Policy dispatch/journal and continuation APIs to wire the local WorkerNode handler.",
+      "target_ticket_id": "ticket-runtime-policy-journal-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-worker-runner-v0"
+}

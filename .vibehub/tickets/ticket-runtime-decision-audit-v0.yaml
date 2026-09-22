@@ -45,17 +45,31 @@
       "criterion": "Trace accepted Event, exploration/source, PolicyRun/artifact/node, authorized input hashes, Graph writes, judge route, local work request/attempt/result/receipt, QueryRun/ContextPackage, awareness and explicit adoption. Reserve typed links for optional future Worker continuations without requiring an unavailable Worker.",
       "identity": "sha256:914db4bacf7a2272d78ee5ab421ddc46483bb4f21d8eb3ad1dc1d2d013b22dc9",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "audit-survives-incomplete-work",
       "criterion": "Crash-resumed policy runs, dormant Agent requests, stale/invalid results, cancelled queries, rejected adoption/promotion, tombstones and pruned payloads remain explicitly explainable without inventing successful downstream completion.",
       "identity": "sha256:eb16d224e5145f2959719f8b899c1472458c5a399d30c450aff9f243d00ae689",
       "revision": 2,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "audit-links-complete-causal-trace",
+      "criterion": "Trace accepted Event, exploration/source, Project activation generation, PolicyRun/artifact/node, authorized input hashes, Graph writes, Judge route and local subscription Worker job/attempt/result/receipt, QueryRun/ContextPackage, awareness and explicit adoption. Interactive Agent requests use the same trace links when selected; remote Worker transport remains a later extension.",
+      "identity": "sha256:25e45992513314e75c87aff708993d2d6cba75385b0f0cc31ac5bb65ce6845f1",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "audit-survives-incomplete-work",
+      "criterion": "Crash-resumed policy runs, interrupted local Workers, auth/quota deferrals, activation cancellation, stale/invalid results, cancelled queries, rejected adoption/promotion, tombstones and pruned payloads remain explicitly explainable without inventing successful completion.",
+      "identity": "sha256:ce49d406165f99aa3868e1bc242ee08e82e998e8f0e7a08528653b1432706a58",
+      "revision": 3,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -63,7 +77,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Local stage L3. Trace the local Collector/policy/extraction/resolution/Agent-request/query/adoption/delivery path. Later independently scheduled Worker events extend the same schema; no live background Worker is required for local audit acceptance.",
+  "context": "Local stage L3. Trace actual local policy/Worker/extraction/query/adoption paths. Reuse typed request/job correlation for interactive Agent requests if enabled; no mandatory interactive bridge or cloud executor.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -78,8 +92,16 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
     }
   ],
   "contract_revisions": [
@@ -134,6 +156,32 @@
       ],
       "identity": "sha256:387fe96b805f2ad8878c50d963b86a64f79e1922a5136eeb15aeaec1525b0770",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "audit-api-explains-operational-outcomes",
+          "identity": "sha256:120271d3fc4ce1fe6ddc214cb550417ad9362179851f133c2d3b2b09b04d6c73",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audit-is-safe-and-immutable",
+          "identity": "sha256:ff03c9d9446479bb59dc4aec1f6c18de0bd680037643e17f546cbb01827cd241",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "audit-links-complete-causal-trace",
+          "identity": "sha256:25e45992513314e75c87aff708993d2d6cba75385b0f0cc31ac5bb65ce6845f1",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "audit-survives-incomplete-work",
+          "identity": "sha256:ce49d406165f99aa3868e1bc242ee08e82e998e8f0e7a08528653b1432706a58",
+          "revision": 3
+        }
+      ],
+      "identity": "sha256:ce1783b5267d1540a4b182da6a0a4ee5315c9b4e21c50d4b963a5e7b975097ed",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -144,17 +192,13 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
     {
       "rationale": "Persisted execution and action trace.",
       "target_ticket_id": "ticket-runtime-policy-journal-v0",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "Actual request/result/receipt events.",
-      "target_ticket_id": "ticket-runtime-agent-work-request-bridge-v0",
       "type": "depends_on"
     },
     {
@@ -170,6 +214,11 @@
     {
       "rationale": "Explicit canonical proposal/application outcomes.",
       "target_ticket_id": "ticket-runtime-canonical-git-bridge-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual durable local job/attempt/result events, replacing the previous mandatory interactive-Agent route.",
+      "target_ticket_id": "ticket-runtime-local-worker-runner-v0",
       "type": "depends_on"
     }
   ],

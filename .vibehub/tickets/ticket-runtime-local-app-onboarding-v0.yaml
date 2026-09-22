@@ -1,0 +1,144 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "app-startup",
+      "criterion": "A documented local app launch opens a usable interface and manages readiness/reconnect/stop without manual multi-terminal orchestration. Show dependency failures and existing-data preservation; local endpoint access is authenticated and browser requests cannot gain arbitrary filesystem access.",
+      "identity": "sha256:7466da2c4e57f2746f7fc14c542d3d60f69b8a23a7d1e17a8820b698c31dbdd2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "app-onboarding",
+      "criterion": "Select a folder (picker or explicit path with equivalent capability), inspect Git/init and linked-worktree membership, choose provider/model and enter key locally, connect Codex/Claude plugins, select either subscribed Worker, enable/disable Project. Use domain APIs and show actual configured/missing/verified states; do not require both subscriptions.",
+      "identity": "sha256:8de717c526cfa429de4c65e849749bd10cadd5401bc5d5f4952c549df2f54290",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "app-lifecycle-test",
+      "criterion": "Real local UI walkthrough covers initial setup, restart with remembered non-secret settings, key replace/remove, one disabled Project alongside an enabled Project, missing CLI/login/quota and new worktree. Disabling stops actual capture/model/delivery admission; synthetic fixtures alone cannot certify live adapters.",
+      "identity": "sha256:2eb5ef1c1b9bd635cd5c47d52891b224e6f9679dbb05de454082c4ddf18e0be2",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Own launch/stop/reconnect and real onboarding/settings UI. A simple local UI is sufficient; choose minimal shell from the profile rather than requiring native desktop polish. Domain/semantic explorer remains separate.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "选择 Git 文件夹后识别同仓库的 branch 与所有登记 worktree",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-git-project-enrollment.yaml"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "app-lifecycle-test",
+          "identity": "sha256:2eb5ef1c1b9bd635cd5c47d52891b224e6f9679dbb05de454082c4ddf18e0be2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "app-onboarding",
+          "identity": "sha256:8de717c526cfa429de4c65e849749bd10cadd5401bc5d5f4952c549df2f54290",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "app-startup",
+          "identity": "sha256:7466da2c4e57f2746f7fc14c542d3d60f69b8a23a7d1e17a8820b698c31dbdd2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:caaff7fb3bb7148ba7bf42b08975719e144f0449aabbf3e5fd669ed1d951438f",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Deliver a locally launched app shell for project, provider, plugin and Worker setup.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Runnable local process and storage lifecycle.",
+      "target_ticket_id": "ticket-runtime-local-service-profile-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Secure provider configuration operations.",
+      "target_ticket_id": "ticket-runtime-provider-settings-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Folder enrollment and authoritative switch.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Codex executor health/login and verified runtime path.",
+      "target_ticket_id": "ticket-runtime-local-codex-executor-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Claude executor health/login and verified runtime path.",
+      "target_ticket_id": "ticket-runtime-local-claude-executor-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual Codex plugin installation/status path.",
+      "target_ticket_id": "ticket-runtime-host-adapter-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual Claude plugin installation/status path.",
+      "target_ticket_id": "ticket-runtime-claude-host-adapter-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-app-onboarding-v0"
+}

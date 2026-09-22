@@ -1,0 +1,31 @@
+{
+  "context_id": "note-runtime-github-link-option",
+  "detail": "用户提出可以探索 GitHub 联动，尚未选择具体范围。可复用后续 connector 承载 remote/PR/commit 关联；选择本地文件夹、Git 初始化和启用 VibeHub 不要求 GitHub 登录，不自动创建远端或上传项目/Context。此条记录探索方向，不授权任何账户或 GitHub 配置变更。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-runtime-git-project-enrollment",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:54.235Z",
+    "quote": "我在想我们这里是不是可以有和github的联动",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "GitHub 联动可增强项目视图，仍是可选扩展",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "note"
+}

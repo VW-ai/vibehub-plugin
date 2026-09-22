@@ -1,0 +1,31 @@
+{
+  "context_id": "contract-runtime-project-activation",
+  "detail": "用户在 App 中为选定 Project 启用或停用 VibeHub；安装插件本身不等于启用所有项目，语义猜测“是否使用”不覆盖项目开关。开关覆盖已绑定同仓库 worktree，并能处理新登记 worktree；其他项目不受影响。工程约定待实现验证：停用阻止新采集、模型派发和 context 注入，取消或冻结未完成任务并隔离迟到结果；保留已存历史及原生 coding 能力。重新启用明确记录停用期间的空白，不自动补采/发送这段原始会话；恢复积压需明确范围。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:49.316Z",
+    "quote": "激活后，我们可以选择在某个点停用vibehub， through app",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "App 中按 Project 显式启停 VibeHub",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "contract"
+}

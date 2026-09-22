@@ -1,4 +1,4 @@
-# Semantic Runtime: local experience and later online delivery
+# Semantic Runtime: local app and later online delivery
 
 Status: revised product direction and planned work, not implemented service behavior.
 Baseline: 2026-09-21, current implementation checkpoint f10a055.
@@ -9,10 +9,10 @@ The original [PRD](02_prd_vibehub_semantic_runtime.md) and
 [Tech Design](03_tech_design_semantic_runtime.md) remain unchanged proposed drafts.
 This plan preserves their Policy Graph, Semantic Working Graph, ingress, query,
 Context Compiler, source/canonical separation and selective reasoning architecture.
-It updates delivery order and the exploration/awareness product model from the
-owner's subsequent discussion. Durable decisions live in the shared Room:
+It updates delivery order and the local App, exploration/awareness and executor
+product model from the owner's subsequent discussion. Durable decisions live in the shared Room:
 
-- [Local useful loop before cloud or a persistent Worker](../../.vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml).
+- [Locally launched App with plugins and local subscription Workers](../../.vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml). The earlier local-first decision is retained as superseded history.
 - [Branch/exploration scope versus worktree execution identity](../../.vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml).
 - [Many Sessions per worktree and multiple attempts per Ticket](../../.vibehub/rooms/semantic-runtime/contract-runtime-ticket-exploration-participation.yaml).
 - [Project overview and Room/context lineage](../../.vibehub/rooms/semantic-runtime/decision-runtime-project-overview-and-room-lineage.yaml).
@@ -27,8 +27,9 @@ owner's subsequent discussion. Durable decisions live in the shared Room:
 The earlier online-first intent is retained as superseded history. Local work
 no longer waits for a cloud platform/cost decision. That decision remains required
 for its actual later hosted release. Tailscale, P2P replication, a cloud data
-service and a persistent independent reasoning Worker are not selected by this
-plan. Local processing may still call an authorized external model; local service
+service and a remote reasoning Worker are not selected by this plan. Local
+subscription Workers are part of the selected path. Local processing may still
+call an authorized external model; local service
 placement does not mean all inference or every data destination is local.
 
 ## Current readiness
@@ -48,21 +49,22 @@ Judge/Worker nodes; the old replay model route is a separate working path.
 Still missing: real Collector and durable service composition, typed extraction
 and entity resolution, production Graph persistence/enrollment, branch-aware
 views/adoption, integrated Judge runtime, query/compiler, actionable Agent
-request delivery, bidirectional awareness and the new local client. Address
-resolution is not semantic entity resolution. Same-entity concurrent assertions
+request delivery, bidirectional awareness, local app/provider settings, project
+activation, two plugins and local Worker orchestration. Address resolution is
+not semantic entity resolution. Same-entity concurrent assertions
 in the current one-lineage Graph are not branch-local hypotheses.
 
 ## Delivery sequence
 
 | Stage | User-visible or engineering outcome | Work |
 | --- | --- | --- |
-| L0 — close the important unknowns | Stable exploration contract, observed host coverage, runnable local profile, executable request contract, reviewable Project UX | The five new firm Tickets below can run independently. |
-| L1 — reliable local state | Authenticate local clients; durably accept events; version/migrate Graph state; isolate explorations; retain exact source and access history | Reuse existing auth/store/ingress/Graph/invalidation/Git Tickets plus branch projection. |
-| L2 — actual semantic write path | Current Agent can receive a tool-bearing request and return a cited proposal; extract typed claims, resolve entities and execute the concrete policy | Request bridge → extraction → resolution → ingress policy, with bounded Judge and durable policy journal. |
-| L3 — useful reads and awareness | Compile scoped Context, capture real host units, recover notices, expose A→B→A without implicit adoption | Existing query/compiler/API/session/host Tickets, new branch awareness, audit and telemetry. |
-| L4 — usable local client | Real local capture-to-context loop and Project/exploration/Room UI; multiple Sessions and one Ticket in two explorations | Existing service and collaboration-surface Tickets revised in place. |
+| L0 — close the important unknowns | Stable exploration contract, observed host coverage, runnable local profile, executable request contract, reviewable Project UX | Five existing firm foundations plus provider settings, OpenRouter adapter and the separate Claude host probe can run independently (eight L0 Tickets). |
+| L1 — reliable local state and project control | Enroll a Git folder and all linked worktrees, enforce Project activation, durably accept events and persist scoped Graph state | Auth/store/ingress/Graph plus Git enrollment, activation and branch projection. |
+| L2 — actual semantic write path | Local subscription Workers run bounded heavy jobs and return cited proposals; extract typed claims, resolve entities and execute policy | Local runner → Codex/Claude executors; extraction → resolution → ingress policy, with configured Judge routes and durable policy journal. Interactive Agent requests remain an additional delivery route. |
+| L3 — useful reads and awareness | Compile scoped Context, capture measured Codex and Claude units, recover notices, expose A→B→A without implicit adoption | Query/compiler/API/session, separate Codex/Claude plugins, awareness, audit and telemetry. |
+| L4 — usable local app | Launch, select folder, configure provider and Worker, enable Project, develop in either host, inspect Context/Tickets and disable | App onboarding shell plus service/client composition; real smoke for each supported API route, plugin and executor. |
 | L5 — measure value | Compare long tasks, handoff, repeated work, forgotten constraints and wrong cross-branch influence against current workflow | Existing downstream-value Ticket now depends on local integration and JudgeOps, not cloud launch. |
-| Later — deployment and expansion | Team network/data service, optional persistent Workers, hosted reliability and external connectors | Existing hosted/Worker/sync/release Tickets remain; refine only when their capability is selected. |
+| Later — deployment and expansion | Team network/data service, optional remote Workers, hosted reliability and external connectors | Existing hosted/Worker/sync/release Tickets remain; refine only when their capability is selected. |
 
 The first product checkpoint is bidirectional: A and B start from an explicit
 shared Project base, work independently in their explorations, and receive
@@ -71,25 +73,28 @@ explicitly adopt one result. Receiving/seeing a notice never changes governing
 context. Source versions, branch-local hypotheses and adoption lineage remain
 inspectable after restart and worktree deletion. Project overview is not main.
 
-A local Agent retains native filesystem, shell and testing capabilities. A
-ContextPackage assists ongoing work; an executable WorkRequest carries exact
+A local Agent retains native filesystem, shell and testing capabilities;
+Tickets specify outcomes and constraints rather than a mandatory development
+method. A ContextPackage assists ongoing work; an executable WorkRequest carries exact
 inputs, registered tools and schemas, permitted actions and result receipts.
-No active Agent or unsupported callback means pending/pull/next-turn delivery,
-not fabricated completion. Developer Evidence and independent reviewer Outcome
-remain distinct. Cloud Worker enrollment is not required to prove this loop.
+Background heavy jobs use the selected local subscription executor, independent
+of a live interactive Session. For an interactive work request, no active Agent
+or supported callback means pending/pull/next-turn delivery, not fabricated
+completion. Developer Evidence and independent reviewer Outcome remain distinct.
+Cloud Worker enrollment is not required to prove this loop.
 
 ## Newly separated Tickets
 
 | Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
 | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml) | firm | None |
-| [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) | firm | None — independently executable |
+| [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) | firm | None |
 | [local-service-profile-v0](../../.vibehub/tickets/ticket-runtime-local-service-profile-v0.yaml) | firm | None — independently executable |
 | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml) | firm | None — independently executable |
 | [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) | firm | None |
 | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [graph-store-v0](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml) |
 | [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) | draft | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
-| [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml) | draft | [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml); [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml) |
+| [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml) | draft | [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml); [local-codex-executor-v0](../../.vibehub/tickets/ticket-runtime-local-codex-executor-v0.yaml) |
 | [entity-resolution-v0](../../.vibehub/tickets/ticket-runtime-entity-resolution-v0.yaml) | draft | [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml); [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) |
 | [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml) | draft | [query-engine-v0](../../.vibehub/tickets/ticket-runtime-query-engine-v0.yaml); [session-delivery-v0](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml) |
 
@@ -123,11 +128,14 @@ remain distinct. Cloud Worker enrollment is not required to prove this loop.
 
 ## Retained hosted scope
 
-The existing platform selection, BYO enrollment, scheduler, cloud Codex adapter,
+The existing hosted platform selection, remote BYO enrollment/scheduler, cloud Codex adapter,
 Worker recovery, hosted release/restore/capacity and online launch Tickets remain
 as later capabilities. The release pipeline directly depends on the explicit
 hosted platform decision; local auth/store do not. The measured local spike is
 input to that decision, not a claim of deployment or production readiness.
+
+The new local runner reuses existing job/request protocols; the later remote
+transport must reuse its semantics rather than create another lifecycle.
 
 GitHub/connectors, full offline multi-device semantic synchronization, compaction,
 query/planning/canonicalization Workers and policy rollout remain independent
@@ -135,10 +143,11 @@ expansion work. No team hosting or Tailscale account changes are made here.
 
 ## Open details assigned to concrete work
 
-Branch/ref incarnation and alias enrollment, project-only/non-Git exploration,
+Branch/ref incarnation and explicit clone/project aliases,
 shared-base adoption behavior and Ticket attempt views are resolved by the scope
 contract and UX Tickets. Collector event granularity and real injection/pull
-capabilities are resolved by the host probe. Concrete local backend/start commands
+capabilities are resolved by the host probe. First-version App enrollment requires Git and offers explicit initialization;
+core project-only/multi-repo identities remain intact. Concrete local backend/start commands
 are resolved by local profile; no new human approval is inferred for routine
 engineering. Entity extraction/resolution thresholds are evaluated, not assumed.
 These are testable uncertainties, not reasons to call the prototype ready.
@@ -160,7 +169,7 @@ part of the scope contract and UX verification.
 | [Ticket workspace provenance](../../.vibehub/tickets/ticket-runtime-ticket-workspace-provenance-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) |
 | [Context lifecycle/lineage](../../.vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml) | draft | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
 
-The existing branch-scope contract supplies the identities; Project UX prototypes
+At the workspace-management checkpoint, the existing branch-scope contract supplied the identities; Project UX prototypes
 the management journeys; Query consumes Context applicability/lifecycle; semantic
 API exposes Ticket provenance and view preferences; the client composes those
 APIs. These five Tickets gain append-only acceptance revisions. Query now also
@@ -181,6 +190,61 @@ history, 14 resolved Context refs and authority guard. Validated batch SHA-256:
 `06b6b2a3245b0092cbf886dd5d23f4498c4093cd1d7bad4e8bbdf01202ee9402`.
 This is a plan update; workspace filters and lifecycle services are not yet built.
 
+## Local App goal follow-up
+
+The selected user journey is: launch local App → configure model API and local
+executor → choose a Git folder (or explicitly initialize it) → inspect linked
+worktrees → enable VibeHub for this Project → develop in Codex or Claude Code →
+inspect captured Context/Tickets and background work → disable when desired.
+A lightweight local UI is sufficient; native shell technology is not yet selected.
+
+The App owns activation; plugins obey it. Project disable stops new capture,
+model dispatch and injection and fences late results. It preserves historical
+records and normal coding. Re-enable exposes capture gaps and an explicit backlog
+choice; it does not silently import disabled-period conversations. Other Projects
+remain independent. GitHub is an optional later connector, not an onboarding gate.
+
+API provider credentials (OpenRouter, Vercel, TypeSafe) and CLI subscription login
+(Codex, Claude) are separate settings and billing paths. Each route has measured
+model capabilities and error behavior. The user chooses an executor; supporting
+two choices does not require buying both subscriptions. Local Worker execution
+still sends selected inputs to its model service. Worker events must not recurse
+into the user-session Collector.
+
+Tickets define outcomes, constraints, inputs and acceptance, not a required
+coding method. Optional development skills remain composable. Internal maintenance
+jobs still need precise input/tool/schema/result contracts, which do not dictate
+how a developer must solve the project's Ticket.
+
+[Primary interface research and local observations](local-app-integration-notes.md)
+identify reusable SDKs and the actual CLI surfaces. They are capability evidence,
+not successful live smoke tests. New Context records preserve the user's claims
+and distinguish engineering interpretation from already implemented behavior.
+
+| New bounded Ticket | Maturity | Responsibility |
+| --- | --- | --- |
+| [provider-settings-v0](../../.vibehub/tickets/ticket-runtime-provider-settings-v0.yaml) | firm | Explicit route/model configuration and local secure credential lifecycle. |
+| [openrouter-judge-adapter-v0](../../.vibehub/tickets/ticket-runtime-openrouter-judge-adapter-v0.yaml) | firm | Reuse maintained evaluation adapter; prove mapping and failure semantics. |
+| [git-project-enrollment-v0](../../.vibehub/tickets/ticket-runtime-git-project-enrollment-v0.yaml) | draft | Selected folder, explicit Git init, repository identity and external worktree discovery. |
+| [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) | draft | Durable Project switch, admission fence and re-enable gaps. |
+| [claude-host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-claude-host-capability-probe-v0.yaml) | firm | Actual Claude capture/query/lifecycle coverage, independently of Codex. |
+| [local-worker-runner-v0](../../.vibehub/tickets/ticket-runtime-local-worker-runner-v0.yaml) | draft | Durable bounded local jobs, current source/access checks and proposal receipts. |
+| [local-codex-executor-v0](../../.vibehub/tickets/ticket-runtime-local-codex-executor-v0.yaml) | draft | Codex CLI transport, login/health and real synthetic job. |
+| [local-claude-executor-v0](../../.vibehub/tickets/ticket-runtime-local-claude-executor-v0.yaml) | draft | Claude CLI transport, login/health and real synthetic job. |
+| [claude-host-adapter-v0](../../.vibehub/tickets/ticket-runtime-claude-host-adapter-v0.yaml) | draft | Installable Claude plugin consuming capture/query/delivery contracts. |
+| [local-app-onboarding-v0](../../.vibehub/tickets/ticket-runtime-local-app-onboarding-v0.yaml) | draft | Local launch and actual provider/project/plugin/executor settings UI. |
+
+Existing Codex probe/adapter, Git sensor, ingress, Judge, extraction, ingress policy,
+session delivery, audit, UX and final service/client composition receive in-place
+updates with append-only Acceptance histories. The mandatory extraction and audit
+route moves from interactive-Agent work requests to local Worker jobs because
+the requested product scope changed. The interactive bridge remains available as
+a separate capability. The local runner owns the real WorkerNode handler, durable
+Policy journal/outbox dispatch and new pinned-policy continuation after guarded
+result admission; the existing non-model kernel is not mistaken for that
+implementation. No completed implementation or benchmark is rerun or marked
+successful by this planning change.
+
 ## Reading and executing this plan
 
 The Ticket YAML files are the source of acceptance, dependencies and maturity.
@@ -196,12 +260,13 @@ The original industrial plan contained 54 Tickets. Its completed contracts and
 spike remain valid history. The local-first checkpoint added 10 narrowly scoped Tickets and
 revised 17 existing unfinished Tickets, preserving prior Acceptance/Contract
 revisions. The workspace-management follow-up below adds two domain Tickets
-and refines five existing Tickets. The five L0 Tickets above are the current new executable frontier;
+and refines five existing Tickets. The App follow-up adds ten bounded Tickets and revises twelve existing Tickets.
+The eight L0 Tickets identified above are the current executable frontier;
 older identity/policy/observability foundations have already been delivered.
 
 The tables below retain the original module inventory with updated direct
-prerequisites. Later hosted and Worker groups are not prerequisites of the
-local checkpoint. Ticket Outcomes and derived next actions, rather than this
+prerequisites. Later hosted and remote Worker groups are not prerequisites of the
+local checkpoint; the newly separated local Worker path is now required. Ticket Outcomes and derived next actions, rather than this
 navigation table, determine current scheduling.
 
 ### Contracts and bounded kernel
@@ -225,9 +290,9 @@ navigation table, determine current scheduling.
 | [选择具体 alpha 平台与部署边界](../../.vibehub/tickets/ticket-select-semantic-runtime-alpha-platform.yaml) | firm | [platform-evaluation-spike](../../.vibehub/tickets/ticket-runtime-platform-evaluation-spike.yaml) |
 | [Implement service identity, authorization, and tenant isolation](../../.vibehub/tickets/ticket-runtime-service-auth-isolation.yaml) | draft | [local-service-profile-v0](../../.vibehub/tickets/ticket-runtime-local-service-profile-v0.yaml) |
 | [建立事务存储适配与 migration 基础](../../.vibehub/tickets/ticket-runtime-store-schema-migrations.yaml) | draft | [service-auth-isolation](../../.vibehub/tickets/ticket-runtime-service-auth-isolation.yaml) |
-| [Build durable idempotent event ingress with explicit ACK and delivery semantics](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml) | draft | [store-schema-migrations](../../.vibehub/tickets/ticket-runtime-store-schema-migrations.yaml) |
+| [Build durable idempotent event ingress with explicit ACK and delivery semantics](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml) | draft | [store-schema-migrations](../../.vibehub/tickets/ticket-runtime-store-schema-migrations.yaml); [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) |
 | [Model immutable Git commits and mutable ref movements as canonical provenance](../../.vibehub/tickets/ticket-runtime-git-commit-ref-provenance-v0.yaml) | firm | [causal-ordering-watermarks-v0](../../.vibehub/tickets/ticket-runtime-causal-ordering-watermarks-v0.yaml) |
-| [Implement non-blocking local Git and worktree observation](../../.vibehub/tickets/ticket-runtime-local-git-worktree-sensor-v0.yaml) | draft | [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml); [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml) |
+| [Implement non-blocking local Git and worktree observation](../../.vibehub/tickets/ticket-runtime-local-git-worktree-sensor-v0.yaml) | draft | [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml); [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) |
 | [Implement the transactional Semantic Working Graph store](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml) | draft | [store-schema-migrations](../../.vibehub/tickets/ticket-runtime-store-schema-migrations.yaml) |
 | [Propagate source tombstones, ACL changes, and permission revocation through derived state](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml) | draft | [graph-store-v0](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml); [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml) |
 
@@ -235,7 +300,7 @@ navigation table, determine current scheduling.
 
 | Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
-| [Build bounded JudgeNode routing and fallback execution](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) | draft | [policy-kernel-v0](../../.vibehub/tickets/ticket-runtime-policy-kernel-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
+| [Build bounded JudgeNode routing and fallback execution](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) | draft | [policy-kernel-v0](../../.vibehub/tickets/ticket-runtime-policy-kernel-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml); [provider-settings-v0](../../.vibehub/tickets/ticket-runtime-provider-settings-v0.yaml); [openrouter-judge-adapter-v0](../../.vibehub/tickets/ticket-runtime-openrouter-judge-adapter-v0.yaml); [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) |
 | [Build durable PolicyRun journaling, idempotency, and crash resume](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml) | draft | [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) |
 | [交付第一套可回放 ingress 业务 Policy](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml) | draft | [policy-journal-v0](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml); [entity-resolution-v0](../../.vibehub/tickets/ticket-runtime-entity-resolution-v0.yaml) |
 | [读取并投影已有 canonical Git 记录](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) | draft | [git-commit-ref-provenance-v0](../../.vibehub/tickets/ticket-runtime-git-commit-ref-provenance-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml) |
@@ -263,14 +328,14 @@ navigation table, determine current scheduling.
 | --- | --- | --- |
 | [Session registration 与可恢复 soft delivery](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml) | draft | [semantic-api-v0](../../.vibehub/tickets/ticket-runtime-semantic-api-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) |
 | [Codex host sensor / query adapter](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml) | draft | [session-delivery-v0](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml); [local-git-worktree-sensor-v0](../../.vibehub/tickets/ticket-runtime-local-git-worktree-sensor-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) |
-| [组合并验收 Git → Policy → Context 在线闭环](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | draft | [host-adapter-v0](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml); [ingress-policy-v0](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [semantic-feedback-v0](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml); [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) |
-| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [ticket-build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
+| [组合并验收 Git → Policy → Context 在线闭环](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | draft | [host-adapter-v0](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml); [ingress-policy-v0](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [semantic-feedback-v0](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml); [claude-host-adapter-v0](../../.vibehub/tickets/ticket-runtime-claude-host-adapter-v0.yaml); [local-claude-executor-v0](../../.vibehub/tickets/ticket-runtime-local-claude-executor-v0.yaml) |
+| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [ticket-build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml); [local-app-onboarding-v0](../../.vibehub/tickets/ticket-runtime-local-app-onboarding-v0.yaml) |
 
 ### Local evidence and later hosted operations
 
 | Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
-| [Build end-to-end semantic decision audit and explanation](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml) | draft | [policy-journal-v0](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml); [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml); [context-compiler-v0](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [canonical-git-bridge-v0](../../.vibehub/tickets/ticket-runtime-canonical-git-bridge-v0.yaml) |
+| [Build end-to-end semantic decision audit and explanation](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml) | draft | [policy-journal-v0](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml); [context-compiler-v0](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [canonical-git-bridge-v0](../../.vibehub/tickets/ticket-runtime-canonical-git-bridge-v0.yaml); [local-worker-runner-v0](../../.vibehub/tickets/ticket-runtime-local-worker-runner-v0.yaml) |
 | [Establish Runtime telemetry, audit, budgets, and SLOs](../../.vibehub/tickets/ticket-runtime-telemetry-slo.yaml) | draft | [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [session-delivery-v0](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml) |
 | [Build full Policy replay and JudgeOps evaluation gates](../../.vibehub/tickets/ticket-runtime-judgeops-v0.yaml) | draft | [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml) |
 | [执行 raw/derived/audit 保留与删除策略](../../.vibehub/tickets/ticket-runtime-retention-pruning-v0.yaml) | draft | [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml) |
@@ -307,10 +372,11 @@ is fabricated to hide or archive old work.
 | Existing Ticket | Current bounded responsibility | Obligations moved to separate Tickets |
 | --- | --- | --- |
 | [Working Graph revision / assertion / conflict 可执行契约](../../.vibehub/tickets/ticket-define-semantic-context-protocol-v0.yaml) | Executable Working Graph revisions/assertions/snapshots/conflicts | Scope identity → identity; causal ordering → watermark contract; external canonical writes → canonical Git bridge. |
-| [选择具体 alpha 平台与部署边界](../../.vibehub/tickets/ticket-select-semantic-runtime-alpha-platform.yaml) | firm | [platform-evaluation-spike](../../.vibehub/tickets/ticket-runtime-platform-evaluation-spike.yaml) |
-| [组合并验收 Git → Policy → Context 在线闭环](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | draft | [host-adapter-v0](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml); [ingress-policy-v0](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [semantic-feedback-v0](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml); [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) |
-| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [ticket-build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
-| [上线受保护的 internal alpha 并验证边界](../../.vibehub/tickets/ticket-launch-semantic-runtime-online-alpha.yaml) | draft | [staged-rollout-degradation](../../.vibehub/tickets/ticket-runtime-staged-rollout-degradation.yaml) |
+| [Platform choice](../../.vibehub/tickets/ticket-select-semantic-runtime-alpha-platform.yaml) | Hosted platform decision | Evaluation/spike and later deployment implementation are separate. |
+| [Service composition](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | Integration of delivered modules | Ingress, store, policy, query/compiler and host adapters own implementation. |
+| [Client surface](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | Consume actual APIs in a reviewable UI | Audit, semantic APIs and service composition are independent prerequisites. |
+| [Hosted launch](../../.vibehub/tickets/ticket-launch-semantic-runtime-online-alpha.yaml) | Bounded internal hosted rollout | Release, recovery, capacity and degradation checks own their verification. |
+
 
 Dependencies of the five revised Tickets change because their actual outcomes
 and required inputs changed. The old broad protocol/platform→service→surface→launch
@@ -326,8 +392,8 @@ No completed provider/benchmark Ticket is added as an artificial prerequisite.
 | §§9,11: actual policy computation | Artifact schema/compiler; execution kernel; bounded JudgeNode; durable journal; concrete ingress business graph. |
 | §§10,19: semantic state and concurrency | Working Graph contract/store; source invalidation; semantic commands; explicit canonical bridge. |
 | §§12–13: retrieval and compiler | Authorized candidate/rank pipeline; reproducible bounded ContextPackage; public query API. |
-| §14: selective reasoning | Job protocol; enrollment/scheduler/context/result; reconciliation bundle; Codex adapter; later query/planning/canonicalization bundles. Canonicalization synthesis feeds the deterministic bridge; no automatic Outcome acceptance. |
-| §§15–17,26: host delivery and compaction | Session delivery; observed Codex capabilities; later checkpoint compaction; no default hard injection in initial alpha. |
+| §14: selective reasoning | Existing job/request contracts → local runner → separate Codex/Claude subscription executors → extraction and validated proposal admission. Remote enrollment/scheduler/context/result and specialized bundles remain later; no automatic Outcome acceptance. |
+| §§15–17,26: host delivery and compaction | Session delivery with activation fencing; independently observed Codex and Claude capabilities; later checkpoint compaction; no default hard injection in initial alpha. |
 | §§18,21–22: persistence, connectors and security | Store/migrations; service auth; source access; retention; connector conformance and GitHub in later expansion. |
 | §§23–24: observability and failure | Early correlation/SLI/budget contract; module failure tests; audit/telemetry; worker recovery; staging capacity and outage drills. |
 | §§27,30: evaluation and rollout gates | JudgeOps frozen replay/regression; controlled downstream study; policy rollout; technical alpha does not satisfy unmeasured product-value gates. |
@@ -388,3 +454,22 @@ Worker scheduler/Codex adapter, online launch or P2P prerequisite.
 Validated batch SHA-256:
 `ca6ebb2eca4b727d0596ff90dc3416dad879d2398464d4b3dee9ef3e7e76be7b`.
 This validates planning and provenance, not execution or product readiness.
+
+## Local App checkpoint validation
+
+The App follow-up adds 10 bounded Tickets and revises 12 existing unfinished
+Tickets, retaining Acceptance/Contract histories. Eight new Context claims record
+the goal; the earlier no-background-Worker delivery assumption is superseded.
+Independent review passed the exact 22-Ticket batch (82 active criteria),
+disposable apply/project validation, all 28 resolved refs and Context guard.
+
+The service/client dependency closures contain 46/50 Tickets respectively and
+require neither the interactive Agent bridge nor the remote Worker scheduler or
+hosted platform decision. The local runner explicitly owns real Policy WorkerNode
+dispatch and guarded result continuation; ingress policy composes it. Module
+criteria own activation checks in ingress, Judge, Worker and session delivery.
+
+Validated batch SHA-256:
+`f5f91b16b0e6ca14d036355e04edafa483a2d129709fad63a18eee72c2fbce7d`.
+This turn changes planning and research records only. No app, plugin or Worker
+was installed, no credential was inspected and no live model call was made.

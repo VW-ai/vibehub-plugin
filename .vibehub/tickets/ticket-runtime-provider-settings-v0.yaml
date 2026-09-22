@@ -1,0 +1,96 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "provider-config",
+      "criterion": "Validate explicit OpenRouter/Vercel/TypeSafe route and model/capability selection with per-project binding, timeout/attempt budget and allowed fallback list. API route configuration and Codex/Claude executor login are separate; unknown capabilities fail explicitly.",
+      "identity": "sha256:a125caec313cb8cc8ade3ede3b22ef90a52b1d7cb32d9f041f59f6b44e64aa91",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "credential-lifecycle",
+      "criterion": "Create/replace/remove credentials through a local-process interface backed by the supported OS secure store; persist only opaque refs in ordinary config. No secrets in Git, Context, URL, logs, exceptions, browser persistent storage or model prompts. Define locked/unavailable-store behavior without plaintext fallback.",
+      "identity": "sha256:952e4c9364f3ee7321d3c4d0b7e4a99a86e99c25ff74984f4a7dea7142372975",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "settings-conformance",
+      "criterion": "Tests with fake credentials and a temporary app-owned secure-store entry verify replacement/deletion, restart lookup, project isolation, missing/revoked key handling and redacted errors. Do not read existing user entries. UI callers get only configured/missing/error state, never a read-key endpoint.",
+      "identity": "sha256:f99930969ff10cc9eb402f9e0358840a8c466155222c4a02d9bf449971148a3f",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Independent local module: typed provider/model configuration, credential references and local secure-store adapter plus synthetic tests. This owns settings operations, not app UI, new Judge models or Worker OAuth.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "credential-lifecycle",
+          "identity": "sha256:952e4c9364f3ee7321d3c4d0b7e4a99a86e99c25ff74984f4a7dea7142372975",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "provider-config",
+          "identity": "sha256:a125caec313cb8cc8ade3ede3b22ef90a52b1d7cb32d9f041f59f6b44e64aa91",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "settings-conformance",
+          "identity": "sha256:f99930969ff10cc9eb402f9e0358840a8c466155222c4a02d9bf449971148a3f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:817d642f2f65a0f39b363b267301a8f8533620c87b597c5befc13aca2a8262f2",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Implement local provider configuration and a secret-store boundary for OpenRouter, Vercel and TypeSafe.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-provider-settings-v0"
+}

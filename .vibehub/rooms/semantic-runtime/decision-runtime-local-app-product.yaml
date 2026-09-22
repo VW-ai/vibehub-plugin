@@ -1,0 +1,31 @@
+{
+  "context_id": "decision-runtime-local-app-product",
+  "detail": "用户将下一阶段目标明确为一个本地启动的 App；可先采用简单本地界面，不以高级原生 desktop 体验为前提。App 管理项目、模型配置、启停、context 与 Ticket，首批集成 Codex 和 Claude Code，并把需要推理的重任务交给本机已登录的订阅 Worker。此决定细化并替代此前“独立后台 reasoning Worker 不属于近期必经路径”的交付假设；云端 Worker、云端数据服务和完整多人同步依然不是近期前提。Policy Graph、Working Graph、query/compiler、来源、权限、审计、可靠接收及独立验收边界保留。具体桌面壳和存储技术仍由工程验证决定。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-experience-first",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:47.225Z",
+    "quote": "一个本地的app，可能可以先不考虑desktop有多nb",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "decision"
+}

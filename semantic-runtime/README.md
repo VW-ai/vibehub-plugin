@@ -179,13 +179,19 @@ injection, worker execution, or canonical writes occur in this prototype.
 
 ## Current product checkpoint
 
-The owner now prioritizes a complete local experience, with branch/exploration
-isolation and bidirectional Project awareness, before choosing hosted deployment
-or requiring a persistent reasoning Worker. The [delivery plan](docs/online-delivery-plan.md)
-links the captured decisions and separates runnable foundations from missing
-Collector, extraction/resolution, scoped query/compiler, Agent tools and client
-integration. Project overview is not the main Git branch. This is planned work;
-the current prototype still has the offline boundaries stated above.
+The next product is a locally launched App with explicit Project enable/disable,
+Git-folder and linked-worktree enrollment, selectable OpenRouter/Vercel/TypeSafe
+API routes, and Codex plus Claude Code plugins. Heavy semantic tasks run through
+the user's selected local subscription executor. Tickets define outcomes and
+constraints while leaving development methods optional. Cloud deployment and
+remote Workers remain later capabilities.
+
+The [delivery plan](docs/online-delivery-plan.md) and
+[integration research](docs/local-app-integration-notes.md) separate this goal
+from delivered foundations. Collector, extraction/resolution, scoped query/compiler,
+app onboarding, plugin coverage and Worker orchestration still require implementation.
+Project overview is not the main Git branch. The current executable prototype
+retains the offline boundaries stated above.
 
 ## Online foundation contracts
 

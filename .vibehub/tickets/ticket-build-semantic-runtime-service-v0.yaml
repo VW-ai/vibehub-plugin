@@ -88,17 +88,31 @@
       "criterion": "Exercise one real supported local Agent work request with supplied tools/schema and cited returned proposal. Demonstrate A→B→A relevant notices, independent continued hypotheses, one explicit per-item adoption and stale/duplicate result handling. Received/seen never means adopted; canonical promotion and independent Ticket acceptance remain separate.",
       "identity": "sha256:5391318a1923e56262b8645ab13bd3de85927c9b8793887dd1c480ca8b1c3a19",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "loop-agent-degradation",
       "criterion": "A supported real host captures selected synthetic events and queries the expected context after restart/session handoff. Runtime/judge/Agent unavailability leaves coding usable and pending work inspectable. Record exact build/policy/input/host profile and demonstrate bounded backlog, source revocation and recovery without claiming distributed or production SLO proof.",
       "identity": "sha256:873f6a748170fa91a0ea7edae00313c6af1030a56dd041fad616687f6af9210d",
       "revision": 2,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "loop-worker-conflict",
+      "criterion": "Exercise heavy synthesis through the same local runner with each real Codex and Claude subscription executor on synthetic inputs, selecting one at a time. Results have cited proposals and durable receipts, with A→B→A notices, continued alternatives, explicit adoption and stale/duplicate handling. Seen is not adopted; independent acceptance stays separate. Interactive work-request delivery remains a supported additional route, not the default heavy-work prerequisite.",
+      "identity": "sha256:ae35b6be28d45e266df8a6c29da9a2e1001e9ebee7c7c96ba0793710a1be7b19",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "loop-agent-degradation",
+      "criterion": "Each of Codex and Claude Code plugins captures selected synthetic events and queries expected Context after restart/handoff. Project disable halts new work and fences late results; Runtime/Judge/Worker unavailability leaves coding usable. Verify each of three configured API routes with a synthetic real request and record actual models/build/latency; unsupported or not-run remains unresolved. Prove bounded backlog, source revocation and recovery without cloud or production SLO claims.",
+      "identity": "sha256:4564796b0f15a02d8368d228c5e905470a92794b7cb35c4119e93366209d1500",
+      "revision": 3,
       "state": "active"
     }
   ],
-  "active_contract_revision": 3,
+  "active_contract_revision": 4,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -106,7 +120,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Local stage L4 integration only. Reuse delivered modules to prove one-person multi-session and two-exploration behavior on the local profile. No hosted deployment, separate persistent Worker, full P2P or automatic semantic merge prerequisite.",
+  "context": "Local stage L4 integration. Compose both host plugins, three selectable model API routes and local subscription executors with existing semantic APIs. Each user needs only their chosen executor. Cloud hosting/P2P/remote Worker remains later; integration does not own module implementation.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -121,12 +135,28 @@
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Long-running native execution and independent review.",
       "ref": ".vibehub/rooms/semantic-runtime/constraint-runtime-local-agent-skill-parity.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "本机订阅 Worker 承担 VibeHub 的重推理任务",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
+    },
+    {
+      "purpose": "首版插件同时支持 Codex 与 Claude Code",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-codex-claude-first.yaml"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
     }
   ],
   "contract_revisions": [
@@ -197,6 +227,27 @@
       ],
       "identity": "sha256:cc74a7302d71f028a399b77549736d841b57dbe7e9a86bcc39fa867d9c19e3ca",
       "revision": 3
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "loop-agent-degradation",
+          "identity": "sha256:4564796b0f15a02d8368d228c5e905470a92794b7cb35c4119e93366209d1500",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "loop-composition",
+          "identity": "sha256:1442421e3f59486e520f03d3ffb68ef8a1dafe5d5861dee2ca39df879e8d3fb5",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "loop-worker-conflict",
+          "identity": "sha256:ae35b6be28d45e266df8a6c29da9a2e1001e9ebee7c7c96ba0793710a1be7b19",
+          "revision": 3
+        }
+      ],
+      "identity": "sha256:7323bbfa0806c6011cad96d5a32c21b263f0c48c66b58f9adaacd07dbfb60a2c",
+      "revision": 4
     }
   ],
   "deliveries": [],
@@ -208,6 +259,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
@@ -232,8 +284,13 @@
       "type": "depends_on"
     },
     {
-      "rationale": "Supported live actionable request roundtrip.",
-      "target_ticket_id": "ticket-runtime-agent-work-request-bridge-v0",
+      "rationale": "Second required interactive host integration.",
+      "target_ticket_id": "ticket-runtime-claude-host-adapter-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Second interchangeable subscription executor to validate the same heavy-work bundle.",
+      "target_ticket_id": "ticket-runtime-local-claude-executor-v0",
       "type": "depends_on"
     }
   ],

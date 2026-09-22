@@ -39,9 +39,16 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "activation-ingress",
+      "criterion": "Check current Project activation and source enrollment before durable acceptance; disabled or unknown scope cannot advance capture cursor or enter the semantic queue. Record authorized denial/gap metadata without retaining rejected raw content. Tests cover stale plugin activation, disable racing ACK and restart; already admitted historical events cannot trigger post-disable work.",
+      "identity": "sha256:db4f9f476ea31d98d100292808e8e47e4f33278b34ccc21fe5ee671422230e42",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -62,6 +69,18 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Current local App activation and Worker product boundary.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,6 +109,37 @@
       ],
       "identity": "sha256:b50c4d7c0aad15947087784b30744ae9b6741c27341c7dc8c913bcbb0ce990ca",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activation-ingress",
+          "identity": "sha256:db4f9f476ea31d98d100292808e8e47e4f33278b34ccc21fe5ee671422230e42",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "delivery-state-machine",
+          "identity": "sha256:db46fb7da69f4bb246f3e9342aef985e27c4aec9042ca3a02f91ba945ff0b991",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "durable-ack-boundary",
+          "identity": "sha256:bb1f2093366c3e90b8d0efe0181554da8b6dd6baecf9a5535ce187e8a22ddb0b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "fault-injection-proof",
+          "identity": "sha256:f4ce7d2074da1aaed74bf467669b14038f681c87eb4afd7953f1cd853b08f0ac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "idempotent-redelivery",
+          "identity": "sha256:ad701f9379322b93da4ef7725717e0c5105627af85d1b4d5df332fc5a8927073",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:394dc8ff099d66896889eb38d04a9329770dbb9e8f61e7b6f522e37bc96f1c86",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -99,12 +149,18 @@
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
     {
       "rationale": "Inbox/outbox ACK semantics require the tested selected transaction and migration adapter.",
       "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Authoritative admission and generation fence for newly captured content.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
       "type": "depends_on"
     }
   ],

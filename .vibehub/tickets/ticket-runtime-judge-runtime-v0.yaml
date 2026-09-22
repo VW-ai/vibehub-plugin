@@ -18,7 +18,7 @@
         "label": "routing-policy-controls-provider-use"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "judge-failure-is-explicit",
@@ -46,9 +46,16 @@
       "identity": "sha256:3ff6a223afbff5b9c03b3523124ded035f9ca6d8bab5e3cbb1f4938e1aba4e27",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "routing-policy-controls-provider-use",
+      "criterion": "Consume explicit local provider settings to route eligible Judge requests through OpenRouter, Vercel or official TypeSafe adapters with model-specific capability/schema checks. Enforce Project activation, current access, redaction and latency/cost/attempt budgets. Only selected/explicitly allowed fallback routes may receive data; API keys remain in local secure storage. No provider-specific core branches or subscription-to-API substitution.",
+      "identity": "sha256:22b6554857c582dc59619078480be2888dcb9f9dfe5599f009094206a0542e71",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -83,12 +90,20 @@
       "ref": "semantic-runtime/docs/phase0-contracts.md"
     },
     {
-      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
-      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
-    },
-    {
       "purpose": "Branch-scoped model inputs.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "模型 API provider 与订阅 Worker 分开配置",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
     }
   ],
   "contract_revisions": [
@@ -143,6 +158,32 @@
       ],
       "identity": "sha256:6405e1b31d58fada6e149f31df4e124c08e4d81c2065093fa5246ed568e0fc8e",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "judge-failure-is-explicit",
+          "identity": "sha256:c72d994ed65c678da337dda1aa2ef554d4004058ee2bef1ff7f24f78d7d58a94",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "judge-input-is-pinned-and-minimal",
+          "identity": "sha256:3ff6a223afbff5b9c03b3523124ded035f9ca6d8bab5e3cbb1f4938e1aba4e27",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "recorded-fixtures-cover-routing",
+          "identity": "sha256:b9cbe1b7b6dbe1e17eed1cbf472dc8a2259e9cb8342a72ff07ccf168aaef84d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "routing-policy-controls-provider-use",
+          "identity": "sha256:22b6554857c582dc59619078480be2888dcb9f9dfe5599f009094206a0542e71",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:76dd68b893c0758e257606ab7e3e0c5dd59d27f24bc5b9e0d1d8f8a8eee1509a",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -153,6 +194,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
   ],
   "relations": [
@@ -169,6 +211,21 @@
     {
       "rationale": "Real exploration-aware reads and source/base version checks.",
       "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual selected API routes and secret references.",
+      "target_ticket_id": "ticket-runtime-provider-settings-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Third required provider adapter; existing Vercel/TypeSafe implementations remain baseline.",
+      "target_ticket_id": "ticket-runtime-openrouter-judge-adapter-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Dispatch and late-result activation fencing.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
       "type": "depends_on"
     }
   ],

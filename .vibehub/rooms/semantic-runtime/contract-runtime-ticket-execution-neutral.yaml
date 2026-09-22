@@ -1,0 +1,35 @@
+{
+  "context_id": "contract-runtime-ticket-execution-neutral",
+  "detail": "Ticket 明确目标、约束、Context、依赖和可验证完成条件，保持创建/参与/完成的 provenance 与独立验收；不要求一种固定开发技能、planning 顺序、coding harness 或执行算法。执行者可以组合专门完成任务的 skill/plugin，也可以只用现有 Agent 原生能力。内部语义维护 WorkRequest 的必要工具/schema/protocol 是接口契约，不能借此给用户开发 Ticket 强加统一方法。",
+  "evidence": [
+    {
+      "note": "用户本次产品目标；detail 中标注的工程约定是把目标变为可验证计划的解释，不代表已实现。",
+      "ref": "conversation:2026-09-21-runtime-local-app-goal"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-runtime-local-agent-skill-parity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-runtime-ticket-workspace-provenance",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T06:34:53.234Z",
+    "quote": "我们的ticket 并不规范你应该如何进行开发，我们只是定义清楚任务",
+    "ref": "conversation:2026-09-21-runtime-local-app-goal"
+  },
+  "state": "active",
+  "summary": "Ticket 规定任务与验收，不规定开发方法",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "product-direction"
+  ],
+  "type": "contract"
+}

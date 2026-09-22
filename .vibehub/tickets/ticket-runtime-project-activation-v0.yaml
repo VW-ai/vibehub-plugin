@@ -1,0 +1,102 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "activation-authority",
+      "criterion": "Enable/disable is an authenticated explicit Project command persisted across restart and bound to enrolled repository/worktrees, including newly registered worktrees. Plugin installation or conversational inference does not enable a project; unrelated projects remain independent.",
+      "identity": "sha256:a405463105eb2709634be53021922bb3ac36ad6bec88c05f16192cec8f392846",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "disable-fencing",
+      "criterion": "Disable rejects new capture/dispatch/delivery, pauses or cancels queued work, and prevents delayed pre-disable results from changing semantic state or injecting context. Define crash-safe epoch/fencing and cancellation acknowledgements with existing request/job protocols; already completed state stays historical.",
+      "identity": "sha256:ac2fec6b9ccc9db6a31d15983820e782ddf9a951db5060e37cc386e3773c12b2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reenable-gap",
+      "criterion": "Re-enable exposes disabled-period gaps and an explicit bounded pending-work recovery choice; never silently backfills private sessions. Tests cover disable during ingress/dispatch/result/delivery, stale plugin cache, app outage, restart and new worktree. Ordinary coding continues throughout.",
+      "identity": "sha256:29022dfc9212b4d665dd81fe8dc911a815571909ea4ed8e295a12e998eef32f8",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+  ],
+  "context": "Own the authoritative activation API and admission/fencing contract; consumers integrate it. Refine cancellation and resume semantics against actual store/enrollment APIs.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
+      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+    },
+    {
+      "purpose": "App 中按 Project 显式启停 VibeHub",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activation-authority",
+          "identity": "sha256:a405463105eb2709634be53021922bb3ac36ad6bec88c05f16192cec8f392846",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "disable-fencing",
+          "identity": "sha256:ac2fec6b9ccc9db6a31d15983820e782ddf9a951db5060e37cc386e3773c12b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "reenable-gap",
+          "identity": "sha256:29022dfc9212b4d665dd81fe8dc911a815571909ea4ed8e295a12e998eef32f8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e28a027afb8a9b15853a9f814805f1f4d5fcaacc9099bbd0db193b0b0fde8ed0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Enforce a persistent Project activation switch across collection, model jobs and delivery.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Persisted selected Project and complete linked-worktree membership.",
+      "target_ticket_id": "ticket-runtime-git-project-enrollment-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-project-activation-v0"
+}
