@@ -47,3 +47,12 @@ export {
   applyGraphAssertion, resolveGraphConflict, updateGraphSourceAccess,
   resolveWorkingGraphAddress, validateWorkerGraphInput,
 } from './core/working-graph.mjs';
+export {
+  POLICY_KERNEL_VERSION, executePolicyRun, validatePolicyActionCommand,
+  createInMemoryPolicyTransactionPort,
+} from './core/policy-kernel.mjs';
+export {
+  WORKER_PROTOCOL_VERSION, WORKER_JOB_STATES, WORKER_OPERATIONS, WORKER_OUTPUT_SCHEMA,
+  workerResultDigest, validateWorkerJob, validateWorkerResult, createWorkerJobState,
+  validateWorkerJobState, validateWorkerAdmission, transitionWorkerJob,
+} from './core/worker-protocol.mjs';

@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "core-node-semantics-execute",
+    "run-budget-is-enforced",
+    "actions-use-atomic-contract",
+    "executor-failure-is-bounded"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "core-node-semantics-execute",
+      "identity": "sha256:71c28f52b501ca352e069d174d83fa2a3b8a7e06b04015c51a7b9d958cf5259d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "run-budget-is-enforced",
+      "identity": "sha256:4773ecfff09832e3de7121638d22390501ba91d5d8330cceb22d36d52faaf909",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "actions-use-atomic-contract",
+      "identity": "sha256:0bd437da3b2e68fec354081e4503b15b622bc4dcd77b5bf6b7c4b8bfad668157",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "executor-failure-is-bounded",
+      "identity": "sha256:43406cba6fdc2a9d61736e21ee1dbc54e0cfbefe43cf6c51d11c712d9359a131",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-kernel-public-integration-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:27.703Z",
+  "refs": [
+    "semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Five public-entry integrations verify candidate Graph writes with exact provenance, duplicate receipt reuse after the captured graph base becomes historical, competing CAS invocations with one winner, prepublication cancellation with zero effects, auditable escalation without Graph mutation, and postcommit interrupted acknowledgement with explicit uncertainty then exact receipt lookup/idempotent retry. On frozen implementation, npm run verify and actual npm run verify:standalone each passed252/252 tests; dependency boundaries passed68 files, separate Skill artifact verification passed79 files excluding Runtime. Synthetic conformance and isolated package proof only; not durable service, authenticated production access, live executor or capacity proof.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}

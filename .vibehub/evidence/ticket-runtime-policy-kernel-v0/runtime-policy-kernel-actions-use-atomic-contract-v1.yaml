@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "actions-use-atomic-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "actions-use-atomic-contract",
+      "identity": "sha256:0bd437da3b2e68fec354081e4503b15b622bc4dcd77b5bf6b7c4b8bfad668157",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-kernel-actions-use-atomic-contract-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:18.217Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-kernel.mjs",
+    "semantic-runtime/docs/policy-kernel-v0.md",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    "semantic-runtime/test/fixtures/policy-kernel/scenario.mjs",
+    "semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:node --test semantic-runtime/test/policy-kernel.test.mjs semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "All five Actions stage strict typed commands pinned to scope/generation, logical key, complete digest, exact policy, run/node, normalized event, original GraphRevision and canonical timestamp. The serial in-memory transaction reference atomically publishes real Working Graph revisions/current projection, command, receipt, allowlisted aliased audit and typed outbox intents. INGEST permits derived candidates; INJECT permits silent/soft recommendations only. Exact retry resolves prior receipt before stale Graph CAS; changed payload rejects. Precommit crash/cancellation leaves all state unchanged and releases the queue. Postcommit cancellation, lost/rejected/hanging acknowledgement return indeterminate with exact command_ref for receipt lookup or identical retry, never falsely claim rollback. Durable journal/store, delivery and canonical writes remain separate Tickets. Final focused kernel/public-entry verification passed 36/36 and import boundaries passed 68 files with zero errors. Fresh context guard passed with zero authorities/violations; prerequisite successful Outcomes and referenced Evidence plus every exact Context source were consumed. Root owns combined full/standalone/plugin release verification; this is synthetic conformance proof, not deployed-service or durable-store certification.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}

@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "worker-job-envelope"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-job-envelope",
+      "identity": "sha256:d4958c8cd500184c81e10eb55782bc046e02fa47553b4eeaf186af9a39cdfaa9",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-job-envelope-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:09:25.887Z",
+  "refs": [
+    "semantic-runtime/src/core/worker-protocol.mjs",
+    "semantic-runtime/docs/worker-protocol-v0.md",
+    "semantic-runtime/test/worker-protocol.test.mjs",
+    "semantic-runtime/test/fixtures/worker-protocol/scenario.mjs",
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/worker-protocol.test.mjs semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Defined strict bounded wire-v1 Job validation for tenant/Project/worker type, exact policy content/executable hashes and WorkerNode operation implementation hash, separately pinned continuation, exact Graph/semantic/source-event inputs and source watermarks, captured ACL/operation/provider/locality/sensitivity ceilings, fixed versioned output schema, deadline, retry budget and scoped idempotency key. Admission recompiles trusted artifacts, requires exact current Graph/caught-up source vector and complete normalized event union, resolves explicit competing revisions for reconciliation, and intersects original capability ceiling with current trusted authorization. Later ACL widening cannot expand captured grants; missing/revoked/stale/out-of-scope inputs deny. Required Ticket Context resolved; successful direct Graph Contract V2 and Policy artifact Contract V1 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Context governing returned no authorities and pre-Evidence guard passed with zero violations. No secrets, private trajectories or provider calls were used.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

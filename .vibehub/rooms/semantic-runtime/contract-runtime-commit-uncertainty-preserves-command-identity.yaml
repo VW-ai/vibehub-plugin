@@ -1,0 +1,41 @@
+{
+  "context_id": "contract-runtime-commit-uncertainty-preserves-command-identity",
+  "detail": "Agent-origin implementation contract from the independently accepted Policy kernel, delegated by Ticket Run to Ingest for downstream journal/store adapters. A transaction has one linearization point for graph state, command, receipt, audit and outbox. Cancellation, timeout, transport rejection or malformed acknowledgement after dispatch can leave the commit outcome unknown. The kernel returns indeterminate/commit_unconfirmed with the requested action and exact scoped command_ref instead of claiming clean cancellation. Recovery must look up or retry the identical idempotency key and complete payload digest; it must not invent a new logical key. A not_found receipt lookup is only a read-time observation and cannot prove an in-flight commit will never publish. Only a trusted adapter can confirm not_committed or cancellation before publication. Future durable journal/store implementations must preserve this distinction; current proof is volatile conformance, not production durability or a human platform selection.",
+  "evidence": [
+    {
+      "note": "Independent exact Contract v1 acceptance includes adversarial postcommit cancellation and lost acknowledgement repairs.",
+      "ref": ".vibehub/outcomes/ticket-runtime-policy-kernel-v0/contract-v1.yaml"
+    },
+    {
+      "note": "Public integration proves committed Graph+receipt can be reconciled after interrupted acknowledgement and exact retry creates no duplicate effects.",
+      "ref": "semantic-runtime/test/policy-kernel-integration.test.mjs"
+    },
+    {
+      "note": "Typed atomic command and receipt uncertainty contract; durable adapters retain authentication, persistence and crash-recovery responsibility.",
+      "ref": "semantic-runtime/docs/policy-kernel-v0.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-cross-repo-state-uses-causal-watermarks",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T00:18:05.816Z",
+    "ref": "semantic-runtime/docs/policy-kernel-v0.md"
+  },
+  "state": "active",
+  "summary": "A lost commit acknowledgement preserves the original command identity for reconciliation; cancellation is not rollback",
+  "tags": [
+    "semantic-runtime",
+    "policy-kernel",
+    "transactions",
+    "idempotency",
+    "journal",
+    "recovery"
+  ],
+  "type": "contract"
+}

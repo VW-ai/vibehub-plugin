@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "worker-result-envelope"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-result-envelope",
+      "identity": "sha256:68fd7d5f7cb3cf198378ff868fd00c0403ef17250009f08b3539c67d66bf433a",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-result-envelope-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:09:26.874Z",
+  "refs": [
+    "semantic-runtime/src/core/worker-protocol.mjs",
+    "semantic-runtime/docs/worker-protocol-v0.md",
+    "semantic-runtime/test/worker-protocol.test.mjs",
+    "semantic-runtime/test/fixtures/worker-protocol/scenario.mjs",
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/worker-protocol.test.mjs semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Defined strict bounded wire-v1 Result validation carrying exact Job/Attempt/fencing identity, full copied consumed inputs and trigger/schema, structured proposal findings with confidence and provenance indexes, scoped immutable digest-pinned artifacts, executor/provider/model identity, accepted usage observations, consistent timings and classified failures. Unsupported actions, hidden reasoning fields, incomplete provenance, wrong scope/attempt and authority elevation reject. Unknown consumption/cost remain null. Admitted failed attempts consume one accounting receipt; duplicate delivery yields no extra usage or terminal effect. Later business bundles pin instruction/schema digests in hashed Worker operation config and materialize separately validated structured artifacts; no canonical writes or human-authority decisions occur. Required Ticket Context resolved; successful direct Graph Contract V2 and Policy artifact Contract V1 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Context governing returned no authorities and pre-Evidence guard passed with zero violations. No secrets, private trajectories or provider calls were used.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

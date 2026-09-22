@@ -199,6 +199,10 @@ contracts through the package's public entry:
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.
+- [Policy kernel](docs/policy-kernel-v0.md): bounded non-model execution,
+  deterministic joins and atomic, idempotent action commands.
+- [Worker protocol](docs/worker-protocol-v0.md): pinned job inputs, permission
+  ceilings, fenced attempts and structured proposal results.
 - [Observability and budgets](docs/observability-contract-v0.md): safe audit and
   metric contracts, a reproducible alpha workload, numerical SLO targets and
   bounded resource admission.

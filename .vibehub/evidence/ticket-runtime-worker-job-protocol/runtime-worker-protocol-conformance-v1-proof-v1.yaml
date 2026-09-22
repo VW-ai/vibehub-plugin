@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "worker-protocol-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-protocol-conformance",
+      "identity": "sha256:9606eb8f9f3454f83d45d87899751fab814c4ba121fbbe1db61db8a9db0ed8b7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-protocol-conformance-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:09:27.853Z",
+  "refs": [
+    "semantic-runtime/src/core/worker-protocol.mjs",
+    "semantic-runtime/docs/worker-protocol-v0.md",
+    "semantic-runtime/test/worker-protocol.test.mjs",
+    "semantic-runtime/test/fixtures/worker-protocol/scenario.mjs",
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/worker-protocol.test.mjs semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Provider-neutral synthetic conformance verifies invalid/unversioned/oversized-shape inputs, accessor safety without invocation, exact policy/input identities, source provenance, competing Graph revisions, stale Graph and actual ACL/tombstone updates, unknown/known-gap watermarks, capability intersection, wrong actor/worker/attempt/fence, backward time, exact lease expiry, total deadline, queued expiry, retry exhaustion, cancellation/supersession races, competing pure claims requiring durable CAS, duplicate terminal zero effects, namespace-safe receipts, unknown usage, proposal-only source-instruction handling and terminal invariants. Focused Worker plus root public-entry integration suite passed 29/29; dependency/import boundary check passed 68 files, zero errors. Full release/standalone/plugin verification is root-owned; this Evidence claims bounded contract behavior only. Required Ticket Context resolved; successful direct Graph Contract V2 and Policy artifact Contract V1 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Context governing returned no authorities and pre-Evidence guard passed with zero violations. No secrets, private trajectories or provider calls were used.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

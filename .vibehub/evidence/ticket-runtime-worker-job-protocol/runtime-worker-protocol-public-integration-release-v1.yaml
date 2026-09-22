@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "worker-job-state-machine",
+    "worker-job-envelope",
+    "worker-result-envelope",
+    "worker-protocol-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-job-state-machine",
+      "identity": "sha256:1ff9f055222424b2a9498ddc5fa06e798ddc72be55e256e200ef8a58bab7e8ef",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "worker-job-envelope",
+      "identity": "sha256:d4958c8cd500184c81e10eb55782bc046e02fa47553b4eeaf186af9a39cdfaa9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "worker-result-envelope",
+      "identity": "sha256:68fd7d5f7cb3cf198378ff868fd00c0403ef17250009f08b3539c67d66bf433a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "worker-protocol-conformance",
+      "identity": "sha256:9606eb8f9f3454f83d45d87899751fab814c4ba121fbbe1db61db8a9db0ed8b7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-protocol-public-integration-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:27.705Z",
+  "refs": [
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "command:cd semantic-runtime && npm run verify",
+    "command:cd semantic-runtime && npm run verify:standalone",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 2,
+  "summary": "Three public-entry integrations verify explicit competing Graph revisions remain unresolved while Worker returns proposal-only result, expired attempt recovery fences an old result and records one new result with unknown usage preserved, and actual Graph source ACL revocation denies completion of captured work. On frozen implementation, npm run verify and actual npm run verify:standalone each passed252/252 tests; dependency boundaries passed68 files, separate Skill artifact verification passed79 files excluding Runtime. Synthetic conformance and isolated package proof only; not durable service, authenticated production access, live executor or capacity proof.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

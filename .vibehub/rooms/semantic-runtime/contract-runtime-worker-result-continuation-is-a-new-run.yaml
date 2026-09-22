@@ -1,0 +1,41 @@
+{
+  "context_id": "contract-runtime-worker-result-continuation-is-a-new-run",
+  "detail": "Agent-origin transport contract from the independently accepted Worker protocol, captured for downstream scheduler and result-ingress work. The WorkerNode enqueue-success edge acknowledges durable job submission; it is not automatically the business route for a later reasoning result. A Job continuation pins an artifact and existing node as a trusted routing hint. The existence/pin check does not authorize entering an arbitrary node or bypassing guards. The later result-ingress adapter must define and validate explicit result-route/new-run entry semantics, with current scope, ACL, freshness and attempt fences, rather than mutating the original PolicyRun snapshot. A succeeded Worker Result retains proposal-only authority and never declares canonical promotion or acceptance. Business instructions and output-schema digests are pinned in immutable Worker operation config; structured business documents travel through exact scoped artifact refs and separate digest/schema validation, not free-text summaries. This records the current protocol boundary, not implementation or acceptance of the future scheduler/result-ingress Tickets.",
+  "evidence": [
+    {
+      "note": "Independent exact V1 Outcome accepts the bounded transport with explicit later result-ingress responsibilities.",
+      "ref": ".vibehub/outcomes/ticket-runtime-worker-job-protocol/contract-v1.yaml"
+    },
+    {
+      "note": "Documents enqueue-success versus trusted continuation hint and separately validated new-run entry; structured business artifact boundary.",
+      "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+    },
+    {
+      "note": "Existing plan gives durable submission to scheduler and result validation/new PolicyRun to result-ingress.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-realtime-context-variations-and-reconciliation",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T00:20:44.880Z",
+    "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+  },
+  "state": "active",
+  "summary": "Worker enqueue success and result continuation are distinct boundaries; results start a separately validated policy run",
+  "tags": [
+    "semantic-runtime",
+    "worker",
+    "policy",
+    "continuation",
+    "scheduler",
+    "result-ingress"
+  ],
+  "type": "contract"
+}

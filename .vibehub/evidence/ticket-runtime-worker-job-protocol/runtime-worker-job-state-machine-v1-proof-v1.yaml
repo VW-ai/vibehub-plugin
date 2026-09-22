@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "worker-job-state-machine"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-job-state-machine",
+      "identity": "sha256:1ff9f055222424b2a9498ddc5fa06e798ddc72be55e256e200ef8a58bab7e8ef",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-job-state-machine-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:09:24.889Z",
+  "refs": [
+    "semantic-runtime/src/core/worker-protocol.mjs",
+    "semantic-runtime/docs/worker-protocol-v0.md",
+    "semantic-runtime/test/worker-protocol.test.mjs",
+    "semantic-runtime/test/fixtures/worker-protocol/scenario.mjs",
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "semantic-runtime/src/index.mjs",
+    "command:node --test semantic-runtime/test/worker-protocol.test.mjs semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented pure versioned Job and Attempt transitions with queued, leased, running, succeeded, failed, expired, cancelled, superseded and dead-letter Job states; separate terminal attempts; trusted actor/time inputs; expected-state revision CAS; worker/attempt/fence ownership; bounded lease renewal; exact expiry/deadline rules; monotonic time; new-attempt retry identity; exhaustion; cancel/complete races; idempotent exact terminal receipts with zero extra effects. Job deadline expiry never requeues a terminal Job. State validation rejects completed attempts without receipts and separates Result/Attempt ID namespaces. Durable CAS/outbox/authentication and real executor fencing are explicitly deferred to adapters. Required Ticket Context resolved; successful direct Graph Contract V2 and Policy artifact Contract V1 Outcomes/Evidence consumed; execution started only from READY/EXECUTE on codex/semantic-runtime. Context governing returned no authorities and pre-Evidence guard passed with zero violations. No secrets, private trajectories or provider calls were used.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

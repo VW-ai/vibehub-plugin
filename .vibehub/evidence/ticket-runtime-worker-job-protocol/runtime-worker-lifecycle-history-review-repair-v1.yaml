@@ -1,0 +1,41 @@
+{
+  "acceptance_ids": [
+    "worker-job-state-machine",
+    "worker-result-envelope",
+    "worker-protocol-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "worker-job-state-machine",
+      "identity": "sha256:1ff9f055222424b2a9498ddc5fa06e798ddc72be55e256e200ef8a58bab7e8ef",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "worker-result-envelope",
+      "identity": "sha256:68fd7d5f7cb3cf198378ff868fd00c0403ef17250009f08b3539c67d66bf433a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "worker-protocol-conformance",
+      "identity": "sha256:9606eb8f9f3454f83d45d87899751fab814c4ba121fbbe1db61db8a9db0ed8b7",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-worker-lifecycle-history-review-repair-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:17:30.142Z",
+  "refs": [
+    "semantic-runtime/src/core/worker-protocol.mjs",
+    "semantic-runtime/test/worker-protocol.test.mjs",
+    "semantic-runtime/docs/worker-protocol-v0.md",
+    "semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:node --test semantic-runtime/test/worker-protocol.test.mjs semantic-runtime/test/worker-protocol-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Independent Worker closeout review found that recomputing state digests could hide impossible lifecycle histories: an earlier success could precede another live attempt and produce a second result effect; successful Jobs could be relabeled cancelled/superseded/expired; a nonretryable failed Job lost its retry classification; completed revision zero and inconsistent temporal states passed. Repair retains exact classified failure in each failed Attempt, derives legal final Job status and later queued termination branches, admits previous attempts only after retryable failure or pre-deadline lease expiry, enforces actual lease-expiry/renewal windows and Job/Attempt time agreement, and requires the minimum persisted claim/start/terminal revision count. Added four regression tests covering all six original review probes, nonretryable failure reload/requeue refusal, early expiry/detached time/unearned renewal, and positive later termination of legitimately queued retries. Reviewer probe now rejects all six malformed histories; focused Worker and root public integration suite passed 33/33, dependency/import boundaries passed 68 files/zero errors, git diff --check and pre-append context guard passed. Job/Result envelope APIs are unchanged; unreleased wire-v1 internal Attempt shape adds failure. Documentation clarifies continuation is a trusted artifact/node routing hint; existence checks do not authorize arbitrary entry or guard bypass, and future result ingress must validate a new PolicyRun business route. Structural history checks do not authenticate persisted state or replace durable CAS. Root owns final full/standalone/artifact verification and reviewer owns independent Outcome.",
+  "ticket_id": "ticket-runtime-worker-job-protocol"
+}

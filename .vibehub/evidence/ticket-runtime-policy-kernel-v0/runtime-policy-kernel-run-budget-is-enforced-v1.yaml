@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "run-budget-is-enforced"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "run-budget-is-enforced",
+      "identity": "sha256:4773ecfff09832e3de7121638d22390501ba91d5d8330cceb22d36d52faaf909",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-kernel-run-budget-is-enforced-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:18.217Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-kernel.mjs",
+    "semantic-runtime/docs/policy-kernel-v0.md",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    "semantic-runtime/test/fixtures/policy-kernel/scenario.mjs",
+    "semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:node --test semantic-runtime/test/policy-kernel.test.mjs semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Enforced original run deadline, fixed per-attempt node deadlines, node-visit and attempt ceilings, counted retrieval attempts, actual UTF-8 returned bytes, conservative full per-attempt token/cost reservations, and cancellation. Explicit typed retry requests remain bounded by original budgets; failures, abandoned attempts and retries do not refund reservations. Tests cover each resource limit, finite retry exhaustion, reverse-completion retries under shared limits, hanging async handlers, and rejection of synchronously over-deadline results. Nonterminal errors take compiled DEFER/ESCALATE system terminals; whole-run cancellation/deadline and Action failures return intrinsic bounded results because schema2 Action has no error edge. JS CPU preemption remains explicitly outside the in-process trusted-handler contract. Final focused kernel/public-entry verification passed 36/36 and import boundaries passed 68 files with zero errors. Fresh context guard passed with zero authorities/violations; prerequisite successful Outcomes and referenced Evidence plus every exact Context source were consumed. Root owns combined full/standalone/plugin release verification; this is synthetic conformance proof, not deployed-service or durable-store certification.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}

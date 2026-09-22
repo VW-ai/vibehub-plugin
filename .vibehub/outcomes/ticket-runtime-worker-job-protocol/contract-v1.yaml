@@ -1,0 +1,35 @@
+{
+  "accepted_acceptance_ids": [
+    "worker-job-envelope",
+    "worker-job-state-machine",
+    "worker-protocol-conformance",
+    "worker-result-envelope"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T00:19:29.164Z",
+  "contract_revision": {
+    "identity": "sha256:d812b7946514c4963c8c707149a304fdbe350f0f7a50dc65047c5f784b272a10",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-worker-job-envelope-v1-proof-v1",
+    "runtime-worker-job-state-machine-v1-proof-v1",
+    "runtime-worker-lifecycle-history-review-repair-v1",
+    "runtime-worker-protocol-conformance-v1-proof-v1",
+    "runtime-worker-protocol-final-history-release-v1",
+    "runtime-worker-protocol-public-integration-release-v1",
+    "runtime-worker-result-envelope-v1-proof-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_worker_protocol did not execute this Ticket or author its source, tests, documentation or Evidence. It read exact contract and prerequisite records, independently inspected behavior, reported lifecycle defects, and rereviewed the executor repairs with private probes. Its sole repository write is this exact Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four active Acceptance revisions in exact Contract V1. The executable Job/Attempt state machine covers queued, leased, running, succeeded, failed, expired, cancelled, superseded and dead-letter states with trusted actor/time input, scope, revision CAS, worker/attempt/fence ownership, current authorization rechecks, bounded heartbeat, exact deadline/lease boundaries, retry limits and duplicate completion with zero additional accounting or proposal effects. Job wire V1 pins tenant/Project, Worker type, triggering policy and operation implementation identities, exact Graph/semantic/source inputs and caught-up watermarks, original permission ceilings, output schema, deadline, retry and scoped idempotency identity. Result wire V1 pins Job/Attempt/executor/provider/model, consumed inputs, proposal-only findings, confidence, complete provenance and immutable artifact references, measured-or-unknown usage, consistent timings and classified failure; unknown fields, hidden reasoning fields and authority elevation reject. Independent review found rehashed impossible terminal histories and lost nonretryable classification; executor repair retains Attempt failure, rejects retry after terminal success/cancellation/supersession/nonretryable failure, derives final Job status, and checks expiry, renewal, time linkage and minimum lifecycle revision. Six original independent malformed-history probes now reject; 198 independent permission-intersection/completion-operation combinations pass. Independently reran 33/33 focused/public Worker tests and 68-file boundary checks. Inspected final exact-bound release Evidence and logs: root full verification and actual isolated standalone install each pass 256/256, and the unchanged 79-file Skill artifact excludes Runtime. These full/standalone/artifact commands were not independently rerun by this reviewer. All three required Context references resolve, successful Graph V2 and Policy V1 prerequisite Outcomes/Evidence were consumed, and fresh Ticket validation, diff check and Context guard pass with no governing authorities or violations. No blocking findings remain. Acceptance is bounded synthetic pure-protocol conformance, not authenticated durable storage, live execution or service capacity. Trusted adapters still own identity and current-state selection, immutable artifact bytes, atomic state/receipt/effect CAS, durable enqueue uniqueness and remote fencing. The pinned continuation is a trusted routing declaration; later result ingress must validate its business route and legal new-run entry before execution. Unknown expired-attempt consumption remains reserved; late-result audit, business artifact schema validation and canonical promotion remain separately owned.",
+  "ticket_id": "ticket-runtime-worker-job-protocol",
+  "unresolved_acceptance_ids": []
+}

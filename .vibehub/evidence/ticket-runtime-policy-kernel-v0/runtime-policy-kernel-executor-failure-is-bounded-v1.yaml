@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "executor-failure-is-bounded"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "executor-failure-is-bounded",
+      "identity": "sha256:43406cba6fdc2a9d61736e21ee1dbc54e0cfbefe43cf6c51d11c712d9359a131",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-kernel-executor-failure-is-bounded-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:18.218Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-kernel.mjs",
+    "semantic-runtime/docs/policy-kernel-v0.md",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    "semantic-runtime/test/fixtures/policy-kernel/scenario.mjs",
+    "semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:node --test semantic-runtime/test/policy-kernel.test.mjs semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Behavior tests exercise malformed typed outputs/branches/usage, accessors without invocation, hidden commands, retrieval timeout and late completion, guard deny, failed aggregate join, simultaneous branch errors, all budget dimensions, explicit finite retries, pre-invocation/in-flight/precommit cancellation, graph CAS contention, exact duplicate invocation, rehashed invalid assertion commands, artifact/handler identity tampering, unsupported Worker/Judge, precommit crash, and postcommit lost acknowledgement. Whole-run/attempt fences refuse late routing or effects. Strict receipts and exact lookup reconcile committed actions despite cancelled delivery. Canonical ISO normalization avoids misreporting valid timestamps as storage failure. No private trajectory, credential, model or external provider data is used. Final focused kernel/public-entry verification passed 36/36 and import boundaries passed 68 files with zero errors. Fresh context guard passed with zero authorities/violations; prerequisite successful Outcomes and referenced Evidence plus every exact Context source were consumed. Root owns combined full/standalone/plugin release verification; this is synthetic conformance proof, not deployed-service or durable-store certification.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}

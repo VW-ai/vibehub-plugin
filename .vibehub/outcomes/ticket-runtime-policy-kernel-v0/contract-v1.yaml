@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "actions-use-atomic-contract",
+    "core-node-semantics-execute",
+    "executor-failure-is-bounded",
+    "run-budget-is-enforced"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T00:13:52.647Z",
+  "contract_revision": {
+    "identity": "sha256:7d56b6bf889510e83d39f3bb733434d6640611a6d35640df11d3f98a1bbf4fd7",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-policy-kernel-actions-use-atomic-contract-v1",
+    "runtime-policy-kernel-core-node-semantics-execute-v1",
+    "runtime-policy-kernel-executor-failure-is-bounded-v1",
+    "runtime-policy-kernel-public-integration-release-v1",
+    "runtime-policy-kernel-run-budget-is-enforced-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_policy_kernel was separate from the executor, received no execution-turn history at creation, wrote no Runtime source, tests, documentation or Evidence, independently inspected and tested the implementation, reported reproduced defects and rereviewed their repairs. Its only repository write is this exact Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four current Contract v1 Acceptance revisions. The non-Judge/non-Worker schema-2 kernel checks exact artifact and handler identity, frozen typed ports, declared guard branches and deterministic frontier/retry/join adjudication. Total and per-attempt deadlines, node visits, attempts, retrievals, returned bytes and conservative token/cost reservations are bounded; explicit retries retain original budgets, late results are fenced and synchronous over-deadline returns are refused without claiming same-isolate CPU preemption. All five typed Actions cross one atomic command/receipt/audit/outbox boundary with expected GraphRevision and logical idempotency; INGEST remains candidate-only and INJECT recommendation-only. Exact repeated commands return original receipts before stale-CAS checks, changed payloads conflict, precommit faults publish nothing, and lost or cancelled postcommit acknowledgement is explicitly indeterminate with exact receipt reconciliation rather than a false rollback claim. Independent review reproduced and required repair of completion-order-dependent failure traces, malformed INGEST acceptance, late synchronous success, hung precommit cancellation/queue blockage, ambiguous committed cancellation and timestamp normalization. Final source, documentation, fixtures, public integration tests and all five native bound Evidence records were inspected. Independently reproduced 36 focused/public tests, 68-file dependency boundaries and full npm run verify with 252/252 passing. Additional private probes passed 32 typed-port cases, nine malformed-command atomic checks, eight simultaneous exact duplicates, cancelled queue recovery, stale-base retry, four reverse-completion shared retry-budget cases and corrected postcommit uncertainty. Inspected parent-produced actual standalone log passing 252/252 outside the repository and the separate 79-file Skill artifact check excluding Runtime; this reviewer did not rerun those release commands. Exact current ticket get routes CLOSE_OUT, ticket validate passes, and Context guard has no authorities or violations. No blocking kernel finding remains. Acceptance is limited to this volatile trusted-handler execution and transaction-conformance slice; it does not certify the separately developed Worker protocol, live providers, canonical writes, crash resume, authenticated durable storage, delivery or deployed capacity.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0",
+  "unresolved_acceptance_ids": []
+}

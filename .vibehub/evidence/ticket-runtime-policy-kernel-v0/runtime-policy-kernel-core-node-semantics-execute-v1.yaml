@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "core-node-semantics-execute"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "core-node-semantics-execute",
+      "identity": "sha256:71c28f52b501ca352e069d174d83fa2a3b8a7e06b04015c51a7b9d958cf5259d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-policy-kernel-core-node-semantics-execute-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:12:18.217Z",
+  "refs": [
+    "semantic-runtime/src/core/policy-kernel.mjs",
+    "semantic-runtime/docs/policy-kernel-v0.md",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    "semantic-runtime/test/fixtures/policy-kernel/scenario.mjs",
+    "semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:node --test semantic-runtime/test/policy-kernel.test.mjs semantic-runtime/test/policy-kernel-integration.test.mjs",
+    "command:npm run check:boundaries --prefix semantic-runtime"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented host/provider/store-independent schema-2 non-Judge/non-Worker execution with exact compiled artifact reconstruction and installed operation descriptor/hash matching. Typed frozen input/output ports, declared guard branches, concurrent canonical frontiers, exclusive routing and one-arrival-per-branch all-joins produce identical complete results under reversed successful completion and simultaneous failure completion. Retry admission, token reservations and output-byte charging also follow deterministic frontier order; failed branches cannot run a join or publish a partial command. Trace records typed output digests and fixed error/system-terminal records, excludes elapsed timing and raw exception text. Worker/Judge artifacts reject before invocation; no adapter imports or external writes. Final focused kernel/public-entry verification passed 36/36 and import boundaries passed 68 files with zero errors. Fresh context guard passed with zero authorities/violations; prerequisite successful Outcomes and referenced Evidence plus every exact Context source were consumed. Root owns combined full/standalone/plugin release verification; this is synthetic conformance proof, not deployed-service or durable-store certification.",
+  "ticket_id": "ticket-runtime-policy-kernel-v0"
+}
