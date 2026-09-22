@@ -18,9 +18,9 @@ From `semantic-runtime/`:
 
 ```sh
 npm ci --ignore-scripts
-npm ci --ignore-scripts --prefix spikes/platform-node-postgres
-node spikes/platform-node-postgres/check.mjs
-SPIKE_PG_BIN=/path/to/postgresql17/bin node spikes/platform-node-postgres/run.mjs
+npm ci --ignore-scripts --prefix research/platform/node-postgres
+node research/platform/node-postgres/check.mjs
+SPIKE_PG_BIN=/path/to/postgresql17/bin node research/platform/node-postgres/run.mjs
 ```
 
 The report defaults to ignored `.local/platform-spike/report.json`. A first
@@ -35,14 +35,14 @@ Run outside the parent repository, installing both independent lockfiles:
 ```sh
 SPIKE_PG_BIN=/path/to/postgresql17/bin \
 SPIKE_NPM_CLI=/path/to/node24/lib/node_modules/npm/bin/npm-cli.js \
-node spikes/platform-node-postgres/standalone.mjs
+node research/platform/node-postgres/standalone.mjs
 ```
 
 The standalone script copies only Runtime source/manifests and required spike
 files. It removes the temporary copy/dependencies afterward. Its source check
 covers five copied modules; the in-repository check also covers the sixth,
 `standalone.mjs`. `check.mjs` parses imports, permits built-ins and declared
-packages, and allows exactly `../../src/index.mjs` outside the spike. It validates
+packages, and allows exactly `../../../src/index.mjs` outside the spike. It validates
 the fixture through the public Worker admission contract. This is a dependency
 boundary check, not a security sandbox or service hardening certification.
 
@@ -50,7 +50,7 @@ To exercise cleanup after an intentional early failure (expected exit code 1):
 
 ```sh
 SPIKE_PG_BIN=/path/to/postgresql17/bin SPIKE_FAIL_PHASE=after-start \
-node spikes/platform-node-postgres/run.mjs .local/platform-spike/failure.json
+node research/platform/node-postgres/run.mjs .local/platform-spike/failure.json
 ```
 
 The runner stops its own children and database, removes its directory and reports
@@ -63,7 +63,7 @@ The optional `Dockerfile` copies exact allowlisted source files into a Debian
 Node/PostgreSQL harness image. It has no exposed service port and runs as postgres:
 
 ```sh
-docker build --platform linux/amd64 -f spikes/platform-node-postgres/Dockerfile -t vh-platform-spike .
+docker build --platform linux/amd64 -f research/platform/node-postgres/Dockerfile -t vh-platform-spike .
 docker run --rm vh-platform-spike
 ```
 
@@ -74,5 +74,5 @@ The measured macOS result does not substantiate Linux container parity.
 unresolved image/secret/VPC bindings. It is not valid for immediate provisioning,
 does not run this IPC-only harness, and has not been submitted to DigitalOcean.
 
-See [the evaluation](../../docs/platform-evaluation-v0.md) for the matrix,
+See [the evaluation](platform-evaluation-v0.md) for the matrix,
 measurements, proposed host, cost envelope and owner decision.

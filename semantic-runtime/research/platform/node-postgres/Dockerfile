@@ -8,11 +8,11 @@ WORKDIR /opt/runtime
 COPY package.json package-lock.json ./
 RUN node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci --ignore-scripts --no-audit --no-fund
 COPY src ./src
-COPY spikes/platform-node-postgres/package.json spikes/platform-node-postgres/package-lock.json ./spikes/platform-node-postgres/
-RUN cd spikes/platform-node-postgres && node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci --ignore-scripts --no-audit --no-fund
-COPY spikes/platform-node-postgres/auth.mjs spikes/platform-node-postgres/service.mjs spikes/platform-node-postgres/executor.mjs spikes/platform-node-postgres/run.mjs spikes/platform-node-postgres/check.mjs spikes/platform-node-postgres/schema.sql spikes/platform-node-postgres/fixture.json ./spikes/platform-node-postgres/
+COPY research/platform/node-postgres/package.json research/platform/node-postgres/package-lock.json ./research/platform/node-postgres/
+RUN cd research/platform/node-postgres && node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci --ignore-scripts --no-audit --no-fund
+COPY research/platform/node-postgres/auth.mjs research/platform/node-postgres/service.mjs research/platform/node-postgres/executor.mjs research/platform/node-postgres/run.mjs research/platform/node-postgres/check.mjs research/platform/node-postgres/schema.sql research/platform/node-postgres/fixture.json ./research/platform/node-postgres/
 RUN mkdir .local && chown postgres:postgres .local
 USER postgres
 ENV SPIKE_PG_BIN=/usr/lib/postgresql/17/bin
-RUN node spikes/platform-node-postgres/check.mjs
-ENTRYPOINT ["node", "spikes/platform-node-postgres/run.mjs"]
+RUN node research/platform/node-postgres/check.mjs
+ENTRYPOINT ["node", "research/platform/node-postgres/run.mjs"]

@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "48e1757b160afe3434741175351a79eab89d3f99",
+        "blob": "197f55ead5ed202ade090b696b135cf5a5d5190e",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "ad9805c6ddf0f3b7a0fe7625910f08892ce3f428",
+        "blob": "875b0fba9b310d92abb817f794c2e306e0ee5474",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -102,7 +102,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "4ac13a0e1906eb5005f00d0f2af22d70402ec20b",
+        "blob": "e1089f3e993964339bd9fe1d87129445bc26b790",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -274,10 +274,6 @@
         "path": "semantic-runtime/docs/phase0-contracts.md"
       },
       {
-        "blob": "463de7d102b46ee6f04622d0a1e878050791f187",
-        "path": "semantic-runtime/docs/platform-evaluation-v0.md"
-      },
-      {
         "blob": "7d1d81dea473d6a72ca2550d01504364747486f2",
         "path": "semantic-runtime/docs/policy-artifacts-v0.md"
       },
@@ -336,6 +332,70 @@
       {
         "blob": "089f5e449244de79c4c14a0c5e6b9f39551613a1",
         "path": "semantic-runtime/policies/phase0.json"
+      },
+      {
+        "blob": "2b134400fb570e426ddec905a2a51c39c6b1748b",
+        "path": "semantic-runtime/research/platform/node-postgres/Dockerfile"
+      },
+      {
+        "blob": "c105cecd4eb268d12a27fe732a4b956a3c6b592f",
+        "path": "semantic-runtime/research/platform/node-postgres/README.md"
+      },
+      {
+        "blob": "fae64ac1c8495ecb0d1e8ecaa2262e490f832866",
+        "path": "semantic-runtime/research/platform/node-postgres/app-spec.template.yaml"
+      },
+      {
+        "blob": "d3f22d2c56e10e5298c4e39d43db395f1bc5db07",
+        "path": "semantic-runtime/research/platform/node-postgres/auth.mjs"
+      },
+      {
+        "blob": "8de98b84b0affb385d653d7c8a2c4faebf40ebf1",
+        "path": "semantic-runtime/research/platform/node-postgres/check.mjs"
+      },
+      {
+        "blob": "1372054a9fb5b3fd8c7d8ffb678fe62d3647cfdf",
+        "path": "semantic-runtime/research/platform/node-postgres/cleanup-failure-report.json"
+      },
+      {
+        "blob": "7ab4f747abf36d46acd1b3798f659a307cdc5564",
+        "path": "semantic-runtime/research/platform/node-postgres/executor.mjs"
+      },
+      {
+        "blob": "01035f848db83030d60bb13280678303a2609129",
+        "path": "semantic-runtime/research/platform/node-postgres/fixture.json"
+      },
+      {
+        "blob": "0831ad0140240abc8ac8e460d2388d103089a800",
+        "path": "semantic-runtime/research/platform/node-postgres/measured-report.json"
+      },
+      {
+        "blob": "ca63aefbb45d1904f9254545b70b4fb739045e27",
+        "path": "semantic-runtime/research/platform/node-postgres/package-lock.json"
+      },
+      {
+        "blob": "2764864b20ae0d7257f82742b05469279a722e16",
+        "path": "semantic-runtime/research/platform/node-postgres/package.json"
+      },
+      {
+        "blob": "33fbc16689043b9a145e5f22c64384b12db608f6",
+        "path": "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md"
+      },
+      {
+        "blob": "c7af07c27cdab24e0e26bd725b985f1c209469d7",
+        "path": "semantic-runtime/research/platform/node-postgres/run.mjs"
+      },
+      {
+        "blob": "725d207cbeed6ae4b275d71e606013a32495994f",
+        "path": "semantic-runtime/research/platform/node-postgres/schema.sql"
+      },
+      {
+        "blob": "f6b8b2cf24451dccba0ac0f949a3b4b31a5918b1",
+        "path": "semantic-runtime/research/platform/node-postgres/service.mjs"
+      },
+      {
+        "blob": "eb732178e37cba10f46b5567c7d9f12cf5207a27",
+        "path": "semantic-runtime/research/platform/node-postgres/standalone.mjs"
       },
       {
         "blob": "2cdeba88286c22e0f96d743c8ab6127bf304ee24",
@@ -430,7 +490,7 @@
         "path": "semantic-runtime/scripts/probe-codex-host.mjs"
       },
       {
-        "blob": "9df21bb18dfa0c7363470223274ea5e5dca8d3c0",
+        "blob": "8b90df217df4ae98ed03945f2ff533e41839d913",
         "path": "semantic-runtime/scripts/runtime-layout.mjs"
       },
       {
@@ -452,66 +512,6 @@
       {
         "blob": "bae17a6eeb6dfcf390505c004e397fdbbc8995fd",
         "path": "semantic-runtime/scripts/verify-standalone.mjs"
-      },
-      {
-        "blob": "4cf254dfe5f83518bf1a08222449b0846affd48f",
-        "path": "semantic-runtime/spikes/platform-node-postgres/Dockerfile"
-      },
-      {
-        "blob": "6252dfaaced9f663eaae05abcad4166fa396b7e8",
-        "path": "semantic-runtime/spikes/platform-node-postgres/README.md"
-      },
-      {
-        "blob": "fae64ac1c8495ecb0d1e8ecaa2262e490f832866",
-        "path": "semantic-runtime/spikes/platform-node-postgres/app-spec.template.yaml"
-      },
-      {
-        "blob": "d3f22d2c56e10e5298c4e39d43db395f1bc5db07",
-        "path": "semantic-runtime/spikes/platform-node-postgres/auth.mjs"
-      },
-      {
-        "blob": "55fb08dd6aff4df750ae14a3c49879127e407fcb",
-        "path": "semantic-runtime/spikes/platform-node-postgres/check.mjs"
-      },
-      {
-        "blob": "1372054a9fb5b3fd8c7d8ffb678fe62d3647cfdf",
-        "path": "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json"
-      },
-      {
-        "blob": "7ab4f747abf36d46acd1b3798f659a307cdc5564",
-        "path": "semantic-runtime/spikes/platform-node-postgres/executor.mjs"
-      },
-      {
-        "blob": "01035f848db83030d60bb13280678303a2609129",
-        "path": "semantic-runtime/spikes/platform-node-postgres/fixture.json"
-      },
-      {
-        "blob": "0831ad0140240abc8ac8e460d2388d103089a800",
-        "path": "semantic-runtime/spikes/platform-node-postgres/measured-report.json"
-      },
-      {
-        "blob": "ca63aefbb45d1904f9254545b70b4fb739045e27",
-        "path": "semantic-runtime/spikes/platform-node-postgres/package-lock.json"
-      },
-      {
-        "blob": "2764864b20ae0d7257f82742b05469279a722e16",
-        "path": "semantic-runtime/spikes/platform-node-postgres/package.json"
-      },
-      {
-        "blob": "4e3a0113792bcc1ba83921dac90fdbead20ccea5",
-        "path": "semantic-runtime/spikes/platform-node-postgres/run.mjs"
-      },
-      {
-        "blob": "725d207cbeed6ae4b275d71e606013a32495994f",
-        "path": "semantic-runtime/spikes/platform-node-postgres/schema.sql"
-      },
-      {
-        "blob": "b17af337516ccdd2f4d45750140e95e3bf91ea52",
-        "path": "semantic-runtime/spikes/platform-node-postgres/service.mjs"
-      },
-      {
-        "blob": "d065e0f58f5f22c6fe007505f0ee43fda20f728f",
-        "path": "semantic-runtime/spikes/platform-node-postgres/standalone.mjs"
       },
       {
         "blob": "bbdf414e6dcc182eaad4c00ad20c5287a18c2039",
@@ -1418,7 +1418,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "01f9b26823692a58102c3bc596bbf982f1aaaabd",
+        "blob": "647ae195f7702cfd5b8a7cfa4bac35b47aef5c5a",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1462,8 +1462,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T22:56:29.958Z",
-    "last_aligned_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307"
+    "checked_at": "2026-09-22T23:29:11.880Z",
+    "last_aligned_commit": "2ed5abd489f93591b2236ab579109b170d0de238"
   },
   "anchors": [
     "semantic-runtime/"

@@ -331,9 +331,9 @@ provide inputs for the later execution, storage, worker and service Tickets in
 the [online delivery plan](docs/online-delivery-plan.md). The online service and
 capacity drill are still pending; numerical targets are not measured results.
 
-The isolated [platform evaluation](docs/platform-evaluation-v0.md) compares
+The isolated [platform evaluation](research/platform/node-postgres/platform-evaluation-v0.md) compares
 hosting approaches and supplies a disposable Node/PostgreSQL experiment under
-`spikes/platform-node-postgres/`, with a separate dependency lockfile. Its local
+`research/platform/node-postgres/`, with a separate dependency lockfile. Its local
 measurements cover transaction, authentication, queue recovery and delivery
 behavior. Hosted deployment, capacity and disaster recovery remain later work;
 the prototype is not the online service or a platform selection.

@@ -2,7 +2,7 @@
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
-import { createWorkerJobState, transitionWorkerJob } from '../../src/index.mjs';
+import { createWorkerJobState, transitionWorkerJob } from '../../../src/index.mjs';
 import { authenticate } from './auth.mjs';
 const fixture = JSON.parse(readFileSync(new URL('./fixture.json', import.meta.url)));
 const json = (res, code, value) => { res.writeHead(code, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(JSON.stringify(value)); };

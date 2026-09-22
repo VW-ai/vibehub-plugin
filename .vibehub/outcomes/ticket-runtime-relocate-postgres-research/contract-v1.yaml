@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "postgres-spike-is-self-contained",
+    "postgres-spike-boundary-is-preserved",
+    "postgres-relocation-is-traceable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T23:39:10Z",
+  "contract_revision": {
+    "identity": "sha256:30789e216edce4abf1ada0d86c6538af34f36503317444ce6fe5e8e3beb62f2b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-relocate-postgres-research-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/postgres_relocation_closeout was not involved in planning or execution. It inspected the exact Contract, bound Evidence, current diff, migration commit, manifests, references, tests and Context guard, and wrote only this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three current criteria in Contract v1. Migration commit 2ed5abd489f93591b2236ab579109b170d0de238 is a pure 16-file 100% rename into research/platform/node-postgres, and an independent manifest audit resolved every recorded old blob in the parent and the identical blob at the new path in the migration commit. Current relative imports, commands, Docker paths, report paths, docs, active Ticket references, layout inventory and Room anchors use the new location while prior platform-spike Evidence, Outcomes, the completed local-service Ticket and historical measured reports remain unchanged. The spike retains its separate manifest and lockfile; the main Runtime manifest and lock root have no pg dependency, production source imports no research, and production source/storage code is unchanged. Independently reproduced the spike static check (6 files, 31 imports), all 5 relocation/layout tests, the 244-file boundary check with no errors or production cycles, Git diff checking, Ticket validation, Context guard with zero violations, all 16 relocation blob checks, and plugin artifact verification (79 files, 3670088 bytes). The current host lacks the required isolated PostgreSQL 17 environment and Node 24, and the runner fails explicitly instead of claiming a live pass. Reviewed the exact bound Evidence for the completed real PostgreSQL, outside-repository locked-install, cleanup-failure, full Runtime and standalone validation runs; no contradictory diff or test result was found.",
+  "ticket_id": "ticket-runtime-relocate-postgres-research",
+  "unresolved_acceptance_ids": []
+}

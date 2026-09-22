@@ -4,11 +4,11 @@
   "evidence": [
     {
       "note": "Operational limits explicitly separate sequence allocation from commit order and assign production cursor publication to later adapters.",
-      "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+      "ref": "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md"
     },
     {
       "note": "Synthetic outbox identity column is a bounded spike mechanism, not the service cursor contract.",
-      "ref": "semantic-runtime/spikes/platform-node-postgres/schema.sql"
+      "ref": "semantic-runtime/research/platform/node-postgres/schema.sql"
     },
     {
       "note": "Primary PostgreSQL reference: concurrent nextval allocates distinct values without waiting for transaction completion, and aborts leave gaps; the lost-event example is an engineering inference.",
@@ -29,7 +29,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T00:42:14.432808+00:00",
-    "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+    "ref": "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md"
   },
   "state": "active",
   "summary": "A resumable outbox cursor must not advance past a transaction that can still publish an earlier allocated sequence",

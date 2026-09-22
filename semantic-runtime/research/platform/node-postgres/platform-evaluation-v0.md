@@ -6,7 +6,7 @@ DigitalOcean App Platform plus Managed PostgreSQL Standard in San Francisco
 (`sfo` application / `sfo3` database and VPC). This recommendation awaits the existing
 human platform-selection Ticket. It creates no deployment or spending authority.
 
-The [disposable spike](../spikes/platform-node-postgres/README.md) actually tested
+The [disposable spike](README.md) actually tested
 the recommended **Node/PostgreSQL stack locally**, not DigitalOcean infrastructure.
 Its isolated install passed 51 checks. Hosting startup, proxy streaming, secrets,
 managed failover, PITR, capacity and disaster SLOs remain unmeasured. This distinction
@@ -70,7 +70,7 @@ Primary references: [DO transactional storage/PITR](https://developers.cloudflar
 
 ## Actual proof and measurement
 
-The checked-in [measured report](../spikes/platform-node-postgres/measured-report.json)
+The checked-in [measured report](measured-report.json)
 was produced by an actual outside-repository copy with fresh dependency installation.
 Node 24.21.0 and PostgreSQL 17.11 came from official release archives verified
 against their published SHA-256 checksums. PostgreSQL was built into a temporary
@@ -114,7 +114,7 @@ SSE replay came from the outbox after disconnect, and revocation closed delivery
 DELETE removed all target project state, jobs, outbox and memberships, preserving
 another tenant and another project. Finally the complete temporary cluster/socket
 and child processes were removed. The separate
-[deliberate failure report](../spikes/platform-node-postgres/cleanup-failure-report.json)
+[deliberate failure report](cleanup-failure-report.json)
 confirms the same cleanup after a forced failure just after database startup.
 This is deletion of synthetic local resources, not a promise of immediate purge
 from a managed provider's retained backups.
@@ -140,9 +140,9 @@ service/delivery work. A sequence allocation order is not automatically commit
 order: the production outbox must serialize its scoped cursor with the commit,
 not blindly copy the spike's global identity counter under concurrent transactions.
 
-The [App Spec template](../spikes/platform-node-postgres/app-spec.template.yaml)
+The [App Spec template](app-spec.template.yaml)
 names the proposed service SKU, region, HTTPS health endpoint, image digest slot
-and secret names. The [Dockerfile](../spikes/platform-node-postgres/Dockerfile)
+and secret names. The [Dockerfile](Dockerfile)
 is an optional isolated Linux rehearsal of the harness, not the production image;
 Docker was unavailable so it was not built. The later release creates and pins the
 actual Runtime service image/manifest, fills the owner-selected VPC/cluster/team

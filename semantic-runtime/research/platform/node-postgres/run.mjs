@@ -10,10 +10,10 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { setTimeout as delay } from 'node:timers/promises';
 import pg from 'pg';
-import { workerResultDigest } from '../../src/index.mjs';
+import { workerResultDigest } from '../../../src/index.mjs';
 import { issue } from './auth.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
-const output=resolve(process.argv[2]??join(here,'../../.local/platform-spike/report.json'));
+const output=resolve(process.argv[2]??join(here,'../../../.local/platform-spike/report.json'));
 const pgBin = process.env.SPIKE_PG_BIN;
 assert(pgBin && existsSync(join(pgBin, 'pg_ctl')), 'Set SPIKE_PG_BIN to an isolated PostgreSQL 17 bin directory');
 assert.equal(Number(process.versions.node.split('.')[0]), 24, 'This measured stack pins Node 24');
@@ -147,7 +147,7 @@ try {
   report.deletion={selected_project_remaining_rows:remaining,other_tenant_preserved:true,other_project_preserved:true};
   const sources=['auth.mjs','service.mjs','executor.mjs','run.mjs','schema.sql','fixture.json','package.json','package-lock.json'];
   report.input_sha256=Object.fromEntries(sources.map(file=>[file,createHash('sha256').update(readFileSync(join(here,file))).digest('hex')]));
-  report.protocol_sha256=Object.fromEntries(['worker-protocol.mjs','observability-contract.mjs'].map(file=>[file,createHash('sha256').update(readFileSync(join(here,'../../src/core',file))).digest('hex')]));
+  report.protocol_sha256=Object.fromEntries(['worker-protocol.mjs','observability-contract.mjs'].map(file=>[file,createHash('sha256').update(readFileSync(join(here,'../../../src/core',file))).digest('hex')]));
   report.status='passed';
 } catch {
   // Never include exceptions, connection strings, bearer tokens or raw payloads.

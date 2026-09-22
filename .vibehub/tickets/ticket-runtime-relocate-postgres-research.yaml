@@ -47,11 +47,11 @@
     },
     {
       "purpose": "Current spike package boundary and commands.",
-      "ref": "semantic-runtime/spikes/platform-node-postgres/README.md"
+      "ref": "semantic-runtime/research/platform/node-postgres/README.md"
     },
     {
       "purpose": "Current platform research conclusion.",
-      "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+      "ref": "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md"
     }
   ],
   "contract_revisions": [

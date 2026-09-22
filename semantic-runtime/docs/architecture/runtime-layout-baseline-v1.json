@@ -5,7 +5,6 @@
     "scripts",
     "test",
     "research",
-    "spikes",
     "policies",
     "docs",
     "<runtime-root-files>"
@@ -347,11 +346,6 @@
       "intended_destination": "research/phase0-replay/phase0-contracts.md"
     },
     {
-      "path": "docs/platform-evaluation-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/platform/node-postgres/platform-evaluation-v0.md"
-    },
-    {
       "path": "docs/policy-artifacts-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/policy-artifacts-v0.md"
@@ -430,6 +424,86 @@
       "path": "README.md",
       "current_role": "component-documentation",
       "intended_destination": "README.md"
+    },
+    {
+      "path": "research/platform/node-postgres/app-spec.template.yaml",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/app-spec.template.yaml"
+    },
+    {
+      "path": "research/platform/node-postgres/auth.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/auth.mjs"
+    },
+    {
+      "path": "research/platform/node-postgres/check.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/check.mjs"
+    },
+    {
+      "path": "research/platform/node-postgres/cleanup-failure-report.json",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/cleanup-failure-report.json"
+    },
+    {
+      "path": "research/platform/node-postgres/Dockerfile",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/Dockerfile"
+    },
+    {
+      "path": "research/platform/node-postgres/executor.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/executor.mjs"
+    },
+    {
+      "path": "research/platform/node-postgres/fixture.json",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/fixture.json"
+    },
+    {
+      "path": "research/platform/node-postgres/measured-report.json",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/measured-report.json"
+    },
+    {
+      "path": "research/platform/node-postgres/package-lock.json",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/package-lock.json"
+    },
+    {
+      "path": "research/platform/node-postgres/package.json",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/package.json"
+    },
+    {
+      "path": "research/platform/node-postgres/platform-evaluation-v0.md",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/platform-evaluation-v0.md"
+    },
+    {
+      "path": "research/platform/node-postgres/README.md",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/README.md"
+    },
+    {
+      "path": "research/platform/node-postgres/run.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/run.mjs"
+    },
+    {
+      "path": "research/platform/node-postgres/schema.sql",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/schema.sql"
+    },
+    {
+      "path": "research/platform/node-postgres/service.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/service.mjs"
+    },
+    {
+      "path": "research/platform/node-postgres/standalone.mjs",
+      "current_role": "platform-research",
+      "intended_destination": "research/platform/node-postgres/standalone.mjs"
     },
     {
       "path": "research/ux/project-exploration/app.mjs",
@@ -575,81 +649,6 @@
       "path": "scripts/verify-standalone.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "tools/verify-standalone.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/app-spec.template.yaml",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/app-spec.template.yaml"
-    },
-    {
-      "path": "spikes/platform-node-postgres/auth.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/auth.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/check.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/check.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/cleanup-failure-report.json",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/cleanup-failure-report.json"
-    },
-    {
-      "path": "spikes/platform-node-postgres/Dockerfile",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/Dockerfile"
-    },
-    {
-      "path": "spikes/platform-node-postgres/executor.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/executor.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/fixture.json",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/fixture.json"
-    },
-    {
-      "path": "spikes/platform-node-postgres/measured-report.json",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/measured-report.json"
-    },
-    {
-      "path": "spikes/platform-node-postgres/package-lock.json",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/package-lock.json"
-    },
-    {
-      "path": "spikes/platform-node-postgres/package.json",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/package.json"
-    },
-    {
-      "path": "spikes/platform-node-postgres/README.md",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/README.md"
-    },
-    {
-      "path": "spikes/platform-node-postgres/run.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/run.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/schema.sql",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/schema.sql"
-    },
-    {
-      "path": "spikes/platform-node-postgres/service.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/service.mjs"
-    },
-    {
-      "path": "spikes/platform-node-postgres/standalone.mjs",
-      "current_role": "platform-research",
-      "intended_destination": "research/platform/node-postgres/standalone.mjs"
     },
     {
       "path": "src/adapters/cached-judge.mjs",

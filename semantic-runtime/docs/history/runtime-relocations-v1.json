@@ -49,6 +49,118 @@
       "old_blob": "0339e7ae472e8f9cec72ca2f370f46b724f65e09",
       "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
       "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/Dockerfile",
+      "new_path": "semantic-runtime/research/platform/node-postgres/Dockerfile",
+      "old_blob": "4cf254dfe5f83518bf1a08222449b0846affd48f",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/README.md",
+      "new_path": "semantic-runtime/research/platform/node-postgres/README.md",
+      "old_blob": "6252dfaaced9f663eaae05abcad4166fa396b7e8",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/app-spec.template.yaml",
+      "new_path": "semantic-runtime/research/platform/node-postgres/app-spec.template.yaml",
+      "old_blob": "fae64ac1c8495ecb0d1e8ecaa2262e490f832866",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/auth.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/auth.mjs",
+      "old_blob": "d3f22d2c56e10e5298c4e39d43db395f1bc5db07",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/check.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/check.mjs",
+      "old_blob": "55fb08dd6aff4df750ae14a3c49879127e407fcb",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json",
+      "new_path": "semantic-runtime/research/platform/node-postgres/cleanup-failure-report.json",
+      "old_blob": "1372054a9fb5b3fd8c7d8ffb678fe62d3647cfdf",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/executor.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/executor.mjs",
+      "old_blob": "7ab4f747abf36d46acd1b3798f659a307cdc5564",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/fixture.json",
+      "new_path": "semantic-runtime/research/platform/node-postgres/fixture.json",
+      "old_blob": "01035f848db83030d60bb13280678303a2609129",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/measured-report.json",
+      "new_path": "semantic-runtime/research/platform/node-postgres/measured-report.json",
+      "old_blob": "0831ad0140240abc8ac8e460d2388d103089a800",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/package-lock.json",
+      "new_path": "semantic-runtime/research/platform/node-postgres/package-lock.json",
+      "old_blob": "ca63aefbb45d1904f9254545b70b4fb739045e27",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/package.json",
+      "new_path": "semantic-runtime/research/platform/node-postgres/package.json",
+      "old_blob": "2764864b20ae0d7257f82742b05469279a722e16",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/platform-evaluation-v0.md",
+      "new_path": "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md",
+      "old_blob": "463de7d102b46ee6f04622d0a1e878050791f187",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/run.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/run.mjs",
+      "old_blob": "4e3a0113792bcc1ba83921dac90fdbead20ccea5",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/schema.sql",
+      "new_path": "semantic-runtime/research/platform/node-postgres/schema.sql",
+      "old_blob": "725d207cbeed6ae4b275d71e606013a32495994f",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/service.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/service.mjs",
+      "old_blob": "b17af337516ccdd2f4d45750140e95e3bf91ea52",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/spikes/platform-node-postgres/standalone.mjs",
+      "new_path": "semantic-runtime/research/platform/node-postgres/standalone.mjs",
+      "old_blob": "d065e0f58f5f22c6fe007505f0ee43fda20f728f",
+      "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
+      "category": "platform-research"
     }
   ]
 }

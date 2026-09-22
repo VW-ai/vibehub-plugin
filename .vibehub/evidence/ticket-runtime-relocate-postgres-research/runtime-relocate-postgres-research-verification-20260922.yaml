@@ -1,0 +1,51 @@
+{
+  "acceptance_ids": [
+    "postgres-spike-is-self-contained",
+    "postgres-spike-boundary-is-preserved",
+    "postgres-relocation-is-traceable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "postgres-spike-is-self-contained",
+      "identity": "sha256:dae4bfd2c67db8d46d0e13ef97dc9f63c0bb7c6eee3fd7b7897e42424a555d23",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "postgres-spike-boundary-is-preserved",
+      "identity": "sha256:1ed4345decc6795cced17b223ffc96b5ddb3a6cc5b3a65ac3bbec7129b48540d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "postgres-relocation-is-traceable",
+      "identity": "sha256:4060d267401aa2996d2525229fbccfa282d9280f46122a8d8fbcc94b7b6f21eb",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-relocate-postgres-research-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T23:28:36Z",
+  "refs": [
+    "semantic-runtime/research/platform/node-postgres/README.md",
+    "semantic-runtime/research/platform/node-postgres/package.json",
+    "semantic-runtime/research/platform/node-postgres/package-lock.json",
+    "semantic-runtime/research/platform/node-postgres/check.mjs",
+    "semantic-runtime/research/platform/node-postgres/run.mjs",
+    "semantic-runtime/research/platform/node-postgres/standalone.mjs",
+    "semantic-runtime/research/platform/node-postgres/Dockerfile",
+    "semantic-runtime/research/platform/node-postgres/platform-evaluation-v0.md",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/README.md",
+    ".vibehub/tickets/ticket-runtime-relocate-postgres-research.yaml",
+    ".vibehub/rooms/semantic-runtime/contract-runtime-outbox-cursor-follows-durable-publication.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "The complete Node/PostgreSQL research boundary moved as sixteen 100% Git renames in migration commit 2ed5abd489f93591b2236ab579109b170d0de238 to semantic-runtime/research/platform/node-postgres. Its package and lockfile remain independent; Runtime production source imports no research, the main package gained no pg dependency, and standalone Runtime verification still excludes research. Relative Runtime-entry imports, protocol hashes, report output, standalone copy target, Docker paths, package commands, README links and evaluation links now resolve from the new location. The versioned relocation manifest records every exact old/new path, original blob and migration commit; an executable audit resolved all sixteen old blobs in the migration parent and identical blobs at the new paths in the migration commit. The historical measured and cleanup reports, prior platform-spike Evidence, completed Outcomes and the prior local-service Ticket remain byte-unchanged. The package static boundary check passes with 6 modules and 31 imports. A real disposable Node 24.21.0/PostgreSQL 17.11 run passes 51 checks; an outside-repository copy with fresh locked installs also passes 51 checks; the intentional after-start failure exits 1 while confirming child exit, database stop, private directory deletion and zero hosted resources. The focused layout suite passes 5/5 and boundary checking reports 244 files, no errors and no production SCCs. Full Runtime verification passes 1031 total / 1029 passed / 0 failed / 2 expected Keychain skips. Standalone locked-install verification passes 1031 total / 1027 passed / 0 failed / 4 expected skips, including two explicit research-exclusion skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Ticket validation, Context guard, git diff checking, relocation blob validation and semantic-runtime Room alignment pass. Current Runtime docs, the active Ticket and the outbox cursor Context use the new path. The platform recommendation, storage implementation and production service behavior did not change. No model provider or JEV call was needed for this structural relocation.",
+  "ticket_id": "ticket-runtime-relocate-postgres-research"
+}

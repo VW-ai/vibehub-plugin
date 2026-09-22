@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parse } from 'acorn';
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'research', 'spikes', 'policies', 'docs']);
+const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'research', 'policies', 'docs']);
 const ROOT_INVENTORY_EXCLUDES = new Set(['.env.local']);
 const BASELINE_PATH = 'docs/architecture/runtime-layout-baseline-v1.json';
 
@@ -177,7 +177,6 @@ function inventoryRecord(path) {
   if (path.startsWith('research/platform/')) return { path, current_role: 'platform-research', intended_destination: path };
   if (path.startsWith('research/host-probes/')) return { path, current_role: 'host-research', intended_destination: path };
   if (path.startsWith('research/')) return { path, current_role: 'research', intended_destination: path };
-  if (path.startsWith('spikes/platform-node-postgres/')) return { path, current_role: 'platform-research', intended_destination: `research/platform/node-postgres/${path.slice('spikes/platform-node-postgres/'.length)}` };
   if (path.startsWith('policies/')) return { path, current_role: 'phase0-research', intended_destination: `research/phase0-replay/policies/${path.slice('policies/'.length)}` };
   return { path, current_role: 'documentation-or-report', intended_destination: documentDestination(path) };
 }
