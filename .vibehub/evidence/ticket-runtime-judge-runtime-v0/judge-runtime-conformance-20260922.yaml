@@ -1,0 +1,48 @@
+{
+  "acceptance_ids": [
+    "judge-input-is-pinned-and-minimal",
+    "routing-policy-controls-provider-use",
+    "judge-failure-is-explicit"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "judge-input-is-pinned-and-minimal",
+      "identity": "sha256:c53d0f15a6b1e2b212d6a2883c2cada242900b0d4ba7687288cd89f7b07252c2",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "routing-policy-controls-provider-use",
+      "identity": "sha256:c3003b529a5ab988530807c1d1e70828a296eb65dd4e82c5decfa3401553e899",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "judge-failure-is-explicit",
+      "identity": "sha256:34d6335769f6c8d6576ecebd07978f94a8d5cf70198dd19addbfe2390091bfed",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "judge-runtime-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T16:47:44.409152Z",
+  "refs": [
+    "semantic-runtime/src/core/judge-node.mjs",
+    "semantic-runtime/src/local/judge-contract.mjs",
+    "semantic-runtime/src/local/judge-inputs.mjs",
+    "semantic-runtime/src/local/judge-provider.mjs",
+    "semantic-runtime/src/local/judge-runtime.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/judge-inputs.test.mjs",
+    "semantic-runtime/test/judge-provider.test.mjs",
+    "semantic-runtime/test/judge-runtime.test.mjs",
+    "semantic-runtime/test/judge-runtime-races.test.mjs",
+    "semantic-runtime/test/jev-judge-check.test.mjs",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    "semantic-runtime/docs/judge-runtime-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Actual LocalJudgeRuntime composes admitted ingress snapshots, exact current v2 exploration candidate revisions, separately pinned shared coverage, real source/access/activation admission and explicit ProviderSettings SDK callbacks. It freezes compiled operation/configuration, derives target aliases from exact revisions, excludes caller text and structural private metadata, and retains private selected proofs across bounded reads. All three real SDK transports use explicit selected credentials, no logging/SDK retries/redirects or hidden provider fallback. One invocation deadline and conservative reservations span at most three configured attempts; only429/5xx retry/fallback. Responses recheck live proof and settings; current-authorized successful cache has128-entry/8MiB LRU bound, at most8inflight, duplicate/conflict/cancel rules and no durable guarantees. Narrow v2 JudgeNode bridge validates exact event/request pins, emits typed outputs and flat conservative usage; legacy full Policy executor still rejects Judge/Worker. Inputs13/13, provider19/19 and runtime38/38 pass; independent public grant/catalog/Project/head race regressions8/8 pass across credential-await and result-return. Synthetic check fixtures2/2 pass. Existing affected174/174 run passed before final two runtime and eight race additions; full verification covers final test set separately. Review found and fixed timeout-after-send audit omission/falsezero usage and nested bridge usage; repro confirms attempted route retained, unknown usage null and flat bridge usage. Proxy input/signal0traps, source closure including inherited unselected parents, policy denial, sizebounds, malformed output, lowconfidence, settings/binding/activation/source races, exact target mappings, real cacheLRU/concurrency and reported usage overflow are covered. No schema/table/dependency, full DAG scheduler, canonical authority, Graph write, ingress ACK or App/host binding is added by evaluate.",
+  "ticket_id": "ticket-runtime-judge-runtime-v0"
+}

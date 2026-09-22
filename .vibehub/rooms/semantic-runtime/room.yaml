@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "2201bb596410aca36d108218b4601db84775337d",
+        "blob": "4b5d678a745f1fa9c29fd478740a9ef6317b1c6a",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -66,7 +66,7 @@
         "path": "semantic-runtime/docs/event-provenance-v0.md"
       },
       {
-        "blob": "f654b496dee27ad825a2cc326381633d2d6ded4b",
+        "blob": "9890266269fc780f596911fa2eea2e465789f56b",
         "path": "semantic-runtime/docs/exploration-projection-v0.md"
       },
       {
@@ -92,6 +92,10 @@
       {
         "blob": "70a22f743bc2c0befdd104f2c8fb098d8ca926cf",
         "path": "semantic-runtime/docs/jev-synthetic-check.md"
+      },
+      {
+        "blob": "527e9e07abc1bb683fbc3cc5538f826da3860090",
+        "path": "semantic-runtime/docs/judge-runtime-v0.md"
       },
       {
         "blob": "ded3ba71e74d23daabd112909246572369321259",
@@ -178,12 +182,20 @@
         "path": "semantic-runtime/docs/measurements/jev-invalidation-composition-final-20260922.json"
       },
       {
+        "blob": "9bb98839c89ec1658d4de1aa4cbebb0a3142b2a9",
+        "path": "semantic-runtime/docs/measurements/jev-judge-runtime-20260922.json"
+      },
+      {
         "blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
         "path": "semantic-runtime/docs/measurements/jev-selected-read-20260922.json"
       },
       {
         "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
         "path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json"
+      },
+      {
+        "blob": "047a1d9a39448e3907f38f59beecda270ea0ab52",
+        "path": "semantic-runtime/docs/measurements/judge-runtime-verification-20260922.json"
       },
       {
         "blob": "7db1a452a90527bcc925ca749820c7f654a85241",
@@ -194,7 +206,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "5dc900840e1fb75b8fb55c37bbfa5a13e6471a80",
+        "blob": "815779133cff89808194d306864747b01cc4c6dd",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -258,7 +270,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "8bd64b69584b8590f9c05875a35d9725d0365380",
+        "blob": "85b35b35f48b4769602e33b32d4bd1bf56d65f06",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -312,6 +324,10 @@
       {
         "blob": "a9e26ad295e9d779cd830a0e57b7c5e7858bbd70",
         "path": "semantic-runtime/scripts/check-jev-ingress.mjs"
+      },
+      {
+        "blob": "0898385509020f8b812c498c83405e3db90302b4",
+        "path": "semantic-runtime/scripts/check-jev-judge.mjs"
       },
       {
         "blob": "4a9a61255baac89fece49f24689c3540e0a7fbb7",
@@ -518,6 +534,10 @@
         "path": "semantic-runtime/src/core/incremental-graph.mjs"
       },
       {
+        "blob": "9ee932e187852083d398ec7b6f08d0469c67ad77",
+        "path": "semantic-runtime/src/core/judge-node.mjs"
+      },
+      {
         "blob": "2be7f10f24537dfd4aee50bc97e8ed263b7f0d04",
         "path": "semantic-runtime/src/core/observability-contract.mjs"
       },
@@ -554,7 +574,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "421308592d45d7ba297749f4fd752b1537186011",
+        "blob": "034715467115e03f9e3128fb188eec1c75765640",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -598,7 +618,7 @@
         "path": "semantic-runtime/src/local/exploration-physical.mjs"
       },
       {
-        "blob": "d2dd67d90c725c7f5c98f4fd0fc9499c252ab58d",
+        "blob": "b3dc9a5c6fd5adf5d5a4013e0a77fafd8e8d65a4",
         "path": "semantic-runtime/src/local/exploration-store.mjs"
       },
       {
@@ -618,8 +638,24 @@
         "path": "semantic-runtime/src/local/graph-storage.mjs"
       },
       {
-        "blob": "c7b6a432d7e8f232b4752f0e53f9ead923581ad4",
+        "blob": "43470edfd4a4934216d30399c47adb9f5ea6589d",
         "path": "semantic-runtime/src/local/graph-store.mjs"
+      },
+      {
+        "blob": "0e75f13d096f1f4f012231fa45ef9d8e6b5befe8",
+        "path": "semantic-runtime/src/local/judge-contract.mjs"
+      },
+      {
+        "blob": "3541b09b845b7484592467b55dfeca1dc2f5bd91",
+        "path": "semantic-runtime/src/local/judge-inputs.mjs"
+      },
+      {
+        "blob": "9cb7bf1ee6c402ec1638f2278722a4139f4f865d",
+        "path": "semantic-runtime/src/local/judge-provider.mjs"
+      },
+      {
+        "blob": "8c8af00cdf6b1636dace5f5a98cfec01605324c6",
+        "path": "semantic-runtime/src/local/judge-runtime.mjs"
       },
       {
         "blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
@@ -986,6 +1022,14 @@
         "path": "semantic-runtime/test/helpers/incremental-graph-fixture.mjs"
       },
       {
+        "blob": "aa7248c7d8f51080019fd50516a3fbe49aae1790",
+        "path": "semantic-runtime/test/helpers/judge-fixture.mjs"
+      },
+      {
+        "blob": "66df2642cf0dbbe5c07b22711c2b69e4dfdd10aa",
+        "path": "semantic-runtime/test/helpers/judge-runtime-fixture.mjs"
+      },
+      {
         "blob": "7f6a30eb0811717753f445fdfdbd05abc37dc35b",
         "path": "semantic-runtime/test/helpers/source-invalidation-process.mjs"
       },
@@ -1010,6 +1054,10 @@
         "path": "semantic-runtime/test/jev-ingress-check.test.mjs"
       },
       {
+        "blob": "3470064c96d89cc6f68909841274ee877a5627cc",
+        "path": "semantic-runtime/test/jev-judge-check.test.mjs"
+      },
+      {
         "blob": "37cbfee98b57c558a5ff6dc5aff1522e0f5ce252",
         "path": "semantic-runtime/test/jev-judge.test.mjs"
       },
@@ -1026,8 +1074,24 @@
         "path": "semantic-runtime/test/judge-comparison.test.mjs"
       },
       {
+        "blob": "9c963a4f90563380cfb85a0e41abf377a195149d",
+        "path": "semantic-runtime/test/judge-inputs.test.mjs"
+      },
+      {
+        "blob": "173de04a0d46dd7e5050cbc571700309eb0ace77",
+        "path": "semantic-runtime/test/judge-provider.test.mjs"
+      },
+      {
         "blob": "29b5282c5bd0064d5cc2a2f45d6750246b69e5eb",
         "path": "semantic-runtime/test/judge-resilience.test.mjs"
+      },
+      {
+        "blob": "4c023b32d3c805a497d4afc2b86bb7336b6c735c",
+        "path": "semantic-runtime/test/judge-runtime-races.test.mjs"
+      },
+      {
+        "blob": "2a83b7caf670785832a6d8d78a19203542ed31ae",
+        "path": "semantic-runtime/test/judge-runtime.test.mjs"
       },
       {
         "blob": "4c5f428734da307d7c7c26afb1a01ac4cce00763",
@@ -1122,8 +1186,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T16:13:26.359Z",
-    "last_aligned_commit": "1454ca64f2eef7b316bd19d0148f80dfe8535dc2"
+    "checked_at": "2026-09-22T16:53:20.689Z",
+    "last_aligned_commit": "dd6638366b76642fc1ec55dee78125c2df0a173f"
   },
   "anchors": [
     "semantic-runtime/"

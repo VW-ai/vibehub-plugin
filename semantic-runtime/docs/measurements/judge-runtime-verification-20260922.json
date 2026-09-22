@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-09-22T16:50:33.982898Z",
+  "scope": "Contract4 selected LocalJudgeRuntime; actual synthetic Git/SQLite, real SDK transport fixtures",
+  "full": {
+    "command": "npm run verify",
+    "tests": 785,
+    "passed": 783,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 57725.207917
+  },
+  "standalone": {
+    "command": "npm run verify:standalone",
+    "tests": 785,
+    "passed": 783,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 59400.266917,
+    "clean_install": true,
+    "outside_parent_repository": true
+  },
+  "boundaries": {
+    "files": 181,
+    "errors": 0
+  },
+  "new_focused_cases": {
+    "judge_inputs": 13,
+    "judge_provider": 19,
+    "judge_runtime": 38,
+    "independent_public_races": 8,
+    "synthetic_checker": 2,
+    "total": 80
+  },
+  "affected_before_final_additions": {
+    "command": "node --test test/judge-inputs.test.mjs test/judge-provider.test.mjs test/judge-runtime.test.mjs test/jev-judge-check.test.mjs test/policy-kernel.test.mjs test/policy-artifacts.test.mjs test/provider-settings.test.mjs test/exploration-projection.test.mjs test/exploration-projection-security.test.mjs test/canonical-source-reader.test.mjs",
+    "tests": 174,
+    "passed": 174,
+    "failed": 0,
+    "skipped": 0,
+    "duration_ms": 22820.667916
+  },
+  "independent_review": {
+    "focused_passed": 72,
+    "additional_public_races_passed": 8,
+    "product_source_edits": false,
+    "blocking_findings": 0
+  },
+  "plugin_artifact": {
+    "command": "npm run verify:artifact",
+    "passed": true,
+    "files": 79,
+    "bytes": 3670088
+  },
+  "git_diff_check": true,
+  "skip_reason": "two existing native macOS Keychain opt-in integration tests",
+  "verification_note": "The first plugin artifact check could not bind127.0.0.1 under the restricted sandbox; the authorized loopback rerun passed. Full and standalone suites were run sequentially. Initial777-case full/standalone runs passed; the final785-case runs also include eight independent public API race regressions. No real credential/model is used by deterministic verification.",
+  "live_jev_report": "jev-judge-runtime-20260922.json",
+  "live_jev_calls": 9,
+  "live_expected_decisions": "8/8",
+  "live_late_revoked_result": "completed provider output refused; no Graph change"
+}

@@ -38,7 +38,8 @@
     "check:jev:ingress": "node scripts/check-jev-ingress.mjs",
     "check:jev:graph": "node scripts/check-jev-ingress.mjs --graph",
     "check:jev:source-fence": "node scripts/check-jev-source-fence.mjs",
-    "check:jev:exploration": "node scripts/check-jev-exploration.mjs"
+    "check:jev:exploration": "node scripts/check-jev-exploration.mjs",
+    "check:jev:judge": "node scripts/check-jev-judge.mjs"
   },
   "devDependencies": {
     "acorn": "8.15.0"

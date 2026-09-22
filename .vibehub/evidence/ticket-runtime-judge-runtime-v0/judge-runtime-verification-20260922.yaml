@@ -1,0 +1,35 @@
+{
+  "acceptance_ids": [
+    "recorded-fixtures-cover-routing"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "recorded-fixtures-cover-routing",
+      "identity": "sha256:d17101bb50aa4cad96536821dcd82bd8ff7156ee9bfe35c5739622329408ec64",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "judge-runtime-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T16:50:33.982898Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/judge-runtime-verification-20260922.json",
+    "semantic-runtime/docs/measurements/jev-judge-runtime-20260922.json",
+    "semantic-runtime/docs/judge-runtime-v0.md",
+    "semantic-runtime/scripts/check-jev-judge.mjs",
+    "semantic-runtime/test/jev-judge-check.test.mjs",
+    "semantic-runtime/test/judge-inputs.test.mjs",
+    "semantic-runtime/test/judge-provider.test.mjs",
+    "semantic-runtime/test/judge-runtime.test.mjs",
+    "semantic-runtime/test/judge-runtime-races.test.mjs",
+    "semantic-runtime/test/helpers/judge-runtime-fixture.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final full Runtime verify and fresh standalone npm ci/verify outside the parent repository each pass785total,783pass,2existing nativeKeychain opt-in skips,0fail; boundary181files0errors. Shipped plugin unchanged79files3670088bytes passes after requiredloopback permission retry.80new tests use real local stores/grants/settings and actual3SDK transports with fixedsynthetic responses; independentreview reproduced72focused plus authored8additional public grant/catalog/Project/head races, all passing and no productsource edits. Existing affected174test run before finaladditions passed; all additions includedin finalfull/standalone. Authorized actual TypeSafe new-runtime smoke performed9fetchcalls, officialjev-1.13.0:8/8expected decisions across4families and2realworktreeexplorations,104–349ms successfulmodel time,8cachehits withzero additional sends,4explicit publicexploration candidatewrites. Ninthcall revoked source afteractualfetch boundary:provider completed, Runtime refused stale_invalidation_fence withnull decision/emptytargets andunchangedGraph. Transport-entrydoesnotclaimremote-deliveryordering; sentinputcannotberecalled. TypeSafe observedcostunknown staysnull. Other2routes testedwithrecordedtransports,notlive. No privateusertrace, credentiallogging, model truthauthority, canonicalpromotion, ingressACK, fulldurablePolicyRun or App/pluginconnection claim.",
+  "ticket_id": "ticket-runtime-judge-runtime-v0"
+}

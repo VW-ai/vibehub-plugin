@@ -91,6 +91,12 @@ Authority inside the configured selection is included despite optional filters.
 Coverage is explicitly selected/partial/unavailable, never all Project rules.
 Candidate text cannot replace governing authority.
 
+`getSelection({exploration_id,at})` returns the same checked shared selection
+without selecting a local entity. This lets a Judge with zero relational targets
+pin its origin/Project metadata without inventing a target. Shared results now
+include `current_project.version` for exact consumer preconditions; this version
+is separate from the immutable canonical Graph pin.
+
 Actual reader issuance and source proof are rechecked against captured Graph
 head, current source fence and access inside the final database view. Failed
 checks return no previously fetched fragment. Missing/quarantined material

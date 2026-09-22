@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "judge-failure-is-explicit",
+    "judge-input-is-pinned-and-minimal",
+    "recorded-fixtures-cover-routing",
+    "routing-policy-controls-provider-use"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T16:52:22.434Z",
+  "contract_revision": {
+    "identity": "sha256:79aee523c2dc54588cafffe0d213523526b035e1374d84318448c2413792c535",
+    "revision": 4
+  },
+  "evidence_ids": [
+    "judge-runtime-conformance-20260922",
+    "judge-runtime-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent subagent /root/judge_closeout was created without execution-turn context. It read the exact Ticket, Context, source, tests and measurements itself, independently reproduced 72 focused cases, and authored eight additional public-boundary verification tests after identifying a coverage gap. It changed no product implementation, Ticket or Evidence. The independent tests and this exact Outcome are its only intentional repository contributions; the executor separately ran the final full and standalone suites.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v4",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four current Acceptance revisions in exact Contract 4. judge-input-is-pinned-and-minimal: reviewed actual authenticated ingress snapshot materialization, exact current v2 exploration/workspace/catalog/Project/source pins, bounded provenance closure and typed candidate profiles. Scope, actor and source authority come from live local capabilities and actual records; request text, target names or caller booleans cannot establish authority. Target aliases bind exact selected revisions, all four existing decision families retain the minimized envelope, and returned IDs map only to those exact revisions. Origin canonical base and current Project rules remain separately checked metadata with explicit coverage and no governing text sent as targets. The fixed compiled Judge operation and narrow bridge check event/request digests and return typed branch/outputs plus conservative flat usage; legacy executePolicyRun remains unchanged and excludes Judge/Worker nodes. routing-policy-controls-provider-use: verified inert one-scope settings binding, actual source principal intersections and conservative sensitivity mapping, explicit selected-fields/local-only/provider policy, current activation and private retained-proof admission. Existing TypeSafe, Vercel and OpenRouter adapters receive explicit keys only within useCredential; configuration and live selected authority are rechecked after credential awaits, at actual SDK fetch, and before result publication. Only configured authorized 429/5xx retries/fallbacks can consume the original deadline and conservative attempt/token/cost reservations; authentication/schema/policy failures cannot broaden routes. Unknown observed billing stays null and raw provider errors, keys, source text and structural private path metadata are excluded from bounded audit output. judge-failure-is-explicit: inspected and reproduced timeout, abort, permanent/transient error, schema/target rejection, low-confidence DEFER/ESCALATE, changed-pin/access refusal, and budget exhaustion. Completed successful cache reuse re-materializes current authority and exact identities, isolates actors/scopes, rejects duplicate in-flight and changed retained keys, and enforces finite LRU/concurrency bounds. Failed or late work publishes no reusable success; cache eviction/restart does not claim dispatch deduplication. recorded-fixtures-cover-routing: independently ran all 72 original focused tests, then persisted and ran eight public evaluate race cases covering grant revocation, catalog, Project selection and graph-head changes at both secure-store await and completed-response boundaries. All 80 cases passed, including zero sends before failed admission, discarded completed output and no cache reuse. Reviewed final parent logs and both native Evidence records: full Runtime verify and clean standalone install/verify outside the repository each report 785 total tests, 783 passed, zero failed and two existing native Keychain opt-in skips; dependency boundaries pass 181 files with zero errors. The unchanged shipped Skill artifact passes at 79 files and 3670088 bytes after the disclosed loopback permission retry. Read the live synthetic measurement and actual checker, and independently reproduced its recorded transport tests: nine selected TypeSafe calls, official jev-1.13.0, eight of eight matching judgments across four families and two worktree explorations, eight cache hits without extra sends, four explicit exploration candidate publications, and one completed response refused after source revocation with unchanged Graph. Successful model time was 104 to 349 ms; unknown TypeSafe cost remains null. This reviewer read no real credentials and made no live model call; Vercel/OpenRouter remain recorded-transport verification only. All 26 Context refs resolve, fresh ticket validation succeeds, Context guard has no governing authority violations, and git diff check passes. No blocking finding or unresolved criterion remains. Acceptance is limited to this bounded one-node in-process service and public selected-store bridge: no durable PolicyRun journal, full DAG integration, exactly-once dispatch, source refresh, ingress ACK, canonical promotion, automatic secret recognition, App/host wiring or downstream semantic-value claim is made; the documented observation/send race cannot recall already-sent input.",
+  "ticket_id": "ticket-runtime-judge-runtime-v0",
+  "unresolved_acceptance_ids": []
+}

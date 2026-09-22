@@ -101,9 +101,16 @@ standalone verification each pass 703 tests with the same two opt-in skips;
 601-origin pagination, process recovery and five live synthetic JEV evaluations
 are measured. It remains an in-process module awaiting consumer/App wiring.
 
+The [selected Judge invocation](judge-runtime-v0.md) now composes exact local
+event/target inputs with the three configured provider routes, current admission,
+bounded retries/deadlines and process-local completed cache. Its narrow typed
+bridge leaves the full Policy executor unchanged. Nine real synthetic TypeSafe
+calls cover 8/8 expected decisions and a late result refused after revocation;
+durable scheduling and App/plugin integration remain separate work.
+
 Still missing: real host Collectors and durable service composition, typed
-extraction and entity resolution, explicit cross-exploration adoption, integrated Judge
-runtime, query/compiler, actionable Agent request delivery, bidirectional
+extraction and entity resolution, explicit cross-exploration adoption, durable
+Policy/Judge composition, query/compiler, actionable Agent request delivery, bidirectional
 awareness, provider/activation wiring through the complete semantic loop, two
 plugins and local Worker orchestration. Address resolution is
 not semantic entity resolution. The new exploration store supplies separate
@@ -364,7 +371,7 @@ navigation table, determine current scheduling.
 
 | Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
-| [Build bounded JudgeNode routing and fallback execution](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) | draft | [policy-kernel-v0](../../.vibehub/tickets/ticket-runtime-policy-kernel-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml); [provider-settings-v0](../../.vibehub/tickets/ticket-runtime-provider-settings-v0.yaml); [openrouter-judge-adapter-v0](../../.vibehub/tickets/ticket-runtime-openrouter-judge-adapter-v0.yaml); [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) |
+| [Build bounded JudgeNode routing and fallback execution](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) | firm | [policy-kernel-v0](../../.vibehub/tickets/ticket-runtime-policy-kernel-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml); [provider-settings-v0](../../.vibehub/tickets/ticket-runtime-provider-settings-v0.yaml); [openrouter-judge-adapter-v0](../../.vibehub/tickets/ticket-runtime-openrouter-judge-adapter-v0.yaml); [project-activation-v0](../../.vibehub/tickets/ticket-runtime-project-activation-v0.yaml) |
 | [Build durable PolicyRun journaling, idempotency, and crash resume](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml) | draft | [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) |
 | [交付第一套可回放 ingress 业务 Policy](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml) | draft | [policy-journal-v0](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml); [entity-resolution-v0](../../.vibehub/tickets/ticket-runtime-entity-resolution-v0.yaml) |
 | [读取并投影已有 canonical Git 记录](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) | draft | [git-commit-ref-provenance-v0](../../.vibehub/tickets/ticket-runtime-git-commit-ref-provenance-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml) |

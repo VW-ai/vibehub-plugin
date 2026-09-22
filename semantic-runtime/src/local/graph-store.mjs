@@ -465,10 +465,10 @@ export class LocalGraphStore {
       });
     });
   }
-  #readExploration(context, options, canonical_reader, paging) {
+  #readExploration(context, options, canonical_reader, paging, selectionOnly = false) {
     return this.#call(() => {
       const input = graphInput(options);
-      graphFields(input, paging ? ['exploration_id', 'at', 'collection', 'cursor', 'limit', 'shared_keys']
+      graphFields(input, selectionOnly ? ['exploration_id', 'at'] : paging ? ['exploration_id', 'at', 'collection', 'cursor', 'limit', 'shared_keys']
         : ['exploration_id', 'at', 'address', 'shared_keys']);
       graphId(input.exploration_id); validateGraphCommitAddress2(input.at);
       if (paging) graphAssert(Number.isInteger(input.limit) && input.limit >= 1 && input.limit <= 32);
@@ -488,21 +488,31 @@ export class LocalGraphStore {
           && graphEqual(metadata.project, inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
         this.#invalidations.assertFence(context, { sequence: fence });
         canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
-        const local = this.#readInView(context, tx, localInput, paging);
+        let local = null;
+        if (selectionOnly) {
+          graphAssert(graphEqual(input.at.scope, this.#scope(context, 'graph:read')));
+          const storage = this.#storage(tx, context, input.at.generation_id, 'graph:read');
+          graphAssert(storage.fact({ at: input.at, kind: 'commit', key: [input.at.commit_digest] }).value, 'graph_unavailable');
+          graphAssert(!storage.head().value.maintenance, 'graph_maintenance');
+          // Validate the retained catalog behind the current selected Graph,
+          // without selecting any unrelated local entity or source payload.
+          this.#selected(context, tx, storage, { generation_id: input.at.generation_id });
+        } else local = this.#readInView(context, tx, localInput, paging);
         // No previously materialized fragment is returned when final access changes.
         canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
         this.#invalidations.assertFence(context, { sequence: fence });
-        const origin_base = canonical.material(origin, input.shared_keys);
-        const current_project = canonical.material(project, input.shared_keys);
+        const origin_base = canonical.material(origin, selectionOnly ? null : input.shared_keys);
+        const current_project = { ...canonical.material(project, selectionOnly ? null : input.shared_keys), version: metadata.project.version };
         const coverage = current_project.coverage;
         return { exploration_id: input.exploration_id, generation_id: input.at.generation_id, graph_revision: input.at,
-          local, shared: { origin_base, current_project, coverage }, availability: {
-            local: local.status ?? 'selected', origin_base: origin_base.status, current_project: current_project.status } };
+          ...(selectionOnly ? {} : { local }), shared: { origin_base, current_project, coverage }, availability: {
+            local: local?.status ?? 'selected', origin_base: origin_base.status, current_project: current_project.status } };
       });
     });
   }
   resolveExploration(context, options, canonical_reader) { return this.#readExploration(context, options, canonical_reader, false); }
   pageExploration(context, options, canonical_reader) { return this.#readExploration(context, options, canonical_reader, true); }
+  getExplorationSelection(context, options, canonical_reader) { return this.#readExploration(context, options, canonical_reader, false, true); }
   getHead(context, options) {
     return this.#call(() => {
       const input = graphInput(options); graphFields(input, ['generation_id']); graphId(input.generation_id);

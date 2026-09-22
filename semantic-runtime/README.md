@@ -46,6 +46,14 @@ worktree bindings, one Graph generation per exploration, fixed canonical bases
 and a separate Project selection. Guarded writes preserve exact origins across
 switching and retry; App integration and adoption remain pending.
 
+The [selected Judge runtime](docs/judge-runtime-v0.md) now evaluates one compiled
+Judge node against exact admitted event/target revisions, using the configured
+TypeSafe, Vercel or OpenRouter route. It checks permissions and pinned state before
+send, on return and on cache reuse; it exposes a narrow typed node bridge.
+`npm run check:jev:judge` exercises all four families and in-flight source
+revocation with fixed synthetic inputs. Full Policy execution, App/plugin wiring
+and candidate publication remain separate caller responsibilities.
+
 The [local Git worktree sensor](docs/local-git-worktree-sensor-v0.md) captures
 bounded HEAD/index/worktree metadata for an enrolled execution and submits it
 through durable ingress. It reports unsupported or racing observations as gaps.

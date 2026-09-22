@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-selected-judge-nine-v1",
+  "measured_at": "2026-09-22T16:40:13.610Z",
+  "transport_calls": 9,
+  "provider": "typesafe-direct",
+  "matched": 8,
+  "total": 8,
+  "isolated_explorations": 2,
+  "completed_cache_hits": 8,
+  "explicit_candidate_publications": 4,
+  "inflight_revocation": {
+    "fetch_boundary_entered": true,
+    "provider_completed": true,
+    "result_status": "refused",
+    "reason_code": "stale_invalidation_fence",
+    "graph_unchanged": true,
+    "model_output_discarded": true
+  },
+  "canonical_promotion": false,
+  "ingress_acknowledged": false,
+  "other_routes_live": false,
+  "results": [
+    {
+      "id": "durable-yes",
+      "family": "durable_cross_ticket_value",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "target_count": 0,
+      "confidence": 0.82,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 349,
+      "elapsed_ms": 454,
+      "input_hash": "d457ab70f9144f6a3c1c887e8184c528532cf6a1a1ac38c9f3328a02d6b62dd1",
+      "result_digest": "sha256:8eb5dc03f947ac7e48c2ad716df43f5f0865b22d5a65e9093b0497d68544b2c9",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 374
+      }
+    },
+    {
+      "id": "durable-no",
+      "family": "durable_cross_ticket_value",
+      "branch": "B",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "target_count": 0,
+      "confidence": 0.89,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 267,
+      "elapsed_ms": 318,
+      "input_hash": "c3f37f5030482270697d45016029cd061d78a8e4555a55c9b961c0af2cff2559",
+      "result_digest": "sha256:2dd17cac3138690f1dac35fff751307b5cefda7c593edf81317fa9a0a15ccc95",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 371
+      }
+    },
+    {
+      "id": "work-yes",
+      "family": "independently_schedulable_work",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "target_count": 0,
+      "confidence": 0.96,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 104,
+      "elapsed_ms": 190,
+      "input_hash": "1cc09bfdffa9014c3223833f25ed70838fadbb76a8a669e8b8d69e8b84af4a7f",
+      "result_digest": "sha256:bf398b0804a64174d6a64dfc5bac522f153378d2539d19d55f784450889b0db3",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 381
+      }
+    },
+    {
+      "id": "work-no",
+      "family": "independently_schedulable_work",
+      "branch": "B",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "target_count": 0,
+      "confidence": 0.97,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 115,
+      "elapsed_ms": 168,
+      "input_hash": "c8d243c4ff5c0994ada192f65a23ab18ce34f5fb4b5907ba33ad68088c326e6a",
+      "result_digest": "sha256:b76348f0bb5f67fdf285ebb16a2c1daa155f4d7a91a2ede21453d6e52b3130c8",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 372
+      }
+    },
+    {
+      "id": "acceptance-yes",
+      "family": "acceptance_relevance",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "target_count": 1,
+      "confidence": 0.95,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 147,
+      "elapsed_ms": 309,
+      "input_hash": "384348bf6eea4459fb4398c1b8af22df75fa6333eda9c38eef44342bc4eb3574",
+      "result_digest": "sha256:8ee23d649b55e13f4393663d035f016324fa443b5ae087d21cfc923b3fcfa8b2",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 552
+      }
+    },
+    {
+      "id": "acceptance-no",
+      "family": "acceptance_relevance",
+      "branch": "B",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "target_count": 0,
+      "confidence": 0.99,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 154,
+      "elapsed_ms": 258,
+      "input_hash": "7c92ace9eaa73e02eeb1e9686917e4aaddda373b6478d87c9d9852465ffd8c2d",
+      "result_digest": "sha256:95b79b5338a9a4f6145f824aec3fa197bbf124feb5005cbe0b2e8e09a80eb2ed",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 541
+      }
+    },
+    {
+      "id": "context-yes",
+      "family": "context_relevance",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "target_count": 1,
+      "confidence": 0.95,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 183,
+      "elapsed_ms": 342,
+      "input_hash": "3af883b659b132afe4414fa7d225b57c85094e576818070acc37be96ea0b32a6",
+      "result_digest": "sha256:457b6738b0c16ef3fd3e7dd818d864350dad8eb9144f4555297a81183886aa47",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 549
+      }
+    },
+    {
+      "id": "context-no",
+      "family": "context_relevance",
+      "branch": "B",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "target_count": 0,
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 153,
+      "elapsed_ms": 260,
+      "input_hash": "b323f7c876ba288852837652a7902c08c4472dc0a55f58df0fa07d85aeeabce8",
+      "result_digest": "sha256:5fb2a80235465e848d10444ad64b5dc13022e3bc3fb61a12fd805c9b0b1c55bb",
+      "attempts": 1,
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 546
+      }
+    }
+  ]
+}
