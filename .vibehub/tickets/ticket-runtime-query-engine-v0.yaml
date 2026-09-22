@@ -28,7 +28,7 @@
         "label": "ranking-is-explainable"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "query-degrades-safely",
@@ -38,39 +38,94 @@
         "label": "query-degrades-safely"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "query-pins-consumer-and-snapshot",
       "criterion": "QueryRequest binds tenant/project/principal, consumer/session/task, explicit exploration and selected shared-base revision, exact/current graph snapshot, watermarks, notice inclusion, budgets and staleness tolerance. Project overview queries aggregate labeled scopes and never default to main or global latest as universal truth.",
       "identity": "sha256:6c77e1c2477036f6774b8cd3dbe48ade9c13f3624e7bc02ac926004393d42f1b",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "candidate-generation-is-bounded",
       "criterion": "Exact IDs, Project/Room/Ticket/repository/exploration, graph neighbors, FTS, optional embeddings, recency and lifecycle feed a bounded candidate set. Keep selected shared background, own exploration state and related other-exploration notices distinguishable; do not deduplicate away genuine alternatives.",
       "identity": "sha256:ee723d8b90ec7554f433cfe7a32df278f7a705bf9936b81f3d9847dc87ed9818",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "lifecycle-aware-selection",
       "criterion": "Consume the scoped Context lifecycle/read contract when constructing current/as-of candidate sets: return role/applicability, exact lineage, selected shared base and explicit historical/superseded status. User/workspace UI hide preferences never silently remove governing Context from Agent compilation; current authorization still gates history.",
       "identity": "sha256:4b0cb24124e0ee587b15f52b0c2517d13a719194c3ffd3faa0ba778fcfe7841c",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "query-pins-consumer-and-snapshot",
+      "criterion": "Deliver the fixed LocalQueryEngine query/next contract for one explicitly selected own exploration and at most two related scopes. Bind authenticated tenant/Project/principal, declared consumer/session/task, exact current/as_of Graph commits and actual watermark/lag coverage, immutable origin shared bases, current Project selection/version, source fence, notice inclusion, result/token budgets and staleness requirements. Return one coherent observed selected window with all resolved pins and honest partial coverage; Project overview preserves labeled scopes without inferring main/global latest. Actor-bound continuation serves the same bounded ranked window, reauthorizes current access and endpoint pins, and expires after eviction/restart.",
+      "identity": "sha256:4d700a5991f618f115c3bd1c8db809aee83b273c3c3b3bba9a2d9732017ebf37",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "candidate-generation-is-bounded",
+      "criterion": "Actually combine bounded exact IDs, verified Project/exploration/Ticket/Room/repository scope, authorized one-hop graph lineage, positional full-text term/phrase matches, publication recency and lifecycle/conflict variants in one selected-window candidate union. Apply current access before text/index/rank; prove each scope filter from immutable configured canonical and actual Context/code facts. Distinguish selected shared background, own hypotheses and related-scope notices. Deduplicate only identical exact scoped references and retain complete selected conflict alternatives, including A/B copies. Implement a real bounded in-memory positional index without requiring unavailable SQLite FTS5 or global recall; optional embeddings remain explicitly not_configured and do not disable FTS.",
+      "identity": "sha256:505601aa5ce23b39012be4d35ee401ba8b6f23f632465f9e18aca82a7390f676",
+      "revision": 3,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ranking-is-explainable",
+      "criterion": "Publish a pure versioned deterministic rankContextWindowV1 and replayable nonsecret factor trace covering relevance, consequence, novelty, authority, redundancy, freshness and optional actual Context Judge results. Fix integer methods, weights and exact-ref tie breaks; preserve all source/pin/status/method evidence. Optional Judge ranks only up to eight eligible own current noncontested typed Contexts through the exact same-store/authority/configuration evaluateContext capability with actual admitted event/source/egress proof and existing budgets; no caller model targets or shadow assertions. Recorded positive/negative results adjust ordering as specified while uncertain/unselected results do not invent labels. Replaying the selected factors plus captured Judge decision reproduces order/digest; similarity or confidence never grants canonical governing status.",
+      "identity": "sha256:a4136e9eee5a4411203edbb4d6e5fefabf55c90cf67368d5db676bdb60ab812d",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-degrades-safely",
+      "criterion": "Exercise real disposable Git/SQLite/scoped grants/Context and recorded Judge transports to prove access precedes indexing/ranking, complete conflict groups survive filtering/budget/pagination, exact/graph/scope/text fallback, explicit unavailable embeddings/Judge and bounded text-index failure, stale snapshots and selected shared/local overlay, current authorization for historical source material, source/grant/head/Project/fence changes during optional Judge work, deterministic actor-isolated continuation and restart expiry. Provider/key/timeouts/low-confidence may degrade to a freshly authorized local ranking; source or local authorization loss cannot return stale text. Ordinary tests need no credentials or model; full Runtime, standalone and plugin artifact verification pass. A separate opt-in at-most-two-send synthetic JEV checker must use Query through the actual Context bridge and honestly report positive/negative rank effect or unavailable/mismatch, without adding provider permissions, retrying disagreements or treating direct adapter output as Query validation.",
+      "identity": "sha256:b9d28fd8981504bc42168f48aca6b0e59b406c0c0e402763645936d6ebeff156",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-aware-selection",
+      "criterion": "Use the accepted Context lifecycle/read contract for actual role, verified or explicitly uncertain applicability, immutable publication/exact one-hop lineage, selected shared base and current/as_of asserted/projected/historical/superseded states. A-origin/B-adoption/A-supersession/B-current fixtures preserve independent own/notice identities and lineage; other-scope candidates remain notices until an explicit separate adoption command. Configured active canonical Authority stays separately present regardless of text/scope matches, budget pagination or absent UI-hide/archive preferences. Read-time source/ACL restrictions gate all history and shared records; local validated status, user preference or model relevance never invents canonical truth or authority.",
+      "identity": "sha256:0c87242ec54aa14733e5a10a0a4ab996407c2b3548a257362e6fa9acc8bda7b7",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 3,
+  "active_contract_revision": 4,
   "constraints": [
-    "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
-    "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
-    "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
-    "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "Implement only within semantic-runtime/ using its actual accepted local capabilities. No new dependency, persistent table/namespace, generic adapter registry, background index/backfill, durable Query cache/journal, embeddings provider, Worker/Compiler/answer synthesis, App/HTTP/cloud/plugin wiring, proactive delivery/ACK, source refresh/capture, Git/canonical write or automatic adoption. One coherent Query Ticket owns all five obligations; pure text/rank, fixed selected composition and public conformance may be implemented in parallel internally. No acceptance is retired, transferred or waived.",
+    "Public constructor: LocalQueryEngine({store,authority,canonical_reader,judge_runtime:null|actualLocalJudgeRuntime}); construction is inert. Public async query(context,request,{signal}={}) and next(context,{cursor},{signal}={}); no callbacks, caller candidates/scores/proofs or raw SQL. Require current opaque LOCAL_AUDIENCE query:read, context:read and existing store:read, graph:read, exploration:read, ingress:read, source:invalidation:read actions; derive scope/principal/kind from the actual grant. Query read paths do not require activation, writable Git or provider credentials. Optional Judge separately requires all accepted dispatch actions/activation and human/service kind.",
+    "Fixed internal seam: QueryInputs({store,authority,canonical_reader}) exposes read-only config_digest from the actual canonical helper, may defensively reuse root-owned queryRequest normalization, and grant(context) returns {scope,actor,actor_kind}; prepare(context,normalizedRequest) synchronously returns frozen {schema_version:1,request_digest,grant,selection,shared,filters,candidates,conflict_groups,lineage,freshness,coverage,omissions}, privately instance/context-branded by WeakMap. assertCurrent(context,prepared) synchronously revalidates the retained actual proofs in one fresh fixed snapshot and returns prepared or a bounded domain code; no callback or new public materialization. Each candidate is {key,ref,exploration_id,layer,item,source_reasons,conflict_group,publication,selected_sequence,scope_match}; item is the actual complete Context item, key hashes [layer,exploration_id,ref], source_reasons contains fixed recipe kind/source_id, publication is verified {origin_ref,graph_revision,sequence}, and scope_match records matched/uncertain/mismatch plus the three fixed dimension methods/proofs and verified count. Shared retains actual current_project/origin canonical material, exact keyed usable documents and mandatory_authority_keys separately. Filters expose actual existing Ticket projections, Room record/event/repository/format/commit/anchor facts and catalog-proved repositories. Coverage returns actual per-recipe inspected/returned counts and continuations; freshness uses actual selected/current sequences/vectors. Returned lineage links strip item bodies; exact authorized role/ref/availability/source pointers remain, while candidate text is returned only after materializing that ref within an explicitly selected own/related scope. Pure text/rank consumes only those authorized facts; root engine owns request/result/window/Judge composition. This is a fixed internal module boundary, not a generic input registry.",
+    "Exact QueryRequest1 required fields: {schema_version:1,request_id,consumer:{consumer_id,session_id,task},own,related,expected_project_selection_version,expected_source_fence,exact,lineage,text:{value,match},scope:{tickets,rooms,repositories},seen_refs,freshness:{minimum_watermarks,max_commit_lag,allow_unknown_coverage},budget:{max_results,token_budget},judge}. session_id/task may be null; labels are not authenticated historical Sessions. Each scope selection is {exploration_id,at,mode,expected_shared_base,heads_cursor}, mode current|as_of, heads_cursor null or actual Context heads continuation. own required; related has <=2 distinct other explorations; an empty related array excludes notices and each supplied selection explicitly includes its notice scope. All at values are exact same-authenticated-Project GraphCommitAddress2; shared-base null/pin must equal actual immutable origin. Current mode requires exact current head; as_of pins exact history and records its current observed head. No main/latest/global selector is inferred.",
+    "Exact selectors: exact <=8 unique {exploration_id,address} entries, where address is an exact entity revision in one explicitly selected generation; lineage null or {address,cursor} selecting one exact own root and its actual one-hop Context continuation. Request scope.tickets and scope.rooms are each <=2 exact configured canonical refs {at,address,record_key}; consumer.task is null or one such Ticket ref. scope.repositories <=4 unique actual catalog repository IDs. seen_refs <=32 exact entity refs are declared hints only. Text value <=4096 UTF-8 bytes and <=32 normalized tokens; match all_terms|phrase, empty text means no text constraint. Unknown fields/accessors/proxies/non-inert JSON refuse under existing <=1MiB/depth<16/50000-node rules. Fixed candidate limit64 needs no caller tuning field.",
+    "Bounded recipe per window: one Context heads page of limit8 in each selected scope (<=24 underlying rows), <=8 exact resolutions, one own lineage page limit8 plus root, and <=16 additional exact conflict variants across the window. No scan-to-fill or repeated source pagination; maximum64 unique authorized local revisions, <=8 distinct canonical selection pins [at,address] across candidate applicability AND task/Ticket/Room filter proofs together, <=16 configured record keys per pin, and existing per-Context source/typed/chain bounds. Count attempted selected slots separately from authorized candidates; reject capacity rather than silently truncate required semantics. Return actual per-source next-window locators; their continuation selects a new window and may yield different ranks. Unrelated Graph history must not increase selected point/range reads.",
+    "Prepare canonical/Ticket proofs and bounded immutable candidate inventory outside the final snapshot, then use ContextInputs, plan/readContextSelection, actual ExplorationInputs/ExplorationCanonical and selected Graph ports in a fixed private composition. No caller hook, no public nested snapshot or transaction across await. Materialize only through actual authorized Context/canonical reads; raw storage bytes locate proof inputs, never confer access. Recheck each involved grant/scope, owned generation/origin, exact selected/current source heads including actual lineage origins, current Project pointer/version, source fence and real selected source/registration/provenance facts before return and after awaited Judge work. Endpoint changes refuse the whole response with bounded codes and no stale prefix. Historical mode preserves semantic history, never old ACL authorization.",
+    "Conflict materialization must use exact deduplicated [projection.head,...projection.competing] from an authorized selected Context; page(collection:conflicts) supplies head/conflict metadata, not all variants. Resolve every exact variant through the accepted typed reader; core v2 may hold32 alternatives and denies the whole entity if any competitor is unreadable. Query allows <=16 variants in a group and <=16 additional variant reads in its window; exceeding either refuses query_capacity, never chooses/truncates a winner. Group all selected variants and any explicitly selected historical member by scope/generation/entity; preserve each asserted/projected/historical role and every actual conflict ref. Match/rank/paginate the whole group atomically (group passes if any variant passes; nonmatching variants remain labeled). No current semantic selection of foreign branches is implied.",
+    "Verify canonical filter records as actual reader-issued usable Ticket or Room entries at their exact pins with current source access. Ticket dimension is OR of verified requested Ticket identities (consumer.task included), comparing actual ticket_id+Contract identity; Room dimension OR; repository dimension OR; nonempty dimensions combine with AND. A proven mismatch excludes an ordinary candidate; declared any passes without pretending an exact match; unspecified or insufficient code applicability remains uncertain, included with explicit reason and zero verified-scope credit. Project/exploration identity always comes from actual owners. Request labels/refs never grant a match. Candidate exact Ticket proofs retain their own supports even when a pin/key union is reused.",
+    "Room scope is deliberately literal and immutable: compare each verified candidate code ref against the actual Room canonical git_revision event by repository_id, object_format and commit_oid, then match path===anchor or path starts with anchor + slash. Anchors are validated repository-relative path components, no wildcard/glob, filesystem scan, HEAD ancestry or semantic membership inference. A different known repository/commit/path is a mismatch; absent/unspecified code association is uncertain. Return the exact Room ref/event and code ref plus match method; stale Room metadata is labeled, not silently treated current. Repository filtering uses actual verified code repository IDs and actual selected catalog membership.",
+    "Each result keeps shared selected canonical material separate from ranked local results. Own and related origin bases retain explicit current/historical/partial/unavailable roles; current Project selection is separate and versioned. Preserve all configured active Authority records through existing canonical materialization even when absent from filter keys or text matches, with governing origin/selection evidence. Null shared coverage stays unavailable; known selected nonnull origin must remain authorized current/historical, known nonnull current Project must remain authorized current. Related exploration candidates have layer notice and owning exploration labels, never own/canonical status; project overview means only these explicitly labeled <=3 scopes. No hide/archive preference exists in this wire.",
+    "Implement actual full-text context-text-v1 as a bounded per-window positional inverted index over already authorized Context summary/detail and returned canonical textual fields (Context summary/detail, Room description/boundary, Ticket outcome; other canonical kinds summary when present). Normalize NFKC then Unicode lowercase; tokens are maximal Unicode letter/number/underscore runs. all_terms intersects postings; phrase additionally requires contiguous ordered token positions. Document exact token rules/CJK limitations and selected-window recall; no substring masquerading as FTS, stemmer/vector service or global top-k claim. Limit total indexed UTF-8 bytes262144 and postings65536; exceed/known internal index failure records text_unavailable and uses exact/scope/graph/recency baseline, without hiding that text predicates were not evaluated. Unknown programming exceptions still refuse; tests inject the bounded index failure at its own pure boundary, not a public callback.",
+    "Candidate reasons form a deterministic union of exact, heads/scope, authorized lineage, full-text, recency and lifecycle/conflict. Keep non-text fallback candidates even when text does not match, with hit=false and zero text credit; this is ranked contextual retrieval, not a global filtered search. Canonical full-text hits are annotated only in the separate shared layer. Dedup only identical [layer,exploration_id,exact revision ref]; never collapse different revisions, A/B copies or conflict variants because text matches. Optional embeddings report not_configured; actual FTS remains required and works with judge_runtime=null.",
+    "Export pure rankContextWindowV1({candidates,shared,seen_refs,judge}) over normalized authorized facts, with no I/O or auth callback. Versioned fixed score per variant:100*exact +20*verified_scope_dimensions +10*matched_distinct_terms +5*lineage +3*recency_bucket +2*novelty +consequence -2*redundancy +30*judge_sign. Raw booleans are0/1; scope dimensions count only actually requested verified Ticket/Room/repository dimensions; term count0..32. Recency bucket4 for publication distance0,3 for1..3,2 for4..15,1 for16..63,0 otherwise, based on actual publication-origin commit sequence versus selected commit in the same generation. Consequence heuristic decision/constraint2 else1; novelty means absent from declared seen_refs; redundancy1 for identical normalized summary/detail text after the lexically first exact ref in the same exploration only. These are explicit heuristics, not inferred impact, durable unseen or cross-branch equivalence.",
+    "Trace every factor with method/raw/weight/contribution and exact supporting refs; actual selected/current sequence lag and commit FreshnessVectors accompany freshness, not invented wall-clock recency. Local and notice authority factor is always0; shared active canonical Authority has verified governing=true in separate trace and cannot be hidden or converted into a local score. A conflict group score is maximum variant score, no winner field; preserve every variant trace. Sort own before notice, notices by exploration_id, then each layer/scope by descending group/item score and canonical exact-ref/group key lexical tie break. The ordered trace plus fixed versions and captured Judge decision replays identical order/rank digest; a fresh model invocation is not promised deterministic.",
+    "Optional judge is null or {node_id,event_id,epoch,execution,execution_workspace_id,expected_binding_version,expected_catalog_version}. Derive all other existing Context Judge request pins from the own selected window and a query-prefixed digest of normalized request_id/request; caller Query text never replaces the actual admitted event snapshot or immutable Context text. Choose at most8 baseline-ranked eligible own current noncontested exact head Contexts with allowed lifecycle and <=4096-byte fixed role/summary/detail model text. Historical/related/contested/unsupported/overflow/rest candidates remain visible with not_evaluated reason. One evaluateContext invocation per window through the real installed semantic-context-judge descriptor; preserve bridge provider/egress/settings/activation/deadline/shared attempt/token/cost bounds. No new provider/network authorization arises from Query.",
+    "An injected Judge must be the actual LocalJudgeRuntime constructed with the identical DomainStore and LocalCredentialAuthority object and same canonical_reader config digest; its trusted scope must equal the authenticated Query scope. Add only one fixed module-private WeakMap-backed binding assertion owned by judge-runtime, callable by the Query owner, populated by the real runtime constructor; instanceof or caller JSON is insufficient. Do not expose configuration, credentials or a generic registration factory. Reject mismatch before any Judge call. Constructor checks remain inert; runtime itself retains all normal source/target/egress checks. Query may call evaluateContext directly; it must not call an adapter or manufacture a bridge proof.",
+    "Judge sign is+1 only for returned exact target refs of a confident positive decision; a confident negative decision gives-1 to all exact targets actually sent; positive-unselected, uncertain, deferred or absent decisions give0 with explicit reason. Preserve sanitized decision/result/input hashes, selected policy/settings/profile identities and reserved/observed-or-unknown usage in the trace. The response does not claim canonical authority or compliance from relevance. Missing optional runtime/configured key/provider, denied external destination, timeout/cancellation of optional work or low confidence may yield explicit local baseline degradation only after final current local proof succeeds. Caller AbortSignal cancellation stops the whole Query; local grant/source/head/shared/fence changes always refuse rather than downgrade stale data to a local fallback.",
+    "Freshness request minimum_watermarks has <=3 unique {exploration_id,vector} entries for selected scopes using validated existing FreshnessVector. Only its requested source target_sequence thresholds constrain actual selected completed_through/accepted_through; caller statuses are never proof. Missing target/source/unordered coverage is unknown; known incomplete coverage fails requested minima. max_commit_lag null or0..10000 bounds selected-to-current commit sequence lag within each same generation; current mode still requires equality. allow_unknown_coverage=false refuses unknown requested coverage (including selected vector unknown when no minimum supplied); true labels it explicitly. Return selected/current actual commit sequences and selected vector, never claim source global catch-up from an empty/missing vector.",
+    "Result QueryResult1 fields are {schema_version:1,request_digest,window_id,consumer,selection,shared,items,rank_trace,coverage,degradation,omissions,cursor}. consumer records actual scope/actor/kind plus declared consumer/session/task; selection records each own/related exact at/mode/origin/observed head/sequence/watermarks, current Project pin/version and source fence. items are tagged context or conflict group with layer own|notice, exact refs, Context meaning/applicability/publication/lineage/source metadata and factor identity. rank_trace is bounded replay input/output for the entire fixed window; shared canonical text is never folded into local items. coverage.kind selected_window and global_recall unknown are mandatory; each source reports inspected/returned counts, actual next-window locator and precise omitted/unavailable states, not a full-project completion claim.",
+    "budget.max_results integer1..16 counts atomic result units (a complete conflict group is one unit); token_budget integer1..262144 uses conservative serialized UTF-8 bytes as token accounting, not an actual provider tokenizer. First account mandatory shared Authority, all exact pin/provenance/lifecycle/group-reference metadata and bounded rank trace; if that cannot fit, refuse query_budget_too_small. Full optional candidate text may become a pointer-only unit, with all exact refs/statuses/reasons retained and an explicit text_omitted flag; a conflict group is budgeted atomically. No silent Authority/conflict/provenance loss. Total wire response and retained material remain <=1MiB; index bounds remain separate. Document accounting and test UTF-8 multibyte behavior.",
+    "Pagination is only over this one bounded ranked window. Retain at most16 completed private windows and8MiB per LocalQueryEngine instance, keyed to actual scope/actor/kind, the original opaque authorization-context object and frozen configuration/request/rank/text versions/all selection and actual Judge result identities. cursor is a fresh unguessable opaque locator plus position, contains no authority/score/text, and is not a resumable durable claim. This first slice intentionally also binds the exact original opaque credential-context instance: a fresh token/context for the same actor must start a new Query, and cannot refresh or reuse retained proofs. Test that refusal explicitly; no hidden grant-renewal framework. next reauthorizes every selected local/canonical/support fact and observed endpoint pin (including as_of current ACL/observed head) before exposing the next slice; changed pins refuse with no stale prefix, unknown/evicted/restarted cursor gives query_cursor_expired. No model call on next and no falling forward/rescan/rerank. Captured Judge trace remains explicitly the original window observation, not a new current provider decision. Source-window cursors instead enter a new query request and are not this ranked continuation.",
+    "Conformance uses actual temporary Git/SQLite and public Context/canonical/adoption/Judge fixtures: term and phrase positive/negative/multibyte postings, exact Room same-commit path boundary and mismatch, Ticket/consumer task/Room combined pin capacity, unspecified versus any versus exact scope, identical text A/B, complete conflict variants (including denied competitor and >16 refusal), current/as_of/superseded history, A supersession with independent B adoption, mandatory Authority despite negative text/filter, source/token/material/window bounds, empty source pages with continuation, text-index failure, actual baseline versus positive/negative selected Judge adjustments and replay, mismatched real store/authority/config runtime zero-send refusal, after-await revocation/head/Project/fence change, actor cursor isolation/expiry/restart and no per-window model replay. Preserve existing read roles and legacy Judge paths; Query changes no graph/origin/receipt/outbox/ACK/canonical state.",
+    "Optional opt-in check-jev-query synthetic command executes through LocalQueryEngine.query -> same actual LocalJudgeRuntime.evaluateContext -> the existing single explicitly credentialed TypeSafe route, at most2 actual sends/one attempt per fresh request. One synthetic event is relevant to the own Context and one unrelated; preserve actual expected/observed labels, eligible target map, baseline/final order and judge_sign contribution, input/result/selection hashes, actual send counts and bounded usage/latency. Mismatch/unavailable is honest; no retry on disagreement and no extra model call from next. Deterministic recorded-transport tests prove exact positive/negative ranking even without credentials. No new credential search, provider or network permission; use only the already explicitly authorized synthetic route.",
+    "Verification after implementation: focused query tests plus affected Context/Context-Judge/Judge/canonical suites, npm run verify and npm run verify:standalone from semantic-runtime, root npm run verify:artifact and git diff --check. Parent-level current sources may be read but Runtime imports no sibling implementations. Native planning validation must independently inspect this candidate, all five preserved responsibilities/dependencies and real boundary cases before apply. No successful Query Outcome may waive FTS/scope/notices/ranking/degradation/lifecycle in favor of future infrastructure."
   ],
-  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Dependency clarification: branch-graph-projection supplies isolated snapshots/views; actual adoption lineage remains required through context-lifecycle-lineage -> exploration-adoption. This does not make query execution ready from view completion or waive any current acceptance. Bounded causal prerequisite refinement: selected typed Context cannot be passed to the accepted legacy judge-target wire. The separate ticket-runtime-context-judge-bridge-v0 supplies that authorized exact-source/pin/egress bridge. This Query Ticket remains draft; all five active acceptance obligations, existing four dependency edges and Acceptance/Contract history are unchanged. Its eventual FTS/text/scope/notices/ranking/degradation/lifecycle wire must be independently refined after the bridge Outcome; this metadata update authorizes no Query implementation.",
+  "context": "Small local library Query slice over the accepted selected Graph, canonical, exploration, Context and typed Judge bridge. Scope is one explicitly bounded window, not global recall, persistent indexing, Compiler or proactive delivery. All five original logical obligations and five historical causal dependencies remain owned here; no acceptance transfer or scheduling ceremony. All five exact direct prerequisite Outcomes are successful and resolved below.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -99,6 +154,130 @@
     {
       "purpose": "Original broad branch Contract1 before explicit adoption responsibility transfer; current query Acceptance/Contract and dependencies remain intact.",
       "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite: exact Contract4 sha256:79aee523c2dc54588cafffe0d213523526b035e1374d84318448c2413792c535. Semantic ranking consumes the tested bounded judge/access/materialization path and its Graph prerequisite.",
+      "ref": ".vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml"
+    },
+    {
+      "purpose": "Actual successful exact causal input for the existing dependency on ticket-runtime-judge-runtime-v0; read its accepted responsibilities before changing this consumer.",
+      "ref": ".vibehub/outcomes/ticket-runtime-judge-runtime-v0/contract-v4.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite: exact Contract2 sha256:970117d359b7f01da6e7b98c11d17df8f2f83a329c1c9715d848e333498d3288. Exact Ticket/Room/Authority/task-contract retrieval needs an actual initial canonical-reference projection.",
+      "ref": ".vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml"
+    },
+    {
+      "purpose": "Actual successful exact causal input for the existing dependency on ticket-runtime-canonical-source-reader-v0; read its accepted responsibilities before changing this consumer.",
+      "ref": ".vibehub/outcomes/ticket-runtime-canonical-source-reader-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite: exact Contract2 sha256:ddc613e30885cd5080b6d049011b1fece57eb257be70d94ca6014e2e1042d997. Exact owned exploration snapshots, guarded branch views and fixed shared-base/current-Project separation; adopted lineage is consumed through the existing context-lifecycle-lineage prerequisite, which now depends on the adoption command.",
+      "ref": ".vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Actual successful exact causal input for the existing dependency on ticket-runtime-branch-graph-projection-v0; read its accepted responsibilities before changing this consumer.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite: exact Contract2 sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5. Domain applicability/lifecycle projection used by retrieval, beyond raw Graph revisions.",
+      "ref": ".vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml"
+    },
+    {
+      "purpose": "Actual successful exact causal input for the existing dependency on ticket-runtime-context-lifecycle-lineage-v0; read its accepted responsibilities before changing this consumer.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-lifecycle-lineage-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite: exact Contract1 sha256:1970a2dd7d7d1fde9516fa004b6924b864b886df1be6eadb7c0b7568283ce717. Actual typed runtime_context relevance requires the separately authorized selected Context Judge bridge; accepted legacy Judge Contract4 supports judge-target only. Its successful Outcome supplies the exact Context-to-model materialization/dispatch capability consumed by optional Query semantic ranking. No Query responsibility is transferred or waived.",
+      "ref": ".vibehub/tickets/ticket-runtime-context-judge-bridge-v0.yaml"
+    },
+    {
+      "purpose": "Actual successful exact causal input for the existing dependency on ticket-runtime-context-judge-bridge-v0; read its accepted responsibilities before changing this consumer.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-judge-bridge-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked bridge Evidence named by its independent successful Outcome; selected typed source and bounded real-provider behavior reused by Query.",
+      "ref": ".vibehub/evidence/ticket-runtime-context-judge-bridge-v0/context-judge-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked bridge Evidence named by its independent successful Outcome; selected typed source and bounded real-provider behavior reused by Query.",
+      "ref": ".vibehub/evidence/ticket-runtime-context-judge-bridge-v0/context-judge-verification-20260922.yaml"
+    },
+    {
+      "purpose": "Active local App/plugin product goal; deliver a reusable bounded Query library before host UI or Worker integration.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Existing downstream owner of durable notice delivery/seen/deferred/handled/recovery. Query returns on-demand related-scope notices only; do not add a reverse dependency or transfer Query acceptance.",
+      "ref": ".vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml"
+    },
+    {
+      "purpose": "Accepted exact/current/as_of Context facade, immutable meaning/applicability, conflict plurality and current authorization for history.",
+      "ref": "semantic-runtime/docs/context-lifecycle-v0.md"
+    },
+    {
+      "purpose": "Actual evaluateContext selected input, current lifecycle eligibility, immutable scope binding, source egress, budgets and cache semantics.",
+      "ref": "semantic-runtime/docs/context-judge-bridge-v0.md"
+    },
+    {
+      "purpose": "Reuse actual typed resolve/page/lineage wire; no invented local filter or reverse-neighborhood API.",
+      "ref": "semantic-runtime/src/local/context-store.mjs"
+    },
+    {
+      "purpose": "Fixed planning/read stages, authorized projections/publication, source-head recheck and one-hop pagination; conflict pages are not variant materializers.",
+      "ref": "semantic-runtime/src/local/context-reader.mjs"
+    },
+    {
+      "purpose": "Batch configured canonical Ticket proofs with per-content support; current code association and explicit uncertainty.",
+      "ref": "semantic-runtime/src/local/context-inputs.mjs"
+    },
+    {
+      "purpose": "Actual typed role, applicability and content bounds; do not create parallel lifecycle truth.",
+      "ref": "semantic-runtime/src/core/context-profile.mjs"
+    },
+    {
+      "purpose": "Actual reader issuance and configured record selection; preserve current/historical/null status and mandatory active Authority.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Existing owned generation/origin, immutable shared base and current Project selection; use fixed actual metadata reads.",
+      "ref": "semantic-runtime/src/local/exploration-inputs.mjs"
+    },
+    {
+      "purpose": "Actual authorized same-view Graph port; source access checks precede returned text.",
+      "ref": "semantic-runtime/src/local/graph-selected.mjs"
+    },
+    {
+      "purpose": "Selected bounded fact/range reads and origin commit pointers; no full database or commit-history scan.",
+      "ref": "semantic-runtime/src/local/graph-storage.mjs"
+    },
+    {
+      "purpose": "Version2 selected commit sequence/watermarks, up-to32 conflict projections, current-source closure and strict bounded semantic reads.",
+      "ref": "semantic-runtime/src/core/incremental-graph.mjs"
+    },
+    {
+      "purpose": "Real FreshnessVector/source partition validation; unknown/missing/unordered coverage cannot become caught-up.",
+      "ref": "semantic-runtime/src/core/causal-ordering.mjs"
+    },
+    {
+      "purpose": "Actual canonical Ticket/Room/Authority validation and literal repository-relative Room anchors.",
+      "ref": "semantic-runtime/src/core/canonical-records.mjs"
+    },
+    {
+      "purpose": "Actual selected typed Context dispatch and private configuration/cache; add only a fixed exact-object binding check for this consumer.",
+      "ref": "semantic-runtime/src/local/judge-runtime.mjs"
+    },
+    {
+      "purpose": "Actual source/canonical/context/activation proof and minimized event/Context envelope; Query must not substitute request text.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Disposable real Git/SQLite typed Context/publication/adoption/canonical source setup for local Query conformance.",
+      "ref": "semantic-runtime/test/helpers/context-fixture.mjs"
+    },
+    {
+      "purpose": "Actual configured typed Judge runtime, credentials and recorded transport setup; optional smoke uses this consumer path.",
+      "ref": "semantic-runtime/test/helpers/context-judge-fixture.mjs"
     }
   ],
   "contract_revisions": [
@@ -184,12 +363,43 @@
       ],
       "identity": "sha256:96b243c7e3b1a5ffb443865d274eb3560facca2a81acda92c8092900a1940dfe",
       "revision": 3
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "candidate-generation-is-bounded",
+          "identity": "sha256:505601aa5ce23b39012be4d35ee401ba8b6f23f632465f9e18aca82a7390f676",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "lifecycle-aware-selection",
+          "identity": "sha256:0c87242ec54aa14733e5a10a0a4ab996407c2b3548a257362e6fa9acc8bda7b7",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "query-degrades-safely",
+          "identity": "sha256:b9d28fd8981504bc42168f48aca6b0e59b406c0c0e402763645936d6ebeff156",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "query-pins-consumer-and-snapshot",
+          "identity": "sha256:4d700a5991f618f115c3bd1c8db809aee83b273c3c3b3bba9a2d9732017ebf37",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "ranking-is-explainable",
+          "identity": "sha256:a4136e9eee5a4411203edbb4d6e5fefabf55c90cf67368d5db676bdb60ab812d",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:7b2911213b3bb0fe7bac41ae5e8767a0bafec3f85cfdcf6585dc6ce2c2547cb1",
+      "revision": 4
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "An authorized consumer queries one exact Graph snapshot and receives explainable ranked candidates from exact scope, graph relations, text/vector indexes, recency, authority, conflict, and freshness.",
+  "maturity": "firm",
+  "outcome": "Retrieve and rank one authorized bounded window of typed Context and selected shared background with exact scopes, full-text matches, lifecycle/notice separation, replayable factors and optional actual Context Judge relevance.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
@@ -197,6 +407,7 @@
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
     "planning:query-context-selected-judge-bridge",
+    "planning:query-selected-window-refinement-20260922",
     "plan-validation:independent"
   ],
   "relations": [
