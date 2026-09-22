@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "query-pins-consumer-and-snapshot",
+    "candidate-generation-is-bounded",
+    "ranking-is-explainable",
+    "query-degrades-safely",
+    "lifecycle-aware-selection"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T20:06:31Z",
+  "contract_revision": {
+    "identity": "sha256:7b2911213b3bb0fe7bac41ae5e8767a0bafec3f85cfdcf6585dc6ce2c2547cb1",
+    "revision": 4
+  },
+  "evidence_ids": [
+    "query-engine-conformance-20260922",
+    "query-engine-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh closeout subagent with no executor role; independently inspected the current Ticket, implementation diff, tests, and all bound Evidence, and reran the focused conformance and repository guards.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v4",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent subagent adjudication accepted all five Contract v4 criteria. The exact Contract identity and all active Acceptance revision identities match both native Evidence records; ticket validation and dirty-worktree context guard pass with no violations. Direct code and test inspection confirms authenticated snapshot and continuation pins, bounded authorized candidate and conflict composition, positional selected-window text search, deterministic replayable ranking with actual fixed Judge composition, safe fallback and post-await reauthorization, lifecycle and notice separation, and mandatory canonical Authority retention. Independently reproduced focused Query tests pass 32/32, git diff --check passes, and plugin artifact verification passes with 79 files and 3670088 bytes. The broader Runtime and standalone totals are supported by the checked verification Evidence; a simultaneous local rerun was intentionally stopped after test-process loopback contention caused by running the two suites concurrently, which does not contradict the sequential recorded verification.",
+  "ticket_id": "ticket-runtime-query-engine-v0",
+  "unresolved_acceptance_ids": []
+}

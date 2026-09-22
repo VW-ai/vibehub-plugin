@@ -41,7 +41,8 @@
     "check:jev:exploration": "node scripts/check-jev-exploration.mjs",
     "check:jev:judge": "node scripts/check-jev-judge.mjs",
     "check:jev:adoption": "node scripts/check-jev-adoption.mjs",
-    "check:jev:context": "node scripts/check-jev-context.mjs"
+    "check:jev:context": "node scripts/check-jev-context.mjs",
+    "check:jev:query": "node scripts/check-jev-query.mjs"
   },
   "devDependencies": {
     "acorn": "8.15.0"

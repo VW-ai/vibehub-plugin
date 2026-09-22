@@ -12,6 +12,13 @@ import { types } from 'node:util';
 const BRIDGE = Symbol('selected JudgeNode invocation');
 const CONTEXT_BRIDGE = Symbol('selected Context JudgeNode invocation');
 const CACHE_BYTES = 8 * 1024 * 1024;
+const bindings = new WeakMap();
+/** Internal Query composition check. JSON/instanceof alone cannot claim this binding. */
+export function assertJudgeRuntimeBinding(runtime, { store, authority, canonical_digest, scope }) {
+  const bound = bindings.get(runtime);
+  judgeCheck(bound && bound.store === store && bound.authority === authority
+    && bound.canonical_digest === canonical_digest && graphEqual(bound.scope, scope), 'query_judge_binding_mismatch');
+}
 const codeOf = error => {
   const code = graphErrorCode(error);
   return typeof code === 'string' && /^[a-z][a-z0-9_]{0,79}$/.test(code) ? code : 'judge_unavailable';
@@ -54,6 +61,7 @@ export class LocalJudgeRuntime {
       judgeCheck(store instanceof DomainStore && authority instanceof LocalCredentialAuthority && provider_settings instanceof ProviderSettings);
       this.#configuration = judgeConfiguration(configuration); this.#settings = provider_settings;
       this.#inputs = new JudgeInputs({ store, authority, canonical_reader, configuration: this.#configuration });
+      bindings.set(this, { store, authority, canonical_digest: this.#inputs.canonical_config_digest, scope: this.#configuration.scope });
     } catch { throw judgeFailure('invalid_judge_configuration'); }
   }
   evaluate(context, request, options = {}) { return this.#evaluate(context, request, optionsSignal(options), null, false); }

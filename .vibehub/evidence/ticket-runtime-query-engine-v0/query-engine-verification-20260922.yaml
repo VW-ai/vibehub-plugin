@@ -1,0 +1,56 @@
+{
+  "acceptance_ids": [
+    "query-pins-consumer-and-snapshot",
+    "candidate-generation-is-bounded",
+    "ranking-is-explainable",
+    "query-degrades-safely",
+    "lifecycle-aware-selection"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "query-pins-consumer-and-snapshot",
+      "identity": "sha256:4d700a5991f618f115c3bd1c8db809aee83b273c3c3b3bba9a2d9732017ebf37",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "candidate-generation-is-bounded",
+      "identity": "sha256:505601aa5ce23b39012be4d35ee401ba8b6f23f632465f9e18aca82a7390f676",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "ranking-is-explainable",
+      "identity": "sha256:a4136e9eee5a4411203edbb4d6e5fefabf55c90cf67368d5db676bdb60ab812d",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "query-degrades-safely",
+      "identity": "sha256:b9d28fd8981504bc42168f48aca6b0e59b406c0c0e402763645936d6ebeff156",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "lifecycle-aware-selection",
+      "identity": "sha256:0c87242ec54aa14733e5a10a0a4ab996407c2b3548a257362e6fa9acc8bda7b7",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "query-engine-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T19:52:51.000Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/query-verification-20260922.json",
+    "semantic-runtime/docs/measurements/jev-query-20260922.json",
+    "semantic-runtime/scripts/check-jev-query.mjs",
+    "semantic-runtime/test/query-jev-check.test.mjs",
+    "semantic-runtime/test/helpers/query-fixture.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/package.json",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final sequential verification passes on the corrected implementation. Focused Query coverage is 32/32. Full Runtime verification reports 1016 total, 1014 passed, two existing opt-in Keychain skips and zero failures; boundaries pass for 227 files. Clean standalone install and verification outside the repository reports the same 1016/1014/2 result and boundaries. The independently shipped plugin artifact passes with 79 files and 3670088 bytes after rerunning outside the loopback-restricted sandbox. The final authorized TypeSafe synthetic check traverses LocalQueryEngine to the existing LocalJudgeRuntime and makes exactly two one-attempt calls to jev-1.13.0: relevant and unrelated labels both match, scores move 16 to 46 and 16 to -14, model latency is 418 ms and 338 ms, pagination adds zero sends, and observed cost remains unavailable. The checked report contains only synthetic hashes, bounded usage and results; the credential remained in the Keychain wrapper process and was never printed or committed. This proves bounded composition, not global recall, retrieval quality, canonical promotion, host integration or an embeddings service.",
+  "ticket_id": "ticket-runtime-query-engine-v0"
+}

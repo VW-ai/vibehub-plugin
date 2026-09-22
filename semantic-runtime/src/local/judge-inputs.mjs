@@ -51,6 +51,7 @@ export class JudgeInputs {
     this.#ingress = new DurableIngress({ store, authority }); this.#feed = new SourceInvalidationFeed({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
   }
+  get canonical_config_digest() { return this.#canonical.config_digest; }
   #call(fn) { try { return fn(); } catch (error) { throw fail(safeCode(error)); } }
   // Preserve only bounded domain codes across DomainStore's deliberately opaque error boundary.
   #view(context, fn, admission = null) {

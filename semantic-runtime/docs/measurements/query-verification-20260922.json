@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "capability": "bounded-context-query-v0",
+  "verified_at": "2026-09-22",
+  "focused_query": {
+    "tests": 32,
+    "passed": 32,
+    "failed": 0
+  },
+  "runtime_verify": {
+    "tests": 1016,
+    "passed": 1014,
+    "failed": 0,
+    "skipped": 2,
+    "boundary_files": 227,
+    "boundary_errors": 0
+  },
+  "standalone_verify": {
+    "tests": 1016,
+    "passed": 1014,
+    "failed": 0,
+    "skipped": 2,
+    "boundary_files": 227,
+    "boundary_errors": 0,
+    "outside_repository": true
+  },
+  "plugin_artifact": {
+    "passed": true,
+    "kind": "skill-first-with-local-ui",
+    "files": 79,
+    "bytes": 3670088
+  },
+  "actual_jev": {
+    "provider": "typesafe-direct",
+    "model": "jev-1.13.0",
+    "transport_calls": 2,
+    "matched": 2,
+    "labelled_cases": 2,
+    "report": "jev-query-20260922.json"
+  },
+  "independent_review": {
+    "status": "clean_after_corrections",
+    "repository_edits": false,
+    "checked": [
+      "unknown freshness remains unknown",
+      "rank replay preserves the fixed public shape",
+      "sixteen-member conflicts fit and paginate atomically",
+      "variant scores match their own factor traces",
+      "locally impossible budgets make zero optional provider sends"
+    ]
+  },
+  "limitations": [
+    "selected-window retrieval only; global recall remains unknown",
+    "embeddings are not configured",
+    "the live JEV check is a two-case composition smoke, not a quality benchmark",
+    "host, App, HTTP, plugin and Worker integration remain outside this capability"
+  ]
+}

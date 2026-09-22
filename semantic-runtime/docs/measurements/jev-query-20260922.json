@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-selected-window-query-jev-v1",
+  "measured_at": "2026-09-22T19:45:13.406Z",
+  "provider": "typesafe-direct",
+  "transport_calls": 2,
+  "labelled_cases": 2,
+  "matched": 2,
+  "passed": true,
+  "max_attempts_per_invocation": 1,
+  "pagination_provider_sends": 0,
+  "global_recall": "unknown",
+  "embeddings": "not_configured",
+  "canonical_promotion": false,
+  "query_effects": false,
+  "structural_canaries_excluded": true,
+  "synthetic_body_digests": [
+    "sha256:5cac35a0e68c73798a1a0cd51ce96f0d4d0ec90be3a9495ab127dfb2f532a425",
+    "sha256:6046ccb0e5880c955baffdcbee130ec6b29e756b56a76cc0cc5fa7bc96d546e3"
+  ],
+  "results": [
+    {
+      "id": "query-relevant",
+      "expected_relevant": true,
+      "observed_relevant": true,
+      "matched": true,
+      "provider_sends": 1,
+      "elapsed_ms": 844,
+      "input_hash": "32b508b68bd4ac12dcb72f5164c866255efd73bfd25195e5d6c161eb67699d2e",
+      "result_digest": "sha256:207773a1a1dfeb3f8e92573aa7aec247ed93771b8da4722643d806c4c664867d",
+      "selection_digest": "sha256:cc180360de98a68f444ce2be3dbf333ccb5a5277e75d19375e78b635067800a4",
+      "baseline_score": 16,
+      "ranked_score": 46,
+      "judge_contribution": 30,
+      "reason": "confident_positive",
+      "model": "jev-1.13.0",
+      "model_latency_ms": 417.93066599999986,
+      "usage": {
+        "observed": { "cost_microunits": null, "tokens": 558 },
+        "reserved": { "attempts": 1, "cost_microunits": 100000, "tokens": 10000 }
+      }
+    },
+    {
+      "id": "query-unrelated",
+      "expected_relevant": false,
+      "observed_relevant": false,
+      "matched": true,
+      "provider_sends": 1,
+      "elapsed_ms": 750,
+      "input_hash": "a37cf6ebd15930195637273effd9db997af52c153bffc218b4156af834ac8b7d",
+      "result_digest": "sha256:fd67020a703cbe07802a3fd0f9029097028788a187c3dfdce4fedf8c8c3c1904",
+      "selection_digest": "sha256:cc180360de98a68f444ce2be3dbf333ccb5a5277e75d19375e78b635067800a4",
+      "baseline_score": 16,
+      "ranked_score": -14,
+      "judge_contribution": -30,
+      "reason": "confident_negative",
+      "model": "jev-1.13.0",
+      "model_latency_ms": 338.424084,
+      "usage": {
+        "observed": { "cost_microunits": null, "tokens": 557 },
+        "reserved": { "attempts": 1, "cost_microunits": 100000, "tokens": 10000 }
+      }
+    }
+  ]
+}

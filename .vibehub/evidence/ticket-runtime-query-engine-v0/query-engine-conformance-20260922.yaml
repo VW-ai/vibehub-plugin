@@ -1,0 +1,58 @@
+{
+  "acceptance_ids": [
+    "query-pins-consumer-and-snapshot",
+    "candidate-generation-is-bounded",
+    "ranking-is-explainable",
+    "query-degrades-safely",
+    "lifecycle-aware-selection"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "query-pins-consumer-and-snapshot",
+      "identity": "sha256:4d700a5991f618f115c3bd1c8db809aee83b273c3c3b3bba9a2d9732017ebf37",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "candidate-generation-is-bounded",
+      "identity": "sha256:505601aa5ce23b39012be4d35ee401ba8b6f23f632465f9e18aca82a7390f676",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "ranking-is-explainable",
+      "identity": "sha256:a4136e9eee5a4411203edbb4d6e5fefabf55c90cf67368d5db676bdb60ab812d",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "query-degrades-safely",
+      "identity": "sha256:b9d28fd8981504bc42168f48aca6b0e59b406c0c0e402763645936d6ebeff156",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "lifecycle-aware-selection",
+      "identity": "sha256:0c87242ec54aa14733e5a10a0a4ab996407c2b3548a257362e6fa9acc8bda7b7",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "query-engine-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T19:52:50.000Z",
+  "refs": [
+    "semantic-runtime/src/local/query-contract.mjs",
+    "semantic-runtime/src/local/query-inputs.mjs",
+    "semantic-runtime/src/local/query-engine.mjs",
+    "semantic-runtime/src/core/query-text.mjs",
+    "semantic-runtime/src/core/query-ranking.mjs",
+    "semantic-runtime/src/local/judge-runtime.mjs",
+    "semantic-runtime/docs/query-engine-v0.md",
+    "semantic-runtime/test/query-contract.test.mjs",
+    "semantic-runtime/test/query-inputs.test.mjs",
+    "semantic-runtime/test/query-engine.test.mjs",
+    "semantic-runtime/test/query-pure.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implements the fixed LocalQueryEngine query/next slice over actual selected Context and canonical facts. QueryInputs binds the authenticated Project/actor, exact own and related exploration commits, immutable origin bases, Project selection, source fence, actual watermark/lag state, typed lifecycle/publication/applicability and current source authorization. Bounded exact/head/one-hop lineage recipes, literal Ticket/Room/repository proofs and a real positional Unicode index form one selected-window union; own, notice and shared layers remain distinct. Conflict alternatives are completely materialized and paginated as one atomic unit, including the admitted 16-variant boundary. rankContextWindowV1 keeps its exact four-field public input, produces a text-free replayable factor trace and preserves per-variant scores while a conflict group uses only the maximum for ordering. Optional relevance calls the actual same-store Context Judge capability once, rechecks all local proof after await, never runs from next, and makes zero provider sends when the mandatory local response cannot fit. Missing optional model/index capability degrades explicitly; authorization or pin movement refuses. Independent review found and the implementation corrected empty-vector freshness, preflight pagination, field-crossing phrases, declared-any Room scope, replay size and conflict score attribution defects; the reviewer reran the corrected paths without editing the repository and reported no remaining concrete defect.",
+  "ticket_id": "ticket-runtime-query-engine-v0"
+}

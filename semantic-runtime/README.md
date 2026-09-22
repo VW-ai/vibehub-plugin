@@ -267,8 +267,10 @@ remote Workers remain later capabilities.
 
 The [delivery plan](docs/online-delivery-plan.md) and
 [integration research](docs/local-app-integration-notes.md) separate this goal
-from delivered foundations. Automatic collection, extraction/resolution, scoped
-query/compiler, plugin integration and Worker orchestration still require implementation.
+from delivered foundations. Automatic collection, extraction/resolution,
+Context compilation, plugin integration and Worker orchestration still require
+implementation. The first bounded scoped Query library is described below; it
+is not yet host-integrated.
 Project overview is not the main Git branch. The current executable prototype
 retains the offline boundaries stated above.
 
@@ -302,6 +304,9 @@ contracts through the package's public entry:
 - [Selected Context relevance](docs/context-judge-bridge-v0.md): exact authorized
   typed Context versions use the existing Judge dispatch path, with lifecycle,
   applicability and source checks before sending and before returning a result.
+- [Bounded Context Query](docs/query-engine-v0.md): one authorized selected
+  own/related exploration window with positional text search, atomic conflicts,
+  replayable ranking, stable pagination and optional actual Context Judge input.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

@@ -98,3 +98,5 @@ export { LocalJudgeRuntime, executeJudgeNode, executeContextJudgeNode } from './
 export { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from './core/judge-node.mjs';
 export { LocalContextStore } from './local/context-store.mjs';
 export { validateContextContent1, validateContextOperation1 } from './core/context-profile.mjs';
+export { LocalQueryEngine } from './local/query-engine.mjs';
+export { rankContextWindowV1 } from './core/query-ranking.mjs';
