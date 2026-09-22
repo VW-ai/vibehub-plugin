@@ -45,8 +45,9 @@ function reference(projectId, routeId) {
 // One local service owns this store. Only non-secret config and opaque references
 // are persisted. The caller must keep this database in its ignored local data dir.
 export class ProviderSettings {
-  #db; #secrets; #pending = Promise.resolve();
-  constructor({ filePath, secretStore }) {
+  #db; #secrets; #pending = Promise.resolve(); #beforeDispatch;
+  constructor({ filePath, secretStore, beforeDispatch = () => {} }) {
+    if (typeof beforeDispatch !== 'function') throw fail('invalid_config');
     if (!secretStore || ['put', 'remove', 'status', 'use'].some(op => typeof secretStore[op] !== 'function')) throw fail('invalid_secret_store');
     try {
       mkdirSync(dirname(filePath), { recursive: true, mode: 0o700 });
@@ -64,6 +65,7 @@ export class ProviderSettings {
       throw fail('settings_store_unavailable');
     }
     this.#secrets = secretStore;
+    this.#beforeDispatch = beforeDispatch;
   }
   #row(projectId) {
     project(projectId);
@@ -82,7 +84,7 @@ export class ProviderSettings {
     } catch { throw fail('settings_store_unavailable'); }
   }
   #serial(fn) {
-    const operation = this.#pending.then(fn);
+    const operation = this.#pending.then(() => { this.#beforeDispatch(); return fn(); });
     this.#pending = operation.catch(() => {});
     return operation;
   }
@@ -118,6 +120,7 @@ export class ProviderSettings {
     });
   }
   async credentialStatus(projectId, routeId) {
+    this.#beforeDispatch();
     provider(routeId);
     const ref = this.#row(projectId).credentials[routeId];
     if (!ref) return { state: 'missing' };

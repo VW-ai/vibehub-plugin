@@ -5,24 +5,45 @@
       "criterion": "A documented local app launch opens a usable interface and manages readiness/reconnect/stop without manual multi-terminal orchestration. Show dependency failures and existing-data preservation; local endpoint access is authenticated and browser requests cannot gain arbitrary filesystem access.",
       "identity": "sha256:7466da2c4e57f2746f7fc14c542d3d60f69b8a23a7d1e17a8820b698c31dbdd2",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "app-onboarding",
       "criterion": "Select a folder (picker or explicit path with equivalent capability), inspect Git/init and linked-worktree membership, choose provider/model and enter key locally, connect Codex/Claude plugins, select either subscribed Worker, enable/disable Project. Use domain APIs and show actual configured/missing/verified states; do not require both subscriptions.",
       "identity": "sha256:8de717c526cfa429de4c65e849749bd10cadd5401bc5d5f4952c549df2f54290",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "app-lifecycle-test",
       "criterion": "Real local UI walkthrough covers initial setup, restart with remembered non-secret settings, key replace/remove, one disabled Project alongside an enabled Project, missing CLI/login/quota and new worktree. Disabling stops actual capture/model/delivery admission; synthetic fixtures alone cannot certify live adapters.",
       "identity": "sha256:2eb5ef1c1b9bd635cd5c47d52891b224e6f9679dbb05de454082c4ddf18e0be2",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "app-startup",
+      "criterion": "Consume the independently accepted ticket-runtime-local-app-setup-v0 shell/pairing/Project/provider/switch foundation and extend the same local launch lifecycle to actual supported Codex/Claude plugin and subscription Worker integrations. One local launch exposes usable integrated readiness/reconnect/stop with safe dependency failure states and data preservation; no manual multi-terminal orchestration, second competing server, unauthenticated access or arbitrary filesystem capability. Reuse rather than re-certify fixture-only startup; prove the full composition with its real integrations before closing this criterion.",
+      "identity": "sha256:196ad4b7fa5bda9f5c6572676e987a5c94426ae3ae46a6b7a7adef7deb99d32c",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "app-onboarding",
+      "criterion": "Retain the complete original product onboarding obligation: consume the real setup foundation for selected Git folder/init/enrollment, linked worktrees, secure provider/model config and Project enable/disable, then actually connect the Codex and Claude plugins and select/configure either subscribed Worker using the independently accepted adapter/executor APIs. A user needs only the chosen subscription. Show genuine installed/connected/missing/login-expired/quota/failure states and bounded recovery; configured API keys remain distinct from subscription authentication and from successful model verification. The earlier setup Ticket may show these integrations as not connected, but that limitation cannot satisfy this criterion or remove the live obligations.",
+      "identity": "sha256:e7c77812357695445acb4b1c207bcca4bf8364c1f8a55e2bbbff45dcd387652f",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "app-lifecycle-test",
+      "criterion": "After the existing adapter/executor prerequisites and the setup foundation succeed, perform the full real local UI walkthrough: initial setup and plugin connection, chosen subscription Worker login/re-auth path and bounded job, restart with remembered non-secret settings, key replace/remove, two independent Project switches and newly registered worktree. Exercise actual missing CLI/login/quota handling and demonstrate that disabling prevents new real capture/model/delivery admission and fences late results while native coding continues. Use each supported live adapter path as required by its Ticket, without requiring one user to own both subscriptions. Synthetic fixtures or setup-only native-store/Git tests cannot certify these live paths; no obligation transfers away from this still-draft integration Ticket.",
+      "identity": "sha256:e958123166fdb953cd5e6b9a54428ec0cff39db442474047907b64715a320c75",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -31,7 +52,7 @@
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
     "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
   ],
-  "context": "Own launch/stop/reconnect and real onboarding/settings UI. A simple local UI is sufficient; choose minimal shell from the profile rather than requiring native desktop polish. Domain/semantic explorer remains separate.",
+  "context": "Own launch/stop/reconnect and real onboarding/settings UI. A simple local UI is sufficient; choose minimal shell from the profile rather than requiring native desktop polish. Domain/semantic explorer remains separate.\nRolling-wave split: ticket-runtime-local-app-setup-v0 owns a first user-operable real setup shell, terminal-approved owner pairing, Git Project/worktree enrollment, secure API provider settings and the authoritative switch using already accepted modules. This Ticket stays draft and keeps every historical dependency. It consumes that new independently verified input, then owns actual plugin/executor connection, authentic login/quota/recovery states and the full capture/model/delivery disable walkthrough. Startup/setup obligations are made executable earlier, not deleted from the composed product. Its original Acceptance and Contract v1 remain immutable history; the same responsibility IDs are refined at v2 to distinguish foundation proof from full integration proof. No live adapter obligations, user permission or external-send authorization are implied by the earlier setup success.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -91,12 +112,33 @@
       ],
       "identity": "sha256:caaff7fb3bb7148ba7bf42b08975719e144f0449aabbf3e5fd669ed1d951438f",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "app-lifecycle-test",
+          "identity": "sha256:e958123166fdb953cd5e6b9a54428ec0cff39db442474047907b64715a320c75",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "app-onboarding",
+          "identity": "sha256:e7c77812357695445acb4b1c207bcca4bf8364c1f8a55e2bbbff45dcd387652f",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "app-startup",
+          "identity": "sha256:196ad4b7fa5bda9f5c6572676e987a5c94426ae3ae46a6b7a7adef7deb99d32c",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:fe967a4f3266b046ddffb8a8e5689be8d0274ed0326f2f552b22cd6c8f72d10f",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "Deliver a locally launched app shell for project, provider, plugin and Worker setup.",
+  "outcome": "Complete real local App onboarding with connected Codex/Claude plugins and the selected subscription Worker on top of the accepted setup shell.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"
@@ -135,6 +177,11 @@
     {
       "rationale": "Actual Claude plugin installation/status path.",
       "target_ticket_id": "ticket-runtime-claude-host-adapter-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The new independently operable setup slice supplies the concrete launch, owner pairing, Project/provider and switch UI to extend with real adapters/executors.",
+      "target_ticket_id": "ticket-runtime-local-app-setup-v0",
       "type": "depends_on"
     }
   ],

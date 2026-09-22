@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>VibeHub · Local setup</title>
+  <link rel="stylesheet" href="/setup/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to setup</a>
+  <aside class="sidebar" aria-label="Projects">
+    <a class="brand" href="/" aria-label="VibeHub local setup"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>VibeHub <span class="local-tag">LOCAL</span></a>
+    <div class="nav-label">YOUR PROJECTS <span id="project-count">—</span></div>
+    <nav id="project-list" aria-label="Select a project"></nav>
+    <button id="add-project" class="add-project" data-action="add" hidden><span aria-hidden="true">＋</span> Add project</button>
+    <button id="reload-projects" class="quiet small" data-action="reload-projects" hidden>Reload project list</button>
+    <div class="sidebar-bottom"><span class="small-dot" aria-hidden="true"></span><strong>Built around your work.</strong><p>Your editor stays yours.<br>Project setup lives here.</p></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div><span class="muted">Workspace</span><span class="slash">/</span><strong id="breadcrumb">Local setup</strong></div><div class="top-actions"><span id="connection-status" class="connection">Connecting…</span><button class="quiet small" id="stop-app" data-action="stop" hidden>Stop app</button></div></header>
+    <div class="page-content"><div id="message" class="message" hidden></div><main id="main" tabindex="-1"><section class="welcome"><span class="eyebrow">VIBEHUB / LOCAL SETUP</span><h1>A home for your<br>project context.</h1><p>Connecting to the local app…</p></section></main></div>
+    <footer>Local setup <span aria-hidden="true">·</span> No collection or model calls are started by this page.</footer>
+  </div>
+  <dialog id="stop-dialog" aria-labelledby="stop-title"><span class="eyebrow">LOCAL APP</span><h2 id="stop-title">Stop VibeHub?</h2><p>Saved projects, settings and activation history stay on this computer. Your editor and coding agents keep running.</p><p>Restart with your original launch command. Keep the same <code>--data-dir</code> and <code>--port</code> options if supplied; the default command is <code>npm run app</code>.</p><div class="actions"><button data-action="cancel-stop" autofocus>Keep running</button><button class="danger" data-action="confirm-stop">Stop local app</button></div></dialog>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="/setup/app.mjs"></script>
+</body>
+</html>

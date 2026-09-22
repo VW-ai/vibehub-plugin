@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "1c91ac1a9dec7546adaa117955b9178a87f78a7b",
+        "blob": "8c6d3cc556d5f8397c8176df389baa32f7668cc4",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -78,6 +78,10 @@
         "path": "semantic-runtime/docs/local-app-integration-notes.md"
       },
       {
+        "blob": "df19260c9100ec1fa384d4df46e77d197183d041",
+        "path": "semantic-runtime/docs/local-app-setup-v0.md"
+      },
+      {
         "blob": "23776a8fbb96de69f7bc2349066ecfb9ff26ef57",
         "path": "semantic-runtime/docs/local-service-profile.md"
       },
@@ -108,6 +112,10 @@
       {
         "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
         "path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json"
+      },
+      {
+        "blob": "7db1a452a90527bcc925ca749820c7f654a85241",
+        "path": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
       },
       {
         "blob": "4a67a8f5e42755c70e5541b56311b81e17958b9a",
@@ -174,7 +182,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "364f1f370f982be3535e0e47980e575859273182",
+        "blob": "84448795b0da0eb58bf084b6d6f1d2c0c51e1613",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -446,11 +454,19 @@
         "path": "semantic-runtime/src/index.mjs"
       },
       {
+        "blob": "dd46fd664fc451005ef594b7502e9c72e9671d60",
+        "path": "semantic-runtime/src/local/app-session.mjs"
+      },
+      {
+        "blob": "f44f4f223e3fc343ac9f81b329957373417383f5",
+        "path": "semantic-runtime/src/local/app-setup.mjs"
+      },
+      {
         "blob": "152bb214f0e63fb717cecb885db7987a3bc860bb",
         "path": "semantic-runtime/src/local/auth.mjs"
       },
       {
-        "blob": "69958407d777891d8c678de889c06405bc9e17d2",
+        "blob": "3c4aa1982ec60211811f7fc6e0af4973f5e282e3",
         "path": "semantic-runtime/src/local/cli.mjs"
       },
       {
@@ -462,7 +478,7 @@
         "path": "semantic-runtime/src/local/durable-ingress.mjs"
       },
       {
-        "blob": "2c7417d1307bd9880bf5c1ea3271915f92ba88e0",
+        "blob": "d44d269b0eb5db2de5911cf078b9eb73425b8cf9",
         "path": "semantic-runtime/src/local/git-projects.mjs"
       },
       {
@@ -478,12 +494,36 @@
         "path": "semantic-runtime/src/local/project-activation.mjs"
       },
       {
-        "blob": "accb01dd44ef0a536a1720be3fead20807c69603",
+        "blob": "1325e13763cb7acd66ba1b7b32177e242fdfa09d",
         "path": "semantic-runtime/src/local/provider-settings.mjs"
       },
       {
-        "blob": "c6dc27cc4855544438851863ff4f32089fbef6ed",
+        "blob": "7273c4974a5fab93c83c51b300e856a748c80c5d",
         "path": "semantic-runtime/src/local/service.mjs"
+      },
+      {
+        "blob": "dfba5296e8e2c01e3d35fe6a63d2e7d0a49e383e",
+        "path": "semantic-runtime/src/local/setup-http.mjs"
+      },
+      {
+        "blob": "7817804fcbb8aef2863545a4e98d43fd450cd67d",
+        "path": "semantic-runtime/src/local/setup-ui/app.mjs"
+      },
+      {
+        "blob": "7b9e74169d041082b4cedcd1027b8c1525ac2685",
+        "path": "semantic-runtime/src/local/setup-ui/index.html"
+      },
+      {
+        "blob": "18b97707705a7821cc76cf16a0b9c97b4638592b",
+        "path": "semantic-runtime/src/local/setup-ui/style.css"
+      },
+      {
+        "blob": "375b8539f03513f2459f089a94a3d255feaa997a",
+        "path": "semantic-runtime/test/app-setup.test.mjs"
+      },
+      {
+        "blob": "29a4a0f9f6230ca35f292f44430631c96fe7e68f",
+        "path": "semantic-runtime/test/app-transport.test.mjs"
       },
       {
         "blob": "8b6d67b04f2c3a2408c1a0d82f81de1e47f9c192",
@@ -540,6 +580,10 @@
       {
         "blob": "9094eaff2468321b25c72c714941ed5d80a693bc",
         "path": "semantic-runtime/test/fixtures/README.md"
+      },
+      {
+        "blob": "3434ae82c93aa26d8fda9426bf929ae2ad9b6bff",
+        "path": "semantic-runtime/test/fixtures/app-setup/secure-store-failure-cli.mjs"
       },
       {
         "blob": "f5b200bae102dd37a9363ceff77dbf29a482c15c",
@@ -750,6 +794,10 @@
         "path": "semantic-runtime/test/service-auth.test.mjs"
       },
       {
+        "blob": "abdab0080ea9a4cf554ebd22104146878a430f7e",
+        "path": "semantic-runtime/test/setup-ui.test.mjs"
+      },
+      {
         "blob": "3dda90fbcdecdbe48a3807ede10b9cf8b523f7e8",
         "path": "semantic-runtime/test/synthetic-jev-check.test.mjs"
       },
@@ -774,8 +822,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T10:07:28.433Z",
-    "last_aligned_commit": "58910bb8a6107521d418ec4add88a982a63ed1d0"
+    "checked_at": "2026-09-22T11:00:37.371Z",
+    "last_aligned_commit": "603f3858f6347e4e403aa0d0b32281c2a52e8e6f"
   },
   "anchors": [
     "semantic-runtime/"

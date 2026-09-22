@@ -1,0 +1,171 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "incremental-graph-wire-and-compatibility",
+      "criterion": "Publish executable versioned validators for exact scoped graph commit/manifest addresses, mutation requests/effect plans and page cursors, with bounded inert JSON and explicit per-row/closure/page budgets compatible with DomainStore. Preserve V1 Working Graph validators and addresses unchanged. Specify the new digest commitment and deterministic ordering; reject cross-scope/generation, missing predecessor, unknown versions, malformed/accessor inputs and ambiguous old/new address coercion. Define exact legacy read/import compatibility or explicit unsupported conversion without rebinding prior digests. Pin identity/catalog versions and exact source/canonical provenance; a hash or copied catalog grants no authority. No storage/network/provider dependency is introduced into core.",
+      "identity": "sha256:b9f0d7413821cf80dfbb65dcc5545b1d35f3fb433f9f211722c3b5f0ffe5f0fe",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "incremental-graph-transition-semantics",
+      "criterion": "Implement deterministic incremental transitions over a small selected-record port, using existing immutable semantic/provenance validation wherever compatible. Cover new/update entity and relation assertions, exact relation endpoints and inherited ACLs, graph CAS mismatch returning an unapplied proposal with zero effects, separately admitted semantic-base conflict, explicit conflict resolution preserving competitors, and source ACL/tombstone transitions with predecessor-only source/epoch admission. Port facts must pin the current committed head, scoped source bodies and lifecycle authority; a caller-provided projection or lifecycle message cannot certify itself. Output bounded append/CAS/audit/outbox effect descriptors for a future transaction without claiming persistence or advancing semantic/source completion merely from receipt. Preserve old-epoch restrictions, immutable event identity, historical refs, derived-only lifecycle and separate canonical-write authority.",
+      "identity": "sha256:c999ee5fe10d676c26c8007773a33165002fcc20b0c2339930873804bd4c5dde",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "incremental-graph-history-pages-and-current-access",
+      "criterion": "Implement exact point-in-time semantic lookup and bounded history/head/conflict page contracts with maximum page size64 and a cursor bound to scope, generation, exact selected commit, collection and position. A miss cannot fall forward to latest. Historical reads intersect complete captured provenance with current source access; revoked/unknown/tombstoned or stale access proof denies content, including relation/parent closure and after page continuation. Old page cursors never carry access grants. The selected-record port exposes actual fact requests so tests reject whole-history/all-entity materialization for one bounded operation. State how a real adapter validates/rebuilds projections incrementally from immutable commits and retains old source/canonical/enrollment pins; dynamic live enrollment, branch adoption, ranking, compaction, pruning and a generic checkpoint engine remain outside this Ticket.",
+      "identity": "sha256:f87c3d320c22dbe7f011870d90a9bb6bb355ca94441e7b4a516570aafa4ed7e9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "incremental-graph-oracle-and-scale-conformance",
+      "criterion": "Use synthetic deterministic in-memory indexed-port fixtures to compare compatible/contradictory assertions, resolutions, exact relation endpoints, lifecycle/ACL changes, tombstones, temporal epoch admission and historical reads against the accepted V1 oracle on bounded traces. Run a same-generation1040-transition workload with at least600 distinct entity/relation records, retaining readable old references and pages across both128/512 thresholds without resets or pruning. For fixed small-support mutations at early and late positions, assert at most64 selected-record reads and no all-history/all-entity fetch; report actual runtime, maximum plan/row bytes and record/page counts without claiming production throughput. Verify missing, cross-scope, digest-inconsistent or stale selected facts fail closed; the trusted repository port remains an authentication boundary and hashes do not prove authenticity and bounds reject atomically at the pure-plan boundary. Run existing Working Graph/public-entry/event/identity/causal tests and component boundaries. No SQLite production-store claim, live host collection, private trace, model call or external traffic is part of this proof.",
+      "identity": "sha256:e63aef716284489bb1ca00bf7ee94f3c8282f722353a804ba5695bffd15b6999",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ with existing independent core/public-entry boundaries; no new database, ORM, dependency, HTTP endpoint, polling worker or generic storage framework.",
+    "Do not remove or increase V1 fixture bounds as a substitute for an incremental contract; do not use automatic generation rollover to hide global capacity or erase provenance/access history.",
+    "Preserve accepted entity/relation/conflict/provenance/current-access/epoch semantics and separate canonical authority. Models and hashes do not confer acceptance or source authenticity.",
+    "Pure selected-record conformance proves semantics and bounded lookup behavior, not crash durability, source permission administration, host enrollment or production scale. The existing graph-store Ticket remains draft until this exact prerequisite Outcome is reviewed.",
+    "Use synthetic selected fixtures only; no private traces, credentials, live models, remote services or changes to root/plugin/site artifacts."
+  ],
+  "context": "Required prerequisite discovered while refining graph-store, not a replacement for its production persistence obligations. The accepted wire-v1 reference implementation validates an entire immutable catalog plus state.snapshots (at most128); each snapshot carries cumulative arrays bounded at512. Persisting those fixtures, or storing deltas and reconstructing the same full state for every operation, still limits a Project to127 semantic transitions and is not a usable local alpha store. Do not solve this by increasing constants, silently resetting generations, discarding historical ACLs or labelling a commit-chain hash as a wire-v1 snapshot digest. A local read-only measurement of16 independent fixture assertions took about4.5s and produced1,032,544 JSON bytes/17 snapshots; this is illustrative environment-specific evidence of cumulative growth, not a performance target or production benchmark.\n\nImplement only the smallest provider/store-independent incremental contract and selected-record in-memory conformance port inside semantic-runtime/. Keep the existing V1 API/fixtures unchanged as a bounded semantic oracle. The new version must specify exact inert wire schemas for an immutable scoped graph commit/manifest, exact semantic revision/address compatibility, per-command expected-graph and semantic-base requests, delta writes, current projection CAS requirements, source/access/canonical provenance references, catalog/enrollment version pins, source watermarks and page cursors. The contract should reuse current immutable SemanticRevision/provenance validators where compatible; do not replace the relation vocabulary, conflict policy or authorization semantics. Suggested port facts are exact committed head/revision lookup, entity head at a selected commit, unresolved conflicts at that commit, accepted event body/digest, current source-access restrictions, explicit identity/enrollment facts and bounded page reads. The trusted adapter supplies those facts under one coherent scope/transaction; caller-authored JSON cannot certify a projection or source authority. A coherent malicious repository response is outside a pure function's authentication power: validation must reject inconsistent/missing selected facts, while the adapter authenticates and selects them. Do not promise that hashes authenticate an arbitrary port. Concrete names can follow repository conventions.\n\nAvoid a generic query/ORM/event-sourcing framework. One graph commit remains a local ordered immutable transition; use stable exact references and an indexed lookup/step protocol, not a cumulative all-entity snapshot body. The output is a deterministic bounded mutation/effect plan: immutable records to append, projection keys/expected versions to update, audit/receipt/outbox descriptors, and an exact next graph address. A stale graph CAS returns the original unapplied proposal and no writes; an admitted semantic base mismatch retains competing revisions/conflict. The later DomainStore adapter owns actual atomicity and receipts. A source lifecycle command has separate explicitly authenticated authority over its targets, which the port must attest; membership, model confidence or a recent timestamp is insufficient. Historical content reads always use current source restrictions and opaque caller identity supplied by the adapter.\n\nPin byte/depth/node and per-command reachable-support bounds compatible with the selected store; bounds apply to each request/row/closure/page, not total Project lifetime. Define a concrete maximum page size64 and scope/generation/exact-commit/collection/position-bound cursor schema. Cursors are locators, never credentials. Point lookup and pages must not materialize every earlier commit or every entity. Keep exact historical membership and predecessor-only source epoch admission, including old restrictions after later watermark changes. Dynamic enrollment is an explicitly versioned input, preserving old catalog/event references; do not build the live Session/Execution enrollment service in this Ticket. Current Git enrollment's empty host arrays remain a truthful integration boundary.\n\nThe required1040-step synthetic conformance trace spans at least600 distinct entities/relations and crosses both legacy thresholds in the same generation without resets or discarded history. Constant-support operations at early and late positions must use no more than64 selected-record reads and must not request an all-history/all-entities collection; bounded page iteration is separate from command admission. Small traces compare actual semantic results with the existing V1 oracle. Different new commit/address digests must be explicit versioned behavior rather than a false byte-compatible promise. Current-vs-historical ACL, tombstone and conflict semantics remain identical. Define how the subsequent SQLite adapter stores immutable per-record sources plus a small CAS head/projection and rebuilds by bounded pages/checkpoints; do not implement that adapter or a checkpoint engine here.\n\nThis candidate is planning only. Parent owns ongoing Room alignment and prioritizes the local App setup independently. No human product choice is manufactured; the missing incremental contract is an ordinary concrete engineering prerequisite.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, pure core and ordinary coding boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Sections 10/19 semantic entities, relation vocabulary, immutable provenance and concurrency; proposals do not authorize all phases.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Existing store, invalidation, branch and semantic API ownership; retain their separate delivery obligations.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Accepted wire-v1 bounded oracle implementing Ticket Contract V2, including its explicit128 snapshots/512 arrays and adapter responsibilities.",
+      "ref": "semantic-runtime/docs/working-graph-v0.md"
+    },
+    {
+      "purpose": "Executable semantic invariants and whole-history/cumulative-array limits; preserve V1 API and validators.",
+      "ref": "semantic-runtime/src/core/working-graph.mjs"
+    },
+    {
+      "purpose": "Existing synthetic differential oracle fixture; it is not a production dataset or store.",
+      "ref": "semantic-runtime/test/fixtures/working-graph/scenario.mjs"
+    },
+    {
+      "purpose": "Exact independently accepted semantic contract, with predecessor-only lifecycle admission and current-access historical reads.",
+      "ref": ".vibehub/outcomes/ticket-define-semantic-context-protocol-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Regression history: reject forged heads/conflicts, future source proof and implicit lifecycle epoch admission.",
+      "ref": ".vibehub/evidence/ticket-define-semantic-context-protocol-v0/runtime-working-graph-independent-review-history-epoch-repair-v1.yaml"
+    },
+    {
+      "purpose": "Selected scoped SQLite primitives, immutable source/outbox rows and1MiB/16-depth/50k-node per-value limits; no arbitrary SQL API.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Accepted persistence foundation, not a finished Graph adapter.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Explicit Project/source/Session/Execution identity and trust boundary.",
+      "ref": "semantic-runtime/docs/identity-contract-v0.md"
+    },
+    {
+      "purpose": "Normalized immutable event/observation/body pins and ACL intersection; shapes are not authentication.",
+      "ref": "semantic-runtime/docs/event-provenance-v0.md"
+    },
+    {
+      "purpose": "Per-source epoch ordering/watermark/gap semantics; graph commit sequence cannot manufacture source continuity.",
+      "ref": "semantic-runtime/docs/causal-ordering-v0.md"
+    },
+    {
+      "purpose": "Concrete later adapter commit admission and disabled-epoch boundary; this pure contract does not claim App integration.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Current Git catalog has no host Session/Execution registry; never fabricate enrollment from a path or message.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Active local App product direction supersedes the older local-experience ordering note.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Explicit App Project enable/disable and preservation of historical state.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Later owner of live ingress lifecycle routing and cache/index/package invalidation; must not become a circular prerequisite.",
+      "ref": ".vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml"
+    },
+    {
+      "purpose": "Later owner of real dynamic exploration/source/session enrollment, scoped heads and adoption.",
+      "ref": ".vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Later owner of user/host registration and HTTP/API delivery; no host enrollment server here.",
+      "ref": ".vibehub/tickets/ticket-runtime-semantic-api-v0.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "incremental-graph-history-pages-and-current-access",
+          "identity": "sha256:f87c3d320c22dbe7f011870d90a9bb6bb355ca94441e7b4a516570aafa4ed7e9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "incremental-graph-oracle-and-scale-conformance",
+          "identity": "sha256:e63aef716284489bb1ca00bf7ee94f3c8282f722353a804ba5695bffd15b6999",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "incremental-graph-transition-semantics",
+          "identity": "sha256:c999ee5fe10d676c26c8007773a33165002fcc20b0c2339930873804bd4c5dde",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "incremental-graph-wire-and-compatibility",
+          "identity": "sha256:b9f0d7413821cf80dfbb65dcc5545b1d35f3fb433f9f211722c3b5f0ffe5f0fe",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:c74c56f1972c38122f0aea93b245e462da73e8d66110f154d910dc7f35931976",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Define and exercise an incremental, page-addressable Working Graph transition contract that preserves accepted semantic behavior without a Project-wide128-snapshot or512-record lifetime ceiling.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "conversation:2026-09-22-continue-without-overengineering",
+    "planning:graph-store-reference-capacity-gap-20260922",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The successful Contract V2 and its executable wire-v1 Working Graph transitions/fixtures are the exact required compatibility oracle for this incremental contract; differential semantic conformance and explicit address/digest compatibility cannot be validated without that accepted artifact.",
+      "target_ticket_id": "ticket-define-semantic-context-protocol-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-incremental-graph-contract-v0"
+}

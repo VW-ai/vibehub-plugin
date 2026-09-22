@@ -13,6 +13,7 @@
   },
   "scripts": {
     "start": "node src/local/cli.mjs",
+    "app": "node src/local/cli.mjs --setup",
     "status": "node src/local/cli.mjs --status",
     "test": "node --test test/*.test.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",

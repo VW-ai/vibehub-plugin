@@ -1,0 +1,69 @@
+{
+  "acceptance_ids": [
+    "setup-launch-lifecycle",
+    "setup-paired-owner-boundary",
+    "setup-project-registration",
+    "setup-provider-credentials",
+    "setup-project-switch-truth",
+    "setup-connected-walkthrough"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "setup-launch-lifecycle",
+      "identity": "sha256:a1ccf89ce8025d8a300e1947e088b063e1263cb4edcf022346869b5b605dcd26",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "setup-paired-owner-boundary",
+      "identity": "sha256:6a29747beae6f21ab0bf084e4d77e118bd7cc7c0b5caa563b567603f501aeb7b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "setup-project-registration",
+      "identity": "sha256:9ccf740e56043b14be57f04bbbedc9d92a9f1b905852c57a8a10638be8bc1f3b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "setup-provider-credentials",
+      "identity": "sha256:bacd2b7a715fc5e0c7f90835ed00b08488f2c9f1cb42f10e07ff8b670d5969b2",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "setup-project-switch-truth",
+      "identity": "sha256:15a853c8f8b15b4f99a07d4a3d4e98ee611210f9ab953686109ec0192191e972",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "setup-connected-walkthrough",
+      "identity": "sha256:c1acd97b7d1186e69264abeaa6fe86f3ddc78b27cdfd3435ed17cf1093f0fcba",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "connected-local-setup-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T10:56:53.126Z",
+  "refs": [
+    "semantic-runtime/src/local/app-setup.mjs",
+    "semantic-runtime/src/local/app-session.mjs",
+    "semantic-runtime/src/local/setup-http.mjs",
+    "semantic-runtime/src/local/service.mjs",
+    "semantic-runtime/src/local/cli.mjs",
+    "semantic-runtime/src/local/provider-settings.mjs",
+    "semantic-runtime/src/local/git-projects.mjs",
+    "semantic-runtime/src/local/setup-ui/app.mjs",
+    "semantic-runtime/src/local/setup-ui/index.html",
+    "semantic-runtime/src/local/setup-ui/style.css",
+    "semantic-runtime/test/app-setup.test.mjs",
+    "semantic-runtime/test/app-transport.test.mjs",
+    "semantic-runtime/test/setup-ui.test.mjs",
+    "semantic-runtime/test/fixtures/app-setup/secure-store-failure-cli.mjs",
+    "semantic-runtime/docs/local-app-setup-v0.md",
+    "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented exact Contract1 through existing local service, scoped SQLite/Git/activation/provider APIs and a small dependency-free UI. Terminal-approved opaque session cookies have server expiry/revoke/restart/stop fences; Host/Origin/custom-header/typed-body checks precede private effects. Domain grants never outlive paired owner and revoke after each operation; authority is checked inside queued provider dispatch. Real enrollment fault boundaries preserve same allocated Project, physical identity/one-use previews and CAS; linked worktrees share explicit switch, independent clones do not. Actual browser walkthrough against two disposable Git folders covered init/enroll/external and newly refreshed worktrees, A enabled/B disabled, all three JEV configs, native synthetic Keychain save/replace/remove, stale view conflict/reload, unexpected offline, authenticated Stop/restart/fresh pairing, labels/dialog keyboard focus and 1280px nooverflow. Separate injected secure-store failure fixture exercised actionable failure with setup usable. Cleanup confirmed all six temporary Project/provider secure slots missing and ordinary databases free of credential canaries. No user credential read or real provider call in this slice. Final full verify:438tests,436pass,2intentionalnative skips,0fail; clean standalone same436pass2skip. Native App test separately passed1/1 with fresh synthetic Keychain entry and cleanup. UI13tests and transport/bootstrap14tests independently rerun after late timeout/Stop/cookie/signal fixes; reviewer identified expiry/Stop issues and authors fixed them before Evidence. Context guard and boundaries pass. Plugins/Workers remain not connected; original onboarding stays draft and retains full real integration responsibilities. Browser cookie restoration is explicitly distinguished from in-memory authority.",
+  "ticket_id": "ticket-runtime-local-app-setup-v0"
+}

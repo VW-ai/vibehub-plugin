@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "setup-launch-lifecycle",
+    "setup-paired-owner-boundary",
+    "setup-project-registration",
+    "setup-provider-credentials",
+    "setup-project-switch-truth",
+    "setup-connected-walkthrough"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T11:01:04.593668Z",
+  "contract_revision": {
+    "identity": "sha256:1e40f08692d68d97084b5c5224d0d30570b385e23b8c9c92a3263715bc96be2d",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "connected-local-setup-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/auth_review validated the candidate and performed read-only source/security review, but authored no App setup implementation, tests, documentation or executor Evidence. /root authored controller/integration and browser Evidence; /root/branch_scope authored transport/session/CLI; /root/provider_settings authored connected UI/tests. Reviewer independently inspected exact Contract, sources, Context and prerequisite Outcomes, executed focused tests and disposable adversarial probes, and reviewed separately attributed native/browser/full-suite evidence. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all six current criteria of exact Contract v1. setup-launch-lifecycle: npm run app extends the existing one-process loopback bootstrap with explicit app-owned setup/config storage, supported Node, fixed/default data location and preserved foreign data; startup advertises readiness after signal/TTY handlers are attached. Stop, SIGINT/SIGTERM and terminal loss revoke authority; shutdown drains handles without deleting data or stopping other coding tools. Restart preserves Projects/settings/switches and requires fresh pairing. setup-paired-owner-boundary: high-entropy pending and active capabilities are hash-held in server memory and delivered only through per-instance HttpOnly SameSite=Strict session cookies, with authoritative two-minute pending and one-hour owner expiry. Exact attached-TTY approval consumes the matching pending request; comparison code, GET, loopback, noninteractive stdin and public APIs cannot independently confer ownership. No Max-Age/Expires or application JS persistence is used; possible browser session-cookie restoration is explicitly not a disk-erasure guarantee. Exact Host/supplied Origin/Fetch Metadata and mutation Origin/custom header/bounded JSON precede private work. Fixed owner/tenant plus persisted Project allowlist yields narrow grants, bounded by paired-owner expiry and revoked after use. setup-project-registration: real selected-path Git inspection, separate preserving initialization, physical/common-directory identity, one-use owner/base-bound preview, external/new/removed worktrees and branch refs compose the accepted registry and CAS. Same repository selection reuses the existing Project; clones remain independent. Reserved/enrolling/error records recover cross-scope failures under the same allocated ID, without rollback of user files or silent folder redirection. Project count is bounded at 64. setup-provider-credentials: exact tenant/Project hashing isolates all three pinned JEV routes, validated budgets/fallbacks and opaque references. Password input never enters UI state or ordinary databases, clears after attempts and Project/provider changes, and routes only to secure-store replace/remove. No read-key/model endpoint or plaintext fallback exists; configured remains unverified. Queued operations recheck owner/Project at actual dispatch, and stale UI responses cannot replace another Project. Already-started OS operations cannot be recalled, with late responses withheld. First-use native compilation is accommodated by bounded client deadlines. setup-project-switch-truth: actual ProjectActivation read/CAS defaults disabled, enable refreshes known Git enrollment, disable survives missing paths/optional providers, and persisted epochs/gaps/history remain Project-specific. Existing real domain admission tests preserve disabled/stale-epoch fencing; no automatic backfill or connected Collector/Worker is inferred from enabled state. setup-connected-walkthrough: accepted the separately attributed parent actual in-app browser measurement, against production TTY launch and two disposable Git folders, for explicit init/enroll, external/new worktrees, three route settings, synthetic native Keychain save/replace/remove, A/B switch isolation, stale-CAS conflict/reload, offline/Stop/restart/fresh pairing, keyboard dialog focus and no overflow at the reviewed 1280px viewport. Secure-store failure used a disclosed injected fixture, not a native-lock claim. Browser cleanup confirmed all six synthetic Project/provider slots missing and ordinary databases without credential canaries. Reviewer inspected the native test and its separate successful 1/1 log; no existing user credentials were accessed. Reviewer independently found and reproduced the synchronous owner-expiry and lost-Stop-response gaps, then verified author fixes. Final independent focused run: 42 tests, 41 passed, zero failed, one intentional native-Keychain skip, covering app controller, transport, bootstrap and UI; earlier provider/Git affected tests also passed. A separate synthetic-clock probe verified no enrollment commit after owner expiry. Reviewed parent full and clean standalone verification logs: each 438 tests, 436 passed, zero failed, two intentional native skips; broad suites were not repeated by reviewer. Boundary scan passed 114 files with zero errors, diff check was clean, all 22 Context refs resolved, direct prerequisites retain successful Outcomes, governing authorities were empty, Context guard passed and Ticket validation passed. No unresolved criterion. This accepts connected local setup only; original onboarding remains draft with all actual Codex/Claude plugin, subscription Worker, capture/model/delivery and lifecycle obligations intact. No model verification, live semantic service, mobile/screen-reader certification or browser physical-storage erasure is claimed.",
+  "ticket_id": "ticket-runtime-local-app-setup-v0",
+  "unresolved_acceptance_ids": []
+}

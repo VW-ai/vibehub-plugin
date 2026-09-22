@@ -1,0 +1,213 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "setup-launch-lifecycle",
+      "criterion": "A documented single local launch command exposes the connected setup page through the existing startLocalRuntime lifecycle, with one process/terminal and token-free URL; reuse supported Node and current explicit/default data directory. Explicitly initialize/migrate only the App-owned DomainStore/config files, preserve foreign/newer/corrupt files and pre-existing user data, and retain bootstrap behavior for existing callers. Nonsensitive readiness distinguishes App/storage readiness from unavailable optional secure-store/host/model capabilities. SIGINT/SIGTERM and an authenticated explicit Stop action revoke sessions, stop new commands and close handles without deleting data or stopping unrelated coding tools; the page shows offline/reconnect and restart instructions. Restart with the same data retains non-secret Projects/settings/switches and requires fresh pairing. No process-manager daemon, auto-login or automatic capture starts.",
+      "identity": "sha256:a1ccf89ce8025d8a300e1947e088b063e1263cb4edcf022346869b5b605dcd26",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-paired-owner-boundary",
+      "criterion": "Implement the bounded one-terminal pairing described in Context: at most one pending browser request, a high-entropy pending HttpOnly SameSite=Strict capability expiring within two minutes, non-secret comparison code and explicit approval only from the attached launcher TTY. Neither GET, loopback/origin alone, the comparison code, noninteractive stdin nor an unauthenticated API can grant owner access; approval consumes only that exact pending request. Use instance-specific cookie names and exact-origin session binding; approved sessions are memory-only, expire within one hour, are revocable and die on restart/stop. No credential in URLs, JSON replies, logs, browser JS/persistent storage or provider input. Every private endpoint authenticates before inspecting paths/stores, checks exact Host/Origin and typed bounded JSON/custom-header requests for mutation, rejects cross-origin/CSRF/rebinding and unknown fields, and derives narrow current LocalCredentialAuthority contexts from fixed owner/tenant plus persisted Project allowlist. No public scope/grant minting or generic store capability. HTTP tests cover unapproved/wrong/reused/expired requests, missing/revoked/foreign-instance cookies, tampered scope, origin/method/content-type/body bounds and no side effects on denial. Same-OS-account hostile process isolation is explicitly outside this local profile.",
+      "identity": "sha256:6a29747beae6f21ab0bf084e4d77e118bd7cc7c0b5caa563b567603f501aeb7b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-project-registration",
+      "criterion": "A paired owner can add/select a Project using a bounded explicit absolute path, inspect actual Git metadata, separately initialize a non-Git folder without overwriting files, explicitly enroll and refresh using GitProjectRegistry expected versions, and view registered external worktrees plus branch refs without checkouts. Show bare/unborn/detached/unavailable/removed and stale-CAS states truthfully; no disk crawl, GitHub/remote/commit requirement or automatic checkout. Persist at most 64 server-created Project IDs with bounded display metadata and setup attempt state in the accepted store. Registering the same selected common-directory identity in an existing Project reuses its existing enrollment; an independent clone is not merged by remote URL. The global App list and scoped enrollment commit separately: failure before/after enrollment must retain a retryable attempt under the same Project ID, reconcile actual registry state on retry/restart and avoid orphan/duplicate projects or rollback of user files/.git. Unknown Project IDs and changed preview/expected base must not redirect operations to another folder. Test real temporary Git/SQLite, two Projects, nested/symlink/spaced paths, safe init, external/new worktree, restart and fault-injected list/enrollment boundary.",
+      "identity": "sha256:9ccf740e56043b14be57f04bbbedc9d92a9f1b905852c57a8a10638be8bc1f3b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-provider-credentials",
+      "criterion": "Expose authenticated Project-specific ProviderSettings config, replace/remove and redacted status through the real setup UI and safe typed endpoints, deriving a stable bounded key from the exact [tenant_id, project_id] tuple. Offer OpenRouter typesafe/jev-1.13, Vercel typesafe-ai/jev and TypeSafe jev-latest with semantic-judge-v0 capability and existing timeout/attempt/explicit fallback limits; reject arbitrary models/base URLs and show subscription Worker settings separately. A local password field submits only to the selected Project/provider, clears after each attempt and on Project/provider change, and is never prefilled from stored credentials. Reuse MacOSSecretStore with no useCredential/read-key endpoint or plaintext fallback; locked/denied/unsupported store is actionable while ordinary setup/coding remains usable. Configured means secure item exists and is visibly unverified; save/status never calls any model or silently substitutes another route. Serialize setup-owned async provider operations and recheck live owner/session/Project authorization after waiting and immediately before actual provider-store dispatch; expired queued work must not invoke the store. Ignore late UI responses from a previously selected Project so A credentials/status cannot appear as B. Test with synthetic secret-store canaries, delayed calls, cross-Project/tenant-key collision cases, unauthorized/expired dispatch, replacement/removal/restart, bounded secret-free errors/responses/logs and one temporary app-owned native Keychain fixture when supported; never read existing user keys.",
+      "identity": "sha256:bacd2b7a715fc5e0c7f90835ed00b08488f2c9f1cb42f10e07ff8b670d5969b2",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-project-switch-truth",
+      "criterion": "Render and mutate real ProjectActivation state using read plus explicit enabled/disabled commands with current expected version. New Projects are disabled; stale/double-click/lost-response commands reconcile authoritative state without inventing success or silently retrying an old CAS. Enable requires valid current enrollment; disable remains available when paths or optional providers are unavailable. Linked/newly refreshed worktrees inherit their Project switch, other Projects remain independent, and restart preserves exact epochs/gaps/history with no automatic disabled-period import or recovery. Use real domain admission tests to confirm disabled/stale epoch gates; clearly state no live Collector/Worker/delivery is connected by this Ticket. Display Codex and Claude plugins and subscription Workers as not connected/unsupported rather than simulated login/verified states, and keep semantic Context/Ticket demo data outside the connected setup surface.",
+      "identity": "sha256:15a853c8f8b15b4f99a07d4a3d4e98ee611210f9ab953686109ec0192191e972",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "setup-connected-walkthrough",
+      "criterion": "Perform an actual browser walkthrough against this running setup service and temporary selected Git Projects, not the fixture-only prototype: pair through the same launcher terminal, inspect/init/enroll, see an external linked worktree and a refreshed new worktree, switch between two Projects, configure each supported route, enter/replace/remove a synthetic credential, enable one Project while leaving the other disabled, exercise stale/offline/secure-store failure, stop/restart and recover remembered state after fresh pairing. Record which secure-store path was truly exercised; ordinary CI uses a fake store and the supported native check uses only a fresh synthetic app-owned entry with guaranteed cleanup. Verify keyboard labels/focus and no horizontal overflow at the reviewed viewport, plus no secret in URL/replies/browser persistence/server diagnostics/database config. Run affected public API/auth/store/provider/Git/activation/HTTP tests, boundaries and clean standalone verification. No external model, private-session collection, real plugin installation or Worker execution is claimed; those remain required by the paired original onboarding Ticket.",
+      "identity": "sha256:c1acd97b7d1186e69264abeaa6fe86f3ddc78b27cdfd3435ed17cf1093f0fcba",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ and preserve its standalone dependency/test/release boundary and existing plugin artifact. No native shell, new frontend framework, generic settings framework, generic auth service, cross-scope SQL API or background daemon is required.",
+    "Reuse current bootstrap/auth/store/Git/activation/provider public contracts. Add only small setup-specific transport, pairing and persistence glue; keep semantic core host/provider/storage independent.",
+    "Serve only allowlisted assets and typed setup operations on 127.0.0.1. No directory listing, arbitrary file read/write, shell/SQL endpoint, remote bind, external asset or caller-selected model endpoint.",
+    "Credentials enter locally and are sent only to the selected app-owned secure-store operation; never return/read/display existing keys, log bodies or bearer/cookie values, persist secrets in ordinary files/browser storage, or fall back to plaintext. No real user credential, private trace, model/provider request, host login/installation or external deployment is needed for this Ticket.",
+    "All configuration, activation and enrollment changes require current paired owner authority and exact server-owned Project scope. Configuring one Project cannot overwrite another or reveal its status through a stale client response.",
+    "Do not claim usable semantic capture, policy evaluation, Context/Ticket Graph screens, live plugin connection, Worker readiness, real provider verification or full product onboarding from this setup slice. Preserve the separate original onboarding obligations and historical dependencies."
+  ],
+  "context": "Ship the useful setup portion of the existing local-app-onboarding direction before unfinished host adapters and subscription executors. Reuse startLocalRuntime/CLI through an explicit setup entry or mode, not a second general service or daemon. Serve a small connected setup interface using the prototype's visual/setup patterns; keep its synthetic semantic explorer separately labelled and disconnected. Suggested internal files are src/local/app-setup.mjs, a small app-session module if needed, allowlisted local UI assets, and focused integration/browser tests; naming is not an acceptance requirement.\nOne stable server-owned local tenant/owner and a bounded list of at most 64 opaque App-created Projects is enough. Persist a small versioned setup catalog using the accepted DomainStore in a private control scope/namespace. Browser requests select only a known Project; the service resolves its exact scope and issues narrow current in-process domain contexts. No arbitrary tenant/principal/action or credential-reference input becomes authority. ProviderSettings accepts a single Project key, so derive a stable bounded collision-safe hash of [tenant_id, project_id] rather than concatenate or pass a raw tuple.\nPairing uses the existing launcher terminal: the token-free page may request a bounded short-lived pending browser capability in an HttpOnly SameSite=Strict cookie and display a non-secret comparison code. The same attached TTY shows that code and requires explicit local approval before owner authority exists. The comparison code alone never authenticates. The pending capability is high-entropy, one-time and expiring; use per-instance cookie names and exact-origin binding because browser cookies are not port-scoped. Noninteractive launches never auto-approve. One terminal suffices; no provider key, App credential or pending capability is printed or placed in a URL or browser persistent storage. This protects the local web boundary, not mutually hostile processes under the same OS account.\nSelect an absolute folder path explicitly; do not pretend a browser file-upload input is a native folder capability. Inspect through GitProjectRegistry, display real common-directory/ref/worktree results, and require separate visible initialize/enroll/enable actions. A tiny persisted reserved/enrolling/ready-or-error setup record makes the cross-scope catalog-to-Project enrollment sequence recoverable under the same Project ID. The control catalog and Project registry cannot share the existing single-scope transaction; never fake atomicity or remove initialized Git/user files after a later failure. Reconcile a recorded attempt against the real enrolled catalog on retry/restart.\nThis slice configures the existing three JEV semantic-judgment routes only. Saving settings or a key never invokes a model and never marks that user's credential verified. Plugins and subscription Workers show not-connected/unsupported capability facts; no CLI auth scan, installation, simulated connected state or worker selection pretending to execute is delivered. App enabled state is the real Project switch, not evidence that a collector or semantic pipeline is connected. The paired original onboarding Ticket retains the full integration and live end-to-end verification. No Graph dependency or namespace is introduced; register future namespaces only when their owning module is actually composed.\nHTTP transport clarification: require exact Host on every request. Reject any supplied mismatched Origin and cross-site Fetch Metadata. Authenticated private GET requests may omit Origin, as ordinary same-origin browser reads commonly do; absence never bypasses session/Project authorization. Mutations and pairing requests require exact Origin plus the setup custom header and bounded typed JSON. This preserves the paired-owner boundary while making actual browser reads work.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, private state and ordinary coding degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Retain semantic architecture; this setup slice does not implement Policy, Graph, Worker or canonical paths.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current local App delivery slices and later live composition ownership.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "A simple locally launched App is the current product goal; native desktop investment is not required.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Explicit folder selection, safe Git init and all registered linked worktrees; GitHub remains optional.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-git-project-enrollment.yaml"
+    },
+    {
+      "purpose": "API semantic-judge configuration and subscription Worker authentication are separate.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-provider-and-worker-settings.yaml"
+    },
+    {
+      "purpose": "Explicit Project switch, retained history, epoch fencing and no automatic backfill.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Reuse the accepted one-process loopback lifecycle, data location, preservation and signal handling.",
+      "ref": "semantic-runtime/docs/local-service-profile.md"
+    },
+    {
+      "purpose": "Exact successful bootstrap prerequisite and its deliberately limited status surface.",
+      "ref": ".vibehub/outcomes/ticket-runtime-local-service-profile-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Trusted-process issuer, opaque scoped contexts, expiry/revocation and no public owner issuance.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Accepted authentication baseline; pairing and authenticated UI composition remain consumer obligations.",
+      "ref": ".vibehub/outcomes/ticket-runtime-service-auth-isolation/contract-v3.yaml"
+    },
+    {
+      "purpose": "Accepted scoped CAS/source/outbox transactions, explicit migrations and strict bounded JSON.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Accepted store identity, compatibility and atomic scoped transaction behavior; no cross-scope transaction API.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual inspect/initialize/enroll/refresh and current/historical worktree identity APIs.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Accepted real Git registration and unchanged/restart/CAS behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-git-project-enrollment-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual ProjectActivation read/CAS switch and four-stage admission APIs.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Exact successful activation prerequisite and limits of unconnected downstream consumers.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-activation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual route/config/credential CRUD, supported secure store, bounded errors and configured-versus-verified distinction.",
+      "ref": "semantic-runtime/docs/provider-settings-v0.md"
+    },
+    {
+      "purpose": "Exact successful settings prerequisite, synthetic native secure-store proof and outstanding scoped HTTP binding.",
+      "ref": ".vibehub/outcomes/ticket-runtime-provider-settings-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Reuse only reviewed setup styling/accessibility patterns; synthetic fixture IDs and semantic screens are not production data.",
+      "ref": "semantic-runtime/docs/project-exploration-ux-v0.md"
+    },
+    {
+      "purpose": "Accepted synthetic UX study, not live setup/auth/credential proof.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-exploration-ux-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Paired refinement keeps full live plugin, subscription Worker and capture/dispatch/delivery walkthrough obligations.",
+      "ref": ".vibehub/tickets/ticket-runtime-local-app-onboarding-v0.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "setup-connected-walkthrough",
+          "identity": "sha256:c1acd97b7d1186e69264abeaa6fe86f3ddc78b27cdfd3435ed17cf1093f0fcba",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-launch-lifecycle",
+          "identity": "sha256:a1ccf89ce8025d8a300e1947e088b063e1263cb4edcf022346869b5b605dcd26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-paired-owner-boundary",
+          "identity": "sha256:6a29747beae6f21ab0bf084e4d77e118bd7cc7c0b5caa563b567603f501aeb7b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-project-registration",
+          "identity": "sha256:9ccf740e56043b14be57f04bbbedc9d92a9f1b905852c57a8a10638be8bc1f3b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-project-switch-truth",
+          "identity": "sha256:15a853c8f8b15b4f99a07d4a3d4e98ee611210f9ab953686109ec0192191e972",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "setup-provider-credentials",
+          "identity": "sha256:bacd2b7a715fc5e0c7f90835ed00b08488f2c9f1cb42f10e07ff8b670d5969b2",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1e40f08692d68d97084b5c5224d0d30570b385e23b8c9c92a3263715bc96be2d",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Deliver a real locally launched setup App for paired owner access, Git Project/worktree enrollment, secure semantic-judge provider configuration and authoritative Project enable/disable.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "planning:local-setup-before-live-adapters",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The accepted existing process/storage lifecycle is the exact host being extended; this slice must preserve its successful startup/stop behavior.",
+      "target_ticket_id": "ticket-runtime-local-service-profile-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The accepted existing config and app-owned native secure-store CRUD is the exact credential backend being exposed through authenticated setup.",
+      "target_ticket_id": "ticket-runtime-provider-settings-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The accepted switch over current enrolled Git identities is the exact authoritative Project control used by the setup UI; its Git/store prerequisites remain transitive.",
+      "target_ticket_id": "ticket-runtime-project-activation-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-app-setup-v0"
+}

@@ -4,6 +4,8 @@ import { resolve, join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { LocalCredentialAuthority, authorizeLocalRequest, LOCAL_AUDIENCE } from './auth.mjs';
 import { scopedReference, accessDiagnostic } from '../core/service-access.mjs';
+import { AppSessions } from './app-session.mjs';
+import { createSetupHandler } from './setup-http.mjs';
 
 const APPLICATION_ID = 0x56484253; // VHBS: bootstrap store, separate from replay/domain databases.
 const SERVICE = 'vibehub-runtime';
@@ -53,14 +55,28 @@ const PAGE = `<!doctype html>
 </html>`;
 
 /** Local status and authenticated identity boundary; no source/model execution. */
-export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
+export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT, setup = false,
+  pairing = {}, secretStore, now = () => Date.now() } = {}) {
   validatePort(port);
   if (typeof dataDir !== 'string' || !dataDir.trim()) throw new Error('An explicit dataDir is required.');
+  if (typeof setup !== 'boolean' || typeof now !== 'function' || !pairing || typeof pairing !== 'object'
+    || pairing.available !== undefined && typeof pairing.available !== 'boolean'
+    || pairing.onPending !== undefined && typeof pairing.onPending !== 'function') throw new Error('Invalid local setup options.');
   const storagePath = resolve(dataDir);
   const db = openStorage(storagePath);
-  const auth = new LocalCredentialAuthority();
+  const auth = new LocalCredentialAuthority({ now });
+  let controller, setupCodes, sessions, setupHandler;
+  if (setup) {
+    try {
+      const { LocalAppSetup, SETUP_ERROR_CODES } = await import('./app-setup.mjs');
+      controller = new LocalAppSetup({ dataDir: storagePath, authority: auth, secretStore, now });
+      setupCodes = SETUP_ERROR_CODES;
+    } catch { auth.close(); db.close(); throw new Error('Local App setup storage could not open. Existing files were not removed.'); }
+  }
   let origin;
   let closing;
+  let finishClosed;
+  const closed = new Promise(resolveClosed => { finishClosed = resolveClosed; });
   const server = createServer((request, response) => {
     const send = (status, body, type = 'application/json; charset=utf-8') => {
       response.writeHead(status, {
@@ -70,6 +86,9 @@ export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
       });
       response.end(typeof body === 'string' ? body : JSON.stringify(body));
     };
+    if (setup && (request.url === '/' || request.url.startsWith('/setup/') || request.url.startsWith('/v1/setup/'))) {
+      void setupHandler(request, response); return;
+    }
     // No CORS. Reject rebinding and cross-origin browser requests even for this read-only surface.
     if (request.headers.host !== new URL(origin).host
       || (request.headers.origin && request.headers.origin !== origin)) {
@@ -97,7 +116,8 @@ export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
         throw new Error('Missing bootstrap state');
       }
       if (request.url === '/') send(200, PAGE, 'text/html; charset=utf-8');
-      else send(200, { service: SERVICE, status: 'ready', storage: 'sqlite', profile: 'bootstrap' });
+      else send(200, { service: SERVICE, status: 'ready', storage: 'sqlite', profile: setup ? 'setup' : 'bootstrap',
+        ...(setup ? { app: 'ready', plugins: 'not_connected', workers: 'not_connected', models: 'unverified' } : {}) });
     } catch {
       send(503, { service: SERVICE, status: 'not_ready', error: 'Local storage unavailable' });
     }
@@ -111,25 +131,31 @@ export async function startLocalRuntime({ dataDir, port = DEFAULT_PORT } = {}) {
       server.listen(port, '127.0.0.1', () => {
         server.off('error', reject);
         origin = `http://127.0.0.1:${server.address().port}`;
+        if (setup) {
+          sessions = new AppSessions({ origin, available: pairing.available ?? false, onPending: pairing.onPending, now });
+          setupHandler = createSetupHandler({ controller, sessions, origin, stop: close, safeCodes: setupCodes });
+        }
         resolveListen();
       });
     });
   } catch (error) {
+    sessions?.close(); await controller?.close();
     auth.close();
     db.close();
     if (error.code === 'EADDRINUSE') throw new Error('Port already in use. Choose --port 0 or another local port.');
     throw new Error('Could not bind the local listener. Allow loopback networking and retry.');
   }
-  return {
-    url: origin, dataDir: storagePath, auth,
-    close() {
-      if (!closing) closing = new Promise((resolveClose, reject) => {
-        server.close(() => {
-          try { auth.close(); db.close(); resolveClose(); } catch (error) { reject(error); }
-        });
-        server.closeAllConnections();
-      });
-      return closing;
-    },
-  };
+  function close() {
+    if (!closing) {
+      // Revoke synchronously: queued/in-flight owner guards fail before awaiting I/O.
+      sessions?.close(); auth.close();
+      const controllerClosed = Promise.resolve(controller?.close());
+      closing = Promise.all([controllerClosed, new Promise((resolveClose, reject) => {
+        server.close(error => { if (error) reject(error); else resolveClose(); }); server.closeAllConnections();
+      })]).finally(() => { try { db.close(); } finally { finishClosed(); } });
+    }
+    return closing;
+  }
+  return { url: origin, dataDir: storagePath, auth, close, closed,
+    ...(setup ? { pairing: Object.freeze({ approve: code => sessions.approve(code), revoke: () => sessions.revoke(), disable: () => sessions.disable() }) } : {}) };
 }

@@ -15,6 +15,12 @@ The included synthetic fixture still proves pipeline behavior only.
 
 ## Run the prototype
 
+For the connected local setup App, run `npm run app -- --port 0` in an interactive
+terminal, open its printed URL and approve browser pairing in that terminal.
+It enrolls actual Git folders/worktrees, stores provider settings with macOS
+Keychain, and controls the durable Project switch. Plugins and Workers remain
+not connected; saved keys are unverified. See [local App setup](docs/local-app-setup-v0.md).
+
 For the local service bootstrap, run `npm start` in this directory and open the
 printed URL; `npm run status` checks readiness and Ctrl+C stops it. This starts
 only a local status page and SQLite bootstrap, with no collection or model calls.
@@ -25,9 +31,9 @@ The local modules now also provide [scoped authentication](docs/service-auth-v0.
 [exploration/worktree scope contract](docs/branch-scope-v0.md), plus a
 [scoped SQLite domain store](docs/domain-store-v0.md) and
 [Git folder/worktree registry](docs/git-project-enrollment-v0.md), and
-[durable Project activation](docs/project-activation-v0.md). Project onboarding
-and the settings UI still need composition; installing these modules does not
-enable collection or background work.
+[durable Project activation](docs/project-activation-v0.md). Project enrollment
+and the settings UI are composed in the explicit setup mode; installing these
+modules does not enable collection or background work.
 
 For the separate [synthetic App interaction preview](docs/project-exploration-ux-v0.md),
 run `node prototype/serve.mjs 51987` and open `http://127.0.0.1:51987/`.

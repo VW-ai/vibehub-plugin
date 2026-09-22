@@ -1,0 +1,44 @@
+{
+  "context_id": "note-runtime-connected-local-setup",
+  "detail": "The 2026-09-22 connected setup slice uses the existing startLocalRuntime with npm run app and terminal-approved browser pairing. Actual Git/SQLite enrollment preserves one Project across linked worktrees and interrupted attempts; provider keys use per-Project macOS Keychain and are labelled configured/unverified; explicit Project switches persist epochs and disabled gaps. A real browser walkthrough covered two synthetic Projects, safe Git init, external/new worktrees, three route configurations, native synthetic key replace/remove, stale-CAS rejection, offline/Stop/restart/fresh pairing and an injected secure-store failure. No real user credential, private trace or model call was used by setup. The existing synthetic semantic explorer stays separate. Codex/Claude plugins and subscription Workers remain not connected, and the original onboarding Ticket retains all live capture/model/delivery and executor obligations. Cookie authority is server-memory-only and restart-invalidated; browser session-cookie restoration is not a physical disk-erasure guarantee.",
+  "evidence": [
+    {
+      "note": "Actual browser observations and explicit proof limits.",
+      "ref": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
+    },
+    {
+      "note": "Launch and composition, scoped operations, recovery and remaining product work.",
+      "ref": "semantic-runtime/docs/local-app-setup-v0.md"
+    },
+    {
+      "note": "Real temporary Git/SQLite plus synthetic secure-store and expiry regression.",
+      "ref": "semantic-runtime/test/app-setup.test.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-provider-and-worker-settings",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T10:56:53.126Z",
+    "ref": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
+  },
+  "state": "active",
+  "summary": "The local setup App now composes real Project enrollment, secure provider settings and activation; live plugins and Workers remain separate",
+  "tags": [
+    "semantic-runtime",
+    "local-app",
+    "setup",
+    "providers",
+    "project-activation"
+  ],
+  "type": "note"
+}

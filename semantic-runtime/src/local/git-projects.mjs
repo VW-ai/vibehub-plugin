@@ -116,6 +116,7 @@ export class GitProjectRegistry {
     if (before.status !== 'not_git') throw error('already_git');
     this.#grant(context, 'project:initialize', true);
     if (inspect(before.selected_path).status !== 'not_git') throw error('discovery_changed');
+    this.#grant(context, 'project:initialize', true);
     try { git(before.selected_path, ['init', '--quiet', '--template=', '--initial-branch=main']); }
     catch { throw error('git_initialize_failed'); }
     const result = inspect(before.selected_path);

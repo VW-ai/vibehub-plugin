@@ -63,7 +63,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Implement the transactional Semantic Working Graph store. Delivery slice: alpha. Architecture: . Scope: Schema, migrations, transactional adapter, current projections, snapshot reads, outbox coupling, and adapter conformance.. Excluded: Dedicated graph database, unrestricted ontology, canonical code history, ranking, and connector ingestion..  Required transitive artifacts: graph-contract: The Graph adapter implements the accepted revision/assertion/snapshot contract. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Implement the transactional Semantic Working Graph store. Delivery slice: alpha. Architecture: . Scope: Schema, migrations, transactional adapter, current projections, snapshot reads, outbox coupling, and adapter conformance.. Excluded: Dedicated graph database, unrestricted ontology, canonical code history, ranking, and connector ingestion..  Required transitive artifacts: graph-contract: The Graph adapter implements the accepted revision/assertion/snapshot contract. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.\n\nRefinement finding2026-09-22: preserve every current Acceptance revision and Contract2; do not promote this Ticket to firm or execute a bounded fixture wrapper as the alpha store. The accepted Working Graph reference requires an entire ordered state with at most128 snapshots,512 records per snapshot array and one immutable catalog. Per-transition delta storage followed by full reference-state reconstruction still has those lifetime limits and does not meet the current production-adapter criterion. A proposed SQLite schema must separate total retained history from per-operation/row/page limits and retain exact historical authorization and rebuild semantics. The new direct incremental-graph-contract prerequisite supplies the missing versioned transition/address/paging input; refine this same Ticket only after its independently successful Outcome. The selected SQLite/DomainStore prerequisite remains DONE and its historical dependency is preserved unchanged.\n\nCandidate adapter direction, deliberately not executable acceptance yet: one working-graph namespace in the existing DomainStore, immutable genesis/catalog/admission pins and per-commit/revision/conflict/source records, a small scoped CAS head and independently versioned disposable current projection, exact idempotent command receipts and one atomic outbox intent. Avoid a cumulative state.snapshots JSON row and duplicate whole-history rows. The prerequisite must settle the actual commit/address/index/paging format before SQL/repository implementation is authorized; do not invent snapshot_digest compatibility. Proposed API families are initialize, applyAssertion, resolveConflict, updateSourceAccess, getReceipt, resolveExact/resolveAt, bounded history/head pages and rebuildProjection. Mutations must derive tenant/Project from opaque auth, authenticate trusted App/human graph/lifecycle authority distinctly and compose current ProjectActivation epoch/expected-head CAS inside the same DomainStore transaction. Reads select the actual current authorization state rather than accepting a caller current_graph. Actual production source ingestion/invalidation, host Session/Execution enrollment, branches/adoption and user-facing HTTP APIs remain owned by their existing downstream Tickets; do not create a cycle to claim these already exist.\n\nThe real adapter refinement must pin exact schemas/bounds and prove more than128 transitions and512 independent records in one generation, restart/history pages/current ACL, exact retry and conflicting duplicate behavior, concurrent SQLite CAS, immutable command/revision/audit/outbox atomicity, pre/post-commit failure, deterministic paged rebuild, corrupt/newer schema refusal and migration/retention policy. A bounded prototype may inform these choices but cannot retire or close current Acceptance. New catalog/enrollment and compaction/checkpoint work may be necessary, but only independently proven formats can become actual implementation prerequisites. No graph implementation or canonical plan application occurs in this candidate.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -80,6 +80,74 @@
     {
       "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Accepted wire-v1 bounded oracle implementing Ticket Contract V2, including its explicit128 snapshots/512 arrays and adapter responsibilities.",
+      "ref": "semantic-runtime/docs/working-graph-v0.md"
+    },
+    {
+      "purpose": "Executable semantic invariants and whole-history/cumulative-array limits; preserve V1 API and validators.",
+      "ref": "semantic-runtime/src/core/working-graph.mjs"
+    },
+    {
+      "purpose": "Existing synthetic differential oracle fixture; it is not a production dataset or store.",
+      "ref": "semantic-runtime/test/fixtures/working-graph/scenario.mjs"
+    },
+    {
+      "purpose": "Exact independently accepted semantic contract, with predecessor-only lifecycle admission and current-access historical reads.",
+      "ref": ".vibehub/outcomes/ticket-define-semantic-context-protocol-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Regression history: reject forged heads/conflicts, future source proof and implicit lifecycle epoch admission.",
+      "ref": ".vibehub/evidence/ticket-define-semantic-context-protocol-v0/runtime-working-graph-independent-review-history-epoch-repair-v1.yaml"
+    },
+    {
+      "purpose": "Selected scoped SQLite primitives, immutable source/outbox rows and1MiB/16-depth/50k-node per-value limits; no arbitrary SQL API.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Accepted persistence foundation, not a finished Graph adapter.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Explicit Project/source/Session/Execution identity and trust boundary.",
+      "ref": "semantic-runtime/docs/identity-contract-v0.md"
+    },
+    {
+      "purpose": "Normalized immutable event/observation/body pins and ACL intersection; shapes are not authentication.",
+      "ref": "semantic-runtime/docs/event-provenance-v0.md"
+    },
+    {
+      "purpose": "Per-source epoch ordering/watermark/gap semantics; graph commit sequence cannot manufacture source continuity.",
+      "ref": "semantic-runtime/docs/causal-ordering-v0.md"
+    },
+    {
+      "purpose": "Concrete later adapter commit admission and disabled-epoch boundary; this pure contract does not claim App integration.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Current Git catalog has no host Session/Execution registry; never fabricate enrollment from a path or message.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Active local App product direction supersedes the older local-experience ordering note.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Explicit App Project enable/disable and preservation of historical state.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Later owner of live ingress lifecycle routing and cache/index/package invalidation; must not become a circular prerequisite.",
+      "ref": ".vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml"
+    },
+    {
+      "purpose": "Later owner of real dynamic exploration/source/session enrollment, scoped heads and adoption.",
+      "ref": ".vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Later owner of user/host registration and HTTP/API delivery; no host enrollment server here.",
+      "ref": ".vibehub/tickets/ticket-runtime-semantic-api-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -150,6 +218,11 @@
     {
       "rationale": "Graph schemas and projection migrations consume the selected transactional store foundation.",
       "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The accepted bounded V1 fixture cannot execute a usable lifetime-scale store. This exact prerequisite supplies versioned incremental transition, historical-address/current-access and page contracts before the real SQLite adapter can be concretely refined without128-snapshot/512-record global caps.",
+      "target_ticket_id": "ticket-runtime-incremental-graph-contract-v0",
       "type": "depends_on"
     }
   ],

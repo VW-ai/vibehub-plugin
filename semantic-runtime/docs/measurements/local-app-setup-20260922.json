@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-22",
+  "kind": "actual-local-browser-walkthrough",
+  "platform": "macOS / Node 23.9.0 / Codex in-app browser",
+  "launch": "npm run app -- --port <fixed-loopback-port> --data-dir <disposable-directory>",
+  "data": "Two purpose-created synthetic Git folders; no user repository or private session captured.",
+  "results": {
+    "same_launcher_tty_pairing": "passed; compared visible code and explicitly approved in attached launch terminal",
+    "non_git_folder": "passed; inspected then separately initialized and enrolled; existing synthetic file preserved; unborn Git displayed",
+    "linked_worktrees": "passed; external worktree visible on initial inspection; a newly created third worktree appeared after explicit Refresh Git",
+    "project_isolation": "passed; Project A enabled, Project B disabled; switching pages and process restart preserved both",
+    "provider_config": "passed; saved TypeSafe jev-latest, Vercel typesafe-ai/jev and OpenRouter typesafe/jev-1.13; final selected route persisted across restart",
+    "native_secure_store": "passed; synthetic key entered in local password form, saved, replaced and removed through actual macOS Keychain; configured always labelled unverified",
+    "secret_input": "passed; password field empty after successful or failed save and after changing provider",
+    "stale_write": "passed; second browser view changed Project A; original view's stale switch received conflict, blocked further mutation until explicit reload, then a fresh command succeeded",
+    "activation_history": "passed; enable/disable/enable produced epoch 3 and visible disabled interval; restart retained it",
+    "stop_and_restart": "passed; authenticated Stop rendered stopped state and exited process; restart required fresh pairing before Projects became visible",
+    "unexpected_offline": "passed; terminating launcher then Reload status showed offline/reconnect, removed private Project view and did not retry writes",
+    "secure_store_failure": "passed in a separately launched injected failure fixture using the same actual HTTP/UI path; actionable Keychain message, empty password and available Project switch; not a native lock simulation",
+    "keyboard": "passed; Stop dialog focused Keep running, Escape dismissed it and restored Stop app focus; controls had visible labels and accessible names",
+    "layout": "passed at 1280px viewport; document scrollWidth 1265px, no horizontal overflow; screenshot inspected",
+    "cleanup": "passed; all six provider slots belonging to the two synthetic Project IDs confirmed missing in native Keychain; both ordinary databases contained none of the synthetic credential canaries"
+  },
+  "limits": [
+    "No actual provider/model request is made by setup operations.",
+    "No real user key was read, entered or transmitted.",
+    "Plugins, subscription Workers, collection and semantic delivery remain not connected.",
+    "Browser storage behavior is enforced by implementation/tests: no localStorage/IndexedDB token persistence, HttpOnly session cookies and memory-only server grants. Browser cookie restoration is not proof of physical disk erasure.",
+    "The independent synthetic explorer is not this connected setup page.",
+    "Initial native helper compilation required waiting beyond a short UI automation locator deadline; save succeeded. Client deadlines now separately account for native compile/operation limits."
+  ],
+  "reproduction": [
+    "Use a new temporary directory with a committed Git repository and an external linked worktree; leave a second folder uninitialized.",
+    "Launch the documented App from an attached TTY and operate its token-free page.",
+    "Use only invented credential text and remove it before stopping.",
+    "For the separate secure-store failure UI path, run node test/fixtures/app-setup/secure-store-failure-cli.mjs <disposable-data-dir> <port> from an attached TTY. This fixture is not a production launch mode."
+  ]
+}
