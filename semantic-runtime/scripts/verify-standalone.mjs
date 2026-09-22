@@ -3,14 +3,17 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { STANDALONE_COPY_PATHS } from './runtime-layout.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const temporary = mkdtempSync(join(tmpdir(), 'semantic-runtime-standalone-'));
 const destination = join(temporary, 'component');
 try {
   mkdirSync(destination);
-  for (const path of ['package.json', 'package-lock.json', 'index.ts', 'src', 'scripts', 'test', 'policies']) {
-    cpSync(join(root, path), join(destination, path), { recursive: true });
+  for (const path of STANDALONE_COPY_PATHS) {
+    const target = join(destination, path);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(root, path), target, { recursive: true });
   }
   for (const args of [['ci', '--ignore-scripts', '--no-audit', '--no-fund'], ['run', 'verify']]) {
     const result = spawnSync('npm', args, { cwd: destination, stdio: 'inherit', timeout: 180_000 });

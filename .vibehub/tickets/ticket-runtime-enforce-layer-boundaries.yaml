@@ -1,0 +1,102 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "production-sccs-are-measured",
+      "criterion": "The deterministic boundary check builds the production JavaScript import graph, reports strongly connected components with exact paths, accepts only the one baselined Graph/Context/Canonical SCC, and fails on any new or enlarged production cycle; focused fixtures prove both pass and fail behavior.",
+      "identity": "sha256:5d15c40aea66cda844a9844f8cc09f836d2567dafd9d84d430970cd423432dd5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "target-layer-directions-are-enforced",
+      "criterion": "Role-aware rules cover current and target paths: domain remains pure and cannot import application/adapters/app-local or Node I/O/provider/storage implementations; application cannot import app-local; adapters cannot import app-local; production cannot import research/verification/test; test, tools, verification and research roots remain scanned under their declared looser roles.",
+      "identity": "sha256:dbb6578e3aa8849122821acf36cabf673fbd477bddf95a69c899b073dd1cfc02",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "boundary-check-is-part-of-release-verification",
+      "criterion": "The existing check:boundaries and verify command names remain stable, standalone verification includes the required checker inputs, deliberate violation fixtures fail with useful messages, and full Runtime/standalone/artifact/project validation passes offline.",
+      "identity": "sha256:f0cbb5a88f8bd786f8febfe26afbaf9c87eae32dcace388cd879f0a6e24dfa22",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not remove the current SCC, move production modules, rename public APIs, change Runtime behavior or introduce a generic architecture framework.",
+    "Use existing acorn/Node tooling and add no dependency."
+  ],
+  "context": "Extend the existing dependency checker from its current core-purity and package checks to the capability-oriented target. The checker should understand current transitional paths and intended roles, expose the known SCC as a tracked baseline, and reject any new cycle or forbidden direction without requiring a wholesale move.",
+  "context_refs": [
+    {
+      "purpose": "Component, provider, storage, private-state, standalone verification, and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current Project, Exploration, Graph, Policy, Judge, and Context Query product model.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current architecture and workflow proposal whose capabilities the layout must preserve.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Local delivery direction and current service/module boundaries.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Current checker and constraints to extend.",
+      "ref": "semantic-runtime/scripts/check-boundaries.mjs"
+    },
+    {
+      "purpose": "Current focused checker regression suite.",
+      "ref": "semantic-runtime/test/boundaries.test.mjs"
+    },
+    {
+      "purpose": "Current known SCC owner and mixed application facade.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "boundary-check-is-part-of-release-verification",
+          "identity": "sha256:f0cbb5a88f8bd786f8febfe26afbaf9c87eae32dcace388cd879f0a6e24dfa22",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-sccs-are-measured",
+          "identity": "sha256:5d15c40aea66cda844a9844f8cc09f836d2567dafd9d84d430970cd423432dd5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "target-layer-directions-are-enforced",
+          "identity": "sha256:dbb6578e3aa8849122821acf36cabf673fbd477bddf95a69c899b073dd1cfc02",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:30a8c6735ead109fcae3051886640a7b1f1db246fe29a4449809e52af8827910",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Automated offline checks enforce the intended Runtime layer directions and reject new production dependency cycles before the source tree is moved.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-layout-direction",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The checker needs the accepted role map and exact current import baseline.",
+      "target_ticket_id": "ticket-runtime-layout-contract-baseline",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-enforce-layer-boundaries"
+}

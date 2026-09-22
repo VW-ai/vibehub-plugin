@@ -1,0 +1,106 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ux-research-is-self-contained",
+      "criterion": "All prototype assets and the Project/Exploration UX research document move by Git history into research/ux/project-exploration with one local README that states purpose, launch/test commands, fixture boundary, limitations and separation from the connected app/local product.",
+      "identity": "sha256:6d29460f661863b39e5d3de1d082b29faedc25298c630b17548b67681e740043",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ux-relocation-preserves-behavior",
+      "criterion": "Prototype syntax/tests and a local browser or deterministic host check preserve the same routes, fixture behavior and static output; no production Runtime import, package dependency, network resource or new UI framework is introduced.",
+      "identity": "sha256:406bddfd6e1d64faa8d0c7c9c430ccf8564978053e5978ea56cd6be021737c39",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "ux-path-history-remains-resolvable",
+      "criterion": "Current README/docs/active Ticket references and Room anchors use the new paths; the relocation manifest records every moved old path/blob and migration commit, while historical Evidence/Outcome/Ticket content is unchanged and project validation passes.",
+      "identity": "sha256:70c12fc071a75e13f16d330f6a21cecca07a8a74e591d8f23d77c991227c02e4",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not redesign the UX, connect the prototype to Runtime state, or change the production setup UI.",
+    "Do not move host probes, platform spikes, live verification, Phase 0 replay, formal tests or production source in this Ticket."
+  ],
+  "context": "Move the lowest-coupling research unit first. Preserve the prototype as design evidence, update current links and active references, and record the relocation without rewriting historical Evidence.",
+  "context_refs": [
+    {
+      "purpose": "Component, provider, storage, private-state, standalone verification, and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current Project, Exploration, Graph, Policy, Judge, and Context Query product model.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current architecture and workflow proposal whose capabilities the layout must preserve.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Local delivery direction and current service/module boundaries.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Current disconnected UX prototype host and asset allowlist.",
+      "ref": "semantic-runtime/prototype/serve.mjs"
+    },
+    {
+      "purpose": "Current deterministic UX prototype behavior checks.",
+      "ref": "semantic-runtime/prototype/prototype.test.mjs"
+    },
+    {
+      "purpose": "Current UX prototype document entry.",
+      "ref": "semantic-runtime/prototype/index.html"
+    },
+    {
+      "purpose": "Current UX research and prototype contract.",
+      "ref": "semantic-runtime/docs/project-exploration-ux-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "ux-path-history-remains-resolvable",
+          "identity": "sha256:70c12fc071a75e13f16d330f6a21cecca07a8a74e591d8f23d77c991227c02e4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ux-relocation-preserves-behavior",
+          "identity": "sha256:406bddfd6e1d64faa8d0c7c9c430ccf8564978053e5978ea56cd6be021737c39",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ux-research-is-self-contained",
+          "identity": "sha256:6d29460f661863b39e5d3de1d082b29faedc25298c630b17548b67681e740043",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:307220c89100527a13f3945cc3bcfd17444d6d89db013e64f82d92ccd39a025b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The disconnected Project/Exploration UX prototype and its research record live together under research/ux/project-exploration without changing the connected local App or prototype behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-layout-direction",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The accepted inventory and relocation contract are required inputs before changing paths.",
+      "target_ticket_id": "ticket-runtime-layout-contract-baseline",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-ux-research"
+}

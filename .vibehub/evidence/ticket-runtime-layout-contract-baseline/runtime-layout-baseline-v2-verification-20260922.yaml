@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "layout-contract-and-inventory",
+    "compatibility-baseline-is-reproducible",
+    "migration-traceability-is-explicit"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "layout-contract-and-inventory",
+      "identity": "sha256:619011c4986febdbae7d4d3530a2b21b0d21533e664681c6d38eb199f8e554fd",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "compatibility-baseline-is-reproducible",
+      "identity": "sha256:0d323a8f457f8916d7a57aa6a37744767fa09943bb781aee5a6a629591d380fc",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "migration-traceability-is-explicit",
+      "identity": "sha256:dcb87cdb29aa9419a9a624519e0ae8fe6a81cc28f46c6f3be498cd5c35b83be8",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-layout-baseline-v2-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T20:55:39Z",
+  "refs": [
+    "semantic-runtime/docs/architecture/runtime-layout-v0.md",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/package.json",
+    "scripts/verify-plugin-artifact.mjs",
+    ".vibehub/outcomes/ticket-runtime-layout-contract-baseline/contract-v1.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "The v2 correction closes both independently identified baseline gaps without moving Runtime assets or changing Runtime behavior. The deterministic inventory now includes all seven tracked Runtime-root files (.env.example, .gitignore, AGENTS.md, README.md, index.ts, package-lock.json and package.json) alongside every file under the source, test, script, prototype, spike, policy and docs trees; a new root file produces a focused inventory drift failure in the complete component. Production dependency inspection now includes static imports, re-exports and dynamic literal import() edges, records cli -> service and service -> app-setup, de-duplicates edges and retains the exact four-file Graph/Context/Canonical SCC. Focused layout and boundary tests pass 8/8, the direct checker reports inventory_checked true with no errors, full Runtime verification passes 1019 tests with 1017 passed, zero failed and two existing opt-in Keychain skips, and corrected standalone verification reports the same totals outside the repository. Root plugin artifact verification passes with 79 files and 3670088 bytes. The architecture document still fixes the shared SQLite transaction, same-instance proof requirements, awareness/adoption distinction and five-field relocation manifest; no public export, command name, schema, namespace, provider route, database content or historical v1 proof was rewritten.",
+  "ticket_id": "ticket-runtime-layout-contract-baseline"
+}

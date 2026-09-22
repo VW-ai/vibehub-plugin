@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "postgres-spike-is-self-contained",
+      "criterion": "The complete spike package and platform evaluation document move by Git history into research/platform/node-postgres; its package, lockfile, Dockerfile, fixture, runner, service, standalone check, README and report keep one coherent set of relative paths and commands.",
+      "identity": "sha256:dae4bfd2c67db8d46d0e13ef97dc9f63c0bb7c6eee3fd7b7897e42424a555d23",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "postgres-spike-boundary-is-preserved",
+      "criterion": "The spike check and independent package verification pass against the Runtime public entry without joining the main Runtime lockfile, changing production storage, or being imported by production source; an unavailable real PostgreSQL environment is reported rather than simulated as a live pass.",
+      "identity": "sha256:1ed4345decc6795cced17b223ffc96b5ddb3a6cc5b3a65ac3bbec7129b48540d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "postgres-relocation-is-traceable",
+      "criterion": "Current docs, active Ticket references and Room anchors use the new path; the relocation manifest covers every moved file/blob and migration commit, historical records remain byte-unchanged, and Runtime/standalone/artifact/project validation passes.",
+      "identity": "sha256:4060d267401aa2996d2525229fbccfa282d9280f46122a8d8fbcc94b7b6f21eb",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not adopt PostgreSQL, alter DomainStore or GraphStorage, change platform conclusions, or merge dependency trees.",
+    "Do not move any production source or unrelated research/verification asset."
+  ],
+  "context": "Move the self-contained platform spike as one unit because its Dockerfile, standalone copier, README and relative imports form a distinct verification boundary. It remains research evidence rather than a production adapter.",
+  "context_refs": [
+    {
+      "purpose": "Component, provider, storage, private-state, standalone verification, and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current Project, Exploration, Graph, Policy, Judge, and Context Query product model.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current architecture and workflow proposal whose capabilities the layout must preserve.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Local delivery direction and current service/module boundaries.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Current spike package boundary and commands.",
+      "ref": "semantic-runtime/spikes/platform-node-postgres/README.md"
+    },
+    {
+      "purpose": "Current platform research conclusion.",
+      "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "postgres-relocation-is-traceable",
+          "identity": "sha256:4060d267401aa2996d2525229fbccfa282d9280f46122a8d8fbcc94b7b6f21eb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "postgres-spike-boundary-is-preserved",
+          "identity": "sha256:1ed4345decc6795cced17b223ffc96b5ddb3a6cc5b3a65ac3bbec7129b48540d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "postgres-spike-is-self-contained",
+          "identity": "sha256:dae4bfd2c67db8d46d0e13ef97dc9f63c0bb7c6eee3fd7b7897e42424a555d23",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:30789e216edce4abf1ada0d86c6538af34f36503317444ce6fe5e8e3beb62f2b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Node/Postgres platform spike remains an independently runnable research package under research/platform/node-postgres with its conclusions and production boundary intact.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-layout-direction",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The accepted inventory and relocation contract are required inputs before changing paths.",
+      "target_ticket_id": "ticket-runtime-layout-contract-baseline",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-postgres-research"
+}

@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "layout-contract-and-inventory",
+    "compatibility-baseline-is-reproducible",
+    "migration-traceability-is-explicit"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T21:04:18.518Z",
+  "contract_revision": {
+    "identity": "sha256:478f88f62952554bf041b97899b2eff8c2150fb32fd6dcae0af1ce460bf0d09a",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "runtime-layout-baseline-v2-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; I did not execute or author the implementation, Ticket, or Evidence.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active criteria of exact Contract v2. The versioned architecture document and machine baseline classify Runtime-root component files and every current source, test, script, prototype, spike, policy, measurement, example, and document into one current role and intended destination, while stating dependency direction, shared-SQLite transaction preservation, same-instance proof constraints, and the separation between cross-exploration visibility and adoption. The deterministic offline checker captures root exports, npm commands and live/offline modes, schema/namespace/version constants, the standalone allowlist, static imports, re-exports, dynamic literal import() edges, and the exact four-file Graph/Context/Canonical SCC; focused drift tests exercise useful failures without external capabilities. The architecture contract identifies active-path consumer classes and specifies the five-field relocation manifest, immutable historical records, current-reference movement, and required focused/full Runtime, standalone, artifact, VibeHub, Room, and diff checks for later migration batches. Independently reran the authorized checks: runtime-layout and boundary tests passed 8/8; the direct checker returned ok with inventory_checked true and no errors; git diff --check passed; Ticket validation passed for 217 Tickets, 521 Evidence records, and 159 existing Outcomes; Context guard passed with zero authorities and violations; Room drift reported semantic-runtime FRESH. Other stale Rooms carry explicit unrelated reasons and do not affect this Runtime contract.",
+  "ticket_id": "ticket-runtime-layout-contract-baseline",
+  "unresolved_acceptance_ids": []
+}

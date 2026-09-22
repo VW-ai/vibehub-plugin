@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { isBuiltin } from 'node:module';
 import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkRuntimeLayout } from './runtime-layout.mjs';
 
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const within = (root, path) => path === root || path.startsWith(`${root}${sep}`);
@@ -104,6 +105,10 @@ export function checkBoundaries(root = defaultRoot) {
         fail(`dependency must be installed inside this component: ${specifier}`);
       }
     });
+  }
+  if (manifest.name === '@vibehub/semantic-runtime') {
+    const layout = checkRuntimeLayout(root);
+    errors.push(...layout.errors.map(error => `runtime layout: ${error}`));
   }
   return { ok: errors.length === 0, files: paths.length, errors };
 }

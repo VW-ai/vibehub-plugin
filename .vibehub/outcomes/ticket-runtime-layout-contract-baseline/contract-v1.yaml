@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "migration-traceability-is-explicit"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T20:42:03Z",
+  "contract_revision": {
+    "identity": "sha256:c848d53cc2a11df703f67fe33ac96f12ad8d19199e8f3c4e525902c3d889e0df",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-layout-baseline-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh closeout subagent; I did not execute or author the implementation, Ticket, or Evidence.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "partial",
+  "summary": "Migration traceability is explicit: the architecture document identifies active-path consumer classes, specifies the five-field versioned relocation manifest, preserves historical records, moves current references with code, and requires focused, full Runtime, standalone, artifact, VibeHub validation, Room alignment, and diff checks per batch. The layout inventory is incomplete against the exact criterion because tracked Runtime documents and examples outside the selected roots, including README.md, AGENTS.md, and .env.example, have no current-role or intended-destination record. The compatibility baseline is also incomplete because production import inspection handles static import/export declarations but omits ImportExpression edges; src/local/cli.mjs dynamically imports src/local/service.mjs and src/local/service.mjs dynamically imports src/local/app-setup.mjs, while neither edge is in the claimed complete graph. Focused layout and boundary tests, the direct checker, VibeHub validation, semantic-runtime Room alignment, git diff checking, and Context guard pass, confirming the recorded implementation is internally reproducible but not sufficient for those two acceptance criteria.",
+  "ticket_id": "ticket-runtime-layout-contract-baseline",
+  "unresolved_acceptance_ids": [
+    "layout-contract-and-inventory",
+    "compatibility-baseline-is-reproducible"
+  ]
+}

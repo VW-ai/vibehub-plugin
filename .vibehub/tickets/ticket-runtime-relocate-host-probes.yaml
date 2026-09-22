@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "host-probes-are-self-contained",
+      "criterion": "Codex and Claude probe runners, deterministic tests, observation reports and usage/limitations documents move into research/host-probes/codex and research/host-probes/claude with clear offline and live commands.",
+      "identity": "sha256:aae847b8ec7640983003ce447ef7f39a7b6053797d031f759212aeb4d30740b0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "host-probes-remain-opt-in",
+      "criterion": "Ordinary npm test and verify never invoke Codex, Claude, credentials, Keychain or network because of the move; live synthetic probe behavior remains gated by its existing explicit switch and reports unavailable capability honestly.",
+      "identity": "sha256:9c5304e47536609ab72ce9354e3f7847d9d951237f1b702203bc720ea627d13e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "host-probe-paths-and-checks-follow",
+      "criterion": "Package commands, imports, current docs, active Ticket references, boundary scanning and standalone expectations use the new locations; focused probe tests, full Runtime verification, standalone verification, artifact verification, project validation and the relocation manifest pass.",
+      "identity": "sha256:ce13acd7d1b1920312c569c198778f0818fd47065fa25860cf3b42dacb8e33c1",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not implement Codex/Claude adapters, authenticate a host, run a live subscription probe, or promote observations to product capability.",
+    "Do not move provider/JEV checks, Query, Worker code or other research units."
+  ],
+  "context": "Separate host research from product source and ordinary verification. Preserve the probe semantics and existing explicit live switches; deterministic parser/admission tests must not require either host subscription.",
+  "context_refs": [
+    {
+      "purpose": "Component, provider, storage, private-state, standalone verification, and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current Project, Exploration, Graph, Policy, Judge, and Context Query product model.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current architecture and workflow proposal whose capabilities the layout must preserve.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Local delivery direction and current service/module boundaries.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Current Codex host probe entry.",
+      "ref": "semantic-runtime/scripts/probe-codex-host.mjs"
+    },
+    {
+      "purpose": "Current Claude host probe entry.",
+      "ref": "semantic-runtime/scripts/probe-claude-host.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "host-probe-paths-and-checks-follow",
+          "identity": "sha256:ce13acd7d1b1920312c569c198778f0818fd47065fa25860cf3b42dacb8e33c1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "host-probes-are-self-contained",
+          "identity": "sha256:aae847b8ec7640983003ce447ef7f39a7b6053797d031f759212aeb4d30740b0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "host-probes-remain-opt-in",
+          "identity": "sha256:9c5304e47536609ab72ce9354e3f7847d9d951237f1b702203bc720ea627d13e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:971a31fa70199aba902dd5c2401e498a6434840868eae6a8fb36fb72a025a22b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Codex and Claude host capability probes, their parser tests, observations and limitations live together under research/host-probes and remain explicitly opt-in.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-layout-direction",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The accepted inventory and relocation contract are required inputs before changing paths.",
+      "target_ticket_id": "ticket-runtime-layout-contract-baseline",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-host-probes"
+}

@@ -1,0 +1,122 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-context-canonical-scc-is-zero",
+      "criterion": "The production import graph contains no SCC involving graph-store, context-inputs, exploration-canonical or canonical-source-reader; none of ExplorationCanonical, ContextInputs or CanonicalSourceReader constructs a LocalGraphStore, and the boundary checker reports zero production cycles.",
+      "identity": "sha256:9eaeb49f96317c9cf3eae11a33c35e01a0dccfa57a56419816ae630d8b79e9f9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "trusted-capability-and-proof-identity-hold",
+      "criterion": "One internal composition path creates and reuses real DomainStore, authority, canonical reader/verifier and Graph capabilities; injected Graph operations are privately branded or otherwise non-forgeable, existing nominal/WeakMap proof checks retain same-instance semantics, and no caller-facing duck-typed port or generic registry is added.",
+      "identity": "sha256:1d8ac48c9cc2ad074b26f9bc180cb0f9bbd1e0e1c3aa2ed67c14ecc148598363",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "atomic-runtime-behavior-is-unchanged",
+      "criterion": "Graph initialize/mutate/read/receipt/repair, canonical current/origin, exploration bind/mutate/adopt/select, Context transition/read/lineage/adopt, source-fence, Query and crash/restart tests preserve digests, error codes, authorization order and one DomainStore transaction for coordinated writes; root exports and npm commands remain identical and full Runtime/standalone/artifact/project verification passes.",
+      "identity": "sha256:aa6400debeea7acf69daf2da1d6a6f8ac282b7114f54ffb4cbead0e8b9c8017b",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not move directories, extract Graph application methods, expose SQLite handles, split transactions, add a DI container/event bus/service/database, or change public constructor/method signatures.",
+    "Do not reduce Query pre/post-await authorization, source-fence, Project selection/head checks, Context lifecycle/conflict plurality or canonical Authority retention."
+  ],
+  "context": "Remove only the current four-module SCC before moving formal source. Inject a narrow internally branded Graph capability into CanonicalSourceReader and ExplorationCanonical, create and reuse one fixed canonical/context/exploration service bundle from a local composition seam, and move passive error codes to a leaf module if needed. Keep Graph-owned multi-capability transaction orchestration in place for this Ticket; extracting application services is later work.",
+  "context_refs": [
+    {
+      "purpose": "Component, provider, storage, private-state, standalone verification, and graceful-degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current Project, Exploration, Graph, Policy, Judge, and Context Query product model.",
+      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+    },
+    {
+      "purpose": "Current architecture and workflow proposal whose capabilities the layout must preserve.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Local delivery direction and current service/module boundaries.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Graph facade and current Graph-owned coordinated transaction orchestration.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Context proof workflow and current cycle edge.",
+      "ref": "semantic-runtime/src/local/context-inputs.mjs"
+    },
+    {
+      "purpose": "Canonical/exploration composition and current cycle edge.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Canonical reader Graph dependency to replace with an internal capability.",
+      "ref": "semantic-runtime/src/local/canonical-source-reader.mjs"
+    },
+    {
+      "purpose": "Current public Context facade whose behavior must remain.",
+      "ref": "semantic-runtime/src/local/context-store.mjs"
+    },
+    {
+      "purpose": "Current public Exploration facade whose behavior must remain.",
+      "ref": "semantic-runtime/src/local/exploration-store.mjs"
+    },
+    {
+      "purpose": "Accepted Query composition and reauthorization behavior that must remain.",
+      "ref": "semantic-runtime/src/local/query-engine.mjs"
+    },
+    {
+      "purpose": "Successful exact Query contract baseline; this is governing implementation context rather than an unfinished prerequisite.",
+      "ref": ".vibehub/outcomes/ticket-runtime-query-engine-v0/contract-v4.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "atomic-runtime-behavior-is-unchanged",
+          "identity": "sha256:aa6400debeea7acf69daf2da1d6a6f8ac282b7114f54ffb4cbead0e8b9c8017b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-context-canonical-scc-is-zero",
+          "identity": "sha256:9eaeb49f96317c9cf3eae11a33c35e01a0dccfa57a56419816ae630d8b79e9f9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "trusted-capability-and-proof-identity-hold",
+          "identity": "sha256:1d8ac48c9cc2ad074b26f9bc180cb0f9bbd1e0e1c3aa2ed67c14ecc148598363",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:428e5689793d0c06b70ff0f9193acc8c3bee2d48f54c31e9ae5056f71661fa17",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Graph, Exploration, Canonical and Context composition has no import cycle while preserving the exact public facade, authorization, proof identity and single-SQLite transaction behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-layout-direction",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "The independently verified SCC and direction guard must exist before the cycle is removed.",
+      "target_ticket_id": "ticket-runtime-enforce-layer-boundaries",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-remove-graph-context-cycle"
+}

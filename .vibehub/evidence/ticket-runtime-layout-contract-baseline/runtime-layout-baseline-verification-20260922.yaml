@@ -1,0 +1,44 @@
+{
+  "acceptance_ids": [
+    "layout-contract-and-inventory",
+    "compatibility-baseline-is-reproducible",
+    "migration-traceability-is-explicit"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "layout-contract-and-inventory",
+      "identity": "sha256:e39ccf7e0aac7bf5a1f1e8ef167a7188068f87d7345877c2874b7036bf2568bf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "compatibility-baseline-is-reproducible",
+      "identity": "sha256:d7e4d2aa2af14525120cd7d12470790663feaf2c215e5899691360b04f329a44",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "migration-traceability-is-explicit",
+      "identity": "sha256:dcb87cdb29aa9419a9a624519e0ae8fe6a81cc28f46c6f3be498cd5c35b83be8",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-layout-baseline-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T20:37:13Z",
+  "refs": [
+    "semantic-runtime/docs/architecture/runtime-layout-v0.md",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/package.json",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "The checked architecture contract and machine baseline classify every current Runtime source, test, fixture, script, prototype, spike, policy, measurement, example and document into a current role and intended destination while preserving the product rule that awareness and adoption differ, the shared SQLite transaction, and same-instance proof boundaries. The existing check:boundaries command now compares 206 public exports, all npm command names and live/offline modes, exported version/schema/namespace constants, standalone copy roots, complete production import edges, the one exact four-file SCC and the full inventory; focused tests prove useful added/removed drift diagnostics without credentials or external capabilities. Sequential Runtime verification passes 1019 tests with 1017 passed, zero failed and two existing opt-in Keychain skips; boundaries cover 229 files. A clean standalone install reports the same totals and successful external-repository isolation. Root plugin artifact verification passes with 79 files and 3670088 bytes. Git diff checking, Context guard and VibeHub Ticket validation pass. The document defines the five-field relocation manifest, immutable historical-record policy and per-batch validation/Room alignment rules; no Runtime behavior, public export, command name, schema, namespace, provider route, database or tracked historical record was changed.",
+  "ticket_id": "ticket-runtime-layout-contract-baseline"
+}
