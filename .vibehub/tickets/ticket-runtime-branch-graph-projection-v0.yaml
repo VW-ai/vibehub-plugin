@@ -38,7 +38,7 @@
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
     "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
   ],
-  "context": "Local stage L1. Extend the real Graph repository with the accepted branch scope contract. Own scope binding, branch views, and per-item adoption commands; no ranking, notifications, Git merge or multi-device replication.",
+  "context": "Local stage L1, still draft Contract1. Refine only after the accepted real Graph repository and canonical-source reader supply concrete executable inputs. The pure branch selector requires governing assertions from a trusted governing-context reader; current Graph/ingress capture facts, caller shared pins and a governing boolean do not establish canonical authority. Add the existing canonical-source-reader as an actual prerequisite, preserving the current branch-scope and GraphStore dependencies. Its source-access-invalidation prerequisite follows GraphStore, so this introduces no dependency cycle or new service. The intended smallest storage direction is one service-bound Graph generation per exploration plus separately pinned authoritative shared baseline, individual durable enrollment/origin/lineage records and bounded selected indexes, not a persisted 512-record cumulative reference fixture. Generation labels alone do not implement adoption or governing visibility. A cross-exploration adoption must retain exact source/destination revisions, current authorization and checked semantic lineage and commit destination Graph/lineage/receipt/outbox atomically; current LocalGraphStore outer-transaction ownership needs a small trusted internal composition refactor, not nested transactions or caller effect plans. Branch-aware reads must enforce adoption support/current access so an unscoped raw route cannot bypass that boundary. Keep existing unscoped immutable refs valid. The real Context schema1 has no per-record revision; the reader must expose an explicit projection-revision-to-immutable-commit/path/blob mapping or a new exact canonical-view pin, never pretend schema_version or commit count is a canonical record revision. Bind that actual output before revising branch Acceptance. Actual runtime publication runs remain distinct from future Codex/Claude Session enrollment; no invented host IDs. Also settle honest unborn Git bases without fake commits, relation endpoint adoption, bounded lineage closure and incomplete governing coverage in the executable refinement. No current criterion is retired or claimed complete; all original branch isolation, governing visibility, explicit adoption and real recovery obligations remain. UI/ranking/notifications, Git merge, canonical promotion and replication stay with their existing owners.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -63,6 +63,46 @@
     {
       "purpose": "Adoption boundary.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Current product direction superseding the earlier local-first-only delivery assumption; local App/plugins/subscription Workers remain the target.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Actual still-draft canonical reader obligation supplying immutable records, authority/applicability and explicit lifecycle projection before branch shared-baseline integration.",
+      "ref": ".vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml"
+    },
+    {
+      "purpose": "Reader prerequisite and remaining source lifecycle behavior; preserve its actual GraphStore/ingress dependency chain rather than inventing a branch-owned invalidation service.",
+      "ref": ".vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml"
+    },
+    {
+      "purpose": "Successful bounded reference contract; not proof of persistent enrollment, dynamic catalogs or branch-isolated Graph storage.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-scope-contract-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Exact successful branch reference conformance and bounds.",
+      "ref": ".vibehub/evidence/ticket-runtime-branch-scope-contract-v0/branch-scope-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Exact identity/view semantics, immutable base pins, trusted governing-reader requirement and reference bounds.",
+      "ref": "semantic-runtime/docs/branch-scope-v0.md"
+    },
+    {
+      "purpose": "Accepted selected-record core and unchanged semantic revision protocol, including same-generation support and explicit trusted repository obligations.",
+      "ref": ".vibehub/outcomes/ticket-runtime-incremental-graph-contract-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Wire2 selected-record API and compatibility boundary; consume per-generation core without automatic address rewriting.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "purpose": "Current real Graph facade and activation/outer-transaction boundary to compose after independent GraphStore closeout.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Public record schema as planning evidence only: Context has no per-record revision. Runtime must not import sibling implementation; canonical-reader owns its versioned standalone schema subset.",
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
     }
   ],
   "contract_revisions": [
@@ -110,6 +150,11 @@
     {
       "rationale": "Real transactional Graph repository and migration boundary.",
       "target_ticket_id": "ticket-runtime-graph-store-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Branch views must obtain authoritative governing Context and selected immutable shared baselines from the actual configured canonical Git reader. Its schema/authority validation and exact record-to-commit/blob projection pins are causal inputs; caller JSON or Graph candidate status cannot establish this authority.",
+      "target_ticket_id": "ticket-runtime-canonical-source-reader-v0",
       "type": "depends_on"
     }
   ],
