@@ -1,0 +1,102 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "explicit-adoption",
+      "criterion": "An authorized per-item adoption command pins source and destination revisions, selected shared base, current ACL and idempotency key; records new destination provenance rather than editing the source. Seen/deferred does not adopt. Shared Project promotion uses a separate authority boundary.",
+      "identity": "sha256:8ef57f8fb90aa6f6fc82b98af30721f6212f4b5c1d56b6d82d22238946debe35",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "adoption-recovery",
+      "criterion": "Real-store fixtures prove exact source/destination/shared-base and current-source authority checks, idempotent per-item adoption with new destination provenance and atomically committed destination Graph/lineage/receipt/outbox. Cover restart, duplicate and changed-key requests, two simultaneous local executions/adopters, stale destination and source/base changes, revoked source, exact historical source reads and SIGKILL before commit/after commit before reply. Retain A origin and B adoption separately through branch/worktree deletion and source supersession; no code merge, observation, seen/deferred state or Project view selection promotes or erases semantic content. Refine concrete supported relation-endpoint/closure and source reauthorization cases from the accepted branch implementation before execution.",
+      "identity": "sha256:dd02a49d640e9ca9a4926c321b397b501ce56851f54a2a148ad4ba0a9628cf6b",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution.",
+    "Preserve the complete moved explicit-adoption responsibility and adoption-specific recovery cases; lack of implementation today keeps consumers blocked. Refine this same draft from its successful branch prerequisite before execution; do not predeclare a live adoption API or unsupported foreign-generation support.",
+    "No automatic adoption from viewing/seen/deferred, Git merge, workspace deletion, Project selection declaration or model confidence. Shared Project canonical promotion remains a separate authority boundary. No new framework/service/schema solely for Ticket lineage."
+  ],
+  "context": "Responsibility transfer, not completion: ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c, explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924, and the adoption-specific portion of branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a, as preserved at commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml, move to ticket-runtime-exploration-adoption-v0 explicit-adoption@1 and adoption-recovery@1. Cross-Ticket derived_from is not supported; these exact Context citations and symmetric transfer notes are audit provenance, not formal cross-Ticket Acceptance lineage. No old Contract or Acceptance semantic identity changes, no old Evidence is rebound, and no adoption obligation is waived. This later independently schedulable command consumes the accepted real branch routing/view format. Seeing or selecting another branch is already useful before this command exists. Keep this Ticket draft until the real branch implementation and its exact Outcome settle the destination transaction entry, support/source authorization and row/receipt format. A later refinement must decide bounded entity/relation endpoint handling and the existing same-generation Graph compatibility without allowing foreign parents, copied caller proof or broad transaction callbacks. It must not infer Project promotion, automatic baseline refresh, source authority or a Git merge. Native v1 criteria below intentionally have no derived_from; source lineage is the immutable committed Ticket/Contract/Acceptance citation, not fabricated cross-Ticket formal lineage.",
+  "context_refs": [
+    {
+      "purpose": "Exact immutable source ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c; explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924 transfers to this Ticket explicit-adoption@1; adoption cases from branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a transfer to adoption-recovery@1. This is documentary cross-Ticket provenance only.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Runtime-only boundaries and candidate/canonical authority separation.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Stable exploration identity and awareness-before-adoption semantics; pure reference is not persistent adoption.",
+      "ref": "semantic-runtime/docs/branch-scope-v0.md"
+    },
+    {
+      "purpose": "Same-generation support closure and immutable semantic core compatibility to preserve.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "purpose": "Actual authorized receipt/atomicity and selected read baseline; future branch integration supplies the concrete adoption entry.",
+      "ref": "semantic-runtime/docs/graph-store-v0.md"
+    },
+    {
+      "purpose": "Actual fixed shared canonical pins, issuance/current authorization; no copied JSON promotion.",
+      "ref": "semantic-runtime/docs/canonical-source-reader-v0.md"
+    },
+    {
+      "purpose": "Product choice to inspect/continue/defer independently before explicit per-item adoption.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Local App useful experience before broad cross-branch/cloud work.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "adoption-recovery",
+          "identity": "sha256:dd02a49d640e9ca9a4926c321b397b501ce56851f54a2a148ad4ba0a9628cf6b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "explicit-adoption",
+          "identity": "sha256:8ef57f8fb90aa6f6fc82b98af30721f6212f4b5c1d56b6d82d22238946debe35",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:f6fdb790a387baee47b71b0b3ae86b46502f019110221d02efc89ec8ddc40025",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Explicitly adopt one authorized exact semantic item into another exploration with new destination provenance and recoverable atomic lineage.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-branch-experience",
+    "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Actual owned exploration generations, exact scoped views/baseline pins, binding guard and atomic Graph/origin integration are required concrete inputs for one cross-exploration adoption command.",
+      "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-exploration-adoption-v0"
+}

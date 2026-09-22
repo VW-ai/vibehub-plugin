@@ -70,7 +70,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Dependency clarification: branch-graph-projection supplies isolated snapshots/views; actual adoption lineage remains required through context-lifecycle-lineage -> exploration-adoption. This does not make query execution ready from view completion or waive any current acceptance.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -95,6 +95,10 @@
     {
       "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
+    },
+    {
+      "purpose": "Original broad branch Contract1 before explicit adoption responsibility transfer; current query Acceptance/Contract and dependencies remain intact.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -191,6 +195,7 @@
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
     "plan-validation:independent"
   ],
   "relations": [
@@ -205,7 +210,7 @@
       "type": "depends_on"
     },
     {
-      "rationale": "Explicit exploration snapshots and scoped adoption lineage.",
+      "rationale": "Exact owned exploration snapshots, guarded branch views and fixed shared-base/current-Project separation; adopted lineage is consumed through the existing context-lifecycle-lineage prerequisite, which now depends on the adoption command.",
       "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
       "type": "depends_on"
     },

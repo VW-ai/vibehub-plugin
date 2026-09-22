@@ -40,7 +40,7 @@
     "Workspace in this product discussion means an execution work area; do not overload administrative Workspace identity or infer historical origin from the current file path.",
     "No record deletion or existing Ticket completion is authorized by view filtering or this planning change."
   ],
-  "context": "Local stage L1/L3. Consume branch Graph primitives to implement the domain lifecycle/meaning projection and read contract; no new generic graph engine, automatic semantic merge or UI-only truth. Canonical promotion remains separately authorized.",
+  "context": "Local stage L1/L3. Consume branch Graph primitives to implement the domain lifecycle/meaning projection and read contract; no new generic graph engine, automatic semantic merge or UI-only truth. Canonical promotion remains separately authorized. Responsibility-transfer update: branch-graph-projection now owns guarded local enrollment/writes/views only; ticket-runtime-exploration-adoption-v0 retains the actual explicit-adoption and adoption-recovery obligations. This Ticket directly consumes that command or its persisted lineage, so remains blocked on its successful Outcome. Existing Acceptance/Contract history and all existing dependency edges are unchanged.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -65,6 +65,10 @@
     {
       "purpose": "Existing immutable revisions and derived versus canonical lifecycle boundary.",
       "ref": "semantic-runtime/docs/working-graph-v0.md"
+    },
+    {
+      "purpose": "Immutable original branch Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c and exact moved adoption/recovery responsibilities; no old coverage is silently treated as complete.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -101,12 +105,18 @@
   "outcome": "Maintain scoped Context lifecycle and semantic lineage as reproducible queryable state.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
     "plan-validation:independent"
   ],
   "relations": [
     {
-      "rationale": "Actual persistent scoped revisions/adoption and lineage primitives.",
+      "rationale": "Actual persistent exploration-scoped revisions, execution origins and selected shared-base views; adoption and adoption lineage are separately required from ticket-runtime-exploration-adoption-v0.",
       "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Its scoped-lineage and lifecycle-conformance criteria require actual explicit adoption provenance and A-origin/B-adoption/A-supersession behavior; view-only enrollment does not supply those facts.",
+      "target_ticket_id": "ticket-runtime-exploration-adoption-v0",
       "type": "depends_on"
     }
   ],

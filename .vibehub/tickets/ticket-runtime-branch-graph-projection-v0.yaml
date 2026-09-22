@@ -5,40 +5,100 @@
       "criterion": "Implement durable exploration enrollment, selected shared-base pins, local assertion heads, exact revision lookup and lineage indexes through versioned migrations. Permit new real source/session enrollment without copying the bounded immutable reference catalog forever.",
       "identity": "sha256:c19e68062b42ec6f8c2152b0496acde4873c0a131394100e45fcca2e178d799a",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "branch-concurrency",
       "criterion": "Same-theme alternatives in A/B stay separately scoped; stale same-scope writes return explicit CAS/semantic conflict states with no silent rebase. Existing Project/global obligations remain visible and cannot be overridden by a local hypothesis.",
       "identity": "sha256:6514ae166efee571f11ddd6823a0f2c3024742c70c1196545d8536430e505970",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "explicit-adoption",
       "criterion": "An authorized per-item adoption command pins source and destination revisions, selected shared base, current ACL and idempotency key; records new destination provenance rather than editing the source. Seen/deferred does not adopt. Shared Project promotion uses a separate authority boundary.",
       "identity": "sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "branch-recovery",
       "criterion": "Real-store fixtures cover restart, duplicate adoption, branch/worktree lifecycle, two simultaneous local executions, stale destination, revoked source and exact historical reads. No code merge or Worktree deletion automatically promotes or erases semantic content.",
       "identity": "sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "branch-projection",
+      "criterion": "Implement the documented LocalExplorationStore in-process API on the existing DomainStore and LocalGraphStore with one fixed exploration namespace and a versioned format record, no new table/dependency/framework. Persist individual immutable exploration origins, exact selected canonical-base pins, ref enrollment pairs, execution-workspace bindings, operation origins/receipts and bounded indexes; never store a cumulative 512-record BranchScope fixture or an ever-growing catalog copy. Service-owned generation and binding identities are allocated by the authenticated bind command. New/existing real Git enrollment is read from the current registry, including linked worktrees outside the selected folder; branch names, paths and source-event citations never establish semantic origin. A new exploration retains its actual observed Git base, including explicit unborn/null, and optional exact reader-verified shared baseline; existing exploration binding cannot rewrite that origin. Binding transitions append history and use expected catalog/binding versions. Detached work requires explicit target selection; a first commit after unborn or an observed branch switch requires an explicit new binding. Worktree/ref deletion, unavailable paths and observed recreation retain old identities and historical records. Ordinary unchanged rescans remain usable at observed assurance. Point/Project-page reads are selected and bounded rather than reconstructed from all prior events; unsupported stored formats and corrupt selected indexes fail closed. The unchanged pure v1 branch contract remains a semantic reference on its supported committed-base/exact-pin subset, not the storage wire or proof of host Session enrollment.",
+      "identity": "sha256:3d0d917623f152d38381cf66601a531110b43a7511c652f5aa8d6ccb434bf1c0",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "branch-write-routing",
+      "criterion": "Route every new assert/resolve command for an owned generation through a fixed trusted exploration integration in the single existing Graph/activation transaction. Under the writer lock verify the actual scoped grant/actor, current activation epoch and enrolled execution, registry/catalog version, current worktree/ref/binding version and owned exploration/generation; reject stale or foreign routing instead of silently rebasing. Atomically append the actual execution-workspace origin, selected Project/shared-base pins, Graph effects, receipt and outbox. Ordinary legacy LocalGraphStore initialize/mutate cannot bypass an owned-generation marker even when opened without the exploration namespace; preserve ordinary unowned generations and authorized historical reads. Other-generation semantic parents/endpoints remain forbidden by the existing core. A source event may be cited under its real ACL but does not certify where this assertion was made. Same-theme A/B candidates stay in separate generations; stale Graph CAS has no effects and same-generation semantic conflicts retain existing behavior. Exact committed retries reconcile before new Git inspection, preserve the original A origin/result across later switching to B, and recheck current input ACL/fence; changed key reuse rejects. Revocation/lifecycle and rebuild retain their existing narrow authenticated paths without requiring the removed bound worktree, and cannot turn into an ordinary assertion bypass. Physical Git checks remain bounded pre-transaction observations followed by catalog/mapping CAS, not a claim that Git and SQLite share an atomic filesystem lock.",
+      "derived_from": [
+        {
+          "acceptance_id": "branch-concurrency",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:629e75f54aea9199fef272fbea2add20a7a953043ecb680b111e9809532a3cef",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "branch-shared-view",
+      "criterion": "Use an actual CanonicalSourceReader constructed from the trusted frozen v0 owner configuration and the exact same store/authority to verify every selected canonical pin {at,address,record_keys}, including its retained reader issuance, immutable source mapping and current access/fence. Never accept a caller governing boolean, fake Context numeric revision or plausible Graph JSON as authority. Branch resolve/page responses keep local candidates, immutable origin shared base and separately declared current Project selection distinct. Include every active usable Authority in the configured selection regardless of optional shared-key filtering; expose the configured keys and selected/partial/unavailable coverage without claiming all Project authority or automatically classifying text contradictions. Ordinary local candidates cannot replace/mutate the Project selection or suppress its known rules. Explicitly report exact current/historical/quarantined/unavailable status; denied source material is not exposed and stale/quarantined rules are not silently presented as current. A new explicit Project selection declaration is CAS/idempotency guarded and does not update any exploration origin or adopt its contents. An initially missing selection, including an unborn Project, remains unavailable/partial; it is not evidence that no rules exist. Project overview pages list authorized exploration/workspace metadata and exact head references, not main-branch truth or merged semantic content. No read, Git merge, workspace deletion, source refresh or selection change adopts, rebases or promotes context.",
+      "derived_from": [
+        {
+          "acceptance_id": "branch-concurrency",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1253529fd54bd118f551ab2081c2060662ee05ff121c56e8b4345ab2b211978c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "branch-view-recovery",
+      "criterion": "Demonstrate the complete local view/write slice with actual temporary Git repositories and SQLite: A/B same-theme alternatives, multiple real linked worktrees including an external folder, independent clones with the same branch name, same-ref explicit multiple-exploration selection, branch switch, actual observed delete/recreate, detached HEAD, unborn then first commit, unavailable/deleted worktrees retaining exact history, restart and two real child-process writers. Cover both stale Graph and stale binding/catalog/Project-selection CAS, expiry/revocation/disable races, SIGKILL before commit and committed lost-response retry after switching workspaces or removing Git paths; no partial generation/binding/origin/Graph/receipt/outbox publication. Exercise current/historical/revoked canonical baselines, optional filters that cannot hide configured active Authorities, null/partial coverage, changed config/pin identity, foreign generation/source/actor/tenant, inaccessible inherited support and operation receipts, inert/accessor/Proxy and capacity rejection, missing/corrupt format/index rows, maintenance/lifecycle with a disappeared binding and legacy unowned Graph compatibility. Persist at least 600 individual exploration origins using repeated real enrolled worktrees and selected reads/pages of at most 32 candidates to prove no cumulative 512-item store ceiling; report actual record/range access and page/response bounds without an SLA. Run focused/affected tests, full Runtime verify, clean standalone verify and unchanged shipped plugin-artifact verification. Deterministic acceptance performs no model/credential/private repository reads. Adoption/retry/lineage cases transferred to the separately blocked adoption Ticket are not claimed by this criterion.",
+      "derived_from": [
+        {
+          "acceptance_id": "branch-recovery",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3feaf1c35cfaa34f18feb493aabb28d10714300c5c9bb4ee231d71da9e16e966",
+      "revision": 1,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
     "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
     "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
-    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
+    "Scope exclusions: no cross-exploration adoption, host Session/Execution enrollment, App/UI/HTTP transport, Policy/model/Worker loop, Ticket business lifecycle, notifications/relevance routing, GitHub integration, P2P/cloud/replication, Git write/merge/promotion or retention/pruning. No live model call is required for deterministic acceptance. Do not add a generic identity/configuration registry, ORM, scheduler or hook framework.",
+    "Public construction: export LocalExplorationStore and EXPLORATION_NAMESPACE='exploration-projection'. new LocalExplorationStore({store,authority,canonical_reader}) requires actual DomainStore/LocalCredentialAuthority capabilities. canonical_reader is inert exact configuration {repository_path,execution:{repository_id,checkout_id,worktree_id},registration_id,selection:{schema_profile,selection_id,policy_id,object_format,records}}, using the existing CanonicalSourceReader fields and limits. Copy/validate data before reading it; construct the actual reader internally with the same store/authority, never accept an arbitrary reader or caller resolver callback. Retain a configuration digest in the format/origin facts. This v0 accepts one frozen canonical selection profile per Project service composition; changing it requires explicit later migration/config support, not reinterpretation of old pins. Constructing/opening alone performs no enrollment, schema migration, source capture or Project activation.",
+    "Wire aliases: Execution is exactly {repository_id,checkout_id,worktree_id}; CanonicalPin is exactly {at:GraphCommitAddress2,address:exact SemanticRevisionAddress,record_keys:[unique configured record keys]}. record_keys has at most 16 entries and never excludes configured active Authorities from returned governing material. An empty optional key list is a filter, not proof of empty authority. IDs retain existing opaque ID grammar; no path/name/remote-derived identity. Semantic addresses, assertions, operation schemas, source snapshots, source policies and publisher_ref string retain their existing public contracts.",
+    "Public bind(context,{epoch,idempotency_key,publisher_ref,execution,expected_catalog_version,expected_binding_version,exploration_id,shared_base}) is the single explicit enrollment/rebinding command. exploration_id:null creates a new service-owned exploration/generation, captures the observed Git base and shared_base:CanonicalPin|null, initializes Graph with coverage:[], and creates its first binding atomically. A nonnull existing exploration requires shared_base:null (unchanged origin), same repository_id and an explicitly selected target; it creates/reuses the exact ref enrollment and replaces the current worktree binding by expected-version CAS without moving old origins. One active binding per registered worktree; multiple explicit explorations for a ref are allowed and no ref-only automatic selection occurs. A successful response is {status:applied|duplicate,exploration_id,generation_id,execution_workspace_id,binding_version,graph_revision,receipt}. Existing identical actor/key/request returns the same IDs/result. Graph genesis, ownership marker, origin/index, binding retirement/new binding and receipt commit together or not at all. Caller allocated generation/record IDs are not accepted.",
+    "Public getBinding(context,{execution}) returns {status:bound|unmapped|rebind_required|unavailable,binding_version,binding,observed_catalog_version}; binding is an authorized current stored record or null. It reads current registered metadata without mutating or performing implicit enrollment. A registered branch/ref/incarnation change, unborn-to-born transition or retired/missing worktree makes the old binding unusable for new writes until explicit bind. Observed renamed attributes preserve identity only where the actual registry proves it; no path/stat/OID alone certifies an unobserved branch delete/recreate. getBinding is metadata lookup, not a host Session claim.",
+    "Public setProjectSelection(context,{epoch,idempotency_key,expected_version,pin}) takes a nonnull CanonicalPin verified current by the configured reader and returns {status:applied|duplicate,version,pin,receipt}. It is a human/service-authenticated explicit declaration of the Project selected canonical view, not source promotion or a canonical write. The pointer initially has null version/pin and unavailable coverage; it cannot be silently cleared after a known selection. A stale pointer CAS or changed reuse applies nothing. New source/configuration/pin contents are never substituted under an old operation key. Changing this pointer leaves all fixed exploration shared bases and local heads unchanged.",
+    "Public mutate(context,{epoch,idempotency_key,publisher_ref,execution_workspace_id,expected_binding_version,expected_catalog_version,expected_project_selection_version,expected_graph,expected_source_fence,operation,coverage}) accepts only the existing assert/resolve operation kinds through the trusted workspace route. expected_graph must belong to the binding-owned generation. expected_source_fence is the current nonnegative source-invalidation pin; expected_project_selection_version is null or the current pointer version. coverage keeps existing null/at-most-8 selected-cursor semantics. Success retains existing {status:applied|duplicate,receipt,revision?,conflict?} plus operation_origin_ref, whose immutable record binds actor, epoch, publisher/execution, workspace/binding version, exploration/generation, catalog version and observed Git tuple, origin shared base and declared Project pin/version. Graph_revision_mismatch returns unchanged request and no effects; stale binding/catalog/Project pointer rejects with a bounded conflict code. This command does not pretend event.provenance.execution proves the publishing workspace.",
+    "Public resolve(context,{exploration_id,at,address,shared_keys}) and page(context,{exploration_id,at,collection,cursor,limit,shared_keys}) use exact existing Graph addressing/collections. at must belong to the selected owned generation. Return {exploration_id,generation_id,graph_revision:at,local:<existing Graph result>,shared:{origin_base,current_project,coverage},availability}. shared entries keep their exact pin, configured/selected record keys, typed current|historical|quarantined|unavailable status and only currently authorized reader material; local Graph material remains separately candidate/derived. Materialization must not expose previously fetched fragments if a later current ACL/fence check rejects. Both methods recheck source/Graph current access, not only the old capture ACL, and work without an accessible current checkout for retained authorized history. They do not fetch Git, refresh a canonical selection, classify contradiction or adopt any context.",
+    "Public list(context,{cursor,limit}) returns {items,cursor}, at most 32 authorized exploration metadata candidates per call with their fixed origin and current binding availability summary/exact head references, no automatic semantic payload fan-out. A bounded opaque cursor pins tenant/project, collection ordering and the first-page append high-water mark; it confers no permission. No new exploration added after that mark is silently folded into the page series. Heads/availability describe the actual selected read, not a frozen whole-Project semantic snapshot. Public getReceipt(context,{idempotency_key}) returns the original caller-owned typed operation receipt or null, rechecking all supporting current source/canonical access and the retained source fence; it never re-routes old A output to the current B binding. Service idempotency keys are scoped by tenant/project/actor across these write methods; changed method/request with the same key rejects.",
+    "Auth: data reads require local-audience exploration:read + graph:read + store:read + ingress:read + source:invalidation:read; Git binding metadata lookup additionally needs project:inspect. New bind/setProjectSelection/mutate require local human/service exploration:write + graph:write + store:write and their existing read/source permissions, project:inspect and activation:admit; real publisher registration stays the existing graph:publish API. Do not mint grants or trust actor fields in input. Exact successful retries need the original operation permission and currently authorized inputs, but no fresh Git path, live binding, enabled Project or fresh publisher; unchanged authority expiry/revocation rules still apply. No branch ACL is invented: this is semantic routing inside existing scoped Project/source authorization.",
+    "Storage/transaction: use existing records/sources/outbox primary-key ranges and CAS. Store the small owned-generation guard in working-graph, so raw LocalGraphStore checks it regardless of an optional exploration namespace handle. A fixed internal Graph entry can perform the admitted exploration command under the existing single transaction owner with an unforgeable internal route or equivalent fixed verified path; no public skip flag, custom transaction callback, precomputed effect-plan admission or nested transaction. Recheck activation, opaque authority, registry/catalog, binding/Project pointer and generation pins before commit. Apply the same current source checks and bounded serialization before commit. Configured canonical reads may preflight outside the writer lock, but acceptance needs exact immutable proof plus fenced current source state and the relevant canonical Graph head/selection under the lock; do not carry an unfenced public resolve result across a write. Do no model/network/Git/filesystem reads inside SQLite views. Keep DomainStore bounded error preservation and no-op/retry CAS semantics.",
+    "Physical observation: before a new bind/semantic write, use the explicitly enrolled path and bounded helper-isolated Git metadata observation to check actual common-dir/admin identity, HEAD/ref/detached/unborn against the supplied current registry version. Changed observation returns rebind/refresh-required rather than silently repairing catalog or binding. Do not invoke source hooks/filters/fsmonitor/network or follow untrusted metadata symlinks. Cached catalog plus physical observation is observed assurance, not a filesystem lock or proof of unobserved historical continuity; a Git change after the observation is an explicit cross-system race boundary. Retained history/retry must not depend on inspecting a removed path.",
+    "Compatibility/maintenance: a generation ownership claim is created only with a fresh genesis, never retroactively seizes an existing unowned generation. Plain legacy initialize/assert/resolve cannot mutate an owned generation or rewrite the ownership marker. Existing source_access and rebuildProjection paths keep their exact graph:lifecycle/graph:rebuild, source-invalidation, activation and Project enrollment requirements, without adding the exploration live-worktree guard or fabricating a new execution origin. If inherited Project enrollment itself is unavailable, report its existing rejection; no administrative auth bypass. Exact existing unowned addresses/reads/writes and old pure BranchScope wire remain valid.",
+    "Capacity/format: versioned exploration format v1, finite schema records and collision-free tuple keys; no cumulative exploration/binding/history arrays. Point commands touch bounded selected rows; list/page limit 1..32, Graph pages retain at most their existing 64 candidate limit, selected canonical record count <=16, configured artifact path count <=32, data depth <=16, <=50000 inert JSON nodes and <=1 MiB aggregate input/record/response bounds. Existing core 32-element support closure and all tighter downstream byte/depth/event/cursor limits remain unchanged. Reject overflow atomically rather than truncate proof or silently return an incomplete-authority success. Page cursors include stable scope/query/pin identity; current authorization remains mandatory. No automatic pruning, hidden all-history reconstruction or implicit repair; corrupt selected indexes fail with a diagnostic and retain authoritative rows.",
+    "Verification commands: add focused real-store branch-projection tests under semantic-runtime/test and synthetic child fixtures only; run those plus affected graph/canonical-reader/Git/activation/ingress/core-branch tests, npm --prefix semantic-runtime run verify, npm --prefix semantic-runtime run verify:standalone, and npm run verify:artifact. Record exact commands/results, bounded synthetic per-page/record counts and release boundaries as acceptance-linked Evidence. Independent closeout must review each active Contract2 criterion; this candidate is not implementation Evidence."
   ],
-  "context": "Local stage L1, still draft Contract1. Refine only after the accepted real Graph repository and canonical-source reader supply concrete executable inputs. The pure branch selector requires governing assertions from a trusted governing-context reader; current Graph/ingress capture facts, caller shared pins and a governing boolean do not establish canonical authority. Add the existing canonical-source-reader as an actual prerequisite, preserving the current branch-scope and GraphStore dependencies. Its source-access-invalidation prerequisite follows GraphStore, so this introduces no dependency cycle or new service. The intended smallest storage direction is one service-bound Graph generation per exploration plus separately pinned authoritative shared baseline, individual durable enrollment/origin/lineage records and bounded selected indexes, not a persisted 512-record cumulative reference fixture. Generation labels alone do not implement adoption or governing visibility. A cross-exploration adoption must retain exact source/destination revisions, current authorization and checked semantic lineage and commit destination Graph/lineage/receipt/outbox atomically; current LocalGraphStore outer-transaction ownership needs a small trusted internal composition refactor, not nested transactions or caller effect plans. Branch-aware reads must enforce adoption support/current access so an unscoped raw route cannot bypass that boundary. Keep existing unscoped immutable refs valid. The real Context schema1 has no per-record revision; the reader must expose an explicit projection-revision-to-immutable-commit/path/blob mapping or a new exact canonical-view pin, never pretend schema_version or commit count is a canonical record revision. Bind that actual output before revising branch Acceptance. Actual runtime publication runs remain distinct from future Codex/Claude Session enrollment; no invented host IDs. Also settle honest unborn Git bases without fake commits, relation endpoint adoption, bounded lineage closure and incomplete governing coverage in the executable refinement. No current criterion is retired or claimed complete; all original branch isolation, governing visibility, explicit adoption and real recovery obligations remain. UI/ranking/notifications, Git merge, canonical promotion and replication stay with their existing owners.",
+  "context": "Accepted branch-scope Contract2, incremental Graph Contract1, real GraphStore Contract3 and canonical-source-reader Contract2 are the implementation inputs. This is the smallest authenticated local service slice before App/host/UI integration: one service-owned Graph generation per exploration, individual durable bindings and immutable operation origins, exact canonical base/current-Project views and bounded Project metadata navigation. It is not a source/session registry, Policy consumer or context adoption engine. Existing real Git enrollment remains the identity source, existing Graph owns semantic transitions/current source access, and the selected canonical reader owns authoritative record verification. Implement one narrow trusted Graph integration for shared transaction ownership rather than nested transactions or an extensible callback/plugin framework. Responsibility transfer, not completion: ticket-runtime-branch-graph-projection-v0 Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c, explicit-adoption@1 sha256:e790df1c7a9f1ff19aba8786a4b64a4987e89937d98118739b06e19110f39924, and the adoption-specific portion of branch-recovery@1 sha256:04fc751bfc552185f68a8f6ba1ff104e60137c3337adbe30c6750209d7df3e2a, as preserved at commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml, move to ticket-runtime-exploration-adoption-v0 explicit-adoption@1 and adoption-recovery@1. Cross-Ticket derived_from is not supported; these exact Context citations and symmetric transfer notes are audit provenance, not formal cross-Ticket Acceptance lineage. No old Contract or Acceptance semantic identity changes, no old Evidence is rebound, and no adoption obligation is waived. Current shared selection is explicitly declared and Project-scoped; it is not inferred from main or the currently checked-out branch. Known configured active Authority records remain distinct from all local candidates. Exact pins point to the reader's real Graph address/revision/record keys and immutable Git proof; Context schema1 has no numeric record revision. Pure v1 reference inputs cannot represent unborn bases or these actual canonical pins, so preserve the old API and document this storage wire as a bounded compatible successor rather than fabricating a v1 input. Source/host IDs not present in the actual catalog remain unmapped; Runtime publisher runs are not Codex/Claude Sessions. V0 binding uses one repository_id per exploration; a Project may contain many repositories/explorations and actual outside-folder linked worktrees, but cross-repository exploration bases remain unsupported rather than guessed. No source/schema/platform prerequisite is missing; ordinary internal transaction composition, finite row keys and proofs are part of this one executable slice.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -69,11 +129,11 @@
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
     },
     {
-      "purpose": "Actual still-draft canonical reader obligation supplying immutable records, authority/applicability and explicit lifecycle projection before branch shared-baseline integration.",
+      "purpose": "Accepted current reader contract supplying actual typed source selection, exact pins and issuance; no longer provisional design.",
       "ref": ".vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml"
     },
     {
-      "purpose": "Reader prerequisite and remaining source lifecycle behavior; preserve its actual GraphStore/ingress dependency chain rather than inventing a branch-owned invalidation service.",
+      "purpose": "Accepted current source lifecycle/fence behavior consumed through the reader/Graph; no new invalidation service.",
       "ref": ".vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml"
     },
     {
@@ -97,12 +157,64 @@
       "ref": "semantic-runtime/docs/incremental-graph-v0.md"
     },
     {
-      "purpose": "Current real Graph facade and activation/outer-transaction boundary to compose after independent GraphStore closeout.",
+      "purpose": "Actual single Graph transaction owner and current source-fence integration; narrowly add verified owned-generation routing.",
       "ref": "semantic-runtime/src/local/graph-store.mjs"
     },
     {
       "purpose": "Public record schema as planning evidence only: Context has no per-record revision. Runtime must not import sibling implementation; canonical-reader owns its versioned standalone schema subset.",
       "ref": "skills/vibehub-core/contracts/context.schema.json"
+    },
+    {
+      "purpose": "Immutable transfer source and unchanged original Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c; retain all original responsibilities through this Ticket and the new adoption owner.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
+    },
+    {
+      "purpose": "Successful exact reader Contract2 sha256:970117d359b7f01da6e7b98c11d17df8f2f83a329c1c9715d848e333498d3288; verified selected records, issuance and current/historical/quarantine boundaries.",
+      "ref": ".vibehub/outcomes/ticket-runtime-canonical-source-reader-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual constructor, exact selected pins/proofs, one-configuration and source-fence limits; no canonical record revision is invented.",
+      "ref": "semantic-runtime/docs/canonical-source-reader-v0.md"
+    },
+    {
+      "purpose": "Actual reader issuance and trusted configuration/access implementation to compose without caller-authorized JSON.",
+      "ref": "semantic-runtime/src/local/canonical-source-reader.mjs"
+    },
+    {
+      "purpose": "Successful actual Graph persistence/atomicity/current-access baseline; branch guard refactor must preserve its compatibility.",
+      "ref": ".vibehub/outcomes/ticket-runtime-graph-store-v0/contract-v3.yaml"
+    },
+    {
+      "purpose": "Exact current public Graph surface, transaction owner, retry/read/maintenance and bounded closure behavior.",
+      "ref": "semantic-runtime/docs/graph-store-v0.md"
+    },
+    {
+      "purpose": "Actual enrolled checkout/ref/worktree/current catalog identities, external linked worktrees and observed continuity.",
+      "ref": "semantic-runtime/src/local/git-projects.mjs"
+    },
+    {
+      "purpose": "No branch identity inference from path/name/OID; current and historical observed continuity limits.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Accepted actual local Git enrollment identities and unavailable/recreated lifecycle behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-git-project-enrollment-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual epoch, scoped writer admission and catalog-version precommit fence.",
+      "ref": "semantic-runtime/src/local/project-activation.mjs"
+    },
+    {
+      "purpose": "Accepted current admission semantics; no new lifecycle or bypass.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-activation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual bounded selected reads, CAS/source/outbox primitives and one coherent transaction owner; no new tables.",
+      "ref": "semantic-runtime/src/local/domain-store.mjs"
+    },
+    {
+      "purpose": "Current Project invalidation fence and source-access read semantics used for canonical pin revalidation.",
+      "ref": "semantic-runtime/src/local/source-invalidation.mjs"
     }
   ],
   "contract_revisions": [
@@ -131,14 +243,42 @@
       ],
       "identity": "sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "branch-projection",
+          "identity": "sha256:3d0d917623f152d38381cf66601a531110b43a7511c652f5aa8d6ccb434bf1c0",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "branch-shared-view",
+          "identity": "sha256:1253529fd54bd118f551ab2081c2060662ee05ff121c56e8b4345ab2b211978c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "branch-view-recovery",
+          "identity": "sha256:3feaf1c35cfaa34f18feb493aabb28d10714300c5c9bb4ee231d71da9e16e966",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "branch-write-routing",
+          "identity": "sha256:629e75f54aea9199fef272fbea2add20a7a953043ecb680b111e9809532a3cef",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ddc613e30885cd5080b6d049011b1fece57eb257be70d94ca6014e2e1042d997",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Persist exploration-isolated semantic revisions and explicit per-item adoption with durable lineage.",
+  "maturity": "firm",
+  "outcome": "Persist real Git-bound exploration context, guard its Graph writes, and expose isolated branch/worktree views plus a bounded Project overview.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
+    "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79",
     "plan-validation:independent"
   ],
   "relations": [

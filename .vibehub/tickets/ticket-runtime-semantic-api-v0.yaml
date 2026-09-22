@@ -60,7 +60,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "提供 Project / semantic reference / proposal 命令 API. Delivery slice: alpha. Architecture: Tech Design §§19,25,26. Scope: Authenticated clients register projects and sources, resolve exact semantic versions, query/materialize Context and submit guarded semantic proposals through versioned public APIs.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "提供 Project / semantic reference / proposal 命令 API. Delivery slice: alpha. Architecture: Tech Design §§19,25,26. Scope: Authenticated clients register projects and sources, resolve exact semantic versions, query/materialize Context and submit guarded semantic proposals through versioned public APIs.. Excluded: Only this bounded outcome; independently owned components are consumed through public contracts..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Responsibility-transfer update: branch-graph-projection now owns guarded local enrollment/writes/views only; ticket-runtime-exploration-adoption-v0 retains the actual explicit-adoption and adoption-recovery obligations. This Ticket directly consumes that command or its persisted lineage, so remains blocked on its successful Outcome. Existing Acceptance/Contract history and all existing dependency edges are unchanged.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -89,6 +89,10 @@
     {
       "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
       "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
+    },
+    {
+      "purpose": "Immutable original branch Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c and exact moved adoption/recovery responsibilities; no old coverage is silently treated as complete.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -170,6 +174,7 @@
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
     "plan-validation:independent"
   ],
   "relations": [
@@ -186,6 +191,11 @@
     {
       "rationale": "Durable Ticket history and workspace relevance projection to expose.",
       "target_ticket_id": "ticket-runtime-ticket-workspace-provenance-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Its active public-contract@2 and concurrency@2 expose explicit per-item adoption commands; the actual accepted command/authority/idempotency behavior is a direct API input, not supplied by branch views alone.",
+      "target_ticket_id": "ticket-runtime-exploration-adoption-v0",
       "type": "depends_on"
     }
   ],

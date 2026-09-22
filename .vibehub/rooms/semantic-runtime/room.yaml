@@ -178,7 +178,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "19ad2ae407f9e9ebf8f45625e2d849854f45c163",
+        "blob": "6ac869737e1d537ca42f37d5d6db778a0b24c1a2",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -564,6 +564,10 @@
       {
         "blob": "e6b477a50929c6312a58783bcfebffe76b45c6db",
         "path": "semantic-runtime/src/local/durable-ingress.mjs"
+      },
+      {
+        "blob": "f58dbc38fdb54ecc66d01a525c3d48abb8603ca9",
+        "path": "semantic-runtime/src/local/exploration-inputs.mjs"
       },
       {
         "blob": "d44d269b0eb5db2de5911cf078b9eb73425b8cf9",
@@ -1050,8 +1054,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T15:16:14.439Z",
-    "last_aligned_commit": "772a213c5590ca3818ae7085ecca3d48ee9be625"
+    "checked_at": "2026-09-22T15:45:10.700Z",
+    "last_aligned_commit": "323c163fdd011ae4a6e3c2f237890b34ecf64f79"
   },
   "anchors": [
     "semantic-runtime/"

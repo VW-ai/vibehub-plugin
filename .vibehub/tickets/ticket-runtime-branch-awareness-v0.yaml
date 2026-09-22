@@ -38,7 +38,7 @@
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
     "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution."
   ],
-  "context": "Local stage L3. Policy-driven relevance, recipient selection, notice lifecycle and explicit adoption interaction through existing commands. No raw-message broadcast, Agent-to-Agent control or full distributed sync.",
+  "context": "Local stage L3. Policy-driven relevance, recipient selection, notice lifecycle and explicit adoption interaction through existing commands. No raw-message broadcast, Agent-to-Agent control or full distributed sync. Responsibility-transfer update: branch-graph-projection now owns guarded local enrollment/writes/views only; ticket-runtime-exploration-adoption-v0 retains the actual explicit-adoption and adoption-recovery obligations. This Ticket directly consumes that command or its persisted lineage, so remains blocked on its successful Outcome. Existing Acceptance/Contract history and all existing dependency edges are unchanged.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -59,6 +59,10 @@
     {
       "purpose": "Requested minimum collaboration behavior.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Immutable original branch Contract1 sha256:2e4a7c4d06c2966c8c15f5f47a3fe4dd7e309831022212390900228e1e5c536c and exact moved adoption/recovery responsibilities; no old coverage is silently treated as complete.",
+      "ref": "commit:323c163fdd011ae4a6e3c2f237890b34ecf64f79:.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -95,6 +99,7 @@
   "outcome": "Deliver relevant semantic changes bidirectionally between explorations without adopting them implicitly.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
     "plan-validation:independent"
   ],
   "relations": [
@@ -106,6 +111,11 @@
     {
       "rationale": "Recoverable per-session delivery transport.",
       "target_ticket_id": "ticket-runtime-session-delivery-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Its seen-is-not-adopted command integration and awareness-scenario explicitly invoke one adoption command and need its accepted stale/conflict/retry/lineage behavior.",
+      "target_ticket_id": "ticket-runtime-exploration-adoption-v0",
       "type": "depends_on"
     }
   ],

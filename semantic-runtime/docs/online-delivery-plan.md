@@ -74,7 +74,7 @@ independent review passed. These are page-memory interactions, not Runtime API
 integration, and they do not settle the documented open product choices.
 
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
-records 283 passing component tests and a successful heuristic replay of 20
+records the earlier 283-test checkpoint and a successful heuristic replay of 20
 sanitized Peel events / 80 decisions. This proves the current mechanisms, not
 semantic quality or downstream product benefit. Existing live-provider benchmark
 Evidence remains historical measurement; it was not rerun during this planning.
@@ -85,15 +85,28 @@ non-model execution, Worker protocol, reconciliation and observability reference
 contracts; isolated measured Node/Postgres spike. The newer kernel rejects
 Judge/Worker nodes; the old replay model route is a separate working path.
 
-Still missing: real Collector and durable service composition, typed extraction
-and entity resolution, production Graph persistence/enrollment, branch-aware
-views/adoption, integrated Judge runtime, query/compiler, actionable Agent
-request delivery, bidirectional awareness, local app/provider settings, project
-activation UI/consumer wiring, two plugins and local Worker orchestration. Provider settings exist
-as a local module; their App form and runtime dispatch integration remain pending.
-Address resolution is
+The local foundations now also include authenticated SQLite persistence, Git
+folder/worktree enrollment, a running setup App with provider configuration and
+Project activation, durable ingress and Working Graph storage, source
+invalidation, a bounded local Git sensor, and the
+[selected canonical-record reader](canonical-source-reader-v0.md). The reader's
+checkpoint passes 637 tests with two native Keychain opt-in tests skipped;
+standalone verification and synthetic live JEV Graph checks also pass. These
+components are not yet a connected coding-session product.
+
+Still missing: real host Collectors and durable service composition, typed
+extraction and entity resolution, branch-aware views/adoption, integrated Judge
+runtime, query/compiler, actionable Agent request delivery, bidirectional
+awareness, provider/activation wiring through the complete semantic loop, two
+plugins and local Worker orchestration. Address resolution is
 not semantic entity resolution. Same-entity concurrent assertions
 in the current one-lineage Graph are not branch-local hypotheses.
+
+Branch projection now separates two delivery boundaries: guarded enrollment,
+local writes and scoped views first; explicit cross-exploration adoption next.
+The adoption Ticket retains the original per-item adoption and recovery
+obligations. Lifecycle, awareness and the public API still depend on that
+implementation; finishing branch views alone does not fulfill adoption.
 
 ## Delivery sequence
 
@@ -133,7 +146,8 @@ Cloud Worker enrollment is not required to prove this loop.
 | [local-service-profile-v0](../../.vibehub/tickets/ticket-runtime-local-service-profile-v0.yaml) | firm | None — independently executable |
 | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml) | firm | None — independently executable |
 | [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) | firm | None |
-| [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [graph-store-v0](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml) |
+| [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) | firm | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [graph-store-v0](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) |
+| [exploration-adoption-v0](../../.vibehub/tickets/ticket-runtime-exploration-adoption-v0.yaml) | draft | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
 | [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) | draft | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
 | [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml) | draft | [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml); [local-codex-executor-v0](../../.vibehub/tickets/ticket-runtime-local-codex-executor-v0.yaml) |
 | [entity-resolution-v0](../../.vibehub/tickets/ticket-runtime-entity-resolution-v0.yaml) | draft | [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml); [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) |
@@ -208,7 +222,7 @@ part of the scope contract and UX verification.
 | New bounded Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
 | [Ticket workspace provenance](../../.vibehub/tickets/ticket-runtime-ticket-workspace-provenance-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) |
-| [Context lifecycle/lineage](../../.vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml) | draft | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
+| [Context lifecycle/lineage](../../.vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml) | draft | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml); [exploration-adoption-v0](../../.vibehub/tickets/ticket-runtime-exploration-adoption-v0.yaml) |
 
 At the workspace-management checkpoint, the existing branch-scope contract supplied the identities; Project UX prototypes
 the management journeys; Query consumes Context applicability/lifecycle; semantic
