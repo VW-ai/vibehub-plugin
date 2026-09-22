@@ -1,0 +1,56 @@
+# Decision template for the FUTURE service release. Never deploy the spike service.
+# Not provisioned, CLI-validated, or an executable deployment authorization.
+# Fill image digest and RUN_TIME secrets only after owner selection, service
+# implementation, and release/restore acceptance; keep values out of this file.
+name: vibehub-runtime-alpha
+region: sfo
+services:
+  - name: runtime
+    image:
+      registry_type: GHCR
+      registry: vw-ai
+      repository: vibehub-semantic-runtime
+      digest: OWNER_APPROVED_RELEASE_SHA256
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    instance_count: 1
+    http_port: 8080
+    health_check:
+      http_path: /healthz
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_TIME
+      - key: DATABASE_URL
+        type: SECRET
+        scope: RUN_TIME
+      - key: DATABASE_CA_PEM
+        type: SECRET
+        scope: RUN_TIME
+      - key: AUTH_SIGNING_KEY_ED25519
+        type: SECRET
+        scope: RUN_TIME
+      - key: AUTH_ISSUER
+        value: vibehub-runtime-alpha
+        scope: RUN_TIME
+      - key: AUTH_AUDIENCE
+        value: vibehub-runtime-alpha
+        scope: RUN_TIME
+      - key: JUDGE_ENDPOINT
+        type: SECRET
+        scope: RUN_TIME
+      - key: JUDGE_API_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: PGPOOL_MAX
+        value: "8"
+        scope: RUN_TIME
+# Existing managed PostgreSQL Standard 17 cluster, 1GiB/1vCPU, 10GiB initial
+# storage in sfo3. Owner/team, cluster UUID, trusted sources, VPC and encrypted
+# bindings are supplied by the later deployment Ticket. No dev database.
+ingress:
+  rules:
+    - component:
+        name: runtime
+      match:
+        path:
+          prefix: /

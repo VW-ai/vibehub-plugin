@@ -1,0 +1,45 @@
+{
+  "context_id": "contract-runtime-outbox-cursor-follows-durable-publication",
+  "detail": "Agent-origin engineering constraint surfaced by the platform spike, delegated from Ticket Run to Ingest for the later store, journal and session-delivery adapters. PostgreSQL sequence allocation is not transaction commit order. Example: transaction A allocates 10 and pauses; B allocates 11 and commits; a consumer advances to 11; A commits 10 afterward and a naive WHERE sequence > 11 poll loses it. The production adapter needs a durable scoped publication order, for example a per-scope cursor row locked and advanced in the same transaction as state/outbox publication, or another explicitly proven gap-safe protocol. NOTIFY may wake a reader but does not replace durable replay state. Later acceptance must exercise reversed completion, rollback/gaps and reconnect without omission or duplicated effects. The disposable platform spike uses an identity counter for its bounded single-job/serialized-state proof; its notification test is not production concurrent-cursor conformance. This is not a platform selection or a claim that the future delivery adapter is implemented.",
+  "evidence": [
+    {
+      "note": "Operational limits explicitly separate sequence allocation from commit order and assign production cursor publication to later adapters.",
+      "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+    },
+    {
+      "note": "Synthetic outbox identity column is a bounded spike mechanism, not the service cursor contract.",
+      "ref": "semantic-runtime/spikes/platform-node-postgres/schema.sql"
+    },
+    {
+      "note": "Primary PostgreSQL reference: concurrent nextval allocates distinct values without waiting for transaction completion, and aborts leave gaps; the lost-event example is an engineering inference.",
+      "ref": "https://www.postgresql.org/docs/17/functions-sequence.html"
+    },
+    {
+      "note": "Primary reference documents postcommit notifications; durable cursor recovery remains application work.",
+      "ref": "https://www.postgresql.org/docs/17/sql-notify.html"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-runtime-commit-uncertainty-preserves-command-identity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T00:42:14.432808+00:00",
+    "ref": "semantic-runtime/docs/platform-evaluation-v0.md"
+  },
+  "state": "active",
+  "summary": "A resumable outbox cursor must not advance past a transaction that can still publish an earlier allocated sequence",
+  "tags": [
+    "semantic-runtime",
+    "outbox",
+    "transactions",
+    "cursor",
+    "delivery",
+    "recovery"
+  ],
+  "type": "contract"
+}

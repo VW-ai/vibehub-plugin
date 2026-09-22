@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "platform-synthetic-proof"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "platform-synthetic-proof",
+      "identity": "sha256:737c8e4012fc541160f4fcaf5ba0cca3c8acf877a7de3f8e4b854c322424308e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-platform-synthetic-proof-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:42:22.736Z",
+  "refs": [
+    "semantic-runtime/docs/platform-evaluation-v0.md",
+    "semantic-runtime/spikes/platform-node-postgres/README.md",
+    "semantic-runtime/spikes/platform-node-postgres/measured-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/run.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/service.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/schema.sql",
+    "semantic-runtime/spikes/platform-node-postgres/standalone.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/check.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/package.json",
+    "semantic-runtime/spikes/platform-node-postgres/package-lock.json"
+  ],
+  "schema_version": 2,
+  "summary": "Actual disposable local Node24.21.0/PostgreSQL17.11/pg8.16.3 proof passed51 assertions, including Ed25519 signature/expiry/audience and scoped membership rejection, restricted-role RLS,24 concurrent CAS pairs with one commit per pair, atomic state/outbox rollback, durable idempotent job enqueue surviving API SIGKILL and PostgreSQL immediate restart, a separately SIGKILLed executor followed by real1000ms lease expiry and fence2 recovery using the accepted public Worker protocol, rejection of stale completion and one terminal usage/result effect despite exact redelivery. SSE notification/replay/revocation, one successful fixed synthetic loopback HTTP judge plus bounded503 failure, scoped DELETE of all target state/job/outbox/memberships preserving other tenant/project, and complete process/cluster cleanup passed. The deliberately forced startup failure also cleaned up. Actual standalone copy installed separate Runtime/spike lockfiles and passed the same51 checks. Synthetic local issuer/mock only; no model credential, private project input, provider request, production deployment or hosted resource. This proves the recommended Node/PostgreSQL substrate locally, not the proposed DigitalOcean managed destination.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike"
+}

@@ -1,0 +1,33 @@
+{
+  "accepted_acceptance_ids": [
+    "platform-constraint-matrix",
+    "platform-operational-evidence",
+    "platform-selection-handoff",
+    "platform-synthetic-proof"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T00:44:01.736657Z",
+  "contract_revision": {
+    "identity": "sha256:feb658622cd78dd39ff6a0a7fb3f39301e0ad96bcd8a0f70c53bdbbf711f95ec",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-platform-constraint-matrix-v1-proof-v1",
+    "runtime-platform-operational-evidence-v1-proof-v1",
+    "runtime-platform-root-verification-release-v1",
+    "runtime-platform-selection-handoff-v1-proof-v1",
+    "runtime-platform-synthetic-proof-v1-proof-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_runtime_platform_spike did not execute this Ticket or author implementation, tests, documentation, reports or Evidence. It inspected the exact Contract/prerequisites, independently reran the frozen synthetic proof and private authentication/failure-cleanup probes, verified report hashes and primary-source facts, and read release evidence. Its sole repository write is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four active Acceptance revisions in exact Contract V1. The matrix compares Workers with per-Project Durable Objects against Node/PostgreSQL for every named constraint, distinguishes documented capabilities from engineering inferences, and identifies extra cross-object reservation/recovery complexity. The concrete proposal names Node24/PostgreSQL17, SQL job queue, durable SSE, Ed25519 JWT with server-owned membership, encrypted runtime SECRET bindings, DigitalOcean app/DB/VPC region mappings, fixed single-instance resource sizes, a conservatively bracketed base price and a proposed infrastructure ceiling with separate model/BYO costs. Independent primary-source checks confirmed the decision-critical price, connection, version, VPC and recovery facts; account, region, routing, availability and spend remain owner choices. The phrase on the recommended target is adjudicated here as execution on the recommended Node24/PostgreSQL17 runtime/store stack: actual local Node24.21.0 and PostgreSQL17.11 were exercised, rather than an emulated database. This does not accept the proposed DigitalOcean host as deployed or operationally proven. Independently ran the frozen disposable harness to a separate private report: all51 checks passed, covering signature and scoped current membership, restricted-role RLS,24 competing CAS pairs, atomic state/outbox rollback, durable idempotent enqueue surviving API kill and immediate PostgreSQL restart, real executor SIGKILL/lease expiry/reclaim/fence2, stale-completion refusal, exact terminal deduplication, scoped SSE/reconnect/revocation, fixed synthetic outbound HTTP and503 failure, and deletion preserving another tenant/project. Independent in-memory authentication probes passed one valid and17 rejection cases. A separate forced post-start failure exited1 as expected while stopping the database/children and deleting its private cluster/socket; zero hosted resources were created. Operational acceptance is measured local fresh-process cold startup with warm OS page cache, request latency and explicitly named one-job queue observations, not hosted/image/VM cold start or the capacity SLI. All sample arrays/counts, versions, hashes, failure/cleanup results and limitations remain in the checked-in report; its source/protocol hashes match reviewer/root runs and it exactly matches the inspected real isolated-install report. Import boundaries passed6files/31imports. Inspected parent release proof: unchanged Runtime full and actual standalone verification each passed283/283 with72file boundaries;79file Skill artifact excludes Runtime. Those broad release commands and isolated spike install were not rerun by this reviewer. All required Context references resolved through the installed engine, prerequisite identity/Worker/observability Outcomes and Evidence were consumed, all5 native Evidence records bind exact active Acceptance identities, and fresh Context guard/validation/diff checks passed. No blocking findings remain. Linux/container parity, managed proxy/secret/failover/PITR behavior, full workload capacity, production outbox commit-order cursor discipline, retention and hosted restore remain downstream responsibilities explicitly documented, not accepted by this synthetic proof. Ordinary acknowledged-event RPO0 and disaster RPO300s/RTO900s and every numerical workload gate remain unchanged/unproven. The existing owner-selection ContractV2 must still receive explicit human-origin Evidence; this Outcome provides neither selection nor deployment/spend authority.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike",
+  "unresolved_acceptance_ids": []
+}

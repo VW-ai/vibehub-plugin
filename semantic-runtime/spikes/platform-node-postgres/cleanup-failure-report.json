@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "run_kind": "local-disposable-synthetic",
+  "started_at": "2026-09-22T00:37:29.136Z",
+  "environment": {
+    "node": "v24.21.0",
+    "postgres": "postgres (PostgreSQL) 17.11",
+    "pg_client": "8.16.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os_release": "25.5.0",
+    "cpu": "Apple M2 Max"
+  },
+  "checks": [],
+  "measurements": {
+    "database_process_start_ms": 112.121
+  },
+  "limitations": [
+    "Not a hosted cold-start, network, capacity, failover, backup/PITR or disaster-restore drill.",
+    "Not the alpha workload; no SLO is adjudicated.",
+    "Synthetic local issuer and loopback mock judge; no production identity/provider credentials or private project inputs.",
+    "One job with accelerated 1000ms lease and 120000ms deadline; protocol permits these values; not the 30-second alpha job workload."
+  ],
+  "status": "failed",
+  "failure_code": "synthetic_assertion_or_infrastructure_failure",
+  "failure_stage": "database_start",
+  "cleanup": {
+    "child_processes_exited": true,
+    "database_stopped": true,
+    "private_cluster_and_socket_deleted": true,
+    "hosted_resources_created": 0
+  },
+  "finished_at": "2026-09-22T00:37:29.797Z"
+}

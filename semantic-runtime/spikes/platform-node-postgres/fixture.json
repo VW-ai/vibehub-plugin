@@ -1,0 +1,2277 @@
+{
+  "job": {
+    "schema_version": 1,
+    "job_id": "job-a",
+    "scope": {
+      "project_id": "product",
+      "tenant_id": "acme"
+    },
+    "worker_type": "semantic-reconciliation",
+    "trigger": {
+      "policy_run_id": "policy-run-a",
+      "policy": {
+        "policy_id": "synthetic-ingress",
+        "version": "1",
+        "content_hash": "sha256:c659fc015e0bb462dc512618c4e7d3bfebf57d219ffb3ed8d1019f74f165cf67",
+        "executable_hash": "sha256:8f8db63f949cabf83dc77215e710acf94f377e851a1e239f7ded28a35a62dba2"
+      },
+      "node_id": "submit",
+      "operation": {
+        "id": "submit",
+        "version": "1",
+        "implementation_hash": "sha256:147165a38c32d015f7963e383d8f15ee0d8565c794a842de570c0737dae5c53f"
+      }
+    },
+    "continuation": {
+      "policy": {
+        "policy_id": "synthetic-ingress",
+        "version": "1",
+        "content_hash": "sha256:c659fc015e0bb462dc512618c4e7d3bfebf57d219ffb3ed8d1019f74f165cf67",
+        "executable_hash": "sha256:8f8db63f949cabf83dc77215e710acf94f377e851a1e239f7ded28a35a62dba2"
+      },
+      "node_id": "ingest"
+    },
+    "inputs": {
+      "graph_revision": {
+        "generation_id": "live-1",
+        "kind": "graph_revision",
+        "schema_version": 1,
+        "scope": {
+          "project_id": "product",
+          "tenant_id": "acme"
+        },
+        "snapshot_digest": "sha256:3f203f09b95d9043d1f3d19f1ee8ad2f8b86b3e9b6f7a49c52cb2394cafd8398"
+      },
+      "revisions": [
+        {
+          "entity_id": "context-a",
+          "entity_kind": "entity",
+          "generation_id": "live-1",
+          "kind": "semantic_revision",
+          "revision_digest": "sha256:1adb7a97737bd8367fec6a8dbe077fcab9b580e92661ce219bf1e3fcfd263d4b",
+          "schema_version": 1,
+          "scope": {
+            "project_id": "product",
+            "tenant_id": "acme"
+          }
+        }
+      ],
+      "source_events": [
+        {
+          "acl": {
+            "allowed_principal_ids": [
+              "alice",
+              "bob"
+            ],
+            "revision": "acl-7"
+          },
+          "causal_parents": [],
+          "effective_access": {
+            "allowed_principal_ids": [
+              "alice",
+              "bob"
+            ],
+            "sensitivity": "sensitive"
+          },
+          "event_id": "api-event-0",
+          "event_type": "GIT_COMMIT",
+          "idempotency_key": "api-retry-0",
+          "identity": {
+            "checkout_id": "api-clone-a",
+            "execution_id": "attempt-a",
+            "membership_id": "product-api",
+            "repository_id": "api",
+            "session_id": "session-a",
+            "workspace_id": "engineering",
+            "worktree_id": "feature-a"
+          },
+          "kind": "normalized_event",
+          "normalization": {
+            "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+            "mapping": {
+              "event_types": {
+                "access.changed": "SOURCE_ACCESS_CHANGED",
+                "git.commit.created": "GIT_COMMIT",
+                "host.message": "AGENT_MESSAGE",
+                "source.deleted": "SOURCE_TOMBSTONE"
+              },
+              "mapping_id": "synthetic-git-adapter",
+              "revision": "mapping-1",
+              "schema_version": 1
+            },
+            "mapping_digest": "sha256:b69b7f85d64841511406ad8ce158632d6e737483499599689d9d3002ebf8bae5",
+            "normalizer_version": 1,
+            "raw_event_digest": "sha256:872bd507b339ec7b401fd7b7b77857d421df3a9577ad18b21882b84cd88be616",
+            "raw_identity": {
+              "execution_id": "attempt-a"
+            },
+            "raw_partition": {
+              "partition_id": "git-api-events",
+              "project_id": "product",
+              "source_installation_id": "laptop",
+              "tenant_id": "acme"
+            }
+          },
+          "observed_at": "2026-09-21T10:00:01.000Z",
+          "occurred_at": "2026-09-21T10:00:00.000Z",
+          "partition": {
+            "partition_id": "git-api-events",
+            "project_id": "product",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme"
+          },
+          "payload": {
+            "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda",
+            "kind": "git_revision",
+            "object": {
+              "kind": "git_commit",
+              "object_format": "sha1",
+              "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "repository_id": "api",
+              "tenant_id": "acme"
+            },
+            "path": null
+          },
+          "producer": {
+            "epoch": "startup-1",
+            "producer_id": "git-sensor",
+            "sequence": 0
+          },
+          "provenance": {
+            "delivery": {
+              "channel": "local_git",
+              "delivery_id": "local-delivery-1"
+            },
+            "source_objects": [
+              {
+                "acl": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "revision": "repo-acl-3"
+                },
+                "object": {
+                  "kind": "git_commit",
+                  "object_format": "sha1",
+                  "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "repository_id": "api",
+                  "tenant_id": "acme"
+                },
+                "sensitivity": "sensitive"
+              }
+            ]
+          },
+          "replay": {
+            "authorization": null,
+            "eligible": true,
+            "reason": "immutable_revision"
+          },
+          "schema_version": 1,
+          "sensitivity": "normal",
+          "source_event_type": "git.commit.created",
+          "source_native_event_id": "api-native-0"
+        }
+      ],
+      "watermarks": {
+        "schema_version": 1,
+        "scope": {
+          "project_id": "product",
+          "tenant_id": "acme"
+        },
+        "status": "caught-up",
+        "watermarks": [
+          {
+            "accepted_through": 0,
+            "completed_through": 0,
+            "input_gaps": [],
+            "maximum_sequence": 0,
+            "projection_gaps": [],
+            "reason": "captured_head_projected",
+            "source": {
+              "partition": {
+                "partition_id": "git-api-events",
+                "project_id": "product",
+                "source_installation_id": "laptop",
+                "tenant_id": "acme"
+              },
+              "producer": {
+                "epoch": "startup-1",
+                "producer_id": "git-sensor"
+              }
+            },
+            "start_sequence": 0,
+            "status": "caught-up",
+            "target_sequence": 0,
+            "unordered_count": 0
+          },
+          {
+            "accepted_through": 0,
+            "completed_through": 0,
+            "input_gaps": [],
+            "maximum_sequence": 0,
+            "projection_gaps": [],
+            "reason": "captured_head_projected",
+            "source": {
+              "partition": {
+                "partition_id": "git-web-events",
+                "project_id": "product",
+                "source_installation_id": "laptop",
+                "tenant_id": "acme"
+              },
+              "producer": {
+                "epoch": "startup-1",
+                "producer_id": "git-sensor"
+              }
+            },
+            "start_sequence": 0,
+            "status": "caught-up",
+            "target_sequence": 0,
+            "unordered_count": 0
+          }
+        ]
+      }
+    },
+    "capability_ceiling": {
+      "allowed_principal_ids": [
+        "alice"
+      ],
+      "allowed_operations": [
+        "read_context",
+        "propose_candidate",
+        "propose_resolution"
+      ],
+      "allowed_provider_ids": [
+        "synthetic"
+      ],
+      "allowed_localities": [
+        "local"
+      ],
+      "sensitivity_ceiling": "sensitive"
+    },
+    "output_schema": {
+      "id": "worker-findings",
+      "version": "1",
+      "digest": "sha256:b20268588fdac5435aedffd84c1b981d4bb08d33aa003ab2a29d0f86c254d4eb"
+    },
+    "created_at_ms": 1000,
+    "deadline_ms": 10000,
+    "retry": {
+      "max_attempts": 2,
+      "lease_ms": 1000
+    },
+    "idempotency_key": "dispatch-a"
+  },
+  "admission": {
+    "catalog": {
+      "schema_version": 1,
+      "tenants": [
+        {
+          "tenant_id": "acme"
+        },
+        {
+          "tenant_id": "other"
+        }
+      ],
+      "workspaces": [
+        {
+          "tenant_id": "acme",
+          "workspace_id": "engineering"
+        },
+        {
+          "tenant_id": "acme",
+          "workspace_id": "research"
+        },
+        {
+          "tenant_id": "other",
+          "workspace_id": "engineering"
+        }
+      ],
+      "projects": [
+        {
+          "tenant_id": "acme",
+          "project_id": "product",
+          "workspace_id": "engineering"
+        },
+        {
+          "tenant_id": "acme",
+          "project_id": "shared",
+          "workspace_id": "engineering"
+        },
+        {
+          "tenant_id": "acme",
+          "project_id": "notes",
+          "workspace_id": "research"
+        },
+        {
+          "tenant_id": "other",
+          "project_id": "product",
+          "workspace_id": "engineering"
+        }
+      ],
+      "repositories": [
+        {
+          "tenant_id": "acme",
+          "repository_id": "api",
+          "external_identity": {
+            "provider": "git-host",
+            "authority": "git.example",
+            "object_id": "101"
+          },
+          "attributes": {
+            "name": "team/api",
+            "remote_url": "https://git.example/team/api.git"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "repository_id": "web",
+          "external_identity": {
+            "provider": "git-host",
+            "authority": "git.example",
+            "object_id": "102"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "repository_id": "api-fork",
+          "external_identity": {
+            "provider": "git-host",
+            "authority": "git.example",
+            "object_id": "103"
+          },
+          "fork_of_repository_id": "api"
+        },
+        {
+          "tenant_id": "other",
+          "repository_id": "api",
+          "external_identity": {
+            "provider": "git-host",
+            "authority": "git.example",
+            "object_id": "101"
+          }
+        }
+      ],
+      "memberships": [
+        {
+          "tenant_id": "acme",
+          "membership_id": "product-api",
+          "project_id": "product",
+          "repository_id": "api"
+        },
+        {
+          "tenant_id": "acme",
+          "membership_id": "product-web",
+          "project_id": "product",
+          "repository_id": "web"
+        },
+        {
+          "tenant_id": "acme",
+          "membership_id": "shared-api",
+          "project_id": "shared",
+          "repository_id": "api"
+        },
+        {
+          "tenant_id": "acme",
+          "membership_id": "product-fork",
+          "project_id": "product",
+          "repository_id": "api-fork"
+        },
+        {
+          "tenant_id": "other",
+          "membership_id": "product-api",
+          "project_id": "product",
+          "repository_id": "api"
+        }
+      ],
+      "source_installations": [
+        {
+          "tenant_id": "acme",
+          "source_installation_id": "laptop",
+          "workspace_id": "engineering",
+          "kind": "local",
+          "external_identity": {
+            "provider": "agent-host",
+            "authority": "host-registration",
+            "object_id": "laptop-1"
+          },
+          "project_ids": [
+            "product"
+          ],
+          "membership_ids": [
+            "product-api",
+            "product-web",
+            "product-fork"
+          ]
+        },
+        {
+          "tenant_id": "acme",
+          "source_installation_id": "connector",
+          "workspace_id": "engineering",
+          "kind": "connector",
+          "external_identity": {
+            "provider": "git-host",
+            "authority": "git.example",
+            "object_id": "installation-1"
+          },
+          "project_ids": [
+            "product",
+            "shared"
+          ],
+          "membership_ids": [
+            "product-api",
+            "product-web",
+            "shared-api",
+            "product-fork"
+          ]
+        },
+        {
+          "tenant_id": "acme",
+          "source_installation_id": "notes-host",
+          "workspace_id": "research",
+          "kind": "local",
+          "external_identity": {
+            "provider": "agent-host",
+            "authority": "host-registration",
+            "object_id": "notes-1"
+          },
+          "project_ids": [
+            "notes"
+          ],
+          "membership_ids": []
+        }
+      ],
+      "checkouts": [
+        {
+          "tenant_id": "acme",
+          "checkout_id": "api-clone-a",
+          "repository_id": "api",
+          "source_installation_id": "laptop",
+          "attributes": {
+            "path": "/synthetic/clone-a"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "checkout_id": "api-clone-b",
+          "repository_id": "api",
+          "source_installation_id": "laptop",
+          "attributes": {
+            "path": "/synthetic/clone-b"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "checkout_id": "web-clone",
+          "repository_id": "web",
+          "source_installation_id": "laptop"
+        }
+      ],
+      "worktrees": [
+        {
+          "tenant_id": "acme",
+          "worktree_id": "feature-a",
+          "checkout_id": "api-clone-a",
+          "attributes": {
+            "path": "/synthetic/feature",
+            "branch": "feature"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "worktree_id": "feature-b",
+          "checkout_id": "api-clone-a",
+          "attributes": {
+            "path": "/synthetic/other-feature",
+            "branch": "other-feature"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "worktree_id": "clone-b-main",
+          "checkout_id": "api-clone-b",
+          "attributes": {
+            "branch": "main"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "worktree_id": "web-main",
+          "checkout_id": "web-clone"
+        }
+      ],
+      "sessions": [
+        {
+          "tenant_id": "acme",
+          "session_id": "session-a",
+          "project_id": "product",
+          "source_installation_id": "laptop",
+          "worktree_id": "feature-a",
+          "attributes": {
+            "host_conversation_id": "conversation-1"
+          }
+        },
+        {
+          "tenant_id": "acme",
+          "session_id": "notes-session",
+          "project_id": "notes",
+          "source_installation_id": "notes-host"
+        },
+        {
+          "tenant_id": "acme",
+          "session_id": "session-b",
+          "project_id": "product",
+          "source_installation_id": "laptop",
+          "worktree_id": "web-main"
+        }
+      ],
+      "executions": [
+        {
+          "tenant_id": "acme",
+          "execution_id": "attempt-a",
+          "session_id": "session-a",
+          "repository_id": "api",
+          "worktree_id": "feature-a"
+        },
+        {
+          "tenant_id": "acme",
+          "execution_id": "notes-attempt",
+          "session_id": "notes-session"
+        },
+        {
+          "tenant_id": "acme",
+          "execution_id": "attempt-b",
+          "session_id": "session-b",
+          "repository_id": "web",
+          "worktree_id": "web-main"
+        }
+      ]
+    },
+    "current_graph": {
+      "catalog": {
+        "checkouts": [
+          {
+            "attributes": {
+              "path": "/synthetic/clone-a"
+            },
+            "checkout_id": "api-clone-a",
+            "repository_id": "api",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme"
+          },
+          {
+            "attributes": {
+              "path": "/synthetic/clone-b"
+            },
+            "checkout_id": "api-clone-b",
+            "repository_id": "api",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme"
+          },
+          {
+            "checkout_id": "web-clone",
+            "repository_id": "web",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme"
+          }
+        ],
+        "executions": [
+          {
+            "execution_id": "attempt-a",
+            "repository_id": "api",
+            "session_id": "session-a",
+            "tenant_id": "acme",
+            "worktree_id": "feature-a"
+          },
+          {
+            "execution_id": "notes-attempt",
+            "session_id": "notes-session",
+            "tenant_id": "acme"
+          },
+          {
+            "execution_id": "attempt-b",
+            "repository_id": "web",
+            "session_id": "session-b",
+            "tenant_id": "acme",
+            "worktree_id": "web-main"
+          }
+        ],
+        "memberships": [
+          {
+            "membership_id": "product-api",
+            "project_id": "product",
+            "repository_id": "api",
+            "tenant_id": "acme"
+          },
+          {
+            "membership_id": "product-web",
+            "project_id": "product",
+            "repository_id": "web",
+            "tenant_id": "acme"
+          },
+          {
+            "membership_id": "shared-api",
+            "project_id": "shared",
+            "repository_id": "api",
+            "tenant_id": "acme"
+          },
+          {
+            "membership_id": "product-fork",
+            "project_id": "product",
+            "repository_id": "api-fork",
+            "tenant_id": "acme"
+          },
+          {
+            "membership_id": "product-api",
+            "project_id": "product",
+            "repository_id": "api",
+            "tenant_id": "other"
+          }
+        ],
+        "projects": [
+          {
+            "project_id": "product",
+            "tenant_id": "acme",
+            "workspace_id": "engineering"
+          },
+          {
+            "project_id": "shared",
+            "tenant_id": "acme",
+            "workspace_id": "engineering"
+          },
+          {
+            "project_id": "notes",
+            "tenant_id": "acme",
+            "workspace_id": "research"
+          },
+          {
+            "project_id": "product",
+            "tenant_id": "other",
+            "workspace_id": "engineering"
+          }
+        ],
+        "repositories": [
+          {
+            "attributes": {
+              "name": "team/api",
+              "remote_url": "https://git.example/team/api.git"
+            },
+            "external_identity": {
+              "authority": "git.example",
+              "object_id": "101",
+              "provider": "git-host"
+            },
+            "repository_id": "api",
+            "tenant_id": "acme"
+          },
+          {
+            "external_identity": {
+              "authority": "git.example",
+              "object_id": "102",
+              "provider": "git-host"
+            },
+            "repository_id": "web",
+            "tenant_id": "acme"
+          },
+          {
+            "external_identity": {
+              "authority": "git.example",
+              "object_id": "103",
+              "provider": "git-host"
+            },
+            "fork_of_repository_id": "api",
+            "repository_id": "api-fork",
+            "tenant_id": "acme"
+          },
+          {
+            "external_identity": {
+              "authority": "git.example",
+              "object_id": "101",
+              "provider": "git-host"
+            },
+            "repository_id": "api",
+            "tenant_id": "other"
+          }
+        ],
+        "schema_version": 1,
+        "sessions": [
+          {
+            "attributes": {
+              "host_conversation_id": "conversation-1"
+            },
+            "project_id": "product",
+            "session_id": "session-a",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme",
+            "worktree_id": "feature-a"
+          },
+          {
+            "project_id": "notes",
+            "session_id": "notes-session",
+            "source_installation_id": "notes-host",
+            "tenant_id": "acme"
+          },
+          {
+            "project_id": "product",
+            "session_id": "session-b",
+            "source_installation_id": "laptop",
+            "tenant_id": "acme",
+            "worktree_id": "web-main"
+          }
+        ],
+        "source_installations": [
+          {
+            "external_identity": {
+              "authority": "host-registration",
+              "object_id": "laptop-1",
+              "provider": "agent-host"
+            },
+            "kind": "local",
+            "membership_ids": [
+              "product-api",
+              "product-web",
+              "product-fork"
+            ],
+            "project_ids": [
+              "product"
+            ],
+            "source_installation_id": "laptop",
+            "tenant_id": "acme",
+            "workspace_id": "engineering"
+          },
+          {
+            "external_identity": {
+              "authority": "git.example",
+              "object_id": "installation-1",
+              "provider": "git-host"
+            },
+            "kind": "connector",
+            "membership_ids": [
+              "product-api",
+              "product-web",
+              "shared-api",
+              "product-fork"
+            ],
+            "project_ids": [
+              "product",
+              "shared"
+            ],
+            "source_installation_id": "connector",
+            "tenant_id": "acme",
+            "workspace_id": "engineering"
+          },
+          {
+            "external_identity": {
+              "authority": "host-registration",
+              "object_id": "notes-1",
+              "provider": "agent-host"
+            },
+            "kind": "local",
+            "membership_ids": [],
+            "project_ids": [
+              "notes"
+            ],
+            "source_installation_id": "notes-host",
+            "tenant_id": "acme",
+            "workspace_id": "research"
+          }
+        ],
+        "tenants": [
+          {
+            "tenant_id": "acme"
+          },
+          {
+            "tenant_id": "other"
+          }
+        ],
+        "workspaces": [
+          {
+            "tenant_id": "acme",
+            "workspace_id": "engineering"
+          },
+          {
+            "tenant_id": "acme",
+            "workspace_id": "research"
+          },
+          {
+            "tenant_id": "other",
+            "workspace_id": "engineering"
+          }
+        ],
+        "worktrees": [
+          {
+            "attributes": {
+              "branch": "feature",
+              "path": "/synthetic/feature"
+            },
+            "checkout_id": "api-clone-a",
+            "tenant_id": "acme",
+            "worktree_id": "feature-a"
+          },
+          {
+            "attributes": {
+              "branch": "other-feature",
+              "path": "/synthetic/other-feature"
+            },
+            "checkout_id": "api-clone-a",
+            "tenant_id": "acme",
+            "worktree_id": "feature-b"
+          },
+          {
+            "attributes": {
+              "branch": "main"
+            },
+            "checkout_id": "api-clone-b",
+            "tenant_id": "acme",
+            "worktree_id": "clone-b-main"
+          },
+          {
+            "checkout_id": "web-clone",
+            "tenant_id": "acme",
+            "worktree_id": "web-main"
+          }
+        ]
+      },
+      "generation_id": "live-1",
+      "schema_version": 1,
+      "scope": {
+        "project_id": "product",
+        "tenant_id": "acme"
+      },
+      "snapshots": [
+        {
+          "access_updates": [],
+          "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+          "conflicts": [],
+          "entities": [],
+          "generation_id": "live-1",
+          "previous_snapshot_digest": null,
+          "resolutions": [],
+          "revisions": [],
+          "schema_version": 1,
+          "scope": {
+            "project_id": "product",
+            "tenant_id": "acme"
+          },
+          "sequence": 0,
+          "snapshot_digest": "sha256:dd0febd9ee5abb260fb4d6e888867bfa82c7328400a842dbdd9ccf5a95e1f4e1",
+          "sources": [],
+          "watermarks": {
+            "schema_version": 1,
+            "scope": {
+              "project_id": "product",
+              "tenant_id": "acme"
+            },
+            "status": "caught-up",
+            "watermarks": [
+              {
+                "accepted_through": 0,
+                "completed_through": 0,
+                "input_gaps": [],
+                "maximum_sequence": 0,
+                "projection_gaps": [],
+                "reason": "captured_head_projected",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                },
+                "start_sequence": 0,
+                "status": "caught-up",
+                "target_sequence": 0,
+                "unordered_count": 0
+              },
+              {
+                "accepted_through": 0,
+                "completed_through": 0,
+                "input_gaps": [],
+                "maximum_sequence": 0,
+                "projection_gaps": [],
+                "reason": "captured_head_projected",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-web-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                },
+                "start_sequence": 0,
+                "status": "caught-up",
+                "target_sequence": 0,
+                "unordered_count": 0
+              }
+            ]
+          }
+        },
+        {
+          "access_updates": [],
+          "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+          "conflicts": [],
+          "entities": [
+            {
+              "competing": [],
+              "entity_id": "context-a",
+              "entity_kind": "entity",
+              "head": {
+                "entity_id": "context-a",
+                "entity_kind": "entity",
+                "generation_id": "live-1",
+                "kind": "semantic_revision",
+                "revision_digest": "sha256:1adb7a97737bd8367fec6a8dbe077fcab9b580e92661ce219bf1e3fcfd263d4b",
+                "schema_version": 1,
+                "scope": {
+                  "project_id": "product",
+                  "tenant_id": "acme"
+                }
+              },
+              "quarantined": false,
+              "status": "candidate"
+            }
+          ],
+          "generation_id": "live-1",
+          "previous_snapshot_digest": "sha256:dd0febd9ee5abb260fb4d6e888867bfa82c7328400a842dbdd9ccf5a95e1f4e1",
+          "resolutions": [],
+          "revisions": [
+            {
+              "assertion": {
+                "assertion_id": "assert-a",
+                "base_revision": null,
+                "canonical_refs": [],
+                "content": {
+                  "data": {
+                    "text": "API remains v1"
+                  },
+                  "semantic_type": "constraint"
+                },
+                "entity_id": "context-a",
+                "entity_kind": "entity",
+                "events": [
+                  {
+                    "acl": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "revision": "acl-7"
+                    },
+                    "causal_parents": [],
+                    "effective_access": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "sensitivity": "sensitive"
+                    },
+                    "event_id": "api-event-0",
+                    "event_type": "GIT_COMMIT",
+                    "idempotency_key": "api-retry-0",
+                    "identity": {
+                      "checkout_id": "api-clone-a",
+                      "execution_id": "attempt-a",
+                      "membership_id": "product-api",
+                      "repository_id": "api",
+                      "session_id": "session-a",
+                      "workspace_id": "engineering",
+                      "worktree_id": "feature-a"
+                    },
+                    "kind": "normalized_event",
+                    "normalization": {
+                      "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+                      "mapping": {
+                        "event_types": {
+                          "access.changed": "SOURCE_ACCESS_CHANGED",
+                          "git.commit.created": "GIT_COMMIT",
+                          "host.message": "AGENT_MESSAGE",
+                          "source.deleted": "SOURCE_TOMBSTONE"
+                        },
+                        "mapping_id": "synthetic-git-adapter",
+                        "revision": "mapping-1",
+                        "schema_version": 1
+                      },
+                      "mapping_digest": "sha256:b69b7f85d64841511406ad8ce158632d6e737483499599689d9d3002ebf8bae5",
+                      "normalizer_version": 1,
+                      "raw_event_digest": "sha256:872bd507b339ec7b401fd7b7b77857d421df3a9577ad18b21882b84cd88be616",
+                      "raw_identity": {
+                        "execution_id": "attempt-a"
+                      },
+                      "raw_partition": {
+                        "partition_id": "git-api-events",
+                        "project_id": "product",
+                        "source_installation_id": "laptop",
+                        "tenant_id": "acme"
+                      }
+                    },
+                    "observed_at": "2026-09-21T10:00:01.000Z",
+                    "occurred_at": "2026-09-21T10:00:00.000Z",
+                    "partition": {
+                      "partition_id": "git-api-events",
+                      "project_id": "product",
+                      "source_installation_id": "laptop",
+                      "tenant_id": "acme"
+                    },
+                    "payload": {
+                      "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda",
+                      "kind": "git_revision",
+                      "object": {
+                        "kind": "git_commit",
+                        "object_format": "sha1",
+                        "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                        "repository_id": "api",
+                        "tenant_id": "acme"
+                      },
+                      "path": null
+                    },
+                    "producer": {
+                      "epoch": "startup-1",
+                      "producer_id": "git-sensor",
+                      "sequence": 0
+                    },
+                    "provenance": {
+                      "delivery": {
+                        "channel": "local_git",
+                        "delivery_id": "local-delivery-1"
+                      },
+                      "source_objects": [
+                        {
+                          "acl": {
+                            "allowed_principal_ids": [
+                              "alice",
+                              "bob"
+                            ],
+                            "revision": "repo-acl-3"
+                          },
+                          "object": {
+                            "kind": "git_commit",
+                            "object_format": "sha1",
+                            "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "repository_id": "api",
+                            "tenant_id": "acme"
+                          },
+                          "sensitivity": "sensitive"
+                        }
+                      ]
+                    },
+                    "replay": {
+                      "authorization": null,
+                      "eligible": true,
+                      "reason": "immutable_revision"
+                    },
+                    "schema_version": 1,
+                    "sensitivity": "normal",
+                    "source_event_type": "git.commit.created",
+                    "source_native_event_id": "api-native-0"
+                  }
+                ],
+                "execution_id": "attempt-a",
+                "parents": [],
+                "schema_version": 1,
+                "status": "candidate"
+              },
+              "entity_id": "context-a",
+              "entity_kind": "entity",
+              "generation_id": "live-1",
+              "provenance": {
+                "access_events": [],
+                "effective_access": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "sensitivity": "sensitive"
+                },
+                "events": [
+                  {
+                    "acl": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "revision": "acl-7"
+                    },
+                    "causal_parents": [],
+                    "effective_access": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "sensitivity": "sensitive"
+                    },
+                    "event_id": "api-event-0",
+                    "event_type": "GIT_COMMIT",
+                    "idempotency_key": "api-retry-0",
+                    "identity": {
+                      "checkout_id": "api-clone-a",
+                      "execution_id": "attempt-a",
+                      "membership_id": "product-api",
+                      "repository_id": "api",
+                      "session_id": "session-a",
+                      "workspace_id": "engineering",
+                      "worktree_id": "feature-a"
+                    },
+                    "kind": "normalized_event",
+                    "normalization": {
+                      "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+                      "mapping": {
+                        "event_types": {
+                          "access.changed": "SOURCE_ACCESS_CHANGED",
+                          "git.commit.created": "GIT_COMMIT",
+                          "host.message": "AGENT_MESSAGE",
+                          "source.deleted": "SOURCE_TOMBSTONE"
+                        },
+                        "mapping_id": "synthetic-git-adapter",
+                        "revision": "mapping-1",
+                        "schema_version": 1
+                      },
+                      "mapping_digest": "sha256:b69b7f85d64841511406ad8ce158632d6e737483499599689d9d3002ebf8bae5",
+                      "normalizer_version": 1,
+                      "raw_event_digest": "sha256:872bd507b339ec7b401fd7b7b77857d421df3a9577ad18b21882b84cd88be616",
+                      "raw_identity": {
+                        "execution_id": "attempt-a"
+                      },
+                      "raw_partition": {
+                        "partition_id": "git-api-events",
+                        "project_id": "product",
+                        "source_installation_id": "laptop",
+                        "tenant_id": "acme"
+                      }
+                    },
+                    "observed_at": "2026-09-21T10:00:01.000Z",
+                    "occurred_at": "2026-09-21T10:00:00.000Z",
+                    "partition": {
+                      "partition_id": "git-api-events",
+                      "project_id": "product",
+                      "source_installation_id": "laptop",
+                      "tenant_id": "acme"
+                    },
+                    "payload": {
+                      "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda",
+                      "kind": "git_revision",
+                      "object": {
+                        "kind": "git_commit",
+                        "object_format": "sha1",
+                        "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                        "repository_id": "api",
+                        "tenant_id": "acme"
+                      },
+                      "path": null
+                    },
+                    "producer": {
+                      "epoch": "startup-1",
+                      "producer_id": "git-sensor",
+                      "sequence": 0
+                    },
+                    "provenance": {
+                      "delivery": {
+                        "channel": "local_git",
+                        "delivery_id": "local-delivery-1"
+                      },
+                      "source_objects": [
+                        {
+                          "acl": {
+                            "allowed_principal_ids": [
+                              "alice",
+                              "bob"
+                            ],
+                            "revision": "repo-acl-3"
+                          },
+                          "object": {
+                            "kind": "git_commit",
+                            "object_format": "sha1",
+                            "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                            "repository_id": "api",
+                            "tenant_id": "acme"
+                          },
+                          "sensitivity": "sensitive"
+                        }
+                      ]
+                    },
+                    "replay": {
+                      "authorization": null,
+                      "eligible": true,
+                      "reason": "immutable_revision"
+                    },
+                    "schema_version": 1,
+                    "sensitivity": "normal",
+                    "source_event_type": "git.commit.created",
+                    "source_native_event_id": "api-native-0"
+                  }
+                ],
+                "schema_version": 1,
+                "source_pins": [
+                  {
+                    "acl": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "revision": "acl-7"
+                    },
+                    "key": "[\"event\",\"[1,\\\"observation\\\",\\\"acme\\\",\\\"api-event-0\\\"]\"]",
+                    "object": null,
+                    "sensitivity": "normal",
+                    "source": {
+                      "partition": {
+                        "partition_id": "git-api-events",
+                        "project_id": "product",
+                        "source_installation_id": "laptop",
+                        "tenant_id": "acme"
+                      },
+                      "producer": {
+                        "epoch": "startup-1",
+                        "producer_id": "git-sensor"
+                      }
+                    }
+                  },
+                  {
+                    "acl": {
+                      "allowed_principal_ids": [
+                        "alice",
+                        "bob"
+                      ],
+                      "revision": "repo-acl-3"
+                    },
+                    "key": "[\"object\",\"[1,\\\"observation\\\",\\\"acme\\\",\\\"api-event-0\\\"]\",\"[1,\\\"git_commit\\\",\\\"acme\\\",\\\"api\\\",\\\"sha1\\\",\\\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\\"]\"]",
+                    "object": {
+                      "kind": "git_commit",
+                      "object_format": "sha1",
+                      "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                      "repository_id": "api",
+                      "tenant_id": "acme"
+                    },
+                    "sensitivity": "sensitive",
+                    "source": {
+                      "partition": {
+                        "partition_id": "git-api-events",
+                        "project_id": "product",
+                        "source_installation_id": "laptop",
+                        "tenant_id": "acme"
+                      },
+                      "producer": {
+                        "epoch": "startup-1",
+                        "producer_id": "git-sensor"
+                      }
+                    }
+                  }
+                ]
+              },
+              "revision_digest": "sha256:1adb7a97737bd8367fec6a8dbe077fcab9b580e92661ce219bf1e3fcfd263d4b",
+              "schema_version": 1,
+              "scope": {
+                "project_id": "product",
+                "tenant_id": "acme"
+              }
+            }
+          ],
+          "schema_version": 1,
+          "scope": {
+            "project_id": "product",
+            "tenant_id": "acme"
+          },
+          "sequence": 1,
+          "snapshot_digest": "sha256:3f203f09b95d9043d1f3d19f1ee8ad2f8b86b3e9b6f7a49c52cb2394cafd8398",
+          "sources": [
+            {
+              "event": {
+                "acl": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "revision": "acl-7"
+                },
+                "causal_parents": [],
+                "effective_access": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "sensitivity": "sensitive"
+                },
+                "event_id": "api-event-0",
+                "event_type": "GIT_COMMIT",
+                "idempotency_key": "api-retry-0",
+                "identity": {
+                  "checkout_id": "api-clone-a",
+                  "execution_id": "attempt-a",
+                  "membership_id": "product-api",
+                  "repository_id": "api",
+                  "session_id": "session-a",
+                  "workspace_id": "engineering",
+                  "worktree_id": "feature-a"
+                },
+                "kind": "normalized_event",
+                "normalization": {
+                  "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+                  "mapping": {
+                    "event_types": {
+                      "access.changed": "SOURCE_ACCESS_CHANGED",
+                      "git.commit.created": "GIT_COMMIT",
+                      "host.message": "AGENT_MESSAGE",
+                      "source.deleted": "SOURCE_TOMBSTONE"
+                    },
+                    "mapping_id": "synthetic-git-adapter",
+                    "revision": "mapping-1",
+                    "schema_version": 1
+                  },
+                  "mapping_digest": "sha256:b69b7f85d64841511406ad8ce158632d6e737483499599689d9d3002ebf8bae5",
+                  "normalizer_version": 1,
+                  "raw_event_digest": "sha256:872bd507b339ec7b401fd7b7b77857d421df3a9577ad18b21882b84cd88be616",
+                  "raw_identity": {
+                    "execution_id": "attempt-a"
+                  },
+                  "raw_partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  }
+                },
+                "observed_at": "2026-09-21T10:00:01.000Z",
+                "occurred_at": "2026-09-21T10:00:00.000Z",
+                "partition": {
+                  "partition_id": "git-api-events",
+                  "project_id": "product",
+                  "source_installation_id": "laptop",
+                  "tenant_id": "acme"
+                },
+                "payload": {
+                  "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda",
+                  "kind": "git_revision",
+                  "object": {
+                    "kind": "git_commit",
+                    "object_format": "sha1",
+                    "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "repository_id": "api",
+                    "tenant_id": "acme"
+                  },
+                  "path": null
+                },
+                "producer": {
+                  "epoch": "startup-1",
+                  "producer_id": "git-sensor",
+                  "sequence": 0
+                },
+                "provenance": {
+                  "delivery": {
+                    "channel": "local_git",
+                    "delivery_id": "local-delivery-1"
+                  },
+                  "source_objects": [
+                    {
+                      "acl": {
+                        "allowed_principal_ids": [
+                          "alice",
+                          "bob"
+                        ],
+                        "revision": "repo-acl-3"
+                      },
+                      "object": {
+                        "kind": "git_commit",
+                        "object_format": "sha1",
+                        "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                        "repository_id": "api",
+                        "tenant_id": "acme"
+                      },
+                      "sensitivity": "sensitive"
+                    }
+                  ]
+                },
+                "replay": {
+                  "authorization": null,
+                  "eligible": true,
+                  "reason": "immutable_revision"
+                },
+                "schema_version": 1,
+                "sensitivity": "normal",
+                "source_event_type": "git.commit.created",
+                "source_native_event_id": "api-native-0"
+              },
+              "pin": {
+                "acl": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "revision": "acl-7"
+                },
+                "key": "[\"event\",\"[1,\\\"observation\\\",\\\"acme\\\",\\\"api-event-0\\\"]\"]",
+                "object": null,
+                "sensitivity": "normal",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                }
+              }
+            },
+            {
+              "event": {
+                "acl": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "revision": "acl-7"
+                },
+                "causal_parents": [],
+                "effective_access": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "sensitivity": "sensitive"
+                },
+                "event_id": "api-event-0",
+                "event_type": "GIT_COMMIT",
+                "idempotency_key": "api-retry-0",
+                "identity": {
+                  "checkout_id": "api-clone-a",
+                  "execution_id": "attempt-a",
+                  "membership_id": "product-api",
+                  "repository_id": "api",
+                  "session_id": "session-a",
+                  "workspace_id": "engineering",
+                  "worktree_id": "feature-a"
+                },
+                "kind": "normalized_event",
+                "normalization": {
+                  "catalog_digest": "sha256:ba925a19bbee10bd84763a34ad26902ccb02f0bb127d321541bccb6c603929b6",
+                  "mapping": {
+                    "event_types": {
+                      "access.changed": "SOURCE_ACCESS_CHANGED",
+                      "git.commit.created": "GIT_COMMIT",
+                      "host.message": "AGENT_MESSAGE",
+                      "source.deleted": "SOURCE_TOMBSTONE"
+                    },
+                    "mapping_id": "synthetic-git-adapter",
+                    "revision": "mapping-1",
+                    "schema_version": 1
+                  },
+                  "mapping_digest": "sha256:b69b7f85d64841511406ad8ce158632d6e737483499599689d9d3002ebf8bae5",
+                  "normalizer_version": 1,
+                  "raw_event_digest": "sha256:872bd507b339ec7b401fd7b7b77857d421df3a9577ad18b21882b84cd88be616",
+                  "raw_identity": {
+                    "execution_id": "attempt-a"
+                  },
+                  "raw_partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  }
+                },
+                "observed_at": "2026-09-21T10:00:01.000Z",
+                "occurred_at": "2026-09-21T10:00:00.000Z",
+                "partition": {
+                  "partition_id": "git-api-events",
+                  "project_id": "product",
+                  "source_installation_id": "laptop",
+                  "tenant_id": "acme"
+                },
+                "payload": {
+                  "digest": "sha256:a2b001738dc4b288d1224282388a38c8039a08783a801ff4a7852515015a9bda",
+                  "kind": "git_revision",
+                  "object": {
+                    "kind": "git_commit",
+                    "object_format": "sha1",
+                    "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "repository_id": "api",
+                    "tenant_id": "acme"
+                  },
+                  "path": null
+                },
+                "producer": {
+                  "epoch": "startup-1",
+                  "producer_id": "git-sensor",
+                  "sequence": 0
+                },
+                "provenance": {
+                  "delivery": {
+                    "channel": "local_git",
+                    "delivery_id": "local-delivery-1"
+                  },
+                  "source_objects": [
+                    {
+                      "acl": {
+                        "allowed_principal_ids": [
+                          "alice",
+                          "bob"
+                        ],
+                        "revision": "repo-acl-3"
+                      },
+                      "object": {
+                        "kind": "git_commit",
+                        "object_format": "sha1",
+                        "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                        "repository_id": "api",
+                        "tenant_id": "acme"
+                      },
+                      "sensitivity": "sensitive"
+                    }
+                  ]
+                },
+                "replay": {
+                  "authorization": null,
+                  "eligible": true,
+                  "reason": "immutable_revision"
+                },
+                "schema_version": 1,
+                "sensitivity": "normal",
+                "source_event_type": "git.commit.created",
+                "source_native_event_id": "api-native-0"
+              },
+              "pin": {
+                "acl": {
+                  "allowed_principal_ids": [
+                    "alice",
+                    "bob"
+                  ],
+                  "revision": "repo-acl-3"
+                },
+                "key": "[\"object\",\"[1,\\\"observation\\\",\\\"acme\\\",\\\"api-event-0\\\"]\",\"[1,\\\"git_commit\\\",\\\"acme\\\",\\\"api\\\",\\\"sha1\\\",\\\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\\"]\"]",
+                "object": {
+                  "kind": "git_commit",
+                  "object_format": "sha1",
+                  "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "repository_id": "api",
+                  "tenant_id": "acme"
+                },
+                "sensitivity": "sensitive",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                }
+              }
+            }
+          ],
+          "watermarks": {
+            "schema_version": 1,
+            "scope": {
+              "project_id": "product",
+              "tenant_id": "acme"
+            },
+            "status": "caught-up",
+            "watermarks": [
+              {
+                "accepted_through": 0,
+                "completed_through": 0,
+                "input_gaps": [],
+                "maximum_sequence": 0,
+                "projection_gaps": [],
+                "reason": "captured_head_projected",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-api-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                },
+                "start_sequence": 0,
+                "status": "caught-up",
+                "target_sequence": 0,
+                "unordered_count": 0
+              },
+              {
+                "accepted_through": 0,
+                "completed_through": 0,
+                "input_gaps": [],
+                "maximum_sequence": 0,
+                "projection_gaps": [],
+                "reason": "captured_head_projected",
+                "source": {
+                  "partition": {
+                    "partition_id": "git-web-events",
+                    "project_id": "product",
+                    "source_installation_id": "laptop",
+                    "tenant_id": "acme"
+                  },
+                  "producer": {
+                    "epoch": "startup-1",
+                    "producer_id": "git-sensor"
+                  }
+                },
+                "start_sequence": 0,
+                "status": "caught-up",
+                "target_sequence": 0,
+                "unordered_count": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "policy_artifact": {
+      "kind": "policy_artifact",
+      "compiler_version": 1,
+      "schema_version": 2,
+      "policy_id": "synthetic-ingress",
+      "version": "1",
+      "compatibility": {
+        "max_runtime_version": 1,
+        "min_runtime_version": 1
+      },
+      "rollback_predecessor": null,
+      "executable_hash": "sha256:8f8db63f949cabf83dc77215e710acf94f377e851a1e239f7ded28a35a62dba2",
+      "content_hash": "sha256:c659fc015e0bb462dc512618c4e7d3bfebf57d219ffb3ed8d1019f74f165cf67",
+      "definition": {
+        "compatibility": {
+          "max_runtime_version": 1,
+          "min_runtime_version": 1
+        },
+        "entry": "scope",
+        "inputs": {
+          "event": "event_ref",
+          "snapshot": "snapshot_ref"
+        },
+        "limits": {
+          "max_attempts": 1280,
+          "max_cost_microunits": 1000000,
+          "max_nodes": 128,
+          "max_tokens": 100000,
+          "timeout_ms": 10000
+        },
+        "nodes": {
+          "combine": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "candidates": "candidates_ref",
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {
+              "combined": {
+                "ports": {
+                  "event": "event",
+                  "signal": "signal",
+                  "snapshot": "snapshot"
+                },
+                "target": "impact"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "combine",
+              "version": "1"
+            },
+            "outputs": {
+              "event": "event_ref",
+              "signal": "signal_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "aggregate"
+          },
+          "defer": {
+            "action": "DEFER",
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "join": {
+              "mode": "any",
+              "name": "errors"
+            },
+            "next": {},
+            "operation": {
+              "id": "emit",
+              "version": "1"
+            },
+            "outputs": {},
+            "type": "action"
+          },
+          "durability": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {
+              "question": "Is this durable context?"
+            },
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {
+              "high": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "related"
+              },
+              "low": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "ignore"
+              },
+              "uncertain": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "related"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "durability",
+              "version": "1"
+            },
+            "outputs": {
+              "event": "event_ref",
+              "signal": "signal_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "judge"
+          },
+          "ignore": {
+            "action": "IGNORE",
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "join": {
+              "mode": "any",
+              "name": "ignored"
+            },
+            "next": {},
+            "operation": {
+              "id": "emit",
+              "version": "1"
+            },
+            "outputs": {},
+            "type": "action"
+          },
+          "impact": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "signal": "signal_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {
+              "allow": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "submit"
+              },
+              "deny": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "ignore"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "impact",
+              "version": "1"
+            },
+            "outputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "guard"
+          },
+          "ingest": {
+            "action": "INGEST",
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {},
+            "operation": {
+              "id": "emit",
+              "version": "1"
+            },
+            "outputs": {},
+            "type": "action"
+          },
+          "related": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "join": {
+              "mode": "any",
+              "name": "durability-route"
+            },
+            "next": {
+              "found": {
+                "ports": {
+                  "candidates": "candidates",
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "combine"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "related",
+              "version": "1"
+            },
+            "outputs": {
+              "candidates": "candidates_ref",
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "retrieve"
+          },
+          "scope": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {
+              "inside": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "durability"
+              },
+              "outside": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "ignore"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "scope",
+              "version": "1"
+            },
+            "outputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "deterministic"
+          },
+          "submit": {
+            "budget": {
+              "max_attempts": 1,
+              "max_cost_microunits": 100,
+              "max_tokens": 32,
+              "timeout_ms": 50
+            },
+            "config": {},
+            "inputs": {
+              "event": "event_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "next": {
+              "submitted": {
+                "ports": {
+                  "event": "event",
+                  "snapshot": "snapshot"
+                },
+                "target": "ingest"
+              }
+            },
+            "on_error": {
+              "ports": {
+                "event": "event",
+                "snapshot": "snapshot"
+              },
+              "target": "defer"
+            },
+            "operation": {
+              "id": "submit",
+              "version": "1"
+            },
+            "outputs": {
+              "event": "event_ref",
+              "job": "job_ref",
+              "snapshot": "snapshot_ref"
+            },
+            "type": "worker"
+          }
+        },
+        "policy_id": "synthetic-ingress",
+        "rollback_predecessor": null,
+        "schema_version": 2,
+        "version": "1"
+      },
+      "operations": [
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "combined"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "combine",
+          "implementation_hash": "sha256:1a4473e4b9ffb627c5bea0b5256f2157a45ae7305d38de8b038f9c6b6c92f8a5",
+          "inputs": {
+            "candidates": "candidates_ref",
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "event": "event_ref",
+            "signal": "signal_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "aggregate",
+          "version": "1"
+        },
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "high",
+            "low",
+            "uncertain"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "maxLength": 1000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "question"
+            ],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "durability",
+          "implementation_hash": "sha256:76367e400d5cc4215b27016c22ce4eac3f55d811e8035765ea8de2fb6323157f",
+          "inputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "event": "event_ref",
+            "signal": "signal_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "judge",
+          "version": "1"
+        },
+        {
+          "branch_mode": "terminal",
+          "branches": [],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {},
+          "id": "emit",
+          "implementation_hash": "sha256:e0552a027681a6c2acb1130b3a7aca8f7878c2ed9f7299a76e5aa7a3407c438a",
+          "inputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {},
+          "type": "action",
+          "version": "1"
+        },
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "allow",
+            "deny"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "impact",
+          "implementation_hash": "sha256:db379d576cb19924ab0330e3da589c6ce93f6179382a295a16ff5bf47241bb21",
+          "inputs": {
+            "event": "event_ref",
+            "signal": "signal_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "guard",
+          "version": "1"
+        },
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "found"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "related",
+          "implementation_hash": "sha256:916062d2e64facefb52aaa66ddc8027481c5efd1d391e480f903ab6884174f9d",
+          "inputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "candidates": "candidates_ref",
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "retrieve",
+          "version": "1"
+        },
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "inside",
+            "outside"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "scope",
+          "implementation_hash": "sha256:341329f71f116748ed6beb6d03dd8167763f077e09c336fc01cae683efc80ba3",
+          "inputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "deterministic",
+          "version": "1"
+        },
+        {
+          "branch_mode": "exclusive",
+          "branches": [
+            "submitted"
+          ],
+          "config_schema": {
+            "additionalProperties": false,
+            "properties": {},
+            "required": [],
+            "type": "object"
+          },
+          "error_outputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "id": "submit",
+          "implementation_hash": "sha256:147165a38c32d015f7963e383d8f15ee0d8565c794a842de570c0737dae5c53f",
+          "inputs": {
+            "event": "event_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "outputs": {
+            "event": "event_ref",
+            "job": "job_ref",
+            "snapshot": "snapshot_ref"
+          },
+          "type": "worker",
+          "version": "1"
+        }
+      ],
+      "bounds": {
+        "max_nodes": 9,
+        "timeout_ms": 450,
+        "max_attempts": 9,
+        "max_tokens": 288,
+        "max_cost_microunits": 900
+      },
+      "topological_order": [
+        "scope",
+        "durability",
+        "related",
+        "combine",
+        "impact",
+        "ignore",
+        "submit",
+        "defer",
+        "ingest"
+      ]
+    },
+    "authorization": {
+      "schema_version": 1,
+      "scope": {
+        "project_id": "product",
+        "tenant_id": "acme"
+      },
+      "authorization_revision": "auth-1",
+      "revoked": false,
+      "capabilities": {
+        "allowed_principal_ids": [
+          "alice"
+        ],
+        "allowed_operations": [
+          "read_context",
+          "propose_candidate",
+          "propose_resolution"
+        ],
+        "allowed_provider_ids": [
+          "synthetic"
+        ],
+        "allowed_localities": [
+          "local"
+        ],
+        "sensitivity_ceiling": "sensitive"
+      }
+    },
+    "worker": {
+      "scope": {
+        "project_id": "product",
+        "tenant_id": "acme"
+      },
+      "worker_id": "worker-a",
+      "principal_id": "alice",
+      "provider_id": "synthetic",
+      "model_id": "fixture-v1",
+      "locality": "local"
+    }
+  }
+}

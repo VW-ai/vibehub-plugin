@@ -1,0 +1,34 @@
+{
+  "acceptance_ids": [
+    "platform-operational-evidence"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "platform-operational-evidence",
+      "identity": "sha256:99354b2ce49926f98e1c43e0487b17212209964350dd1adb31e7146c51108215",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-platform-operational-evidence-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:42:23.764Z",
+  "refs": [
+    "semantic-runtime/docs/platform-evaluation-v0.md",
+    "semantic-runtime/spikes/platform-node-postgres/README.md",
+    "semantic-runtime/spikes/platform-node-postgres/measured-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/run.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/service.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/schema.sql",
+    "semantic-runtime/spikes/platform-node-postgres/standalone.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/check.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/package.json",
+    "semantic-runtime/spikes/platform-node-postgres/package-lock.json"
+  ],
+  "schema_version": 2,
+  "summary": "Checked-in sanitized standalone report preserves exact source/protocol hashes, versions, durability settings, all latency samples and expected failures. Fresh Node process spawn to DB-connected HTTP ready: n5 P95/P99115.700ms with warm OS cache; warm scoped HTTP read n32 P952.220/P992.293ms; competing CAS winner n24 P951.628/P994.736ms. Durable enqueue6.119ms; durable-ACK observed to first-claim observed465.630ms includes API/DB restart; recovered expiry-to-fenced-completion118.823ms, each n1. SSE24.711ms; synthetic15ms mock HTTP roundtrip28.727ms. These exact local endpoints are not hosted cold starts, alpha capacity SLIs, real-provider speed or disaster recovery. Documented resource limits, local/Linux fidelity gap, process/provider/storage/authorization failure behavior, migration/rollback constraints, managed PITR uncertainty, cost drivers and rejected alternatives are explicit. Original ACK/query/candidate/queue/worker success/latency, backlog, ordinary-RPO0 and disaster-RPO300/RTO900 targets remain unchanged/unproven until their existing downstream drills. Isolated import boundary passes6modules/31imports; copied proof checks5required modules/26imports.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike"
+}

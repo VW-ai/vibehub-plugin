@@ -1,0 +1,52 @@
+{
+  "acceptance_ids": [
+    "platform-constraint-matrix",
+    "platform-synthetic-proof",
+    "platform-operational-evidence",
+    "platform-selection-handoff"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "platform-constraint-matrix",
+      "identity": "sha256:207f1bcbefb16d04f292d55e9334f60286e4bac28b32089d10c3b9325e539b28",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "platform-synthetic-proof",
+      "identity": "sha256:737c8e4012fc541160f4fcaf5ba0cca3c8acf877a7de3f8e4b854c322424308e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "platform-operational-evidence",
+      "identity": "sha256:99354b2ce49926f98e1c43e0487b17212209964350dd1adb31e7146c51108215",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "platform-selection-handoff",
+      "identity": "sha256:64c63f134b4a2ef2ce380aadfe7dffa70d72ed1e17bff34a5018397b698026a1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-platform-root-verification-release-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:42:58.892426+00:00",
+  "refs": [
+    "semantic-runtime/docs/platform-evaluation-v0.md",
+    "semantic-runtime/spikes/platform-node-postgres/README.md",
+    "semantic-runtime/spikes/platform-node-postgres/measured-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/check.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/standalone.mjs",
+    "semantic-runtime/README.md",
+    ".vibehub/rooms/semantic-runtime/contract-runtime-outbox-cursor-follows-durable-publication.yaml",
+    "command:SPIKE_PG_BIN=<isolated PostgreSQL17 bin> node24 semantic-runtime/spikes/platform-node-postgres/run.mjs <private report>",
+    "command:node24 semantic-runtime/spikes/platform-node-postgres/check.mjs",
+    ".vibehub/evidence/ticket-runtime-reconciliation-worker-v0/runtime-reconciliation-public-integration-release-v1.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Root independently reran the frozen disposable harness with actual Node24.21.0 and PostgreSQL17.11: all51 checks passed, all recorded input/protocol SHA256 values match current source, and cleanup confirms exited children, stopped database, removed private cluster/socket and zero hosted resources. Includes restricted-role scope access,24 concurrent CAS pairs, rollback with outbox, acknowledged state/job restart recovery, stale-attempt fencing, replay/revocation, fixed outbound mock HTTP and scoped deletion preserving another tenant/project. Local fresh-process P95=113.099ms(n5,warm OS cache), scoped-read P95=1.77ms(n32), CAS-winner P95=1.792ms(n24), ACK-to-claim observation451.384ms(n1,includes injected restart); no hosted/SLO inference. Inspected executor actual isolated installation and checked-in measured report:51 checks pass; independent spike import boundary passes6files/31imports. Prior unchanged Runtime source release at cd1fcc8 retains283/283 full and actual standalone tests,72file boundaries and79file plugin artifact exclusion. Root reviewed concrete Node/PG/SQLqueue/SSE/auth/DigitalOcean region/cost proposal and README navigation; SQL outbox publication-order nuance is captured in durable Context for downstream adapters. No human platform selection, deployment, paid API, live model quality, capacity or disaster-recovery acceptance is claimed.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike"
+}

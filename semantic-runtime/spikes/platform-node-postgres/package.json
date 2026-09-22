@@ -1,0 +1,21 @@
+{
+  "name": "@vibehub/platform-node-postgres-spike",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Disposable synthetic platform decision evidence, not a production service",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "verify": "node run.mjs",
+    "check": "node check.mjs",
+    "verify:standalone": "node standalone.mjs"
+  },
+  "dependencies": {
+    "pg": "8.16.3"
+  },
+  "devDependencies": {
+    "acorn": "8.15.0"
+  }
+}

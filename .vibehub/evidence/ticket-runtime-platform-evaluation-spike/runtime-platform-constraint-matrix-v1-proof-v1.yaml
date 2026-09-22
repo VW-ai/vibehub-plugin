@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "platform-constraint-matrix"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "platform-constraint-matrix",
+      "identity": "sha256:207f1bcbefb16d04f292d55e9334f60286e4bac28b32089d10c3b9325e539b28",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-platform-constraint-matrix-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:42:21.726Z",
+  "refs": [
+    "semantic-runtime/docs/platform-evaluation-v0.md",
+    "semantic-runtime/spikes/platform-node-postgres/README.md"
+  ],
+  "schema_version": 2,
+  "summary": "Compared Workers plus per-Project SQLite Durable Objects with Node plus PostgreSQL across Local Runtime independence, project serialization/CAS, global/project admission, durable queue and protocol leases, stable links/realtime, outbound HTTP judges, authentication, secrets, locality, migration, backup, rollback and cost visibility. Official primary documentation supports platform facts; distributed-coordinator complexity and the preference for one SQL transaction boundary are labeled engineering inferences. Recommends Node24/PostgreSQL17 for the first implementation; Cloudflare remains a viable challenger. Read required Context and successful observability/Worker Outcomes and referenced Evidence, began only from EXECUTE on codex/semantic-runtime, and pre-append Context guard passed with no authorities/violations. No authority artifact or SLO was changed.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike"
+}

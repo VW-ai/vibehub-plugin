@@ -1,0 +1,37 @@
+{
+  "acceptance_ids": [
+    "platform-selection-handoff"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "platform-selection-handoff",
+      "identity": "sha256:64c63f134b4a2ef2ce380aadfe7dffa70d72ed1e17bff34a5018397b698026a1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-platform-selection-handoff-v1-proof-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T00:42:24.767Z",
+  "refs": [
+    "semantic-runtime/docs/platform-evaluation-v0.md",
+    "semantic-runtime/spikes/platform-node-postgres/README.md",
+    "semantic-runtime/spikes/platform-node-postgres/measured-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/cleanup-failure-report.json",
+    "semantic-runtime/spikes/platform-node-postgres/run.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/service.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/schema.sql",
+    "semantic-runtime/spikes/platform-node-postgres/standalone.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/check.mjs",
+    "semantic-runtime/spikes/platform-node-postgres/package.json",
+    "semantic-runtime/spikes/platform-node-postgres/package-lock.json",
+    "semantic-runtime/spikes/platform-node-postgres/app-spec.template.yaml",
+    "semantic-runtime/spikes/platform-node-postgres/Dockerfile",
+    ".vibehub/tickets/ticket-select-semantic-runtime-alpha-platform.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Delivered a concrete owner recommendation: Node24LTS, PostgreSQL17 Standard, transactional SQL queue with accepted job fencing, durable SSE, invite-only Ed25519 JWT plus server membership/RLS and future revocable bootstrap enrollment, encrypted runtime SECRET bindings, DigitalOcean App Platform1GiB fixed singleinstance plus1GiB/1vCPU managedPostgres10GiB, preferred app sfo/database+VPCsfo3 with nyc/fra/sgp mappings. Public-list-price base estimate25.15–27.30USD/month conservatively brackets displayed storage inclusion; proposed40USD/month infrastructure ceiling excludes model/BYO/taxes/optionalHA. Explicit daily-trace and continuous-steady call/token scenarios make model charges separately rate-dependent and destination/budget-authorized. Names singleinstance availability, unknown managed backup lag/restore performance, proxy/region/data-routing and spend tradeoffs; supplies unexecuted Linux rehearsal Dockerfile and intentionally incomplete future App Spec template. Exact account/team/region/spend/platform selection stays human-authority in the existing downstream ContractV2; this recommendation neither selects for the owner nor authorizes paid resource creation. Remaining hosted release/capacity/restore checks are scoped to existing Tickets, not falsely claimed as completed experiments.",
+  "ticket_id": "ticket-runtime-platform-evaluation-spike"
+}
