@@ -1,0 +1,39 @@
+{
+  "acceptance_ids": [
+    "activation-authority",
+    "disable-fencing",
+    "reenable-gap"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "activation-authority",
+      "identity": "sha256:943240bafabf364e345f9e586deb651ddae7dc04958d42ff92ba517580988f70",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "disable-fencing",
+      "identity": "sha256:99e3f419227beea36feee02325533d10637b736744c3a3ec994ed9cd65b170b3",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "reenable-gap",
+      "identity": "sha256:362c12cf851bde655bab1261bb59261f809d055b1430f93d0e9487cb0d2d5cf7",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-project-activation-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:24:41.395Z",
+  "refs": [
+    "semantic-runtime/src/local/project-activation.mjs",
+    "semantic-runtime/test/project-activation.test.mjs",
+    "semantic-runtime/docs/project-activation-v0.md",
+    "semantic-runtime/src/index.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented exact Contract2 as a small module using existing scoped DomainStore and current Git enrollment, with no added dependency/database/queue framework. Explicit human/App-service enable/disable persists CAS state and monotonic epoch plus immutable transition sources and durable cancel notice; same-state CAS is no-op, disable works with unavailable paths. Four-stage withAdmission reads activation and enrolled membership inside same synchronous transaction, rejects stale/disabled before callback, and rechecks auth/authority-row versions before committing.13 focused tests and81 affected auth/store/Git/Worker tests pass; actual separate SQLite writers prove admitted commit survives and later result/delivery is fenced, with bounded competing writer timeout. Tests cover implicit disabled, switch authority/tenant isolation/new worktree, restart, malformed/overflow states, callback exceptions/async/stale handles/revocation and authority mutation rollback, immutable history/gaps, final-batch queue/progress/ACK rollback and duplicate/restart cancellation processing using real Worker cancel/expire transitions. Fixture-only recovery enforces explicit bounded selected persisted refs, new Job IDs and fresh source/access/base validation; no old envelope relabel or terminal reopen. Boundary99 files0errors and diff check pass; Context guard passed. Production coordinator, actual capture/model send/host injection remain downstream integrations and external calls cannot be recalled by SQLite; no models/private traces or automatic backfill used.",
+  "ticket_id": "ticket-runtime-project-activation-v0"
+}

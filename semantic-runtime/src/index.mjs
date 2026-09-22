@@ -72,3 +72,4 @@ export {
 } from './core/reconciliation.mjs';
 
 export { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './local/git-projects.mjs';
+export { ProjectActivation, ACTIVATION_NAMESPACE, ACTIVATION_STAGES } from './local/project-activation.mjs';

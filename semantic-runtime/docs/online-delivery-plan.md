@@ -37,7 +37,7 @@ placement does not mean all inference or every data destination is local.
 Local bootstrap delivered 2026-09-22: `npm start` now serves a loopback status
 page with SQLite readiness, `npm run status` checks it, and SIGINT/SIGTERM stop
 the process while preserving data. This is the local-service-profile slice only;
-app onboarding, project activation, the provider settings UI, collection and Workers remain
+app onboarding, activation UI, the provider settings UI, collection and Workers remain
 pending. [Run instructions and boundaries](local-service-profile.md).
 
 OpenRouter adapter delivered 2026-09-22: the pinned official AI SDK provider now
@@ -63,6 +63,10 @@ history; it is still a module awaiting App composition.
 The [Claude capability probe](claude-host-probe-v0.md) verified invocation-local
 hooks/MCP and exact-session delivery after native manual compaction. This remains
 a synthetic CLI probe; TTY/plugin installation and crash replay are still gaps.
+The [Project activation module](project-activation-v0.md) now persists explicit
+switches, immutable gaps and cancellation notices, and checks an epoch within
+the same transaction as admitted effects. Its 13 focused tests and independent
+review pass; actual capture/send/host boundaries still require consumer wiring.
 
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20
@@ -80,7 +84,7 @@ Still missing: real Collector and durable service composition, typed extraction
 and entity resolution, production Graph persistence/enrollment, branch-aware
 views/adoption, integrated Judge runtime, query/compiler, actionable Agent
 request delivery, bidirectional awareness, local app/provider settings, project
-activation, two plugins and local Worker orchestration. Provider settings exist
+activation UI/consumer wiring, two plugins and local Worker orchestration. Provider settings exist
 as a local module; their App form and runtime dispatch integration remain pending.
 Address resolution is
 not semantic entity resolution. Same-entity concurrent assertions

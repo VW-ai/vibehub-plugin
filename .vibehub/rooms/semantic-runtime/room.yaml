@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "e2842bde0c051c8b5403ea0f20d43483be80206d",
+        "blob": "2c00a5123a36caacc01abbf96b0b47b3ea2cf2a4",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -38,7 +38,7 @@
         "path": "semantic-runtime/docs/causal-ordering-v0.md"
       },
       {
-        "blob": "b57c7ac1be3c071699c799009f6dccca69dde98d",
+        "blob": "a13e98a80fe8ec9ff83ca8904783fc5f0b866ecc",
         "path": "semantic-runtime/docs/claude-host-probe-v0.md"
       },
       {
@@ -82,6 +82,10 @@
         "path": "semantic-runtime/docs/measurements/claude-host-20260922.json"
       },
       {
+        "blob": "a2fc5c7fb622c74be9076e4841c6df660deb4b83",
+        "path": "semantic-runtime/docs/measurements/claude-host-compaction-20260922.json"
+      },
+      {
         "blob": "8b6228b0a638c8cdb9af6919be5c493177c4495b",
         "path": "semantic-runtime/docs/measurements/codex-host-20260922.json"
       },
@@ -102,7 +106,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "e0f6856f462a3a4d0275fb68f9f49c55f6a69e11",
+        "blob": "c92d920bf101be588d36c7961ebac25f27105d23",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -124,6 +128,14 @@
       {
         "blob": "aa2acc775de164a6790a087bcbe81af56c2b6013",
         "path": "semantic-runtime/docs/policy-kernel-v0.md"
+      },
+      {
+        "blob": "9a1f28b1c8765bd77e501228efa5d884b89d4268",
+        "path": "semantic-runtime/docs/project-activation-v0.md"
+      },
+      {
+        "blob": "99a87bd1e137f6b928160739fc639fd5fcde6ee8",
+        "path": "semantic-runtime/docs/project-exploration-ux-v0.md"
       },
       {
         "blob": "33618cf864ff66c53dad0a3ce1112818b33114f4",
@@ -166,6 +178,30 @@
         "path": "semantic-runtime/policies/phase0.json"
       },
       {
+        "blob": "3c90f991c49731a05764ffdba6c657a84d98900c",
+        "path": "semantic-runtime/prototype/app.mjs"
+      },
+      {
+        "blob": "3905bb55a237df2b3879e62804e70b86007eab4f",
+        "path": "semantic-runtime/prototype/fixtures.mjs"
+      },
+      {
+        "blob": "5ef4c20cf89516cde0a622835a5b20747b276b5e",
+        "path": "semantic-runtime/prototype/index.html"
+      },
+      {
+        "blob": "d181004111b74efa7943df1dd14cb61cfa5b73b8",
+        "path": "semantic-runtime/prototype/prototype.test.mjs"
+      },
+      {
+        "blob": "0926fe6469bdac5eec51b82c44c596f3c12e0fea",
+        "path": "semantic-runtime/prototype/serve.mjs"
+      },
+      {
+        "blob": "0339e7ae472e8f9cec72ca2f370f46b724f65e09",
+        "path": "semantic-runtime/prototype/style.css"
+      },
+      {
         "blob": "7924a79e9371d1edc749c8cd3f8349d550f5f9be",
         "path": "semantic-runtime/scripts/benchmark-peel-jev.mjs"
       },
@@ -190,7 +226,7 @@
         "path": "semantic-runtime/scripts/compare-peel-judges.mjs"
       },
       {
-        "blob": "729afdd465123cb858e18d2381ab84d92b436f65",
+        "blob": "730f921dd4f93d71919438708d7b6d89377c3c81",
         "path": "semantic-runtime/scripts/probe-claude-host.mjs"
       },
       {
@@ -394,7 +430,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "91e295ebff91d9ce9511aca4ee904d86b4fc1ec3",
+        "blob": "af8e24542d7c262121ecef88cceef26f4864f574",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -420,6 +456,10 @@
       {
         "blob": "80aa48bb142dcd72330d2905c51668df0d64d069",
         "path": "semantic-runtime/src/local/macos-secret-store.mjs"
+      },
+      {
+        "blob": "b930549c9bda79177be1554a29be95bc3f64bae5",
+        "path": "semantic-runtime/src/local/project-activation.mjs"
       },
       {
         "blob": "accb01dd44ef0a536a1720be3fead20807c69603",
@@ -450,7 +490,7 @@
         "path": "semantic-runtime/test/claude-cli-judge.test.mjs"
       },
       {
-        "blob": "69fd0b7c88184ed3b73f78cef2b15a54d166cdba",
+        "blob": "94848bbc9e24f31a7ffc3633bcae35563488a6bd",
         "path": "semantic-runtime/test/claude-host-probe.test.mjs"
       },
       {
@@ -650,6 +690,10 @@
         "path": "semantic-runtime/test/policy-kernel.test.mjs"
       },
       {
+        "blob": "43eac75ae91ccf574466f7d0b6d98c8dcd030cf8",
+        "path": "semantic-runtime/test/project-activation.test.mjs"
+      },
+      {
         "blob": "a81479507d816d03587b13df74b46c72aa40898e",
         "path": "semantic-runtime/test/provider-settings.test.mjs"
       },
@@ -694,8 +738,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T09:11:20.920Z",
-    "last_aligned_commit": "addd01fa140cb4f19a142c5615cf71ef3b5bbca1"
+    "checked_at": "2026-09-22T09:33:48.267Z",
+    "last_aligned_commit": "6c9abd3564e1c44059ca98acafed807349344228"
   },
   "anchors": [
     "semantic-runtime/"

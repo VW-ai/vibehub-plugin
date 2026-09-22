@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "activation-authority",
+    "disable-fencing",
+    "reenable-gap"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T09:27:11.976Z",
+  "contract_revision": {
+    "identity": "sha256:ee2f96251514728494ad7dca313370cd041660af649618c8ba4b72be26a42048",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "local-project-activation-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/branch_scope performed read-only candidate validation and review, but did not author activation implementation, documentation, conformance tests or Evidence. Parent /root implemented source/docs and /root/provider_settings authored fixtures. Reviewer independently read exact artifacts, reran tests and used separate temporary Git/SQLite probes; its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all three current criteria in exact Contract v2. The small ProjectActivation module derives scope from opaque live credentials, separates read/write/admit actions, restricts switches to human/service principals, defaults to disabled epoch zero and persists actual transitions with expected-version CAS, immutable transition sources and atomic cancellation notices. Enabling checks current active Git enrollment inside the same DomainStore transaction; disable remains available without live Git paths or inspection permission. Same-state commands enforce CAS without growing history. All four admission stages check current epoch, enabled state and optional exact enrolled execution IDs before the trusted callback, then recheck authority and unchanged activation/enrollment row versions before commit. Late old-epoch work remains rejected after re-enable; exceptions, async results, expiry, revocation and authority-row writes roll back effects. Independently reran 73 activation/store/Git/Worker tests including all 13 new activation cases, plus all five service-auth tests: 78 passed. The localhost auth test initially encountered the sandbox listener restriction and passed after an approved loopback-enabled rerun. Boundary scan passed 99 files/zero errors. Read the parent complete verification log: 372 passed, zero failures, one intentional native-Keychain skip; that entire suite was not rerun by reviewer. Source and fixture review confirm real separate SQLite writers exercise the lock/late-result boundary, current membership changes are observed in the transaction, and synthetic coordinator batches use existing Worker cancel/expire with durable checkpoint/restart/duplicate handling and atomic final queue/progress/ACK rollback. Explicit recovery rejects unselected/oversized/duplicate/missing/completed work, stale epochs and fresh authorization/base failures; it constructs new Job identities while preserving old terminal envelopes. Separate reviewer temporary-Git/SQLite probes passed switch-kind denial, stable no-op, callback revocation rollback, membership-change rollback, all-stage old-epoch fencing, immutable transition sources, backward display-clock behavior, Project isolation and disabling unavailable enrollment without Git-inspection permission. All fourteen Context refs resolve, exact Git prerequisite Outcome is successful, governing authorities are empty, context guard and Ticket validation pass, and git diff --check is clean. No remaining blocker. This accepts a bounded local switch/admission API plus executable synthetic cancellation/recovery protocol, not a live coordinator, Collector, model/host cancellation, production queues, backfill, UI or end-to-end activated product. External sends already started cannot be recalled, delivery intent is not receipt, source ACLs and Worker attempt fences remain separate, and consumers must integrate the epoch gate at their actual boundaries.",
+  "ticket_id": "ticket-runtime-project-activation-v0",
+  "unresolved_acceptance_ids": []
+}

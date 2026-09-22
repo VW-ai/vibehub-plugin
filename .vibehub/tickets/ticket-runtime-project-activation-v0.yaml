@@ -5,33 +5,55 @@
       "criterion": "Enable/disable is an authenticated explicit Project command persisted across restart and bound to enrolled repository/worktrees, including newly registered worktrees. Plugin installation or conversational inference does not enable a project; unrelated projects remain independent.",
       "identity": "sha256:a405463105eb2709634be53021922bb3ac36ad6bec88c05f16192cec8f392846",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "disable-fencing",
       "criterion": "Disable rejects new capture/dispatch/delivery, pauses or cancels queued work, and prevents delayed pre-disable results from changing semantic state or injecting context. Define crash-safe epoch/fencing and cancellation acknowledgements with existing request/job protocols; already completed state stays historical.",
       "identity": "sha256:ac2fec6b9ccc9db6a31d15983820e782ddf9a951db5060e37cc386e3773c12b2",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "reenable-gap",
       "criterion": "Re-enable exposes disabled-period gaps and an explicit bounded pending-work recovery choice; never silently backfills private sessions. Tests cover disable during ingress/dispatch/result/delivery, stale plugin cache, app outage, restart and new worktree. Ordinary coding continues throughout.",
       "identity": "sha256:29022dfc9212b4d665dd81fe8dc911a815571909ea4ed8e295a12e998eef32f8",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "activation-authority",
+      "criterion": "Expose a small documented local ProjectActivation API backed by the accepted DomainStore and LocalCredentialAuthority. Reads and explicit set-enabled/set-disabled commands derive exact tenant/Project from an opaque current context, require separate activation read/write grants plus needed store actions, and restrict switch mutation to trusted human/App-service principals; a host-adapter/worker cannot toggle merely because it can submit events. An absent activation record means disabled, epoch 0. Persist versioned enabled state, a monotonically increasing safe-integer activation epoch and immutable transition sources; each actual enabled/disabled transition advances the epoch, while a same-state command with the current expected version is a no-op. Caller expected-version CAS rejects stale commands without partial history/outbox writes; a lost response is reconciled by reading authoritative state, not replaying an unbounded command ledger. Enable requires a current enrolled Git Project; disable remains possible even when its enrolled paths are unavailable. Read GitProjectRegistry membership from the same DomainStore transaction for authority-bearing checks, never from client path/ref assertions or a stale snapshot. Existing and newly registered worktrees inherit their Project switch without duplicating per-worktree switches; validate referenced repository/checkout/worktree IDs against current active membership when admission carries execution provenance. Persist across restart, keep Projects/tenants independent and preserve enrollment historical-assurance limits. Plugin installation, source text and conversational inference never enable a Project.",
+      "identity": "sha256:943240bafabf364e345f9e586deb651ddae7dc04958d42ff92ba517580988f70",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "disable-fencing",
+      "criterion": "Provide a composable synchronous admission transaction wrapper for the four stages capture, dispatch, result and delivery. It owns one accepted DomainStore transaction, rechecks opaque context/action/scope, current enabled state, exact caller-captured activation epoch and applicable enrolled execution IDs, then gives the authorized transaction to a trusted bounded callback so its record/source/outbox effects commit with that check. Missing/wrong epoch, disabled Project, invalid membership or denied/expired/revoked context rejects before the callback; async callbacks, stale handles and exceptions cannot leave partial effects. The epoch is a freshness fence, never authentication, a Job attempt fence or permission to skip current source ACLs. Disable atomically advances the epoch and appends a durable cancellation notice with its transition; older epochs remain rejected after re-enable. Show a real SQLite race/rollback fixture proving that effects committed before disable remain historical and a stale result or queued-delivery commit after disable produces no semantic mutation/delivery intent. Define one trusted App cancellation coordinator as the sole owner of the activation outbox: it processes bounded queue batches with durable progress, uses existing Worker cancel/expire transitions and atomically acknowledges the notice only after the relevant local queue updates/checkpoint commit. Acknowledgement is local processing/handoff, not proof a remote/model process stopped. Test restart and duplicate notice processing using synthetic queue state and the existing Worker protocol. Do not build the coordinator loop or production queues here. No network/model/host call occurs inside a SQLite transaction; consumers must recheck immediately at their actual dispatch/injection boundary, propagate cancellation and reject late results. A process/send already started before disable cannot be recalled by this module, and a committed delivery intent is not host receipt. Document these limits rather than claiming global instantaneous cancellation.",
+      "identity": "sha256:99e3f419227beea36feee02325533d10637b736744c3a3ec994ed9cd65b170b3",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "reenable-gap",
+      "criterion": "Re-enable persists the new epoch and closes the recorded disabled interval with explicit no-automatic-backfill semantics; retained sources and already completed semantic history remain unchanged. Expose actual transition/gap references in the read API without claiming capture continuity for app outages or intervals never observed. Old capture/dispatch/result/delivery envelopes keep their original epoch and cannot be silently relabelled. Specify and test the bounded recovery protocol with synthetic queue fixtures: default is leave pre-disable pending work cancelled/fenced; any recovery requires an explicit selected list of at most 64 previously persisted pending-work references, current enabled epoch, fresh source/access/base validation and new request/Job identities linked to the old work. Worker terminal states never reopen and already completed work is not replayed. A reference list is a recovery request, not permission to import disabled-period/private raw sessions; no directory/session scan or automatic disabled/outage backfill is implemented. Recovery queue composition and live consumer integration remain owned by later runner/ingress/delivery Tickets. Temporary SQLite plus Git fixtures and public-entry tests cover explicit enable/disable, unknown and newly registered worktrees, tenant/Project isolation, stale cached epoch, disable between admission and later result/delivery, cancellation duplicates/checkpoints, outage/closed store, process restart, CAS races, rollback, and re-enable with rejected old work. Prove the admission callback is not invoked on denied paths and native coding remains independent of Runtime availability. Document bounded input/error behavior and run affected auth/store/enrollment/Worker tests plus component boundary checks. No scheduler, Collector, provider/model call, plugin install, UI, HTTP pairing, background watcher or separate database is delivered by this Ticket.",
+      "identity": "sha256:362c12cf851bde655bab1261bb59261f809d055b1430f93d0e9487cb0d2d5cf7",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
     "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
     "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
-    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
+    "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record.",
+    "This refinement delivers authoritative local activation and executable integration primitives only. Keep end-to-end capture, external-send cancellation and host injection claims with the later consumers that actually integrate them."
   ],
-  "context": "Own the authoritative activation API and admission/fencing contract; consumers integrate it. Refine cancellation and resume semantics against actual store/enrollment APIs.",
+  "context": "Local L1 API foundation only. Reuse one DomainStore namespace (project-activation) for a small current-state record, immutable transition sources and cancellation outbox; no new database, generic state-machine framework, queue registry or scheduler. Candidate API names are get(context), setEnabled(context, { enabled, expectedVersion }) and withAdmission(context, { epoch, stage, execution? }, tx => ...); exact names are ordinary implementation choices. Use explicit activation:read, activation:write and activation:admit grants alongside store:read/store:write and any Git registry read action. The trusted process constructs GitProjectRegistry and activation around the same DomainStore so its documented registry read inside the transaction shares the lock/snapshot. Registry reads perform no Git subprocess; absent/unavailable/removed mappings never gain authority from a client path. Project-level operations need not invent a worktree; consumers that require execution provenance must provide and validate the full enrolled ID tuple. The persisted epoch is independent of DomainStore row version and Worker attempt fencing; it changes only on actual switch transitions, never from model/source instructions. Safe integer exhaustion or malformed persisted state fails closed. Transition time is trusted display/audit metadata, not an ordering substitute for epoch/CAS. Disable need not scan every queue atomically: its epoch fences all conforming commits immediately and its durable notice drives eventual queue cancellation. The sole App coordinator owns acknowledgement; individual collectors/workers cannot prematurely consume a shared cancellation notice. A fixture coordinator may persist a bounded cursor/receipt and cancel synthetic Worker states through their existing pure transitions, but this Ticket does not implement its live loop. Recovery is a documented/tested consumer protocol over selected pre-disable persisted work, not a new recovery scheduler or arbitrary callback dispatch API. Existing Worker wire v1 remains immutable: activation metadata belongs in the local stored envelope alongside the exact Job/ref/digest and is not accepted as a model-supplied field. The Agent Work Request Ticket is still planned, so describe its analogous terminal/new-request rule without inventing a shipped request API or adding that independent foundation as an execution prerequisite. Later ingress/Judge/runner/session-delivery Tickets already own applying this gate at their real boundary; completion here proves the API and synthetic composition, not a fully activated product. Preserve normal coding on store/app failure. Planning may proceed now, but implementation remains blocked until the preserved Git enrollment prerequisite has a successful independently adjudicated Outcome; inspect its final API then and revise this candidate if that API differs.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -56,6 +78,38 @@
     {
       "purpose": "App 中按 Project 显式启停 VibeHub",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-project-activation.yaml"
+    },
+    {
+      "purpose": "Accepted scoped synchronous transaction, CAS, immutable source and outbox/ack APIs; no I/O inside transaction.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Exact accepted persistence foundation and its bounded local-process guarantees.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Opaque authenticated context, action/audience/scope checks, expiry/revocation and source authorization limits.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Exact successful authentication acceptance, without implying host pairing or a production collector.",
+      "ref": ".vibehub/outcomes/ticket-runtime-service-auth-isolation/contract-v3.yaml"
+    },
+    {
+      "purpose": "Preserved direct prerequisite and current versioned enrolled-identity contract; successful Outcome must precede activation execution.",
+      "ref": ".vibehub/tickets/ticket-runtime-git-project-enrollment-v0.yaml"
+    },
+    {
+      "purpose": "Pending registry API currently exposes get(context) on the same DomainStore; verify accepted final API before implementation, not proof of DONE.",
+      "ref": "semantic-runtime/src/local/git-projects.mjs"
+    },
+    {
+      "purpose": "Existing immutable Job/attempt fences, runtime cancel/expire, terminal-state and duplicate receipt behavior; no reopening cancelled Jobs.",
+      "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+    },
+    {
+      "purpose": "Planned request lifecycle alignment only; no implemented request API or execution dependency is assumed.",
+      "ref": ".vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -79,12 +133,33 @@
       ],
       "identity": "sha256:e28a027afb8a9b15853a9f814805f1f4d5fcaacc9099bbd0db193b0b0fde8ed0",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activation-authority",
+          "identity": "sha256:943240bafabf364e345f9e586deb651ddae7dc04958d42ff92ba517580988f70",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "disable-fencing",
+          "identity": "sha256:99e3f419227beea36feee02325533d10637b736744c3a3ec994ed9cd65b170b3",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "reenable-gap",
+          "identity": "sha256:362c12cf851bde655bab1261bb59261f809d055b1430f93d0e9487cb0d2d5cf7",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:ee2f96251514728494ad7dca313370cd041660af649618c8ba4b72be26a42048",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Enforce a persistent Project activation switch across collection, model jobs and delivery.",
+  "maturity": "firm",
+  "outcome": "Persist explicit Project activation and expose transaction-bound epoch admission plus cancellation/recovery contracts.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-app-goal",
     "plan-validation:independent"

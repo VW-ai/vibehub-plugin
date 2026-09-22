@@ -24,7 +24,8 @@ The local modules now also provide [scoped authentication](docs/service-auth-v0.
 [provider settings with macOS Keychain](docs/provider-settings-v0.md) and the
 [exploration/worktree scope contract](docs/branch-scope-v0.md), plus a
 [scoped SQLite domain store](docs/domain-store-v0.md) and
-[Git folder/worktree registry](docs/git-project-enrollment-v0.md). Project onboarding
+[Git folder/worktree registry](docs/git-project-enrollment-v0.md), and
+[durable Project activation](docs/project-activation-v0.md). Project onboarding
 and the settings UI still need composition; installing these modules does not
 enable collection or background work.
 
