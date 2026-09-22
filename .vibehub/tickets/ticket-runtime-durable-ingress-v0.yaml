@@ -8,7 +8,7 @@
         "label": "durable-ack-boundary"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "idempotent-redelivery",
@@ -18,7 +18,7 @@
         "label": "idempotent-redelivery"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "delivery-state-machine",
@@ -28,7 +28,7 @@
         "label": "delivery-state-machine"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "fault-injection-proof",
@@ -38,25 +38,60 @@
         "label": "fault-injection-proof"
       },
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "activation-ingress",
       "criterion": "Check current Project activation and source enrollment before durable acceptance; disabled or unknown scope cannot advance capture cursor or enter the semantic queue. Record authorized denial/gap metadata without retaining rejected raw content. Tests cover stale plugin activation, disable racing ACK and restart; already admitted historical events cannot trigger post-disable work.",
       "identity": "sha256:db4f9f476ea31d98d100292808e8e47e4f33278b34ccc21fe5ee671422230e42",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "durable-ack-boundary",
+      "criterion": "Expose a bounded local DurableIngress API using the accepted DomainStore, ProjectActivation and opaque LocalCredentialAuthority contexts, with no HTTP listener or live Collector. A trusted human/App-service explicitly registers a source stream against the current Git Project: exact installation/partition/producer/epoch, attested start_sequence, producer principal, optional enrolled repository/checkout/worktree tuple, exact event-type mapping and current source access/capture policy. Identity, epoch origin and mapping cannot be rebound; change them through a new registration, preserving prior references. Source enable/access updates are explicit authenticated CAS commands. Submit accepts strict v1 RawEvent plus either an approved bounded UTF-8 snapshot or an existing payload reference; derive tenant/Project and producer authority from context/registration and mechanically normalize against a retained current Git identity catalog and registered mapping. Unknown/ambiguous identities or event types are rejected, not guessed. For snapshots, verifyEventPayload must match the exact supplied UTF-8 bytes and the configured trusted synchronous snapshot policy must approve those bytes unchanged; a payload claiming authorized or sanitized is insufficient. Construct the separately trusted snapshot authorization only after source/capture/ACL checks and actual immutable snapshot persistence; reject raw transcript/log objects, unknown executable fields, invalid/mismatched/oversized bytes and content needing sanitization before storing or logging it. Do not silently rewrite an observation or its digest. In one activation-gated transaction persist the immutable admitted raw and normalized envelope, first normalized digest and retained catalog/mapping/snapshot grant references, exact approved snapshot bytes when supplied, source cursor CAS and one downstream outbox intent. Return a documented durable receipt only after commit; validation/source/activation rejection, retryable store failure and accepted receipt are distinct. Receipt means durable intake, not semantic processing, host delivery or source truth.",
+      "identity": "sha256:c39f34265f44755d12df3639d1010ef6b7bb471d0ff7e11a98377dc2a0cc8189",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "idempotent-redelivery",
+      "criterion": "Reuse sourcePartitionKey, sourceEventFingerprint, eventIdempotencyKey, createSourceCursor and acceptSourceEvent without changing their core semantics. Allocate a stable observation identity through a documented helper derived from the enrolled registration and producer idempotency key, including authenticated tenant/Project in the collision-safe tuple; retain source-native IDs separately. Enforce the helper identity rather than trusting an event ID that could collide across Project-scoped stores. Within the exact source incarnation, a retry with only changed observed_at/delivery-attempt metadata returns the original durable receipt and first event/payload pins, creating no new cursor entry, snapshot, source row or outbox intent. Changed logical contents, source identity, sequence, event identity, ACL or sensitivity under an existing observation/retry/position reject without replacement; matching different prior entries is a conflict. Independent observations of the same Git/source object remain separate and correlate through sourceObjectKey. Start sequence is registered explicitly, never inferred from first arrival; arrivals 0,2,1 preserve the accepted prefix/gap behavior and sequence null cannot prove continuity. Admission advances accepted progress only; completed_through never advances from receipt or downstream handoff. Preserve existing 4096-entry cursor limit and tighter DomainStore JSON limits; capacity failure is explicit without pruning, resetting origin, hiding gaps or automatic new epochs.",
+      "identity": "sha256:dd7c1721c34974c952f9c615217c064f2d54b18133f2ca6dce5594275adae18c",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "delivery-state-machine",
+      "criterion": "This local intake slice owns persisted pending outbox intents and atomic handoff receipts for one logical downstream ingress-policy consumer. Provide a bounded pending-intent read and an authenticated synchronous handoff composition that uses ProjectActivation with the event original epoch, rechecks current source access and enrolled membership, loads the accepted immutable event, and atomically commits a trusted callback durable consumer effect, an immutable handoff receipt and outbox ACK. Repeated successful handoff cannot invoke the effect again; callback failure, expiry, stale epoch, changed authority, async work or process loss before commit leaves the intent pending and no effect/receipt. ACK here means durable consumer ownership, never completed semantic projection, so do not call completeSourceEvent or manufacture a caught-up watermark. No network/model/host operation occurs in the transaction. Old-epoch intents stay historical/fenced through re-enable and are never silently relabelled or discarded; selected recovery uses the accepted activation protocol later. Consumer leases, bounded retry/backoff/defer, poison-event dead-letter and audited operator replay are explicitly transferred to the still-draft ticket-runtime-policy-journal-v0 consumer recovery criterion in this same candidate, not implemented or claimed by this module. No polling loop, generic scheduler, broker, automatic retries or second Worker state machine is delivered.",
+      "identity": "sha256:7684b42c1c08e8b50590f8d8702e03625d62838cd873a40a04a8041c64584c2f",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "fault-injection-proof",
+      "criterion": "Use real temporary Git/SQLite and only synthetic selected source content. The central fixture registers/enables a Project and source, submits a policy-approved sanitized text snapshot, receives a post-commit ACK, closes/reopens the store, reads the same authorized bytes and verifies their digest/normalization pins, and retries the observation with no duplicate cursor/source/outbox. Include a rejected raw-content canary and a synthetic upstream-redaction-to-approved-snapshot path; neither rejection diagnostics nor database records contain the rejected body. Cover pointer-only intake without fetching source paths/URLs, foreign producer/Project, unmapped Session IDs, duplicate receipt metadata, conflicting payload/ACL/sequence, independent observations of one commit, null and out-of-order sequence, source disable/access tightening, unavailable worktree, bounds and denial before callback. Faults before commit and SIGKILL with an open transaction leave no partial event/bytes/cursor/outbox; simulated lost response after commit returns the original receipt on retry. Separate real SQLite writers prove one duplicate admission/effect and a conflicting loser. Downstream handoff rollback/restart/duplicate tests preserve pending work or exactly one durable synthetic consumer effect, including ACK-after-commit and no semantic completion claim. Run affected public-entry, event/provenance, causal, auth/store/Git/activation tests and component boundaries; document local bounds, failure categories, sanitization trust, payload retention and future migration/checkpoint limits. No private traces, credentials, remote calls, live Judge/Collector or end-to-end Policy service are exercised.",
+      "identity": "sha256:418167d3f47de2eeef6a04b66dc77b89761cf399c713b1ba5af04a0c5edf7ee3",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "activation-ingress",
+      "criterion": "Every new acceptance and downstream handoff must use the same DomainStore as ProjectActivation and check current opaque scope/actions, current source registration/access, exact original activation epoch and applicable active Git IDs inside the authoritative transaction; caller-supplied path, registration object, enabled flag, ACL widening or generation cannot grant authority. Required ingress register/read/submit/handoff actions are distinct and compose required activation/project/store actions; source registration and access mutation are human/App-service only, and event submission is bound to the registered authenticated producer principal. Disabled Project/source, unknown scope, revoked/expired/foreign context, stale epoch or removed membership cannot advance capture cursor, persist payload or enqueue semantic work. For an authenticated known source, an optional single bounded latest-denial record may contain only allowlisted reason/time/registered references, never rejected raw bytes, arbitrary client IDs or a fabricated accepted gap; unknown/unauthorized inputs create no record. Read APIs may recover an already committed historical receipt after disable without new acceptance/cursor/outbox mutation; snapshot/event materialization still intersects captured access with current registered source access and caller permission. Re-enable retains actual disabled intervals and pending historical refs with no private-session scan or automatic backfill. Prove disable racing intake and handoff yields either a fully committed earlier historical receipt/effect or a rejected transaction, and that a pre-disable accepted event cannot start post-disable work merely because it remains in the inbox. Ordinary coding remains independent of this API and storage availability.",
+      "identity": "sha256:b3e2abf85e397af372c54bc07fdaf687c4a7c911d65834b50b3ebc184e3e903d",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
     "Fast judges and workers produce auditable candidates/proposals; canonical writes require explicit authority and concurrency checks. Do not infer acceptance from model confidence.",
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
-    "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
+    "This is a bounded local intake API with synthetic composition. Do not claim real host capture, automatic redaction completeness, source materialization availability, live semantic completion or cloud delivery. Preserve later consumer recovery obligations through the paired existing draft Ticket refinement."
   ],
-  "context": "Build durable idempotent event ingress with explicit ACK and delivery semantics. Delivery slice: alpha. Architecture: 8.1 Event Gateway; 11 Ingress Pipeline; 18 Storage Design; 19 Consistency Model; 23 Observability; 24 Failure Handling. Scope: Gateway acceptance contract; Durable inbox/outbox semantics; At-least-once delivery and idempotent consumption; Retry, lease recovery, dead-letter, and backpressure behavior. Excluded: Tenant authentication UI; Platform and queue vendor selection; Semantic Policy Graph node behavior; General-purpose workflow orchestration.  Required transitive artifacts: runtime-causal-ordering-watermarks-v0: Durable ingestion implements ordering/gap/idempotency semantics and its event schema prerequisites. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Local L1 durable intake, not a broad online gateway or host recorder. Reuse the single accepted DomainStore and public core event/causal contracts; no new database, dependency, blob service or domain framework. Suggested operations are registerSource, updateSourceAccess, eventIdFor, submit, getReceipt/readSnapshot, listPending and handoff; exact naming is an implementation choice. One durable-ingress namespace may hold bounded registration/cursor/access records, immutable event/snapshot/catalog pins, receipts and outbox; use collision-safe hash keys because DomainStore keys are at most 200 characters. A registration is service-owned state, never a submitted authority object. Its source tuple, producer principal, start_sequence and type mapping are immutable; source enable/read-access policy can be CAS-updated without widening captured event access. Registration does not activate a Project. Bind only identity the accepted Git catalog currently knows: it has no Session/Execution registration, so do not invent those IDs or accept unknown host identities; later host enrollment extends that boundary. Project-level source observations can omit execution provenance; worktree-bound producers must match their exact enrolled tuple.\nThe useful content path is a strict RawEvent snapshot reference plus at most 64 KiB of explicit already-sanitized UTF-8 text, an exact digest and a trusted App-configured synchronous snapshot validation policy. The policy is supplied by trusted construction/configuration, not the event. Require it to approve the exact bytes unchanged or reject sanitization_required; no silent rewrite/rebinding and no claim of a universal secret detector. A synthetic upstream sanitizer fixture demonstrates converting selected test content to accepted bytes before forming its RawEvent/digest. Host-specific raw capture/redaction remains with host adapters. Reference-only intake retains known immutable or mutable references and their replay classification without retrieving local files or remote URLs; no auto-snapshot of a pointer. Snapshot authorization is produced by the service from enrolled capture permission and effective captured access, not accepted as an event flag. Payload bytes, normalized envelope and full first pins must survive restart and current authorized materialization. Limit complete intake JSON/envelope to 128 KiB in addition to existing core/store depth/node/byte limits, return no more than 64 pending intents per read, and fail closed at cursor/store limits without rollover or silent truncation.\nCore event IDs are tenant observation identities while DomainStore is Project-scoped. Use a small deterministic ID helper over authenticated tenant/Project, an opaque service-allocated registration identity and producer idempotency key; the adapter uses that ID when forming the RawEvent. This preserves retries, keeps source-native IDs separate and avoids claiming a cross-Project database uniqueness check. Correlation by object never deduplicates distinct observations. Store the first full normalized event digest, not a later retry normalization snapshot. Catalog and mapping pins are retained immutable and current membership/registration are checked in the same transaction. Snapshot access intersects immutable captured ACLs with live source-registration access; this is a local source permission boundary, not the later remote source invalidation graph. Do not accept caller-authored source authorization or expose generic store handles over a client interface.\nAn ACK recovers only after commit. A submit retry remains activation-gated; an explicit authorized getReceipt can report historical success after disable without accepting again. Producer acknowledgements must not overwrite local progress with a larger maximum_sequence that hides gaps; cursor acceptance and opaque producer resume tokens are distinct, and this API does not invent host file offsets. Handoff is to one logical ingress-policy consumer; its trusted synchronous callback records a durable synthetic inbox/effect in the same transaction before outbox ACK. It does not execute Policy/JEV or mark source projection complete. Expose no bare client ACK that could discard work. Old activation epochs are carried unchanged. The unchanged existing policy-journal -> judge -> source-access-invalidation -> durable-ingress prerequisite chain supplies this consumer's durable input; its paired draft refinement explicitly owns event lease/retry/dead-letter/operator recovery. No circular prerequisite is added. Existing Worker runner/recovery remains separate; this Ticket does not add a competing scheduler.\nOnly write this raw candidate for independent validation before apply. Both preserved direct prerequisites are independently DONE. Room drift is currently in the parent's concurrently reviewed runtime/UI work; parent owns Room alignment, while this planner writes no canonical Room or Ticket record.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -81,6 +116,58 @@
     {
       "purpose": "Current local App activation and Worker product boundary.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-subscription-workers.yaml"
+    },
+    {
+      "purpose": "Accepted scoped records, immutable sources, outbox and synchronous atomic transactions.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Exact successful direct persistence prerequisite.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Accepted captured-epoch admission, disable/cancellation and explicit recovery limits.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Exact successful direct activation prerequisite.",
+      "ref": ".vibehub/outcomes/ticket-runtime-project-activation-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Opaque authentication and current source/materialization permission boundary.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Accepted action/scope/expiry/revocation enforcement foundation.",
+      "ref": ".vibehub/outcomes/ticket-runtime-service-auth-isolation/contract-v3.yaml"
+    },
+    {
+      "purpose": "Current enrolled identity and operational/historical assurance, with no host Session registry.",
+      "ref": "semantic-runtime/docs/git-project-enrollment-v0.md"
+    },
+    {
+      "purpose": "Exact accepted Git enrollment baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-git-project-enrollment-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Strict raw/normalized event, payload digest, snapshot attestation and observation/object distinction.",
+      "ref": "semantic-runtime/docs/event-provenance-v0.md"
+    },
+    {
+      "purpose": "Accepted event/provenance contract, without inferring durable permission from shapes.",
+      "ref": ".vibehub/outcomes/ticket-runtime-event-provenance-contract-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact source incarnation, retry fingerprint, receipt cursor/gaps and separate semantic completion.",
+      "ref": "semantic-runtime/docs/causal-ordering-v0.md"
+    },
+    {
+      "purpose": "Accepted pure cursor/reference contracts and existing 4096-entry limit.",
+      "ref": ".vibehub/outcomes/ticket-runtime-causal-ordering-watermarks-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Paired draft consumer owner of lease/retry/dead-letter/operator replay, not part of the intake implementation.",
+      "ref": ".vibehub/tickets/ticket-runtime-policy-journal-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -140,12 +227,43 @@
       ],
       "identity": "sha256:394dc8ff099d66896889eb38d04a9329770dbb9e8f61e7b6f522e37bc96f1c86",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "activation-ingress",
+          "identity": "sha256:b3e2abf85e397af372c54bc07fdaf687c4a7c911d65834b50b3ebc184e3e903d",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "delivery-state-machine",
+          "identity": "sha256:7684b42c1c08e8b50590f8d8702e03625d62838cd873a40a04a8041c64584c2f",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "durable-ack-boundary",
+          "identity": "sha256:c39f34265f44755d12df3639d1010ef6b7bb471d0ff7e11a98377dc2a0cc8189",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "fault-injection-proof",
+          "identity": "sha256:418167d3f47de2eeef6a04b66dc77b89761cf399c713b1ba5af04a0c5edf7ee3",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "idempotent-redelivery",
+          "identity": "sha256:dd7c1721c34974c952f9c615217c064f2d54b18133f2ca6dce5594275adae18c",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:4a24cc091479c1bbebf186ae9a50e1dfb7229c32b7cdbf77c0c70a255786427e",
+      "revision": 3
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Accepted source events survive process failure and are delivered to downstream Policy Graph consumers at least once without producing duplicate semantic effects.",
+  "maturity": "firm",
+  "outcome": "Durably accept scoped local source observations and approved content snapshots with exact retry identity, causal receipt cursor, post-commit ACK and atomic downstream handoff.",
   "provenance_refs": [
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",

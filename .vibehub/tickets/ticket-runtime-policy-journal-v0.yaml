@@ -39,9 +39,16 @@
       },
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "ingress-consumer-delivery-recovery",
+      "criterion": "When this still-draft Policy journal is refined and implemented, consume the accepted durable-ingress pending-intent/atomic-handoff contract and retain the full source-event delivery recovery obligation transferred from ticket-runtime-durable-ingress-v0. Persist consumer pending/leased/succeeded/retryable/deferred/dead-letter state, lease expiry/fencing, bounded backoff/attempt/deadline budgets and poison-event isolation without blocking unrelated events. Audited operator replay names exact retained source/event and current source access plus activation/base authority; it creates a new explicit attempt or generation and never rewrites original bytes, first receipt, closed epoch or completed semantic effects. Couple successful consumer ownership and later semantic completion to their respective real transactions; intake ACK alone cannot advance completed_through. Fault-inject before/after handoff, consumer effect, completion and ACK plus duplicate concurrent resume, proving one logical effect and recoverable/fenced failure. Integrate this with the existing PolicyRun journal and later local runner rather than add a second scheduler. Concrete queue/checkpoint schemas and tuning remain part of this Ticket subsequent refinement, which remains draft until its existing prerequisites finish.",
+      "identity": "sha256:fcf07364e6b8ead087828d6edf1b72bb30133ee89f3359823c35d4f3b7c415bc",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -49,7 +56,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Build durable PolicyRun journaling, idempotency, and crash resume. Delivery slice: alpha. Architecture: . Scope: Run/attempt journal, scheduler integration, leases/fencing, idempotency ledger, cancellation, recovery scanner, and crash tests.. Excluded: Worker executor internals, cross-region DR, and transport-level exactly-once claims..  Required transitive artifacts: graph-store: Journal/action/outbox transactions integrate the accepted real Graph repository. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close.",
+  "context": "Build durable PolicyRun journaling, idempotency, and crash resume. Delivery slice: alpha. Architecture: . Scope: Run/attempt journal, scheduler integration, leases/fencing, idempotency ledger, cancellation, recovery scanner, and crash tests.. Excluded: Worker executor internals, cross-region DR, and transport-level exactly-once claims..  Required transitive artifacts: graph-store: Journal/action/outbox transactions integrate the accepted real Graph repository. Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Explicit local-scope transfer: the durable-ingress Contract v3 delivers persistence/receipt/cursor/pending intent and atomic synchronous handoff only. This existing consumer Ticket retains event-level leases, bounded retry/backoff/defer, poison dead-letter and audited operator replay as ingress-consumer-delivery-recovery; none is claimed shipped by intake. Keep existing dependencies unchanged: judge -> source-access-invalidation already transitively requires durable-ingress, so no reverse/circular or redundant edge is introduced. This is planning ownership only; no consumer implementation in the intake task.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -62,6 +69,10 @@
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
       "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Exact input/handoff contract and explicit transfer of unfinished event consumer delivery recovery; this draft remains unimplemented.",
+      "ref": ".vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml"
     }
   ],
   "contract_revisions": [
@@ -90,6 +101,37 @@
       ],
       "identity": "sha256:b5516889565e8acc433649872b0b5f7d66c8cfcc4467fe7b2eae2cd61d3eb86e",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "crash-matrix-proves-recovery",
+          "identity": "sha256:94fbe2f70a258fb0ada61028a065d379c49c8237546902d8e3cb0abe329551d1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ingress-consumer-delivery-recovery",
+          "identity": "sha256:fcf07364e6b8ead087828d6edf1b72bb30133ee89f3359823c35d4f3b7c415bc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "leases-and-fencing-prevent-split-brain",
+          "identity": "sha256:d4d9840c1797a7d2b6f23c64f62e3c10200cda2df77d0c115aef19c20fbca870",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "resume-does-not-repeat-effects",
+          "identity": "sha256:156764b5b347434fd0c0525bd064bb4b0bb08fb53e5204af263562a9fd3bc3b4",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "run-journal-pins-replay-inputs",
+          "identity": "sha256:2a448d42cb477167ce1b663597bbac8d7426d0e52ada2f42c287eed295c85e3e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:e50d19551bc7cdacb53dce3646379ab3fe726d012c31e32cdccee0c61a88d20f",
+      "revision": 2
     }
   ],
   "deliveries": [],

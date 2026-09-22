@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "f7e894572af92a8a05b84995aecc9f6e59b88780",
+        "blob": "1c91ac1a9dec7546adaa117955b9178a87f78a7b",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -50,6 +50,10 @@
         "path": "semantic-runtime/docs/domain-store-v0.md"
       },
       {
+        "blob": "588ca5064fea84a115f9ab2e895c6273400bd949",
+        "path": "semantic-runtime/docs/durable-ingress-v0.md"
+      },
+      {
         "blob": "1de631289ac07ebdf0eac599903f8a3d63a00097",
         "path": "semantic-runtime/docs/event-provenance-v0.md"
       },
@@ -66,7 +70,7 @@
         "path": "semantic-runtime/docs/identity-contract-v0.md"
       },
       {
-        "blob": "ee9cc6b2eb26e4f44abf5db7d8b25089aea21a00",
+        "blob": "70a22f743bc2c0befdd104f2c8fb098d8ca926cf",
         "path": "semantic-runtime/docs/jev-synthetic-check.md"
       },
       {
@@ -96,6 +100,10 @@
       {
         "blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
         "path": "semantic-runtime/docs/measurements/jev-edge-timing-20260922.json"
+      },
+      {
+        "blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
+        "path": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
       },
       {
         "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
@@ -166,7 +174,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "03cf182bd6c6ca80bf62b671eba0c1c303f50b35",
+        "blob": "364f1f370f982be3535e0e47980e575859273182",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -212,6 +220,10 @@
       {
         "blob": "c709b8d091692f0b5f828a04ee1d2c0c26319e70",
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
+      },
+      {
+        "blob": "2223f42b06f7d19377d3f2bd05b467fa8869db20",
+        "path": "semantic-runtime/scripts/check-jev-ingress.mjs"
       },
       {
         "blob": "589a10e5bb71677eeb985263150e3ee76c2651c3",
@@ -430,7 +442,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "af8e24542d7c262121ecef88cceef26f4864f574",
+        "blob": "6d67ac6783730b436f5eba9c8a2ff0d223abe592",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -444,6 +456,10 @@
       {
         "blob": "441dec39eeb0ff82fa83bfc69ea9ae11dcac176a",
         "path": "semantic-runtime/src/local/domain-store.mjs"
+      },
+      {
+        "blob": "5cb3d512b66f632a04df5daac7def738e7a108e2",
+        "path": "semantic-runtime/src/local/durable-ingress.mjs"
       },
       {
         "blob": "2c7417d1307bd9880bf5c1ea3271915f92ba88e0",
@@ -506,6 +522,14 @@
         "path": "semantic-runtime/test/domain-store.test.mjs"
       },
       {
+        "blob": "24f9443d6350365c1c05f08b10eda245adf8ae0e",
+        "path": "semantic-runtime/test/durable-ingress-faults.test.mjs"
+      },
+      {
+        "blob": "59c3385d474a2d4ca08c52b55896c824f575410c",
+        "path": "semantic-runtime/test/durable-ingress.test.mjs"
+      },
+      {
         "blob": "479dd73b8b557b3361ba2b3114d446188506caa7",
         "path": "semantic-runtime/test/event-integration.test.mjs"
       },
@@ -520,6 +544,14 @@
       {
         "blob": "f5b200bae102dd37a9363ceff77dbf29a482c15c",
         "path": "semantic-runtime/test/fixtures/causal-ordering/source-arrivals.json"
+      },
+      {
+        "blob": "962037e8b9096c9304e798f4985fe6410d81a331",
+        "path": "semantic-runtime/test/fixtures/durable-ingress/scenario.mjs"
+      },
+      {
+        "blob": "9982db3a0c7489d8c28a750ee134af363b44641c",
+        "path": "semantic-runtime/test/fixtures/durable-ingress/writer.mjs"
       },
       {
         "blob": "d923dd8c8db440a38b901d7fb9372b0b7e4a2182",
@@ -642,6 +674,10 @@
         "path": "semantic-runtime/test/identity.test.mjs"
       },
       {
+        "blob": "1d9c398cb5098a5d2b5ebaaf71bd51c64fb1b21f",
+        "path": "semantic-runtime/test/jev-ingress-check.test.mjs"
+      },
+      {
         "blob": "37cbfee98b57c558a5ff6dc5aff1522e0f5ce252",
         "path": "semantic-runtime/test/jev-judge.test.mjs"
       },
@@ -738,8 +774,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T09:39:35.248Z",
-    "last_aligned_commit": "80dd0f36efac98b69ccb2cc0d795250d2853bb3f"
+    "checked_at": "2026-09-22T10:07:28.433Z",
+    "last_aligned_commit": "58910bb8a6107521d418ec4add88a982a63ed1d0"
   },
   "anchors": [
     "semantic-runtime/"

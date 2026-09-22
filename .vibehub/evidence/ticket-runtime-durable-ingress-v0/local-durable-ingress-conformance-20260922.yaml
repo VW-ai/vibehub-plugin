@@ -1,0 +1,54 @@
+{
+  "acceptance_ids": [
+    "durable-ack-boundary",
+    "idempotent-redelivery",
+    "delivery-state-machine",
+    "fault-injection-proof",
+    "activation-ingress"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "durable-ack-boundary",
+      "identity": "sha256:c39f34265f44755d12df3639d1010ef6b7bb471d0ff7e11a98377dc2a0cc8189",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "idempotent-redelivery",
+      "identity": "sha256:dd7c1721c34974c952f9c615217c064f2d54b18133f2ca6dce5594275adae18c",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "delivery-state-machine",
+      "identity": "sha256:7684b42c1c08e8b50590f8d8702e03625d62838cd873a40a04a8041c64584c2f",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "fault-injection-proof",
+      "identity": "sha256:418167d3f47de2eeef6a04b66dc77b89761cf399c713b1ba5af04a0c5edf7ee3",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "activation-ingress",
+      "identity": "sha256:b3e2abf85e397af372c54bc07fdaf687c4a7c911d65834b50b3ebc184e3e903d",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-durable-ingress-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T10:03:31.448Z",
+  "refs": [
+    "semantic-runtime/src/local/durable-ingress.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/docs/durable-ingress-v0.md",
+    "semantic-runtime/test/durable-ingress.test.mjs",
+    "semantic-runtime/test/durable-ingress-faults.test.mjs",
+    "semantic-runtime/test/fixtures/durable-ingress/scenario.mjs",
+    "semantic-runtime/test/fixtures/durable-ingress/writer.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Exact Contract3 implementation uses one accepted DomainStore and internally composed Git registry/ProjectActivation. Service-owned immutable stream registration/start/mapping/producer and explicit access CAS govern strict RawEvent intake; approved unchanged UTF-8 snapshot bytes have checked digest, service-built capture grant and immutable partition+snapshot identity. One gated transaction preserves first raw/normalized envelopes, registration/access revision, full catalog/mapping/grant pins, exact cursor acceptance and outbox; postcommit receipt is durable intake only. Stable authenticated observation helper plus core partition/fingerprint/idempotency/cursor logic preserve first pins and distinguish retries from conflict or independent same-object observations. Pending read is bounded64; authenticated synchronous handoff commits one consumer effect/receipt/ACK atomically, with no completeSourceEvent or semantic completion. Consumer leases/retry/dead-letter/operator replay explicitly remain in paired draft journal. 26 meaningful ingress tests pass on real temp Git/SQLite: sanitized bytes/reopen/retry, first receipts, foreign/unknown authority, no raw canary persisted, digest/UTF-8/size/inert input/policy limits, pointers without I/O, 0/2/1 and null sequences, independent Git observations, same snapshot identity conflict/reuse, source ACL/sensitivity tightening, immutable captured grants, cursor entry ACL, expired/revoked context, removed worktree, registration/activation/catalog callback CAS fences, pending cap and actual near-1MiB cursor rollback. Real child writers exercise duplicate/conflict admission, SIGKILL before intake/handoff commit, lost response after commit, duplicate effect and disable races; old epochs remain fenced through re-enable. Related event/causal/store/Git/activation124/124 and auth/foundation7/7 passed. Full verify and isolated standalone install+verify each passed400 tests with0 failures and1 intentional native-Keychain skip. Final focused28/28 (26 ingress plus2 offline fake-Judge composition tests) passed after the final async-policy guard. Boundaries106files0errors, diffcheck and Context guard pass. Ticket acceptance tests use synthetic content and no models, private traces, keys or network sources; a separately user-authorized fixed-corpus live JEV smoke is documented outside this acceptance. No HTTP/real Collector/Policy service/scheduler/automatic recovery is claimed.",
+  "ticket_id": "ticket-runtime-durable-ingress-v0"
+}

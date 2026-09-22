@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "durable-ack-boundary",
+    "idempotent-redelivery",
+    "delivery-state-machine",
+    "fault-injection-proof",
+    "activation-ingress"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T10:06:29.143345Z",
+  "contract_revision": {
+    "identity": "sha256:4a24cc091479c1bbebf186ae9a50e1dfb7229c32b7cdbf77c0c70a255786427e",
+    "revision": 3
+  },
+  "evidence_ids": [
+    "local-durable-ingress-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/auth_review validated the paired candidate and provided read-only integration/source review findings, but authored no ingress implementation, tests, documentation or executor Evidence. /root/branch_scope implemented source/docs, /root/provider_settings authored conformance/fault tests, and /root integrated exports and separate JEV smoke. Reviewer independently read the exact active Contract, dependencies, referenced Context/Outcomes and final artifacts, reran focused tests and ran graph/Context checks. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v3",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all five active criteria of exact Contract v3. durable-ack-boundary: source-owned immutable registration, attested origin and mapping bind strict RawEvent intake to opaque Project/producer authority; approved unchanged bounded UTF-8 bytes, digest verification and service-built capture authorization commit with first raw/normalized envelopes, exact registration/access/catalog/mapping/grant pins, cursor CAS and pending intent through the same DomainStore/ProjectActivation transaction. No receipt escapes before commit, and bounded rejection versus retryable failure categories do not expose rejected content. idempotent-redelivery: exact sourcePartitionKey uniqueness and authenticated observation IDs compose the accepted core fingerprint/idempotency/cursor operations; metadata-only retries preserve original receipts and all first pins without writes, conflicting identities/contents/ACL/sequence reject, same-object observations remain distinct, and out-of-order/unsequenced input never invents continuity or completion. delivery-state-machine: bounded pending inspection and original-epoch authenticated synchronous handoff atomically commit one durable consumer effect, immutable receipt and outbox ACK; repeat handoff does not rerun the callback, while errors/async/authority changes/process loss roll back. Neither path calls completeSourceEvent. The paired draft policy-journal retains leases/retry/dead-letter/operator replay obligations. fault-injection-proof: reviewer independently inspected all fixture/writer source and reran the final 26 deterministic ingress tests plus two offline fake-Judge composition tests, 28 passed. Real temporary Git/SQLite and separate child writers exercise exact bytes after restart, sanitizer canary rejection, first pins, retries/conflicts, actual SIGKILL before intake/handoff commit, lost response after commit, concurrent duplicate/conflicting admissions, exactly one effect, and disable races. The tighter capacity case intentionally seeds a schema-valid synthetic near-1MiB cursor through DomainStore and proves complete rollback, not historical payload availability for those seeded entries. activation-ingress: current opaque actions, registered producer, source access, live Git membership and unchanged activation/source/catalog versions gate new intake/handoff; old epochs remain fenced after re-enable, ACL and sensitivity tightening block materialization without relabelling immutable events, broader current ACL never widens captured access, and protected cursor entries deny the whole read rather than inventing filtered continuity. Snapshot reads recheck current source access and authority before return. Registration/access actions are human/service only, historical authorized receipts survive disable, no denied body/gap is recorded, and no automatic backfill occurs. Reviewer read parent full verification and isolated standalone logs, each showing 400 pass, zero fail and one intentional native-Keychain skip; those broad runs were not rerun by reviewer. Final exact Context resolution (19 refs), repository Ticket validation, Context guard and git diff --check pass; both direct prerequisites have successful exact Outcomes. No unresolved acceptance item. This Outcome certifies the bounded local API and deterministic synthetic composition only. The separately user-authorized live JEV smoke is excluded from this acceptance. No real Collector, HTTP transport, source-fetch availability, production Policy consumer, scheduler, automatic recovery, host context delivery or end-to-end product completion is claimed.",
+  "ticket_id": "ticket-runtime-durable-ingress-v0",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,44 @@
+{
+  "context_id": "note-runtime-persisted-jev-check",
+  "detail": "The 2026-09-22 opt-in check created a temporary synthetic Git Project and real scoped SQLite DomainStore, registered and enabled intake, persisted eight fixed edge-case text snapshots, reopened the store, recovered the same eight receipts on retry, and materialized and digest-verified all eight snapshots before calling official TypeSafe JEV outside transactions. All eight decisions matched the small synthetic expectations. Requested jev-latest returned jev-1.13.0; successful adapter requests took 124–441 ms, with no observed retries or rate limits. Only event type/fixed timestamp/text, question and visible synthetic target IDs/text reached the model; local source/ingress IDs, provenance, ACL, catalog, expected labels and credentials stayed local. The exact-text allowlist is a fixture policy, not a production sanitizer. Pending intents remained pending: this proves intake-to-model composition, not a live Policy consumer, host collection, semantic completion, quality calibration or production rate limits. Four synthetic checks during this development turn totaled 32 actual decisions; repeated cases do not add dataset diversity. Existing Peel route benchmarks remain separate historical evidence.",
+  "evidence": [
+    {
+      "note": "Repeatable opt-in composition; source bytes come from authorized immutable snapshots after reopening.",
+      "ref": "semantic-runtime/scripts/check-jev-ingress.mjs"
+    },
+    {
+      "note": "Safe observed 8/8 actual JEV report, without source bodies or secrets.",
+      "ref": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+    },
+    {
+      "note": "Two offline tests verify minimal inputs and safe transport/semantic failure reporting.",
+      "ref": "semantic-runtime/test/jev-ingress-check.test.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-semantic-judgeops-continuous-evaluation",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "finding-typesafe-direct-route-performance",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T09:58:21.357Z",
+    "ref": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+  },
+  "state": "active",
+  "summary": "Approved synthetic snapshot bytes survive local intake and restart before reaching the real JEV adapter",
+  "tags": [
+    "semantic-runtime",
+    "jev",
+    "durable-ingress",
+    "synthetic",
+    "verification"
+  ],
+  "type": "note"
+}

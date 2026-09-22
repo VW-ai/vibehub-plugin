@@ -22,6 +22,30 @@ enough to pass a multiple-target case.
 `successful_attempt_ms` measures the successful adapter request, including SDK
 and network overhead. It is not server-only inference latency.
 
+## Persisted input check
+
+`npm run check:jev:ingress` runs the same eight edge cases through the actual
+local intake module before calling JEV. It creates a temporary synthetic Git
+Project and SQLite store, enrolls and enables them, registers a synthetic source,
+and persists each approved text snapshot. It closes and reopens the store,
+retries the observations to check stable receipts, then reads and verifies the
+authorized snapshot bytes before sending their text to the model. It never
+opens an existing project, host session or trace.
+
+The smoke's snapshot policy accepts only the eight checked-in synthetic texts.
+It is not a production sanitizer. Only text, fixed event type/timestamp, the
+semantic question and visible synthetic target IDs/text reach the Judge. Local
+ingress/source IDs, catalog, ACL, provenance, payload digests and labels remain
+local. Model calls happen outside SQLite transactions.
+The temporary store is removed on normal completion or a caught failure.
+
+This command uses the same explicit TypeSafe origin, pacing, retry and deadline
+limits. Unlike the original route check, its exit status fails for either a
+transport failure or a semantic mismatch. Its report includes intake/reopen/
+deduplication/materialization counts. Pending ingress intents remain pending:
+the smoke does not execute the production Policy consumer, deliver context to
+a host, or claim semantic processing is complete.
+
 ## Measurement: 2026-09-22
 
 Real endpoint: `api.typesafe.ai`, requested `jev-latest`, returned `jev-1.13.0`.
@@ -47,6 +71,17 @@ verified the explicitly pinned TypeSafe origin and repeated all eight edge cases
 8/8 matched, no retry or rate-limit response. Successful adapter requests took
 141–505 ms; whole cases took 308–526 ms, with 1769 ms total pacing. Together the
 three runs comprise 24 actual decisions, not a concurrency/load measurement.
+
+The [persisted-input run](measurements/jev-ingress-20260922.json) then exercised
+the real temporary intake/reopen/read path: all eight snapshots persisted and
+materialized, eight retries recovered their original receipts, and all eight
+JEV decisions matched the same edge expectations. The requested `jev-latest`
+returned `jev-1.13.0`; successful adapter requests took 124–441 ms, with no retry,
+rate limit or transient failure observed and 1974 ms accumulated pacing wait.
+All eight ingress intents remained pending, as expected: this was a model-input
+composition check, not production Policy processing. These four runs total 32
+actual decisions. Repeated examples verify integration but do not increase the
+diversity of the quality dataset.
 
 This is route/basic-behavior verification, not a quality benchmark. It cannot
 establish calibration, nuanced entity resolution, long-session benefit, or
