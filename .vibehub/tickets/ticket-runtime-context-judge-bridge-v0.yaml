@@ -1,0 +1,208 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "typed-context-input-is-selected",
+      "criterion": "Add the exact evaluateContext method and separate pinned Context Judge descriptor/typed bridge for context_relevance only. Select at most eight actual current own-exploration runtime_context entity revisions through the accepted Context profile, applicability and publication/source proofs; candidate, validated and resolved noncontested current heads are eligible. Historical/stale/superseded/rejected/contested/foreign/denied or untyped targets refuse before send. Derive the fixed bounded role/summary/detail text and target-ID-to-original-ref map from those immutable revisions, preserving exact local/shared/Ticket/source pins and explicit uncertain applicability. No caller target text, shadow assertion, source-label forgery, canonical Authority text or other-exploration hypothesis is inserted into model targets. Keep shared origin/current-Project rules separately pinned and checked and report governance_evaluated:false/shared_material_sent:false; relevance never implies canonical truth or adoption.",
+      "identity": "sha256:8c199c23cbb3382354f08cd404b9e1cac3907209e818534a2f1f0a86719ef83f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-dispatch-preserves-judge-guards",
+      "criterion": "Reuse the existing actual Judge provider/settings/authority/activation path for the new fixed input profile, preserving explicit configured source-registration policy, current and captured ACL/sensitivity, provider allowlists/local-only restrictions, minimal model envelope, deadline and shared attempt/token/cost reservations, bounded telemetry, cancellation and late-result refusal. Recheck every Context/Ticket/canonical/source/owner/head/binding/catalog/current-Project/fence/settings/grant pin immediately before each send and before exposing/caching a decision. Profile-tag the existing actor-scoped global invocation/cache/in-flight identity so cross-method reuse conflicts rather than returning the wrong result or dispatching twice. Existing evaluate/executeJudgeNode, four legacy families, descriptor identity and legacy executePolicyRun remain compatible; no Core v1 wire or generic provider/Policy framework is introduced.",
+      "identity": "sha256:e04233ee0a6addc80c08431fd34cad7318c0fb45f13298b934fce21ba6ecd3b3",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-bridge-conformance-and-live-smoke",
+      "criterion": "Real disposable Git/SQLite, scoped grants, admitted events, actual typed Context mutations/adoption, settings and recorded transports prove positive/negative relevance mapping, all eligible states, honest uncertain applicability, A superseded while adopted B remains eligible, each excluded lifecycle/scope, exact Ticket/code provenance, bounds, missing/denied source policy, three-route regression, cross-profile cache/in-flight collision, changed grants/selected pins, pre-send and in-flight revocation, timeout/cancellation and no late success. Refused inputs send zero requests; evaluation creates no Graph/origin/receipt/outbox/ACK/canonical effect. A separate opt-in fixed synthetic TypeSafe JEV smoke exercises exactly four actual new provider sends: relevant own Context, unrelated own Context, adopted B after A supersession, and a fourth in-flight revocation whose completed response is discarded. Use fresh opaque invocation contexts and distinct invocation IDs, report the first three observed labels/latencies and the fourth refusal rather than assigning it an expected model label; retries/cache/invalid-input checks add no send. Record honest unavailable/not-run or mismatched model outcomes, bounded usage and structural canary exclusion with no secrets/private traces. Focused/affected tests, full Runtime verify, standalone verify and unchanged plugin artifact checks pass; deterministic acceptance needs no live credential.",
+      "identity": "sha256:08137d7a0d8cbf246dad9d4f865e38b3838a5cd648c197cb7348e96087656385",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through actual capabilities. No new dependency, persistent namespace/table, model adapter, generic registry/callback, index/cache framework, dispatch journal, full Policy executor, Query/FTS/ranker, Compiler, App/HTTP/cloud/Worker/plugin wiring, automatic capture/ACK/source refresh, Git mutation or canonical write. Construction is inert and performs no enrollment, activation, key lookup, source read or network call. Synthetic fixture setup may explicitly create its own selected sources, typed revisions and adoption through existing public APIs.",
+    "Keep LocalJudgeRuntime constructor exact {store,authority,provider_settings,canonical_reader,configuration}; configuration remains exact {schema_version:1,scope,settings_project_id,artifact,egress_policy}. Validate/freeze the real compilePolicyArtifact output and known installed descriptors; an artifact may contain the existing descriptor, the new descriptor or both, and each chosen method must require its exact corresponding node descriptor. Reject unknown/spoofed descriptor or family before credentials/send. No public input-profile selector, arbitrary mapper, ready-made prepared proof or caller target text is added.",
+    "Add LocalJudgeRuntime.evaluateContext(context,request,{signal}={}); request is the unchanged existing JudgeRequest shape {invocation_id,node_id,epoch,execution,exploration_id,execution_workspace_id,expected_binding_version,expected_catalog_version,expected_project_selection_version,at,event_id,target_refs,expected_source_fence}. at is GraphCommitAddress2 and target_refs are zero to eight unique sorted exact same-scope/same-generation entity revision refs. No local/current selector is inferred: a new evaluation requires at equal the owned current head. Existing evaluate retains its previous at-most32 judge-target profile and all four families. Both methods retain bounded decision/deferred/cancelled/refused result semantics; a profile mismatch cannot be routed automatically to the other method.",
+    "Export CONTEXT_JUDGE_NODE_OPERATION with id semantic-context-judge, version1, type judge, inputs {event:event_ref,selection:signal_ref}, outputs {relevant:boolean,confidence:number,targets:candidates_ref,decision:signal_ref}, error_outputs {error:error_ref}, exclusive positive/negative/uncertain branches. Config has the existing exact required fields family,question_id,question_version,question_text,confidence_threshold,impact, but family enum contains only context_relevance. Compute its own fixed implementation identity through existing descriptor fingerprint conventions; do not change JUDGE_NODE_OPERATION identity or any legacy Core v1 protocol. The existing boolean-targets DecisionSchema remains unchanged.",
+    "Export executeContextJudgeNode({runtime,context,request,inputs,signal,deadline_ms}) with the existing typed handler-style outputs/branch/error and flat reserved usage. inputs exactly {event,selection}; event is the actual admitted event_ref, selection is a signal_ref whose digest binds the fixed runtime-context-v1 profile tag plus normalized request. Check before send. Its deadline may only tighten the same-process runtime deadline. Existing executeJudgeNode and its legacy request-only selection signal stay unchanged. Neither bridge accepts actions/Graph assertions/callbacks, and executePolicyRun continues rejecting Judge and Worker nodes.",
+    "Require current opaque LOCAL_AUDIENCE human/service grants for context:read plus all existing Judge actions: judge:execute, model:dispatch, source:read, store:read/write, ingress:read, graph:read, exploration:read, source:invalidation:read, project:inspect and activation:admit. Resolve actor/tenant/Project from the grant and retain trusted scope-to-settings_project_id binding. Source ACL or author labels in JSON never substitute for actual admission. Local Context read authorization alone cannot authorize a provider send.",
+    "Eligible target is an actual typed entity selected by LocalContextStore current mode at the request pin, exact projection head, no competitors/quarantine, immutable assertion and projection status candidate|validated|resolved. Use validateContextContent1, current ContextInputs applicability proofs and verified exploration publication; do not fabricate judge-target revisions, alter existing Context content/status, infer current identity from source folders or silently follow another generation. Adopted B may remain eligible after A is superseded because its real owned current instance is independent; A source lineage remains exact. Unspecified applicability remains explicit uncertainty in selection metadata, not inferred universal scope or policy compliance.",
+    "Fixed model text for each selected Context is role + newline + summary + two newlines + detail, with no other fields. It must be nonempty and at most4096 UTF-8 bytes including separators; a valid larger Context is explicitly ineligible for this bridge rather than silently truncated/summarized. Alias is target- plus SHA256 of the exact revision ref, type is context. Keep the original ref map outside model input. Event text is the actual retained/admitted snapshot at event_id with verified payload digest, at most16384 bytes. Envelope remains exactly {event:{type,timestamp,payload:{text}},stateRefs:[{id,type,text}],question:{family,text}}; no structural actor/scope/worktree/path/source/ACL fields, entire records, rationale, canonical text or other-exploration material is appended. Approved text itself is not claimed universally sanitized.",
+    "Reuse actual ingress event/receipt/getRegistration and full selected revision provenance.events/access_events. Union is at most32 distinct normalized events and32 registrations; validate retained digests and current/source-captured principal access. Across targets prepare at most8 distinct Ticket selection pins [at,address], retaining configured canonical reader limit16 and each Context limit8 exact Ticket refs. Several record keys on one actual selection are one pin, not additional pins; reuse union keys only within this invocation/context while asserting each target's own actual support. Every actual support registration needs the fixed owner egress policy; missing entry/deny refuses. Preserve normal->INTERNAL, sensitive->CONFIDENTIAL, restricted->RESTRICTED mapping and highest captured/current level. authority.materialize must approve each selected provider destination using the actual scoped source facts; no local-only or unlisted-provider fallback.",
+    "Prepare actual canonical/Ticket/Context material outside transactions. A fixed private instance-branded proof must bind exact revision bytes, normalized applicability, publication/owner facts, source registrations/versions, current local head/binding/catalog/workspace, immutable origin base, current Project declaration/version, source fence, current grant and frozen configuration. Inside actual ProjectActivation.withAdmission recheck only fixed selected internal reads, never nested public Context/Graph/canonical snapshots or caller hooks. Repeat before send after async credential retrieval/backoff and before result/cache return. No transaction spans await. Preserve the documented observed-endpoint/send race and inability to recall already-sent input.",
+    "Shared known nonnull origin must remain authorized current/historical, known nonnull current Project selection current/authorized; null coverage remains explicitly unavailable. Context Ticket refs retain their exact historical/current roles and actual supporting events. Keep configured active Authority material visible through its existing separate read path, never fold it into stateRefs/question. Returned selection extends the existing nonsecret pins with input_profile {id:runtime-context,version:1} and per-target exact ref, asserted/projected lifecycle, applicability status/verified refs and publication-origin ref, without raw target/canonical text. governance_evaluated:false and shared_material_sent:false are mandatory.",
+    "Use the existing three explicit-key routes and source-configured provider policies without SDK retries/default-env fallbacks. Deadline remains min(artifact,node,ProviderSettings timeout100..120000ms,optional tighter bridge deadline). Attempts remain min(node,artifact,settings1..3), reserving the full node max_tokens/max_cost_microunits per attempt against artifact totals without refund/reset. Only configured allowed transient retries consume the same budget; 401/403/schema/policy/target failures do not broaden routing. Preserve observed null usage when unreported and bounded error-code-only failures. New model envelope max65536 bytes and existing request/result max1MiB,depth<16,nodes<=50000 stay unchanged.",
+    "Keep one existing cache/in-flight key namespace per runtime instance: authenticated scope/actor/kind plus invocation_id across both methods. The request/entry/in-flight identity additionally includes the fixed input profile and descriptor/node identity; same invocation_id under another profile conflicts, including zero-target decisions, rather than creating a second dispatch or sharing a legacy success. Completed-decision cache remains at most128 entries/8MiB and in-flight at most8. Reprepare/reauthorize actual current Context/canonical/source/pins and settings before a same-actor hit; changed same-key requests conflict, failed/deferred/late work cannot become cached success, eviction/restart has no durable exactly-once guarantee. Zero targets returns the existing local no_visible_targets negative after current proof/local admission without credential lookup or send.",
+    "Offline conformance must exercise candidate/validated/resolved actual Contexts; excludes historical/stale/superseded/rejected/contested/foreign/raw judge-target/canonical selection payloads on evaluateContext, and rejects runtime_context on legacy evaluate. Include actor-separated hits, both directions of cross-method invocation reuse/in-flight contention, evicted/restarted instances, exact target alias validation/invented outputs, source-policy/local-only/three-route compatibility, closure/text/count/JSON bounds, direct and inherited Ticket/code support, shared pin races, grant/source/activation/binding/catalog/Project/settings change after awaited credential and after send, deadline/cancellation/late completion. Existing legacy Judge/Policy behavior must pass unchanged.",
+    "Live smoke is an explicit synthetic fixture command, not run by ordinary test/verify or construction. At most and, for a successful smoke, exactly4 actual TypeSafe fetch sends using one route/attempt per invocation and fresh distinct invocation IDs/opaque contexts. Cases1–3 expect yes/no/yes for relevant own, unrelated own and adopted B after A supersession; record actual matches/mismatches without changing inputs post hoc. Case4 counts a new send at the actual transport boundary, performs actual source revocation after that boundary, allows its real provider response to complete, then requires final refusal with null decision/empty targets and no cached success. Do not substitute a cached hit, pre-send refusal, cancellation or timeout and call it completed-response discard; an incomplete fourth response is an honest incomplete smoke. No expected model label is assigned to revoked case4. Invalid lifecycle/foreign/zero-target/retry/cache checks must not add a fifth send; no automatic retry on model disagreement. A temporary harness observer may count only its own approved synthetic body and must never log headers/credentials/raw exceptions.",
+    "Evaluation must leave working Graph, exploration origins/receipts/outbox and ingress ACK state unchanged; fixture preparation/adoption and deliberate revocation are separately explicit setup effects. Write only sanitized synthetic measurements with exact input/result/selection identities, expected/observed labels for first3, actual send/attempt counts, provider-completed/final-discard facts for fourth, latency/reserved/observed-or-unknown usage, and excluded-canary assertions. Credential access only through actual ProviderSettings.useCredential, using already authorized local key provisioning; no private traces, user project scan, external deployment or canonical record/model output publication.",
+    "Verification: node --test test/context-judge*.test.mjs plus affected test/judge-*.test.mjs and test/context-*.test.mjs; npm run verify and npm run verify:standalone from semantic-runtime/; npm run verify:artifact from root; git diff --check. Deterministic recorded transport cases need no secret or model. Keep live smoke evidence separate from deterministic verification and report route/model availability honestly. This Ticket owns only the bridge; Query remains draft with all five acceptance obligations and existing four dependencies/history unchanged until a separate independently validated refinement consumes this Outcome."
+  ],
+  "context": "Small independently usable local library bridge between the accepted Context lifecycle and Judge runtime contracts. It enables meaningful selected Context relevance tests before the larger Query implementation. Reuse existing Graph/Context/canonical/source facts and provider orchestration; do not implement Query/FTS/ranking, Compiler, delivery, App, host integration or Worker execution. No Query acceptance responsibility is transferred, retired or waived. Both exact direct prerequisite Outcomes are independently successful and included below.",
+  "context_refs": [
+    {
+      "purpose": "Independent Runtime/core/provider/storage boundaries and verification obligations.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Architecture §§11–12: bounded semantic judgments and relevance remain candidate signals, not canonical authority or complete Policy execution.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Active local App/plugin direction; the library bridge is reusable without pulling App, host or Worker wiring into this slice.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-app-product.yaml"
+    },
+    {
+      "purpose": "Awareness and relevance do not adopt another exploration or grant governing status.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Actual role, scope, lifecycle, exact source and lineage must survive relevance projection.",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
+    },
+    {
+      "purpose": "Direct prerequisite exact Judge Contract4 sha256:79aee523c2dc54588cafffe0d213523526b035e1374d84318448c2413792c535 and its unchanged provider/activation/cache/budget/public-wire obligations.",
+      "ref": ".vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml"
+    },
+    {
+      "purpose": "Direct prerequisite exact Context Contract2 sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5; execute only after its independent successful Outcome exists.",
+      "ref": ".vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml"
+    },
+    {
+      "purpose": "Actual accepted one-shot Judge wire, typed bridge, three routes, minimized envelope and current proof checks.",
+      "ref": "semantic-runtime/docs/judge-runtime-v0.md"
+    },
+    {
+      "purpose": "Actual six-method Context facade, typed profile, applicability/lineage reads and explicit currently unsupported Judge-target boundary.",
+      "ref": "semantic-runtime/docs/context-lifecycle-v0.md"
+    },
+    {
+      "purpose": "Actual runtime_context role/meaning/applicability schema and inert bounded validators; no duplicated content truth.",
+      "ref": "semantic-runtime/src/core/context-profile.mjs"
+    },
+    {
+      "purpose": "Public actual typed Context materialization; target text must come from selected authorized revisions.",
+      "ref": "semantic-runtime/src/local/context-store.mjs"
+    },
+    {
+      "purpose": "Instance-branded configured canonical Ticket proofs and actual code/source projection; inherited support and current authority.",
+      "ref": "semantic-runtime/src/local/context-inputs.mjs"
+    },
+    {
+      "purpose": "Current lifecycle/exact publication validation and selected fixed internal reads; no copied source labels.",
+      "ref": "semantic-runtime/src/local/context-reader.mjs"
+    },
+    {
+      "purpose": "Actual shared provider orchestration, deadline/reservations, current admission and per-actor process-local cache/in-flight namespace to preserve.",
+      "ref": "semantic-runtime/src/local/judge-runtime.mjs"
+    },
+    {
+      "purpose": "Existing actual ingress/snapshot/source/registration/egress/pin proofs and legacy judge-target restrictions.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Existing inert trusted configuration and exact JudgeRequest validators; new method must not broaden old request wire.",
+      "ref": "semantic-runtime/src/local/judge-contract.mjs"
+    },
+    {
+      "purpose": "Existing fixed descriptor and typed outputs; add a separate descriptor without changing its identity or legacy Core executor.",
+      "ref": "semantic-runtime/src/core/judge-node.mjs"
+    },
+    {
+      "purpose": "Actual explicitly credentialed three-route transport; preserve provider retry/logging controls and before-send check.",
+      "ref": "semantic-runtime/src/local/judge-provider.mjs"
+    },
+    {
+      "purpose": "Actual same-store canonical issuance, access, source fence and separate origin/current Project proof.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Reusable real runtime/settings/transport fixture for deterministic routing/cache/race cases.",
+      "ref": "semantic-runtime/test/helpers/judge-runtime-fixture.mjs"
+    },
+    {
+      "purpose": "Actual disposable Git/SQLite typed Context and adoption fixture, not fake selected success.",
+      "ref": "semantic-runtime/test/helpers/context-fixture.mjs"
+    },
+    {
+      "purpose": "Existing opt-in synthetic actual-fetch observer and in-flight revocation pattern; new smoke must count exactly four new sends.",
+      "ref": "semantic-runtime/scripts/check-jev-judge.mjs"
+    },
+    {
+      "purpose": "Actual successful exact Judge Contract4 supplies the accepted dispatch/security/budget behavior reused by this bridge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-judge-runtime-v0/contract-v4.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked Evidence referenced by the successful direct Judge prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-judge-runtime-v0/judge-runtime-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked Evidence referenced by the successful direct Judge prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-judge-runtime-v0/judge-runtime-verification-20260922.yaml"
+    },
+    {
+      "purpose": "Actual independently successful exact Context Contract2 sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5 supplies the selected typed materialization and authenticated lifecycle/source/publication proof required by the bridge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-lifecycle-lineage-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked Evidence referenced by the successful direct Context prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-context-lifecycle-lineage-v0/context-lifecycle-conformance-20260922.yaml"
+    },
+    {
+      "purpose": "Actual acceptance-linked Evidence referenced by the successful direct Context prerequisite Outcome.",
+      "ref": ".vibehub/evidence/ticket-runtime-context-lifecycle-lineage-v0/context-lifecycle-verification-20260922.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-bridge-conformance-and-live-smoke",
+          "identity": "sha256:08137d7a0d8cbf246dad9d4f865e38b3838a5cd648c197cb7348e96087656385",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-dispatch-preserves-judge-guards",
+          "identity": "sha256:e04233ee0a6addc80c08431fd34cad7318c0fb45f13298b934fce21ba6ecd3b3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "typed-context-input-is-selected",
+          "identity": "sha256:8c199c23cbb3382354f08cd404b9e1cac3907209e818534a2f1f0a86719ef83f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1970a2dd7d7d1fde9516fa004b6924b864b886df1be6eadb7c0b7568283ce717",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Evaluate actual authorized current typed Context relevance through the existing bounded local Judge runtime without copying caller targets or creating shadow Graph entities.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-local-app-goal",
+    "planning:query-context-selected-judge-bridge",
+    "planning:parent-authorized-bounded-refinement",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Its exact successful Context Contract2 sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5 supplies actual current typed Context content/applicability/lifecycle and authenticated source/publication materialization required before any Context text can be dispatched.",
+      "target_ticket_id": "ticket-runtime-context-lifecycle-lineage-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Its exact successful Judge Contract4 sha256:79aee523c2dc54588cafffe0d213523526b035e1374d84318448c2413792c535 supplies the actual configured provider/credential/egress/admission/deadline/budget/cache path extended by this fixed profile; adapters alone are insufficient.",
+      "target_ticket_id": "ticket-runtime-judge-runtime-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-context-judge-bridge-v0"
+}

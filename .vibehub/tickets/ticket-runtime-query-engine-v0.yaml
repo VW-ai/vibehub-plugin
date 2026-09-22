@@ -70,7 +70,7 @@
     "Use synthetic or explicitly selected, destination-authorized input for live calls; credentials stay outside Context, logs and Git. Existing Peel authorization is not blanket authorization for new sources or destinations.",
     "REFINE this same Ticket from its prerequisite Outcomes before execution; bind concrete schemas, commands, workloads and thresholds rather than treating draft acceptance as implementation authorization."
   ],
-  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Dependency clarification: branch-graph-projection supplies isolated snapshots/views; actual adoption lineage remains required through context-lifecycle-lineage -> exploration-adoption. This does not make query execution ready from view completion or waive any current acceptance.",
+  "context": "Build point-in-time semantic retrieval and ranking. Delivery slice: alpha. Architecture: . Scope: Query contracts, snapshot resolution, candidate adapters, traversal, dedup, ranking, pagination, degradation, and trace.. Excluded: Answer-synthesis Worker, prompt formatting, proactive delivery, and mandatory vector database..  Refine exact adapter endpoints, fixtures, commands and measurable limits after its direct prerequisites close. Dependency clarification: branch-graph-projection supplies isolated snapshots/views; actual adoption lineage remains required through context-lifecycle-lineage -> exploration-adoption. This does not make query execution ready from view completion or waive any current acceptance. Bounded causal prerequisite refinement: selected typed Context cannot be passed to the accepted legacy judge-target wire. The separate ticket-runtime-context-judge-bridge-v0 supplies that authorized exact-source/pin/egress bridge. This Query Ticket remains draft; all five active acceptance obligations, existing four dependency edges and Acceptance/Contract history are unchanged. Its eventual FTS/text/scope/notices/ranking/degradation/lifecycle wire must be independently refined after the bridge Outcome; this metadata update authorizes no Query implementation.",
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
@@ -196,6 +196,7 @@
     "conversation:2026-09-21-runtime-local-branch-experience",
     "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "planning-transfer:ticket-runtime-branch-graph-projection-v0/contract-v1/explicit-adoption-and-adoption-recovery-to/ticket-runtime-exploration-adoption-v0",
+    "planning:query-context-selected-judge-bridge",
     "plan-validation:independent"
   ],
   "relations": [
@@ -217,6 +218,11 @@
     {
       "rationale": "Domain applicability/lifecycle projection used by retrieval, beyond raw Graph revisions.",
       "target_ticket_id": "ticket-runtime-context-lifecycle-lineage-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Actual typed runtime_context relevance requires the separately authorized selected Context Judge bridge; accepted legacy Judge Contract4 supports judge-target only. Its successful Outcome supplies the exact Context-to-model materialization/dispatch capability consumed by optional Query semantic ranking. No Query responsibility is transferred or waived.",
+      "target_ticket_id": "ticket-runtime-context-judge-bridge-v0",
       "type": "depends_on"
     }
   ],
