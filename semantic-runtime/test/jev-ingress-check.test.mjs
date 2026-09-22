@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkPersistedJev } from '../scripts/check-jev-ingress.mjs';
 import { edgeCases } from '../scripts/check-jev-synthetic.mjs';
-import { DomainStore } from '../src/index.mjs';
+import { DomainStore, LocalGraphStore } from '../src/index.mjs';
 
 test('persisted JEV smoke reopens approved bytes, deduplicates intake and sends only minimal synthetic input', async t => {
   let calls = 0, activeSnapshot = false, snapshots = 0;
@@ -45,6 +45,14 @@ test('persisted smoke reports transport failures and semantic misses without raw
 
 test('Graph smoke materializes synthetic state before dispatch and retains candidate judgments with exact restart retries', async t => {
   let calls = 0, views = 0;
+  const judgments = new Map(), resolve = LocalGraphStore.prototype.resolve;
+  t.mock.method(LocalGraphStore.prototype, 'resolve', function (...args) {
+    const result = resolve.apply(this, args);
+    if (result.status === 'resolved' && result.revision.entity_id.startsWith('judgment-')) {
+      judgments.set(result.revision.entity_id, result.revision);
+    }
+    return result;
+  });
   for (const method of ['readSnapshot', 'transaction']) {
     const original = DomainStore.prototype[method];
     t.mock.method(DomainStore.prototype, method, function (...args) {
@@ -64,6 +72,15 @@ test('Graph smoke materializes synthetic state before dispatch and retains candi
   } }, { graphRoundTrip: true });
   assert.equal(report.completed, 8); assert.equal(report.matched, 8);
   assert.deepEqual(report.graph, { state_materializations: 9, candidate_judgments: 8, restarted: true,
+    judgment_provenance_sources_verified: 17,
     historical_reads_verified: 17, exact_retries_verified: 17, canonical_promotion: false, ingress_acknowledged: false });
   assert.equal(report.ingress.pending_intents, 17);
+  assert.equal(judgments.size, 8);
+  for (const [index, entry] of edgeCases.entries()) {
+    const revision = judgments.get(`judgment-${index + 1}`);
+    assert.equal(revision.assertion.parents.length, entry[3].length,
+      'each target considered by JEV must retain its exact Graph revision, even when not selected');
+    assert.equal(revision.provenance.events.length, 1 + entry[3].length,
+      'the persisted judgment depends on its event and all visible target sources');
+  }
 });

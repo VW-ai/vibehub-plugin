@@ -117,11 +117,20 @@ one local synthetic run, not a throughput guarantee.
 `TYPESAFE_API_KEY`. It sends only eight fixed synthetic event texts and their
 visible target text to the official TypeSafe endpoint. Nine target states are
 first persisted with their own admitted sources, then materialized from Graph.
-The eight model judgments become candidate revisions; restart verifies all 17
-exact reads/retries. Labels, ACLs, IDs, paths, provenance and credentials are not
+The eight model judgments become candidate revisions that pin every target
+revision they considered, including targets not selected by the model. Their
+provenance therefore inherits every input source. Restart verifies all 17
+exact reads/retries and checks this source closure. Labels, ACLs, runtime/storage IDs, paths, provenance and credentials are not
 sent as model input. Network calls run after all database views close.
 
 The [2026-09-22 live run](measurements/jev-graph-round-trip-20260922.json) completed
 8/8 expected judgments, 96–347 ms per successful request, with no retries or rate
 limits. All 17 source intents remain pending. This verifies composition; it does
 not establish extraction quality, an automatic Policy loop or plugin coverage.
+
+The [source-closure follow-up](measurements/jev-graph-source-closure-20260922.json)
+also completed 8/8 expected judgments, 127–337 ms per successful request, with
+no retries or rate limits. It verifies 17 supporting source pins across the
+eight judgment revisions after reopening the database. Both runs use the same
+small synthetic corpus; the follow-up corrects missing target-revision parents
+in the smoke harness, without changing the Graph Store or model adapter.

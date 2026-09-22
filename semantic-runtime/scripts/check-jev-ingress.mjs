@@ -101,10 +101,10 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000, graphRoundT
       graphHead = graph.initialize(context, { generation_id, epoch, idempotency_key: 'initialize',
         publisher_ref: publisher.publisher_ref, coverage: [] }).receipt.next_graph;
     }
-    const publish = (id, data, events) => {
+    const publish = (id, data, events, parents = []) => {
       const request = { epoch, idempotency_key: id, publisher_ref: publisher.publisher_ref, expected_graph: graphHead,
         operation: { kind: 'assert', assertion: { schema_version: 1, assertion_id: id, entity_kind: 'entity', entity_id: id,
-          base_revision: null, parents: [], execution_id: publisher.execution_id, status: 'candidate',
+          base_revision: null, parents, execution_id: publisher.execution_id, status: 'candidate',
           content: { semantic_type: 'decision', data }, events, canonical_refs: [] } }, coverage: null };
       const result = graph.mutate(context, request);
       if (result.status !== 'applied') throw new Error('Synthetic Graph publication failed');
@@ -128,6 +128,7 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000, graphRoundT
       // Do not spread the persisted envelope: source IDs, ACL, paths, catalog,
       // receipt, provenance, digest and labels have no role in model input.
       let stateRefs = input.stateRefs;
+      const stateParents = [];
       if (graphRoundTrip) {
         // Deliberately synthetic initial state has its own admitted source.
         // Labels and expected decisions never enter these state assertions.
@@ -142,6 +143,7 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000, graphRoundT
           const saved = publish(`state-${stateCount++}`, { id: ref.id, text: snapshot.text }, [retained.event]); stateAssertions.push(saved);
           const read = graph.resolve(context, { at: graphHead, address: saved.result.revision });
           if (read.status !== 'resolved') throw new Error('Synthetic Graph state unavailable');
+          stateParents.push(saved.result.revision);
           return read.revision.assertion.content.data;
         });
       }
@@ -155,23 +157,36 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000, graphRoundT
         // Ticket, resolve semantic conflict, or ACK source processing.
         published.push(publish(`judgment-${materialized}`, { family: input.question.family,
           relevant: validated.value.relevant, target_ids: validated.value.target_ids,
-          model: validated.model, provider: validated.provider }, [retained.event]));
+          model: validated.model, provider: validated.provider }, [retained.event], stateParents));
       }
       return decision;
     } }, { suite: 'edge', timeoutMs });
     let graphReport;
     if (graphRoundTrip) {
       store.close(); ingress = open(); graph = new LocalGraphStore({ store, authority });
-      let verified = 0;
+      let verified = 0, judgmentSources = 0;
       for (const saved of [...stateAssertions, ...published]) {
         const read = graph.resolve(context, { at: saved.result.receipt.next_graph, address: saved.result.revision });
         if (read.status !== 'resolved' || read.revision.assertion.status !== 'candidate'
           || canonical(read.revision.assertion.content.data) !== canonical(saved.data)) throw new Error('Synthetic Graph restart mismatch');
+        // Every state sent to the judge, including a rejected target, helped
+        // produce its output. Preserve those exact revision/source dependencies.
+        const expectedEvents = [...saved.request.operation.assertion.events,
+          ...saved.request.operation.assertion.parents.flatMap(parent => {
+            const source = stateAssertions.find(item => canonical(item.result.revision) === canonical(parent));
+            if (!source) throw new Error('Synthetic state provenance missing');
+            return source.request.operation.assertion.events;
+          })];
+        const actualIds = read.revision.provenance.events.map(event => event.event_id).sort();
+        const expectedIds = [...new Set(expectedEvents.map(event => event.event_id))].sort();
+        if (canonical(actualIds) !== canonical(expectedIds)) throw new Error('Synthetic judgment provenance mismatch');
+        if (published.includes(saved)) judgmentSources += actualIds.length;
         const retried = graph.mutate(context, saved.request);
         if (retried.status !== 'duplicate' || JSON.stringify(retried.receipt) !== JSON.stringify(saved.result.receipt)) throw new Error('Synthetic Graph retry mismatch');
         verified++;
       }
       graphReport = { state_materializations: stateAssertions.length, candidate_judgments: published.length,
+        judgment_provenance_sources_verified: judgmentSources,
         restarted: true, historical_reads_verified: verified, exact_retries_verified: verified,
         canonical_promotion: false, ingress_acknowledged: false };
     }
