@@ -1,0 +1,46 @@
+{
+  "acceptance_ids": [
+    "ux-research-is-self-contained",
+    "ux-relocation-preserves-behavior",
+    "ux-path-history-remains-resolvable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "ux-research-is-self-contained",
+      "identity": "sha256:6d29460f661863b39e5d3de1d082b29faedc25298c630b17548b67681e740043",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-relocation-preserves-behavior",
+      "identity": "sha256:406bddfd6e1d64faa8d0c7c9c430ccf8564978053e5978ea56cd6be021737c39",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-path-history-remains-resolvable",
+      "identity": "sha256:70c12fc071a75e13f16d330f6a21cecca07a8a74e591d8f23d77c991227c02e4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-relocate-ux-research-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T22:57:03Z",
+  "refs": [
+    "semantic-runtime/research/ux/project-exploration/README.md",
+    "semantic-runtime/research/ux/project-exploration/project-exploration-ux-v0.md",
+    "semantic-runtime/research/ux/project-exploration/serve.mjs",
+    "semantic-runtime/research/ux/project-exploration/prototype.test.mjs",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/docs/architecture/runtime-layout-v0.md",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    ".vibehub/tickets/ticket-runtime-relocate-ux-research.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "The disconnected Project/Exploration UX prototype and its design record moved as seven 100% Git renames in migration commit b402f18e3aefa13d2063521bfb0c1b5a180d0307 to semantic-runtime/research/ux/project-exploration. A local README now states purpose, launch and test commands, synthetic page-memory fixture boundaries, limitations, and separation from src/local. Current Runtime README, product/operations docs, the active relocation Ticket and semantic-runtime Room anchors use the new paths; completed historical Ticket, Evidence and Outcome records were not rewritten. The versioned relocation manifest records all seven exact old/new paths, original Git blobs, migration commit and category; an executable audit resolved every declared old blob in the migration parent and the identical blob at the new path in the migration commit. The layout checker now inventories research directly, classifies relocated UX assets in place, treats docs/history as settled, and cannot silently skip the full in-repository inventory when the retired prototype root is absent. Standalone verification deliberately omits research and the relocation-only test records one explicit skip there rather than copying research into the production package. Six deterministic fixture tests and three syntax checks pass. A temporary loopback host check verified the four allowlisted assets and content types with restrictive CSP, unknown path 404, POST 405, foreign Host 403, and HEAD 200 with zero body. Focused layout/boundary tests pass 14/14. Full Runtime verification passes 1030 total / 1028 passed / 0 failed / 2 expected Keychain skips. Standalone locked-install verification passes outside the repository with 1030 total / 1027 passed / 0 failed / 3 expected skips (two Keychain plus the explicit research-exclusion skip). Plugin artifact verification passes with 79 files and 3670088 bytes. Ticket validation, Context guard, git diff checking and semantic-runtime Room freshness pass. No Runtime production import, public export, npm command, dependency, provider call, database behavior or UI behavior changed.",
+  "ticket_id": "ticket-runtime-relocate-ux-research"
+}

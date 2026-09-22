@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parse } from 'acorn';
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'prototype', 'spikes', 'policies', 'docs']);
+const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'research', 'spikes', 'policies', 'docs']);
 const ROOT_INVENTORY_EXCLUDES = new Set(['.env.local']);
 const BASELINE_PATH = 'docs/architecture/runtime-layout-baseline-v1.json';
 
@@ -138,6 +138,7 @@ function testDestination(path) {
 
 function documentDestination(path) {
   const basename = path.split('/').at(-1);
+  if (path.startsWith('docs/history/')) return path;
   if (path.startsWith('docs/measurements/')) {
     if (/^(?:codex|claude)-host/.test(basename)) {
       const host = basename.includes('codex') ? 'codex' : 'claude';
@@ -172,7 +173,10 @@ function inventoryRecord(path) {
   if (path.startsWith('src/')) return { path, current_role: 'production', intended_destination: sourceDestination(path) };
   if (path.startsWith('scripts/')) return { path, current_role: 'tooling-or-runner', intended_destination: scriptDestination(path) };
   if (path.startsWith('test/')) return { path, current_role: 'test-or-fixture', intended_destination: testDestination(path) };
-  if (path.startsWith('prototype/')) return { path, current_role: 'ux-research', intended_destination: `research/ux/project-exploration/${path.slice('prototype/'.length)}` };
+  if (path.startsWith('research/ux/')) return { path, current_role: 'ux-research', intended_destination: path };
+  if (path.startsWith('research/platform/')) return { path, current_role: 'platform-research', intended_destination: path };
+  if (path.startsWith('research/host-probes/')) return { path, current_role: 'host-research', intended_destination: path };
+  if (path.startsWith('research/')) return { path, current_role: 'research', intended_destination: path };
   if (path.startsWith('spikes/platform-node-postgres/')) return { path, current_role: 'platform-research', intended_destination: `research/platform/node-postgres/${path.slice('spikes/platform-node-postgres/'.length)}` };
   if (path.startsWith('policies/')) return { path, current_role: 'phase0-research', intended_destination: `research/phase0-replay/policies/${path.slice('policies/'.length)}` };
   return { path, current_role: 'documentation-or-report', intended_destination: documentDestination(path) };

@@ -8,7 +8,7 @@ import { checkRuntimeLayout, inspectRuntimeLayout } from '../scripts/runtime-lay
 function copyComponent(t) {
   const root = mkdtempSync(join(tmpdir(), 'semantic-layout-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'index.ts', 'src', 'scripts', 'test', 'prototype', 'spikes', 'policies', 'docs']) {
+  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'index.ts', 'src', 'scripts', 'test', 'research', 'spikes', 'policies', 'docs']) {
     const source = new URL(`../${path}`, import.meta.url);
     if (existsSync(source)) cpSync(source, join(root, path), { recursive: true });
   }
@@ -17,8 +17,27 @@ function copyComponent(t) {
 
 test('checked Runtime layout baseline matches the complete component', () => {
   const result = checkRuntimeLayout();
-  assert.equal(result.inventory_checked, existsSync(new URL('../prototype', import.meta.url)));
+  assert.equal(result.inventory_checked, existsSync(new URL('../research', import.meta.url)));
   assert.deepEqual(result.errors, []);
+});
+
+test('UX research relocation is complete and recorded', t => {
+  if (!existsSync(new URL('../research', import.meta.url))) {
+    t.skip('standalone production verification deliberately excludes research');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url), 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'ux-research');
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(entries.length, 7);
+  assert.equal(new Set(entries.map(item => item.migration_commit)).size, 1);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.match(entry.migration_commit, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+  assert.ok(entries.every(entry => entry.new_path.startsWith('semantic-runtime/research/ux/project-exploration/')));
 });
 
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
@@ -53,7 +72,7 @@ test('layout check gives focused additions and removals without external capabil
   mkdirSync(dirname(extra), { recursive: true });
   writeFileSync(extra, 'export const value = 1;\n');
   result = checkRuntimeLayout(root);
-  if (existsSync(new URL('../prototype', import.meta.url))) {
+  if (existsSync(new URL('../research', import.meta.url))) {
     assert.equal(result.ok, false);
     assert.match(result.errors.join('\n'), /inventory: added or changed/);
   } else {
@@ -63,7 +82,7 @@ test('layout check gives focused additions and removals without external capabil
   rmSync(extra);
   writeFileSync(join(root, 'unexpected.md'), '# unclassified root document\n');
   result = checkRuntimeLayout(root);
-  if (existsSync(new URL('../prototype', import.meta.url))) {
+  if (existsSync(new URL('../research', import.meta.url))) {
     assert.equal(result.ok, false);
     assert.match(result.errors.join('\n'), /inventory: added or changed.*unexpected\.md/);
   } else {

@@ -47,19 +47,19 @@
     },
     {
       "purpose": "Current disconnected UX prototype host and asset allowlist.",
-      "ref": "semantic-runtime/prototype/serve.mjs"
+      "ref": "semantic-runtime/research/ux/project-exploration/serve.mjs"
     },
     {
       "purpose": "Current deterministic UX prototype behavior checks.",
-      "ref": "semantic-runtime/prototype/prototype.test.mjs"
+      "ref": "semantic-runtime/research/ux/project-exploration/prototype.test.mjs"
     },
     {
       "purpose": "Current UX prototype document entry.",
-      "ref": "semantic-runtime/prototype/index.html"
+      "ref": "semantic-runtime/research/ux/project-exploration/index.html"
     },
     {
       "purpose": "Current UX research and prototype contract.",
-      "ref": "semantic-runtime/docs/project-exploration-ux-v0.md"
+      "ref": "semantic-runtime/research/ux/project-exploration/project-exploration-ux-v0.md"
     }
   ],
   "contract_revisions": [

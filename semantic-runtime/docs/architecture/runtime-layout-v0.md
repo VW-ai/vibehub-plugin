@@ -59,20 +59,12 @@ trees.
 `npm run check:boundaries` verifies it without credentials, Keychain, host
 subscriptions, provider calls, GitHub, or network access.
 
-There is one production dependency cycle:
-
-```text
-graph-store
-  -> context-inputs
-  -> exploration-canonical
-  -> canonical-source-reader
-  -> graph-store
-```
-
-`graph-store.mjs` also coordinates Graph, Exploration, canonical selection,
-Context lifecycle, and their shared transaction. Moving those files first
-would preserve the cycle under better-looking paths and make behavioral changes
-harder to review.
+The original baseline recorded one Graph/Context/Canonical production cycle.
+That cycle has since been removed through the composition seam below; the
+machine baseline now requires zero production SCCs. `graph-store.mjs` still
+coordinates Graph, Exploration, canonical selection, Context lifecycle, and
+their shared transaction. Moving or splitting those responsibilities remains a
+separate, behavior-sensitive migration.
 
 ## Required composition seam
 
@@ -111,13 +103,15 @@ unchanged.
 
 ## Relocation manifest
 
-Before the first move, create a versioned JSON manifest under `docs/history/`.
+The versioned
+[`runtime-relocations-v1.json`](../history/runtime-relocations-v1.json) manifest
+under `docs/history/` records each completed move. Every entry contains:
 Every entry contains:
 
 ```json
 {
-  "old_path": "semantic-runtime/prototype/serve.mjs",
-  "new_path": "semantic-runtime/research/ux/project-exploration/serve.mjs",
+  "old_path": "<repository-relative old path>",
+  "new_path": "<repository-relative new path>",
   "old_blob": "<40 lowercase hex Git blob>",
   "migration_commit": "<40 lowercase hex commit>",
   "category": "ux-research"

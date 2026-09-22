@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "relocations": [
+    {
+      "old_path": "semantic-runtime/prototype/app.mjs",
+      "new_path": "semantic-runtime/research/ux/project-exploration/app.mjs",
+      "old_blob": "160f821be5aaa2f8b7d6cc09181ae7ccb939c0b3",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/prototype/fixtures.mjs",
+      "new_path": "semantic-runtime/research/ux/project-exploration/fixtures.mjs",
+      "old_blob": "6c40293b6d37083dbcd33e1ccc2418c0cd573578",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/prototype/index.html",
+      "new_path": "semantic-runtime/research/ux/project-exploration/index.html",
+      "old_blob": "5ef4c20cf89516cde0a622835a5b20747b276b5e",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/project-exploration-ux-v0.md",
+      "new_path": "semantic-runtime/research/ux/project-exploration/project-exploration-ux-v0.md",
+      "old_blob": "fe67e3e0662143a569b9039931a6e235cc833375",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/prototype/prototype.test.mjs",
+      "new_path": "semantic-runtime/research/ux/project-exploration/prototype.test.mjs",
+      "old_blob": "a06b64393cbded37ab3fc8a292022f5604d78823",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/prototype/serve.mjs",
+      "new_path": "semantic-runtime/research/ux/project-exploration/serve.mjs",
+      "old_blob": "0926fe6469bdac5eec51b82c44c596f3c12e0fea",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    },
+    {
+      "old_path": "semantic-runtime/prototype/style.css",
+      "new_path": "semantic-runtime/research/ux/project-exploration/style.css",
+      "old_blob": "0339e7ae472e8f9cec72ca2f370f46b724f65e09",
+      "migration_commit": "b402f18e3aefa13d2063521bfb0c1b5a180d0307",
+      "category": "ux-research"
+    }
+  ]
+}

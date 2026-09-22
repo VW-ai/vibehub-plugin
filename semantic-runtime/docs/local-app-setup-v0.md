@@ -42,7 +42,8 @@ Closing a browser tab does not stop the service.
 Plugins and subscription Workers are visibly **not connected**. This setup
 slice does not collect sessions, run Policy Graph nodes, activate context in a
 coding Agent, or execute a Worker. The separate synthetic explorer remains at
-`prototype/serve.mjs`; its semantic screens are not mixed into this App.
+`research/ux/project-exploration/serve.mjs`; its semantic screens are not mixed
+into this App.
 
 ## Small composition and authority boundary
 

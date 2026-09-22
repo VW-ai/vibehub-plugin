@@ -67,7 +67,7 @@ The [Project activation module](project-activation-v0.md) now persists explicit
 switches, immutable gaps and cancellation notices, and checks an epoch within
 the same transaction as admitted effects. Its 13 focused tests and independent
 review pass; actual capture/send/host boundaries still require consumer wiring.
-A separate [synthetic local App prototype](project-exploration-ux-v0.md) now
+A separate [synthetic local App prototype](../research/ux/project-exploration/project-exploration-ux-v0.md) now
 demonstrates setup, Project awareness, Ticket provenance/filtering, context
 lineage and explicit adoption. Six fixture tests, browser walkthroughs and
 independent review passed. These are page-memory interactions, not Runtime API

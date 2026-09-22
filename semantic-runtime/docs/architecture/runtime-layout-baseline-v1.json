@@ -4,7 +4,7 @@
     "src",
     "scripts",
     "test",
-    "prototype",
+    "research",
     "spikes",
     "policies",
     "docs",
@@ -130,6 +130,11 @@
       "path": "docs/graph-store-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/graph-store-v0.md"
+    },
+    {
+      "path": "docs/history/runtime-relocations-v1.json",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/history/runtime-relocations-v1.json"
     },
     {
       "path": "docs/identity-contract-v0.md",
@@ -362,11 +367,6 @@
       "intended_destination": "docs/contracts/project-activation-v0.md"
     },
     {
-      "path": "docs/project-exploration-ux-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/ux/project-exploration/project-exploration-ux-v0.md"
-    },
-    {
       "path": "docs/provider-settings-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/operations/provider-settings-v0.md"
@@ -427,39 +427,49 @@
       "intended_destination": "research/phase0-replay/policies/phase0.json"
     },
     {
-      "path": "prototype/app.mjs",
+      "path": "README.md",
+      "current_role": "component-documentation",
+      "intended_destination": "README.md"
+    },
+    {
+      "path": "research/ux/project-exploration/app.mjs",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/app.mjs"
     },
     {
-      "path": "prototype/fixtures.mjs",
+      "path": "research/ux/project-exploration/fixtures.mjs",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/fixtures.mjs"
     },
     {
-      "path": "prototype/index.html",
+      "path": "research/ux/project-exploration/index.html",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/index.html"
     },
     {
-      "path": "prototype/prototype.test.mjs",
+      "path": "research/ux/project-exploration/project-exploration-ux-v0.md",
+      "current_role": "ux-research",
+      "intended_destination": "research/ux/project-exploration/project-exploration-ux-v0.md"
+    },
+    {
+      "path": "research/ux/project-exploration/prototype.test.mjs",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/prototype.test.mjs"
     },
     {
-      "path": "prototype/serve.mjs",
+      "path": "research/ux/project-exploration/README.md",
+      "current_role": "ux-research",
+      "intended_destination": "research/ux/project-exploration/README.md"
+    },
+    {
+      "path": "research/ux/project-exploration/serve.mjs",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/serve.mjs"
     },
     {
-      "path": "prototype/style.css",
+      "path": "research/ux/project-exploration/style.css",
       "current_role": "ux-research",
       "intended_destination": "research/ux/project-exploration/style.css"
-    },
-    {
-      "path": "README.md",
-      "current_role": "component-documentation",
-      "intended_destination": "README.md"
     },
     {
       "path": "scripts/benchmark-peel-jev.mjs",

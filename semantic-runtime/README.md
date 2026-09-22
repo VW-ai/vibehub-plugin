@@ -74,8 +74,9 @@ retains ordered lifecycle notices, and exposes a fence for future query consumer
 access is revoked while the model is running: publication must fail without
 changing the Graph. See [Graph access and lifecycle rules](docs/graph-store-v0.md).
 
-For the separate [synthetic App interaction preview](docs/project-exploration-ux-v0.md),
-run `node prototype/serve.mjs 51987` and open `http://127.0.0.1:51987/`.
+For the separate [synthetic App interaction preview](research/ux/project-exploration/project-exploration-ux-v0.md),
+run `node research/ux/project-exploration/serve.mjs 51987` and open
+`http://127.0.0.1:51987/`.
 It demonstrates Project/Context/Ticket/setup flows using page-memory fixtures;
 it does not connect to the Runtime or accept real credentials.
 

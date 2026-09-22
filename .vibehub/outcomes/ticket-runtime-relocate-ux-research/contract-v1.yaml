@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "ux-research-is-self-contained",
+    "ux-relocation-preserves-behavior",
+    "ux-path-history-remains-resolvable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T23:08:38Z",
+  "contract_revision": {
+    "identity": "sha256:307220c89100527a13f3945cc3bcfd17444d6d89db013e64f82d92ccd39a025b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-relocate-ux-research-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh subagent /root/ux_independent_closeout had no role in implementation or Evidence authoring. It independently read the exact Ticket, Contract identities, Evidence, migration commit, current diff, governing instructions and acceptance contracts; audited blobs and references; inspected prototype, manifest, README, layout and standalone boundaries; and reran focused behavior, host, boundary, validation, full Runtime and artifact checks. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three criteria of exact Contract v1. The migration commit contains exactly seven R100 renames, and every manifest entry resolves to the declared Git blob at the old parent path and new migration path. The colocated README states purpose, launch and test commands, page-memory fixture limits, and separation from the connected local App. The six fixture tests and three syntax checks pass. A fresh loopback host audit returned byte-identical allowlisted assets and expected content types, restrictive CSP, 404 unknown path, 405 POST, 403 foreign Host, and bodyless 200 HEAD. Production source has no research import, package and lock dependencies are unchanged, and no served asset behavior changed. Current Runtime README and docs, active relocation Ticket, and semantic-runtime Room anchors use new paths; old paths remain only in completed historical records. The manifest records all seven paths, blobs, category, and migration commit. Ticket and project validation, Context guard, Room freshness, and diff checking pass. Focused layout and boundary tests pass 14 of 14; the layout inventory includes research, production cannot import it, and the standalone copy list omits research with an explicit relocation-test skip when research is absent. Full Runtime verification independently passes 1030 total, 1028 passed, zero failed, and two expected native Keychain skips. Plugin artifact verification passes with 79 files and 3670088 bytes. The bound Evidence reports a clean standalone locked-install run with the one additional expected research-exclusion skip; the closeout independently inspected that boundary and did not need to repeat the full standalone suite. No acceptance criterion remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-ux-research",
+  "unresolved_acceptance_ids": []
+}

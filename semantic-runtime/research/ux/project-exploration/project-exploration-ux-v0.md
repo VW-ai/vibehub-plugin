@@ -11,7 +11,7 @@ framework, dependency or sibling implementation is imported.
 From the repository root:
 
 ```sh
-node semantic-runtime/prototype/serve.mjs 51987
+node semantic-runtime/research/ux/project-exploration/serve.mjs 51987
 ```
 
 Open `http://127.0.0.1:51987/`. This is a different process/port from the Runtime
@@ -120,11 +120,13 @@ certification or a screen-reader test claim.
 
 ## Verification and open choices
 
-`node --test semantic-runtime/prototype/prototype.test.mjs` passes six focused
+`node --test semantic-runtime/research/ux/project-exploration/prototype.test.mjs`
+passes six focused
 checks for cross-workspace facts, scoped hide/restore, retained blockers,
 archive/status separation, independent context variants and unavailable-action
 gates, including adoption receipt retention under repeated/preference transitions.
-`node --check semantic-runtime/prototype/app.mjs` and `git diff --check`
+`node --check semantic-runtime/research/ux/project-exploration/app.mjs` and
+`git diff --check`
 pass. Browser walkthrough is recorded separately in acceptance-linked Evidence;
 these pure fixture checks do not prove browser behavior or service enforcement.
 
