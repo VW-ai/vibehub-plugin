@@ -29,6 +29,11 @@ The local modules now also provide [scoped authentication](docs/service-auth-v0.
 and the settings UI still need composition; installing these modules does not
 enable collection or background work.
 
+For the separate [synthetic App interaction preview](docs/project-exploration-ux-v0.md),
+run `node prototype/serve.mjs 51987` and open `http://127.0.0.1:51987/`.
+It demonstrates Project/Context/Ticket/setup flows using page-memory fixtures;
+it does not connect to the Runtime or accept real credentials.
+
 For a small real JEV check, run `npm run check:jev:synthetic` with the TypeSafe key
 configured locally; add `-- edge` for the targeted edge suite.
 [Inputs, results and limits](docs/jev-synthetic-check.md).

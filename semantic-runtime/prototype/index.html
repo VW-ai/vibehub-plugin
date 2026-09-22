@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>VibeHub · Project exploration prototype</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <aside class="sidebar" aria-label="Workspace navigation">
+    <a class="brand" href="#overview"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>VibeHub<span class="local-label">LOCAL</span></a>
+    <label class="field-label" for="project">PROJECT</label>
+    <select id="project"><option value="atlas">Atlas</option><option value="notebook">Notebook · empty</option></select>
+    <nav aria-label="Project"><a href="#overview" data-view="overview"><span aria-hidden="true">◫</span> Overview</a><a href="#context" data-view="context"><span aria-hidden="true">◇</span> Context & lineage</a><a href="#tickets" data-view="tickets"><span aria-hidden="true">☷</span> Tickets</a><a href="#setup" data-view="setup"><span aria-hidden="true">⚙</span> Project setup</a></nav>
+    <div class="sidebar-note"><span class="small-dot"></span> Your work stays yours<p>Native coding or optional skills.<br>VibeHub keeps the context.</p></div>
+    <div class="sidebar-bottom"><strong>Prototype workspace</strong><p>Synthetic people, projects and events.<br>No connection to your repository.</p><button class="text-button" id="reset">Reset all demo changes ↺</button></div>
+  </aside>
+  <div class="shell">
+    <header class="topbar"><span>Projects <span class="slash">/</span> <strong id="project-name">Atlas</strong></span><span class="top-right"><span class="local-indicator" id="runtime-label">● Local app · running demo</span><span class="avatar" aria-hidden="true">M</span></span></header>
+    <div class="prototype-bar"><span><strong>SYNTHETIC PROTOTYPE</strong> <span class="bar-detail">Interaction study · nothing leaves this page</span></span><label for="scenario">Preview state <select id="scenario"><option value="ready">Ready</option><option value="offline">App offline</option><option value="dormant">Session dormant</option><option value="stale">Stale context</option><option value="unavailable">Source unavailable</option><option value="denied">Access denied</option><option value="empty">No data</option><option value="auth">Worker auth expired</option><option value="quota">Provider quota</option><option value="failure">Worker failure</option></select></label></div>
+    <main id="main" tabindex="-1"></main>
+    <footer>Local App UX study · fixture time 10:42 · all statuses and receipts are simulated</footer>
+  </div>
+  <dialog id="detail" aria-labelledby="dialog-title"><div class="dialog-head"><span class="eyebrow">ATLAS · SYNTHETIC PREVIEW</span><button class="icon-button" id="close-dialog" aria-label="Close detail">×</button></div><div id="dialog-body"></div></dialog>
+  <div class="toast" id="announcement" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

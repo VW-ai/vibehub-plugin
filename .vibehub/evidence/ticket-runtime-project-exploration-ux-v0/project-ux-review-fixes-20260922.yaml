@@ -1,0 +1,39 @@
+{
+  "acceptance_ids": [
+    "awareness-and-action",
+    "context-lifecycle-meaning",
+    "ux-handoff"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "awareness-and-action",
+      "identity": "sha256:1287b1fb015369ed7e0aaa6a85f9db458c02868c228f67894f56fc6153ee3c9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-handoff",
+      "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-lifecycle-meaning",
+      "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "project-ux-review-fixes-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:36:33.473Z",
+  "refs": [
+    "semantic-runtime/prototype/app.mjs",
+    "semantic-runtime/prototype/fixtures.mjs",
+    "semantic-runtime/prototype/prototype.test.mjs",
+    "semantic-runtime/docs/project-exploration-ux-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Independent reviewer /root/provider_settings identified two source-level interaction defects after the initial browser walkthrough: denied Context retained an enabled Project-background button revealing fixture background details, and Continue/Defer after explicit adoption could overwrite the adopted notice state and permit duplicate adoption lineage. Executor fixed the denied button and its action handler to expose only a permitted tombstone, disabled Continue/Defer on adopted notices and guarded the handlers, and centralized the synthetic notice transition to retain adopted receipts and deduplicate exact revision/recipient relations. Added an adversarial test that performs adoption followed by deferred/continued/seen/repeated-adopted transitions; the adopted receipt remains and exactly one ctx-queue@1-to-A relation exists. All6 focused prototype tests and JavaScript syntax check passed. Handoff now describes these semantics and the review findings. No production authority logic or private content exists in this prototype. This records implemented fixes and automated proof; independent adjudication is still required and no fresh mobile/liveAPI/browser execution is claimed by this supplemental record.",
+  "ticket_id": "ticket-runtime-project-exploration-ux-v0"
+}

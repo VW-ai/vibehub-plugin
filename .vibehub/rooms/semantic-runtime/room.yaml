@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "2c00a5123a36caacc01abbf96b0b47b3ea2cf2a4",
+        "blob": "f7e894572af92a8a05b84995aecc9f6e59b88780",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -106,7 +106,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "c92d920bf101be588d36c7961ebac25f27105d23",
+        "blob": "19ad2ae407f9e9ebf8f45625e2d849854f45c163",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -134,7 +134,7 @@
         "path": "semantic-runtime/docs/project-activation-v0.md"
       },
       {
-        "blob": "99a87bd1e137f6b928160739fc639fd5fcde6ee8",
+        "blob": "fe67e3e0662143a569b9039931a6e235cc833375",
         "path": "semantic-runtime/docs/project-exploration-ux-v0.md"
       },
       {
@@ -178,11 +178,11 @@
         "path": "semantic-runtime/policies/phase0.json"
       },
       {
-        "blob": "3c90f991c49731a05764ffdba6c657a84d98900c",
+        "blob": "160f821be5aaa2f8b7d6cc09181ae7ccb939c0b3",
         "path": "semantic-runtime/prototype/app.mjs"
       },
       {
-        "blob": "3905bb55a237df2b3879e62804e70b86007eab4f",
+        "blob": "6c40293b6d37083dbcd33e1ccc2418c0cd573578",
         "path": "semantic-runtime/prototype/fixtures.mjs"
       },
       {
@@ -190,7 +190,7 @@
         "path": "semantic-runtime/prototype/index.html"
       },
       {
-        "blob": "d181004111b74efa7943df1dd14cb61cfa5b73b8",
+        "blob": "a06b64393cbded37ab3fc8a292022f5604d78823",
         "path": "semantic-runtime/prototype/prototype.test.mjs"
       },
       {
@@ -738,8 +738,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T09:33:48.267Z",
-    "last_aligned_commit": "6c9abd3564e1c44059ca98acafed807349344228"
+    "checked_at": "2026-09-22T09:39:35.248Z",
+    "last_aligned_commit": "80dd0f36efac98b69ccb2cc0d795250d2853bb3f"
   },
   "anchors": [
     "semantic-runtime/"

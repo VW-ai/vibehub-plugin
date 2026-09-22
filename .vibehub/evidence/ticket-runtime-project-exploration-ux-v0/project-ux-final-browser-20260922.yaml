@@ -1,0 +1,38 @@
+{
+  "acceptance_ids": [
+    "awareness-and-action",
+    "context-lifecycle-meaning",
+    "ux-handoff"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "awareness-and-action",
+      "identity": "sha256:1287b1fb015369ed7e0aaa6a85f9db458c02868c228f67894f56fc6153ee3c9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-handoff",
+      "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-lifecycle-meaning",
+      "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "project-ux-final-browser-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:37:19.371Z",
+  "refs": [
+    "semantic-runtime/prototype/app.mjs",
+    "semantic-runtime/prototype/fixtures.mjs",
+    "semantic-runtime/docs/project-exploration-ux-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "After the two independently reported interaction fixes, parent Agent /root reloaded the final prototype in the actual Codex in-app browser on loopback51987. Following B-to-A adoption, the same notice retained adopted status with Continue own path, Defer and Review adoption all disabled while Inspect remained enabled. In denied Context state, Inspect Project background was disabled and the main content showed only the permitted tombstone with no revision contents. Reset restored Overview. These are actual final browser confirmations beyond the earlier source/fixture regression checks; no live service, credential, model, mobile, TTY or production authorization verification is implied.",
+  "ticket_id": "ticket-runtime-project-exploration-ux-v0"
+}

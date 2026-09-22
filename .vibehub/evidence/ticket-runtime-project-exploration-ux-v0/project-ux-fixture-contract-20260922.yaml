@@ -1,0 +1,54 @@
+{
+  "acceptance_ids": [
+    "project-and-lineage",
+    "workspace-ticket-management",
+    "context-lifecycle-meaning",
+    "execution-method-choice",
+    "ux-handoff"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "project-and-lineage",
+      "identity": "sha256:33e4ca2fa66eabca50ca95685d5f02b762e268a40c4c9f825bfc286f779199f3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-handoff",
+      "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workspace-ticket-management",
+      "identity": "sha256:34bc4611bbe29acb64edcf6db7687fe3167e50be716c0325d7f20a0309678b9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-lifecycle-meaning",
+      "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "execution-method-choice",
+      "identity": "sha256:1c8bdd5440aba7e4179726a2225d79b91bcf48186de9e99e8f31ff84c6b0217d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "project-ux-fixture-contract-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:30:25.337Z",
+  "refs": [
+    "semantic-runtime/prototype/index.html",
+    "semantic-runtime/prototype/style.css",
+    "semantic-runtime/prototype/app.mjs",
+    "semantic-runtime/prototype/fixtures.mjs",
+    "semantic-runtime/prototype/serve.mjs",
+    "semantic-runtime/prototype/prototype.test.mjs",
+    "semantic-runtime/docs/project-exploration-ux-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented an isolated vanilla HTML/CSS/ES-module synthetic UX study under semantic-runtime/prototype. Atlas overview is independent of main; A has multiple Sessions and T-24 spans A/B; deleted workspace D remains a historical origin. Context roles/applicability/rationale and exact fork/supersession/adoption references are visible, with A superseded independently of current B; semantic invalidation/conflict/inaccessible tombstones differ from UI hide/archive. Ticket projections expose all seven requested views with reasons and distinct A-create/B-execute/C-review plus attempts. Five focused tests passed for those facts, per-view/viewer/workspace hiding, archive/restore preserving shared state, retained authorized dependency blockers and synthetic unavailable-action gates. A 133-line interaction/API handoff names future required fields, nine walkthroughs, keyboard behavior and unresolved product choices without user-approval claims. Ticket detail explicitly leaves native coding and optional skills available; separate maintenance request UI includes named tools/input/output examples and proposal-only receipt. Source implements no production domain authorization/state mutation, no external calls/storage/key form and no sibling imports. Six live loopback static-server checks passed for four assets, unknown-path404, POST405 and restrictive CSP; the existing Runtime service on50985 is unchanged while preview uses51987. node syntax check and git diff check passed; component boundary scan99 files zero errors (prototype lies outside the existing scanner roots and its own imports were separately inspected). All13 Ticket context refs resolved; no governing authority or dependency; guard passed. This Evidence establishes source/fixture/handoff behavior, not service integration or a successful product deployment. Actual browser walkthrough is a separate Evidence item.",
+  "ticket_id": "ticket-runtime-project-exploration-ux-v0"
+}

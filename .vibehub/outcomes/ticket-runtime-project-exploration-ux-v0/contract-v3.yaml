@@ -1,0 +1,35 @@
+{
+  "accepted_acceptance_ids": [
+    "project-and-lineage",
+    "awareness-and-action",
+    "ux-handoff",
+    "workspace-ticket-management",
+    "context-lifecycle-meaning",
+    "local-app-entry",
+    "execution-method-choice"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T09:38:18.189Z",
+  "contract_revision": {
+    "identity": "sha256:52a3ac3d9a340a9ad10c7be51c514c82a66e123581e976201b9f1e5f3186ab07",
+    "revision": 3
+  },
+  "evidence_ids": [
+    "project-ux-fixture-contract-20260922",
+    "project-ux-browser-walkthrough-20260922",
+    "project-ux-review-fixes-20260922",
+    "project-ux-final-browser-20260922"
+  ],
+  "independence": {
+    "note": "Reviewer /root/provider_settings did not author or implement this UX Ticket, its tests, handoff or Evidence and received no prior UX execution context before this read-only handoff. Executor /root/auth_review owns the implementation; parent /root supplied separately recorded actual browser observations. Reviewer independently inspected all artifacts, resolved Context and ran fixture, actual-handler and HTTP checks. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v3",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all seven criteria of exact Contract v3 as a bounded synthetic interaction prototype. Project overview is distinct from main, shows multiple Sessions in A and a shared Ticket across A/B, and retains deleted D as a readable permitted origin. Room revisions expose roles, applicability, rationale and exact origin/fork/supersession/adoption relations; A@1 superseded does not invalidate B@1, and UI hiding/archive, semantic invalidation, unresolved conflict and inaccessible tombstones remain different. Both directional notices support inspect/seen, continue/defer and explicit per-item adoption; maintenance requests have separate tools, scoped inputs and proposal-only idempotent receipts. All seven Ticket projections expose inclusion reasons, distinct A-create/B-execute/C-review and attempt provenance, with scoped hide/restore and preserved authorized blockers. Setup distinguishes synthetic local launch, folder init/enrollment/linked worktrees, three API provider references, Codex/Claude subscription and plugin states, explicit Project switch, gaps/restart/auth/quota/failure and optional GitHub. Ticket goals/constraints/Context/acceptance leave development methods optional. Handoff provides required future API fields, nine walkthroughs, keyboard route and unresolved product choices, explicitly not user approval or existing endpoints. Reviewer found two real UI defects: denied background detail disclosure and adopted receipts overwritten by Continue/Defer allowing repeated lineage. Executor fixed both. Reviewer reproduced6/6 fixture tests and independently exercised actual app event handlers in an isolated minimal offline DOM harness: denied background renders disabled and handler returns only denial; adopt/continue/defer/re-adopt retains adopted status and exactly one relation. This handler test is not visual-browser evidence. Reviewer also verified7 live static HTTP cases covering4 assets/CSP, unknown path404, POST405 and explicit raw Host403; fetch did not honor its attempted Host override, so that check used raw HTTP. All source imports remain inside the standalone prototype; restrictive CSP forbids connect/form; no secret input, provider call, Runtime API or durable business-state claim exists. Parent actual in-app browser observations are accepted as separately attributed Evidence, including no default-viewport overflow/console errors, exploration/Ticket/lineage/setup/request/activation flows, keyboard focus/Escape, and final recheck of the two reviewer fixes. Reviewer did not independently claim browser, mobile or screen-reader execution. Syntax and diff checks pass; component boundary scanner99 files/0errors plus manual prototype-import inspection (prototype is outside scanner roots). All13 Context refs resolve; governing authorities empty, guard passes, graph validation passes. No remaining criterion gap. This Outcome does not certify a connected App, complete message capture, production authorization, live Worker, mobile accessibility or final product-choice approval.",
+  "ticket_id": "ticket-runtime-project-exploration-ux-v0",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,65 @@
+{
+  "acceptance_ids": [
+    "project-and-lineage",
+    "awareness-and-action",
+    "ux-handoff",
+    "workspace-ticket-management",
+    "context-lifecycle-meaning",
+    "local-app-entry",
+    "execution-method-choice"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "project-and-lineage",
+      "identity": "sha256:33e4ca2fa66eabca50ca95685d5f02b762e268a40c4c9f825bfc286f779199f3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "awareness-and-action",
+      "identity": "sha256:1287b1fb015369ed7e0aaa6a85f9db458c02868c228f67894f56fc6153ee3c9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "ux-handoff",
+      "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "workspace-ticket-management",
+      "identity": "sha256:34bc4611bbe29acb64edcf6db7687fe3167e50be716c0325d7f20a0309678b9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-lifecycle-meaning",
+      "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "local-app-entry",
+      "identity": "sha256:499f253452f7c4c4410cae4be619e44e883cb428441329d530e4a2203a2a86c9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "execution-method-choice",
+      "identity": "sha256:1c8bdd5440aba7e4179726a2225d79b91bcf48186de9e99e8f31ff84c6b0217d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "project-ux-browser-walkthrough-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:33:46.958Z",
+  "refs": [
+    "semantic-runtime/docs/project-exploration-ux-v0.md",
+    "semantic-runtime/prototype/index.html",
+    "semantic-runtime/prototype/app.mjs",
+    "semantic-runtime/prototype/fixtures.mjs",
+    "semantic-runtime/prototype/style.css",
+    "semantic-runtime/prototype/serve.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Parent Agent /root performed actual Codex in-app browser interactions on the isolated synthetic preview http://127.0.0.1:51987/ (tab8), reporting a visually clear default viewport, no horizontal overflow and no console errors/warnings. Verified B-to-A notice inspection marks seen, explicit per-item confirmation marks adopted and adds exact ctx-queue@1 lineage. Browser review exposed two real defects: focus was lost after modal submission/render, and static Context copy contradicted the adoption. Executor fixed both; parent reloaded and verified current row says B-origin proposal adopted into A with Project background unchanged, confirm-adopt/pause leave focus on main, and Escape from re-enable returns to the surviving Enable trigger. Verified Project-wide Ticket filter, hiding T-18 in A preserves its authorized blocker on T-24 while B still shows the T-18 row; Context shows A@1 superseded with B current, and denied scenario suppresses Context contents. Setup renders distinct Git initialization/enrollment, linked worktrees and ref without checkout, provider API routes versus CLI subscription and no key input. Pause preserves historical display; re-enable default retains the gap, forbids backfill and leaves old jobs fenced. Keyboard Enter opens bounded work request; claim/start/pending/submit produces stable demo-receipt-7 text explicitly not adoption or acceptance; Escape works. Reset returns Overview and tab was marked deliverable. Other scenario selectors and seven filter/provenance modes remain reviewable synthetic fixtures, with separate source/projection Evidence; this record does not pretend every scenario was exercised by the parent. No mobile, screen-reader, TTY, real Worker, production API, credentials or deployment were verified. All clicks affected browser memory only. The handoff records these observed limits and unresolved product choices, not user approval.",
+  "ticket_id": "ticket-runtime-project-exploration-ux-v0"
+}
