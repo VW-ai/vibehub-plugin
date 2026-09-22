@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "openrouter-live-boundary"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "openrouter-live-boundary",
+      "identity": "sha256:7174e04143a31a5462ec61d3640597eb4da33544f8d3838c1e2874c542edd15c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "openrouter-live-not-run-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:44:27.702993+00:00",
+  "refs": [
+    "semantic-runtime/scripts/smoke-openrouter-jev.mjs",
+    "semantic-runtime/docs/openrouter-jev-adapter.md",
+    "semantic-runtime/README.md"
+  ],
+  "schema_version": 2,
+  "summary": "Published npm run smoke:jev:openrouter with one fixed synthetic input, one attempt and deadline; key is consumed only within the local process. Deterministic env -u OPENROUTER_API_KEY check exits 1 with local-configuration instruction and no model call. Live route NOT RUN: no real OpenRouter key inspected/requested, no model request sent, and documentation/README explicitly withhold verified-route claims pending real synthetic integration.",
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0"
+}

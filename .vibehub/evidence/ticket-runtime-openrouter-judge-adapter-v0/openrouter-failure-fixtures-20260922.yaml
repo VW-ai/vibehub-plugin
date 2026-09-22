@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "openrouter-failures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "openrouter-failures",
+      "identity": "sha256:bd3b79417f41b0351f552e7b84cbb6be988af722cc7d6ddbbb41dcc56ae78a50",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "openrouter-failure-fixtures-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:44:26.713453+00:00",
+  "refs": [
+    "semantic-runtime/test/openrouter-jev-judge.test.mjs",
+    "semantic-runtime/src/adapters/openrouter-jev-judge.mjs",
+    "semantic-runtime/src/adapters/resilient-judge.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Seven actual-SDK/fake-HTTP tests cover malformed/out-of-range/missing/extra/wrong-type answers, unsupported family/model, duplicate/unbounded targets, 429 recovery, 503 retry exhaustion, deadline and caller cancellation. SDK retries disabled; existing ResilientJudge bounds attempts; public errors exclude raw SDK bodies/causes/secrets. Standalone fresh install passed all 295 tests before final resolved-model assertion; focused/full checks then passed on final tree. Existing Vercel/TypeSafe fixtures and historical benchmark records unchanged.",
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0"
+}

@@ -22,6 +22,7 @@
     "example:gateway": "node --experimental-strip-types --env-file=.env.local index.ts",
     "smoke:jev": "node --env-file=.env.local scripts/smoke-jev.mjs",
     "smoke:jev:direct": "node --env-file=.env.local scripts/smoke-typesafe-direct.mjs",
+    "smoke:jev:openrouter": "node scripts/smoke-openrouter-jev.mjs",
     "replay": "node src/cli.mjs replay",
     "replay:jev": "node --env-file=.env.local src/cli.mjs replay --judge jev",
     "replay:peel": "node src/cli.mjs replay --events test/fixtures/peel/events.jsonl --state test/fixtures/peel/state.json --labels test/fixtures/peel/labels.json --tenant benchmark --project peel --dataset-kind real --db .local/peel-replay-v3.sqlite",
@@ -37,6 +38,7 @@
     "acorn": "8.15.0"
   },
   "dependencies": {
+    "@openrouter/ai-sdk-provider": "3.1.0",
     "@typesafe-ai/sdk": "0.6.0",
     "ai": "7.0.107"
   }

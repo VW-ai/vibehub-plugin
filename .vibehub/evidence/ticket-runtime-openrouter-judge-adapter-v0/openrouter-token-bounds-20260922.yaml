@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "openrouter-contract",
+    "openrouter-failures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "openrouter-contract",
+      "identity": "sha256:f5026a0da04d3623012be1ab9ded0dd7700f235ca38650cf24217f056c07ac4e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "openrouter-failures",
+      "identity": "sha256:bd3b79417f41b0351f552e7b84cbb6be988af722cc7d6ddbbb41dcc56ae78a50",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "openrouter-token-bounds-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:50:01.762Z",
+  "refs": [
+    "semantic-runtime/src/adapters/openrouter-jev-judge.mjs",
+    "semantic-runtime/test/openrouter-jev-judge.test.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Independent review found that individually finite token counts could overflow their total. Adapter now accepts only nonnegative safe integer token counts and applies the same bound to their sum, returning null for invalid or overflowing values. Regression fixtures cover 1e308, negative, fractional and MAX_SAFE_INTEGER boundary inputs. Final focused OpenRouter suite passed 8/8; final npm run verify passed 296/296 with 78 component files and 0 boundary errors. No live model call was made; the earlier standalone 295/295 result preceded this final bound fix, which was verified in the full component suite.",
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0"
+}

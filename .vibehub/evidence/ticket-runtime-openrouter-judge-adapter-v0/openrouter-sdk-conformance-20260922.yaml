@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "openrouter-contract"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "openrouter-contract",
+      "identity": "sha256:f5026a0da04d3623012be1ab9ded0dd7700f235ca38650cf24217f056c07ac4e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "openrouter-sdk-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T07:44:25.730542+00:00",
+  "refs": [
+    "semantic-runtime/src/adapters/openrouter-jev-judge.mjs",
+    "semantic-runtime/test/openrouter-jev-judge.test.mjs",
+    "semantic-runtime/package.json",
+    "semantic-runtime/package-lock.json",
+    "semantic-runtime/docs/openrouter-jev-adapter.md"
+  ],
+  "schema_version": 2,
+  "summary": "Official @openrouter/ai-sdk-provider 3.1.0 is pinned alongside ai 7.0.107; real SDK evaluationModel uses explicit alpha/decisions endpoint, not a default Gateway string. Offline transport fixtures verify minimized request, exact question/target IDs, boolean probabilities, resolved model identity, bounded cost/token/provider metadata and underlying SDK rounded score mapping. Final focused 7/7 and full 295/295 pass; component boundary 78 files/0 errors.",
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0"
+}

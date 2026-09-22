@@ -37,8 +37,14 @@ placement does not mean all inference or every data destination is local.
 Local bootstrap delivered 2026-09-22: `npm start` now serves a loopback status
 page with SQLite readiness, `npm run status` checks it, and SIGINT/SIGTERM stop
 the process while preserving data. This is the local-service-profile slice only;
-app onboarding, project activation, providers, collection and Workers remain
+app onboarding, project activation, provider settings, collection and Workers remain
 pending. [Run instructions and boundaries](local-service-profile.md).
+
+OpenRouter adapter delivered 2026-09-22: the pinned official AI SDK provider now
+implements the existing four Judge families, with offline transport, failure and
+cancellation coverage. Full component verification passes 296 tests. No live
+OpenRouter request has been run; route availability remains unverified until the
+synthetic smoke succeeds. [Adapter contract and smoke](openrouter-jev-adapter.md).
 
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20
@@ -267,8 +273,10 @@ spike remain valid history. The local-first checkpoint added 10 narrowly scoped 
 revised 17 existing unfinished Tickets, preserving prior Acceptance/Contract
 revisions. The workspace-management follow-up below adds two domain Tickets
 and refines five existing Tickets. The App follow-up adds ten bounded Tickets and revises twelve existing Tickets.
-The eight L0 Tickets identified above are the current executable frontier;
-older identity/policy/observability foundations have already been delivered.
+The App planning checkpoint identified eight independent L0 Tickets. The local
+bootstrap and OpenRouter adapter slices are now implemented; consult current
+Outcomes and next actions for the remaining frontier. Older
+identity/policy/observability foundations have already been delivered.
 
 The tables below retain the original module inventory with updated direct
 prerequisites. Later hosted and remote Worker groups are not prerequisites of the

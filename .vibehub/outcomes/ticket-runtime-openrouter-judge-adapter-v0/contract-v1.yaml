@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "openrouter-contract",
+    "openrouter-failures",
+    "openrouter-live-boundary"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T07:51:55.617Z",
+  "contract_revision": {
+    "identity": "sha256:fae35f6376493f47cc69c4df7ba66d8206e78ce5a2d3a77c72f0fa2951d9ce87",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "openrouter-sdk-conformance-20260922",
+    "openrouter-failure-fixtures-20260922",
+    "openrouter-live-not-run-20260922",
+    "openrouter-token-bounds-20260922"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent /root/closeout_runtime_events was uninvolved in implementation. It read the exact Contract and all four native Evidence records, inspected the installed SDK/provider code and public adapter, ran independent synthetic tests/probes, reported a token-overflow finding to the executor, and independently verified the executor fix before recording this Outcome. It changed no implementation, test, documentation, Evidence or other Ticket.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three current v1 criteria. The pinned official OpenRouter provider 3.1.0 is compatible with installed AI SDK 7.0.107 and supplies an actual evaluation model object to the alpha Decisions endpoint; transport inspection confirms no default Gateway route, provider fallback disabled and SDK retries disabled. Minimized event/candidate state, exact question IDs and visible-target slots preserve the existing boolean SemanticJudge semantics, negative confidence, requested versus resolved model and bounded route/cost/token metadata. The SDK score distribution/rounding mapping is tested separately without inventing new core score semantics. Malformed/wrong/missing/extra answers, unsupported families/models, target bounds, rate limits, retry exhaustion, deadline and caller cancellation are covered with actual SDK plus synthetic fetch. The review discovered finite input token values whose sum overflowed to Infinity; the executor fixed input/output/sum to nonnegative safe integers or explicit null, added regression tests and native supplementary Evidence, and the reviewer verified 64 metadata combinations including undefined, negative, fractional and overflow boundaries. Final independent targeted run passed 22/22 across OpenRouter, existing Vercel JEV, direct TypeSafe and Resilient/CachedJudge; independent component boundary check passed 78 files with zero errors. Additional probes passed seven probability boundaries, reordered three-target identity mapping, five permanent HTTP statuses with one attempt and redacted errors, capped Retry-After with cancellation during backoff, and pre-aborted zero-call behavior. The reviewer ran the actual smoke script only in isolated child environments with fetch fully replaced: absent key failed actionably, synthetic key and response succeeded with validated decision/latency and no key output. No real credentials were read and no real model request was sent. All seven Context references resolved, current context guard had zero authorities/violations, ticket validation and diff check passed. Reviewed parent logs: standalone fresh install passed 295/295 before the final resolved-model/token-bound changes; final full component verify passed 296/296 after those changes, while the reviewer independently retested the changed adapter. Live route remains NOT RUN, explicitly permitted by the live-boundary criterion; app integration must complete its own real synthetic request before advertising verification. No remaining blocking findings; provider settings wiring, real route availability and live quality/cost claims remain outside this acceptance.",
+  "ticket_id": "ticket-runtime-openrouter-judge-adapter-v0",
+  "unresolved_acceptance_ids": []
+}

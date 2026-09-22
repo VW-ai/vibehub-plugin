@@ -21,9 +21,9 @@ only a local status page and SQLite bootstrap, with no collection or model calls
 See the [local service profile](docs/local-service-profile.md) for setup and limits.
 
 Use Node.js 22.13+ (23.x requires 23.4+); CI targets Node 22 and 24. The SQLite
-adapter uses Node's built-in `node:sqlite`. The pinned AI SDK is the Runtime's
-only production dependency; Acorn is a pinned development dependency for
-boundary checks.
+adapter uses Node's built-in `node:sqlite`. Production dependencies are the pinned
+AI SDK, official TypeSafe SDK and OpenRouter AI SDK provider; Acorn is a pinned
+development dependency for boundary checks.
 
 ```sh
 cd semantic-runtime
@@ -183,6 +183,10 @@ selection makes network/model calls. No host hooks, background capture, context
 injection, worker execution, or canonical writes occur in this prototype.
 
 ## Current product checkpoint
+
+The [OpenRouter JEV adapter](docs/openrouter-jev-adapter.md) now has offline
+conformance tests and an explicit synthetic smoke command. Its live route has
+not been tested with a real key; it is not yet a verified app provider setting.
 
 The next product is a locally launched App with explicit Project enable/disable,
 Git-folder and linked-worktree enrollment, selectable OpenRouter/Vercel/TypeSafe

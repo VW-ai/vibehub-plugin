@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "76a1b4394f757d2aa4e324ba166492090e01c673",
+        "blob": "5308a2b28509a72a376889c7bfd4863a17bd6fff",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -58,8 +58,12 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "5afca1cbba7f1285ad18a4ba5dd69c5155d829f3",
+        "blob": "4a64e3dd45ab7ab214a6addb478989ef8c962c27",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
+      },
+      {
+        "blob": "2308bf1acb7432c302dbb1593c40be0aacb16c3c",
+        "path": "semantic-runtime/docs/openrouter-jev-adapter.md"
       },
       {
         "blob": "95d3ebd03a199a2008824a749818d50638eeac28",
@@ -94,11 +98,11 @@
         "path": "semantic-runtime/index.ts"
       },
       {
-        "blob": "1fcfd88f20d94213b691e99927fcc9506e52e0bc",
+        "blob": "909f650fdc383bbe92345bb90b1365be115a83c5",
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "acc40ba6557cd0a8924ce9c69a1af95fbea6bf97",
+        "blob": "3265055a6400086b4060a53f3388c9afd8e604f4",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -132,6 +136,10 @@
       {
         "blob": "9dd6592aea0ba1b48a5163b02d04882c1e569a63",
         "path": "semantic-runtime/scripts/smoke-jev.mjs"
+      },
+      {
+        "blob": "67a63861f068783449b21c1f1b0356ddcdcd60d9",
+        "path": "semantic-runtime/scripts/smoke-openrouter-jev.mjs"
       },
       {
         "blob": "bde24b4973486ca9afb462590d4e3296e9de4b79",
@@ -234,6 +242,10 @@
         "path": "semantic-runtime/src/adapters/judge-input.mjs"
       },
       {
+        "blob": "81b4c0d99fd83fd1a6d6d77f891eb08b18995526",
+        "path": "semantic-runtime/src/adapters/openrouter-jev-judge.mjs"
+      },
+      {
         "blob": "c38400e51d5b9ec03df189e65520e5a2271157db",
         "path": "semantic-runtime/src/adapters/recorded-judge.mjs"
       },
@@ -310,7 +322,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "61d3af50f428e50dc8afaf7a03445d3c6bbcd812",
+        "blob": "545ee967e7d295f3754306eef3efb13acfd25110",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -498,6 +510,10 @@
         "path": "semantic-runtime/test/observability-contract.test.mjs"
       },
       {
+        "blob": "331fa62120f8c685d9e9129a64a4d81f23fcf736",
+        "path": "semantic-runtime/test/openrouter-jev-judge.test.mjs"
+      },
+      {
         "blob": "dc398124b3f61082c39663777feb5809c8862778",
         "path": "semantic-runtime/test/peel-fixture.test.mjs"
       },
@@ -546,8 +562,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T07:34:17.013Z",
-    "last_aligned_commit": "75272dab23f81201e4c296c0c30182b0ea160ae7"
+    "checked_at": "2026-09-22T07:51:33.258Z",
+    "last_aligned_commit": "2b2366b5adefd718ebc070f6a3c2d6c59fa935aa"
   },
   "anchors": [
     "semantic-runtime/"
