@@ -93,3 +93,4 @@ export { LocalGitWorktreeSensor, GIT_SENSOR_ERROR_CODES } from './local/git-work
 export { validateGitWorktreeObservation, GIT_SENSOR_LIMITS } from './core/git-worktree-observation.mjs';
 export { CanonicalSourceReader } from './local/canonical-source-reader.mjs';
 export { CANONICAL_RECORD_PROFILE, parseCanonicalRecord, evaluateCanonicalRecords } from './core/canonical-records.mjs';
+export { LocalExplorationStore, EXPLORATION_NAMESPACE } from './local/exploration-store.mjs';

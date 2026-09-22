@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "dataset": "exploration-routed-synthetic-edge-four-v1",
+  "measured_at": "2026-09-22T16:06:54.505Z",
+  "total": 4,
+  "completed": 4,
+  "matched": 4,
+  "rows": [
+    {
+      "id": "failed-acceptance",
+      "exploration": "A",
+      "status": "ok",
+      "expected": true,
+      "expected_targets": [
+        "logout"
+      ],
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "logout"
+      ],
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 336,
+      "latency_ms": 461
+    },
+    {
+      "id": "retracted-context",
+      "exploration": "B",
+      "status": "ok",
+      "expected": true,
+      "expected_targets": [
+        "login"
+      ],
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "login"
+      ],
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 149,
+      "latency_ms": 275
+    },
+    {
+      "id": "two-contexts",
+      "exploration": "A",
+      "status": "ok",
+      "expected": true,
+      "expected_targets": [
+        "storage",
+        "worker"
+      ],
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "storage",
+        "worker"
+      ],
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 150,
+      "latency_ms": 488
+    },
+    {
+      "id": "unrelated-targets",
+      "exploration": "B",
+      "status": "ok",
+      "expected": false,
+      "expected_targets": [],
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 106,
+      "latency_ms": 372
+    }
+  ],
+  "model_calls": 5,
+  "routing": {
+    "real_worktrees": 2,
+    "isolated_explorations": 2,
+    "state_materializations": 9,
+    "exact_local_reads": 15,
+    "candidate_judgments": 4,
+    "provenance_sources_verified": 13,
+    "minimized_inputs_verified": 5,
+    "source_fence_pinned": true,
+    "cross_exploration_input": false,
+    "canonical_promotion": false,
+    "adoption": false,
+    "ingress_acknowledged": false
+  },
+  "ingress": {
+    "selected_admitted_events": 13
+  },
+  "stale_result": {
+    "status": "rejected",
+    "model_completed": true,
+    "rejection": "exploration_binding_conflict",
+    "receipt_absent": true,
+    "unchanged_graphs": true,
+    "rejected_store_row_delta": 0,
+    "latency_ms": 353
+  },
+  "operational": {
+    "requests": 5,
+    "retries": 0,
+    "rate_limited": 0,
+    "transient_failures": 0,
+    "wait_ms": 555
+  }
+}

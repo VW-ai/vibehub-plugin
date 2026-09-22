@@ -41,6 +41,11 @@ projection repair in SQLite. Its in-process API consumes actual admitted ingress
 sources. `npm run check:jev:graph` separately exercises a fixed synthetic Graph
 context → JEV → candidate/restart round trip with a locally supplied TypeSafe key.
 
+The [exploration projection](docs/exploration-projection-v0.md) adds explicit
+worktree bindings, one Graph generation per exploration, fixed canonical bases
+and a separate Project selection. Guarded writes preserve exact origins across
+switching and retry; App integration and adoption remain pending.
+
 The [local Git worktree sensor](docs/local-git-worktree-sensor-v0.md) captures
 bounded HEAD/index/worktree metadata for an enrolled execution and submits it
 through durable ingress. It reports unsupported or racing observations as gaps.

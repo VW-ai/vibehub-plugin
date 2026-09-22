@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "branch-projection",
+    "branch-write-routing",
+    "branch-shared-view"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "branch-projection",
+      "identity": "sha256:3d0d917623f152d38381cf66601a531110b43a7511c652f5aa8d6ccb434bf1c0",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "branch-write-routing",
+      "identity": "sha256:629e75f54aea9199fef272fbea2add20a7a953043ecb680b111e9809532a3cef",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "branch-shared-view",
+      "identity": "sha256:1253529fd54bd118f551ab2081c2060662ee05ff121c56e8b4345ab2b211978c",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "exploration-projection-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T16:10:15.854000Z",
+  "refs": [
+    "semantic-runtime/docs/exploration-projection-v0.md",
+    "semantic-runtime/src/local/exploration-store.mjs",
+    "semantic-runtime/src/local/exploration-inputs.mjs",
+    "semantic-runtime/src/local/exploration-physical.mjs",
+    "semantic-runtime/src/local/exploration-canonical.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/exploration-projection.test.mjs",
+    "semantic-runtime/test/exploration-projection-security.test.mjs",
+    "semantic-runtime/test/exploration-projection-recovery.test.mjs",
+    "semantic-runtime/test/exploration-projection-scale.test.mjs",
+    "semantic-runtime/test/exploration-inputs.test.mjs",
+    "semantic-runtime/test/exploration-canonical.test.mjs",
+    "semantic-runtime/test/helpers/exploration-fixture.mjs",
+    "semantic-runtime/test/helpers/exploration-process.mjs",
+    "semantic-runtime/docs/measurements/exploration-projection-20260922.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implements the exact Contract2 in-process LocalExplorationStore using one exploration namespace and the existing single activation-admitted Graph transaction. Real enrolled Git worktrees bind to service-owned isolated generations and immutable origins; source event citations remain distinct from actual publishing workspace. Fixed actual CanonicalSourceReader proofs retain origin base and declared Project baseline separately, preserve configured active Authorities under optional filters, and recheck source access/fence and exact reader issuance. Legacy Graph cannot bypass owned generations even without exploration namespace; ordinary unowned Graph and narrow lifecycle/rebuild paths retain compatibility. Shared trusted mutation validation prevents forged watermarks. Exact actor/key retry returns original result before new Git inspection while rechecking original input access. Bounded index/declaration witnesses reject lost or regressed ownership, append horizon, Project selection and worktree binding rather than treating corruption as initial absence. 125 focused/affected tests pass, including real Git/SQLite public API, current/historical/revoked pins, A/B alternatives, semantic conflicts and cross-generation rejection, unborn/detached/switch/delete/recreate/outside-folder/clone identities, actual expiry/revocation/disable races, two child writers and SIGKILL/lost-response recovery. Independent review reran61 focused tests and separately reproduced12 one-row corruption variants with zero row deltas. Scope excludes adoption, host Session integration, App/HTTP, Policy/Judge dispatch and canonical promotion. Physical Git is observed, not an atomic lock with SQLite; one canonical configuration per Project and one repository per exploration remain explicit.",
+  "ticket_id": "ticket-runtime-branch-graph-projection-v0"
+}

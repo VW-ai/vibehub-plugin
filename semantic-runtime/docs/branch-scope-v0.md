@@ -163,15 +163,14 @@ retains historical identities; no production catalog migration is implemented
 here. The fixture includes explicitly enrolled old and replacement instances to
 exercise lifecycle behavior without pretending that old IDs change ownership.
 
-Current Working Graph addresses identify one Project/generation lineage. They
-do **not** yet include exploration scope. Do not feed assertions from separate
-explorations into that one graph and claim isolation because this registry now
-exists. The planned branch-projection/store work must add explicit exploration
-and selected shared-base pins to graph keys, queries, conflict domains and
-Worker inputs, retain old address resolution, and carry ACL/provenance through
-projection. Existing data with no exploration origin stays explicitly unscoped
-until a deliberate migration maps it. Sharing/adoption, base updates, merge
-lineage and production persistence remain follow-up work.
+The pure registry above does not itself isolate Graph writes. The separate
+[local exploration projection](exploration-projection-v0.md) now assigns each
+exploration an owned Project/generation lineage, binds writes to a real enrolled
+worktree, and returns its immutable origin base separately from the selected
+Project baseline. Existing Graph addresses remain valid; existing data with no
+exploration origin stays unscoped. This is a local in-process service boundary;
+explicit adoption, base updates, merge lineage and host/UI integration remain
+follow-up work.
 
 Conformance: `node --test test/branch-scope.test.mjs` exercises the public package
 entry; `npm run check:boundaries` checks independent component imports. All

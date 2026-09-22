@@ -37,6 +37,12 @@ Source lifecycle mutation additionally requires `graph:lifecycle`. Reads require
 `graph:read`, `store:read` and `ingress:read`, without an enabled Project or a
 currently accessible checkout directory.
 
+Generations owned by the [exploration service](exploration-projection-v0.md)
+require its guarded binding route for ordinary initialization and semantic
+writes. The marker lives in `working-graph`, so opening a legacy facade without
+the exploration namespace does not bypass it. Authorized unowned generations,
+historical reads, source lifecycle and rebuild retain their existing behavior.
+
 After current source access is denied, a service principal with
 `source:invalidation:read` and `source:invalidation:consume` may still apply an
 exact retained lifecycle event through `source_access`. This path reads only

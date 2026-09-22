@@ -94,13 +94,20 @@ checkpoint passes 637 tests with two native Keychain opt-in tests skipped;
 standalone verification and synthetic live JEV Graph checks also pass. These
 components are not yet a connected coding-session product.
 
+The [local exploration projection](exploration-projection-v0.md) now binds real
+worktrees to isolated Graph generations, retains immutable origin/base pins and
+returns local candidates separately from the selected Project rules. Full and
+standalone verification each pass 703 tests with the same two opt-in skips;
+601-origin pagination, process recovery and five live synthetic JEV evaluations
+are measured. It remains an in-process module awaiting consumer/App wiring.
+
 Still missing: real host Collectors and durable service composition, typed
-extraction and entity resolution, branch-aware views/adoption, integrated Judge
+extraction and entity resolution, explicit cross-exploration adoption, integrated Judge
 runtime, query/compiler, actionable Agent request delivery, bidirectional
 awareness, provider/activation wiring through the complete semantic loop, two
 plugins and local Worker orchestration. Address resolution is
-not semantic entity resolution. Same-entity concurrent assertions
-in the current one-lineage Graph are not branch-local hypotheses.
+not semantic entity resolution. The new exploration store supplies separate
+generation lineages; ordinary unscoped Graphs remain explicitly unscoped.
 
 Branch projection now separates two delivery boundaries: guarded enrollment,
 local writes and scoped views first; explicit cross-exploration adoption next.

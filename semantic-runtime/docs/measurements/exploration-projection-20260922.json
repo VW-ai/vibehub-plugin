@@ -1,0 +1,114 @@
+{
+  "dataset": "600-real-git-enrollments-sqlite",
+  "origins": 601,
+  "retained_page_horizon": 600,
+  "pages": 19,
+  "maximum_range_rows": 32,
+  "maximum_page_bytes": 62786,
+  "selected_reads": [
+    {
+      "origins": 64,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "origins": 600,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 2,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 3,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 4,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 5,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 6,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 7,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 8,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 9,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 10,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 11,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 12,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 13,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 14,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 15,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 16,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 17,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 18,
+      "queries": 356,
+      "rows": 387
+    },
+    {
+      "page": 19,
+      "queries": 269,
+      "rows": 292
+    }
+  ],
+  "enrollment_ms": 25000,
+  "note": "Actual local measurements; no SLA. Two real enrolled worktrees, 601 individual origins, no pruning.",
+  "schema_version": 1,
+  "measured_at": "2026-09-22T16:10:15.854000Z"
+}

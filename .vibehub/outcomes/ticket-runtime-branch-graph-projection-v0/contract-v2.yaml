@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "branch-projection",
+    "branch-shared-view",
+    "branch-view-recovery",
+    "branch-write-routing"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T16:13:13.164Z",
+  "contract_revision": {
+    "identity": "sha256:ddc613e30885cd5080b6d049011b1fece57eb257be70d94ca6014e2e1042d997",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "exploration-projection-conformance-20260922",
+    "exploration-projection-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent reviewer /root/review_exploration received a read-only handoff and did not author implementation, tests, documentation, Ticket or Evidence. I inspected the exact contract and sources, ran independent tests and temporary synthetic corruption probes, reported findings for the executor authors to repair, and rechecked the final fixes. This Outcome is my only canonical write for this Ticket.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four active criteria in exact Contract 2. branch-projection: reviewed the public LocalExplorationStore over the existing DomainStore and Graph transaction owner, one fixed namespace/format and individual immutable origins, ref enrollment, binding history, operation records and bounded indexes. Real registry and bounded physical Git observations preserve explicit unborn, detached, switched, removed and recreated identities; no path, branch name or cited source event establishes publishing origin. The unchanged pure branch contract remains a bounded reference rather than the persistence wire. branch-write-routing: fixed integration checks actual scoped grants, actor/publisher, activation, current catalog, workspace binding, owned generation, selected Project pointer and source fence under the existing single writer transaction. Graph effects, actual execution origin, receipts and outbox commit together. Exact committed retries precede new Git inspection and preserve original A results after B switching, disable and path loss while rechecking current input authorization. Legacy unowned Graph remains usable; owned semantic writes require the route even without the exploration namespace, and lifecycle/rebuild retain their separate narrow authority. branch-shared-view: actual configured CanonicalSourceReader issuance, exact revision, source mapping, Graph head, current ACL and fence are revalidated; caller booleans or plausible Graph JSON cannot manufacture canonical authority. Local candidates, fixed origin base and explicitly declared current Project selection stay separate, optional filters retain configured active usable Authorities, unavailable/partial/historical/quarantined states remain explicit, and no selection/read/merge adopts or promotes content. branch-view-recovery: independently reproduced four material one-row metadata-loss gaps affecting owner guard, append horizon, Project selection and worktree binding. Authors repaired them with paired working-graph ownership facts and bounded latest immutable index/declaration checks. Final independent rerun passed 61 affected, process-recovery and offline JEV tests; 12 additional real-SQLite deletion/witness-loss/rollback variants all rejected exploration_corrupt with exact zero row delta. Independently reran the real 600-origin fixture: 601 individual origins retained, pinned horizon 600 over 19 pages, maximum 32 range rows and 62786-byte page; the same 32-item page used 356 queries/387 rows at both 64 and 600 origins. Timing is a local sample, not an SLA. Reviewed final executor logs and exact Evidence: affected 125/125; full Runtime and clean standalone install/verify outside the repository each 705 total, 703 passed, zero failed and two existing native Keychain opt-in skips; boundary check 168 files with no errors; unchanged shipped plugin artifact 79 files/3670088 bytes. The initial loopback sandbox failures and one unchanged concurrent Policy timing failure are disclosed; the isolated final full run passed without code or threshold edits. Reviewed the optional official TypeSafe report and minimized synthetic script: four of four judgments matched across two worktrees, nine target states and 13 source pins; a fifth completed evaluation rejected the stale binding with no receipt or row delta. Pending evaluation may include pacing, so exact network-dispatch timing is not claimed. This reviewer made no model, credential or private-trace call. All 29 Ticket Context references resolve; fresh Ticket validation, Context guard with no governing authorities or violations, and git diff check pass. No criterion remains unresolved. This Outcome certifies the bounded local in-process view/write slice, not host Session/App/HTTP integration, automatic Policy/Judge operation, awareness, adoption, canonical promotion, distributed synchronization or retention.",
+  "ticket_id": "ticket-runtime-branch-graph-projection-v0",
+  "unresolved_acceptance_ids": []
+}

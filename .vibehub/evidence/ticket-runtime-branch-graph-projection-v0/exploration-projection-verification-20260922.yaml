@@ -1,0 +1,36 @@
+{
+  "acceptance_ids": [
+    "branch-view-recovery"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "branch-view-recovery",
+      "identity": "sha256:3feaf1c35cfaa34f18feb493aabb28d10714300c5c9bb4ee231d71da9e16e966",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "exploration-projection-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T16:11:26.587645Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/exploration-projection-verification-20260922.json",
+    "semantic-runtime/docs/measurements/exploration-projection-20260922.json",
+    "semantic-runtime/docs/measurements/jev-exploration-20260922.json",
+    "semantic-runtime/docs/exploration-projection-v0.md",
+    "semantic-runtime/test/exploration-projection.test.mjs",
+    "semantic-runtime/test/exploration-projection-security.test.mjs",
+    "semantic-runtime/test/exploration-projection-recovery.test.mjs",
+    "semantic-runtime/test/exploration-projection-scale.test.mjs",
+    "semantic-runtime/test/helpers/exploration-process.mjs",
+    "semantic-runtime/scripts/check-jev-exploration.mjs",
+    "semantic-runtime/test/jev-exploration-check.test.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Frozen affected suites pass125/125. Full Runtime verify and fresh standalone npm ci/full verify outside the parent repository each pass705 total,703pass,2existing native Keychain opt-in skips,0fail; boundary168files/0errors. Separate shipped plugin artifact passes unchanged79files/3670088bytes. Independent reviewer reran61focused tests,12additional real-SQLite corruption probes and the actual601-origin scale fixture.600-origin cursor horizon returns19pages, maximum32range rows and62786-byte page; first32-item page requires356queries/387rows at both64and600origins, so witness checks remain independent of cumulative history. Real child-process CAS/idempotency races, SIGKILL before commit and committed lost response, restart/switch/unavailable Git retry, stale metadata/Graph/source/activation/credential rejection and rollback are covered. Initial restricted loopback run failed environmentally; concurrent full verification later hit one unchanged Policy all-join timing assertion. Standalone/affected passed, and isolated full rerun passed without code/threshold changes. Supplementary authorized official TypeSafe synthetic JEV run made5calls:4/4expected judgments on9exact target states across2real worktrees,13source-provenance pins verified,106–336ms successful provider attempts,0retries/429. Fifth pending evaluation completed but original workspace binding was stale and publication rejected with zero row delta and no receipt; pending time includes pacing and does not locate exact network dispatch. No private trace/new user data/credential was read by deterministic tests or sent in the model payload. No Policy consumer, ingress ACK, adoption or canonical promotion is claimed.",
+  "ticket_id": "ticket-runtime-branch-graph-projection-v0"
+}
