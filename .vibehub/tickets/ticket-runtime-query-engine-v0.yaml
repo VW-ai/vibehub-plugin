@@ -53,9 +53,16 @@
       "identity": "sha256:ee723d8b90ec7554f433cfe7a32df278f7a705bf9936b81f3d9847dc87ed9818",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-aware-selection",
+      "criterion": "Consume the scoped Context lifecycle/read contract when constructing current/as-of candidate sets: return role/applicability, exact lineage, selected shared base and explicit historical/superseded status. User/workspace UI hide preferences never silently remove governing Context from Agent compilation; current authorization still gates history.",
+      "identity": "sha256:4b0cb24124e0ee587b15f52b0c2517d13a719194c3ffd3faa0ba778fcfe7841c",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -84,6 +91,10 @@
     {
       "purpose": "Return awareness separately from adopted governing content.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
     }
   ],
   "contract_revisions": [
@@ -138,6 +149,37 @@
       ],
       "identity": "sha256:48840b38f39379519317d7563bb4b0ed6b2d0eac898af401771e5e3d72eeef29",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "candidate-generation-is-bounded",
+          "identity": "sha256:ee723d8b90ec7554f433cfe7a32df278f7a705bf9936b81f3d9847dc87ed9818",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "lifecycle-aware-selection",
+          "identity": "sha256:4b0cb24124e0ee587b15f52b0c2517d13a719194c3ffd3faa0ba778fcfe7841c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-degrades-safely",
+          "identity": "sha256:4bf909f85a9ee84f4b1b0abfd0e4ba6a98b5b04308fd84f29c42e979c57d525a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-pins-consumer-and-snapshot",
+          "identity": "sha256:6c77e1c2477036f6774b8cd3dbe48ade9c13f3624e7bc02ac926004393d42f1b",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ranking-is-explainable",
+          "identity": "sha256:a93adcb16bcc398c164f359ebd0b2a3007ffea371f4d8a009be7af956e0adb45",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:96b243c7e3b1a5ffb443865d274eb3560facca2a81acda92c8092900a1940dfe",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -148,6 +190,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "plan-validation:independent"
   ],
   "relations": [
@@ -164,6 +207,11 @@
     {
       "rationale": "Explicit exploration snapshots and scoped adoption lineage.",
       "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Domain applicability/lifecycle projection used by retrieval, beyond raw Graph revisions.",
+      "target_ticket_id": "ticket-runtime-context-lifecycle-lineage-v0",
       "type": "depends_on"
     }
   ],

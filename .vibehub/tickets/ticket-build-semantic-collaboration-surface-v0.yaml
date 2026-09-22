@@ -88,7 +88,7 @@
       "criterion": "Show producer/session/worktree/ref and code revision, selected shared base, semantic origins/variants/adoptions, evidence/source watermarks and policy/audit links. A Git merge signal is not displayed as automatic semantic acceptance; retain history after worktree deletion.",
       "identity": "sha256:5365286d380595e07d914056eca8d45a1eacc00ecf80d9e60337978089f41805",
       "revision": 2,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "explorer-feedback-and-delivery",
@@ -96,9 +96,23 @@
       "identity": "sha256:4ef48ca86c4675ea3813370405d11541caf1f1917cb9daa271de9d98e5682384",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "workspace-ticket-lifecycle",
+      "criterion": "Use the actual Ticket workspace-management API to show creation, participants, execution-finished and independently accepted locations with exact versions; filter current relevant versus Project/all/history and hide/restore without global mutation. A-create/B-execute/C-review, unknown legacy origin and deleted-workspace history stay understandable; authorized external blockers remain visible.",
+      "identity": "sha256:105d04b0a4b46895e48959a09f391f9c2a1dda9d4cfd54e70ba4847e435fb8e0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "explorer-causal-inspection",
+      "criterion": "Show producer/session/worktree/ref/code revision, Context semantic role/applicability/rationale, selected shared base, origins/variants/adoptions/supersession, evidence/source watermarks and audit links from actual domain APIs. Scope-local supersession does not imply Project-wide invalidity; code merge and Ticket completion are not automatic semantic acceptance. Keep authorized history after workspace removal and distinguish archived UI state from lifecycle change.",
+      "identity": "sha256:85c3f24b8af6489da2bb7815f0b4b8a2dc2d658c853bcc52869a54eaf7475d2e",
+      "revision": 3,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 3,
+  "active_contract_revision": 4,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -127,6 +141,18 @@
     {
       "purpose": "Permission to redesign within component boundaries.",
       "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-client-redesign.yaml"
+    },
+    {
+      "purpose": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml"
+    },
+    {
+      "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
+    },
+    {
+      "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
     }
   ],
   "contract_revisions": [
@@ -197,6 +223,32 @@
       ],
       "identity": "sha256:b3bb7b0c8531285dac8c653418e924313525c98611757da71a1e836b5b1f1b01",
       "revision": 3
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "explorer-addressable-views",
+          "identity": "sha256:f3d2ba187075eb73f211eb9bdcc89bf5c1570d79ba86b77f7cdb78d29053cdbb",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "explorer-causal-inspection",
+          "identity": "sha256:85c3f24b8af6489da2bb7815f0b4b8a2dc2d658c853bcc52869a54eaf7475d2e",
+          "revision": 3
+        },
+        {
+          "acceptance_id": "explorer-feedback-and-delivery",
+          "identity": "sha256:4ef48ca86c4675ea3813370405d11541caf1f1917cb9daa271de9d98e5682384",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "workspace-ticket-lifecycle",
+          "identity": "sha256:105d04b0a4b46895e48959a09f391f9c2a1dda9d4cfd54e70ba4847e435fb8e0",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:35d8c6009e4e089dc164e9abc2563e9e53b8251c9f36164dd54411fd991f4ff0",
+      "revision": 4
     }
   ],
   "deliveries": [],
@@ -208,6 +260,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "plan-validation:independent"
   ],
   "relations": [

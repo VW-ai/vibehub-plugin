@@ -1,0 +1,116 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "meaning-and-applicability",
+      "criterion": "Validate typed semantic role, applicable Project/exploration/Ticket/code version, exact sources and rationale alongside lifecycle state; incomplete applicability is explicitly uncertain. Shared governing claims remain visible unless superseded/retracted through the authorized domain path, not because someone hid a card.",
+      "identity": "sha256:ea1f65ef0dcab73f943642cd80ca8d2118ab7ecac164fc8dabd32fb2c769050d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "scoped-lineage",
+      "criterion": "Persist exact parent/reason links for creation, derivation, revision, branching, explicit adoption, supersession, invalidation and conflict resolution using existing immutable Graph commands. A is superseded locally while B remains valid when appropriate; relation traversal cannot collapse branch alternatives or grant canonical authority.",
+      "identity": "sha256:ac731d919842506825a985564b9bc8b94e343c6d7e0cc1ebb6531949785ebfcf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-read-contract",
+      "criterion": "Expose reproducible current/as-of lineage and applicability reads with current authorization, selected shared base, stale/unavailable/tombstone behavior and bounded traversal. UI archive/hide is orthogonal; worktree removal, code merge or Ticket closeout cannot silently delete or promote Context.",
+      "identity": "sha256:c9ffa8e3aeeeb27d570d840bc3e7476e632be5da0062f2e002771e4e8de76081",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "lifecycle-conformance",
+      "criterion": "Real-store cases cover A-origin/B-adoption/A-supersession/B-still-current, source revocation, stale parent, repeated transition, restart, corrected meaning and denied history. Query selection preserves active governing Context while returning superseded material only with its explicit historical role.",
+      "identity": "sha256:029e454d6572c13e980c919e201912db452c0737dea5fc4bd7d748a25de3c60b",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution.",
+    "Workspace in this product discussion means an execution work area; do not overload administrative Workspace identity or infer historical origin from the current file path.",
+    "No record deletion or existing Ticket completion is authorized by view filtering or this planning change."
+  ],
+  "context": "Local stage L1/L3. Consume branch Graph primitives to implement the domain lifecycle/meaning projection and read contract; no new generic graph engine, automatic semantic merge or UI-only truth. Canonical promotion remains separately authorized.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
+    },
+    {
+      "purpose": "Existing immutable revisions and derived versus canonical lifecycle boundary.",
+      "ref": "semantic-runtime/docs/working-graph-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "lifecycle-conformance",
+          "identity": "sha256:029e454d6572c13e980c919e201912db452c0737dea5fc4bd7d748a25de3c60b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "lifecycle-read-contract",
+          "identity": "sha256:c9ffa8e3aeeeb27d570d840bc3e7476e632be5da0062f2e002771e4e8de76081",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "meaning-and-applicability",
+          "identity": "sha256:ea1f65ef0dcab73f943642cd80ca8d2118ab7ecac164fc8dabd32fb2c769050d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scoped-lineage",
+          "identity": "sha256:ac731d919842506825a985564b9bc8b94e343c6d7e0cc1ebb6531949785ebfcf",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:fe2261ca499af1b0f35ad39b9c5dfba0a5a3201e5b3e85d594f05df945e0af48",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Maintain scoped Context lifecycle and semantic lineage as reproducible queryable state.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Actual persistent scoped revisions/adoption and lineage primitives.",
+      "target_ticket_id": "ticket-runtime-branch-graph-projection-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-context-lifecycle-lineage-v0"
+}

@@ -1,0 +1,36 @@
+{
+  "context_id": "contract-runtime-context-lifecycle-lineage",
+  "detail": "用户明确要求维护 Context 的生命周期、意义与 lineage。每条 claim 保留它是决定/约束/观察/证据/待解问题等语义角色、适用 Project/探索/Ticket/代码版本、来源和依据、当前状态与变更原因。创建、派生、修订、分叉、明确采纳、替代、失效、冲突和解决引用精确父版本；同一主题在不同探索可同时有效，A 内 superseded 不自动令 B 失效。UI 归档/隐藏不等于撤回或 supersede，也不能静默移除依然生效的项目约束。工作区清理不级联销毁精确引用和语义历史；删除/权限/保留策略导致内容不可读时保留允许的 tombstone/不可用说明，不承诺永远可见。代码合并或 Ticket 完成只是语义复核触发，不自动把所有 context 变成稳定事实或废弃。",
+  "evidence": [
+    {
+      "note": "用户明确要求；detail 中默认视图、术语映射与具体字段为待验证的工程/产品解释。",
+      "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-awareness-before-cross-branch-adoption",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-project-overview-and-room-lineage",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:42:31.379Z",
+    "quote": "context 也就是我们需要去维护它的生命周期，维护它的意义，这个 lineage",
+    "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+  },
+  "state": "active",
+  "summary": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
+  "tags": [
+    "semantic-runtime",
+    "workspace",
+    "lifecycle",
+    "lineage"
+  ],
+  "type": "contract"
+}

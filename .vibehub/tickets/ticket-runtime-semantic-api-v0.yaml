@@ -43,9 +43,16 @@
       "identity": "sha256:83ecb04fd10eb85116654c499257ffa6d986833c992d9d07fd4e50aa1d8229ee",
       "revision": 2,
       "state": "active"
+    },
+    {
+      "acceptance_id": "ticket-workspace-management-api",
+      "criterion": "Expose scoped Ticket origin/participation/execution-completion/independent-acceptance lineage and current-workspace relevance filters using the shared provenance projection. Implement per-user/workspace hide/restore preferences separately from shared Ticket business state with idempotency and current access; no destructive record delete endpoint is implied. Publish examples covering A-create/B-execute/C-closeout and unknown legacy origin.",
+      "identity": "sha256:7597af8c384896b7ef03bd0bdda74a2dec1b7fe2eb41db2f3a2ce9ead5077013",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 2,
+  "active_contract_revision": 3,
   "constraints": [
     "Implement within semantic-runtime/ with its own dependencies, build, tests and release; host/source integrations consume public contracts and never import sibling plugin internals.",
     "Retain existing replay/provider behavior, run affected contract tests and component boundary checks; release composition also runs standalone and plugin artifact checks. Do not rebuild completed Phase 0 work.",
@@ -74,6 +81,14 @@
     {
       "purpose": "Public scope and mapping.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-branch-exploration-scope.yaml"
+    },
+    {
+      "purpose": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml"
+    },
+    {
+      "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
     }
   ],
   "contract_revisions": [
@@ -118,6 +133,32 @@
       ],
       "identity": "sha256:43d1586323ec04b3abc576266543848dedbc1f14733b1b84d222a4b1c9be1041",
       "revision": 2
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "semantic-api-concurrency",
+          "identity": "sha256:83ecb04fd10eb85116654c499257ffa6d986833c992d9d07fd4e50aa1d8229ee",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "semantic-api-conformance",
+          "identity": "sha256:d9368ae7f296c5f45b27ecf3ae77683d1251e3977ae99166d4ae3666cb9965d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "semantic-api-public-contract",
+          "identity": "sha256:0e9b3eabe31e76030e45e014a403bd828a8fe4f8f3c9827280958ad9f817bb71",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "ticket-workspace-management-api",
+          "identity": "sha256:7597af8c384896b7ef03bd0bdda74a2dec1b7fe2eb41db2f3a2ce9ead5077013",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:48cbe9bb87fc6151594a0dd1c8c1a136c1513d5fd6f0c5ff1c381aaeef329843",
+      "revision": 3
     }
   ],
   "deliveries": [],
@@ -128,6 +169,7 @@
     "conversation:2026-09-21-industrial-runtime-ticket-plan",
     "conversation:2026-09-21-restore-tech-design-policy-graph",
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "plan-validation:independent"
   ],
   "relations": [
@@ -139,6 +181,11 @@
     {
       "rationale": "Proposal API delegates authority/base checks to the single canonical bridge contract.",
       "target_ticket_id": "ticket-runtime-canonical-git-bridge-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Durable Ticket history and workspace relevance projection to expose.",
+      "target_ticket_id": "ticket-runtime-ticket-workspace-provenance-v0",
       "type": "depends_on"
     }
   ],

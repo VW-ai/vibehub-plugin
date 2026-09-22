@@ -1,0 +1,121 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ticket-origin-and-events",
+      "criterion": "Persist immutable creation origin and append-only participating execution/workspace/exploration/session/actor records with exact Ticket/Contract revision and source refs. Distinguish work execution completion, independent accepted Outcome, delivery and reopen; preserve multiple historical completion locations without redefining current canonical status.",
+      "identity": "sha256:7a2909306453b3cc29bf3d6d133260f18d09c75381e9c09901b36f0cef0b92d5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "workspace-relevance",
+      "criterion": "Implement bounded queries for current relevant, created-here, participated-here, execution-finished-here, accepted-here, Project-wide and hidden/archived views. Return reason for inclusion. A Ticket created in A but active in B appears in B; current visibility preferences do not alter Ticket identity, dependencies or acceptance.",
+      "identity": "sha256:463713b19c18a621d61978088d11fd96b629f20731c259af19a8ed49d212f3ef",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "provenance-survival",
+      "criterion": "Deletion/recreation of a worktree, branch switch, session restart and cross-workspace handoff do not rewrite provenance. Unknown legacy origin remains unknown; file copy is not creation. Scoped current permission checks prevent historical origin/actor metadata from bypassing access.",
+      "identity": "sha256:712d8bdbdb0471b8d0a8749db8b8023061a7387c7e73831ee0dca5b862be21dc",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "management-conformance",
+      "criterion": "Real-store/API-ready fixtures prove A-create/B-execute/C-independent-closeout, later Contract/reopen, two concurrent attempts, source event retry, crash/restart and workspace removal. Hiding unrelated Tickets preserves authorized dependency stubs/blockers and a restore path; no global status mutation or record deletion occurs.",
+      "identity": "sha256:75b4b039f0045c79a361c1718dbc4d508ce190841697b5beb4e51644be42de53",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
+    "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
+    "Use synthetic or explicitly selected destination-authorized input; never read or log credentials or ingest arbitrary private traces. No external deployment is authorized by this plan.",
+    "Candidate/proposal results cannot certify acceptance, grant access or silently overwrite governing Context; retain independent review and user-reserved decisions.",
+    "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
+    "REFINE this same Ticket after prerequisites close; pin actual adapters, schemas and reproducible acceptance commands before execution.",
+    "Workspace in this product discussion means an execution work area; do not overload administrative Workspace identity or infer historical origin from the current file path.",
+    "No record deletion or existing Ticket completion is authorized by view filtering or this planning change."
+  ],
+  "context": "Local stage L1/L3. Own durable Ticket provenance/read projections and workspace relevance filters, consuming exact canonical Ticket/Contract/Evidence/Outcome source facts. This is not a second Ticket lifecycle or an authority to close work; wire schemas refined after prerequisites. Personal/workspace hide preferences are separate from shared business state.",
+  "context_refs": [
+    {
+      "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
+      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+    },
+    {
+      "purpose": "Independent component and ordinary Agent degradation boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Current local-first delivery sequence and retained later hosting scope.",
+      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+    },
+    {
+      "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",
+      "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-local-experience-first.yaml"
+    },
+    {
+      "purpose": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml"
+    },
+    {
+      "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "management-conformance",
+          "identity": "sha256:75b4b039f0045c79a361c1718dbc4d508ce190841697b5beb4e51644be42de53",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "provenance-survival",
+          "identity": "sha256:712d8bdbdb0471b8d0a8749db8b8023061a7387c7e73831ee0dca5b862be21dc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ticket-origin-and-events",
+          "identity": "sha256:7a2909306453b3cc29bf3d6d133260f18d09c75381e9c09901b36f0cef0b92d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workspace-relevance",
+          "identity": "sha256:463713b19c18a621d61978088d11fd96b629f20731c259af19a8ed49d212f3ef",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:910d7463688a2bcdbc5c104f444b6389ff0c6326c7e54481cd855647187e5785",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Persist and query Ticket creation, participation and completion provenance across execution workspaces.",
+  "provenance_refs": [
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "Stable execution work area/exploration identity and participation rules.",
+      "target_ticket_id": "ticket-runtime-branch-scope-contract-v0",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Exact existing Ticket/Contract/Evidence/Outcome facts without inventing a new truth lifecycle.",
+      "target_ticket_id": "ticket-runtime-canonical-source-reader-v0",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-ticket-workspace-provenance-v0"
+}

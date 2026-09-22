@@ -12,7 +12,7 @@
       "criterion": "Model many Sessions/executions per worktree and multiple exploration executions of one Ticket while preserving exact Acceptance/Evidence association. Worktree deletion or Session restart does not erase exploration lineage or silently rebind another execution.",
       "identity": "sha256:3a7f7a48157a8bcdfdca9bb677c3f8cbe301bf89cf4bd521039ff0e02b291cd4",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "view-and-authority",
@@ -27,9 +27,16 @@
       "identity": "sha256:0a30d1351059054a469cc7bbbf57a0cf0c58d73fa2c63b3acb03eafc4927b524",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "participation",
+      "criterion": "Model many Sessions/executions per worktree and multiple exploration executions of one Ticket, preserving exact Acceptance/Evidence association. Provide stable execution-workspace provenance refs distinct from administrative Workspace. Creation, participation, execution completion and independent acceptance may have different origins; worktree deletion/recreation or Session restart does not rewrite historical identity. This contract supplies identities, not a second Ticket state machine.",
+      "identity": "sha256:fd6f0f38f0046ad0ca3f9abfe01296ad569d9227152618a45c04cb31a33a5874",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -70,6 +77,14 @@
     {
       "purpose": "One existing Project lineage must not be falsely claimed to provide branch isolation.",
       "ref": "semantic-runtime/docs/working-graph-v0.md"
+    },
+    {
+      "purpose": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml"
+    },
+    {
+      "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
     }
   ],
   "contract_revisions": [
@@ -98,6 +113,32 @@
       ],
       "identity": "sha256:3c5d4f9d958220499a124d1792d1a37a74622e242ccf23c67a8ecc400aba52ad",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "participation",
+          "identity": "sha256:fd6f0f38f0046ad0ca3f9abfe01296ad569d9227152618a45c04cb31a33a5874",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "scope-conformance",
+          "identity": "sha256:0a30d1351059054a469cc7bbbf57a0cf0c58d73fa2c63b3acb03eafc4927b524",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scope-identity",
+          "identity": "sha256:8094a0bfebb9251d43dd6bb9c64d65eeba83807fd3bc5ef888bcb0d14272d9e0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "view-and-authority",
+          "identity": "sha256:039b7df88fd74e29af176746a2d7c65691519bb7c4450367bf680a33fb43ec48",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a801545ea89239a0c5ae0298c3e64bf64b01d8cf5279bace06e760b90afccc28",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -106,6 +147,7 @@
   "outcome": "Define executable exploration/branch scope without conflating Git refs, worktrees, Sessions or Ticket identity.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "plan-validation:independent"
   ],
   "relations": [],

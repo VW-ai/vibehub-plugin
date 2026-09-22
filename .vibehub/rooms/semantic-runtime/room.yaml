@@ -50,7 +50,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "e06a4ad43939c6d447f861e8d73075e79bcf7f4c",
+        "blob": "ebcc2b4facaf22aae0531b8291b6eec52e47b4d3",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -526,8 +526,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T05:38:10.688Z",
-    "last_aligned_commit": "f10a0552448ec271ff05a383d86b57a4e549ef9a"
+    "checked_at": "2026-09-22T05:45:40.529Z",
+    "last_aligned_commit": "c49b6f7fd66977a5cdf0c3795cbaee837c1da1d3"
   },
   "anchors": [
     "semantic-runtime/"

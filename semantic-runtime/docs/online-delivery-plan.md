@@ -82,11 +82,11 @@ remain distinct. Cloud Worker enrollment is not required to prove this loop.
 
 | Ticket | Maturity | Direct prerequisites |
 | --- | --- | --- |
-| [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml) | firm | None — independently executable |
+| [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml) | firm | None |
 | [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) | firm | None — independently executable |
 | [local-service-profile-v0](../../.vibehub/tickets/ticket-runtime-local-service-profile-v0.yaml) | firm | None — independently executable |
 | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml) | firm | None — independently executable |
-| [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) | firm | None — independently executable |
+| [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) | firm | None |
 | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [graph-store-v0](../../.vibehub/tickets/ticket-runtime-graph-store-v0.yaml) |
 | [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) | draft | [agent-work-request-contract-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-contract-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
 | [entity-extraction-v0](../../.vibehub/tickets/ticket-runtime-entity-extraction-v0.yaml) | draft | [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml); [durable-ingress-v0](../../.vibehub/tickets/ticket-runtime-durable-ingress-v0.yaml) |
@@ -143,6 +143,44 @@ are resolved by local profile; no new human approval is inferred for routine
 engineering. Entity extraction/resolution thresholds are evaluated, not assumed.
 These are testable uncertainties, not reasons to call the prototype ready.
 
+## Workspace management and lifecycle follow-up
+
+The owner also requires Ticket origin and completion locations plus Context
+lifecycle/meaning/lineage. Product “workspace” currently means an execution work
+area (checkout/worktree and its exploration binding); it must not silently reuse
+the existing administrative Workspace entity. Exact terminology/mapping remains
+part of the scope contract and UX verification.
+
+- [Ticket workspace provenance](../../.vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml): immutable creation; append-only participation, execution completion, independent acceptance and delivery, pinned to their exact Ticket/Contract revisions. Old unknown origin is not guessed from file location.
+- [Workspace visibility](../../.vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml): current-relevant and origin/participation/completion filters; hide/restore preferences separate from shared state or record deletion. An A-created Ticket active in B remains relevant to B, with permission-safe dependency blockers.
+- [Context lifecycle and meaning](../../.vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml): semantic role, applicability, sources and reasons alongside lifecycle and exact parent lineage. Local supersession in A does not invalidate B; UI archive does not withdraw a governing constraint.
+
+| New bounded Ticket | Maturity | Direct prerequisites |
+| --- | --- | --- |
+| [Ticket workspace provenance](../../.vibehub/tickets/ticket-runtime-ticket-workspace-provenance-v0.yaml) | draft | [branch-scope-contract-v0](../../.vibehub/tickets/ticket-runtime-branch-scope-contract-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) |
+| [Context lifecycle/lineage](../../.vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml) | draft | [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
+
+The existing branch-scope contract supplies the identities; Project UX prototypes
+the management journeys; Query consumes Context applicability/lifecycle; semantic
+API exposes Ticket provenance and view preferences; the client composes those
+APIs. These five Tickets gain append-only acceptance revisions. Query now also
+depends on Context lifecycle; semantic API also depends on Ticket provenance.
+The remaining new Tickets wait for their direct prerequisites and require
+refinement; no current records are deleted or falsely completed by this plan.
+
+Acceptance examples: Ticket created in A, executed in B and independently
+accepted in C; later Contract/reopen preserves prior completion history; one
+Ticket participates in two attempts; Context originates in A, is adopted by B,
+and supersession in A leaves B's selected version explicit. Restart, duplicate
+source events, unknown origin, worktree removal, revocation and hide/restore are
+part of each domain's verification.
+
+Independent follow-up validation passed for 2 new draft Tickets and 5 existing
+revisions (30 active criteria): disposable apply, full graph, append-only
+history, 14 resolved Context refs and authority guard. Validated batch SHA-256:
+`06b6b2a3245b0092cbf886dd5d23f4498c4093cd1d7bad4e8bbdf01202ee9402`.
+This is a plan update; workspace filters and lifecycle services are not yet built.
+
 ## Reading and executing this plan
 
 The Ticket YAML files are the source of acceptance, dependencies and maturity.
@@ -155,9 +193,10 @@ Contract revisions when refinement changes the semantic obligation.
 ## Plan inventory
 
 The original industrial plan contained 54 Tickets. Its completed contracts and
-spike remain valid history. This replan adds 10 narrowly scoped Tickets and
-revises 17 existing unfinished Tickets, preserving prior Acceptance/Contract
-revisions. The five L0 Tickets above are the current new executable frontier;
+spike remain valid history. The local-first checkpoint added 10 narrowly scoped Tickets and
+revised 17 existing unfinished Tickets, preserving prior Acceptance/Contract
+revisions. The workspace-management follow-up below adds two domain Tickets
+and refines five existing Tickets. The five L0 Tickets above are the current new executable frontier;
 older identity/policy/observability foundations have already been delivered.
 
 The tables below retain the original module inventory with updated direct
@@ -200,9 +239,9 @@ navigation table, determine current scheduling.
 | [Build durable PolicyRun journaling, idempotency, and crash resume](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml) | draft | [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml) |
 | [交付第一套可回放 ingress 业务 Policy](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml) | draft | [policy-journal-v0](../../.vibehub/tickets/ticket-runtime-policy-journal-v0.yaml); [entity-resolution-v0](../../.vibehub/tickets/ticket-runtime-entity-resolution-v0.yaml) |
 | [读取并投影已有 canonical Git 记录](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) | draft | [git-commit-ref-provenance-v0](../../.vibehub/tickets/ticket-runtime-git-commit-ref-provenance-v0.yaml); [source-access-invalidation-v0](../../.vibehub/tickets/ticket-runtime-source-access-invalidation-v0.yaml) |
-| [Build point-in-time semantic retrieval and ranking](../../.vibehub/tickets/ticket-runtime-query-engine-v0.yaml) | draft | [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml) |
+| [Build point-in-time semantic retrieval and ranking](../../.vibehub/tickets/ticket-runtime-query-engine-v0.yaml) | draft | [judge-runtime-v0](../../.vibehub/tickets/ticket-runtime-judge-runtime-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml); [branch-graph-projection-v0](../../.vibehub/tickets/ticket-runtime-branch-graph-projection-v0.yaml); [context-lifecycle-lineage-v0](../../.vibehub/tickets/ticket-runtime-context-lifecycle-lineage-v0.yaml) |
 | [Build reproducible consumer-specific Context compilation](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml) | firm | [query-engine-v0](../../.vibehub/tickets/ticket-runtime-query-engine-v0.yaml) |
-| [提供 Project / semantic reference / proposal 命令 API](../../.vibehub/tickets/ticket-runtime-semantic-api-v0.yaml) | draft | [context-compiler-v0](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml); [canonical-git-bridge-v0](../../.vibehub/tickets/ticket-runtime-canonical-git-bridge-v0.yaml) |
+| [提供 Project / semantic reference / proposal 命令 API](../../.vibehub/tickets/ticket-runtime-semantic-api-v0.yaml) | draft | [context-compiler-v0](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml); [canonical-git-bridge-v0](../../.vibehub/tickets/ticket-runtime-canonical-git-bridge-v0.yaml); [ticket-workspace-provenance-v0](../../.vibehub/tickets/ticket-runtime-ticket-workspace-provenance-v0.yaml) |
 | [语义关系纠错与溯源](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml) | draft | [context-compiler-v0](../../.vibehub/tickets/ticket-runtime-context-compiler-v0.yaml) |
 | [Define explicit proposal and compare-and-swap promotion into Git-backed canonical records](../../.vibehub/tickets/ticket-runtime-canonical-git-bridge-v0.yaml) | draft | [reconciliation-worker-v0](../../.vibehub/tickets/ticket-runtime-reconciliation-worker-v0.yaml); [canonical-source-reader-v0](../../.vibehub/tickets/ticket-runtime-canonical-source-reader-v0.yaml) |
 
@@ -225,7 +264,7 @@ navigation table, determine current scheduling.
 | [Session registration 与可恢复 soft delivery](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml) | draft | [semantic-api-v0](../../.vibehub/tickets/ticket-runtime-semantic-api-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) |
 | [Codex host sensor / query adapter](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml) | draft | [session-delivery-v0](../../.vibehub/tickets/ticket-runtime-session-delivery-v0.yaml); [local-git-worktree-sensor-v0](../../.vibehub/tickets/ticket-runtime-local-git-worktree-sensor-v0.yaml); [host-capability-probe-v0](../../.vibehub/tickets/ticket-runtime-host-capability-probe-v0.yaml) |
 | [组合并验收 Git → Policy → Context 在线闭环](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | draft | [host-adapter-v0](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml); [ingress-policy-v0](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [semantic-feedback-v0](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml); [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) |
-| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
+| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [ticket-build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
 
 ### Local evidence and later hosted operations
 
@@ -270,7 +309,7 @@ is fabricated to hide or archive old work.
 | [Working Graph revision / assertion / conflict 可执行契约](../../.vibehub/tickets/ticket-define-semantic-context-protocol-v0.yaml) | Executable Working Graph revisions/assertions/snapshots/conflicts | Scope identity → identity; causal ordering → watermark contract; external canonical writes → canonical Git bridge. |
 | [选择具体 alpha 平台与部署边界](../../.vibehub/tickets/ticket-select-semantic-runtime-alpha-platform.yaml) | firm | [platform-evaluation-spike](../../.vibehub/tickets/ticket-runtime-platform-evaluation-spike.yaml) |
 | [组合并验收 Git → Policy → Context 在线闭环](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml) | draft | [host-adapter-v0](../../.vibehub/tickets/ticket-runtime-host-adapter-v0.yaml); [ingress-policy-v0](../../.vibehub/tickets/ticket-runtime-ingress-policy-v0.yaml); [branch-awareness-v0](../../.vibehub/tickets/ticket-runtime-branch-awareness-v0.yaml); [semantic-feedback-v0](../../.vibehub/tickets/ticket-runtime-semantic-feedback-v0.yaml); [agent-work-request-bridge-v0](../../.vibehub/tickets/ticket-runtime-agent-work-request-bridge-v0.yaml) |
-| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
+| [提供最小 semantic activity 与精确引用页面](../../.vibehub/tickets/ticket-build-semantic-collaboration-surface-v0.yaml) | draft | [ticket-build-semantic-runtime-service-v0](../../.vibehub/tickets/ticket-build-semantic-runtime-service-v0.yaml); [decision-audit-v0](../../.vibehub/tickets/ticket-runtime-decision-audit-v0.yaml); [project-exploration-ux-v0](../../.vibehub/tickets/ticket-runtime-project-exploration-ux-v0.yaml) |
 | [上线受保护的 internal alpha 并验证边界](../../.vibehub/tickets/ticket-launch-semantic-runtime-online-alpha.yaml) | draft | [staged-rollout-degradation](../../.vibehub/tickets/ticket-runtime-staged-rollout-degradation.yaml) |
 
 Dependencies of the five revised Tickets change because their actual outcomes
@@ -336,7 +375,7 @@ future work. Concrete environment mechanisms and capability probes are recorded
 as refinement work, not extra human approval gates.
 
 
-## Current planning validation
+## Local-first checkpoint validation (c49b6f7)
 
 The local-first replan adds 10 bounded Tickets and revises 17 existing unfinished
 Tickets. Successful implementation Outcomes and original design drafts are

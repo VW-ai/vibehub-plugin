@@ -1,0 +1,36 @@
+{
+  "context_id": "intent-runtime-workspace-ticket-visibility",
+  "detail": "用户希望不属于当前 workspace 的 Ticket 可以先不管、不看。按产品意图提供当前工作区相关、在此创建、在此参与/执行完成/验收、项目全部及归档等视图，并能看到归属原因。当前相关性不能只按创建地判断：A 创建但 B 正在推进的 Ticket 仍应出现在 B。当前界面隐藏、个人/工作区归档偏好与共享 Ticket 状态、业务取消、物理删除是不同操作；这次讨论不授权删除任何记录。隐藏外部 Ticket 时，当前可见任务所需依赖可保留权限允许的最小引用/阻塞提示，不能伪造依赖消失或完成。具体默认筛选和恢复入口通过 UX 原型验证；可见性偏好不应改变 Agent 的 governing Context 或验收事实。",
+  "evidence": [
+    {
+      "note": "用户明确要求；detail 中默认视图、术语映射与具体字段为待验证的工程/产品解释。",
+      "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-runtime-ticket-workspace-provenance",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-project-overview-and-room-lineage",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:42:31.379Z",
+    "quote": "不属于我们这个 workspace ticket，我们先不去管了，不去看了",
+    "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+  },
+  "state": "active",
+  "summary": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+  "tags": [
+    "semantic-runtime",
+    "workspace",
+    "lifecycle",
+    "lineage"
+  ],
+  "type": "intent"
+}

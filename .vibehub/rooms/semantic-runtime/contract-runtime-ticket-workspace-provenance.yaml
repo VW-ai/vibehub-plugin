@@ -1,0 +1,36 @@
+{
+  "context_id": "contract-runtime-ticket-workspace-provenance",
+  "detail": "用户要求知道 Ticket 在哪里创建、在哪里完成，并能按当前工作区管理。这里 workspace 暂按日常执行工作区理解（checkout/worktree 及关联探索），不能直接复用已有管理域 Workspace ID；精确产品命名由 scope/UX 契约确定。创建来源为不可改写的历史事实；参与推进、执行完成、独立验收、交付及之后重开是带精确 Ticket/Contract 版本的不同记录，可能发生在不同工作区。完成来源可以有多次历史，不能用一个可覆盖 finished_workspace 字段抹平。迁移旧记录缺少来源时明确 unknown，不能按当前目录、文件复制或 Git checkout 位置伪造出生地。worktree 删除后保留稳定来源与历史，访问仍受当前权限约束。",
+  "evidence": [
+    {
+      "note": "用户明确要求；detail 中默认视图、术语映射与具体字段为待验证的工程/产品解释。",
+      "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-runtime-ticket-exploration-participation",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-branch-exploration-scope",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T05:42:31.379Z",
+    "quote": "它是在哪个 workspace 里面被创建的，然后在哪个 workspace 里面它被 finished",
+    "ref": "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle"
+  },
+  "state": "active",
+  "summary": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+  "tags": [
+    "semantic-runtime",
+    "workspace",
+    "lifecycle",
+    "lineage"
+  ],
+  "type": "contract"
+}

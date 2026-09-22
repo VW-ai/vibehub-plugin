@@ -20,9 +20,23 @@
       "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "workspace-ticket-management",
+      "criterion": "Prototype current-relevant, created-here, participated-here, execution-finished-here, accepted-here, Project-wide and archived views with visible inclusion reasons. Show A-create/B-execute/C-review and one Ticket across attempts. Hide/restore affects only the selected view/user/workspace preference; preserve authorized dependency blockers without deleting records or changing status.",
+      "identity": "sha256:34bc4611bbe29acb64edcf6db7687fe3167e50be716c0325d7f20a0309678b9e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-lifecycle-meaning",
+      "criterion": "Prototype Context role/applicability/rationale and exact origin/branch/adoption/supersession lineage, including A superseded while B remains current. Clearly distinguish hidden/archived UI state, semantic invalidation, unresolved conflict and inaccessible history; deleted workspaces remain historical origins.",
+      "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+      "revision": 1,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -59,6 +73,18 @@
     {
       "purpose": "Bounded first collaboration experience.",
       "ref": ".vibehub/rooms/semantic-runtime/decision-runtime-awareness-before-cross-branch-adoption.yaml"
+    },
+    {
+      "purpose": "Ticket 保留创建、参与执行与完成验收的工作区来源",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-ticket-workspace-provenance.yaml"
+    },
+    {
+      "purpose": "当前工作区只展示相关 Ticket，隐藏与归档不删除共享历史",
+      "ref": ".vibehub/rooms/semantic-runtime/intent-runtime-workspace-ticket-visibility.yaml"
+    },
+    {
+      "purpose": "Context 的语义角色、适用范围、生命周期和来源链共同维护",
+      "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-context-lifecycle-lineage.yaml"
     }
   ],
   "contract_revisions": [
@@ -82,6 +108,37 @@
       ],
       "identity": "sha256:c0af3b8b7b5cbab28094a3b1469f492b63f8f76cd773844ccc322f01ae8f2d07",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "awareness-and-action",
+          "identity": "sha256:1287b1fb015369ed7e0aaa6a85f9db458c02868c228f67894f56fc6153ee3c9e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-lifecycle-meaning",
+          "identity": "sha256:6661e467d4cfb661cc597ed36b9e1013d2d6af7cdd787ea842e7836f215f3b82",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "project-and-lineage",
+          "identity": "sha256:33e4ca2fa66eabca50ca95685d5f02b762e268a40c4c9f825bfc286f779199f3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "ux-handoff",
+          "identity": "sha256:f427564fe3609bd4e6da99980855fb1ab3ab9505fe2d0aa08c1aa32a87952eb6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "workspace-ticket-management",
+          "identity": "sha256:34bc4611bbe29acb64edcf6db7687fe3167e50be716c0325d7f20a0309678b9e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:27b543cd55481f5614448f34ddf427eb5051e4d1e0974c3c6581666efa0daf06",
+      "revision": 2
     }
   ],
   "deliveries": [],
@@ -90,6 +147,7 @@
   "outcome": "Design and demonstrate Project, exploration, Room lineage and actionable work-request journeys.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-branch-experience",
+    "conversation:2026-09-21-runtime-workspace-ticket-context-lifecycle",
     "plan-validation:independent"
   ],
   "relations": [],
