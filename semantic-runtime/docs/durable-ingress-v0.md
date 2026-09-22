@@ -40,6 +40,8 @@ select the store partition; input IDs cannot broaden it.
 | eventIdFor | `ingress:submit`; registered producer principal only |
 | submit | `ingress:submit`, `store:write`, `project:inspect`, `activation:admit`; registered producer principal only |
 | getSource/getReceipt/readEvent/readSnapshot/listPending | `ingress:read`; current source ACL, plus captured event ACL for event reads |
+| getRegistration | `ingress:read`; current registration ACL; no cursor or historical content |
+| assertGitReadAccess | `ingress:read`, `project:inspect`; human/service registered producer with current registration ACL and exact enrolled repository/execution |
 | handoff | `ingress:handoff`, `store:write`, `project:inspect`, `activation:admit`; human/service only; current and captured ACL |
 
 The App owns registration and policy configuration. These process-local objects
@@ -81,6 +83,16 @@ immutable audit record. It returns the registration result shape above.
 offset or a producer resume token. It never treats maximum_sequence as continuity.
 It rejects the whole read when any cursor entry's captured/current access excludes
 the caller; filtering a cursor would invent a false account of continuity.
+
+`getRegistration(context, {registration_id})` returns registration metadata and
+version without expanding the cursor. `assertGitReadAccess(context,
+{registration_id, object})` checks a prospective `git_commit` against the actual
+execution registration and current object guard, returning the source fence.
+It writes nothing. An unseen commit can be read only through this enrolled
+producer boundary; a known object with a missing guard summary fails closed.
+This lets a selected reader authorize a new commit even when an older commit
+in the same source cursor is revoked. It cannot authorize that older content,
+enable capture or replace Project activation checks.
 
 Before constructing a RawEvent, the producer calls:
 

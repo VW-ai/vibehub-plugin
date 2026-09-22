@@ -72,6 +72,25 @@ base, and 4096 path bytes per change. An oversized path or unsupported diff stay
 an unresolved per-base result while preserving the verified commit metadata.
 Limits produce explicit unresolved data, never silently truncated content.
 
+## Bounded selected record reads
+
+`readFileAtCommit({commit_oid, path})` reads one regular blob through verified
+commit/tree objects. `readEntryAtCommit` returns its membership and available
+blob metadata without reading the artifact body. Both distinguish `resolved`,
+proved `absent`, `unsupported` and `unavailable`, retaining exact object/digest
+pins. `proveDescendant({ancestor_oid, descendant_oid})` follows bounded raw
+commit parents; missing ancestry never proves a rewind or divergence. A retained
+ancestor OID is a comparison pin and its body need not be reopened.
+
+The trusted local reader may provide `object_directory` from actual enrollment
+to enter the private Git view immediately, plus an `authorize_commit` callback
+that must allow each raw commit expansion. These constructor capabilities are
+not client-supplied JSON. One adapter instance shares caches and fixed budgets
+across a refresh; `metrics()` reports actual reads and `GIT_SELECTED_READ_LIMITS`
+exports the limits. The [canonical reader](canonical-source-reader-v0.md)
+documents the complete bound and authority contract. It performs no recursive
+project import, source config read, fetch, or automatic refresh.
+
 ## Correlating observations
 
 `createGitCommitObservation({commit, event})` requires a valid normalized

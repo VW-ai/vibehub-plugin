@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "scope": "Selected synthetic local Git/SQLite samples; not a production SLA or App/host integration",
+  "reader": {
+    "schema_version": 1,
+    "kind": "synthetic_canonical_reader_measurement",
+    "node": "v23.9.0",
+    "source": "actual local Git, DurableIngress and LocalGraphStore",
+    "samples": [
+      {
+        "unrelated_files": 0,
+        "status": "applied",
+        "selected_records": 8,
+        "selected_canonical_refs": 8,
+        "metrics": {
+          "blobs_read": 8,
+          "commands": 38,
+          "commits_read": 1,
+          "git_io_ms": 296.21745699999997,
+          "objects_read": 12,
+          "raw_object_bytes": 5890,
+          "record_bytes": 5159,
+          "selected_paths": 9,
+          "trees_read": 3
+        },
+        "refresh_ms": 611.4495830000001,
+        "restart_retry_ms": 87.64049999999997,
+        "restart_retry_status": "duplicate",
+        "retry_with_checkout_removed": true,
+        "pending_ingress": 8,
+        "graph_commit_count_including_genesis": 2,
+        "immutable_issuance_count": 1
+      },
+      {
+        "unrelated_files": 1000,
+        "status": "applied",
+        "selected_records": 8,
+        "selected_canonical_refs": 8,
+        "metrics": {
+          "blobs_read": 8,
+          "commands": 38,
+          "commits_read": 1,
+          "git_io_ms": 275.46587300000033,
+          "objects_read": 12,
+          "raw_object_bytes": 5919,
+          "record_bytes": 5159,
+          "selected_paths": 9,
+          "trees_read": 3
+        },
+        "refresh_ms": 532.0926670000001,
+        "restart_retry_ms": 84.01241600000003,
+        "restart_retry_status": "duplicate",
+        "retry_with_checkout_removed": true,
+        "pending_ingress": 8,
+        "graph_commit_count_including_genesis": 2,
+        "immutable_issuance_count": 1
+      }
+    ]
+  },
+  "git_adapter": {
+    "schema_version": 1,
+    "workload": "one selected record, two selected trees; 1 vs1001 total files",
+    "baseline": {
+      "total_files": 1,
+      "status": "resolved",
+      "content_bytes": 38,
+      "elapsed_ms": 89.148334,
+      "commands": 12,
+      "raw_object_bytes": 319,
+      "record_bytes": 38,
+      "objects_read": 4,
+      "selected_paths": 1,
+      "commits_read": 1,
+      "trees_read": 2,
+      "blobs_read": 1,
+      "git_io_ms": 85.049207
+    },
+    "wide": {
+      "total_files": 1001,
+      "status": "resolved",
+      "content_bytes": 38,
+      "elapsed_ms": 91.74837500000001,
+      "commands": 12,
+      "raw_object_bytes": 406,
+      "record_bytes": 38,
+      "objects_read": 4,
+      "selected_paths": 1,
+      "commits_read": 1,
+      "trees_read": 2,
+      "blobs_read": 1,
+      "git_io_ms": 89.10391600000014
+    },
+    "limits": {
+      "paths": 32,
+      "path_components": 16,
+      "path_bytes": 4096,
+      "record_bytes": 65536,
+      "total_record_bytes": 262144,
+      "tree_bytes": 1048576,
+      "raw_object_bytes": 4194304,
+      "commands": 128,
+      "command_ms": 10000,
+      "git_io_ms": 30000,
+      "pack_entries": 512
+    },
+    "verified_formats": [
+      "sha1",
+      "sha256"
+    ],
+    "verification": {
+      "focused_tests": 13,
+      "focused_passed": 13,
+      "per_record_overflow": "unsupported/limit_exceeded; no blob content read",
+      "aggregate_record_overflow": "fifth64KiB selection rejected, including duplicate blob IDs",
+      "tree_overflow": "greater than1MiB rejected",
+      "aggregate_raw_overflow": "fifth bounded wide tree rejected within4MiB",
+      "selected_path_overflow": "33rd unique selected path rejected",
+      "command_overflow": "ancestry traversal stops at128 commands",
+      "cumulative_time": "isolated injected clock rejects final completed command after30s; actual Git used; no30s sleep",
+      "timeouts": "at most10s per command and SIGKILL; reduced to remaining budget"
+    },
+    "model_calls": 0,
+    "measurement_scope": "synthetic local sample, not an SLA or live reader App integration"
+  },
+  "model_calls": 0
+}

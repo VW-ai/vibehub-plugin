@@ -5,7 +5,7 @@ import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { canonical, fingerprint } from '../core/contracts.mjs';
 import { EVENT_TYPES, validateRawEvent, normalizeRawEvent, effectiveEventAccess,
-  verifyEventPayload, eventIdempotencyKey } from '../core/event-provenance.mjs';
+  verifyEventPayload, eventIdempotencyKey, sourceObjectKey } from '../core/event-provenance.mjs';
 import { sourcePartitionKey, sourceEventFingerprint, createSourceCursor, acceptSourceEvent } from '../core/causal-ordering.mjs';
 import { SourceInvalidationDomain } from './source-invalidation.mjs';
 import { types as utilTypes } from 'node:util';
@@ -231,6 +231,40 @@ export class DurableIngress {
           access: value.access, request_digest: hash({ kind: 'direct_access_update', ...value }) });
         return { registration_id: value.registration_id, version, registration };
       });
+    });
+  }
+  getRegistration(context, options) {
+    return this.#call(() => {
+      const grant = this.#grant(context, 'ingress:read'), value = input(options); fields(value, ['registration_id']);
+      const row = this.#source(context, value.registration_id); this.#readAllowed(grant, row.value);
+      // Configuration lookup carries no cursor, receipt, or historical content.
+      this.#readAllowed(this.#grant(context, 'ingress:read'), this.#source(context, value.registration_id).value);
+      return { registration_id: value.registration_id, version: row.version, registration: row.value };
+    });
+  }
+  assertGitReadAccess(context, options) {
+    return this.#call(() => {
+      const value = input(options); fields(value, ['registration_id', 'object']);
+      sourceObjectKey(value.object); assert(value.object.kind === 'git_commit');
+      let domainCode;
+      try {
+        return this.#store.readSnapshot(context, tx => {
+          try {
+            const grant = this.#grant(context, 'ingress:read', { owner: true, project: true });
+            const row = this.#source(context, value.registration_id, tx);
+            assert(grant.principal_id === row.value.producer_principal_id, 'ingress_unauthorized');
+            this.#live(context, row.value); this.#readAllowed(grant, row.value);
+            assert(value.object.tenant_id === grant.tenant_id && row.value.execution
+              && value.object.repository_id === row.value.execution.repository_id, 'source_mismatch');
+            const fence = this.#invalidation.assertProspectiveObjectAllowed(context, value.object, { tx });
+            this.#grant(context, 'ingress:read', { owner: true, project: true });
+            return { status: 'allowed', registration_id: value.registration_id, version: row.version, source_fence: fence.sequence };
+          } catch (error) { domainCode = errorCode(error); throw error; }
+        });
+      } catch (error) {
+        if (ownCodes.has(domainCode) || invalidationCodes.has(domainCode) || domainCode === 'source_invalidation_denied') throw fail(domainCode);
+        throw error;
+      }
     });
   }
   getSource(context, options) {

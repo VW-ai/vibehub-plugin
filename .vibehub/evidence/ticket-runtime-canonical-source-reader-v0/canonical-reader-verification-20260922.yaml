@@ -1,0 +1,36 @@
+{
+  "acceptance_ids": [
+    "canonical-reader-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canonical-reader-fixtures",
+      "identity": "sha256:26fbee68a85713ac6a9c603b6837ba290d18107486dec7783b754bc206d8540a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "canonical-reader-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T15:14:16.502Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/canonical-reader-verification-20260922.json",
+    "semantic-runtime/docs/measurements/canonical-reader-20260922.json",
+    "semantic-runtime/docs/measurements/jev-canonical-graph-regression-20260922.json",
+    "semantic-runtime/docs/canonical-source-reader-v0.md",
+    "semantic-runtime/test/canonical-source-reader.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-authority.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-records.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-crash.test.mjs",
+    "semantic-runtime/test/git-provenance-canonical.test.mjs",
+    "semantic-runtime/test/helpers/canonical-reader-process.mjs",
+    "semantic-runtime/test/helpers/canonical-fence-process.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final frozen affected suites pass144/144. Full Runtime boundary/test verification passes639 total,637 pass,2 existing native provider opt-in skips,0 failures; boundary154 files/0 errors. A fresh standalone npm install and full verify outside the parent repository reproduces639 total,637 pass,2 skips,0 failures. Separate shipped plugin artifact remains independently valid:79 files,3670088 bytes; no Runtime implementation or dependency entered the package. git diff --check passes and Context guard reports no authority violations. Temporary real Git/SQLite fixtures exercise selected-record bootstrap and restart, changed Authority/Acceptance and presentation-stable hashes, exact human Evidence/Outcome independence/history, invalid and unavailable closure, symlinks/gitlinks, corruption, absence, GC, bounded ancestry, permissions, activation and fence races, exact/changed retries, actual SIGKILL before selection and after publication, and downstream capacity rollback. The retained measurement shows eight selected records still require38 commands,8 blobs and3 trees with0 or1000 unrelated files; refresh532–611ms, restart retry84–88ms after checkout removal,8 pending ingress intents and exactly one added Graph commit. Independent lower-level Git measurement covers SHA1/SHA256,128-command/30s/4MiB budgets and exact overflow rejection without truncation. Nine additional authorized fixed synthetic official JEV calls verify compatibility of the existing Graph routes:8/8 expected at127–379ms,0 retries/429,17 source pins plus17 historical reads/retries after reopen;325ms in-flight revocation rejects publication with unchanged Graph. JEV is a compatibility regression, not canonical-reader extraction quality or App/plugin integration proof.",
+  "ticket_id": "ticket-runtime-canonical-source-reader-v0"
+}

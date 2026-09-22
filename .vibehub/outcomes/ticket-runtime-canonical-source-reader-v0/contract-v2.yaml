@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "canonical-reader-contract",
+    "canonical-reader-fixtures",
+    "canonical-reader-lifecycle"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T15:16:39.105Z",
+  "contract_revision": {
+    "identity": "sha256:970117d359b7f01da6e7b98c11d17df8f2f83a329c1c9715d848e333498d3288",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "canonical-reader-conformance-20260922",
+    "canonical-reader-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/closeout_canonical_reader, given a read-only review handoff without execution context. I did not author or edit implementation/tests, independently reproduced and re-adjudicated the Evidence-binding defect, reran the frozen affected suite and boundary checks, inspected exact Evidence and release logs, and wrote only this Outcome through the native closeout command.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all three current Acceptance revisions in exact Contract 2. canonical-reader-contract: reviewed the public exported reader, Runtime-owned strict JSON-as-YAML validators and bounded hardened Git adapter against public Context v1, Room v1, bound Ticket v3 and native-bound Evidence/Outcome v2. Selected kind/ID, complete Acceptance/Contract identities, Evidence closure, successful Outcome independence claims and human-origin support are checked. Origin and independence remain source claims. Same-commit Authority artifact membership is checked without treating Room stale metadata as revocation. Actual enrollment and producer/source grants gate scratch-view commit/tree/record-blob reads; immutable hashes, exact absence proofs and bounded selected paths are retained without loading source configuration or importing sibling implementation. Every selected record supports one candidate Graph assertion through actual DurableIngress events. Verified-read issuance binds the exact assertion/configuration/request/generation/fence in the existing namespace; generic Graph JSON cannot impersonate source verification. canonical-reader-lifecycle: reviewed deterministic request/observation pins, receipt-first retries, current access, exact prior-selection issuance and source authorization before bytes and returns. New refresh requires current activation; already committed exact retries retain authorized disabled-read behavior without Git access. Same-selection advancement requires equality or proven ancestry; rewind, divergence and incomplete ancestry do not replace the selection. The Graph checks optional expected_source_fence inside the transaction and on duplicate, receipt and reconciliation paths while preserving unpinned behavior. Failed CAS/capacity publication may retain observations and inert issuance but creates no new semantic selection; base lineage does not accumulate prior support. Absent paths use verified tree absence and whole-commit events, not source tombstones. Exact current/historical/quarantined/unavailable reads retain structured citations across restart and actual source GC under present authorization. No ingress ACK/completion or canonical promotion occurs. canonical-reader-fixtures: independently ran the final required affected suite: 144 tests passed, zero failures or skips; boundary check passed 154 files with zero errors, and git diff --check passed. Independently exercised a temporary real Git/SQLite composition probe for changed Authority rules, appended Acceptance/Contract revisions, historical old Outcome, stale Graph CAS and rewind; all passed with unchanged head on rejected publication. Reviewed the committed regressions for these cases, missing ancestry, actual source GC, enrollment/activation/ACL composition, cross-process fence change, partial-ingress SIGKILL and lost publication reply. Independent review reproduced a successful Outcome marked verified despite referencing Evidence with a forged extra Acceptance binding; the author repaired complete referenced-Evidence validation and the final regression passes. The early capacity test exposed a diagnostic expectation mismatch; the corrected test accepts the existing storage rejection and proves retained pending observations with unchanged selection, without widening limits. Read exact acceptance-linked Evidence and actual executor full/standalone/plugin logs rather than claiming independent broad reruns. Full Runtime and a clean npm ci outside the parent repository each report 639 total tests, 637 passed, zero failed and two existing native macOS Keychain opt-in skips; standalone completion and dependency boundaries pass. The separate shipped plugin artifact remains 79 files and 3670088 bytes. Reviewed bounded measurements: eight selected records use 38 commands, eight blobs and three trees both with zero and with 1000 unrelated files; local sample refresh is 532–611 ms and source-unavailable restart retry 84–88 ms. Eight ingress intents remain pending and exactly one Graph commit is added. These are local samples, not an SLA. Reviewed the supplemental nine synthetic JEV compatibility results but made no model or credential call; they are not canonical-reader quality or integration acceptance. All 27 Ticket Context references resolve, exact prerequisite successful Outcomes were inspected, current Ticket validation passes and Context guard reports no governing authority violations. No unresolved criterion remains. This Outcome accepts the bounded explicit local canonical-source reader, not recursive import, automatic collection, a Policy consumer, scheduler, branch adoption, canonical writes, host/App wiring or a complete product workflow.",
+  "ticket_id": "ticket-runtime-canonical-source-reader-v0",
+  "unresolved_acceptance_ids": []
+}

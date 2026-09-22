@@ -46,6 +46,13 @@ bounded HEAD/index/worktree metadata for an enrolled execution and submits it
 through durable ingress. It reports unsupported or racing observations as gaps.
 The caller drives capture; the setup App and host plugins do not yet run it.
 
+The [canonical source reader](docs/canonical-source-reader-v0.md) reads explicitly
+selected Context, Room, Ticket, Evidence and Outcome records from one immutable
+Git commit. It checks their version bindings, admits exact source observations
+and publishes one atomic candidate selection in Graph. Reads retain citations
+and distinguish historical or quarantined selections. This is an in-process
+API; automatic discovery and the App/plugin connection remain follow-up work.
+
 [Source invalidation](docs/source-invalidation-v0.md) blocks content reads across every supporting source,
 retains ordered lifecycle notices, and exposes a fence for future query consumers.
 `npm run check:jev:source-fence` tests a fixed synthetic JEV request whose source

@@ -58,6 +58,15 @@ metadata changes; a changed request cannot reuse the key. Current permissions
 still apply to retry and receipt reads. No model, network call or source-file
 fetch occurs inside the transaction.
 
+Selected-source consumers may include `expected_source_fence` on `mutate`. This
+optional nonnegative integer is part of the exact request identity. The Graph
+checks it against the source-invalidation feed before planning, inside the write
+transaction and before commit. Duplicate, receipt and reconciliation paths also
+check the retained pin; a later fence rejects with `stale_invalidation_fence`.
+These calls additionally require `source:invalidation:read`. Requests without
+this field retain the existing source-closure checks and behavior. The pin is
+conservative: an unrelated source change can invalidate a selected result too.
+
 ## Read and retain provenance
 
 - `getHead(context, {generation_id})` returns the graph address and whether a
@@ -159,3 +168,10 @@ matched at 107–241 ms per successful attempt, and the in-flight revocation cas
 completed at 344 ms but was rejected on publication. Both checks had no retries;
 the eight-call route reported no rate limits. These are fixed synthetic checks,
 with the same limits as the earlier runs.
+
+The [canonical-reader Graph regression](measurements/jev-canonical-graph-regression-20260922.json)
+ran these existing synthetic routes after adding the optional mutation fence:
+8/8 judgments matched at 127–379 ms, with zero retries or rate limits. The
+325 ms in-flight request was rejected on publication with the Graph unchanged.
+This verifies compatibility of the existing JEV route; the canonical reader
+itself performs no model calls.

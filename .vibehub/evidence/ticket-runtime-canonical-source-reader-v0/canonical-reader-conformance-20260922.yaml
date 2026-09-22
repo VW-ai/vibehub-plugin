@@ -1,0 +1,42 @@
+{
+  "acceptance_ids": [
+    "canonical-reader-contract",
+    "canonical-reader-lifecycle"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canonical-reader-contract",
+      "identity": "sha256:8788657cc930e447614fd0cc1c04e2dbca5ae8d2360cac7d2fb45baf8d1a2baf",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "canonical-reader-lifecycle",
+      "identity": "sha256:850090b88539f087dc41c84aed7c10681dbbf67afe2f121a3639abd3ca0cff47",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "canonical-reader-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T15:12:34.250Z",
+  "refs": [
+    "semantic-runtime/docs/canonical-source-reader-v0.md",
+    "semantic-runtime/src/local/canonical-source-reader.mjs",
+    "semantic-runtime/src/core/canonical-records.mjs",
+    "semantic-runtime/src/adapters/git-provenance.mjs",
+    "semantic-runtime/src/local/durable-ingress.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/source-invalidation.mjs",
+    "semantic-runtime/test/canonical-source-reader.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-records.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-authority.test.mjs",
+    "semantic-runtime/test/canonical-source-reader-crash.test.mjs",
+    "semantic-runtime/test/git-provenance-canonical.test.mjs",
+    "semantic-runtime/docs/measurements/canonical-reader-20260922.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implements the explicit immutable Git selection reader with independent JSON-as-YAML public-record validation, exact Acceptance/Contract/Evidence/Outcome binding, same-commit Authority artifact proofs and typed historical/unusable states. Hardened selected reads enter a scratch Git view from actual enrollment, authorize each commit before bytes, verify hashes and use fixed shared I/O budgets. Actual deterministic ingress observations support one candidate Graph assertion; prior selection is lineage only and no ingress ACK, canonical promotion, model call or App/host wiring occurs. A metadata-only immutable verified-read issuance fact in the existing working-graph namespace binds the exact assertion/configuration/request/generation/fence, preventing generic Graph JSON from impersonating verified source records without another table, namespace or secret. Optional Graph expected_source_fence is checked inside publication and on duplicate/receipt/reconciliation paths, preserving legacy unpinned behavior. The 144-test affected suite passes on the frozen implementation, covering all reader/profile/Git/ingress/Graph/invalidation tests. Real SIGKILL tests preserve partial intake without selection and recover lost publication replies exactly. Actual refresh tests cover changed Authority and Acceptance/Contract history, stale Graph CAS, rewind/missing ancestry, old-object revocation followed by a new authorized descendant, disable/re-enable, current/captured ACL, typed reads after actual Git GC, and changed-key rejection. Independent review regressions reject fabricated canonical Graph content, successful Outcomes without independence claims, and Outcomes citing Evidence with any forged extra Acceptance binding. Full/standalone verification is recorded separately.",
+  "ticket_id": "ticket-runtime-canonical-source-reader-v0"
+}

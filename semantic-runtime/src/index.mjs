@@ -53,7 +53,7 @@ export {
   createGitCommitObservation, correlateGitCommitObservations, createRefMovement,
   validateRefMovement, assessGitClaimAfterMovement,
 } from './core/git-provenance.mjs';
-export { GitProvenance } from './adapters/git-provenance.mjs';
+export { GitProvenance, GIT_SELECTED_READ_LIMITS } from './adapters/git-provenance.mjs';
 export {
   WORKING_GRAPH_CONTRACT_VERSION, SEMANTIC_STATES, SEMANTIC_RELATIONS,
   validateSemanticAddress, semanticAddress, exactRevisionAddress,
@@ -91,3 +91,5 @@ export { DurableIngress, INGRESS_NAMESPACE } from './local/durable-ingress.mjs';
 export { SourceInvalidationFeed, SOURCE_INVALIDATION_NAMESPACE, sourceLifecycleInvalidationId } from './local/source-invalidation.mjs';
 export { LocalGitWorktreeSensor, GIT_SENSOR_ERROR_CODES } from './local/git-worktree-sensor.mjs';
 export { validateGitWorktreeObservation, GIT_SENSOR_LIMITS } from './core/git-worktree-observation.mjs';
+export { CanonicalSourceReader } from './local/canonical-source-reader.mjs';
+export { CANONICAL_RECORD_PROFILE, parseCanonicalRecord, evaluateCanonicalRecords } from './core/canonical-records.mjs';

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-09-22T15:14:16.499Z",
+  "scope": "Frozen selected canonical reader; synthetic temporary Git/SQLite only",
+  "affected": {
+    "command": "node --test test/canonical-source-reader*.test.mjs test/git-provenance*.test.mjs test/durable-ingress*.test.mjs test/graph-store*.test.mjs test/graph-source-invalidation.test.mjs test/source-invalidation*.test.mjs",
+    "tests": 144,
+    "passed": 144,
+    "failed": 0
+  },
+  "full": {
+    "command": "npm run verify",
+    "tests": 639,
+    "passed": 637,
+    "failed": 0,
+    "skipped": 2,
+    "skip_reason": "two existing native macOS Keychain opt-in integration tests",
+    "duration_ms": 47509.984167
+  },
+  "standalone": {
+    "command": "npm run verify:standalone",
+    "clean_install": true,
+    "outside_parent_repository": true,
+    "tests": 639,
+    "passed": 637,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 54593.707125,
+    "skip_reason": "two existing native macOS Keychain opt-in integration tests"
+  },
+  "boundaries": {
+    "files": 154,
+    "errors": 0
+  },
+  "plugin_artifact": {
+    "command": "npm run verify:artifact",
+    "passed": true,
+    "files": 79,
+    "bytes": 3670088
+  },
+  "git_diff_check": true,
+  "skipped_tests": [
+    "fresh synthetic native app-owned Keychain entry is replaced/removed with cleanup",
+    "temporary app-owned macOS Keychain credential lifecycle, including fresh instance lookup"
+  ]
+}

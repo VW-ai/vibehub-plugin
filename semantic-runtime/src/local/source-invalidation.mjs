@@ -158,6 +158,21 @@ export class SourceInvalidationDomain {
     if (row) validator(row.value);
     return row;
   }
+  assertProspectiveObjectAllowed(context, object, { tx = null } = {}) {
+    const grant = this.grant(context, 'store:read'), object_key = sourceObjectKey(object);
+    assert(object.tenant_id === grant.tenant_id);
+    const head = this.#head(context, tx), row = this.#row(context, tx, summaryKey(object_key), summary);
+    if (!row) {
+      // Unobserved objects need no write just to authorize a selected read.
+      // An immutable origin distinguishes them from a lost known summary.
+      assert(!this.#row(context, tx, originKey(object_key), origin), 'invalidation_corrupt');
+    } else {
+      assert(equal(row.value.object, object), 'invalidation_corrupt');
+      assert(!row.value.tombstoned && row.value.blocking_stream_count === 0, 'source_invalidation_denied');
+    }
+    this.grant(context, 'store:read');
+    return { sequence: head.sequence };
+  }
   assertEventAllowed(context, event, { tx = null, initialize = false } = {}) {
     this.#head(context, tx); // Also proves the required namespace exists for zero-target events.
     for (const item of guardTargets(event)) {
