@@ -1,0 +1,40 @@
+{
+  "context_id": "note-runtime-incremental-graph-boundary",
+  "detail": "Wire-v2 graph commit/manifest addresses are distinct from V1 snapshot addresses. The new pure planner retains V1 semantic revision/conflict bytes for compatible authorized bounded inputs, and uses fixed per-operation closure/row/page limits without a Project-wide retained-record or transition ceiling. Each operation selects only named records and every historical read intersects complete retained provenance with current access, including competing revisions, old observer epochs and lifecycle records. Parent/endpoint and fetched lifecycle provenance may not be returned to an unauthorized principal; base_revision remains exact lineage without inherited ACL. Current command Execution uses the current catalog; retained normalized events keep their original catalog pins. The trusted repository must attest latest/as-of completeness, committed lineage and source/lifecycle authority; hashes and caller-provided JSON do not authenticate them. The current implementation and indexed synthetic scale fixture are not a SQLite Graph repository, live collection, branch adoption, canonical promotion or Policy consumer. Those remain separate delivery responsibilities. The later adapter must atomically apply immutable commit/records, head and projection CAS, audit and outbox, and preserve current-access checks during exact history and rebuild.",
+  "evidence": [
+    {
+      "note": "Versioned interface, compatibility, trusted selection and storage boundary.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "note": "Authority, event/catalog, complete provenance and immutable receipt regressions.",
+      "ref": "semantic-runtime/test/incremental-graph-security.test.mjs"
+    },
+    {
+      "note": "One-generation indexed synthetic conformance; no persistence or throughput claim.",
+      "ref": "semantic-runtime/test/fixtures/incremental-graph/scale-measurement.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-runtime-local-app-product",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T11:32:11.278655Z",
+    "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+  },
+  "state": "active",
+  "summary": "Incremental graph commits retain semantic history through selected records; repository completeness and current authority remain adapter responsibilities",
+  "tags": [
+    "semantic-runtime",
+    "working-graph",
+    "provenance",
+    "authorization",
+    "incremental"
+  ],
+  "type": "note"
+}

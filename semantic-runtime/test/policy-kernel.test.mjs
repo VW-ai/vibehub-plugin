@@ -177,19 +177,33 @@ test('precommit crash atomically preserves Graph, audit, receipt and outbox', as
 test('commit followed by cancellation or lost acknowledgement reports uncertainty with exact receipt reconciliation', async () => {
   for (const fault of ['cancel', 'throw', 'hang']) {
     const fixture = kernelFixture(), controller = new AbortController();
+    // The fault belongs after commit, regardless of host CPU contention.
+    let now = 0, nextTimer = 0; const timers = new Map();
+    const clock = {
+      now: () => now,
+      setTimeout: (callback, ms) => { const id = ++nextTimer; timers.set(id, { callback, at: now + ms }); return id; },
+      clearTimeout: id => timers.delete(id),
+    };
     const base = createInMemoryPolicyTransactionPort({ graph: fixture.graph });
     const transaction = { commit: async (command, options) => {
       const receipt = await base.commit(command, options);
+      assert.equal(receipt.status, 'committed');
       if (fault === 'cancel') controller.abort();
       if (fault === 'throw') throw new Error('lost acknowledgement');
-      if (fault === 'hang') return new Promise(() => {});
+      if (fault === 'hang') {
+        now = 101;
+        for (const [id, timer] of [...timers]) if (timers.has(id) && timer.at <= now) {
+          timers.delete(id); timer.callback();
+        }
+        return new Promise(() => {});
+      }
       return receipt;
     } };
-    const { result } = await run(fixture, { transaction, signal: controller.signal, limits: { timeout_ms: 100 } });
+    const { result } = await run(fixture, { transaction, signal: controller.signal, clock, limits: { timeout_ms: 100 } });
     assert.equal(result.status, 'indeterminate'); assert.equal(result.reason_code, 'commit_unconfirmed');
     assert.equal(result.action, 'INGEST'); assert.equal(result.receipt, null);
     const reconciled = base.lookup(result.command_ref); assert.equal(reconciled.status, 'committed');
-    const retry = await run(fixture, { transaction: base }); assert.deepEqual(retry.result.receipt, reconciled.receipt);
+    const retry = await run(fixture, { transaction: base, clock }); assert.deepEqual(retry.result.receipt, reconciled.receipt);
     assert.equal(base.inspect().commands.length, 1);
   }
 });

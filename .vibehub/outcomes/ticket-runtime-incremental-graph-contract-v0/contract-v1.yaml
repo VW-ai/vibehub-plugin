@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "incremental-graph-wire-and-compatibility",
+    "incremental-graph-transition-semantics",
+    "incremental-graph-history-pages-and-current-access",
+    "incremental-graph-oracle-and-scale-conformance"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T11:35:56.121Z",
+  "contract_revision": {
+    "identity": "sha256:c74c56f1972c38122f0aea93b245e462da73e8d66110f154d910dc7f35931976",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "incremental-graph-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Dedicated independent reviewer /root/auth_review; implementation was authored by /root/branch_scope, indexed fixture/conformance by /root/provider_settings, and public integration/security tests by /root. This reviewer authored no source, tests, fixtures, documentation or Evidence for this Ticket; participation was read-only review, isolated temporary adversarial probes and feedback, followed by independent exact-Contract adjudication. Only this Outcome is written by the reviewer.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepted all four criteria of exact Contract 1. Wire and compatibility: reviewed strict inert JSON and typed scoped manifest/commit/mutation/effect/cursor validators, unchanged V1 semantic validators and explicit rejection of legacy graph-address coercion; immutable semantic bytes are compared only on compatible authorized inputs. Transition semantics: selected-record planning preserves exact parents/endpoints, base-only lineage without inherited ACL, complete provenance, original event catalog pins, source epoch ordering and irreversible tombstones; stale graph CAS retains the original proposal with zero effects, while semantic conflicts and complete-parent resolutions remain explicit. Plans carry bounded append/CAS/audit/outbox descriptors without asserting persistence, canonical authority or source completion. History and current access: point and bounded page paths select exact admitted records, recheck current caller/access and retain all observer-epoch restrictions; old cursors confer no grants. Repository latest/as-of completeness, committed lineage and source authority remain trusted adapter duties, explicitly not established by hashes. Independently exercised coherent omitted-provenance forgery, retired original catalog reuse, denied parent/endpoint and lifecycle materialization, mutable-current aliasing and false lifecycle predecessor; all final probes behaved correctly, and the permanent security suite passed 21/21. Conformance: independently ran all eight differential/scale tests; inspected the final serialized measurement after the last ACL fix, retaining 1040 transitions and 600 semantic objects in one generation, maximum 14 selected reads/16 total calls, 16161-byte plan and 6618-byte row, 10 head pages and 7 history pages. Final recorded mutation runtime is 12747.78 ms, an environment-specific synthetic measurement rather than a throughput promise. Inspected full and fresh standalone verification: each 467 tests, 465 passed, two intentional native opt-in skips, zero failures; component boundaries passed 118 files with zero errors. Reviewed and independently ran the test-only deterministic-clock repair for the pre-existing lost-ack timing race: it now asserts actual commit before cancellation/lost acknowledgement/timeout and preserves exact receipt reconciliation, idempotency and unchanged precommit deadline tests. All 20 Context references resolve; project validation and golden Context guard pass, with no governing authorities. No production Graph persistence, crash durability, live host collection, model call, private trace, branch adoption or canonical promotion is certified by this Outcome.",
+  "ticket_id": "ticket-runtime-incremental-graph-contract-v0",
+  "unresolved_acceptance_ids": []
+}

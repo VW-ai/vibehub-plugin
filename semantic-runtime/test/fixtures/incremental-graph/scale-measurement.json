@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-incremental-graph",
+  "generation_id": "live-1",
+  "transitions": 1040,
+  "distinct_semantic_objects": 600,
+  "runtime_ms": 12747.78,
+  "node": "v23.9.0",
+  "platform": "darwin",
+  "max_selected_fact_reads": 14,
+  "max_all_port_requests": 16,
+  "max_plan_bytes": 16161,
+  "max_row_bytes": 6618,
+  "record_counts": {
+    "catalog": 1,
+    "manifest": 1,
+    "commit": 1041,
+    "accepted_event": 1,
+    "revision": 1040,
+    "assertion_id": 1040,
+    "entity": 1040,
+    "source_epoch": 1040,
+    "source_object": 1,
+    "source_object_epoch": 1040
+  },
+  "mutation_totals": {
+    "current": 2080,
+    "read": 13956,
+    "page": 0,
+    "authority": 0,
+    "candidate_rows": 0
+  },
+  "samples": [
+    {
+      "transition": 1,
+      "current": 2,
+      "read": 10,
+      "authority": 0,
+      "all_port_requests": 12
+    },
+    {
+      "transition": 2,
+      "current": 2,
+      "read": 11,
+      "authority": 0,
+      "all_port_requests": 13
+    },
+    {
+      "transition": 3,
+      "current": 2,
+      "read": 14,
+      "authority": 0,
+      "all_port_requests": 16
+    },
+    {
+      "transition": 4,
+      "current": 2,
+      "read": 13,
+      "authority": 0,
+      "all_port_requests": 15
+    },
+    {
+      "transition": 128,
+      "current": 2,
+      "read": 13,
+      "authority": 0,
+      "all_port_requests": 15
+    },
+    {
+      "transition": 512,
+      "current": 2,
+      "read": 13,
+      "authority": 0,
+      "all_port_requests": 15
+    },
+    {
+      "transition": 600,
+      "current": 2,
+      "read": 13,
+      "authority": 0,
+      "all_port_requests": 15
+    },
+    {
+      "transition": 1037,
+      "current": 2,
+      "read": 14,
+      "authority": 0,
+      "all_port_requests": 16
+    },
+    {
+      "transition": 1038,
+      "current": 2,
+      "read": 14,
+      "authority": 0,
+      "all_port_requests": 16
+    },
+    {
+      "transition": 1039,
+      "current": 2,
+      "read": 14,
+      "authority": 0,
+      "all_port_requests": 16
+    },
+    {
+      "transition": 1040,
+      "current": 2,
+      "read": 14,
+      "authority": 0,
+      "all_port_requests": 16
+    }
+  ],
+  "pages": {
+    "heads": 10,
+    "history": 7,
+    "head_rows": 600,
+    "history_rows": 441,
+    "head_candidate_rows": 600
+  },
+  "current_acl_continuation": {
+    "additional_lifecycle_transitions": 1,
+    "candidates": 64,
+    "visible_items": 0,
+    "continues": true
+  },
+  "bounds": {
+    "selected_fact_reads_small_support": 64,
+    "page_candidates": 64,
+    "row_and_plan_bytes": 1048576
+  },
+  "scope": "In-memory indexed synthetic conformance only; no persistence, throughput, production authorization, network or model claim."
+}

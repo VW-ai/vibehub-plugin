@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "incremental-graph-wire-and-compatibility",
+    "incremental-graph-transition-semantics",
+    "incremental-graph-history-pages-and-current-access",
+    "incremental-graph-oracle-and-scale-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "incremental-graph-wire-and-compatibility",
+      "identity": "sha256:b9f0d7413821cf80dfbb65dcc5545b1d35f3fb433f9f211722c3b5f0ffe5f0fe",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "incremental-graph-transition-semantics",
+      "identity": "sha256:c999ee5fe10d676c26c8007773a33165002fcc20b0c2339930873804bd4c5dde",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "incremental-graph-history-pages-and-current-access",
+      "identity": "sha256:f87c3d320c22dbe7f011870d90a9bb6bb355ca94441e7b4a516570aafa4ed7e9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "incremental-graph-oracle-and-scale-conformance",
+      "identity": "sha256:e63aef716284489bb1ca00bf7ee94f3c8282f722353a804ba5695bffd15b6999",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "incremental-graph-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T11:33:45.449949Z",
+  "refs": [
+    "semantic-runtime/src/core/incremental-graph.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/docs/incremental-graph-v0.md",
+    "semantic-runtime/test/helpers/incremental-graph-fixture.mjs",
+    "semantic-runtime/test/incremental-graph.test.mjs",
+    "semantic-runtime/test/incremental-graph-security.test.mjs",
+    "semantic-runtime/test/fixtures/incremental-graph/scale-measurement.json",
+    "semantic-runtime/test/policy-kernel.test.mjs",
+    ".vibehub/rooms/semantic-runtime/note-runtime-incremental-graph-boundary.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented exact Contract1 as a provider/store-independent incremental graph planner and selected-record read contract, preserving unchanged V1 validators and semantic revision/conflict bytes on authorized compatible bounded traces. Distinct v2 manifest/commit digests, strict inert JSON/row/request/effect/cursor validators, exact source and original catalog pins, current command enrollment, graph CAS mismatch with original unapplied proposal, separate semantic conflicts and explicit complete-parent resolution. Trusted current/latest/as-of/lineage/authority facts are checked, copied immutably and rechecked before return; hashes do not authenticate a malicious repository. Current ACL, all retained observer epochs, immutable lifecycle admission/predecessor, tombstones, parent/endpoint closure and competing records gate historical content and planning. Base-only lineage does not inherit ACL. Bounded append/CAS/audit/outbox plans are not transactions, source completion, acceptance or canonical writes. Public point/history/head/conflict paging caps candidate positions at64 and resumes with fresh authority. Indexed fixture uses exact Map keys and binary-searched version vectors, no cumulative-state reconstruction. Eight differential/scale tests compare V1 updates/conflicts/resolution/relations/lifecycle/ACL/tombstone/epoch/history and dynamic catalog pins. Final serial scale run retained1040 transitions,1041 commits,600 semantic objects in one generation with no reset/pruning; maximum14 selected fact reads/16 all port calls,16161-byte plan/6618-byte row; mutation trace12747.78ms. Heads600 rows/10 pages and entity history441 rows/7 pages cross prior limits; a separately counted lifecycle update yields64 examined/0 visible rows plus continuation under current ACL. Twenty-one security tests include malformed/getter input, fact envelope/membership/digest errors, immutable lifecycle predecessor, all-target authority, private parent/endpoint/current-lifecycle rejection, retired catalog reuse, rehashed omitted provenance, mutable authority alias, plan descriptor consistency, exact cursor fences and zero-effect CAS. Independent review found these authority cases and fixes were preserved as regressions. Full verify467tests:465pass,2intentional native skips,0fail; fresh standalone repeats465pass2skip outside repository. An initial concurrent standalone run exposed an existing100ms lost-ack test racing before commit; only that test now uses injected deterministic time after asserting actual commit, independently reviewed and targeted52/52 policy+security rerun passed. Existing real precommit/hanging deadline tests unchanged. Boundaries118files/0errors, context guard and project validation pass. No SQLite Graph persistence, live host collection, private trace, model call or external traffic is claimed by this graph proof.",
+  "ticket_id": "ticket-runtime-incremental-graph-contract-v0"
+}

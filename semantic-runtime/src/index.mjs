@@ -56,6 +56,12 @@ export {
   resolveWorkingGraphAddress, validateWorkerGraphInput,
 } from './core/working-graph.mjs';
 export {
+  INCREMENTAL_GRAPH_CONTRACT_VERSION, INCREMENTAL_GRAPH_LIMITS,
+  validateGraphManifest2, validateGraphCommit2, validateGraphCommitAddress2,
+  validateGraphMutation2, validateGraphEffectPlan2, validateGraphPageCursor2,
+  planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph,
+} from './core/incremental-graph.mjs';
+export {
   POLICY_KERNEL_VERSION, executePolicyRun, validatePolicyActionCommand,
   createInMemoryPolicyTransactionPort,
 } from './core/policy-kernel.mjs';

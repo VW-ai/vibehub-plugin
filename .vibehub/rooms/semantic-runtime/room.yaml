@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "8c6d3cc556d5f8397c8176df389baa32f7668cc4",
+        "blob": "04731083745bef30a261e81127863fc3a80e93c3",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -68,6 +68,10 @@
       {
         "blob": "849bcc72fff867a22a8907c064545db05dac2a26",
         "path": "semantic-runtime/docs/identity-contract-v0.md"
+      },
+      {
+        "blob": "f1d758c78a9d5dc69d275cf5df564909a57bc922",
+        "path": "semantic-runtime/docs/incremental-graph-v0.md"
       },
       {
         "blob": "70a22f743bc2c0befdd104f2c8fb098d8ca926cf",
@@ -414,6 +418,10 @@
         "path": "semantic-runtime/src/core/identity.mjs"
       },
       {
+        "blob": "19cd7e733a90ad97a02bdde46f7b8ef50699f146",
+        "path": "semantic-runtime/src/core/incremental-graph.mjs"
+      },
+      {
         "blob": "2be7f10f24537dfd4aee50bc97e8ed263b7f0d04",
         "path": "semantic-runtime/src/core/observability-contract.mjs"
       },
@@ -450,7 +458,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "6d67ac6783730b436f5eba9c8a2ff0d223abe592",
+        "blob": "c9279ab93bb632e15e15f3f9a3b92861c8b4292f",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -622,6 +630,10 @@
         "path": "semantic-runtime/test/fixtures/identity/multi-source.json"
       },
       {
+        "blob": "2ceff7dad49271c119f931b2f32bad25a9ac8a29",
+        "path": "semantic-runtime/test/fixtures/incremental-graph/scale-measurement.json"
+      },
+      {
         "blob": "50a7ccdb6e2d49e35a8e46714e201f3feb959b3f",
         "path": "semantic-runtime/test/fixtures/labels.json"
       },
@@ -714,8 +726,20 @@
         "path": "semantic-runtime/test/helpers.mjs"
       },
       {
+        "blob": "015cc55783a014638ef3d95d697dfa24e1cd0da5",
+        "path": "semantic-runtime/test/helpers/incremental-graph-fixture.mjs"
+      },
+      {
         "blob": "552b9e1dcfc19904725829340d3024c1a3276051",
         "path": "semantic-runtime/test/identity.test.mjs"
+      },
+      {
+        "blob": "59dd956501d3537422c1ccb33ae693d6a5f86943",
+        "path": "semantic-runtime/test/incremental-graph-security.test.mjs"
+      },
+      {
+        "blob": "c24794dc2c37e325028e0d9981279c221a22ea95",
+        "path": "semantic-runtime/test/incremental-graph.test.mjs"
       },
       {
         "blob": "1d9c398cb5098a5d2b5ebaaf71bd51c64fb1b21f",
@@ -766,7 +790,7 @@
         "path": "semantic-runtime/test/policy-kernel-integration.test.mjs"
       },
       {
-        "blob": "1831952aef0f1b06925d5b812fa2d7f1ad4dfdb2",
+        "blob": "5c8f2312f89da25fc034de3d49da850c43634ded",
         "path": "semantic-runtime/test/policy-kernel.test.mjs"
       },
       {
@@ -822,8 +846,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T11:00:37.371Z",
-    "last_aligned_commit": "603f3858f6347e4e403aa0d0b32281c2a52e8e6f"
+    "checked_at": "2026-09-22T11:37:18.117Z",
+    "last_aligned_commit": "ddcb834b73cc11cb4f2e2d8f0ce5847d82fb6c01"
   },
   "anchors": [
     "semantic-runtime/"

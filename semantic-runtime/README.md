@@ -252,6 +252,10 @@ contracts through the package's public entry:
 - [Working Graph](docs/working-graph-v0.md): immutable semantic revisions and
   snapshots, explicit competing assertions, exact relation endpoints and
   provenance-based access checks.
+- [Incremental Working Graph](docs/incremental-graph-v0.md): selected-record
+  transitions and bounded historical pages, retaining the existing semantic
+  revision format. The indexed synthetic fixture tests long histories; the
+  transactional storage adapter remains a separate delivery.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.
