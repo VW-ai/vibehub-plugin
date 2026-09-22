@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "lifecycle-conformance",
+    "lifecycle-read-contract",
+    "meaning-and-applicability",
+    "scoped-lineage"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "lifecycle-conformance",
+      "identity": "sha256:00977ad9ef22af5e99a9145d47c90cf24d6e925b634f83c28187553645e2ad7e",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "lifecycle-read-contract",
+      "identity": "sha256:4910a2fdb8d03bfcefcd41cb90a57e185ac2c11cef4d1dec06a11a0df8c628d3",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "meaning-and-applicability",
+      "identity": "sha256:3a4fc51f0ae856c71a47333baef4547be5b122c1dbeadb3d30a00969ace417bc",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "scoped-lineage",
+      "identity": "sha256:591681e0c9f7d9282a4577fb2dbd6ca3f39f1fd295748b60a15d126b43b97397",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "context-lifecycle-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T18:02:31.143Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/context-lifecycle-verification-20260922.json",
+    "semantic-runtime/docs/measurements/jev-context-regression-20260922.json",
+    "semantic-runtime/docs/context-lifecycle-v0.md",
+    "semantic-runtime/package.json",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/check-jev-adoption.mjs",
+    "semantic-runtime/test/context-independent-review.test.mjs",
+    "semantic-runtime/test/context-capacity.test.mjs",
+    "semantic-runtime/test/context-recovery.test.mjs",
+    "semantic-runtime/test/context-reader.test.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final full Runtime verification and fresh standalone installation outside the parent repository both completed with914tests,912passes,2pre-existing nativeKeychainoptinskips,0failures. Boundary checker passed206files; shipped Skill plugin artifact passed79files/3670088bytes unchanged.64new cases include actual public domain transitions/lineage/applicability, source and canonical authority checks, races/cursors, meaningful aggregate and selected-port bounds, independent malformed-source/9record1pin/16target32event cases, two-process idempotency and before/after-commit SIGKILL recovery. Official TypeSafe JEV regression executed4real selected-Judge calls using only fixed synthetic text; all4expected labels matched jev-1.13.0,128–331ms and1attempt each. Source revocation refused before another send. This proves existing Judge behavior remains working; it does not claim typed runtime_context is already a supported Judge input. No canonical promotion or App/host/plugin integration is claimed. Current golden-truth guard passes with0authorities/violations, and native record validation passes.",
+  "ticket_id": "ticket-runtime-context-lifecycle-lineage-v0"
+}

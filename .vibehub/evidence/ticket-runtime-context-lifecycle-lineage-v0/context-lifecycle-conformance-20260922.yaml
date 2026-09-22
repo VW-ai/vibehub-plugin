@@ -1,0 +1,59 @@
+{
+  "acceptance_ids": [
+    "lifecycle-conformance",
+    "lifecycle-read-contract",
+    "meaning-and-applicability",
+    "scoped-lineage"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "lifecycle-conformance",
+      "identity": "sha256:00977ad9ef22af5e99a9145d47c90cf24d6e925b634f83c28187553645e2ad7e",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "lifecycle-read-contract",
+      "identity": "sha256:4910a2fdb8d03bfcefcd41cb90a57e185ac2c11cef4d1dec06a11a0df8c628d3",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "meaning-and-applicability",
+      "identity": "sha256:3a4fc51f0ae856c71a47333baef4547be5b122c1dbeadb3d30a00969ace417bc",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "scoped-lineage",
+      "identity": "sha256:591681e0c9f7d9282a4577fb2dbd6ca3f39f1fd295748b60a15d126b43b97397",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "context-lifecycle-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T18:00:44.418Z",
+  "refs": [
+    "semantic-runtime/docs/context-lifecycle-v0.md",
+    "semantic-runtime/src/core/context-profile.mjs",
+    "semantic-runtime/src/local/context-inputs.mjs",
+    "semantic-runtime/src/local/context-reader.mjs",
+    "semantic-runtime/src/local/context-store.mjs",
+    "semantic-runtime/src/local/graph-selected.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/exploration-adoption.mjs",
+    "semantic-runtime/test/context-capacity.test.mjs",
+    "semantic-runtime/test/context-independent-review.test.mjs",
+    "semantic-runtime/test/context-lifecycle.test.mjs",
+    "semantic-runtime/test/context-lineage.test.mjs",
+    "semantic-runtime/test/context-profile.test.mjs",
+    "semantic-runtime/test/context-reader.test.mjs",
+    "semantic-runtime/test/context-recovery.test.mjs",
+    "semantic-runtime/test/context-security.test.mjs",
+    "semantic-runtime/test/helpers/context-fixture.mjs",
+    "semantic-runtime/test/helpers/exploration-process.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented the six-method LocalContextStore with exact typed meaning, explicitly uncertain applicability, actual configured Ticket Contract and admitted Git revision proofs, immutable transitions, current/as-of selection and bounded outgoing lineage. Existing Graph/exploration transaction owns all atomic effects; no new table, namespace, public hook, extraction, canonical write, App/HTTP integration or automatic model call. Actual publication chains distinguish B adoption from copied A change statements. Context reads retain exact source/access facts and separate origin/current-Project Authority material, including getReceipt read-time shared material. Typed create/derive/branch verify actual entity absence; fresh-source correction can retain an unreadable old base without inheriting it. Independent review reproduced and verified fixes for counting distinct Ticket selection pins rather than records, validating the adopted source typed transition, and excluding duplicated private provenance from the public aggregate response budget. Per-operation canonical proof reuse preserves per-Context source support and fresh independent preparations. Actual regression cases prove 9 Ticket records from one selected pin, 16 authorized lineage targets with 32 shared source events and a small response, pre-send/input authorization, current/as-of/cursor/head/fence/Project/binding races, corrupted or missing publication facts, zero rejected-write delta, source permission loss, exact alias retries, restart/disabled/missing-worktree recovery, two real SQLite writers and SIGKILL before/after both typed mutation and adoption commits. Context capacity fixtures reject aggregate overflow without truncating Authority or provenance. A full Runtime run passed 912 of914 tests with2 existing native Keychain opt-in skips and0 failures; standalone evidence is recorded separately after completion.",
+  "ticket_id": "ticket-runtime-context-lifecycle-lineage-v0"
+}

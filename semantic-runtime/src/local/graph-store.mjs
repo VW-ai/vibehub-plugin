@@ -1,3 +1,8 @@
+import { exactRevisionAddress } from '../core/working-graph.mjs';
+import { ContextInputs, CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
+import { validateContextContent1, validateContextOperation1 } from '../core/context-profile.mjs';
+import { planContextSelection, readContextSelection, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
+import { selectGraph } from './graph-selected.mjs';
 import { DomainStore } from './domain-store.mjs';
 import { LocalCredentialAuthority } from './auth.mjs';
 import { ProjectActivation } from './project-activation.mjs';
@@ -11,7 +16,7 @@ import { validateSourceCursor } from '../core/causal-ordering.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';
 import { ExplorationInputs, readExplorationOwner, EXPLORATION_ERROR_CODES } from './exploration-inputs.mjs';
 import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
-import { materializeExplorationAdoption, verifyExplorationAdoptionResult } from './exploration-adoption.mjs';
+import { materializeExplorationAdoption, verifyExplorationAdoptionResult, verifyExplorationPublication } from './exploration-adoption.mjs';
 
 export { WORKING_GRAPH_NAMESPACE };
 export const GRAPH_ERROR_CODES = Object.freeze(['invalid_graph_input', 'graph_capacity', 'graph_unauthorized', 'graph_access_denied',
@@ -36,7 +41,7 @@ export class LocalGraphStore {
   #store; #authority; #inputs; #activation; #invalidations;
   constructor({ store, authority }) {
     // The selected reader also composes this Graph class; resolve its codes after module initialization.
-    for (const code of EXPLORATION_CANONICAL_ERROR_CODES) CODES.add(code);
+    for (const code of [...EXPLORATION_CANONICAL_ERROR_CODES, ...CONTEXT_INPUT_ERROR_CODES, ...CONTEXT_READER_ERROR_CODES]) CODES.add(code);
     graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
     this.#store = store; this.#authority = authority; this.#inputs = new GraphInputs({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
@@ -82,84 +87,8 @@ export class LocalGraphStore {
   #storage(tx, context, generation, action) {
     return new GraphStorage({ view: tx, scope: this.#scope(context, action), generation_id: generation });
   }
-  #selected(context, tx, storage, { generation_id, write = false, catalogFact = null, epoch = null, operation = null }) {
-    const head = storage.head();
-    if (!catalogFact) {
-      graphAssert(head, 'graph_unavailable');
-      const c = storage.fact({ at: head.value.head, kind: 'commit', key: [head.value.head.commit_digest] }).value;
-      graphAssert(c, 'graph_corrupt'); catalogFact = this.#inputs.catalogFromPin(context, c.catalog_pin);
-      graphAssert(catalogFact, 'graph_corrupt');
-    }
-    const action = write ? 'graph:write' : 'graph:read', initial = this.#inputs.grant(context, action);
-    const access_view = graphKey('access-view', [scopeOf(initial), generation_id, head?.value.head ?? null, head?.version ?? null, initial.principal_id]);
-    const facts = [], selectedEvents = new Map(), catalogs = new Map([[graphHash(catalogFact.pin), catalogFact]]), authorityRefs = [];
-    const isLifecycle = write && operation?.kind === 'source_access';
-    const lifecycleTargets = new Set(isLifecycle ? operation.event.provenance.source_objects.map(s => sourceObjectKey(s.object)) : []);
-    const priorLifecycle = new Map();
-    const lifecycleFallback = observation => {
-      graphAssert(isLifecycle, 'graph_access_denied');
-      if (observation === eventObservationKey(operation.event)) return this.#inputs.lifecycleEvent(context, operation.event,
-        { access_state: operation.access_state });
-      const update = priorLifecycle.get(observation);
-      graphAssert(update, 'graph_access_denied');
-      const proof = storage.fact({ at: head.value.head, kind: 'access_update', key: [update.event_digest] }).value;
-      graphAssert(proof && graphEqual(proof.event, update.event) && proof.event_digest === update.event_digest
-        && proof.access_state === update.access_state, 'graph_corrupt');
-      return this.#inputs.lifecycleEvent(context, update.event, { prior: true });
-    };
-    const stage = items => { facts.push(...items); };
-    const current = () => {
-      const grant = this.#inputs.grant(context, action), actual = storage.head();
-      return { scope: scopeOf(grant), generation_id, head: actual?.value.head ?? null, head_version: actual?.version ?? null,
-        catalog_pin: catalogFact.pin, access_view, principal_id: grant.principal_id };
-    };
-    const envelope = (query, row) => ({ ...query, current_head: head?.value.head ?? null, access_view, complete: true, ...row });
-    const port = {
-      current,
-      read: query => {
-        if (query.kind === 'catalog') {
-          const pin = { revision_id: query.key[0], digest: query.key[1] };
-          const value = catalogs.get(graphHash(pin)) ?? this.#inputs.catalogFromPin(context, pin);
-          return envelope(query, { version: value ? 1 : null, value, origin: null });
-        }
-        if (query.kind === 'accepted_event') {
-          let selected = selectedEvents.get(query.key[0]);
-          if (!selected) {
-            try { selected = this.#inputs.acceptedEvent(context, query.key[0]); }
-            catch (error) {
-              if (graphErrorCode(error) !== 'graph_access_denied') throw error;
-              selected = lifecycleFallback(query.key[0]);
-            }
-            graphAssert(write || selected.retained, 'graph_corrupt'); selectedEvents.set(query.key[0], selected);
-            catalogs.set(graphHash(selected.catalogFact.pin), selected.catalogFact); if (write) stage(selected.facts);
-          }
-          return envelope(query, { version: 1, value: selected.fact, origin: null });
-        }
-        const row = storage.fact(query);
-        // Admit prior security metadata only as the core selects this target's
-        // current projection; no scan, historic locator or arbitrary event read.
-        if (isLifecycle && query.kind === 'source_access' && lifecycleTargets.has(query.key[0])
-          && graphEqual(query.at, head.value.head) && row.value) {
-          graphAssert(sourceObjectKey(row.value.object) === query.key[0] && Array.isArray(row.value.updates)
-            && row.value.updates.length <= 32, 'graph_corrupt');
-          for (const update of row.value.updates) {
-            graphAssert(graphHash(update.event) === update.event_digest, 'graph_corrupt');
-            const observation = eventObservationKey(update.event), prior = priorLifecycle.get(observation);
-            graphAssert(!prior || graphEqual(prior, update), 'graph_corrupt'); priorLifecycle.set(observation, update);
-            graphAssert(priorLifecycle.size <= 32, 'graph_capacity');
-          }
-        }
-        return envelope(query, row);
-      },
-      page: query => ({ at: query.at, collection: query.collection, after: query.after, current_head: head?.value.head ?? null, access_view, ...storage.page(query) }),
-      authorizeLifecycle: query => {
-        graphAssert(write && operation?.kind === 'source_access' && graphHash(operation.event) === query.event_digest, 'graph_unauthorized');
-        const admitted = selectedEvents.get(eventObservationKey(operation.event)); graphAssert(admitted, 'graph_corrupt');
-        const selected = this.#inputs.lifecycle(context, { ...query, current_head: head?.value.head ?? null, access_view, event: operation.event, epoch }, admitted);
-        stage(selected.facts); authorityRefs.push(selected.fact.authority_ref); return selected.fact;
-      }
-    };
-    return { port, facts, selectedEvents, authorityRefs };
+  #selected(context, tx, storage, options) {
+    return selectGraph({ inputs: this.#inputs, context, tx, storage, ...options });
   }
   #receiptAllowed(context, tx, receipt, action = 'graph:read') {
     const g = this.#inputs.grant(context, action);
@@ -331,9 +260,46 @@ export class LocalGraphStore {
       }, request.epoch, tx => { checkGraphFormat(tx); this.#ordinaryWrite(tx, context, generation, request.operation); return this.#prior(context, tx, generation, request.idempotency_key, request); });
     });
   }
-  #explorationServices(canonical_reader) {
+  #explorationServices(canonical_reader, domain = false) {
     const canonical = new ExplorationCanonical({ store: this.#store, authority: this.#authority, canonical_reader });
-    return { canonical, inputs: new ExplorationInputs({ store: this.#store, authority: this.#authority, config_digest: canonical.config_digest }) };
+    return { canonical, contexts: domain ? new ContextInputs({ authority: this.#authority, canonical }) : null, inputs: new ExplorationInputs({ store: this.#store, authority: this.#authority, config_digest: canonical.config_digest }) };
+  }
+  #contextOperation(context, tx, services, operation, at, write = true) {
+    if (!services.contexts) return;
+    services.contexts.grant(context, { write });
+    if (['create', 'derive', 'branch'].includes(operation.assertion?.content?.data?.change?.kind)) {
+      const storage = this.#storage(tx, context, at.generation_id, 'graph:read');
+      graphAssert(storage.fact({ at, kind: 'entity', key: ['entity', operation.assertion.entity_id] }).value === null,
+        'context_transition_invalid');
+    }
+    let branch_parent = null;
+    if (operation.assertion?.content?.data?.change?.kind === 'branch') {
+      graphAssert(operation.assertion.parents?.length === 1);
+      const selected = this.#readInView(context, tx, { at, address: operation.assertion.parents[0] }, false);
+      graphAssert(selected.status === 'resolved', 'graph_access_denied'); branch_parent = selected.revision;
+    }
+    validateContextOperation1(operation, { branch_parent });
+  }
+  #contextResult(context, tx, services, proof, result) {
+    if (!services.contexts) return;
+    graphAssert(result.revision && result.receipt?.next_graph, 'invalid_graph_input');
+    const selected = this.#readInView(context, tx, { at: result.receipt.next_graph, address: result.revision }, false);
+    graphAssert(selected.status === 'resolved', 'graph_access_denied');
+    validateContextContent1(selected.revision.assertion.content);
+    services.contexts.assert(tx, context, proof, { assertion: selected.revision.assertion, provenance: selected.revision.provenance });
+  }
+  #contextShared(canonical, origin, project, version) {
+    const origin_base = canonical.material(origin);
+    const current_project = { ...canonical.material(project), version };
+    const governing = [];
+    for (const [layer, material] of Object.entries({ origin_base, current_project })) {
+      for (const entry of material.data?.records ?? []) {
+        if (entry.status !== 'usable' || entry.kind !== 'context' || entry.record?.type !== 'authority' || entry.record.state !== 'active') continue;
+        const artifact = material.canonical_refs[entry.canonical_ref_index]; graphAssert(artifact, 'canonical_record_corrupt');
+        governing.push({ layer, pin: material.pin, status: material.status, record: entry.record, artifact });
+      }
+    }
+    return { origin_base, current_project, governing, coverage: current_project.coverage };
   }
   #explorationProofs(context, canonical, shared, { requireCurrent = false } = {}) {
     this.#invalidations.assertFence(context, { sequence: shared.source_fence });
@@ -358,7 +324,13 @@ export class LocalGraphStore {
       : services.inputs.receipt(tx, context, { idempotency_key }));
   }
   #returnExplorationPrior(context, services, selected, { kind, request, idempotency_key, readOnly = false }) {
+    services.contexts?.grant(context, { write: !readOnly });
+    const domainProof = services.contexts ? services.contexts.prepare(context,
+      validateContextContent1(selected.graph_request?.operation?.assertion?.content)) : null;
     const proofs = this.#explorationProofs(context, services.canonical, selected.receipt.shared);
+    const currentProject = services.contexts && readOnly ? this.#view(context, 'graph:read', false,
+      tx => services.inputs.projectSelection(tx, context)) : null;
+    const currentProjectProof = currentProject ? services.canonical.prepare(context, currentProject.pin) : null;
     const adoptionRequest = selected.receipt.operation === 'adopt' ? selected.request : null;
     const sourceProofs = adoptionRequest ? this.#explorationProofs(context, services.canonical,
       { ...selected.receipt.shared, origin_base: adoptionRequest.source.shared_base }) : null;
@@ -387,7 +359,19 @@ export class LocalGraphStore {
         const retained = this.#prior(context, tx, generation, graphRequest.idempotency_key, readOnly ? null : graphRequest);
         graphAssert(retained, 'exploration_corrupt');
       }
+      if (services.contexts && prior.receipt.operation === 'mutate') {
+        this.#contextOperation(context, tx, services, prior.graph_request.operation, prior.graph_request.expected_graph, !readOnly);
+      }
+      this.#contextResult(context, tx, services, domainProof, prior.result);
+      services.contexts?.grant(context, { write: !readOnly });
       const publicReceipt = prior.result.receipt ?? prior.receipt;
+      if (currentProject) {
+        graphAssert(graphEqual(currentProject, services.inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
+        services.canonical.assert(tx, context, currentProjectProof);
+        const shared = this.#contextShared(services.canonical, proofs.origin, currentProjectProof, currentProject.version);
+        this.#invalidations.assertFence(context, { sequence: proofs.shared.source_fence });
+        return { ...publicReceipt, shared };
+      }
       this.#invalidations.assertFence(context, { sequence: proofs.shared.source_fence });
       return readOnly ? publicReceipt : { ...prior.result, status: 'duplicate', receipt: publicReceipt };
     });
@@ -415,6 +399,14 @@ export class LocalGraphStore {
       if (!destinationWritten) graphAssert(graphEqual(bHead.value.head, request.destination.expected_graph), 'graph_storage_conflict');
     }
     const localSource = this.#readInView(context, tx, { at: request.source.at, address: request.source.address }, false);
+    if (services.contexts) {
+      graphAssert(localSource.status === 'resolved', 'graph_access_denied');
+      validateContextContent1(localSource.revision.assertion.content);
+      const publication = verifyExplorationPublication(tx, sourceStorage, request.source.at, localSource.revision,
+        source.exploration_id, canonical.config_digest);
+      if (publication.origin.operation !== 'adopt') this.#contextOperation(context, tx, services,
+        publication.operation, publication.origin.previous_graph, false);
+    }
     const endpoints = request.endpoint_map.map(mapping => ({ ...mapping, resolved: this.#readInView(context, tx,
       { at: request.destination.expected_graph, address: mapping.destination }, false) }));
     this.#sourceFence(context, request);
@@ -422,10 +414,12 @@ export class LocalGraphStore {
       source_storage: sourceStorage, destination_storage: destinationStorage, grant: g, execution_id,
       source_exploration: source, destination_exploration: destination, config_digest: canonical.config_digest });
   }
-  adoptExploration(context, options, canonical_reader) {
+  #adoptExploration(context, options, canonical_reader, domain) {
     return this.#call(() => {
-      const services = this.#explorationServices(canonical_reader), { inputs, canonical } = services;
+      const services = this.#explorationServices(canonical_reader, domain), { inputs, canonical } = services;
       const request = inputs.parse('adopt', options); inputs.grant(context, { write: true, adopt: true });
+      services.contexts?.grant(context, { write: true });
+      if (domain) graphAssert(request.endpoint_map.length === 0 && request.source.address.entity_kind === 'entity');
       const identity = { kind: 'adopt', request }, prior = this.#explorationPrior(context, services, identity);
       if (prior) return this.#returnExplorationPrior(context, services, prior, identity);
       const observation = inputs.preflight(context, identity);
@@ -439,6 +433,7 @@ export class LocalGraphStore {
       const visible = this.resolveExploration(context, { exploration_id: request.source.exploration_id,
         at: request.source.at, address: request.source.address, shared_keys: null }, canonical_reader);
       graphAssert(visible.local?.status === 'resolved', 'graph_access_denied');
+      const domainProof = services.contexts ? services.contexts.prepare(context, validateContextContent1(visible.local.revision.assertion.content)) : null;
       for (const mapping of request.endpoint_map) {
         const endpoint = this.resolveExploration(context, { exploration_id: request.destination.exploration_id,
           at: request.destination.expected_graph, address: mapping.destination, shared_keys: null }, canonical_reader);
@@ -448,6 +443,7 @@ export class LocalGraphStore {
       const result = this.#view(context, 'graph:write', true, tx => {
         checkGraphFormat(tx); const committed = duplicate(tx); if (committed) return committed;
         inputs.grant(context, { write: true, adopt: true });
+        services.contexts?.grant(context, { write: true });
         this.#assertExplorationProofs(tx, context, services, proofs);
         this.#assertExplorationProofs(tx, context, services, sourceProofs);
         const publisher = this.#inputs.publisher(context, request.publisher_ref, { epoch: request.epoch });
@@ -465,11 +461,14 @@ export class LocalGraphStore {
         this.#assertExplorationProofs(tx, context, services, sourceProofs);
         const after = this.#adoptionMaterial(context, tx, services, request, publisher.run.execution_id, { destinationWritten: true });
         graphAssert(graphEqual(after, material), 'exploration_corrupt');
+        this.#contextResult(context, tx, services, domainProof, output);
         const saved = inputs.finish(tx, context, route, { result: output, graph_request: graphRequest });
         inputs.assertUnchanged(tx, context, route);
         this.#assertExplorationProofs(tx, context, services, proofs);
         this.#assertExplorationProofs(tx, context, services, sourceProofs);
         this.#sourceFence(context, request);
+        this.#contextResult(context, tx, services, domainProof, saved.result);
+        services.contexts?.grant(context, { write: true });
         return saved.result;
       }, request.epoch, duplicate, observation.execution);
       if (result.status !== 'exploration_duplicate_recheck') return result;
@@ -478,13 +477,18 @@ export class LocalGraphStore {
       return this.#returnExplorationPrior(context, services, committed, identity);
     });
   }
-  #changeExploration(context, options, canonical_reader, kind) {
+  adoptExploration(context, options, canonical_reader) { return this.#adoptExploration(context, options, canonical_reader, false); }
+  adoptContext(context, options, canonical_reader) { return this.#adoptExploration(context, options, canonical_reader, true); }
+  #changeExploration(context, options, canonical_reader, kind, domain = false) {
     return this.#call(() => {
-      const services = this.#explorationServices(canonical_reader), { inputs, canonical } = services;
+      const services = this.#explorationServices(canonical_reader, domain), { inputs, canonical } = services;
       const request = inputs.parse(kind, options); inputs.grant(context, { write: true });
+      services.contexts?.grant(context, { write: true });
+      if (domain) validateContextContent1(request.operation?.assertion?.content);
       const identity = { kind, request };
       const prior = this.#explorationPrior(context, services, identity);
       if (prior) return this.#returnExplorationPrior(context, services, prior, identity);
+      const domainProof = services.contexts ? services.contexts.prepare(context, request.operation.assertion.content) : null;
       const observation = kind === 'selection' ? null : inputs.preflight(context, identity);
       const metadata = observation ?? this.#view(context, 'graph:read', false, tx => inputs.metadata(tx, context, identity));
       const shared = { source_fence: canonical.fence(context), origin_base: metadata.origin_base,
@@ -498,6 +502,7 @@ export class LocalGraphStore {
       const duplicate = tx => inputs.prior(tx, context, identity) ? { status: 'exploration_duplicate_recheck' } : null;
       const result = this.#view(context, 'graph:write', true, tx => {
         checkGraphFormat(tx, { initialize: true });
+        services.contexts?.grant(context, { write: true });
         const committed = duplicate(tx); if (committed) return committed;
         this.#assertExplorationProofs(tx, context, services, proofs);
         let routed, output;
@@ -520,14 +525,18 @@ export class LocalGraphStore {
             graph_revision, operation_origin_ref };
         } else {
           routed = inputs.mutation(tx, context, { request, observation, shared });
+          this.#contextOperation(context, tx, services, request.operation, request.expected_graph);
           output = this.#mutateInView(context, tx, routed.graph_request, { inputs, route: routed.route });
           if (output.status === 'graph_revision_mismatch') return { ...output, proposal: request };
         }
         inputs.assertUnchanged(tx, context, routed.route);
         this.#assertExplorationProofs(tx, context, services, proofs);
+        this.#contextResult(context, tx, services, domainProof, output);
         const saved = inputs.finish(tx, context, routed.route, { result: output, graph_request: routed.graph_request ?? null });
         inputs.assertUnchanged(tx, context, routed.route);
         this.#assertExplorationProofs(tx, context, services, proofs);
+        this.#contextResult(context, tx, services, domainProof, saved.result);
+        services.contexts?.grant(context, { write: true });
         return { ...saved.result, receipt: saved.result.receipt ?? saved.receipt };
       }, request.epoch, duplicate, observation?.execution);
       if (result.status !== 'exploration_duplicate_recheck') return result;
@@ -538,15 +547,19 @@ export class LocalGraphStore {
   }
   bindExploration(context, options, canonical_reader) { return this.#changeExploration(context, options, canonical_reader, 'bind'); }
   mutateExploration(context, options, canonical_reader) { return this.#changeExploration(context, options, canonical_reader, 'mutate'); }
+  mutateContext(context, options, canonical_reader) { return this.#changeExploration(context, options, canonical_reader, 'mutate', true); }
   setExplorationProjectSelection(context, options, canonical_reader) { return this.#changeExploration(context, options, canonical_reader, 'selection'); }
-  getExplorationReceipt(context, options, canonical_reader) {
+  #getExplorationReceipt(context, options, canonical_reader, domain) {
     return this.#call(() => {
       const input = graphInput(options); graphFields(input, ['idempotency_key']); graphId(input.idempotency_key);
-      const services = this.#explorationServices(canonical_reader);
+      const services = this.#explorationServices(canonical_reader, domain);
+      services.contexts?.grant(context);
       const prior = this.#explorationPrior(context, services, input);
       return prior ? this.#returnExplorationPrior(context, services, prior, { ...input, readOnly: true }) : null;
     });
   }
+  getExplorationReceipt(context, options, canonical_reader) { return this.#getExplorationReceipt(context, options, canonical_reader, false); }
+  getContextReceipt(context, options, canonical_reader) { return this.#getExplorationReceipt(context, options, canonical_reader, true); }
   getExplorationBinding(context, options, canonical_reader) {
     return this.#call(() => {
       const input = graphInput(options); graphFields(input, ['execution']);
@@ -568,6 +581,90 @@ export class LocalGraphStore {
       });
     });
   }
+  #readContext(context, options, canonical_reader, kind) {
+    return this.#call(() => {
+      const request = validateContextReadRequest(options, kind);
+      const services = this.#explorationServices(canonical_reader, true), { inputs, canonical, contexts } = services;
+      contexts.grant(context);
+      const metadata = this.#view(context, 'graph:read', false, tx => {
+        contexts.grant(context);
+        const exploration = inputs.getExploration(tx, context, { exploration_id: request.exploration_id });
+        graphAssert(exploration && exploration.generation_id === request.at.generation_id, 'exploration_unavailable');
+        return { exploration, project: inputs.projectSelection(tx, context) };
+      });
+      const fence = canonical.fence(context);
+      const origin = canonical.prepare(context, metadata.exploration.origin.shared_base);
+      const project = canonical.prepare(context, metadata.project.pin);
+      const read_pins = { project_selection: metadata.project, source_fence: fence };
+      // This pass reads bounded immutable locators only. It never materializes
+      // authorized semantic results; the final selected pass does that once.
+      const planned = this.#view(context, 'graph:read', false, tx => {
+        contexts.grant(context);
+        const selected = planContextSelection({ view: tx, context, inputs: this.#inputs, explorations: inputs,
+          config_digest: canonical.config_digest, request, kind, read_pins });
+        // Canonical preparation needs only exact locators and typed content.
+        // Repeated private provenance is verified inside the final snapshot,
+        // and must not consume the public response's aggregate byte budget.
+        return { revisions: selected.revisions.map(revision => ({ ref: exactRevisionAddress(revision),
+          content: revision.assertion.content })), ticket_refs: selected.ticket_refs, selection: selected.selection };
+      });
+      const prepared = new Map();
+      for (const candidate of planned.revisions) {
+        const key = graphHash(candidate.ref);
+        try { prepared.set(key, { candidate, proof: contexts.prepare(context, candidate.content, planned.ticket_refs) }); }
+        catch (error) { prepared.set(key, { candidate, error }); }
+      }
+      return this.#view(context, 'graph:read', false, tx => {
+        contexts.grant(context);
+        inputs.grant(context);
+        graphAssert(graphEqual(metadata.exploration, inputs.getExploration(tx, context, { exploration_id: request.exploration_id }))
+          && graphEqual(metadata.project, inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
+        this.#invalidations.assertFence(context, { sequence: fence });
+        canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
+        const selected = readContextSelection({ view: tx, context, inputs: this.#inputs, explorations: inputs,
+          config_digest: canonical.config_digest, request, kind, read_pins });
+        const { source_heads: plannedHeads, ...plannedPins } = planned.selection;
+        const { source_heads: selectedHeads, ...selectedPins } = selected.selection;
+        graphAssert(graphEqual(plannedPins, selectedPins) && selectedHeads.every(head =>
+          plannedHeads.some(before => graphEqual(before, head))), 'graph_storage_conflict');
+        const applicability = new Map();
+        for (const revision of selected.revisions) {
+          const key = graphHash(exactRevisionAddress(revision)), p = prepared.get(key);
+          graphAssert(p && graphEqual(p.candidate.ref, exactRevisionAddress(revision))
+            && graphEqual(p.candidate.content, revision.assertion.content), 'graph_storage_conflict');
+          if (p.error) throw p.error;
+          applicability.set(key, contexts.assert(tx, context, p.proof, { assertion: revision.assertion, provenance: revision.provenance }));
+        }
+        const item = value => {
+          if (!value) return value;
+          const verified = applicability.get(graphHash(value.ref)); graphAssert(verified, 'graph_corrupt');
+          const owner = readExplorationOwner(tx, { scope: value.ref.scope, generation_id: value.ref.generation_id });
+          graphAssert(owner, 'exploration_corrupt');
+          return { ...value, applicability: { ...verified, scope: value.ref.scope,
+            exploration_id: owner.exploration_id } };
+        };
+        const local = { ...selected.local };
+        if (Object.hasOwn(local, 'item')) local.item = item(local.item);
+        if (Object.hasOwn(local, 'root')) local.root = item(local.root);
+        if (local.items) local.items = local.items.map(item);
+        if (local.links) local.links = local.links.map(link => Object.hasOwn(link, 'item') ? { ...link, item: item(link.item) } : link);
+        // Recheck selected canonical source material and opaque grants after
+        // assembly, before any fragment can escape the snapshot.
+        for (const revision of selected.revisions) contexts.assert(tx, context, prepared.get(graphHash(exactRevisionAddress(revision))).proof, { assertion: revision.assertion, provenance: revision.provenance });
+        canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
+        graphAssert(graphEqual(metadata.project, inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
+        this.#invalidations.assertFence(context, { sequence: fence }); contexts.grant(context);
+        const shared = this.#contextShared(canonical, origin, project, metadata.project.version);
+        return { exploration_id: request.exploration_id, generation_id: request.at.generation_id,
+          graph_revision: request.at, mode: request.mode, selection: selectedPins,
+          local, shared, availability: { local: local.status ?? 'selected', origin_base: shared.origin_base.status,
+            current_project: shared.current_project.status } };
+      });
+    });
+  }
+  resolveContext(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'resolve'); }
+  pageContexts(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'page'); }
+  contextLineage(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'lineage'); }
   #readExploration(context, options, canonical_reader, paging, selectionOnly = false) {
     return this.#call(() => {
       const input = graphInput(options);

@@ -55,7 +55,7 @@ function selectedRevision(resolved, address, at) {
 }
 
 /** Actual immutable publication chain; intentionally not an actor-private getReceipt. */
-function publication(view, storage, at, revision, explorationId, config) {
+export function verifyExplorationPublication(view, storage, at, revision, explorationId, config) {
   const address = exactRevisionAddress(revision);
   const fact = storage.fact({ at, kind: 'revision', key: [revision.revision_digest] });
   check(fact.value && graphEqual(fact.value, revision) && fact.origin);
@@ -130,7 +130,7 @@ function publication(view, storage, at, revision, explorationId, config) {
     && graphEqual(publisher.scope, origin.scope) && publisher.session_id === origin.publisher_session_id
     && publisher.execution_id === origin.publisher_execution_id
     && publisher.publisher_ref === graphKey('publisher', [1, origin.scope, origin.actor, publisher.run_key]));
-  return { origin, ref: receipt.operation_origin_ref };
+  return { origin, ref: receipt.operation_origin_ref, operation: command.request.operation };
 }
 
 function materialize(options) {
@@ -145,7 +145,7 @@ function materialize(options) {
   const aMeta = exploration(view, graphInput(options.source_exploration), a.exploration_id, a.at.generation_id, scope, options.config_digest);
   const bMeta = exploration(view, graphInput(options.destination_exploration), b.exploration_id, b.expected_graph.generation_id, scope, options.config_digest);
   check(samePin(aMeta.origin.shared_base, a.shared_base) && samePin(bMeta.origin.shared_base, b.shared_base), 'exploration_selection_conflict');
-  const revision = selectedRevision(source, a.address, a.at), sourcePublication = publication(view, source_storage, a.at, revision, a.exploration_id, options.config_digest);
+  const revision = selectedRevision(source, a.address, a.at), sourcePublication = verifyExplorationPublication(view, source_storage, a.at, revision, a.exploration_id, options.config_digest);
   check(Array.isArray(request.endpoint_map) && request.endpoint_map.length <= 2 && endpoints.length === request.endpoint_map.length, 'invalid_exploration_input');
   const needed = new Map();
   if (revision.entity_kind === 'relation') for (const endpoint of [revision.assertion.content.from, revision.assertion.content.to]) {
@@ -158,7 +158,7 @@ function materialize(options) {
     check(needed.has(key) && !replacements.has(key) && request.endpoint_map.some(pair => graphEqual(pair.source, item.source) && graphEqual(pair.destination, item.destination)), 'invalid_exploration_input');
     check(item.destination.generation_id === b.expected_graph.generation_id && graphEqual(item.destination.scope, scope), 'invalid_exploration_input');
     const selected = selectedRevision(item.resolved, item.destination, b.expected_graph);
-    const adopted = publication(view, destination_storage, b.expected_graph, selected, b.exploration_id, options.config_digest);
+    const adopted = verifyExplorationPublication(view, destination_storage, b.expected_graph, selected, b.exploration_id, options.config_digest);
     const original = adopted.origin.adoption?.source;
     check(adopted.origin.operation === 'adopt' && original?.exploration_id === a.exploration_id
       && original.generation_id === a.at.generation_id && graphEqual(original.address, item.source)
@@ -166,7 +166,7 @@ function materialize(options) {
     // Verify the linked original A publication as well; a plausible origin ref alone is insufficient.
     const sourceEndpoint = source_storage.fact({ at: original.at, kind: 'revision', key: [item.source.revision_digest] }).value;
     check(sourceEndpoint && graphEqual(exactRevisionAddress(sourceEndpoint), item.source));
-    const originalPublication = publication(view, source_storage, original.at, sourceEndpoint, a.exploration_id, options.config_digest);
+    const originalPublication = verifyExplorationPublication(view, source_storage, original.at, sourceEndpoint, a.exploration_id, options.config_digest);
     check(original.operation_origin_ref === originalPublication.ref);
     replacements.set(key, item.destination); endpointRevisions.push(selected);
     mapped.push({ source: item.source, destination: item.destination, operation_origin_ref: adopted.ref });
@@ -243,7 +243,7 @@ export function verifyExplorationAdoptionResult({ view, request, result, destina
     exploration(view, destination_exploration, request.destination.exploration_id, at.generation_id, scope, config_digest);
     const selected = destination_storage.fact({ at, kind: 'revision', key: [result.revision.revision_digest] });
     check(selected.value && graphEqual(exactRevisionAddress(selected.value), result.revision)); validateSemanticRevision(selected.value);
-    const proof = publication(view, destination_storage, at, selected.value, request.destination.exploration_id, config_digest);
+    const proof = verifyExplorationPublication(view, destination_storage, at, selected.value, request.destination.exploration_id, config_digest);
     check(proof.ref === result.operation_origin_ref && proof.ref === result.receipt.operation_origin_ref
       && proof.origin.operation === 'adopt' && proof.origin.request_digest === graphHash(request)
       && graphEqual(proof.origin.adoption, result.adoption));

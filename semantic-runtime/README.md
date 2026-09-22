@@ -295,6 +295,10 @@ contracts through the package's public entry:
   transitions and bounded historical pages, retaining the existing semantic
   revision format. Both the pure fixture and the [local SQLite adapter](docs/graph-store-v0.md)
   exercise retained long histories; host and Policy integration remain pending.
+- [Typed Context lifecycle](docs/context-lifecycle-v0.md): sourced meaning and
+  applicability, exact revision/adoption lineage, bounded current/as-of reads,
+  and separate shared Authority views over the existing local Graph transaction.
+  Automatic extraction, query integration and typed Context Judge support remain pending.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

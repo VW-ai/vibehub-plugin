@@ -96,3 +96,5 @@ export { CANONICAL_RECORD_PROFILE, parseCanonicalRecord, evaluateCanonicalRecord
 export { LocalExplorationStore, EXPLORATION_NAMESPACE } from './local/exploration-store.mjs';
 export { LocalJudgeRuntime, executeJudgeNode } from './local/judge-runtime.mjs';
 export { JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from './core/judge-node.mjs';
+export { LocalContextStore } from './local/context-store.mjs';
+export { validateContextContent1, validateContextOperation1 } from './core/context-profile.mjs';

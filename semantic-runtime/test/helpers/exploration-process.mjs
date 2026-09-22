@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { DomainStore } from '../../src/local/domain-store.mjs';
 import { connect } from './exploration-fixture.mjs';
+import { LocalContextStore } from '../../src/local/context-store.mjs';
+import { CONTEXT_ACTIONS } from './context-fixture.mjs';
 
 const [mode, filePath, commandPath] = process.argv.slice(2);
 if (!['run', 'pause-before-commit', 'pause-after-commit'].includes(mode) || !filePath || !commandPath || typeof process.send !== 'function') {
@@ -8,6 +10,10 @@ if (!['run', 'pause-before-commit', 'pause-after-commit'].includes(mode) || !fil
 } else {
   const command = JSON.parse(readFileSync(commandPath, 'utf8'));
   const f = connect(filePath, command.config), transaction = DomainStore.prototype.transaction;
+  if (command.surface === 'context') {
+    f.context = f.issue({ actions: CONTEXT_ACTIONS }).context;
+    f.contexts = new LocalContextStore({ store: f.store, authority: f.authority, canonical_reader: command.config });
+  }
   let paused = false;
   const pause = phase => {
     if (paused) return;
@@ -26,8 +32,10 @@ if (!['run', 'pause-before-commit', 'pause-after-commit'].includes(mode) || !fil
   const finish = () => { f.store.close(); f.authority.close(); process.disconnect(); };
   const execute = () => {
     try {
-      if (!['bind', 'mutate', 'setProjectSelection'].includes(command.method)) throw new Error('invalid fixture method');
-      const result = f.explorations[command.method](f.context, command.request);
+      const service = command.surface === 'context' ? f.contexts : f.explorations;
+      const methods = command.surface === 'context' ? ['mutate', 'adopt'] : ['bind', 'mutate', 'setProjectSelection'];
+      if (!methods.includes(command.method)) throw new Error('invalid fixture method');
+      const result = service[command.method](f.context, command.request);
       process.send({ type: 'result', result }, finish);
     } catch (error) { process.send({ type: 'error', code: error?.code ?? 'unexpected_child_failure' }, finish); }
   };

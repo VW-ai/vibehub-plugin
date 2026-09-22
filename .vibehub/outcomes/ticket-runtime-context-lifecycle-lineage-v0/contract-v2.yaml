@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "meaning-and-applicability",
+    "scoped-lineage",
+    "lifecycle-read-contract",
+    "lifecycle-conformance"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T18:05:36.699Z",
+  "contract_revision": {
+    "identity": "sha256:d2b78aa41c6a74525b6670ed659a4c715eaae68a294ba5d033a5f7cd4b9da6f5",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "context-lifecycle-conformance-20260922",
+    "context-lifecycle-verification-20260922"
+  ],
+  "independence": {
+    "note": "Fresh independent reviewer /root/lifecycle_closeout began from a bounded read-only handoff without execution context. I did not plan this Ticket or author its implementation, documentation or Evidence. I inspected and adversarially tested the actual implementation, authored only the separate independent regression test file, reported concrete defects for executors to repair and independently verified those repairs. This exact Outcome is my only canonical project-record write for this Ticket. The installed agent-session contract was absent; no session API or session completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four active revision-2 criteria of exact Contract 2 after reading the Ticket, native Evidence, implementation and selected-source contracts, final documentation, measurement reports and raw verification logs. meaning-and-applicability: the fixed six-method LocalContextStore validates the exact inert Context profile, role, change rationale and declared scope; actual generation ownership, configured reader issuance and admitted canonical events derive Project/exploration, Ticket Contract and Git revision applicability. Unspecified dimensions remain uncertain. Successful reads retain separate immutable origin and read-time Project views, real active Authority records/artifacts and explicit coverage without granting canonical authority to local claims. scoped-lineage: typed transitions preserve exact base/support distinctions, complete competing variants and resolution, immutable reasons and publication chains. The unchanged adoption command retains A content and exact A/B origin/source/base facts while reporting B adoption as explicit_adoption with unrecorded prose; A supersession does not alter B. The source transition is now independently checked before typed adoption, including an actual malformed lower-level source regression with zero effects. lifecycle-read-contract: point, candidate-bounded pages and one-hop lineage use exact current/as-of Graph selection, actual publication/access facts and current source/Project/fence/grant checks. Historical assertion status and selected projection are separate; misses never fall forward and protected targets expose no content. Preparation performs zero semantic point reads, final lineage performs at most 17 selected point reads with existing per-read ceilings, Ticket proof limits count distinct selection pins, and complete public output retains the aggregate 1 MiB bound. No new namespace, table, public callback, recursive walker, automatic source event, canonical writer or host integration was introduced. lifecycle-conformance: real Git/SQLite fixtures cover transitions, A/B independence, exact Ticket/code sources, unknown applicability, authorities, conflicts, denied history, races, corrupt publication facts, retries, restart and worktree loss; existing process harnesses exercise two writers and SIGKILL before and after typed mutation/adoption commits. I reproduced three material defects during independent review and verified the executor repairs: counting records instead of Ticket selection pins, malformed source transition laundering through adoption, and duplicated private provenance consuming the public response budget. My final focused run passed 17 of 17 cases, including 9 Ticket records at one selection and 16 direct targets with 32 shared admitted events, plus the historical preparation-cache regression and aggregate overflow test. An additional independent disposable-store probe confirmed semantic stale remains readable while a real sequenced source tombstone denies current/as-of Context resolve, lineage and retained receipt, with unchanged rows after denied reads. Final full Runtime and fresh clean standalone logs each report 914 tests, 912 passes, two pre-existing native Keychain opt-in skips and zero failures; standalone ran outside the parent repository. Boundary validation passed 206 files, and the independently shipped plugin artifact remains 79 files and 3670088 bytes. Native Ticket validation, exact CLOSE_OUT readback, git diff check and Context guard with no authorities or violations pass. The retained four-call synthetic TypeSafe JEV report matches all expected labels and refuses revoked-source dispatch; this is compatibility evidence for the existing selected Judge path, not direct runtime_context Judge support or a general accuracy claim. No criterion remains unresolved. This Outcome certifies the bounded local in-process domain library, not extraction, ranking, App/HTTP/plugin integration, canonical promotion or distributed operation.",
+  "ticket_id": "ticket-runtime-context-lifecycle-lineage-v0",
+  "unresolved_acceptance_ids": []
+}

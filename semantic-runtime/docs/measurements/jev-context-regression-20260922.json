@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-adoption-judge-four-v1",
+  "measured_at": "2026-09-22T17:45:54.199Z",
+  "provider": "typesafe-direct",
+  "transport_calls": 4,
+  "matched": 4,
+  "total": 4,
+  "before_adoption_foreign_target_refused": true,
+  "adoption_model_calls": 0,
+  "source_graph_unchanged": true,
+  "destination_candidates": 1,
+  "source_revocation_refused_before_send": true,
+  "canonical_promotion": false,
+  "results": [
+    {
+      "branch": "A",
+      "case": "context-yes",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "confidence": 0.95,
+      "model": "jev-1.13.0",
+      "latency_ms": 331,
+      "attempts": 1,
+      "input_hash": "1d8d57be1da901bcda383ba9ef769bf17a682c4f8a57a87328fdf1293a1d5ee2",
+      "result_digest": "sha256:d97d4747d11909a5a7e5c483c65dda4c248dc2cfb16c26cd4f168a034a8cb013"
+    },
+    {
+      "branch": "A",
+      "case": "context-no",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "latency_ms": 241,
+      "attempts": 1,
+      "input_hash": "2bbac8c158fd12a6911ad0309379c8860c7eab13638ed04ccd89c9dae04331ec",
+      "result_digest": "sha256:85028357f2c8d51e7c9e073a509c3243fc5de1266f00dfff31b6683097f9f67c"
+    },
+    {
+      "branch": "B",
+      "case": "context-yes",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "matched": true,
+      "relevant": true,
+      "confidence": 0.96,
+      "model": "jev-1.13.0",
+      "latency_ms": 146,
+      "attempts": 1,
+      "input_hash": "ce8416b7cf57ebecfb9b9b462623902e183db160d8f0ca7a20064a383b80ddf5",
+      "result_digest": "sha256:d0fe7dc27f66943b510d668d2cea4ef72aec8f95a80ee2f1d646bad5fb6566e7"
+    },
+    {
+      "branch": "B",
+      "case": "context-no",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "matched": true,
+      "relevant": false,
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "latency_ms": 128,
+      "attempts": 1,
+      "input_hash": "88dffc0d45972d66dfce188a1a0dbe80302feeac6c2b7347284bd9ff05e6e8dc",
+      "result_digest": "sha256:ae7d7c60e4b5735a508eecdbfb4fb824d6ce552ab67645aec710f76ee773c9ec"
+    }
+  ]
+}

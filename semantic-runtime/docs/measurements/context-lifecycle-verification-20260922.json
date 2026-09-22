@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-09-22T18:02:31.143Z",
+  "scope": "Context lifecycle Contract2; real disposable Git/SQLite with fixed typed meaning and selected lineage",
+  "full": {
+    "command": "npm run verify",
+    "tests": 914,
+    "passed": 912,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 77310.360209
+  },
+  "standalone": {
+    "command": "npm run verify:standalone",
+    "tests": 914,
+    "passed": 912,
+    "failed": 0,
+    "skipped": 2,
+    "duration_ms": 82157.295667,
+    "clean_install": true,
+    "outside_parent_repository": true
+  },
+  "boundaries": {
+    "files": 206,
+    "errors": 0
+  },
+  "added_tests": 64,
+  "plugin_artifact": {
+    "command": "npm run verify:artifact",
+    "passed": true,
+    "files": 79,
+    "bytes": 3670088
+  },
+  "independent_review": {
+    "product_source_edits": false,
+    "resolved_findings": [
+      "Distinct Ticket selection pins instead of record count; canonical proof reuse scoped to one preparation batch",
+      "Actual source typed transition verified before adoption",
+      "Private repeated provenance excluded from public response aggregate budget"
+    ],
+    "unresolved_findings": 0
+  },
+  "recovery": {
+    "real_two_writer_idempotency": true,
+    "sigkill_before_commit": [
+      "typed_mutate",
+      "typed_adopt"
+    ],
+    "sigkill_after_commit_before_reply": [
+      "typed_mutate",
+      "typed_adopt"
+    ]
+  },
+  "selected_bounds": {
+    "lineage_point_reads": 17,
+    "raw_preparation_semantic_reads": 0,
+    "lineage_targets": 16,
+    "support_events": 32,
+    "response_bytes_limit": 1048576,
+    "ticket_selection_pins": 8,
+    "configured_records_per_selection": 16
+  },
+  "git_diff_check": true,
+  "skip_reason": "Two pre-existing native macOS Keychain opt-in integration tests.",
+  "verification_note": "Final full and clean standalone suites ran sequentially on the same product source and tests; no product edits afterward. An earlier restricted run could not bind loopback HTTP fixtures; final full run used the required loopback permission. Deterministic verification uses no real credential/model.",
+  "live_jev_report": "jev-context-regression-20260922.json",
+  "live_jev_calls": 4,
+  "live_expected_decisions": "4/4",
+  "live_model": "jev-1.13.0",
+  "typed_context_judge_integration": false,
+  "live_boundary": "Existing selected Judge regression only; fixed synthetic source text, actual A/B adoption and source revocation before send. Context library itself performs no model call."
+}
