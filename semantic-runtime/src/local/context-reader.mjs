@@ -71,6 +71,44 @@ function publicationItem(proof) {
     publisher_ref: o.publisher_ref, publisher_execution_id: o.publisher_execution_id, epoch: o.epoch };
 }
 
+// Generic exploration writes may carry Context-shaped content without using
+// the typed facade. An adoption must not turn an invalid original transition
+// into a typed fact. Follow only its immutable publication sources, never the
+// source exploration's current head or a general semantic neighborhood.
+function verifyTypedPublication(view, storage, at, revision, proof, config) {
+  const seen = new Set();
+  for (let depth = 0; depth < 32; depth++) {
+    const key = graphHash(exactRevisionAddress(revision));
+    check(!seen.has(key), 'context_corrupt'); seen.add(key);
+    const meaning = validateContextContent1(revision.assertion.content).data;
+    if (proof.origin.operation !== 'adopt') {
+      if (['create', 'derive', 'branch'].includes(meaning.change.kind)) {
+        check(storage.fact({ at: proof.origin.previous_graph, kind: 'entity', key: ['entity', revision.entity_id] }).value === null,
+          'context_transition_invalid');
+      }
+      const parent = meaning.change.kind === 'branch'
+        ? storage.fact({ at, kind: 'revision', key: [revision.assertion.parents[0]?.revision_digest] }).value : null;
+      validateContextOperation1(proof.operation, parent === null ? {} : { branch_parent: parent });
+      return;
+    }
+    check(depth < 31, 'context_capacity');
+    const source = proof.origin.adoption?.source;
+    check(source && source.address?.kind === 'semantic_revision' && source.address.entity_kind === 'entity'
+      && graphEqual(source.at.scope, revision.scope) && graphEqual(source.address.scope, revision.scope)
+      && source.at.generation_id === source.address.generation_id, 'context_corrupt');
+    const owner = readExplorationOwner(view, { scope: revision.scope, generation_id: source.at.generation_id });
+    check(owner?.exploration_id === source.exploration_id && owner.config_digest === config, 'context_corrupt');
+    storage = new GraphStorage({ view, scope: revision.scope, generation_id: source.at.generation_id });
+    const adopted = storage.fact({ at: source.at, kind: 'revision', key: [source.address.revision_digest] }).value;
+    check(adopted && graphEqual(exactRevisionAddress(adopted), source.address)
+      && graphEqual(adopted.assertion.content, revision.assertion.content), 'context_corrupt');
+    const published = verifyExplorationPublication(view, storage, source.at, adopted, source.exploration_id, config);
+    check(published.ref === source.operation_origin_ref, 'context_corrupt');
+    at = source.at; revision = adopted; proof = published;
+  }
+  throw graphFail('context_capacity');
+}
+
 /** Fixed selected reader; only the Graph owner supplies its real snapshot and services. */
 function selectedContext({ view, context, inputs, explorations, config_digest, request, kind, read_pins }, planning) {
   check(inputs instanceof GraphInputs && explorations instanceof ExplorationInputs);
@@ -132,17 +170,7 @@ function selectedContext({ view, context, inputs, explorations, config_digest, r
     if (!supported(revision)) { const absent = { status: 'unsupported', item: null }; cache.set(key, absent); return absent; }
     const proof = verifyExplorationPublication(view, s, at, revision, explorationId, config_digest);
     const ref = exactRevisionAddress(revision), meaning = revision.assertion.content.data;
-    if (!planning && proof.origin.operation !== 'adopt') {
-      if (['create', 'derive', 'branch'].includes(meaning.change.kind)) {
-        check(s.fact({ at: proof.origin.previous_graph, kind: 'entity', key: ['entity', revision.entity_id] }).value === null,
-          'context_transition_invalid');
-      }
-      const parent = meaning.change.kind === 'branch'
-        ? s.fact({ at, kind: 'revision', key: [revision.assertion.parents[0]?.revision_digest] }).value : null;
-      // The selected semantic read already authenticated this exact supporting
-      // parent. A raw lookup here verifies shape without a second point read.
-      validateContextOperation1(proof.operation, parent === null ? {} : { branch_parent: parent });
-    }
+    if (!planning) verifyTypedPublication(view, s, at, revision, proof, config_digest);
     const item = { ref, assertion_status: revision.assertion.status,
       projection: { head: result.entity.head, status: result.entity.status, competing: result.entity.competing, quarantined: result.entity.quarantined },
       historical_role: graphEqual(ref, result.entity.head) ? 'head'

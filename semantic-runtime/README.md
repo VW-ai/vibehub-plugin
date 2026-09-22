@@ -298,7 +298,10 @@ contracts through the package's public entry:
 - [Typed Context lifecycle](docs/context-lifecycle-v0.md): sourced meaning and
   applicability, exact revision/adoption lineage, bounded current/as-of reads,
   and separate shared Authority views over the existing local Graph transaction.
-  Automatic extraction, query integration and typed Context Judge support remain pending.
+  Automatic extraction and query integration remain pending.
+- [Selected Context relevance](docs/context-judge-bridge-v0.md): exact authorized
+  typed Context versions use the existing Judge dispatch path, with lifecycle,
+  applicability and source checks before sending and before returning a result.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

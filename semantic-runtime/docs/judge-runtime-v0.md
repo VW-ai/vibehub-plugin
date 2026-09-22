@@ -6,6 +6,11 @@ ingress, exploration, source invalidation, activation and provider-settings
 modules. It returns a decision or a bounded refusal/defer result. It performs no
 Graph write, canonical promotion, ingress ACK or autonomous scheduling.
 
+Typed `runtime_context` revisions use the separate
+[`evaluateContext` entry](context-judge-bridge-v0.md), which shares this dispatch
+path and requires its own installed operation descriptor. The legacy target
+profile below is unchanged.
+
 This is an in-process service. The setup App, host plugins and full durable
 Policy executor do not call it yet. The existing `executePolicyRun` still
 rejects Judge/Worker nodes; its full-snapshot v1 interface is unchanged.

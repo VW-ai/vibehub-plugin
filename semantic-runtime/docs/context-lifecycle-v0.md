@@ -10,7 +10,7 @@ This is an in-process domain API for later App/plugin/query integration. It does
 not extract Context from conversations, resolve entity identity, rank a query,
 run a Worker or promote anything to canonical project authority. The existing
 selected Judge accepts `judge-target` / `judge_target`; this new `runtime_context`
-profile is not yet a supported Judge target.
+profile uses the separate [Context Judge entry](context-judge-bridge-v0.md).
 
 ## Public surface
 
@@ -27,6 +27,12 @@ principal. These facade grants do not revoke an existing lower-level capability.
 Ordinary reads of an adopted B revision use current semantic/source read access.
 Reading or retrying the original adoption receipt additionally retains the
 adoption/source permissions of that command.
+
+Typed reads validate adopted content back through at most 32 exact immutable
+publication records, including the selected revision. This prevents a generic
+exploration write from laundering an invalid typed transition through adoption.
+The check ignores later source-branch semantic changes; a longer chain refuses
+with `context_capacity` rather than claiming verified lineage.
 
 | Method | Request and result |
 | --- | --- |

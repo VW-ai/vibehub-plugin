@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "measured_at": "2026-09-22T18:52:48.019937+00:00",
+  "scope": "Context Judge bridge Contract1; actual selected typed Context, bounded immutable publication verification and existing authorized provider dispatch",
+  "full": {
+    "command": "npm run verify",
+    "tests": 984,
+    "pass": 982,
+    "fail": 0,
+    "skipped": 2,
+    "duration_ms": 96907.112583
+  },
+  "standalone": {
+    "command": "npm run verify:standalone",
+    "tests": 984,
+    "pass": 982,
+    "fail": 0,
+    "skipped": 2,
+    "duration_ms": 105646.853292,
+    "clean_install": true,
+    "outside_parent_repository": true
+  },
+  "boundaries": {
+    "files": 215,
+    "errors": 0
+  },
+  "added_tests": 70,
+  "plugin_artifact": {
+    "command": "npm run verify:artifact",
+    "passed": true,
+    "files": 79,
+    "bytes": 3670088
+  },
+  "skips": "Two existing opt-in native Keychain integration cases; no new skips.",
+  "verification_correction": {
+    "initial_parallel_runs": "Full and standalone each had one capacity-fixture failure: its existing 5-second dispatch deadline elapsed under simultaneous full-suite CPU load. No production deadline was changed.",
+    "change": "Give only the source-closure 32/33 capacity fixture a 30-second test deadline; dedicated short-deadline tests remain.",
+    "final_runs": "The isolated capacity test and sequential complete full/standalone reruns all passed."
+  },
+  "independent_review": "Real generic-write/adoption lifecycle laundering was reproduced; typed reads now validate up to 32 exact immutable publication records. Invalid retained/adopted records are refused by typed selection and dispatch. This does not claim every generic writer prevents persisting an invalid record.",
+  "live_measurement": "semantic-runtime/docs/measurements/jev-context-bridge-20260922.json",
+  "live_summary": {
+    "provider": "typesafe-direct",
+    "model": "jev-1.13.0",
+    "final_report_calls": 4,
+    "labelled_cases": 3,
+    "matched": 3,
+    "completed_revoked_response_discarded": true,
+    "cache_hits_without_send": 3,
+    "latency_ms": [
+      287,
+      263,
+      159
+    ],
+    "observed_cost": null,
+    "bridge_calls_across_two_runs": 8
+  },
+  "limits": [
+    "Fixed synthetic fixtures only; no private traces or credentials retained.",
+    "Selected in-process composition; not global retrieval accuracy, host capture, automatic extraction or canonical promotion."
+  ],
+  "passed": true
+}

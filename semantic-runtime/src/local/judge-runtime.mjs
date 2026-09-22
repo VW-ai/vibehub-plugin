@@ -5,11 +5,12 @@ import { JudgeInputs } from './judge-inputs.mjs';
 import { invokeJudgeProvider } from './judge-provider.mjs';
 import { judgeConfiguration, judgeRequest, judgeCopy, judgeCheck, judgeFailure } from './judge-contract.mjs';
 import { graphHash, graphEqual, graphFields, graphErrorCode } from './graph-inputs.mjs';
-import { JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from '../core/judge-node.mjs';
+import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from '../core/judge-node.mjs';
 import { validateDecision } from '../core/contracts.mjs';
 import { types } from 'node:util';
 
 const BRIDGE = Symbol('selected JudgeNode invocation');
+const CONTEXT_BRIDGE = Symbol('selected Context JudgeNode invocation');
 const CACHE_BYTES = 8 * 1024 * 1024;
 const codeOf = error => {
   const code = graphErrorCode(error);
@@ -55,14 +56,19 @@ export class LocalJudgeRuntime {
       this.#inputs = new JudgeInputs({ store, authority, canonical_reader, configuration: this.#configuration });
     } catch { throw judgeFailure('invalid_judge_configuration'); }
   }
-  evaluate(context, request, options = {}) { return this.#evaluate(context, request, optionsSignal(options), null); }
+  evaluate(context, request, options = {}) { return this.#evaluate(context, request, optionsSignal(options), null, false); }
+  evaluateContext(context, request, options = {}) { return this.#evaluate(context, request, optionsSignal(options), null, true); }
   [BRIDGE](context, request, { signal, inputs, deadline_ms }) {
-    return this.#evaluate(context, request, signal, { inputs: judgeCopy(inputs), deadline_ms });
+    return this.#evaluate(context, request, signal, { inputs: judgeCopy(inputs), deadline_ms }, false);
   }
-  #node(request) {
+  [CONTEXT_BRIDGE](context, request, { signal, inputs, deadline_ms }) {
+    return this.#evaluate(context, request, signal, { inputs: judgeCopy(inputs), deadline_ms }, true);
+  }
+  #node(request, typedContext) {
+    const operation = typedContext ? CONTEXT_JUDGE_NODE_OPERATION : JUDGE_NODE_OPERATION;
     const node = this.#configuration.artifact.definition.nodes[request.node_id];
-    judgeCheck(node?.type === 'judge' && node.operation.id === JUDGE_NODE_OPERATION.id
-      && node.operation.version === JUDGE_NODE_OPERATION.version, 'unsupported_judge_node'); return node;
+    judgeCheck(node?.type === 'judge' && node.operation.id === operation.id
+      && node.operation.version === operation.version, 'unsupported_judge_node'); return node;
   }
   #config() {
     const config = this.#settings.getConfig(this.#configuration.settings_project_id);
@@ -78,7 +84,7 @@ export class LocalJudgeRuntime {
     }
     this.#cache.set(key, { ...entry, bytes }); this.#cacheBytes += bytes;
   }
-  async #evaluate(context, input, signal, bridge) {
+  async #evaluate(context, input, signal, bridge, typedContext) {
     const started = performance.now();
     let request;
     try { request = judgeRequest(input); } catch { throw judgeFailure('invalid_judge_input'); }
@@ -92,9 +98,10 @@ export class LocalJudgeRuntime {
       attempts, usage, ...fields });
     let ownsFlight = false;
     try {
-      node = this.#node(request);
+      node = this.#node(request, typedContext);
       const grant = this.#inputs.grant(context);
-      key = graphHash([grant.scope, grant.actor, grant.actor_kind, request.invocation_id]); requestHash = graphHash(request);
+      key = graphHash([grant.scope, grant.actor, grant.actor_kind, request.invocation_id]);
+      requestHash = graphHash([typedContext ? 'runtime-context-v1' : 'judge-target-v1', node.operation, request]);
       const running = this.#inflight.get(key);
       if (running) return result({ reason_code: running === requestHash ? 'invocation_in_progress' : 'judge_invocation_conflict' });
       cached = this.#cache.get(key);
@@ -109,7 +116,9 @@ export class LocalJudgeRuntime {
       const relay = () => controller.abort(); signal?.addEventListener('abort', relay, { once: true });
       // This listener is released below even on preparation/credential failures.
       controller.detach = () => signal?.removeEventListener('abort', relay);
-      prepared = this.#inputs.prepare(context, request, { family: node.config.family, question: { family: node.config.family, text: node.config.question_text } });
+      const inputOptions = { family: node.config.family, question: { family: node.config.family, text: node.config.question_text } };
+      prepared = typedContext ? this.#inputs.prepareContext(context, request, inputOptions)
+        : this.#inputs.prepare(context, request, inputOptions);
       stop(signal, deadline);
       if (bridge) {
         graphFields(bridge.inputs, ['event', 'selection']);
@@ -207,14 +216,14 @@ export class LocalJudgeRuntime {
 }
 
 /** Typed single-node bridge. The full v1 Policy executor remains unchanged. */
-export async function executeJudgeNode(options) {
+async function executeSelectedJudgeNode(options, method) {
   judgeCheck(options && typeof options === 'object' && !types.isProxy(options) && Object.getPrototypeOf(options) === Object.prototype
     && Reflect.ownKeys(options).every(key => ['runtime', 'context', 'request', 'inputs', 'signal', 'deadline_ms'].includes(key))
     && Object.values(Object.getOwnPropertyDescriptors(options)).every(d => Object.hasOwn(d, 'value') && d.enumerable));
   const { runtime, context, request, inputs, signal, deadline_ms } = options;
   judgeCheck(!types.isProxy(runtime) && runtime instanceof LocalJudgeRuntime
     && (signal === undefined || !types.isProxy(signal) && signal instanceof AbortSignal));
-  const result = await runtime[BRIDGE](context, request, { signal, inputs, deadline_ms });
+  const result = await runtime[method](context, request, { signal, inputs, deadline_ms });
   const usage = { tokens: result.usage.reserved.tokens, cost_microunits: result.usage.reserved.cost_microunits };
   if (!result.decision || !result.branch) return judgeCopy({ outputs: { error: { kind: 'error_ref', code: 'handler_error', node_id: result.node_id } },
     error: { code: 'handler_error', retryable: false }, usage });
@@ -222,3 +231,6 @@ export async function executeJudgeNode(options) {
     targets: { kind: 'candidates_ref', refs: result.target_refs }, decision: { kind: 'signal_ref', digest: result.result_digest } },
     branch: result.branch, usage });
 }
+
+export function executeJudgeNode(options) { return executeSelectedJudgeNode(options, BRIDGE); }
+export function executeContextJudgeNode(options) { return executeSelectedJudgeNode(options, CONTEXT_BRIDGE); }

@@ -1,0 +1,44 @@
+{
+  "acceptance_ids": [
+    "context-bridge-conformance-and-live-smoke",
+    "context-dispatch-preserves-judge-guards",
+    "typed-context-input-is-selected"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "context-bridge-conformance-and-live-smoke",
+      "identity": "sha256:08137d7a0d8cbf246dad9d4f865e38b3838a5cd648c197cb7348e96087656385",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-dispatch-preserves-judge-guards",
+      "identity": "sha256:e04233ee0a6addc80c08431fd34cad7318c0fb45f13298b934fce21ba6ecd3b3",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "typed-context-input-is-selected",
+      "identity": "sha256:8c199c23cbb3382354f08cd404b9e1cac3907209e818534a2f1f0a86719ef83f",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "context-judge-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T18:52:49.313Z",
+  "refs": [
+    "semantic-runtime/docs/measurements/context-judge-verification-20260922.json",
+    "semantic-runtime/docs/measurements/jev-context-bridge-20260922.json",
+    "semantic-runtime/scripts/check-jev-context.mjs",
+    "semantic-runtime/test/context-judge-jev-check.test.mjs",
+    "semantic-runtime/test/helpers/context-judge-fixture.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/package.json",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Final full Runtime and clean standalone verification pass: full 984 total/982 pass/2 existing skips, standalone 984 total/982 pass/2 existing skips, zero failures. Initial simultaneous full/standalone runs exposed a capacity-test fixture deadline under CPU load; only that test now uses30s, production deadlines and dedicated deadline tests are unchanged, and isolated plus sequential final verification passes. Component boundary and unchanged independently shipped Skill artifact checks pass. The checked-in final official TypeSafe measurement made exactly four new synthetic sends using jev-1.13.0: all three yes/no/yes labels matched and a completed fourth response was discarded after actual source revocation. The three model calls took159–287ms; unavailable cost remains null. Fresh opaque contexts and distinct invocation IDs, one attempt per case, three cache hits without extra sends, exact selected refs/selection/input/result/body digests and excluded structural canaries are recorded. Recorded transport also verifies mismatched labels and incomplete fourth responses are reported honestly. Credentials stayed in the private Keychain pipe/process memory and actual ProviderSettings callback; only synthetic measurements are retained. An earlier four-send smoke before final explicit lifecycle assertions also passed, so this turn used eight actual bridge smoke sends in two separate runs; the checked-in report describes only the final four. Existing pre-bridge four-call regression is separately recorded by the prior Context delivery. This is bounded in-process composition evidence, not global retrieval accuracy, automatic extraction, canonical promotion or App/plugin integration.",
+  "ticket_id": "ticket-runtime-context-judge-bridge-v0"
+}

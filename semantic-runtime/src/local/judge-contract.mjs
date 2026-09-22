@@ -1,6 +1,6 @@
 import { FAMILIES, SENSITIVITIES, canonical } from '../core/contracts.mjs';
 import { compilePolicyArtifact } from '../core/policy-artifacts.mjs';
-import { JUDGE_NODE_OPERATION } from '../core/judge-node.mjs';
+import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION } from '../core/judge-node.mjs';
 import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
 import { validateSemanticAddress } from '../core/working-graph.mjs';
 import { PROVIDER_MODELS } from './provider-settings.mjs';
@@ -23,14 +23,20 @@ export function judgeConfiguration(value) {
   judgeCheck(typeof config.settings_project_id === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(config.settings_project_id));
   const artifact = compilePolicyArtifact(config.artifact.definition, { operations: config.artifact.operations });
   judgeCheck(graphEqual(artifact, config.artifact));
-  const installed = artifact.operations.find(op => op.id === JUDGE_NODE_OPERATION.id && op.version === JUDGE_NODE_OPERATION.version);
-  // Compilation canonicalizes operation enum/required order.
-  const expected = graphInput(JUDGE_NODE_OPERATION);
-  expected.config_schema.required.sort();
-  for (const property of Object.values(expected.config_schema.properties)) if (property.enum) property.enum.sort(lexical);
-  judgeCheck(graphEqual(installed, expected));
+  const descriptors = [JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION];
+  const installed = artifact.operations.filter(op => op.type === 'judge');
+  judgeCheck(installed.length > 0);
+  for (const operation of installed) {
+    const descriptor = descriptors.find(op => op.id === operation.id && op.version === operation.version);
+    judgeCheck(descriptor);
+    // Compilation canonicalizes operation enum/required order.
+    const expected = graphInput(descriptor);
+    expected.config_schema.required.sort();
+    for (const property of Object.values(expected.config_schema.properties)) if (property.enum) property.enum.sort(lexical);
+    judgeCheck(graphEqual(operation, expected));
+  }
   judgeCheck(artifact.compatibility.min_runtime_version <= 1 && artifact.compatibility.max_runtime_version >= 1);
-  for (const node of Object.values(artifact.definition.nodes).filter(n => n.type === 'judge' && n.operation.id === installed.id && n.operation.version === installed.version)) {
+  for (const node of Object.values(artifact.definition.nodes).filter(n => n.type === 'judge')) {
     graphId(node.config.question_id); graphId(node.config.question_version);
     judgeCheck(FAMILIES.includes(node.config.family) && node.config.question_text.trim().length > 0 && Buffer.byteLength(node.config.question_text) <= 4096);
   }

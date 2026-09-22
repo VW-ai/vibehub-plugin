@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "dataset": "synthetic-typed-context-judge-four-v1",
+  "measured_at": "2026-09-22T18:28:52.086Z",
+  "provider": "typesafe-direct",
+  "transport_calls": 4,
+  "labelled_cases": 3,
+  "matched": 3,
+  "status": "completed",
+  "passed": true,
+  "fresh_opaque_contexts": 4,
+  "distinct_invocation_ids": 4,
+  "max_attempts_per_invocation": 1,
+  "completed_cache_hits": 3,
+  "source_graph_unchanged_by_adoption": true,
+  "a_superseded_b_current": true,
+  "structural_canaries_excluded": true,
+  "synthetic_body_digests": [
+    "sha256:6e1c7a91bfeb8dc44ec3568b4b5c322614ef7ccaa5954cf961ea44804fac9aad",
+    "sha256:5733976e5a3ed1f47238dcafb28282ee30d6236aaea87dbcb35dee8d0dab8f28",
+    "sha256:55a67b2c3efddca0498163c8434a5e44a5057c8b3fd111f768c0053914d52ac6",
+    "sha256:b0d70f41d3f86183ac9837af492491f8ecb801cfa33373cc7608b16f292db275"
+  ],
+  "governance_evaluated": false,
+  "shared_material_sent": false,
+  "canonical_promotion": false,
+  "ingress_acknowledged": false,
+  "evaluation_effects": false,
+  "results": [
+    {
+      "id": "own-relevant",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "provider_sends": 1,
+      "attempts": 1,
+      "input_hash": "67573bea626715c4d0d152b0acf630406b9c11ad26a354bf4cff6f0002f41e80",
+      "result_digest": "sha256:ba54bd5a5ea514bd22616c7f631af608551f531deebffecbc5446e687957dae4",
+      "selection_digest": "sha256:3d7b0fd65cb5b5936e66a9aaddceb331e160bb29c3b7ac5fd0474a796a38626e",
+      "selected_ref": {
+        "entity_id": "typed-context-target",
+        "entity_kind": "entity",
+        "generation_id": "exploration-generation/139330f31e65ffa79760d42bf2c4b901a521b42ef626d93a46907e615c5abd5b",
+        "kind": "semantic_revision",
+        "revision_digest": "sha256:87d97fa7e714dda17711568fc9e99b650824be2eb190d012177f450420d25e03",
+        "schema_version": 1,
+        "scope": {
+          "project_id": "graph-store",
+          "tenant_id": "synthetic"
+        }
+      },
+      "elapsed_ms": 564,
+      "reserved_usage": {
+        "attempts": 1,
+        "cost_microunits": 100000,
+        "tokens": 10000
+      },
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 561
+      },
+      "expected_relevant": true,
+      "observed_relevant": true,
+      "matched": true,
+      "confidence": 0.93,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 287
+    },
+    {
+      "id": "own-unrelated",
+      "branch": "A",
+      "status": "decision",
+      "reason_code": "jev_direct_negative",
+      "provider_sends": 1,
+      "attempts": 1,
+      "input_hash": "5def122b019bb5a7ceedb260af73cdac618f81804de87f0a5b3b29684a7c00bc",
+      "result_digest": "sha256:a8e30251b36824f14ce0f8dc44e4d44d81780968e1884384dbaa3603e75f0600",
+      "selection_digest": "sha256:3d7b0fd65cb5b5936e66a9aaddceb331e160bb29c3b7ac5fd0474a796a38626e",
+      "selected_ref": {
+        "entity_id": "typed-context-target",
+        "entity_kind": "entity",
+        "generation_id": "exploration-generation/139330f31e65ffa79760d42bf2c4b901a521b42ef626d93a46907e615c5abd5b",
+        "kind": "semantic_revision",
+        "revision_digest": "sha256:87d97fa7e714dda17711568fc9e99b650824be2eb190d012177f450420d25e03",
+        "schema_version": 1,
+        "scope": {
+          "project_id": "graph-store",
+          "tenant_id": "synthetic"
+        }
+      },
+      "elapsed_ms": 582,
+      "reserved_usage": {
+        "attempts": 1,
+        "cost_microunits": 100000,
+        "tokens": 10000
+      },
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 557
+      },
+      "expected_relevant": false,
+      "observed_relevant": false,
+      "matched": true,
+      "confidence": 0.98,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 263
+    },
+    {
+      "id": "adopted-after-source-supersession",
+      "branch": "B",
+      "status": "decision",
+      "reason_code": "jev_direct_positive",
+      "provider_sends": 1,
+      "attempts": 1,
+      "input_hash": "5595aae13906bcec3882d796fc2961eb2d1e8709c15432db3d88975561c22067",
+      "result_digest": "sha256:b61a98d76f65b384bb1236ae3f45555ba1775c4de447edf87248dbbdf4f80179",
+      "selection_digest": "sha256:d48fca8a1c4707af210d54fe731ef51c89b252a6932f9b2e3f515cc94adea380",
+      "selected_ref": {
+        "entity_id": "adopted-item/23182b81d7fff63a829168cf2a9c650623749aef3682eededb8770c3ab2ee4b9",
+        "entity_kind": "entity",
+        "generation_id": "exploration-generation/63d3e36356617de7afaff6b1e179407a6c80e7ae673c3f36fb62390cb5a35dc7",
+        "kind": "semantic_revision",
+        "revision_digest": "sha256:64a4c2ccdb16db9ecbe9a9a2f9263b98c752d19d7ce35ee2851654195cb8ed1b",
+        "schema_version": 1,
+        "scope": {
+          "project_id": "graph-store",
+          "tenant_id": "synthetic"
+        }
+      },
+      "elapsed_ms": 447,
+      "reserved_usage": {
+        "attempts": 1,
+        "cost_microunits": 100000,
+        "tokens": 10000
+      },
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 564
+      },
+      "expected_relevant": true,
+      "observed_relevant": true,
+      "matched": true,
+      "confidence": 0.87,
+      "model": "jev-1.13.0",
+      "model_latency_ms": 159
+    },
+    {
+      "id": "inflight-source-revocation",
+      "branch": "B",
+      "status": "refused",
+      "reason_code": "stale_invalidation_fence",
+      "provider_sends": 1,
+      "attempts": 1,
+      "input_hash": "ec432206eedb47608b5c55bc23901af8481154068714973d536b956d5e288c71",
+      "result_digest": "sha256:efe9a42b17dadb9e7d5cc6f1694a29d68c2de21dd6d0ba6cb79d27237e243477",
+      "selection_digest": "sha256:d48fca8a1c4707af210d54fe731ef51c89b252a6932f9b2e3f515cc94adea380",
+      "selected_ref": {
+        "entity_id": "adopted-item/23182b81d7fff63a829168cf2a9c650623749aef3682eededb8770c3ab2ee4b9",
+        "entity_kind": "entity",
+        "generation_id": "exploration-generation/63d3e36356617de7afaff6b1e179407a6c80e7ae673c3f36fb62390cb5a35dc7",
+        "kind": "semantic_revision",
+        "revision_digest": "sha256:64a4c2ccdb16db9ecbe9a9a2f9263b98c752d19d7ce35ee2851654195cb8ed1b",
+        "schema_version": 1,
+        "scope": {
+          "project_id": "graph-store",
+          "tenant_id": "synthetic"
+        }
+      },
+      "elapsed_ms": 294,
+      "reserved_usage": {
+        "attempts": 1,
+        "cost_microunits": 100000,
+        "tokens": 10000
+      },
+      "observed_usage": {
+        "cost_microunits": null,
+        "tokens": 561
+      },
+      "fetch_boundary_entered": true,
+      "provider_completed": true,
+      "completed_response_discarded": true,
+      "no_cached_success": true,
+      "evaluation_effects": false
+    }
+  ]
+}

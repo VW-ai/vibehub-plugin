@@ -3,6 +3,9 @@ import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { LocalExplorationStore } from './exploration-store.mjs';
+import { LocalContextStore } from './context-store.mjs';
+import { ContextInputs } from './context-inputs.mjs';
+import { readContextSelection } from './context-reader.mjs';
 import { ExplorationInputs } from './exploration-inputs.mjs';
 import { ExplorationCanonical } from './exploration-canonical.mjs';
 import { GraphStorage } from './graph-storage.mjs';
@@ -13,12 +16,14 @@ import { scopedReference } from '../core/service-access.mjs';
 import { effectiveEventAccess, eventObservationKey, verifyEventPayload } from '../core/event-provenance.mjs';
 import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
 import { exactRevisionAddress, validateSemanticAddress } from '../core/working-graph.mjs';
+import { validateContextContent1 } from '../core/context-profile.mjs';
 
 const ACTIONS = ['judge:execute', 'model:dispatch', 'source:read', 'store:read', 'store:write', 'ingress:read',
   'graph:read', 'exploration:read', 'source:invalidation:read', 'project:inspect', 'activation:admit'];
 const PROVIDERS = ['typesafe', 'vercel', 'openrouter'];
 const SENSITIVITY = ['normal', 'sensitive', 'restricted'];
 const MAPPED = ['INTERNAL', 'CONFIDENTIAL', 'RESTRICTED'];
+const CONTEXT_PROFILE = Object.freeze({ id: 'runtime-context', version: 1 });
 const fail = code => Object.assign(new Error(`Judge inputs: ${code}`), { code });
 const check = (ok, code = 'invalid_judge_input') => { if (!ok) throw fail(code); };
 const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };
@@ -30,7 +35,7 @@ const summary = value => Object.fromEntries(['pin', 'status', 'configured_record
 
 /** Fixed local composition. Its private proof, never wire JSON, authorizes each send/result. */
 export class JudgeInputs {
-  #store; #authority; #config; #explorations; #metadata; #canonical; #graph; #ingress; #activation; #feed; #proofs = new WeakMap();
+  #store; #authority; #config; #explorations; #contexts; #contextInputs; #metadata; #canonical; #graph; #ingress; #activation; #feed; #proofs = new WeakMap();
   constructor({ store, authority, canonical_reader, configuration }) {
     check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
     this.#config = copy(configuration);
@@ -41,6 +46,8 @@ export class JudgeInputs {
     this.#canonical = new ExplorationCanonical({ store, authority, canonical_reader });
     this.#metadata = new ExplorationInputs({ store, authority, config_digest: this.#canonical.config_digest });
     this.#explorations = new LocalExplorationStore({ store, authority, canonical_reader });
+    this.#contexts = new LocalContextStore({ store, authority, canonical_reader });
+    this.#contextInputs = new ContextInputs({ authority, canonical: this.#canonical });
     this.#ingress = new DurableIngress({ store, authority }); this.#feed = new SourceInvalidationFeed({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
   }
@@ -128,11 +135,27 @@ export class JudgeInputs {
   }
   #assert(tx, context, proof, provider = undefined) {
     check(context === proof.context && graphEqual(this.grant(context), proof.grant), 'judge_unauthorized');
+    if (proof.contextTargets) this.#contextInputs.grant(context);
     check(graphEqual(this.#endpoints(tx, context, proof.request), proof.endpoints), 'judge_selection_changed');
     this.#canonical.assert(tx, context, proof.origin); this.#canonical.assert(tx, context, proof.project);
     const storage = new GraphStorage({ view: tx, scope: this.#config.scope, generation_id: proof.request.at.generation_id });
     for (const revision of proof.revisions) check(graphEqual(storage.fact({ at: proof.request.at, kind: 'revision',
       key: [revision.revision_digest] }).value, revision), 'judge_target_invalid');
+    for (const target of proof.contextTargets ?? []) {
+      const selected = readContextSelection({ view: tx, context, inputs: this.#graph, explorations: this.#metadata,
+        config_digest: this.#canonical.config_digest, request: target.request, kind: 'resolve',
+        read_pins: { project_selection: proof.endpoints.project, source_fence: proof.request.expected_source_fence } });
+      this.#contextTarget(selected.local, target.item.ref);
+      check(selected.revisions.length === 1 && graphEqual(selected.revisions[0], target.revision), 'judge_target_invalid');
+      const applicability = this.#contextInputs.assert(tx, context, target.proof,
+        { assertion: target.revision.assertion, provenance: target.revision.provenance });
+      const item = { ...selected.local.item, applicability: { ...applicability,
+        scope: proof.grant.scope, exploration_id: proof.request.exploration_id } };
+      const { source_heads, ...selection } = selected.selection;
+      check(graphEqual(item, target.item) && graphEqual(selection, target.selection)
+        && source_heads.length === 1 && graphEqual(source_heads[0], {
+          generation_id: proof.request.at.generation_id, head: proof.request.at }), 'judge_selection_changed');
+    }
     const sources = proof.supports.map(support => {
       const current = this.#support(context, support.event, proof.grant);
       check(graphEqual(current, support), 'judge_source_changed'); return current.source;
@@ -145,6 +168,15 @@ export class JudgeInputs {
     }
     check(graphEqual(this.#endpoints(tx, context, proof.request), proof.endpoints), 'judge_selection_changed');
     check(graphEqual(this.grant(context), proof.grant), 'judge_unauthorized');
+    if (proof.contextTargets) this.#contextInputs.grant(context);
+  }
+  #contextTarget(local, ref) {
+    const item = local.item, allowed = ['candidate', 'validated', 'resolved'];
+    check(local.status === 'resolved' && item && graphEqual(item.ref, ref)
+      && allowed.includes(item.assertion_status) && allowed.includes(item.projection.status)
+      && item.projection.quarantined === false && item.projection.competing.length === 0
+      && graphEqual(item.projection.head, ref) && item.historical_role === 'head', 'judge_target_invalid');
+    return validateContextContent1({ semantic_type: 'context', data: item.meaning });
   }
   prepare(context, request, { family, question } = {}) {
     return this.#call(() => {
@@ -197,6 +229,82 @@ export class JudgeInputs {
       const prepared = copy({ input, input_hash: judgeInputHash(input), selection, target_refs: r.target_refs, target_map,
         event_ref: { kind: 'event_ref', observation_key: eventObservationKey(event), event_digest: graphHash(event) },
         selection_ref: { kind: 'signal_ref', digest: graphHash(r) } });
+      this.#proofs.set(prepared, proof); return prepared;
+    });
+  }
+  prepareContext(context, request, { family, question } = {}) {
+    return this.#call(() => {
+      const grant = this.grant(context); this.#contextInputs.grant(context);
+      const r = this.#request(request), q = graphInput(question);
+      graphFields(q, ['family', 'text']);
+      check(family === 'context_relevance' && q.family === family, 'judge_target_invalid'); bytes(q.text, 4096);
+      check(r.target_refs.length <= 8, 'judge_input_capacity');
+      const endpoints = this.#view(context, tx => this.#endpoints(tx, context, r));
+      const selected = this.#explorations.getSelection(context, { exploration_id: r.exploration_id, at: r.at });
+      const origin = this.#canonical.prepare(context, endpoints.exploration.origin.shared_base);
+      const project = this.#canonical.prepare(context, endpoints.project.pin, { requireCurrent: endpoints.project.pin !== null });
+      check(endpoints.exploration.origin.shared_base === null || ['current', 'historical'].includes(this.#canonical.status(origin)), 'canonical_source_unavailable');
+      const contextTargets = [], stateRefs = [], target_map = [], events = new Map(), ticketRefs = new Map(), ticketPins = new Set();
+      const event = this.#ingress.readEvent(context, { event_id: r.event_id }).event;
+      const addEvent = value => {
+        const key = eventObservationKey(value), prior = events.get(key);
+        check(!prior || graphEqual(prior, value), 'judge_source_changed'); events.set(key, value);
+        check(events.size <= 32, 'judge_input_capacity');
+      };
+      addEvent(event);
+      // Inspect at most eight immutable shapes before canonical preparation so
+      // a ninth distinct Ticket selection never starts another selected read.
+      // These private bytes convey no authorization; every entry still passes
+      // the public Context reader and the fixed admitted proof below.
+      const inventory = this.#view(context, tx => {
+        const storage = new GraphStorage({ view: tx, scope: grant.scope, generation_id: r.at.generation_id });
+        return r.target_refs.map(ref => {
+          const revision = storage.fact({ at: r.at, kind: 'revision', key: [ref.revision_digest] }).value;
+          check(revision && graphEqual(exactRevisionAddress(revision), ref)
+            && revision.assertion.content.semantic_type === 'context'
+            && revision.assertion.content.data?.kind === 'runtime_context', 'judge_target_invalid');
+          return { ref, revision, content: validateContextContent1(revision.assertion.content) };
+        });
+      });
+      for (const { content } of inventory) {
+        for (const ticket of content.data.applicability.tickets.refs) {
+          ticketRefs.set(canonical(ticket), ticket); ticketPins.add(canonical([ticket.at, ticket.address]));
+          check(ticketPins.size <= 8, 'judge_input_capacity');
+        }
+      }
+      for (const { ref, revision, content } of inventory) {
+        const targetRequest = { exploration_id: r.exploration_id, at: r.at, address: ref, mode: 'current' };
+        const visible = this.#contexts.resolve(context, targetRequest);
+        check(graphEqual(this.#contextTarget(visible.local, ref), content), 'judge_target_invalid');
+        const text = `${content.data.role}\n${content.data.summary}\n\n${content.data.detail}`; bytes(text, 4096);
+        const id = `target-${graphHash(ref).slice(7)}`;
+        stateRefs.push({ id, type: 'context', text }); target_map.push({ id, ref });
+        contextTargets.push({ request: targetRequest, item: visible.local.item, selection: visible.selection, revision, content });
+        [...revision.provenance.events, ...revision.provenance.access_events].forEach(addEvent);
+      }
+      const batch = [...ticketRefs.values()];
+      for (const target of contextTargets) target.proof = this.#contextInputs.prepare(context, target.content, batch);
+      const supports = [...events.values()].sort((a, b) => eventObservationKey(a).localeCompare(eventObservationKey(b))).map(e => this.#support(context, e, grant));
+      check(new Set(supports.map(s => s.registration.registration_id)).size <= 32, 'judge_input_capacity');
+      const snapshot = this.#snapshot(context, event), revisions = contextTargets.map(target => target.revision);
+      const proof = { context, grant, request: r, endpoints, origin, project, supports, revisions, snapshot, event, contextTargets };
+      this.#view(context, tx => this.#assert(tx, context, proof));
+      const input = { event: { type: event.event_type, timestamp: event.observed_at, payload: { text: snapshot.text } }, stateRefs, question: q };
+      check(Buffer.byteLength(JSON.stringify(input)) <= 65536, 'judge_input_capacity');
+      const registrations = [...new Map(supports.map(s => [s.registration.registration_id,
+        { registration_id: s.registration.registration_id, version: s.registration.version }])).values()].sort((a, b) => a.registration_id.localeCompare(b.registration_id));
+      const selection = { scope: grant.scope, epoch: r.epoch, exploration_id: r.exploration_id, generation_id: r.at.generation_id,
+        execution: r.execution, execution_workspace_id: r.execution_workspace_id, binding_version: r.expected_binding_version,
+        catalog_version: r.expected_catalog_version, project_selection_version: r.expected_project_selection_version,
+        graph_revision: r.at, source_fence: r.expected_source_fence, registrations,
+        shared: { origin_base: summary(selected.shared.origin_base), current_project: summary(selected.shared.current_project), coverage: selected.shared.coverage },
+        governance_evaluated: false, shared_material_sent: false, input_profile: CONTEXT_PROFILE,
+        context_targets: contextTargets.map(({ item }) => ({ ref: item.ref, assertion_status: item.assertion_status,
+          projection_status: item.projection.status, applicability: item.applicability,
+          publication_origin_ref: item.publication.operation_origin_ref })) };
+      const prepared = copy({ input, input_hash: judgeInputHash(input), selection, target_refs: r.target_refs, target_map,
+        event_ref: { kind: 'event_ref', observation_key: eventObservationKey(event), event_digest: graphHash(event) },
+        selection_ref: { kind: 'signal_ref', digest: graphHash([CONTEXT_PROFILE, r]) } });
       this.#proofs.set(prepared, proof); return prepared;
     });
   }

@@ -23,4 +23,9 @@ const operation = {
 // This descriptor identifies the selected-input v1 operation contract, not a
 // claim that the legacy full-snapshot Policy executor supports model nodes.
 export const JUDGE_NODE_OPERATION = freeze({ ...operation, implementation_hash: `sha256:${fingerprint(['selected-judge-node-v1', operation])}` });
+const contextOperation = { ...operation, id: 'semantic-context-judge', config_schema: {
+  ...configuration, properties: { ...configuration.properties, family: { type: 'string', enum: ['context_relevance'] } },
+} };
+export const CONTEXT_JUDGE_NODE_OPERATION = freeze({ ...contextOperation,
+  implementation_hash: `sha256:${fingerprint(['selected-context-judge-node-v1', contextOperation])}` });
 export const JUDGE_DECISION_SCHEMA = freeze({ id: 'semantic-judge-boolean-targets', version: 1 });
