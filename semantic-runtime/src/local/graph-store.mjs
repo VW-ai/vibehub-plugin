@@ -1,0 +1,303 @@
+import { DomainStore } from './domain-store.mjs';
+import { LocalCredentialAuthority } from './auth.mjs';
+import { ProjectActivation } from './project-activation.mjs';
+import { GraphStorage, checkGraphFormat, WORKING_GRAPH_NAMESPACE } from './graph-storage.mjs';
+import { GraphInputs, GRAPH_NS, graphFail, graphAssert, graphHash, graphKey, graphEqual, graphId,
+  graphUint, graphInput, graphFields, graphErrorCode } from './graph-inputs.mjs';
+import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph,
+  validateGraphCommitAddress2, validateGraphEffectPlan2, validateGraphMutation2 } from '../core/incremental-graph.mjs';
+import { eventObservationKey, sourceObjectKey } from '../core/event-provenance.mjs';
+import { validateSourceCursor } from '../core/causal-ordering.mjs';
+
+export { WORKING_GRAPH_NAMESPACE };
+export const GRAPH_ERROR_CODES = Object.freeze(['invalid_graph_input', 'graph_capacity', 'graph_unauthorized', 'graph_access_denied',
+  'graph_corrupt', 'graph_publisher_unavailable', 'graph_idempotency_conflict', 'graph_unavailable', 'graph_plan_rejected',
+  'graph_storage_invalid', 'graph_storage_corrupt', 'graph_storage_conflict', 'graph_maintenance', 'unsupported_graph_format',
+  'project_disabled', 'stale_activation_epoch', 'activation_unauthorized', 'invalid_activation_input', 'invalid_activation_state',
+  'project_not_enrolled', 'invalid_execution_membership', 'project_unauthorized', 'ingress_unauthorized', 'missing_event',
+  'corrupt_ingress_state', 'unknown_source', 'store_closed', 'store_busy', 'store_unavailable', 'store_unauthorized',
+  'invalid_store_input', 'unknown_namespace', 'cas_conflict', 'duplicate_identity', 'async_transaction', 'stale_transaction',
+  'nested_transaction', 'migration_required', 'incompatible_store', 'store_page_too_large']);
+const CODES = new Set(GRAPH_ERROR_CODES);
+const scopeOf = g => ({ tenant_id: g.tenant_id, project_id: g.project_id });
+const commandKey = (g, generation, key) => graphKey('command', [1, scopeOf(g), g.principal_id, generation, key]);
+const receiptKey = (g, generation, key) => graphKey('receipt', [1, scopeOf(g), g.principal_id, generation, key]);
+const descriptor = (kind, value) => ({ id: graphKey(kind, value), kind, value });
+const planner = fn => { try { return fn(); } catch (error) { if (CODES.has(graphErrorCode(error))) throw error; throw graphFail('graph_plan_rejected'); } };
+
+/** Local authenticated graph service. Every database operation remains synchronous and scoped. */
+export class LocalGraphStore {
+  #store; #inputs; #activation;
+  constructor({ store, authority }) {
+    graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    this.#store = store; this.#inputs = new GraphInputs({ store, authority });
+    this.#activation = new ProjectActivation({ store, authority });
+  }
+  #call(fn) {
+    try { return graphInput(fn()); } catch (error) {
+      const code = graphErrorCode(error); throw graphFail(CODES.has(code) ? code : 'invalid_graph_input');
+    }
+  }
+  #view(context, action, write, operation, epoch, reconcile) {
+    let domainCode;
+    const run = tx => {
+      try {
+        this.#inputs.grant(context, action, { write, owner: write });
+        if (action === 'graph:read' || action === 'graph:write') this.#inputs.grant(context, 'ingress:read');
+        const value = operation(tx);
+        this.#inputs.grant(context, action, { write, owner: write });
+        if (action === 'graph:read' || action === 'graph:write') this.#inputs.grant(context, 'ingress:read');
+        // Validate the result before commit; output capacity is atomic too.
+        return graphInput(value);
+      } catch (error) { const code = graphErrorCode(error); if (CODES.has(code)) domainCode = code; throw error; }
+    };
+    try {
+      if (!write) return this.#store.readSnapshot(context, run);
+      const admitted = this.#activation.withAdmission(context, { epoch, stage: 'result' }, run);
+      if (!admitted.admitted) {
+        // Another process may have committed this exact request after the first read,
+        // then disabled capture before this admission obtained the writer lock.
+        const prior = reconcile ? this.#view(context, action, false, reconcile) : null;
+        if (prior) return prior;
+        throw graphFail(admitted.reason);
+      }
+      return admitted.value;
+    } catch (error) { if (domainCode) throw graphFail(domainCode); throw error; }
+  }
+  #scope(context, action, options) { return scopeOf(this.#inputs.grant(context, action, options)); }
+  #storage(tx, context, generation, action) {
+    return new GraphStorage({ view: tx, scope: this.#scope(context, action), generation_id: generation });
+  }
+  #selected(context, tx, storage, { generation_id, write = false, catalogFact = null, epoch = null, operation = null }) {
+    const head = storage.head();
+    if (!catalogFact) {
+      graphAssert(head, 'graph_unavailable');
+      const c = storage.fact({ at: head.value.head, kind: 'commit', key: [head.value.head.commit_digest] }).value;
+      graphAssert(c, 'graph_corrupt'); catalogFact = this.#inputs.catalogFromPin(context, c.catalog_pin);
+      graphAssert(catalogFact, 'graph_corrupt');
+    }
+    const action = write ? 'graph:write' : 'graph:read', initial = this.#inputs.grant(context, action);
+    const access_view = graphKey('access-view', [scopeOf(initial), generation_id, head?.value.head ?? null, head?.version ?? null, initial.principal_id]);
+    const facts = [], selectedEvents = new Map(), catalogs = new Map([[graphHash(catalogFact.pin), catalogFact]]), authorityRefs = [];
+    const stage = items => { facts.push(...items); };
+    const current = () => {
+      const grant = this.#inputs.grant(context, action), actual = storage.head();
+      return { scope: scopeOf(grant), generation_id, head: actual?.value.head ?? null, head_version: actual?.version ?? null,
+        catalog_pin: catalogFact.pin, access_view, principal_id: grant.principal_id };
+    };
+    const envelope = (query, row) => ({ ...query, current_head: head?.value.head ?? null, access_view, complete: true, ...row });
+    const port = {
+      current,
+      read: query => {
+        if (query.kind === 'catalog') {
+          const pin = { revision_id: query.key[0], digest: query.key[1] };
+          const value = catalogs.get(graphHash(pin)) ?? this.#inputs.catalogFromPin(context, pin);
+          return envelope(query, { version: value ? 1 : null, value, origin: null });
+        }
+        if (query.kind === 'accepted_event') {
+          let selected = selectedEvents.get(query.key[0]);
+          if (!selected) {
+            selected = this.#inputs.acceptedEvent(context, query.key[0]);
+            graphAssert(write || selected.retained, 'graph_corrupt'); selectedEvents.set(query.key[0], selected);
+            catalogs.set(graphHash(selected.catalogFact.pin), selected.catalogFact); if (write) stage(selected.facts);
+          }
+          return envelope(query, { version: 1, value: selected.fact, origin: null });
+        }
+        return envelope(query, storage.fact(query));
+      },
+      page: query => ({ at: query.at, collection: query.collection, after: query.after, current_head: head?.value.head ?? null, access_view, ...storage.page(query) }),
+      authorizeLifecycle: query => {
+        graphAssert(write && operation?.kind === 'source_access' && graphHash(operation.event) === query.event_digest, 'graph_unauthorized');
+        const selected = this.#inputs.lifecycle(context, { ...query, current_head: head?.value.head ?? null, access_view, event: operation.event, epoch });
+        stage(selected.facts); authorityRefs.push(selected.fact.authority_ref); return selected.fact;
+      }
+    };
+    return { port, facts, selectedEvents, authorityRefs };
+  }
+  #receiptAllowed(context, tx, receipt, action = 'graph:read') {
+    const g = this.#inputs.grant(context, action);
+    graphAssert(receipt.actor === g.principal_id && receipt.actor_kind === g.kind && graphEqual(receipt.scope, scopeOf(g)), 'graph_access_denied');
+    const events = [];
+    for (const ref of receipt.source_refs) {
+      const source = tx.getSource(GRAPH_NS, ref);
+      graphAssert(source?.kind === 'graph-accepted-event', 'graph_corrupt');
+      const current = this.#inputs.acceptedEvent(context, source.value.observation);
+      graphAssert(current.retained && graphEqual(current.receipt, source.value.receipt), 'graph_corrupt'); events.push(current.fact.event);
+    }
+    events.push(...this.#coverageAllowed(context, tx, receipt.coverage_pins));
+    const storage = this.#storage(tx, context, receipt.generation_id, action), head = storage.head();
+    graphAssert(head, 'graph_corrupt');
+    const capturedAccess = new Set(events.filter(e => ['SOURCE_ACCESS_CHANGED', 'SOURCE_TOMBSTONE'].includes(e.event_type)).map(graphHash));
+    const objects = new Map(events.flatMap(e => e.provenance.source_objects.map(s => [sourceObjectKey(s.object), s.object])));
+    for (const [key, object] of objects) {
+      const current = storage.fact({ at: head.value.head, kind: 'source_object', key: [key] }).value;
+      if (current) graphAssert(graphEqual(current.object, object) && current.tombstone === null, 'graph_access_denied');
+      const access = storage.fact({ at: head.value.head, kind: 'source_access', key: [key] }).value;
+      if (!access) continue;
+      graphAssert(graphEqual(access.object, object), 'graph_corrupt');
+      for (const update of access.updates) {
+        const admitted = this.#inputs.acceptedEvent(context, eventObservationKey(update.event));
+        graphAssert(graphEqual(admitted.fact.event, update.event) && admitted.fact.event_digest === update.event_digest, 'graph_corrupt');
+        graphAssert(update.access_state === 'active' && capturedAccess.has(update.event_digest), 'graph_access_denied');
+      }
+    }
+  }
+  #coverageAllowed(context, tx, pins) {
+    const events = [];
+    for (const pin of pins) {
+      const source = tx.getSource(GRAPH_NS, pin.snapshot_ref); graphAssert(source?.kind === 'graph-coverage'
+        && graphKey('graph-coverage', source.value) === pin.snapshot_ref && graphEqual(source.value.selector, pin.selector)
+        && source.value.registration_version === pin.registration_version && source.value.cursor_version === pin.cursor_version, 'graph_corrupt');
+      try { validateSourceCursor(source.value.cursor); } catch { throw graphFail('graph_corrupt'); }
+      // Every retained cursor entry is a selected original input, even when not in the semantic closure.
+      for (const entry of source.value.cursor.entries) {
+        const admitted = this.#inputs.acceptedEvent(context, JSON.stringify([1, 'observation', entry.event_ref.tenant_id, entry.event_ref.event_id]));
+        graphAssert(admitted.fact.event_digest === entry.first_event_digest, 'graph_corrupt'); events.push(admitted.fact.event);
+      }
+    }
+    return events;
+  }
+  #prior(context, tx, generation, idempotency, request = null) {
+    const action = request ? 'graph:write' : 'graph:read', grant = this.#inputs.grant(context, action), key = commandKey(grant, generation, idempotency);
+    const row = tx.getSource(GRAPH_NS, key); if (!row) return null;
+    graphAssert(row.kind === 'graph-command' && row.value.generation_id === generation && row.value.idempotency_key === idempotency
+      && row.value.receipt_ref === receiptKey(grant, generation, idempotency), 'graph_corrupt');
+    if (request) graphAssert(graphEqual(row.value.request, request), 'graph_idempotency_conflict');
+    const stored = tx.getSource(GRAPH_NS, row.value.receipt_ref);
+    graphAssert(stored?.kind === 'graph-receipt' && graphHash(stored.value) === row.value.receipt_digest
+      && stored.value.generation_id === generation && stored.value.idempotency_key === idempotency
+      && stored.value.raw_request_digest === graphHash(row.value.request) && stored.value.command_digest === graphHash(row.value.command)
+      && graphEqual(stored.value.result, row.value.result), 'graph_corrupt');
+    this.#receiptAllowed(context, tx, stored.value, action);
+    return { status: 'duplicate', receipt: stored.value, ...row.value.result };
+  }
+  registerPublisherRun(context, options) {
+    return this.#call(() => {
+      const input = graphInput(options); graphFields(input, ['epoch', 'run_key']); graphUint(input.epoch); graphId(input.run_key);
+      this.#inputs.grant(context, 'graph:publish', { write: true, owner: true });
+      const prior = this.#view(context, 'graph:publish', false, tx => { checkGraphFormat(tx); return this.#inputs.registration(context, input); });
+      if (prior) return prior;
+      return this.#view(context, 'graph:publish', true, tx => { checkGraphFormat(tx, { initialize: true }); return this.#inputs.registerPublisher(tx, context, input); }, input.epoch, tx => { checkGraphFormat(tx); return this.#inputs.registration(context, input); });
+    });
+  }
+  #save(context, tx, request, command, planned, selected, publisher, coverage, generation) {
+    const grant = this.#inputs.grant(context, 'graph:write', { write: true, owner: true }), scope = scopeOf(grant), plan = planned.plan;
+    validateGraphEffectPlan2(plan);
+    const facts = [...publisher.facts, ...coverage.facts, ...selected.facts];
+    this.#inputs.retain(tx, context, facts);
+    const audit = descriptor('graph-audit', { ...plan.audit, actor: grant.principal_id, actor_kind: grant.kind, epoch: request.epoch, publisher_ref: request.publisher_ref });
+    tx.appendSource(GRAPH_NS, audit.id, audit.kind, audit.value);
+    const source_refs = [...new Set(facts.filter(f => f.kind === 'graph-accepted-event').map(f => f.id))].sort();
+    const result = Object.fromEntries(['revision', 'conflict', 'access_revision'].filter(k => Object.hasOwn(planned, k)).map(k => [k, planned[k]]));
+    const receipt = { schema_version: 1, kind: 'graph_receipt', scope, generation_id: generation, actor: grant.principal_id, actor_kind: grant.kind,
+      idempotency_key: request.idempotency_key, raw_request_digest: graphHash(request), command_digest: graphHash(command), plan_digest: plan.plan_digest,
+      publisher_ref: request.publisher_ref, epoch: request.epoch, catalog_pin: publisher.catalogFact.pin, previous_graph: plan.expected_graph, next_graph: plan.next_graph,
+      source_refs, coverage_pins: coverage.pins, authority_refs: [...new Set(selected.authorityRefs)], audit_ref: audit.id,
+      record_refs: plan.commit.records, result };
+    const rKey = receiptKey(grant, generation, request.idempotency_key), cKey = commandKey(grant, generation, request.idempotency_key);
+    tx.appendSource(GRAPH_NS, rKey, 'graph-receipt', receipt);
+    tx.appendSource(GRAPH_NS, graphKey('commit-receipt', plan.next_graph), 'graph-commit-receipt', { next_graph: plan.next_graph, receipt_ref: rKey });
+    tx.appendSource(GRAPH_NS, cKey, 'graph-command', { schema_version: 1, generation_id: generation, idempotency_key: request.idempotency_key,
+      request, command, receipt_ref: rKey, receipt_digest: graphHash(receipt), result });
+    tx.enqueue(GRAPH_NS, graphKey('changed', [scope, generation, plan.next_graph]), plan.outbox);
+    return { status: 'applied', receipt, ...result };
+  }
+  initialize(context, options) {
+    return this.#call(() => {
+      const request = graphInput(options); graphFields(request, ['generation_id', 'epoch', 'idempotency_key', 'publisher_ref', 'coverage']);
+      graphId(request.generation_id); graphId(request.idempotency_key); graphId(request.publisher_ref); graphUint(request.epoch);
+      graphAssert(Array.isArray(request.coverage)); this.#inputs.grant(context, 'graph:write', { write: true, owner: true });
+      const prior = this.#view(context, 'graph:write', false, tx => { checkGraphFormat(tx); return this.#prior(context, tx, request.generation_id, request.idempotency_key, request); });
+      if (prior) return prior;
+      return this.#view(context, 'graph:write', true, tx => {
+        checkGraphFormat(tx, { initialize: true }); const duplicate = this.#prior(context, tx, request.generation_id, request.idempotency_key, request); if (duplicate) return duplicate;
+        const storage = this.#storage(tx, context, request.generation_id, 'graph:write'); graphAssert(!storage.head(), 'graph_storage_conflict');
+        const publisher = this.#inputs.publisher(context, request.publisher_ref, { epoch: request.epoch });
+        const coverage = this.#inputs.coverage(context, request.coverage, null);
+        const selected = this.#selected(context, tx, storage, { generation_id: request.generation_id, write: true, catalogFact: publisher.catalogFact, epoch: request.epoch });
+        const command = { scope: this.#scope(context, 'graph:write'), generation_id: request.generation_id, catalog_pin: publisher.catalogFact.pin, watermarks: coverage.watermarks };
+        const planned = planner(() => planGraphGenesis(selected.port, command)); storage.applyPlan(planned.plan);
+        return this.#save(context, tx, request, command, planned, selected, publisher, coverage, request.generation_id);
+      }, request.epoch, tx => { checkGraphFormat(tx); return this.#prior(context, tx, request.generation_id, request.idempotency_key, request); });
+    });
+  }
+  mutate(context, options) {
+    return this.#call(() => {
+      const request = graphInput(options); graphFields(request, ['epoch', 'idempotency_key', 'publisher_ref', 'expected_graph', 'operation', 'coverage']);
+      graphUint(request.epoch); graphId(request.idempotency_key); graphId(request.publisher_ref); validateGraphCommitAddress2(request.expected_graph);
+      graphAssert(request.operation && !Object.hasOwn(request.operation, 'watermarks'));
+      graphAssert(request.operation.kind === 'assert' ? request.coverage === null || Array.isArray(request.coverage) : request.coverage === null);
+      const g = this.#inputs.grant(context, 'graph:write', { write: true, owner: true }); graphAssert(graphEqual(request.expected_graph.scope, scopeOf(g)));
+      const generation = request.expected_graph.generation_id;
+      const prior = this.#view(context, 'graph:write', false, tx => { checkGraphFormat(tx); return this.#prior(context, tx, generation, request.idempotency_key, request); });
+      if (prior) return prior;
+      return this.#view(context, 'graph:write', true, tx => {
+        checkGraphFormat(tx); const duplicate = this.#prior(context, tx, generation, request.idempotency_key, request); if (duplicate) return duplicate;
+        const storage = this.#storage(tx, context, generation, 'graph:write'), head = storage.head(); graphAssert(head, 'graph_unavailable');
+        const current = storage.fact({ at: head.value.head, kind: 'commit', key: [head.value.head.commit_digest] }).value;
+        graphAssert(current, 'graph_corrupt');
+        // Validate the wire body even for a stale proposal. This retained pin is used
+        // only for syntax; a new command below obtains its actual current publisher catalog.
+        planner(() => validateGraphMutation2({ schema_version: 2, kind: 'graph_mutation', expected_graph: request.expected_graph, catalog_pin: current.catalog_pin, operation: request.operation }));
+        if (!graphEqual(head.value.head, request.expected_graph)) return { status: 'graph_revision_mismatch', graph_revision: head.value.head, proposal: request, effects: [] };
+        graphAssert(head.value.maintenance === null, 'graph_maintenance');
+        const publisher = this.#inputs.publisher(context, request.publisher_ref, { epoch: request.epoch });
+        if (['assert', 'resolve'].includes(request.operation.kind)) graphAssert(request.operation.assertion?.execution_id === publisher.run.execution_id, 'graph_publisher_unavailable');
+        const coverage = this.#inputs.coverage(context, request.coverage, current.watermarks);
+        if (request.coverage === null) {
+          const link = tx.getSource(GRAPH_NS, graphKey('commit-receipt', head.value.head));
+          graphAssert(link?.kind === 'graph-commit-receipt' && graphEqual(link.value.next_graph, head.value.head), 'graph_corrupt');
+          const previous = tx.getSource(GRAPH_NS, link.value.receipt_ref); graphAssert(previous?.kind === 'graph-receipt', 'graph_corrupt');
+          coverage.pins = previous.value.coverage_pins;
+          // Inherited coverage preserves old capture facts, with current access checked anew.
+          this.#coverageAllowed(context, tx, coverage.pins);
+        }
+        const operation = request.coverage === null ? request.operation : { ...request.operation, watermarks: coverage.watermarks };
+        const selected = this.#selected(context, tx, storage, { generation_id: generation, write: true, catalogFact: publisher.catalogFact, epoch: request.epoch, operation });
+        const command = { schema_version: 2, kind: 'graph_mutation', expected_graph: request.expected_graph, catalog_pin: publisher.catalogFact.pin, operation };
+        const planned = planner(() => planGraphMutation(selected.port, command)); graphAssert(planned.status === 'planned', 'graph_storage_conflict');
+        storage.applyPlan(planned.plan); return this.#save(context, tx, request, command, planned, selected, publisher, coverage, generation);
+      }, request.epoch, tx => { checkGraphFormat(tx); return this.#prior(context, tx, generation, request.idempotency_key, request); });
+    });
+  }
+  getHead(context, options) {
+    return this.#call(() => {
+      const input = graphInput(options); graphFields(input, ['generation_id']); graphId(input.generation_id);
+      return this.#view(context, 'graph:read', false, tx => {
+        checkGraphFormat(tx); const head = this.#storage(tx, context, input.generation_id, 'graph:read').head();
+        return { graph_revision: head?.value.head ?? null, maintenance: head?.value.maintenance ? 'building' : null };
+      });
+    });
+  }
+  getReceipt(context, options) {
+    return this.#call(() => {
+      const input = graphInput(options); graphFields(input, ['generation_id', 'idempotency_key']); graphId(input.generation_id); graphId(input.idempotency_key);
+      return this.#view(context, 'graph:read', false, tx => { checkGraphFormat(tx); return this.#prior(context, tx, input.generation_id, input.idempotency_key)?.receipt ?? null; });
+    });
+  }
+  #read(context, options, paging) {
+    const input = graphInput(options); graphFields(input, paging ? ['at', 'collection', 'cursor', 'limit'] : ['at', 'address']); validateGraphCommitAddress2(input.at);
+    return this.#view(context, 'graph:read', false, tx => {
+      checkGraphFormat(tx); graphAssert(graphEqual(input.at.scope, this.#scope(context, 'graph:read')));
+      const storage = this.#storage(tx, context, input.at.generation_id, 'graph:read');
+      const { port } = this.#selected(context, tx, storage, { generation_id: input.at.generation_id });
+      try { return planner(() => paging ? pageIncrementalGraph(port, input) : resolveIncrementalGraph(port, input)); }
+      catch (error) { if (!paging && graphErrorCode(error) === 'graph_access_denied') return { status: 'denied', revision: null }; throw error; }
+    });
+  }
+  resolve(context, options) { return this.#call(() => this.#read(context, options, false)); }
+  page(context, options) { return this.#call(() => this.#read(context, options, true)); }
+  rebuildProjection(context, options) {
+    return this.#call(() => {
+      const input = graphInput(options); graphFields(input, ['generation_id', 'expected_graph', 'epoch', 'cursor', 'limit']);
+      graphId(input.generation_id); graphUint(input.epoch); validateGraphCommitAddress2(input.expected_graph);
+      graphAssert(input.generation_id === input.expected_graph.generation_id && Number.isInteger(input.limit) && input.limit >= 1 && input.limit <= 64);
+      graphAssert(graphEqual(input.expected_graph.scope, this.#scope(context, 'graph:rebuild', { write: true, owner: true })));
+      return this.#view(context, 'graph:rebuild', true, tx => {
+        checkGraphFormat(tx); const storage = this.#storage(tx, context, input.generation_id, 'graph:rebuild');
+        const result = storage.rebuildStep({ expected_graph: input.expected_graph, cursor: input.cursor, limit: input.limit });
+        return { status: result.status, cursor: result.cursor, processed: result.processed, total: result.total, graph_revision: result.head };
+      }, input.epoch);
+    });
+  }
+}

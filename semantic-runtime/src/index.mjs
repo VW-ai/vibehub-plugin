@@ -12,6 +12,7 @@ export { MacOSSecretStore } from './local/macos-secret-store.mjs';
 export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMaterialization, accessDiagnostic } from './core/service-access.mjs';
 export { LOCAL_AUDIENCE, LocalCredentialAuthority, authorizeLocalRequest } from './local/auth.mjs';
 export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './local/domain-store.mjs';
+export { LocalGraphStore, WORKING_GRAPH_NAMESPACE, GRAPH_ERROR_CODES } from './local/graph-store.mjs';
 export {
   IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity,
 } from './core/identity.mjs';

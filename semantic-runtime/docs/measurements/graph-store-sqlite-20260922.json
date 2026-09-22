@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "dataset": "actual-synthetic-git-ingress-sqlite-graph",
+  "measured_at": "2026-09-22T12:35:00.508Z",
+  "generation_count": 1,
+  "semantic_transitions": 1040,
+  "commits": 1041,
+  "distinct_semantic_objects": 600,
+  "pages": {
+    "heads": {
+      "items": 600,
+      "pages": 10
+    },
+    "history": {
+      "items": 441,
+      "pages": 7
+    }
+  },
+  "fixed_support_samples": [
+    {
+      "transition": 1,
+      "queries": 123,
+      "rows": 74,
+      "max_range_rows": 0
+    },
+    {
+      "transition": 301,
+      "queries": 153,
+      "rows": 122,
+      "max_range_rows": 1
+    },
+    {
+      "transition": 600,
+      "queries": 153,
+      "rows": 122,
+      "max_range_rows": 1
+    },
+    {
+      "transition": 601,
+      "queries": 164,
+      "rows": 138,
+      "max_range_rows": 1
+    },
+    {
+      "transition": 801,
+      "queries": 164,
+      "rows": 138,
+      "max_range_rows": 1
+    },
+    {
+      "transition": 1040,
+      "queries": 164,
+      "rows": 138,
+      "max_range_rows": 1
+    }
+  ],
+  "scoped_range_plans": [
+    [
+      "SEARCH sources USING INDEX sqlite_autoindex_sources_1 (tenant_id=? AND project_id=? AND namespace=? AND id>? AND id<?)"
+    ],
+    [
+      "SEARCH sources USING INDEX sqlite_autoindex_sources_1 (tenant_id=? AND project_id=? AND namespace=? AND id>? AND id<?)"
+    ],
+    [
+      "SEARCH sources USING INDEX sqlite_autoindex_sources_1 (tenant_id=? AND project_id=? AND namespace=? AND id>? AND id<?)"
+    ]
+  ],
+  "maximum_plan_bytes": 16921,
+  "maximum_page_bytes": 520590,
+  "source_rows_before_rebuild": 13092,
+  "source_rows_after_rebuild": 19952,
+  "maximum_source_value_bytes": 7959,
+  "mutation_ms": 30278.17,
+  "rebuild_ms": 1824.86,
+  "rebuild_batches": 17,
+  "database_logical_bytes": 51548160,
+  "note": "Actual adapter query/row counts include authority, source and index overhead. Core port budget remains covered by unchanged incremental contract tests. Timings are a local synthetic measurement, not an SLA; old index prefixes retained, no prune/completion claim."
+}

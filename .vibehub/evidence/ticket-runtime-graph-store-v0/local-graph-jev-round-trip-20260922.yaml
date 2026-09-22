@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "graph-authenticated-source-and-publisher",
+    "snapshot-read-is-reproducible"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-authenticated-source-and-publisher",
+      "identity": "sha256:644333d96689e58ab244ede6b7a5d72581a091bf09f89f2acfbc3fc87b43f5bc",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "snapshot-read-is-reproducible",
+      "identity": "sha256:d9cebf18360d710e5ca3ca05398f3c4491c1cedcd78ea4fc718426b3c6f069fe",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-graph-jev-round-trip-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T12:39:29.599981+00:00",
+  "refs": [
+    "semantic-runtime/scripts/check-jev-ingress.mjs",
+    "semantic-runtime/test/jev-ingress-check.test.mjs",
+    "semantic-runtime/docs/measurements/jev-graph-round-trip-20260922.json",
+    "semantic-runtime/docs/graph-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Supplemental opt-in composition, not Graph correctness or production semantic quality: extended existing fixed synthetic ingress smoke with --graph. Real temporary Git/SQLite,17 deliberately selected synthetic event/state sources, reopen/dedupe,9 target-state candidate assertions with their own original admitted source, exact Graph state materialization before model call,8 JEV decisions retained as candidate assertions, restart17 exact historical reads and17 exact retries. No labels/IDs/paths/provenance/ACL/credentials in model inputs; no model/network call inside any read/write transaction (instrumented deterministic test). Actual api.typesafe.ai jev-latest resolved jev-1.13.0:8/8 completed and matched including targets,96-347ms per successful request,0retries/429/transient failures,1986ms controlled pacing. Keychain typesafe-vb consumed privately in launcher subprocess environment, never printed/committed. All17 ingress intents remain pending; no source completion/canonical promotion/acceptance inferred. Deterministic mock adapter smoke3/3 passes including existing failure sanitization. Safe aggregate live report committed; private temporary database deleted. npm run check:jev:graph reproduces with key supplied locally.",
+  "ticket_id": "ticket-runtime-graph-store-v0"
+}

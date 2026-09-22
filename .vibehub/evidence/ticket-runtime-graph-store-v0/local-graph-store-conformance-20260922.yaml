@@ -1,0 +1,61 @@
+{
+  "acceptance_ids": [
+    "graph-authenticated-source-and-publisher",
+    "graph-mutation-is-atomic",
+    "snapshot-read-is-reproducible",
+    "store-implements-revision-protocol",
+    "store-survives-isolation-and-crash-tests"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-authenticated-source-and-publisher",
+      "identity": "sha256:644333d96689e58ab244ede6b7a5d72581a091bf09f89f2acfbc3fc87b43f5bc",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-mutation-is-atomic",
+      "identity": "sha256:6745f40dcfffb9d489d3da0024d3e3e5fd4073c34bc9eda4896e1ee71b254462",
+      "revision": 3
+    },
+    {
+      "acceptance_id": "snapshot-read-is-reproducible",
+      "identity": "sha256:d9cebf18360d710e5ca3ca05398f3c4491c1cedcd78ea4fc718426b3c6f069fe",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-implements-revision-protocol",
+      "identity": "sha256:a5f74268dfdca576d272e3476ba0d2504bfe285d8a3a62870822c74a47e2395c",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-survives-isolation-and-crash-tests",
+      "identity": "sha256:77fb731d13137700dc2bc6a2db5ce521269f78cabbae1adb997ed7fd875dfe96",
+      "revision": 3
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "local-graph-store-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T12:39:29.599981+00:00",
+  "refs": [
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/graph-inputs.mjs",
+    "semantic-runtime/src/local/graph-storage.mjs",
+    "semantic-runtime/src/local/domain-store.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/graph-store.test.mjs",
+    "semantic-runtime/test/graph-storage.test.mjs",
+    "semantic-runtime/test/graph-store-crash.test.mjs",
+    "semantic-runtime/test/helpers/graph-store-process.mjs",
+    "semantic-runtime/test/helpers/graph-store-fixture.mjs",
+    "semantic-runtime/test/graph-store-scale.test.mjs",
+    "semantic-runtime/test/domain-store-statement-lifetime.test.mjs",
+    "semantic-runtime/docs/graph-store-v0.md",
+    "semantic-runtime/docs/measurements/graph-store-sqlite-20260922.json"
+  ],
+  "schema_version": 2,
+  "summary": "Implements exact GraphStore Contract3 on existing scoped DomainStore schema2, without new dependencies/tables/migrations or cumulative in-memory graph reconstruction. LocalGraphStore composes real authority, Git Project/activation and immutable DurableIngress, separately registers actor/installation/workspace/epoch runtime publication identities, keeps original event/catalog/coverage pins and commits canonical records/projections/head/audit/command/receipt/outbox atomically. Current source policy plus captured ACL and Graph lifecycle applies to exact/historical reads, receipt metadata, retry, inherited parents and relation closure; source-denied pages fail whole. CAS mismatch has no effects; semantic competing assertions remain explicit until complete resolution. Writes fenced by Project admission, with exact retry reconciliation after disable and original pins retained after current Git metadata changes. Coverage from real bounded selectors preserves gaps/null completion and never ACKs ingress. Resumable maintenance pages canonical deltas into a new index prefix with durable exact step receipts, mutation fencing, restart, current activation gates, final atomic switch, and no canonical mutation/pruning. Oversized rebuild batch rolls back completely and smaller retry advances. Real process tests exercise distinct CAS and exact duplicate writers, SIGKILL before SQLite commit (all rows unchanged), and SIGKILL after commit before facade reply (durable receipt/one outbox on retry). Review-driven repairs: bound as-of temporal predecessor/successor adjacency and current pointer checks so deleted middle/latest/current rows fail closed; missing format cannot be recreated by reads/retry/fresh publication; coverage snapshot digests cannot be corrupted to erase receipt authorization inputs. Dense 48-commit x32-source fixture exposed native SQLite iterator statement lifetime on Node23.9; DomainStore now strongly retains each active StatementSync until finally cleanup, with forced-GC subprocess regression and aggregate-overflow reuse. Final facade20/20, helper9/9, crash4/4, nativeGC1/1, selected-range14/14; independent42/42 earlier focused plus5/5 real crash/GC, additional2/2 final format regression. Full verify516 total514pass2native opt-in skips; after final format fix standalone clean npm ci + verify517 total515pass2skips, zero failures,129 dependency boundary files0errors. Standalone runs outside parent repo. Core V1/incremental/auth/events/identity/causal/store/Git/activation/ingress regressions remain passing. Actual SQLite retained1040 transitions600 objects1041commits one generation,600heads/10pages and441history/7pages; scoped EXPLAIN primary-key SEARCH/noSCAN/noOFFSET. Fixed-support actual adapter queries/rows164/138 at transitions601/801/1040; pure-port <=64 fixture proof unchanged. Max plan16921B,row7959B,page520590B, source rows13092 before/19952 after17 rebuild batches, logical database51548160B. Measured mutations30278.17ms/rebuild1824.86ms on this local concurrent run, not SLA. Old exact view survives rebuild; old index prefixes retained. Public in-process export/docs included. No host plugin, HTTP semantic API, automatic extraction, Policy scheduler, branch adoption, Worker execution or complete App semantic loop claimed.",
+  "ticket_id": "ticket-runtime-graph-store-v0"
+}

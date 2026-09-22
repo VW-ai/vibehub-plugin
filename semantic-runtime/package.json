@@ -35,7 +35,8 @@
     "benchmark:peel:compare:gateway": "node --env-file=.env.local scripts/compare-peel-judges.mjs --transport gateway",
     "audit": "node src/cli.mjs audit",
     "compare": "node src/cli.mjs compare",
-    "check:jev:ingress": "node scripts/check-jev-ingress.mjs"
+    "check:jev:ingress": "node scripts/check-jev-ingress.mjs",
+    "check:jev:graph": "node scripts/check-jev-ingress.mjs --graph"
   },
   "devDependencies": {
     "acorn": "8.15.0"

@@ -42,3 +42,28 @@ test('persisted smoke reports transport failures and semantic misses without raw
   assert.equal(report.ingress.materialized, 8); assert.equal(report.ingress.pending_intents, 8);
   assert.equal(JSON.stringify(report).includes('CANARY'), false);
 });
+
+test('Graph smoke materializes synthetic state before dispatch and retains candidate judgments with exact restart retries', async t => {
+  let calls = 0, views = 0;
+  for (const method of ['readSnapshot', 'transaction']) {
+    const original = DomainStore.prototype[method];
+    t.mock.method(DomainStore.prototype, method, function (...args) {
+      views++;
+      try { return original.apply(this, args); } finally { views--; }
+    });
+  }
+  const report = await checkPersistedJev({ async evaluate(input) {
+    assert.equal(views, 0, 'no model dispatch from any active database view');
+    const entry = edgeCases[calls++];
+    assert.deepEqual(input.stateRefs, entry[3]);
+    assert.deepEqual(Object.keys(input).sort(), ['event', 'question', 'stateRefs']);
+    assert.deepEqual(Object.keys(input.event).sort(), ['payload', 'timestamp', 'type']);
+    assert.deepEqual(input.event.payload, { text: entry[2] });
+    return { value: { relevant: entry[4], target_ids: entry[5] ?? [] }, confidence: 0.9,
+      latency_ms: 1, provider: 'synthetic', model: 'fixture', reason_code: 'synthetic' };
+  } }, { graphRoundTrip: true });
+  assert.equal(report.completed, 8); assert.equal(report.matched, 8);
+  assert.deepEqual(report.graph, { state_materializations: 9, candidate_judgments: 8, restarted: true,
+    historical_reads_verified: 17, exact_retries_verified: 17, canonical_promotion: false, ingress_acknowledged: false });
+  assert.equal(report.ingress.pending_intents, 17);
+});

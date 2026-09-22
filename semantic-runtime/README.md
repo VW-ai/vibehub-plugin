@@ -35,6 +35,12 @@ The local modules now also provide [scoped authentication](docs/service-auth-v0.
 and the settings UI are composed in the explicit setup mode; installing these
 modules does not enable collection or background work.
 
+The [local Graph Store](docs/graph-store-v0.md) now persists authenticated
+semantic revisions, exact historical reads, competing claims and resumable
+projection repair in SQLite. Its in-process API consumes actual admitted ingress
+sources. `npm run check:jev:graph` separately exercises a fixed synthetic Graph
+context → JEV → candidate/restart round trip with a locally supplied TypeSafe key.
+
 For the separate [synthetic App interaction preview](docs/project-exploration-ux-v0.md),
 run `node prototype/serve.mjs 51987` and open `http://127.0.0.1:51987/`.
 It demonstrates Project/Context/Ticket/setup flows using page-memory fixtures;
@@ -254,8 +260,8 @@ contracts through the package's public entry:
   provenance-based access checks.
 - [Incremental Working Graph](docs/incremental-graph-v0.md): selected-record
   transitions and bounded historical pages, retaining the existing semantic
-  revision format. The indexed synthetic fixture tests long histories; the
-  transactional storage adapter remains a separate delivery.
+  revision format. Both the pure fixture and the [local SQLite adapter](docs/graph-store-v0.md)
+  exercise retained long histories; host and Policy integration remain pending.
 - [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.

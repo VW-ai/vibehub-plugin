@@ -175,7 +175,7 @@ export function migrateDomainStore({ filePath, targetVersion = DOMAIN_SCHEMA_VER
 }
 
 export class DomainStore {
-  #db; #authority; #namespaces; #version; #closed = false; #inTransaction = false;
+  #db; #authority; #namespaces; #version; #closed = false; #inTransaction = false; #rangeStatements = new Set();
   constructor({ filePath, authority, namespaces }) {
     if (!(authority instanceof LocalCredentialAuthority) || !Array.isArray(namespaces) || !namespaces.length || namespaces.length > 64) throw failure('invalid_store_input');
     namespaces.forEach(id);
@@ -229,16 +229,22 @@ export class DomainStore {
         ORDER BY id COLLATE BINARY ${ascending ? 'ASC' : 'DESC'} LIMIT ?`);
       const rows = [];
       let encodedRowsBytes = 0, last_id = null;
-      for (const row of statement.iterate(...parameters)) {
-        // Parse one bounded value at a time instead of materializing up to64MiB
-        // through .all(). Aggregate overflow returns no partial page.
-        if (Buffer.byteLength(row.value) > 1_048_576) throw failure('store_unavailable');
-        const selected = { id: id(row.id), kind: id(row.kind), value: parsed(row.value) };
-        encodedRowsBytes += Buffer.byteLength(JSON.stringify(selected)) + (rows.length ? 1 : 0);
-        last_id = selected.id;
-        if (encodedRowsBytes + Buffer.byteLength(JSON.stringify({ rows: [], last_id })) > 1_048_576) throw failure('store_page_too_large');
-        rows.push(selected);
-      }
+      // Node's SQLite iterator does not itself retain its StatementSync on
+      // every supported runtime. Keep explicit ownership until iteration (or
+      // early overflow/error) finishes; otherwise GC may finalize it mid-read.
+      this.#rangeStatements.add(statement);
+      try {
+        for (const row of statement.iterate(...parameters)) {
+          // Parse one bounded value at a time instead of materializing up to64MiB
+          // through .all(). Aggregate overflow returns no partial page.
+          if (Buffer.byteLength(row.value) > 1_048_576) throw failure('store_unavailable');
+          const selected = { id: id(row.id), kind: id(row.kind), value: parsed(row.value) };
+          encodedRowsBytes += Buffer.byteLength(JSON.stringify(selected)) + (rows.length ? 1 : 0);
+          last_id = selected.id;
+          if (encodedRowsBytes + Buffer.byteLength(JSON.stringify({ rows: [], last_id })) > 1_048_576) throw failure('store_page_too_large');
+          rows.push(selected);
+        }
+      } finally { this.#rangeStatements.delete(statement); }
       this.#scope(context, 'store:read');
       return { rows, last_id };
     });

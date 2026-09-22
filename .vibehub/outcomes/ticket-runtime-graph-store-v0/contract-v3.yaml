@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "store-implements-revision-protocol",
+    "snapshot-read-is-reproducible",
+    "graph-mutation-is-atomic",
+    "store-survives-isolation-and-crash-tests",
+    "graph-authenticated-source-and-publisher"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T12:42:21.900Z",
+  "contract_revision": {
+    "identity": "sha256:a4e4c1a40b9237112eed11df42923a3787f069ae4aadcc728b213d76a53d77d6",
+    "revision": 3
+  },
+  "evidence_ids": [
+    "local-graph-store-conformance-20260922",
+    "local-graph-jev-round-trip-20260922"
+  ],
+  "independence": {
+    "note": "Dedicated independent review subagent. This agent did not author this Ticket implementation, canonical tests, planning candidate or Evidence; it inspected actual sources and records, ran existing tests and temporary synthetic adversarial probes, and sent read-only findings to the executor authors, who made all fixes. It writes only this independent Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v3",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all five active criteria of exact Contract3. Revision protocol: reviewed the actual LocalGraphStore/GraphInputs/GraphStorage composition over existing scoped DomainStore schema2, finite immutable canonical rows, per-key current/temporal/page indexes, versioned domain format and public authenticated API. It preserves accepted incremental wire2 and V1 semantic revisions, explicit alternatives/resolutions, parent/relation provenance and original event catalogs without cumulative lifetime snapshots or new tables/dependencies. Source and publisher authority: every selected event is re-resolved through actual DurableIngress under a coherent SQLite view; publication identities are explicit actor/installation/workspace/epoch-bound logical runtime runs, not fictional coding-host sessions. Current source ACL/sensitivity and Graph lifecycle govern historical reads, receipt/retry inputs and page materialization, including while capture is disabled. Lifecycle requires its separate scoped operator grant; real cursor coverage retains unknown/gaps and never advances source completion or acknowledges ingress. Atomicity: source/catalog/command/semantic/audit/authority/receipt rows, projections, head CAS and one graph_changed outbox intent commit in the same activation-admitted transaction. Exact retries preserve original pins after metadata changes or disable; changed requests reject, stale graph CAS leaves zero effects, and semantic conflicts remain a distinct admitted path. Storage/recovery: bounded canonical replay retains immutable sources, records exact step receipts, fences new mutations, survives restart and switches the index only at the pinned head; capacity failures roll back before smaller retries. Independent review reproduced an incorrect historical fallback after deleting only a middle temporal row; the author added bounded successor/version/digest and current-pointer consistency checks, and the original real-facade probe now rejects graph_storage_corrupt. A second independent probe confirmed that deleting only format allowed fresh publication to recreate it; the final scoped limit1 absence check now refuses reads, retries and new publication without changing rows. The dense fixture also exposed native StatementSync lifetime under GC; reviewed the confined strong-ownership/finally fix and independently ran its forced-GC regression. Independent executions passed42/42 facade/storage/selected-read tests after adjacency repair,5/5 actual process-race/precommit/postcommit-crash/GC tests,2/2 final format/pristine regressions, and3/3 final offline persisted-JEV composition tests. An earlier dense-fixture run failed because32 commits were below the claimed byte bound; the corrected48-wide fixture explicitly proves more than1MiB and passes rollback/reduced-batch checks. Reviewed author logs rather than claiming independent broad reruns: final clean standalone npm ci plus verification has517 tests,515 passed,2 intentional native opt-in skips,zero failures and129 boundary files without errors. Inspected the real1040-transition/600-object/1041-commit measurement:600 head items in10 pages,441 history items in7 pages, scoped PK SEARCH/noSCAN/noOFFSET, fixed-support164 queries/138 rows at transitions601/801/1040,16921-byte maximum plan,7959-byte row,520590-byte page,17 rebuild batches and51548160 logical database bytes. Recorded local timings30278.17ms mutation and1824.86ms rebuild are not an SLA; old prefixes remain retained. Supplemental parent-run official JEV smoke completed8/8 matching fixed synthetic judgments,9 Graph state materializations and17 restart historical reads/exact retries with17 ingress intents still pending. Independently inspected minimal input construction and verified model dispatch occurs outside database views; no live model/credential call was made by this reviewer. This smoke supports composition only, not extraction quality or canonical acceptance. All39 Ticket Context refs resolve; successful exact prerequisite Outcomes/Evidence were inspected, current Ticket validation and Context guard pass with no governing authorities, and public exports/git diff checks pass. No unresolved criterion remains. This Outcome certifies the bounded local authenticated Graph adapter; it does not claim live host plugins, HTTP/UI semantic integration, an automatic Policy consumer, Worker execution, branch adoption, distributed replication, pruning or a complete local App semantic workflow.",
+  "ticket_id": "ticket-runtime-graph-store-v0",
+  "unresolved_acceptance_ids": []
+}
