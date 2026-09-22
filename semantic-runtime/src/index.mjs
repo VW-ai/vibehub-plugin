@@ -14,6 +14,13 @@ export { LOCAL_AUDIENCE, LocalCredentialAuthority, authorizeLocalRequest } from 
 export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './local/domain-store.mjs';
 export { LocalGraphStore, WORKING_GRAPH_NAMESPACE, GRAPH_ERROR_CODES } from './local/graph-store.mjs';
 export {
+  AGENT_WORK_REQUEST_VERSION, AGENT_WORK_ACTIONS, AGENT_WORK_PHASES,
+  agentWorkReturnParameters, agentWorkSubmissionArguments,
+  createAgentWorkRequest, validateAgentWorkRequest, createAgentWorkResult, validateAgentWorkResult,
+  createAgentWorkRequestState, validateAgentWorkRequestState, validateAgentWorkReceipt,
+  validateAgentWorkAdmission, transitionAgentWorkRequest,
+} from './core/agent-work-request.mjs';
+export {
   IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity,
 } from './core/identity.mjs';
 export {

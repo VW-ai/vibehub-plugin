@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "host-and-authority",
+    "request-contract-tests",
+    "request-is-actionable",
+    "result-and-receipt"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "host-and-authority",
+      "identity": "sha256:f9cc4d27340a8475f7825d0e554f3ca7b59335097e6691a5c1e03b7b7d0deba8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "request-contract-tests",
+      "identity": "sha256:1106d855e366ab6e2b2bd53f8bfc8ecfe8bf1d3beee33c40aedc5ddd27ea3f12",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "request-is-actionable",
+      "identity": "sha256:f5e22b7d8f68b99121c301564e07408efa4e117a22149b3a72337643d3c5d9ae",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "result-and-receipt",
+      "identity": "sha256:db5e5a07b0ebe4b34c4e153c48a3a0a773444620d8ee980445acd8ae1b831cd2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "agent-work-request-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T12:57:39.965548+00:00",
+  "refs": [
+    "semantic-runtime/src/core/agent-work-request.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/agent-work-request.test.mjs",
+    "semantic-runtime/test/agent-work-request-integration.test.mjs",
+    "semantic-runtime/docs/agent-work-request-v0.md",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/README.md"
+  ],
+  "schema_version": 2,
+  "summary": "Exact Contract1 implemented as isolated provider/host/store-independent pure wire1 constructors/validators and lifecycle transitions, exported through src/index.mjs. Requests pin Project/exploration/workspace/session applicability, job/attempt/fence, immutable input/base refs, trusted versioned instruction bundle, required registered tool name/version/origin/action/schema/example, exact return-tool arguments, schema-validated output and captured principal/action ceilings. Tool names do not create tool registrations; trusted host/service admission supplies real binding IDs/current pins/permission and actual callback availability. Native tools retain native origin. Return helper generates exact parameters, while adapter must compare current request ID/digest and supply authenticated executor/job bindings; examples are explicitly illustrative to avoid a self-referential request hash. Source excerpts remain untrusted data. Fixed vocabulary only allows proposal actions, no canonical write/Ticket acceptance/independent closeout. Pending/offered/claimed/completed/expired/cancelled reference states have bounded progress, one exact result receipt, current source/scope/action/actor admission and monotonic trusted time. Current stale bases deny new submission; exact completed retry reconciles original receipt after deadline/base movement/dormancy but never bypasses current input/principal checks. Changed content or key rejects, zero extra effects. Root review corrected deadlines being hidden by transient pending hosts and bound owner/receipt/result to original principal/session; independent review corrected terminal states returning pending when host dormant. Terminal matrix3phases x5commands preserves rejection except exact completed-submit reconciliation. Small fail-closed JSON Schema subset actually validates examples/output; unsupported keywords/ref/combinators/regex/coercion are rejected. JSON/strings/arrays/depth/count/bytes are bounded, getters/Proxies rejected without hooks, outputs copied/frozen. Core boundary adds precisely node:util/types for inert native inspection alongside existing node:crypto, not broad node:util or I/O; explicit checker regression preserves bans on util/fs/child_process/sqlite/http and siblings. Parent public integration uses actual temporary Git/SQLite/Graph source context: stable request produces one proposal receipt without mutating Graph; actual Graph advancement denies stale input base; source revocation while Project disabled denies pending submission. Final own/public14/14 and independent14/14 pass; affected prior73/73 then final request+Worker47/47; boundary5/5 and132files0errors; final npm run verify532total530pass2intentional native opt-in skips0fail (~42.16s). No dependency, model call, real host enrollment/delivery, scheduler, durable queue/receipt or Worker wrapper added. Adapter must still enforce authenticated ingress, atomic state CAS/receipt/effect persistence, creation uniqueness and cross-request attempt fencing. Receipt proves accepted proposal submission only; informational Context cannot trigger action by resembling instruction text.",
+  "ticket_id": "ticket-runtime-agent-work-request-contract-v0"
+}

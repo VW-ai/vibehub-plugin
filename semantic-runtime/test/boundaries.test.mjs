@@ -40,6 +40,15 @@ test('rejects core-to-adapter dependencies while ignoring prose and comments', t
   assert.equal(checkBoundaries(root).ok, true);
 });
 
+test('core permits inert native type inspection but keeps general utilities and I/O outside its boundary', t => {
+  const { root, put } = repository(t, "import { isProxy } from 'node:util/types'; import { createHash } from 'node:crypto';");
+  assert.equal(checkBoundaries(root).ok, true);
+  for (const module of ['node:util', 'node:fs', 'node:child_process', 'node:sqlite', 'node:http']) {
+    put('src/core/example.mjs', `import '${module}';`);
+    assert.equal(checkBoundaries(root).ok, false, module);
+  }
+});
+
 test('rejects symlinks and manifest dependencies on parent workspaces', t => {
   const { root } = repository(t, 'export const x = 1;');
   symlinkSync(join(root, 'package.json'), join(root, 'src/core/linked.mjs'));

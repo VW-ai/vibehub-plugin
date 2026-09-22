@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "request-is-actionable",
+    "result-and-receipt",
+    "host-and-authority",
+    "request-contract-tests"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T12:59:24.711Z",
+  "contract_revision": {
+    "identity": "sha256:062f0db17f7a51171ba908767d8bbecccd0cffb899128ee1d5e3f7ad58e81504",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "agent-work-request-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Dedicated independent review subagent, not an author of this Ticket implementation, canonical tests, documentation or Evidence. This agent read the actual code and records, ran existing tests and temporary synthetic probes, and sent read-only findings; executor authors made all fixes. It writes only this independent Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four current criteria of exact Contract1. Actionable wire: reviewed strict versioned request/result/receipt/state constructors and validators, scoped job/attempt/fence and exploration/workspace/session applicability, immutable input/base refs, exact instruction/schema digests, captured principal/action ceilings, bounded actually validated tool examples and exact return-argument helper. The request requires a registered runtime submit_proposal tool; host/service admission supplies actual callable binding/schema pins and current source/base/bundle authority, so tool names and source instructions create no capability. Illustrative example digests are explicitly distinguished from the final request digest, avoiding a self-referential payload. Results bind the original request and executor, validate schema/proposal actions and enumerate every captured input exactly once. Lifecycle/receipts: reviewed pending/offered/claimed/completed/expired/cancelled transitions, actor/owner/time/CAS checks, current input/action/applicability checks, stale-base rejection, exact original completed-submission reconciliation and changed-content/key rejection. A receipt carries accepted_submission_only authority and never implies adoption, canonical publication, Ticket acceptance or independent review. Independent review reproduced terminal cancelled/completed states returning pending when a host became dormant; the executor fixed terminal classification before transient delivery availability. The original scratch reproduction now rejects terminal, the3terminal-by5command regression passes, and exact completed submission still reconciles after deadline/base movement/dormancy under current input/actor authorization. Host/authority: informational Context is not actionable; unavailable tools/dormant callbacks remain pending only for live work, denied/stale/invalid/late results add no effects, management cancellation/expiry uses a separate trusted Runtime actor, and source-text injection cannot add actions or closeout authority. Internal returned state is explicitly not safe transport output; adapter-authenticated facts, persistence and cross-request fencing remain outside this pure reference contract. Tests/boundary: independently ran the final12 conformance tests,2 public-entry real temporary Git/SQLite/Graph integration tests and5 boundary tests,19/19 passed. The integration derives actual exact Graph context, demonstrates one proposal receipt without Graph mutation, and fences submission after actual Graph advancement or source revocation while Project capture is disabled. Reviewed the narrow checker update allowing only node:util/types for inert isProxy inspection alongside existing hashing; broad util, filesystem/process/storage/network and sibling imports remain forbidden. Independent real component scan passes132 files with zero errors; git diff check passes. Inspected parent full verification log rather than claiming an independent full rerun:532 tests,530 passed,2 intentional native opt-in skips,zero failures. All six Context references resolve, current validation and Context guard pass, and no governing authority or protected human criterion is missing. No unresolved criterion remains. This Outcome certifies a provider-independent pure work-request/return protocol and bounded synthetic composition, not actual host registration/delivery, plugin installation, model execution, a scheduler, a persistent queue/receipt database, a Worker wrapper or product completion. Trusted adapters still must authenticate refs/excerpts and tools, enforce unique request/attempt identity, persist state CAS/receipt/effect intent atomically and authorize transport responses.",
+  "ticket_id": "ticket-runtime-agent-work-request-contract-v0",
+  "unresolved_acceptance_ids": []
+}

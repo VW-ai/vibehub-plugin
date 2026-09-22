@@ -6,6 +6,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const within = (root, path) => path === root || path.startsWith(`${root}${sep}`);
+// Hashing and inert-value inspection have no filesystem, process, provider or
+// storage capability. Keep the general util module and all I/O modules outside core.
+const coreBuiltins = new Set(['node:crypto', 'node:util/types']);
 
 function walk(node, visit) {
   if (!node || typeof node !== 'object') return;
@@ -79,7 +82,7 @@ export function checkBoundaries(root = defaultRoot) {
       }
       const specifier = source.value;
       if (isBuiltin(specifier)) {
-        if (core && specifier !== 'node:crypto') fail(`core cannot import host/storage module ${specifier}`);
+        if (core && !coreBuiltins.has(specifier)) fail(`core cannot import host/storage module ${specifier}`);
         return;
       }
       if (specifier.startsWith('.')) {
