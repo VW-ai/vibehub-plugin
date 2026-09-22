@@ -88,12 +88,15 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000 } = {}) {
     const report = await checkSyntheticJev({ async evaluate(input, request) {
       const observation = observations.get(input.event.payload.text);
       if (!observation) throw new Error('Unexpected synthetic input');
-      const retained = ingress.readEvent(context, { event_id: observation.event.event_id });
-      const snapshot = ingress.readSnapshot(context, { event_id: observation.event.event_id });
+      const { retained, snapshot } = store.readSnapshot(context, () => ({
+        retained: ingress.readEvent(context, { event_id: observation.event.event_id }),
+        snapshot: ingress.readSnapshot(context, { event_id: observation.event.event_id }),
+      }));
       if (!retained || !snapshot || snapshot.text !== input.event.payload.text
         || snapshot.digest !== observation.event.payload.digest) throw new Error('Synthetic snapshot mismatch');
       verifyEventPayload(retained.event.payload, Buffer.from(snapshot.text, 'utf8'));
       materialized++;
+      // The coherent database view is closed before any model/network call.
       // Do not spread the persisted envelope: source IDs, ACL, paths, catalog,
       // receipt, provenance, digest and labels have no role in model input.
       return judge.evaluate({ event: { type: retained.event.event_type,
@@ -102,6 +105,7 @@ export async function checkPersistedJev(judge, { timeoutMs = 15_000 } = {}) {
     } }, { suite: 'edge', timeoutMs });
     return { ...report, dataset: 'persisted-synthetic-edge-eight-v1',
       ingress: { stored: observations.size, reopened: true, deduplicated, materialized,
+        coherent_read_snapshots: materialized,
         pending_intents: ingress.listPending(context, { limit: 64 }).length,
         semantic_processing_claimed: false } };
   } finally {

@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "scoped-source-range",
+    "coherent-read-snapshot",
+    "selected-read-real-sqlite-proof",
+    "selected-read-compatibility"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T11:58:50.261Z",
+  "contract_revision": {
+    "identity": "sha256:a13411588ed9f88787e4d193fffe7a31d593be9c141548476ada9addb1007f94",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "selected-source-snapshot-conformance-20260922",
+    "selected-read-persisted-jev-composition-20260922"
+  ],
+  "independence": {
+    "note": "Independent reviewer /root/auth_review authored no production implementation, tests, documentation or Evidence for this Ticket. /root authored the store and consumer composition; /root/provider_settings authored focused conformance tests. Reviewer involvement was read-only inspection, temporary synthetic adversarial probes, independent test runs and fix feedback; only this Outcome is written by the reviewer.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepted all four criteria of exact Contract 1. Scoped range: reviewed the five required inert options, ASCII/BINARY inclusive lower and exclusive upper bounds, both direction-relative exclusive continuations, opaque tenant/Project and registered namespace checks, limit 1..64, incremental SQLite iteration and exact whole-response 1 MiB rejection without partial results. Coherent snapshots: BEGIN DEFERRED pins the SQLite view at its first read; frozen callback-lifetime handles expose only scoped exact/range reads, require current read grants at each access and before return, reject nested read/write/close/rebuild operations and become stale after every outcome. Write handles read their own uncommitted sources and require both read and write permission. Independently reproduced and reviewed executor fixes for two defects: bound async callbacks now execute zero times before rejection; thrown error getters/Proxies execute zero hooks and cannot leak unbounded diagnostics. Thenable-result detection does not assimilate accessors; failures roll back and leave the connection reusable. Real SQLite proof: independently ran the original and new suites, 26/26 passed, including two-connection WAL first-read stability and later visibility, own writes, current authority expiry/revocation, callback lifetime, corrupt selected rows, exact 1 MiB/+1-byte boundary, scope isolation, and 2048 retained rows using the scoped primary-key SEARCH in both directions with 64 actual iterated rows, no full scan, temporary sort or OFFSET. Compatibility: inspected unchanged schema version 2, DDL/migrations, immutable-source/outbox/CAS and prior foreign/newer/corrupt-store refusal; prerequisite Contract v2 Outcome and both Evidence records remain valid. Reviewed other executors logs rather than claiming them as independent reruns: affected 83/83, actual auth/Git/activation/ingress 38/38 after an initial sandbox listener-bind denial, and full verification 481 tests with 479 passed, two intentional native opt-in skips, zero failures; boundaries 119 files, zero errors. After that full run, a small opt-in persisted-JEV consumer change wraps exact event/snapshot materialization in the new readSnapshot and dispatches the model only after the view closes. Independently ran both final offline composition tests, 2/2 passed; inspected test instrumentation and the separate parent-executed fixed synthetic live report: 8/8 completed/matched, no retry/rate-limit, with no private source or credential in the report. That live measurement supports composition only and is not deterministic storage acceptance, general model accuracy or semantic workflow completion. All nine Context references resolve; current project validation and golden Context guard pass, with no governing authorities. This Outcome certifies selected scoped local storage reads and compatibility only, not Graph lineage/current source ACL interpretation, Graph persistence, cross-device consistency, live host collection or an end-to-end semantic service.",
+  "ticket_id": "ticket-runtime-store-selected-reads-v0",
+  "unresolved_acceptance_ids": []
+}

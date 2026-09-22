@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "coherent-read-snapshot",
+    "scoped-source-range",
+    "selected-read-compatibility",
+    "selected-read-real-sqlite-proof"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "coherent-read-snapshot",
+      "identity": "sha256:5a0d81ec9823b256d02c22a79fab8a6723216dcfaf8d49e56f4fde96fa92edac",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "scoped-source-range",
+      "identity": "sha256:dbf71ba6e7da6df32f4cb0ce9bf8da874bde3666207aa562a3b5886c1b59cc55",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "selected-read-compatibility",
+      "identity": "sha256:8db9c33d2c0ae9e9c6758b77cacb86e58b4264d3f1cdb93b4026a50563e0ec9e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "selected-read-real-sqlite-proof",
+      "identity": "sha256:6919fa252f06dc5af51ac507a726340cd067d9ec4d84478a6d91964edb3ac853",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "selected-source-snapshot-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T11:54:52.346Z",
+  "refs": [
+    "semantic-runtime/src/local/domain-store.mjs",
+    "semantic-runtime/test/domain-store-selected-reads.test.mjs",
+    "semantic-runtime/test/domain-store.test.mjs",
+    "semantic-runtime/docs/domain-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Exact Contract1 implemented using the existing DomainStore schema2 and source composite primary key: five-field inert scoped getSourceRange with inclusive/exclusive BINARY bounds, asc/desc exclusive continuation, limit1..64 and last_id locator; selected rows are consumed through SQLite iterate, with per-value validation and a complete serialized-response1MiB cap. Exact1MiB succeeds, +1byte rejects atomically with store_page_too_large. New synchronous BEGIN DEFERRED readSnapshot pins at first SQLite read, supplies a frozen scoped three-method handle, checks current opaque grants at each access and before returning, rolls back failures and expires handles. Shared connection guard rejects read/write nesting, close and projection rebuild even before first read. Write transaction handles gain exact/range source reads including own uncommitted appends. Independent review found two edge defects and executor fixed both: bound async functions are rejected before body execution using descriptor-safe async prototype recognition; thrown code/errcode accessors and proxies cannot execute or leak raw errors through bounded(). Thenable result getters/proxies are rejected without assimilation; returned Promise rejection handling remains caller-owned. New14/14 tests pass, original+new26/26 independently reproduced, affected83/83 reported by test author, parent actual auth/Git/activation/ingress38/38 passes after enabling test loopback (initial sandbox run37pass+1listener-bind denial preserved). Real temporary WAL two-connection proof reads old versions after another writer commits and new versions in the next snapshot; callback entry before first read does not falsely pin.2048 retained sources in both directions each consume64 actual iterator rows; EXPLAIN is scoped SEARCH USING INDEX sqlite_autoindex_sources_1 with no SCAN/temp sort/OFFSET. Additional coverage: scope/namespace/forged/wrong-audience/write-only/revoked/expired grants, continuation boundaries and nonexistent positions, exact fields/getters/Proxies, stale handles, own writes, nested attempts, malformed selected JSON, thrown/async callbacks, aggregate overflow rollback/reuse, schema1/2 compatibility and unchanged public class export. Final npm run verify:481tests,479pass,2intentional native opt-in skips,0fail;119 boundary files0errors; public import smoke and Context guard pass. No migration/table/index/dependency/listener or model call added. This accepts selected storage reads only; Graph temporal membership, current source ACL semantics and service composition remain downstream.",
+  "ticket_id": "ticket-runtime-store-selected-reads-v0"
+}

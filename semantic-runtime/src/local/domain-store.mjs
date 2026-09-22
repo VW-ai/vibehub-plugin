@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, existsSync, chmodSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { types } from 'node:util';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
 
 const APPLICATION_ID = 0x56484453; // VHDS, separate from bootstrap and provider settings.
@@ -8,11 +9,19 @@ export const DOMAIN_SCHEMA_VERSION = 2;
 export const SOURCE_KIND_PROJECTION_VERSION = 1;
 const SAFE_CODES = new Set(['store_closed', 'store_busy', 'store_unavailable', 'store_unauthorized',
   'invalid_store_input', 'unknown_namespace', 'cas_conflict', 'duplicate_identity',
-  'async_transaction', 'stale_transaction', 'nested_transaction', 'migration_required', 'incompatible_store']);
+  'async_transaction', 'stale_transaction', 'nested_transaction', 'migration_required', 'incompatible_store', 'store_page_too_large']);
 const failure = code => Object.assign(new Error(`Domain store: ${code}`), { code });
+function errorField(error, field) {
+  // Callback-thrown values are arbitrary. Never evaluate getters, proxy traps
+  // or caller formatting hooks while replacing an error with a bounded code.
+  if (!error || (typeof error !== 'object' && typeof error !== 'function') || types.isProxy(error)) return undefined;
+  const descriptor = Object.getOwnPropertyDescriptor(error, field);
+  return descriptor && 'value' in descriptor ? descriptor.value : undefined;
+}
 function bounded(error) {
-  return failure(SAFE_CODES.has(error?.code) ? error.code
-    : error?.errcode === 5 || error?.errcode === 6 ? 'store_busy' : 'store_unavailable');
+  const code = errorField(error, 'code'), errcode = errorField(error, 'errcode');
+  return failure(SAFE_CODES.has(code) ? code
+    : errcode === 5 || errcode === 6 ? 'store_busy' : 'store_unavailable');
 }
 function id(value) {
   if (typeof value !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}$/.test(value)) throw failure('invalid_store_input');
@@ -22,6 +31,7 @@ function json(value) {
   let entries = 0;
   const visit = (item, depth) => {
     if (++entries > 50_000 || depth > 16) throw failure('invalid_store_input');
+    if (types.isProxy(item)) throw failure('invalid_store_input');
     if (item === null || typeof item === 'boolean' || typeof item === 'string') return JSON.stringify(item);
     if (typeof item === 'number' && Number.isFinite(item)) return JSON.stringify(item);
     if (Array.isArray(item)) {
@@ -51,6 +61,48 @@ function json(value) {
   return encoded;
 }
 function parsed(value) { const result = JSON.parse(value); json(result); return result; }
+function rangeOptions(input) {
+  // Copy inert data before inspecting options; never evaluate input accessors.
+  const value = JSON.parse(json(input));
+  if (!value || Array.isArray(value) || typeof value !== 'object'
+    || Object.keys(value).sort().join(',') !== 'after,limit,lower,order,upper') throw failure('invalid_store_input');
+  const { lower, upper, order, limit, after } = value;
+  id(lower); id(upper);
+  if (lower >= upper || !['asc', 'desc'].includes(order) || !Number.isSafeInteger(limit)
+    || limit < 1 || limit > 64 || (after !== null && (id(after) < lower || after >= upper))) throw failure('invalid_store_input');
+  return value;
+}
+const ASYNC_PROTOTYPES = new Set([Object.getPrototypeOf(async () => {}), Object.getPrototypeOf(async function* () {})]);
+function synchronousOperation(operation) {
+  if (typeof operation !== 'function') throw failure('async_transaction');
+  // Bound async functions are not identified by util.types.isAsyncFunction,
+  // but retain their async prototype. Inspect descriptors/prototypes, not
+  // operation.constructor, whose getter could run before authorization.
+  let current = operation, depth = 0;
+  while (current !== null) {
+    if (types.isProxy(current) || types.isAsyncFunction(current) || ASYNC_PROTOTYPES.has(current) || ++depth > 64) throw failure('async_transaction');
+    const constructor = Object.getOwnPropertyDescriptor(current, 'constructor')?.value;
+    const name = errorField(constructor, 'name');
+    if (name === 'AsyncFunction' || name === 'AsyncGeneratorFunction') throw failure('async_transaction');
+    current = Object.getPrototypeOf(current);
+  }
+}
+function synchronousResult(result) {
+  // Do not assimilate thenables or inspect result.then: both can execute code.
+  // Returned promises remain their caller's responsibility, including rejection
+  // handling. Async functions are rejected before their body runs.
+  if (types.isPromise(result)) throw failure('async_transaction');
+  let current = result, depth = 0;
+  while (current !== null && (typeof current === 'object' || typeof current === 'function')) {
+    if (types.isProxy(current) || ++depth > 64) throw failure('async_transaction');
+    const descriptor = Object.getOwnPropertyDescriptor(current, 'then');
+    if (descriptor) {
+      if (descriptor.get || descriptor.set || typeof descriptor.value === 'function') throw failure('async_transaction');
+      return;
+    }
+    current = Object.getPrototypeOf(current);
+  }
+}
 function target(version) {
   if (!Number.isInteger(version) || version < 1 || version > DOMAIN_SCHEMA_VERSION) throw failure('incompatible_store');
   return version;
@@ -163,6 +215,34 @@ export class DomainStore {
       return row ? { kind: id(row.kind), value: parsed(row.value) } : null;
     });
   }
+  getSourceRange(context, namespace, options) {
+    return this.#query(context, 'store:read', scope => {
+      this.#key(namespace, 'range');
+      const { lower, upper, order, limit, after } = rangeOptions(options);
+      const ascending = order === 'asc';
+      const parameters = [...scope, namespace, lower, upper, ...(after === null ? [] : [after]), limit];
+      // Only validated direction and a fixed optional predicate enter SQL. The
+      // existing composite primary key bounds both selection and ordering.
+      const statement = this.#db.prepare(`SELECT id,kind,value FROM sources
+        WHERE tenant_id=? AND project_id=? AND namespace=? AND id>=? AND id<?
+        ${after === null ? '' : ascending ? 'AND id>?' : 'AND id<?'}
+        ORDER BY id COLLATE BINARY ${ascending ? 'ASC' : 'DESC'} LIMIT ?`);
+      const rows = [];
+      let encodedRowsBytes = 0, last_id = null;
+      for (const row of statement.iterate(...parameters)) {
+        // Parse one bounded value at a time instead of materializing up to64MiB
+        // through .all(). Aggregate overflow returns no partial page.
+        if (Buffer.byteLength(row.value) > 1_048_576) throw failure('store_unavailable');
+        const selected = { id: id(row.id), kind: id(row.kind), value: parsed(row.value) };
+        encodedRowsBytes += Buffer.byteLength(JSON.stringify(selected)) + (rows.length ? 1 : 0);
+        last_id = selected.id;
+        if (encodedRowsBytes + Buffer.byteLength(JSON.stringify({ rows: [], last_id })) > 1_048_576) throw failure('store_page_too_large');
+        rows.push(selected);
+      }
+      this.#scope(context, 'store:read');
+      return { rows, last_id };
+    });
+  }
   pendingOutbox(context, namespace, { limit = 100 } = {}) {
     return this.#query(context, 'store:read', scope => {
       this.#key(namespace, 'list');
@@ -183,7 +263,7 @@ export class DomainStore {
     });
   }
   transaction(context, operation) {
-    if (typeof operation !== 'function' || operation.constructor?.name === 'AsyncFunction') throw failure('async_transaction');
+    synchronousOperation(operation);
     if (this.#inTransaction) throw failure('nested_transaction');
     let active = false;
     const assertActive = () => { if (!active) throw failure('stale_transaction'); return this.#scope(context, 'store:write'); };
@@ -192,6 +272,8 @@ export class DomainStore {
       this.#db.exec('BEGIN IMMEDIATE'); this.#inTransaction = true; active = true;
       const handle = Object.freeze({
         getRecord: (namespace, key) => { assertActive(); return this.getRecord(context, namespace, key); },
+        getSource: (namespace, sourceId) => { assertActive(); return this.getSource(context, namespace, sourceId); },
+        getSourceRange: (namespace, options) => { assertActive(); return this.getSourceRange(context, namespace, options); },
         compareAndSwap: (namespace, key, expectedVersion, value) => {
           const scope = assertActive(), address = this.#key(namespace, key), encoded = json(value);
           if (expectedVersion !== null && (!Number.isSafeInteger(expectedVersion) || expectedVersion < 1 || expectedVersion >= Number.MAX_SAFE_INTEGER)) throw failure('invalid_store_input');
@@ -218,8 +300,30 @@ export class DomainStore {
         },
       });
       const result = operation(handle);
-      if (result && typeof result.then === 'function') { Promise.resolve(result).catch(() => {}); throw failure('async_transaction'); }
+      synchronousResult(result);
       assertActive(); // Revocation or expiry during the callback must roll back all changes.
+      this.#db.exec('COMMIT'); return result;
+    } catch (error) {
+      if (active) { try { this.#db.exec('ROLLBACK'); } catch {} }
+      throw bounded(error);
+    } finally { if (active) this.#inTransaction = false; active = false; }
+  }
+  readSnapshot(context, operation) {
+    synchronousOperation(operation);
+    if (this.#inTransaction) throw failure('nested_transaction');
+    let active = false;
+    const assertActive = () => { if (!active) throw failure('stale_transaction'); return this.#scope(context, 'store:read'); };
+    try {
+      this.#scope(context, 'store:read');
+      this.#db.exec('BEGIN DEFERRED'); this.#inTransaction = true; active = true;
+      const handle = Object.freeze({
+        getRecord: (namespace, key) => { assertActive(); return this.getRecord(context, namespace, key); },
+        getSource: (namespace, sourceId) => { assertActive(); return this.getSource(context, namespace, sourceId); },
+        getSourceRange: (namespace, options) => { assertActive(); return this.getSourceRange(context, namespace, options); },
+      });
+      const result = operation(handle);
+      synchronousResult(result);
+      assertActive();
       this.#db.exec('COMMIT'); return result;
     } catch (error) {
       if (active) { try { this.#db.exec('ROLLBACK'); } catch {} }

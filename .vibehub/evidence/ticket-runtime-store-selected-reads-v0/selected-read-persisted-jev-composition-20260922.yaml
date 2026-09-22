@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "selected-read-compatibility"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "selected-read-compatibility",
+      "identity": "sha256:8db9c33d2c0ae9e9c6758b77cacb86e58b4264d3f1cdb93b4026a50563e0ec9e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "selected-read-persisted-jev-composition-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T11:57:41.380Z",
+  "refs": [
+    "semantic-runtime/scripts/check-jev-ingress.mjs",
+    "semantic-runtime/test/jev-ingress-check.test.mjs",
+    "semantic-runtime/docs/measurements/jev-selected-read-20260922.json",
+    "semantic-runtime/docs/domain-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Additional actual consumer validation after the full481-test run: the existing opt-in persisted JEV smoke now obtains its exact admitted event and approved snapshot in one DomainStore.readSnapshot. Both synchronous reads and payload checks complete before judge.evaluate; test instrumentation verifies8snapshot lifetimes and zero model dispatch inside them. New source/whole-model inputs unchanged: only the fixed eight synthetic edge texts plus minimal question/state are sent; no stored source IDs, paths, catalog, ACL, provenance, credentials or labels enter model input. node --test test/domain-store-selected-reads.test.mjs test/jev-ingress-check.test.mjs passes16/16 after this small composition patch, boundaries119files0errors. Live authorized api.typesafe.ai check ran2026-09-22T11:57:09.417Z, requested jev-latest resolved jev-1.13.0:8/8 completed and matched fixture labels,8persisted/reopened/deduplicated/materialized/coherent snapshots,0retries,0rate-limit responses,0transient failures. Successful request timing98–294ms; pacing wait2460ms total, measured separately from request duration. The Keychain credential remained in private process memory and was not printed/stored in this report. Eight pending intents remain; neither the smoke nor an ingress receipt claims semantic workflow completion. This is a small fixed synthetic regression and actual new read API composition, not general model accuracy, load/rate-limit capacity or an installed plugin end-to-end claim.",
+  "ticket_id": "ticket-runtime-store-selected-reads-v0"
+}

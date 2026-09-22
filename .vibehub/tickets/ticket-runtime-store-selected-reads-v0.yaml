@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "scoped-source-range",
+      "criterion": "Implement the exact bounded getSourceRange API described in Context using the existing sources scoped primary-key BINARY range. Validate inert exact options before access, enforce inclusive lower/exclusive upper and direction-relative exclusive after, limit1..64, current opaque scope/action/namespace and a1MiB aggregate response; return {rows,last_id}, never an unscoped iterator/count/offset/SQL API or silently truncated proof. Tests cover both orders, boundaries/empty pages/continuations, malformed/accessor/oversized input and output, and denied tenant/Project/namespace traversal.",
+      "identity": "sha256:dbf71ba6e7da6df32f4cb0ce9bf8da874bde3666207aa562a3b5886c1b59cc55",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "coherent-read-snapshot",
+      "criterion": "Implement synchronous readSnapshot with one coherent SQLite read transaction and a frozen scoped read handle exposing exact record/source and bounded range reads. Add exact source/range methods to existing write handles for read-your-write composition. Require read authorization at every access and before returning; reject expired/revoked/foreign/copied contexts, async/thenable results without invoking accessors, stale handles and nested snapshot/write/close/rebuild operations. Failures roll back and leave the connection reusable; read callbacks cannot mutate through a read handle.",
+      "identity": "sha256:5a0d81ec9823b256d02c22a79fab8a6723216dcfaf8d49e56f4fde96fa92edac",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "selected-read-real-sqlite-proof",
+      "criterion": "Real temporary WAL tests use a second independent connection/process to commit while a read snapshot is active: the active reader retains its initial view and the next view sees committed changes. Exercise scope separation, own uncommitted writes, callback expiry/revocation/reentrancy/rollback, missing/corrupt selected rows and page byte overflow. With at least2048 immutable rows, EXPLAIN QUERY PLAN and actual row iteration show scoped primary-key SEARCH and no full scan/temporary sort/OFFSET for both directions, with at most64 iterated rows and no partial oversized response.",
+      "identity": "sha256:6919fa252f06dc5af51ac507a726340cd067d9ec4d84478a6d91964edb3ac853",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "selected-read-compatibility",
+      "criterion": "Keep DomainStore schema version2 and prior DDL/migration/immutable-source/outbox/CAS behavior unchanged; existing foreign/newer/corrupt-store refusal and explicit migration requirements remain intact. Publish the exact APIs, read linearization and bounded-error/size/continuation contracts without claiming Graph authorization or cross-device consistency. Run affected domain-store/auth/Git/activation/durable-ingress tests, public-entry checks and component boundaries using only synthetic local data and no new dependency or service.",
+      "identity": "sha256:8db9c33d2c0ae9e9c6758b77cacb86e58b4264d3f1cdb93b4026a50563e0ec9e",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Implement only in semantic-runtime/ through its existing standalone package boundary; no additional database, table, migration, ORM, generic query language, listener or dependency.",
+    "Keep all original store tests and contracts; read snapshots do not authorize generic browser/plugin SQL or executable callbacks.",
+    "Use synthetic temporary SQLite fixtures only; no credentials, private traces, live hosts or external model/network calls.",
+    "Range keys and cursors never authenticate latest/as-of/lineage or business access; the consuming domain adapter owns those duties.",
+    "Independent review and acceptance-linked Evidence are required before this prerequisite can unlock the actual Graph adapter."
+  ],
+  "context": "The real Working Graph adapter needs exact historical selected-record lookups and bounded page/rebuild scans. Existing sources already has PRIMARY KEY(tenant_id,project_id,namespace,id), but the public DomainStore has only exact getRecord/getSource and BEGIN IMMEDIATE write transactions. Add only this independently verifiable read prerequisite. Reuse the existing Node SQLite connection, opaque LocalCredentialAuthority, namespace allowlist, inert JSON validation, bounded errors and transaction guard. The parent Graph Store remains draft and still owns all semantic persistence, source/publisher admission, idempotent mutations, indexes, rebuild and end-to-end conformance. This Ticket adds no Graph/domain schema, SQL exposure, generic query language, ORM, new dependency or listener.\n\nExact proposed API: store.getSourceRange(context, namespace, {lower,upper,order,limit,after}) returns {rows,last_id}; lower is inclusive, upper exclusive, order is 'asc' or 'desc', limit is an integer1..64, after is null or an exclusive continuation ID within [lower,upper). All fields are required; lower,upper,after use the existing case-sensitive ASCII identifier grammar and length bound, lower < upper in BINARY order. Ascending adds id > after, descending id < after. Each returned row is {id,kind,value}; last_id is null for an empty page or the last returned id. It is a locator, not an access grant or a claim that another row exists. No count/offset query, unbounded iterator, implicit scope, wildcard, SQL fragment or silently chosen range is accepted. The caller pins its semantic as-of cutoff; this primitive has no semantic/history authority. The complete JSON response must fit1MiB in aggregate (existing per-value depth16/node50000 limits still apply); reject an oversized page without returning a partial proof. Iterate no more than64 SQLite rows, checking aggregate size while consuming rather than loading every large value with .all(). Returning fewer rows solely because the byte budget was reached is forbidden; the caller can explicitly reduce limit.\n\nstore.readSnapshot(context, operation) runs one synchronous read-only callback inside BEGIN DEFERRED/COMMIT or rollback, returning its result only after a fresh opaque grant check. Its frozen, callback-lifetime handle exposes getRecord(namespace,key), getSource(namespace,id), and getSourceRange(namespace,options), bound to that context and scope. Every handle call checks read permission and expiry/revocation. The same getSource and getSourceRange methods are added to existing write-transaction handles and read their actual uncommitted writes without opening a nested transaction. Standalone ranges execute one bounded SELECT; when called inside a snapshot/write callback they use that existing coherent view. No mutator exists on the read handle. One connection-level guard prohibits nested readSnapshot/transaction, close, and rebuild during either callback, including before a first read. Existing top-level scoped reads may compose within the active view; they do not create a second transaction. Handles become stale after success, failure, expiry or rejection. Async/Promise/thenable callbacks are rejected synchronously; no callback-result accessor may be invoked while detecting them. Do not expose SQLite handles/iterators or accept callback code from clients.\n\nAuthentication is store:read for read snapshots/ranges; existing write handles continue to require store:write and store:read for their read methods. Scope and local API audience come solely from the opaque current authority. Check input options as inert exact JSON before field access/destructuring. Unknown namespaces, copied/foreign/revoked contexts, malformed range IDs/order/limit and escaped continuation reject with bounded codes. Retain schema version2 and unchanged migrations/DDL/core preservation rules; this is an API addition using the existing primary-key range index. New bounded page-capacity error is acceptable only if named/documented and tested; do not echo bodies or SQL diagnostics.\n\nConformance uses real temporary SQLite and two independent connections/processes in WAL mode. A reader performs a first scoped record/source read, a second writer commits replacements/appends, then the reader sees the old snapshot and a new read sees the new data. Prove exact ascending/descending boundaries, empty/reversed ranges, exclusive continuation, scope/namespace separation and read-your-write inside one real mutation transaction. Use at least2048 synthetic immutable rows and EXPLAIN QUERY PLAN for each direction to establish SEARCH through the existing scoped primary-key range, with no full source scan, OFFSET or temporary sort. At most64 rows are iterated/returned per request independent of total history. Test aggregate overflow without partial results, inert getters, expired/revoked mid-callback authority, stale handles, nested/close/rebuild attempts, thrown and asynchronous callbacks, malformed persisted selected JSON and normal use after each rollback. Re-run domain-store/auth/Git/activation/durable-ingress suites and component boundaries; no model, live host, private trace, credential or network call is needed. This Ticket does not claim Graph functionality or performance beyond the measured bounded query.",
+  "context_refs": [
+    {
+      "purpose": "Component isolation, independent package and synthetic-state boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Exact existing scoped storage, immutable rows, bounds and migration promises to preserve.",
+      "ref": "semantic-runtime/docs/domain-store-v0.md"
+    },
+    {
+      "purpose": "Actual SQLite schema, BINARY composite primary key and connection/auth/transaction implementation to extend minimally.",
+      "ref": "semantic-runtime/src/local/domain-store.mjs"
+    },
+    {
+      "purpose": "Existing real persistence, migration, crash, CAS and authority regressions remain binding baseline.",
+      "ref": "semantic-runtime/test/domain-store.test.mjs"
+    },
+    {
+      "purpose": "Opaque current authority and same-OS-account trusted composition boundary.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Exact independently accepted storage foundation and compatibility repair.",
+      "ref": ".vibehub/outcomes/ticket-runtime-store-schema-migrations/contract-v2.yaml"
+    },
+    {
+      "purpose": "Concrete consumer selected-record/as-of/paging need; no Graph implementation is included here.",
+      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    },
+    {
+      "purpose": "Existing same-transaction consumer composition that must continue to work.",
+      "ref": "semantic-runtime/docs/project-activation-v0.md"
+    },
+    {
+      "purpose": "Existing same-store source reads, immutable ingress and atomic handoff to keep compatible.",
+      "ref": "semantic-runtime/docs/durable-ingress-v0.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "coherent-read-snapshot",
+          "identity": "sha256:5a0d81ec9823b256d02c22a79fab8a6723216dcfaf8d49e56f4fde96fa92edac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "scoped-source-range",
+          "identity": "sha256:dbf71ba6e7da6df32f4cb0ce9bf8da874bde3666207aa562a3b5886c1b59cc55",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selected-read-compatibility",
+          "identity": "sha256:8db9c33d2c0ae9e9c6758b77cacb86e58b4264d3f1cdb93b4026a50563e0ec9e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "selected-read-real-sqlite-proof",
+          "identity": "sha256:6919fa252f06dc5af51ac507a726340cd067d9ec4d84478a6d91964edb3ac853",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:a13411588ed9f88787e4d193fffe7a31d593be9c141548476ada9addb1007f94",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The existing scoped DomainStore provides indexed bounded immutable-source ranges and synchronous coherent read snapshots for domain adapters, without a schema change or another database.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-local-app-progress",
+    "plan-validation:independent"
+  ],
+  "relations": [
+    {
+      "rationale": "This exact successful foundation supplies the actual DomainStore class, scoped primary key, opaque-auth fences and migration compatibility contract being extended; a different storage baseline would change this deliverable.",
+      "target_ticket_id": "ticket-runtime-store-schema-migrations",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-store-selected-reads-v0"
+}

@@ -46,7 +46,7 @@
         "path": "semantic-runtime/docs/codex-host-probe-v0.md"
       },
       {
-        "blob": "5256e0291b15fa7a2d208af17f51601599af783f",
+        "blob": "0c209b1248de139d468a16f4681911cf6791173c",
         "path": "semantic-runtime/docs/domain-store-v0.md"
       },
       {
@@ -112,6 +112,10 @@
       {
         "blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
         "path": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+      },
+      {
+        "blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
+        "path": "semantic-runtime/docs/measurements/jev-selected-read-20260922.json"
       },
       {
         "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
@@ -234,7 +238,7 @@
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
       },
       {
-        "blob": "2223f42b06f7d19377d3f2bd05b467fa8869db20",
+        "blob": "0a05645bedf1477545ad346680c126417bfb8a18",
         "path": "semantic-runtime/scripts/check-jev-ingress.mjs"
       },
       {
@@ -478,7 +482,7 @@
         "path": "semantic-runtime/src/local/cli.mjs"
       },
       {
-        "blob": "441dec39eeb0ff82fa83bfc69ea9ae11dcac176a",
+        "blob": "fa3fd6f4328eddfe5e42d491f72680d75e203e45",
         "path": "semantic-runtime/src/local/domain-store.mjs"
       },
       {
@@ -564,6 +568,10 @@
       {
         "blob": "88651670e87a1c5e7593061d75e11ba656c57595",
         "path": "semantic-runtime/test/codex-host-probe.test.mjs"
+      },
+      {
+        "blob": "7dd144eb34cbd3476a76b9d2335b0c1991d3d193",
+        "path": "semantic-runtime/test/domain-store-selected-reads.test.mjs"
       },
       {
         "blob": "797b9c08252ed0c219c711d5efcf7c2d3ebef71a",
@@ -742,7 +750,7 @@
         "path": "semantic-runtime/test/incremental-graph.test.mjs"
       },
       {
-        "blob": "1d9c398cb5098a5d2b5ebaaf71bd51c64fb1b21f",
+        "blob": "5f136009cfdee8f5ea0eb87e2afcac718ae4d249",
         "path": "semantic-runtime/test/jev-ingress-check.test.mjs"
       },
       {
@@ -846,8 +854,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T11:37:18.117Z",
-    "last_aligned_commit": "ddcb834b73cc11cb4f2e2d8f0ce5847d82fb6c01"
+    "checked_at": "2026-09-22T11:58:37.393Z",
+    "last_aligned_commit": "4a53cc17aa1792e358f91a8c1bbff1356601600f"
   },
   "anchors": [
     "semantic-runtime/"

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "dataset": "persisted-synthetic-edge-eight-v1",
+  "measured_at": "2026-09-22T11:57:09.417Z",
+  "completed": 8,
+  "matched": 8,
+  "total": 8,
+  "rows": [
+    {
+      "id": "failed-acceptance",
+      "family": "acceptance_relevance",
+      "expected": true,
+      "expected_targets": [
+        "logout"
+      ],
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "logout"
+      ],
+      "confidence": 0.96,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 294,
+      "latency_ms": 295
+    },
+    {
+      "id": "retracted-context",
+      "family": "context_relevance",
+      "expected": true,
+      "expected_targets": [
+        "login"
+      ],
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "login"
+      ],
+      "confidence": 0.9,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 138,
+      "latency_ms": 347
+    },
+    {
+      "id": "two-contexts",
+      "family": "context_relevance",
+      "expected": true,
+      "expected_targets": [
+        "storage",
+        "worker"
+      ],
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [
+        "storage",
+        "worker"
+      ],
+      "confidence": 0.93,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 105,
+      "latency_ms": 469
+    },
+    {
+      "id": "unrelated-targets",
+      "family": "context_relevance",
+      "expected": false,
+      "expected_targets": [],
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.96,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 98,
+      "latency_ms": 496
+    },
+    {
+      "id": "rejected-work",
+      "family": "independently_schedulable_work",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.97,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 141,
+      "latency_ms": 545
+    },
+    {
+      "id": "quoted-instruction",
+      "family": "durable_cross_ticket_value",
+      "expected": false,
+      "status": "ok",
+      "matched": true,
+      "relevant": false,
+      "target_ids": [],
+      "confidence": 0.97,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 139,
+      "latency_ms": 501
+    },
+    {
+      "id": "durable-constraint",
+      "family": "durable_cross_ticket_value",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [],
+      "confidence": 0.85,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 116,
+      "latency_ms": 479
+    },
+    {
+      "id": "concrete-followup",
+      "family": "independently_schedulable_work",
+      "expected": true,
+      "status": "ok",
+      "matched": true,
+      "relevant": true,
+      "target_ids": [],
+      "confidence": 0.97,
+      "model": "jev-1.13.0",
+      "successful_attempt_ms": 136,
+      "latency_ms": 523
+    }
+  ],
+  "ingress": {
+    "stored": 8,
+    "reopened": true,
+    "deduplicated": 8,
+    "materialized": 8,
+    "coherent_read_snapshots": 8,
+    "pending_intents": 8,
+    "semantic_processing_claimed": false
+  },
+  "operational": {
+    "requests": 8,
+    "retries": 0,
+    "rate_limited": 0,
+    "transient_failures": 0,
+    "wait_ms": 2460
+  }
+}
