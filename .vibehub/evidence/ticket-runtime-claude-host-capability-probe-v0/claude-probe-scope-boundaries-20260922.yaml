@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "claude-scope"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "claude-scope",
+      "identity": "sha256:231aaa7221e7d903ecce2db73c7678cb991df48f98ad7f1fc33663a2e4499480",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "claude-probe-scope-boundaries-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:55:28.214Z",
+  "refs": [
+    "semantic-runtime/scripts/probe-claude-host.mjs",
+    "semantic-runtime/test/claude-host-probe.test.mjs",
+    "semantic-runtime/docs/claude-host-probe-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Invocation uses restricted mode, no built-in tools, exact two MCP tool allowlist, strict MCP config, empty settings sources, disabled skills/Chrome, ordinary instruction/auto-memory exclusions and a synthetic system prompt. API-key env is excluded and --bare is absent; CLI owns saved login, account type/billing and resolved model identity were not inspected. Trusted launcher admission fixture checks enabled state, canonical project root, selected session and interactive origin; worker/probe/unknown/foreign/disabled cases fail. All 12 real probe hook rows matched temporary project/session and were excluded from user collection by probe origin. This is tested integration-admission behavior, not production authentication or App activation. Inspected installed help/version/package license and official Anthropic headless/hooks/CLI/memory/legal docs; package license is all-rights-reserved/legal-agreements, not assumed Apache/MIT. No dependencies or third-party transcript parser added; MCP fixture reuses the existing synthetic Codex probe handler. Focused node --test test/claude-host-probe.test.mjs test/codex-host-probe.test.mjs passed 7/7; projection canaries cover prompt/transcript path/tool contents/raw IDs. Recorded real report satisfies final success/exclusion predicate without further calls. Boundaries passed 97 files/zero errors, git diff --check clean, seven Context refs resolved and context guard passed. Temporary project/journal removed; only the synthetic host conversation may persist for resume. Failure replay, durable cursors, real plugin enrollment, compaction and authenticated activation remain explicit downstream work.",
+  "ticket_id": "ticket-runtime-claude-host-capability-probe-v0"
+}

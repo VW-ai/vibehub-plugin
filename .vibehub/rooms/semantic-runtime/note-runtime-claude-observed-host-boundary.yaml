@@ -1,0 +1,39 @@
+{
+  "context_id": "note-runtime-claude-observed-host-boundary",
+  "detail": "这是 Claude Code 2.1.278 的工程观测，不是全量 Collector 或最终交付方案的用户确认。隔离合成调用验证 MCP 查询和 nonce 回执、UserPromptSubmit context、生命周期 hooks、原生 /compact 的 PreCompact/PostCompact 与 compact_boundary，以及同一 session 恢复后确认新的 hook-only 标记。首次带 disable-slash-commands 的压缩尝试没有执行 compaction；只在 literal /compact 调用中移除此限制后实测成功，其它隔离仍保留。报告只保留类型、计时和伪名，不含原始正文、凭据或私人 trace。trusted Worker/probe origin 被排除在用户采集中。TTY、实际插件安装、自动压缩、崩溃重放、durable service receipt 和每条底层模型消息覆盖仍是未验证边界；后续插件按 Project activation 和已测生命周期逐项集成。",
+  "evidence": [
+    {
+      "note": "实测版本、覆盖与原始失败尝试保留。",
+      "ref": "semantic-runtime/docs/claude-host-probe-v0.md"
+    },
+    {
+      "note": "独立验收以补充实测解决 compaction 和 fresh marker 缺口。",
+      "ref": ".vibehub/outcomes/ticket-runtime-claude-host-capability-probe-v0/contract-v1.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-runtime-collector-reuse-and-coverage",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-internal-capabilities-and-host-bridge",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T09:18:27.281Z",
+    "ref": "agent-measurement:2026-09-22-claude-synthetic-host-probe"
+  },
+  "state": "active",
+  "summary": "Claude 合成 hooks/MCP 与手动压缩后新 context 回送已实测，交互插件和崩溃恢复仍待验证",
+  "tags": [
+    "semantic-runtime",
+    "claude-code",
+    "collector",
+    "measured-capability"
+  ],
+  "type": "note"
+}

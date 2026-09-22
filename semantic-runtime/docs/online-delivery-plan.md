@@ -60,6 +60,9 @@ The [domain store](domain-store-v0.md) now supplies scoped durable CAS/source/ou
 transactions. The [Git registry](git-project-enrollment-v0.md) enrolls selected
 folders and registered worktrees, retaining observed identities and immutable
 history; it is still a module awaiting App composition.
+The [Claude capability probe](claude-host-probe-v0.md) verified invocation-local
+hooks/MCP and exact-session delivery after native manual compaction. This remains
+a synthetic CLI probe; TTY/plugin installation and crash replay are still gaps.
 
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20

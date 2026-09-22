@@ -1,0 +1,39 @@
+{
+  "acceptance_ids": [
+    "claude-capture",
+    "claude-delivery",
+    "claude-scope"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "claude-capture",
+      "identity": "sha256:483a9c1ecc931b813716e251202627f795990d8640761e010c4d62a99eab2e56",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "claude-delivery",
+      "identity": "sha256:a9ed58f2c7938b89578493997e499b8c751009cf01f0cb5ae9bb59bbcb268faa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "claude-scope",
+      "identity": "sha256:231aaa7221e7d903ecce2db73c7678cb991df48f98ad7f1fc33663a2e4499480",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "claude-native-compaction-fresh-delivery-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:14:12.790Z",
+  "refs": [
+    "semantic-runtime/scripts/probe-claude-host.mjs",
+    "semantic-runtime/test/claude-host-probe.test.mjs",
+    "semantic-runtime/docs/claude-host-probe-v0.md",
+    "semantic-runtime/docs/measurements/claude-host-compaction-20260922.json"
+  ],
+  "schema_version": 2,
+  "summary": "Supplemental actual-host proof for unchanged Contract v1. Resolved all seven Context refs; governing/guard return no authorities or violations. Added fresh random hook-only markers per invocation, absent from user prompts and earlier turns, and a bounded native /compact phase. First authorized three-invocation follow-up: initial+resume fresh-marker receipt succeeded, but /compact with --disable-slash-commands emitted neither compact_boundary nor compact hooks (6828/1028/3392ms); capability gate correctly failed, raw command text was discarded. A second meaningful follow-up omitted that flag only for the literal native /compact invocation, keeping restricted mode, empty built-in tools/settings sources, strict synthetic MCP, ordinary-instruction/auto-memory exclusions and saved-login credential ownership. Claude Code 2.1.278 requested haiku; final first/compact/post-compact-resume invocations exited 0 in6539/17939/3178ms, with83/12/34 projected events and no timeout/malformed stream. Real first MCP nonce tool-result and assistant/result acknowledgements passed. Native exact-session compact_boundary at17530ms plus manual PreCompact -> SessionStart(source:compact) -> PostCompact(summary presence only) -> SessionEnd were observed. Resume of that same explicit synthetic session acknowledged a different fresh hook-only marker in assistant and result, proving new delivery after actual compaction rather than recall of old marker. All17 real hook rows matched selected temporary project/session and were excluded from collection as trusted probe origin. Compaction summary/text/arguments/diagnostics/IDs/paths/credentials are not retained; command diagnostics project only allowlisted categories. No private transcript/auth/global config inspection or real project data; temporary repository and journal removed, synthetic CLI-owned conversation may remain. No more live calls: six follow-up invocations total across two bounded runs. node --test test/claude-host-probe.test.mjs test/codex-host-probe.test.mjs10/10pass including fresh marker negative recall, compaction native-boundary/manual-hook/session/result failures and diagnostic canaries. Final parser independently rechecked saved minimized report successfully; boundaries97files/0errors. Official commands/hooks/headless docs and installed CLI help informed the native mechanism; --autocompact minimum100k avoided. Interactive TTY/plugin/hot reload, every-message completeness, automatic compaction, summary fidelity, crash/interrupted-compaction recovery and durable replay remain unproven. Executor does not issue Outcome.",
+  "ticket_id": "ticket-runtime-claude-host-capability-probe-v0"
+}

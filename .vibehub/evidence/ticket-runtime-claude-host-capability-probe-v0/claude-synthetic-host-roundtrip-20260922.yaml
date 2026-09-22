@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "claude-capture",
+    "claude-delivery"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "claude-capture",
+      "identity": "sha256:483a9c1ecc931b813716e251202627f795990d8640761e010c4d62a99eab2e56",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "claude-delivery",
+      "identity": "sha256:a9ed58f2c7938b89578493997e499b8c751009cf01f0cb5ae9bb59bbcb268faa",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "claude-synthetic-host-roundtrip-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:55:26.970Z",
+  "refs": [
+    "semantic-runtime/scripts/probe-claude-host.mjs",
+    "semantic-runtime/test/claude-host-probe.test.mjs",
+    "semantic-runtime/docs/claude-host-probe-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Ran node scripts/probe-claude-host.mjs --live-synthetic against installed Claude Code 2.1.278 in an empty temporary Git repository, requested haiku alias, two calls only. Initial print stream-json session used explicit synthetic stdio MCP get_context -> ack_context with nonce and invocation-local UserPromptSubmit context marker. Tool-result VH_CONTEXT_ACK, assistant exact response and successful result were independently observed. Clean process restart resumed only the newly created explicit session UUID; next-turn input and hook-marker assistant/result ack passed. Both exit 0, no timeout/stream error; process times 7213ms and 2835ms. User echo, assistant thinking/text/tool-use block types, tool-result user units, message/block partial event kinds and stable within-response message IDs were observed without recording content. Actual hook journal: SessionStart/UserPromptSubmit, two PreToolUse/PostToolUse pairs, Stop/SessionEnd, then SessionStart/UserPromptSubmit/Stop/SessionEnd on resume. PreCompact/PostCompact were registered but no compaction occurred; no interactive TTY/plugin/full-message/crash-replay/hot-reload guarantee. Full sanitized metadata report was kept only at /private/tmp/vh-claude-host-probe-result.json; version, timing and coverage/gaps are recorded in docs. No auth/private trace scan, reauthentication, broad recorder, existing-project payload or global config changes.",
+  "ticket_id": "ticket-runtime-claude-host-capability-probe-v0"
+}

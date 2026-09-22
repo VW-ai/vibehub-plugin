@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "claude-capture",
+    "claude-delivery",
+    "claude-scope"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T09:15:50.211Z",
+  "contract_revision": {
+    "identity": "sha256:6ca1dbaf59681c4af79f1320971c370698f202ec5f0682d431c6a9097b8d3d4b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "claude-synthetic-host-roundtrip-20260922",
+    "claude-probe-scope-boundaries-20260922",
+    "claude-native-compaction-fresh-delivery-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/branch_scope did not author the Claude probe, tests, documentation, measurements or Evidence. Initial executor was /root/auth_review and supplemental fixes/live runs were by /root/provider_settings. Reviewer independently inspected exact artifacts and minimized reports, ran focused offline tests and adversarial probes, and made no model call or credential/private-trace access. Its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Accepts all three exact Contract v1 criteria after two review findings were fixed with actual host evidence. Original shared hook marker and merely registered compaction hooks were insufficient for fresh-delivery and compaction claims; supplemental work now uses distinct random hook-only markers absent from prompts/prior turns and a literal native /compact invocation. Read the checked-in final minimized report and verified it is byte-identical to the executor saved report. Claude Code 2.1.278 first/native-compaction/exact-session-resume took 6539/17939/3178ms, exited zero, and produced 83/12/34 projected events. Real MCP nonce acknowledgement and separate assistant/result receipts passed; after actual compaction the same explicit synthetic session acknowledged a new hook marker. Native exact-session compact_boundary plus manual PreCompact, SessionStart(source compact), PostCompact(summary presence only) and SessionEnd establish real manual compaction. All seventeen hooks matched the temporary project/session and remained excluded from collection because trusted origin was probe. Independently reran final Claude/Codex focused suite 10/10 and boundary check 97 files/zero errors. Independently recomputed compaction classification from the saved report, checked event labels and hook order, rejected foreign-scope or missing-native-boundary proof, and verified error/content-canary projection; earlier six reviewer probes also covered registration override attempts, same/foreign session errors, bounded 1000-event streams, ID label stability and detached report copies. Fixed argv/environment and source review confirm explicit opt-in, bounded streams/deadlines, synthetic-only tool allowlist, settings exclusions, no credential/private transcript reads or broad recorder installation; documentation cites maintained official interfaces/license and distinguishes local fixture authority from production enrollment. All seven Context refs resolve, governing authorities are empty, guard passes, Ticket validation and git diff --check pass. No remaining blocker within measurement scope and no extra live calls by reviewer. This accepts programmatic host-interface measurement, not interactive TTY/plugin installation, hot reload, every-message completeness, automatic compaction, summary fidelity, crash replay, durable ingestion or production activation. The requested haiku alias was observed; resolved model/account/billing identity was not certified. The first follow-up with slash commands disabled correctly failed its compaction gate and is documented separately; successful later evidence does not rewrite that failed observation.",
+  "ticket_id": "ticket-runtime-claude-host-capability-probe-v0",
+  "unresolved_acceptance_ids": []
+}

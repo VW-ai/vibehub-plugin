@@ -1,0 +1,937 @@
+{
+  "schema_version": 1,
+  "host": "claude-code",
+  "version": "2.1.278",
+  "surface": "print-stream-json-with-mcp-and-invocation-hooks",
+  "source_origin": "probe",
+  "first": {
+    "events": [
+      {
+        "sequence": 1,
+        "elapsed_ms": 905,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-1"
+      },
+      {
+        "sequence": 2,
+        "elapsed_ms": 905,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-2"
+      },
+      {
+        "sequence": 3,
+        "elapsed_ms": 969,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-3"
+      },
+      {
+        "sequence": 4,
+        "elapsed_ms": 1016,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-4"
+      },
+      {
+        "sequence": 5,
+        "elapsed_ms": 1020,
+        "type": "system",
+        "subtype": "init",
+        "event_id": "id-5"
+      },
+      {
+        "sequence": 6,
+        "elapsed_ms": 1024,
+        "type": "system",
+        "subtype": "status",
+        "event_id": "id-6"
+      },
+      {
+        "sequence": 7,
+        "elapsed_ms": 2275,
+        "type": "user",
+        "event_id": "id-7"
+      },
+      {
+        "sequence": 8,
+        "elapsed_ms": 2276,
+        "type": "stream_event",
+        "stream_type": "message_start",
+        "event_id": "id-8"
+      },
+      {
+        "sequence": 9,
+        "elapsed_ms": 2276,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-9"
+      },
+      {
+        "sequence": 10,
+        "elapsed_ms": 2633,
+        "type": "system",
+        "event_id": "id-10"
+      },
+      {
+        "sequence": 11,
+        "elapsed_ms": 2634,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-11"
+      },
+      {
+        "sequence": 12,
+        "elapsed_ms": 3320,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-12"
+      },
+      {
+        "sequence": 13,
+        "elapsed_ms": 3320,
+        "type": "system",
+        "event_id": "id-13"
+      },
+      {
+        "sequence": 14,
+        "elapsed_ms": 3320,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-14"
+      },
+      {
+        "sequence": 15,
+        "elapsed_ms": 3326,
+        "type": "assistant",
+        "block_types": [
+          "thinking"
+        ],
+        "event_id": "id-15",
+        "message_id": "id-16"
+      },
+      {
+        "sequence": 16,
+        "elapsed_ms": 3326,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-17"
+      },
+      {
+        "sequence": 17,
+        "elapsed_ms": 3326,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-18"
+      },
+      {
+        "sequence": 18,
+        "elapsed_ms": 3326,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-19"
+      },
+      {
+        "sequence": 19,
+        "elapsed_ms": 3427,
+        "type": "assistant",
+        "block_types": [
+          "tool_use"
+        ],
+        "event_id": "id-20",
+        "message_id": "id-16",
+        "tools": [
+          "mcp__vh_probe__get_context"
+        ]
+      },
+      {
+        "sequence": 20,
+        "elapsed_ms": 3433,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-21"
+      },
+      {
+        "sequence": 21,
+        "elapsed_ms": 3433,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-22"
+      },
+      {
+        "sequence": 22,
+        "elapsed_ms": 3443,
+        "type": "stream_event",
+        "stream_type": "message_delta",
+        "event_id": "id-23"
+      },
+      {
+        "sequence": 23,
+        "elapsed_ms": 3443,
+        "type": "stream_event",
+        "stream_type": "message_stop",
+        "event_id": "id-24"
+      },
+      {
+        "sequence": 24,
+        "elapsed_ms": 3498,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-25"
+      },
+      {
+        "sequence": 25,
+        "elapsed_ms": 3505,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-26"
+      },
+      {
+        "sequence": 26,
+        "elapsed_ms": 3550,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-27"
+      },
+      {
+        "sequence": 27,
+        "elapsed_ms": 3552,
+        "type": "user",
+        "block_types": [
+          "tool_result"
+        ],
+        "event_id": "id-28"
+      },
+      {
+        "sequence": 28,
+        "elapsed_ms": 3554,
+        "type": "system",
+        "subtype": "status",
+        "event_id": "id-29"
+      },
+      {
+        "sequence": 29,
+        "elapsed_ms": 3965,
+        "type": "stream_event",
+        "stream_type": "message_start",
+        "event_id": "id-30"
+      },
+      {
+        "sequence": 30,
+        "elapsed_ms": 3965,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-31"
+      },
+      {
+        "sequence": 31,
+        "elapsed_ms": 4428,
+        "type": "system",
+        "event_id": "id-32"
+      },
+      {
+        "sequence": 32,
+        "elapsed_ms": 4428,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-33"
+      },
+      {
+        "sequence": 33,
+        "elapsed_ms": 4665,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-34"
+      },
+      {
+        "sequence": 34,
+        "elapsed_ms": 4665,
+        "type": "system",
+        "event_id": "id-35"
+      },
+      {
+        "sequence": 35,
+        "elapsed_ms": 4665,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-36"
+      },
+      {
+        "sequence": 36,
+        "elapsed_ms": 4667,
+        "type": "assistant",
+        "block_types": [
+          "thinking"
+        ],
+        "event_id": "id-37",
+        "message_id": "id-38"
+      },
+      {
+        "sequence": 37,
+        "elapsed_ms": 4667,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-39"
+      },
+      {
+        "sequence": 38,
+        "elapsed_ms": 4667,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-40"
+      },
+      {
+        "sequence": 39,
+        "elapsed_ms": 4667,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-41"
+      },
+      {
+        "sequence": 40,
+        "elapsed_ms": 4742,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-42"
+      },
+      {
+        "sequence": 41,
+        "elapsed_ms": 4768,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-43"
+      },
+      {
+        "sequence": 42,
+        "elapsed_ms": 4887,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-44"
+      },
+      {
+        "sequence": 43,
+        "elapsed_ms": 4895,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-45"
+      },
+      {
+        "sequence": 44,
+        "elapsed_ms": 4895,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-46"
+      },
+      {
+        "sequence": 45,
+        "elapsed_ms": 4895,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-47"
+      },
+      {
+        "sequence": 46,
+        "elapsed_ms": 4901,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-48"
+      },
+      {
+        "sequence": 47,
+        "elapsed_ms": 5026,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-49"
+      },
+      {
+        "sequence": 48,
+        "elapsed_ms": 5027,
+        "type": "assistant",
+        "block_types": [
+          "tool_use"
+        ],
+        "event_id": "id-50",
+        "message_id": "id-38",
+        "tools": [
+          "mcp__vh_probe__ack_context"
+        ]
+      },
+      {
+        "sequence": 49,
+        "elapsed_ms": 5030,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-51"
+      },
+      {
+        "sequence": 50,
+        "elapsed_ms": 5030,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-52"
+      },
+      {
+        "sequence": 51,
+        "elapsed_ms": 5095,
+        "type": "stream_event",
+        "stream_type": "message_delta",
+        "event_id": "id-53"
+      },
+      {
+        "sequence": 52,
+        "elapsed_ms": 5095,
+        "type": "stream_event",
+        "stream_type": "message_stop",
+        "event_id": "id-54"
+      },
+      {
+        "sequence": 53,
+        "elapsed_ms": 5102,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-55"
+      },
+      {
+        "sequence": 54,
+        "elapsed_ms": 5106,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-56"
+      },
+      {
+        "sequence": 55,
+        "elapsed_ms": 5151,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-57"
+      },
+      {
+        "sequence": 56,
+        "elapsed_ms": 5153,
+        "type": "user",
+        "block_types": [
+          "tool_result"
+        ],
+        "event_id": "id-58"
+      },
+      {
+        "sequence": 57,
+        "elapsed_ms": 5154,
+        "type": "system",
+        "subtype": "status",
+        "event_id": "id-59"
+      },
+      {
+        "sequence": 58,
+        "elapsed_ms": 5618,
+        "type": "stream_event",
+        "stream_type": "message_start",
+        "event_id": "id-60"
+      },
+      {
+        "sequence": 59,
+        "elapsed_ms": 5618,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-61"
+      },
+      {
+        "sequence": 60,
+        "elapsed_ms": 6059,
+        "type": "system",
+        "event_id": "id-62"
+      },
+      {
+        "sequence": 61,
+        "elapsed_ms": 6059,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-63"
+      },
+      {
+        "sequence": 62,
+        "elapsed_ms": 6461,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-64"
+      },
+      {
+        "sequence": 63,
+        "elapsed_ms": 6461,
+        "type": "system",
+        "event_id": "id-65"
+      },
+      {
+        "sequence": 64,
+        "elapsed_ms": 6461,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-66"
+      },
+      {
+        "sequence": 65,
+        "elapsed_ms": 6462,
+        "type": "assistant",
+        "block_types": [
+          "thinking"
+        ],
+        "event_id": "id-67",
+        "message_id": "id-68"
+      },
+      {
+        "sequence": 66,
+        "elapsed_ms": 6462,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-69"
+      },
+      {
+        "sequence": 67,
+        "elapsed_ms": 6462,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-70"
+      },
+      {
+        "sequence": 68,
+        "elapsed_ms": 6463,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-71"
+      },
+      {
+        "sequence": 69,
+        "elapsed_ms": 6463,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-72"
+      },
+      {
+        "sequence": 70,
+        "elapsed_ms": 6463,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-73"
+      },
+      {
+        "sequence": 71,
+        "elapsed_ms": 6463,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-74"
+      },
+      {
+        "sequence": 72,
+        "elapsed_ms": 6476,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-75"
+      },
+      {
+        "sequence": 73,
+        "elapsed_ms": 6531,
+        "type": "assistant",
+        "block_types": [
+          "text"
+        ],
+        "event_id": "id-76",
+        "message_id": "id-68"
+      },
+      {
+        "sequence": 74,
+        "elapsed_ms": 6531,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-77"
+      },
+      {
+        "sequence": 75,
+        "elapsed_ms": 6532,
+        "type": "stream_event",
+        "stream_type": "message_delta",
+        "event_id": "id-78"
+      },
+      {
+        "sequence": 76,
+        "elapsed_ms": 6532,
+        "type": "stream_event",
+        "stream_type": "message_stop",
+        "event_id": "id-79"
+      },
+      {
+        "sequence": 77,
+        "elapsed_ms": 6538,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-80"
+      },
+      {
+        "sequence": 78,
+        "elapsed_ms": 6596,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-81"
+      },
+      {
+        "sequence": 79,
+        "elapsed_ms": 6599,
+        "type": "result",
+        "subtype": "success",
+        "event_id": "id-82"
+      }
+    ],
+    "assistant_ack": true,
+    "result_ack": true,
+    "result_success": true,
+    "error_observed": false,
+    "selected_session": true,
+    "tool_ack": true,
+    "exit_code": 0,
+    "malformed_stream": false,
+    "timed_out": false,
+    "elapsed_ms": 7213
+  },
+  "resumed": {
+    "events": [
+      {
+        "sequence": 1,
+        "elapsed_ms": 391,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-1"
+      },
+      {
+        "sequence": 2,
+        "elapsed_ms": 465,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-2"
+      },
+      {
+        "sequence": 3,
+        "elapsed_ms": 522,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-3"
+      },
+      {
+        "sequence": 4,
+        "elapsed_ms": 622,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-4"
+      },
+      {
+        "sequence": 5,
+        "elapsed_ms": 632,
+        "type": "system",
+        "subtype": "init",
+        "event_id": "id-5"
+      },
+      {
+        "sequence": 6,
+        "elapsed_ms": 637,
+        "type": "system",
+        "subtype": "status",
+        "event_id": "id-6"
+      },
+      {
+        "sequence": 7,
+        "elapsed_ms": 1348,
+        "type": "user",
+        "event_id": "id-7"
+      },
+      {
+        "sequence": 8,
+        "elapsed_ms": 1349,
+        "type": "stream_event",
+        "stream_type": "message_start",
+        "event_id": "id-8"
+      },
+      {
+        "sequence": 9,
+        "elapsed_ms": 1349,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-9"
+      },
+      {
+        "sequence": 10,
+        "elapsed_ms": 1694,
+        "type": "system",
+        "event_id": "id-10"
+      },
+      {
+        "sequence": 11,
+        "elapsed_ms": 1694,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-11"
+      },
+      {
+        "sequence": 12,
+        "elapsed_ms": 2096,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-12"
+      },
+      {
+        "sequence": 13,
+        "elapsed_ms": 2096,
+        "type": "system",
+        "event_id": "id-13"
+      },
+      {
+        "sequence": 14,
+        "elapsed_ms": 2096,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-14"
+      },
+      {
+        "sequence": 15,
+        "elapsed_ms": 2098,
+        "type": "assistant",
+        "block_types": [
+          "thinking"
+        ],
+        "event_id": "id-15",
+        "message_id": "id-16"
+      },
+      {
+        "sequence": 16,
+        "elapsed_ms": 2098,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-17"
+      },
+      {
+        "sequence": 17,
+        "elapsed_ms": 2098,
+        "type": "stream_event",
+        "stream_type": "content_block_start",
+        "event_id": "id-18"
+      },
+      {
+        "sequence": 18,
+        "elapsed_ms": 2098,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-19"
+      },
+      {
+        "sequence": 19,
+        "elapsed_ms": 2124,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-20"
+      },
+      {
+        "sequence": 20,
+        "elapsed_ms": 2150,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-21"
+      },
+      {
+        "sequence": 21,
+        "elapsed_ms": 2177,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-22"
+      },
+      {
+        "sequence": 22,
+        "elapsed_ms": 2201,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-23"
+      },
+      {
+        "sequence": 23,
+        "elapsed_ms": 2228,
+        "type": "stream_event",
+        "stream_type": "content_block_delta",
+        "event_id": "id-24"
+      },
+      {
+        "sequence": 24,
+        "elapsed_ms": 2276,
+        "type": "assistant",
+        "block_types": [
+          "text"
+        ],
+        "event_id": "id-25",
+        "message_id": "id-16"
+      },
+      {
+        "sequence": 25,
+        "elapsed_ms": 2276,
+        "type": "stream_event",
+        "stream_type": "content_block_stop",
+        "event_id": "id-26"
+      },
+      {
+        "sequence": 26,
+        "elapsed_ms": 2278,
+        "type": "stream_event",
+        "stream_type": "message_delta",
+        "event_id": "id-27"
+      },
+      {
+        "sequence": 27,
+        "elapsed_ms": 2278,
+        "type": "stream_event",
+        "stream_type": "message_stop",
+        "event_id": "id-28"
+      },
+      {
+        "sequence": 28,
+        "elapsed_ms": 2283,
+        "type": "system",
+        "subtype": "hook_started",
+        "event_id": "id-29"
+      },
+      {
+        "sequence": 29,
+        "elapsed_ms": 2342,
+        "type": "system",
+        "subtype": "hook_response",
+        "event_id": "id-30"
+      },
+      {
+        "sequence": 30,
+        "elapsed_ms": 2345,
+        "type": "result",
+        "subtype": "success",
+        "event_id": "id-31"
+      }
+    ],
+    "assistant_ack": true,
+    "result_ack": true,
+    "result_success": true,
+    "error_observed": false,
+    "selected_session": true,
+    "tool_ack": false,
+    "exit_code": 0,
+    "malformed_stream": false,
+    "timed_out": false,
+    "elapsed_ms": 2835
+  },
+  "hooks": [
+    {
+      "hook": "SessionStart",
+      "at_ms": 1790067152198,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "UserPromptSubmit",
+      "at_ms": 1790067152589,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": true,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "PreToolUse",
+      "at_ms": 1790067155074,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": true
+    },
+    {
+      "hook": "PostToolUse",
+      "at_ms": 1790067155126,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": true
+    },
+    {
+      "hook": "PreToolUse",
+      "at_ms": 1790067156676,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": true
+    },
+    {
+      "hook": "PostToolUse",
+      "at_ms": 1790067156727,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": true
+    },
+    {
+      "hook": "Stop",
+      "at_ms": 1790067158172,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": true,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "SessionEnd",
+      "at_ms": 1790067158282,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "SessionStart",
+      "at_ms": 1790067159246,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "UserPromptSubmit",
+      "at_ms": 1790067159402,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": true,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "Stop",
+      "at_ms": 1790067161131,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": true,
+      "has_tool_use_id": false
+    },
+    {
+      "hook": "SessionEnd",
+      "at_ms": 1790067161252,
+      "selected_project_session": true,
+      "collection_admitted": false,
+      "has_prompt": false,
+      "has_last_assistant_message": false,
+      "has_tool_use_id": false
+    }
+  ],
+  "limits": [
+    "Not an interactive TTY/plugin installation test.",
+    "Compaction and crash replay untested.",
+    "All probe/Worker-origin events excluded from user collection."
+  ]
+}
