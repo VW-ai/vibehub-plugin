@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "capture-boundaries"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "capture-boundaries",
+      "identity": "sha256:c948a05ea78431acf0d447058ed655cc2fc3c6c217c5ac4745fdb1691c50c4e1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "codex-probe-boundaries-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:39:24.429Z",
+  "refs": [
+    "semantic-runtime/scripts/probe-codex-host.mjs",
+    "semantic-runtime/test/codex-host-probe.test.mjs",
+    "semantic-runtime/docs/codex-host-probe-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Inspected local codex --version, exec/app-server/resume help, installed Apache-2.0 package metadata and generated experimental app-server JSON schemas. ThreadStartParams SHA-256 25f490368ec6df52a2a3b82a5469d2413307eb93439121b309f415b5648eee7a. Official OpenAI App Server, non-interactive mode, hooks and config pages fetched; source links and version-specific observed/documented/unverified matrix recorded in docs/codex-host-probe-v0.md. Reused CLI JSONL and a tiny synthetic MCP protocol fixture; no third-party recorder/parser/dependency added. App-server callbacks/hook insertion/compaction/cursors remain untested downstream gaps. Unit command node --test test/codex-host-probe.test.mjs passed 4/4, covering metadata minimization with secret canaries, stable per-run labels, unknown/error unit handling and bounds, nonce-ack fixture behavior, and rejection of false success after timeout/error/incomplete turn. npm run check:boundaries passed 93 files, zero errors; git diff --check clean, eight Context refs resolved and context guard passed. Shell/web/plugins/apps/multi-agent/image tools disabled for live invocation, user config/rules ignored, no API-key env inherited. Existing CLI login remains CLI-owned; account type/billing route was not inspected.",
+  "ticket_id": "ticket-runtime-host-capability-probe-v0"
+}

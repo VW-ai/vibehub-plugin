@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "selected-folder",
+    "git-init-onboarding",
+    "enrollment-conformance"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T09:10:21.354Z",
+  "contract_revision": {
+    "identity": "sha256:4b08e43dbf6ac5539a3567f4fb73e8c95207aeec8a6e4d30de95cb4d7a214358",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "git-project-enrollment-conformance-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/branch_scope authored the prior planning candidate but did not author this Git implementation, tests, documentation or Evidence. Parent /root executed and fixed the review finding. Reviewer inspected exact artifacts, ran focused tests and separate temporary-Git probes; its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all three active criteria in exact Contract v2. Source/public-entry review confirms explicit selected-directory inspection with symlink/nested/common-directory resolution, Git-registered external worktrees and independent refs, bounded fixed Git argv without shell/remotes or inherited Git overrides, and explicit non-Git/bare/unborn/detached/unavailable states. Separate initialization preserves existing files, uses an empty template, rechecks ancestry and creates no commit, remote or activation. Enrollment uses the accepted scoped DomainStore with per-operation project/store actions, expected-version CAS inside the transaction including unchanged scans, and immutable complete catalog-vN source snapshots atomically written with each changed catalog. Stable operational IDs survive unchanged observations/restart while actual gaps, branch deletion/rename/recreation and replacements retain old metadata; move continuity is explicit operator-declared and clone remotes never dedupe. Observed mapping is explicitly not proof of uninterrupted historical incarnation between snapshots. Independently reproduced 41/41 related tests: 18 real Git/SQLite fixtures, 9 branch-scope and 14 identity tests; boundary check passed 97 files with zero errors. Review independently found selected-linked-worktree deletion incorrectly hiding healthy siblings; executor fixed it, and reviewer reran its separate original reproduction: healthy main remains active, removed linked origin is tombstoned, old source bytes remain semantically unchanged, and a subsequent refresh is idempotent. A separate filesystem-stat failure probe returned bounded git_inspection_failed without its path canary. Focused coverage includes clone/Project isolation, denied/revoked/expired/foreign contexts, unchanged restart, stale CAS before and inside persistence, changed discovery with no partial writes, external worktrees, symlinks/spaces, initialization failure preservation, and explicit move history. All eleven Context refs resolve; both exact prerequisite Outcomes are successful, governing authorities are empty, context guard passes, Ticket graph validates and git diff --check is clean. No remaining blocker. This accepts a bounded local registration API, not App UI/activation, live collection, Graph migration, distributed synchronization or certified Git historical continuity. External Git and SQLite are not one atomic transaction; bounded freshness checks and documented source snapshots preserve that limitation.",
+  "ticket_id": "ticket-runtime-git-project-enrollment-v0",
+  "unresolved_acceptance_ids": []
+}

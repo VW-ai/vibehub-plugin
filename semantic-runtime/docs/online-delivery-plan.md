@@ -37,7 +37,7 @@ placement does not mean all inference or every data destination is local.
 Local bootstrap delivered 2026-09-22: `npm start` now serves a loopback status
 page with SQLite readiness, `npm run status` checks it, and SIGINT/SIGTERM stop
 the process while preserving data. This is the local-service-profile slice only;
-app onboarding, project activation, provider settings, collection and Workers remain
+app onboarding, project activation, the provider settings UI, collection and Workers remain
 pending. [Run instructions and boundaries](local-service-profile.md).
 
 OpenRouter adapter delivered 2026-09-22: the pinned official AI SDK provider now
@@ -52,6 +52,14 @@ are modules awaiting App composition; there is no project picker or activation
 UI yet. The [real synthetic JEV check](jev-synthetic-check.md) completed 8/8 cases
 through TypeSafe with 8/8 expected classifications and no observed rate limit.
 It is a basic route check, not evidence of nuanced semantic quality.
+The additional JEV edge suite completed another 8/8 matching cases, including
+exact multiple-target association. The [Codex host probe](codex-host-probe-v0.md)
+also verified synthetic MCP query/ack and next-turn input after exact-ID resume;
+existing Desktop sessions, complete message coverage and compaction remain gaps.
+The [domain store](domain-store-v0.md) now supplies scoped durable CAS/source/outbox
+transactions. The [Git registry](git-project-enrollment-v0.md) enrolls selected
+folders and registered worktrees, retaining observed identities and immutable
+history; it is still a module awaiting App composition.
 
 The [readiness checkpoint](../../.vibehub/rooms/semantic-runtime/note-runtime-foundation-readiness-20260921.yaml)
 records 283 passing component tests and a successful heuristic replay of 20

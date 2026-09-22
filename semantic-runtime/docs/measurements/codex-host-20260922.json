@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "host": "codex-cli",
+  "version": "0.155.1",
+  "surface": "exec-jsonl-with-stdio-mcp",
+  "synthetic_only": true,
+  "first": {
+    "events": [
+      {
+        "sequence": 1,
+        "elapsed_ms": 683,
+        "event": "thread.started"
+      },
+      {
+        "sequence": 2,
+        "elapsed_ms": 710,
+        "event": "turn.started"
+      },
+      {
+        "sequence": 3,
+        "elapsed_ms": 3783,
+        "event": "item.completed"
+      },
+      {
+        "sequence": 4,
+        "elapsed_ms": 9682,
+        "event": "item.started",
+        "item_type": "mcp_tool_call",
+        "item": "item-1"
+      },
+      {
+        "sequence": 5,
+        "elapsed_ms": 9683,
+        "event": "item.completed",
+        "item_type": "mcp_tool_call",
+        "item": "item-1"
+      },
+      {
+        "sequence": 6,
+        "elapsed_ms": 16929,
+        "event": "item.started",
+        "item_type": "mcp_tool_call",
+        "item": "item-2"
+      },
+      {
+        "sequence": 7,
+        "elapsed_ms": 16931,
+        "event": "item.completed",
+        "item_type": "mcp_tool_call",
+        "item": "item-2"
+      },
+      {
+        "sequence": 8,
+        "elapsed_ms": 20011,
+        "event": "item.completed",
+        "item_type": "agent_message",
+        "item": "item-3"
+      },
+      {
+        "sequence": 9,
+        "elapsed_ms": 20036,
+        "event": "turn.completed"
+      }
+    ],
+    "assistant_ack": true,
+    "turn_completed": true,
+    "failure_observed": false,
+    "exit_code": 0,
+    "timed_out": false,
+    "malformed_stream": false,
+    "elapsed_ms": 21105
+  },
+  "resumed": {
+    "events": [
+      {
+        "sequence": 1,
+        "elapsed_ms": 158,
+        "event": "thread.started"
+      },
+      {
+        "sequence": 2,
+        "elapsed_ms": 162,
+        "event": "turn.started"
+      },
+      {
+        "sequence": 3,
+        "elapsed_ms": 5618,
+        "event": "item.completed",
+        "item_type": "agent_message",
+        "item": "item-1"
+      },
+      {
+        "sequence": 4,
+        "elapsed_ms": 5632,
+        "event": "turn.completed"
+      }
+    ],
+    "assistant_ack": true,
+    "turn_completed": true,
+    "failure_observed": false,
+    "exit_code": 0,
+    "timed_out": false,
+    "malformed_stream": false,
+    "elapsed_ms": 6292
+  },
+  "same_thread_after_process_restart": true,
+  "limits": [
+    "Only this newly created synthetic session is selected.",
+    "CLI does not prove Desktop/plugin coverage.",
+    "Compaction and crash replay were not exercised.",
+    "Receipt is transport/model observation, not durable service acceptance."
+  ]
+}

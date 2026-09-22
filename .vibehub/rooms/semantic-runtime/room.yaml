@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "7831f112745d82ef4dad82c0c37bbcd91cf3d247",
+        "blob": "e2842bde0c051c8b5403ea0f20d43483be80206d",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -38,8 +38,24 @@
         "path": "semantic-runtime/docs/causal-ordering-v0.md"
       },
       {
+        "blob": "b57c7ac1be3c071699c799009f6dccca69dde98d",
+        "path": "semantic-runtime/docs/claude-host-probe-v0.md"
+      },
+      {
+        "blob": "37e2ac23bcaeeaa8089737c897e00d504021fed1",
+        "path": "semantic-runtime/docs/codex-host-probe-v0.md"
+      },
+      {
+        "blob": "5256e0291b15fa7a2d208af17f51601599af783f",
+        "path": "semantic-runtime/docs/domain-store-v0.md"
+      },
+      {
         "blob": "1de631289ac07ebdf0eac599903f8a3d63a00097",
         "path": "semantic-runtime/docs/event-provenance-v0.md"
+      },
+      {
+        "blob": "868a3a3c9a95677ba5cf9474fb2c948717ee4ed6",
+        "path": "semantic-runtime/docs/git-project-enrollment-v0.md"
       },
       {
         "blob": "76b8576a07bb2a42a176a7cf3160eb30bb471dd2",
@@ -50,7 +66,7 @@
         "path": "semantic-runtime/docs/identity-contract-v0.md"
       },
       {
-        "blob": "66cf95ee28925df5e2ef14ec4caa7fdba1b9eefc",
+        "blob": "ee9cc6b2eb26e4f44abf5db7d8b25089aea21a00",
         "path": "semantic-runtime/docs/jev-synthetic-check.md"
       },
       {
@@ -62,6 +78,22 @@
         "path": "semantic-runtime/docs/local-service-profile.md"
       },
       {
+        "blob": "8c0a23adbc1691357c582da02634ffb731373dd0",
+        "path": "semantic-runtime/docs/measurements/claude-host-20260922.json"
+      },
+      {
+        "blob": "8b6228b0a638c8cdb9af6919be5c493177c4495b",
+        "path": "semantic-runtime/docs/measurements/codex-host-20260922.json"
+      },
+      {
+        "blob": "44e27698d4ef69befcda945d9bc3022f306b6601",
+        "path": "semantic-runtime/docs/measurements/jev-edge-20260922.json"
+      },
+      {
+        "blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
+        "path": "semantic-runtime/docs/measurements/jev-edge-timing-20260922.json"
+      },
+      {
         "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
         "path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json"
       },
@@ -70,7 +102,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "396176894b7305f7451f0c768faa1f1549d38cbd",
+        "blob": "e0f6856f462a3a4d0275fb68f9f49c55f6a69e11",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -146,7 +178,7 @@
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
       },
       {
-        "blob": "5610214c3090c4625a62c5d61ae2746265f98515",
+        "blob": "589a10e5bb71677eeb985263150e3ee76c2651c3",
         "path": "semantic-runtime/scripts/check-jev-synthetic.mjs"
       },
       {
@@ -156,6 +188,14 @@
       {
         "blob": "c311ef7729b91626e95c33296c3b609c9909ce5a",
         "path": "semantic-runtime/scripts/compare-peel-judges.mjs"
+      },
+      {
+        "blob": "729afdd465123cb858e18d2381ab84d92b436f65",
+        "path": "semantic-runtime/scripts/probe-claude-host.mjs"
+      },
+      {
+        "blob": "5412c2d139bbd02e5cb98220b77b59647f99aa48",
+        "path": "semantic-runtime/scripts/probe-codex-host.mjs"
       },
       {
         "blob": "9dd6592aea0ba1b48a5163b02d04882c1e569a63",
@@ -354,7 +394,7 @@
         "path": "semantic-runtime/src/core/working-graph.mjs"
       },
       {
-        "blob": "69243b6d57f7e0d0ca3e8b63dccd258bda663cce",
+        "blob": "91e295ebff91d9ce9511aca4ee904d86b4fc1ec3",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -364,6 +404,14 @@
       {
         "blob": "69958407d777891d8c678de889c06405bc9e17d2",
         "path": "semantic-runtime/src/local/cli.mjs"
+      },
+      {
+        "blob": "441dec39eeb0ff82fa83bfc69ea9ae11dcac176a",
+        "path": "semantic-runtime/src/local/domain-store.mjs"
+      },
+      {
+        "blob": "2c7417d1307bd9880bf5c1ea3271915f92ba88e0",
+        "path": "semantic-runtime/src/local/git-projects.mjs"
       },
       {
         "blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
@@ -402,8 +450,20 @@
         "path": "semantic-runtime/test/claude-cli-judge.test.mjs"
       },
       {
+        "blob": "69fd0b7c88184ed3b73f78cef2b15a54d166cdba",
+        "path": "semantic-runtime/test/claude-host-probe.test.mjs"
+      },
+      {
         "blob": "e1a11ad2701ddd451a6734098bfacc664908d4fe",
         "path": "semantic-runtime/test/cli.test.mjs"
+      },
+      {
+        "blob": "88651670e87a1c5e7593061d75e11ba656c57595",
+        "path": "semantic-runtime/test/codex-host-probe.test.mjs"
+      },
+      {
+        "blob": "797b9c08252ed0c219c711d5efcf7c2d3ebef71a",
+        "path": "semantic-runtime/test/domain-store.test.mjs"
       },
       {
         "blob": "479dd73b8b557b3361ba2b3114d446188506caa7",
@@ -518,6 +578,10 @@
         "path": "semantic-runtime/test/foundation-integration.test.mjs"
       },
       {
+        "blob": "e2e6773922af143b6f04f522471bd57a497ba9fa",
+        "path": "semantic-runtime/test/git-projects.test.mjs"
+      },
+      {
         "blob": "c68997a1a5a3bbbe97f6d65b49958cfe1f85ffdb",
         "path": "semantic-runtime/test/git-provenance-integration.test.mjs"
       },
@@ -606,7 +670,7 @@
         "path": "semantic-runtime/test/service-auth.test.mjs"
       },
       {
-        "blob": "c2d4ec72f5cfbe2e0d8ef4ca8d809b7c088c062f",
+        "blob": "3dda90fbcdecdbe48a3807ede10b9cf8b523f7e8",
         "path": "semantic-runtime/test/synthetic-jev-check.test.mjs"
       },
       {
@@ -630,8 +694,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T08:28:00.342Z",
-    "last_aligned_commit": "040d5994f070fa8d9ebbd6545a9a30ee08be418a"
+    "checked_at": "2026-09-22T09:11:20.920Z",
+    "last_aligned_commit": "addd01fa140cb4f19a142c5615cf71ef3b5bbca1"
   },
   "anchors": [
     "semantic-runtime/"

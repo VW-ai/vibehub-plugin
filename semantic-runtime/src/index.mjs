@@ -11,6 +11,7 @@ export { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderCo
 export { MacOSSecretStore } from './local/macos-secret-store.mjs';
 export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMaterialization, accessDiagnostic } from './core/service-access.mjs';
 export { LOCAL_AUDIENCE, LocalCredentialAuthority, authorizeLocalRequest } from './local/auth.mjs';
+export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './local/domain-store.mjs';
 export {
   IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity,
 } from './core/identity.mjs';
@@ -69,3 +70,5 @@ export {
   reconciliationPolicyConfig, createReconciliationInput, validateReconciliationProposal,
   encodeReconciliationProposal, validateReconciliationResult,
 } from './core/reconciliation.mjs';
+
+export { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './local/git-projects.mjs';

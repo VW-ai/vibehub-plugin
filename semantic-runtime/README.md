@@ -22,12 +22,18 @@ See the [local service profile](docs/local-service-profile.md) for setup and lim
 
 The local modules now also provide [scoped authentication](docs/service-auth-v0.md),
 [provider settings with macOS Keychain](docs/provider-settings-v0.md) and the
-[exploration/worktree scope contract](docs/branch-scope-v0.md). Project onboarding
+[exploration/worktree scope contract](docs/branch-scope-v0.md), plus a
+[scoped SQLite domain store](docs/domain-store-v0.md) and
+[Git folder/worktree registry](docs/git-project-enrollment-v0.md). Project onboarding
 and the settings UI still need composition; installing these modules does not
 enable collection or background work.
 
 For a small real JEV check, run `npm run check:jev:synthetic` with the TypeSafe key
-configured locally. [Inputs, results and limits](docs/jev-synthetic-check.md).
+configured locally; add `-- edge` for the targeted edge suite.
+[Inputs, results and limits](docs/jev-synthetic-check.md).
+A [real Codex capability probe](docs/codex-host-probe-v0.md) also measures
+MCP query/ack and exact-session next-turn delivery on synthetic inputs; it does
+not install a recorder into existing sessions.
 
 Use Node.js 22.13+ (23.x requires 23.4+); CI targets Node 22 and 24. The SQLite
 adapter uses Node's built-in `node:sqlite`. Production dependencies are the pinned

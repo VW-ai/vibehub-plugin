@@ -1,0 +1,32 @@
+{
+  "acceptance_ids": [
+    "observed-capture",
+    "observed-delivery"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "observed-delivery",
+      "identity": "sha256:4f19cba29b7b4a01fdb11e36ac728ec051238909cee6aefd5c5e66224ca812a0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "observed-capture",
+      "identity": "sha256:6fe96e31ad4cf210c89f59647c8e49a0ee1ece43f0fd60c3d36fb3fafb4271fd",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "codex-synthetic-capture-delivery-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:39:23.361Z",
+  "refs": [
+    "semantic-runtime/scripts/probe-codex-host.mjs",
+    "semantic-runtime/test/codex-host-probe.test.mjs",
+    "semantic-runtime/docs/codex-host-probe-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Measured installed codex-cli 0.155.1 via node scripts/probe-codex-host.mjs --live-synthetic in an empty temporary Git project. Two bounded live CLI turns only: initial stdio MCP fixture query/nonce-ack request, then clean process restart and exact newly returned thread-ID resume with explicit next-turn input. Both processes exited 0, turns completed, exact synthetic assistant acknowledgements passed, and thread identity matched. First turn: two MCP start/completed pairs at 9682-9683ms and 16929-16931ms, assistant completion 20011ms, turn completion 20036ms, process 21105ms. Resume: assistant 5618ms, completion 5632ms, process 6292ms. One first-turn item was outside the known-item allowlist and stays opaque. No user-message item, assistant delta/start, compaction, crash recovery or Desktop coverage is claimed. Script prints allowlisted metadata and ack booleans only; tool bodies/names and raw IDs are not persisted in its report, so this is an observed assistant acknowledgement, not an independently durable service receipt. Final success predicate was checked against the saved sanitized report without another live call. Temporary repo removed; only this synthetic host thread may remain in normal CLI history. No private trace, real project payload, key read, reauthentication, config edit or plugin install.",
+  "ticket_id": "ticket-runtime-host-capability-probe-v0"
+}

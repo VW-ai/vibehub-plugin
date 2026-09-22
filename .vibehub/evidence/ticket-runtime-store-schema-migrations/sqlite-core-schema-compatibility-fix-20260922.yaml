@@ -1,0 +1,38 @@
+{
+  "acceptance_ids": [
+    "store-schema-integrity",
+    "store-migration-runner",
+    "store-concurrency-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "store-schema-integrity",
+      "identity": "sha256:a19b78b0ffe925706a87b4a6630982ea91156a0e9bb4bc87666fc88613c3ce52",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-migration-runner",
+      "identity": "sha256:8ee0dc16594ee5c131557c7ee252e380d6e68c77cfb40b79361eeb7a3d3d0b29",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-concurrency-fixtures",
+      "identity": "sha256:c7598993510af369c7b8ece29aa8ae6b7819213dbea569fa9adc4cae8439813b",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "sqlite-core-schema-compatibility-fix-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:46:19.875Z",
+  "refs": [
+    "semantic-runtime/src/local/domain-store.mjs",
+    "semantic-runtime/test/domain-store.test.mjs",
+    "semantic-runtime/docs/domain-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Addressed independent reviewer finding: APP_ID/user_version/quick_check alone had accepted missing core tables. inspect now checks the full versioned records/sources/outbox DDL against the exact migration artifact, normalized only for whitespace/case, preserving required columns, PK/unique/JSON/check constraints and STRICT mode. Disposable source_kind_index remains rebuildable if missing. Added real SQLite fixtures for missing records, malformed record key/nullability, source missing JSON check, and malformed/non-STRICT outbox. Plan, constructor and migration all reject each, with original database bytes unchanged. Final node --test test/domain-store.test.mjs passed 12/12 including migration/rebuild, independent process CAS and SIGKILL recovery. No new dependency or public SQL API; Context guard passes.",
+  "ticket_id": "ticket-runtime-store-schema-migrations"
+}

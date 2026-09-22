@@ -1,0 +1,44 @@
+{
+  "acceptance_ids": [
+    "store-schema-integrity",
+    "store-migration-runner",
+    "store-rebuild-derived-state",
+    "store-concurrency-fixtures"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "store-schema-integrity",
+      "identity": "sha256:a19b78b0ffe925706a87b4a6630982ea91156a0e9bb4bc87666fc88613c3ce52",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-migration-runner",
+      "identity": "sha256:8ee0dc16594ee5c131557c7ee252e380d6e68c77cfb40b79361eeb7a3d3d0b29",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-rebuild-derived-state",
+      "identity": "sha256:dbea9b117ae3929010373185b7ed61e1de44535e8c50bc6001e48de742fe637c",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "store-concurrency-fixtures",
+      "identity": "sha256:c7598993510af369c7b8ece29aa8ae6b7819213dbea569fa9adc4cae8439813b",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "sqlite-domain-store-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T08:39:44.215Z",
+  "refs": [
+    "semantic-runtime/src/local/domain-store.mjs",
+    "semantic-runtime/test/domain-store.test.mjs",
+    "semantic-runtime/docs/domain-store-v0.md"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented exact Contract v2 as an isolated built-in SQLite store with VHDS application ID, explicit migration owner, opaque LocalCredentialAuthority contexts for every domain operation, exact tenant/project derivation, registered namespaces, versioned JSON CAS records, immutable source IDs and atomic outbox enqueue/ack. node --test test/domain-store.test.mjs passed all 11 tests, including real independent processes racing CAS (one winner) and SIGKILL during a transaction (record/source/outbox all rolled back, restarted writer succeeds); actual competing write produces bounded store_busy. Tests also prove read-only missing/existing migration planning, v1->v2 source retention/backfill, failed migration rollback/retry, foreign/newer/corrupt file preservation, atomic success, duplicate identities, async callback and stale handle rejection, forged/revoked/expired/wrong audience/action contexts, auth recheck before commit, exact tenant/project isolation, malformed/oversized JSON and nonexecuted accessor/toJSON rejection, projection corruption/drop/rebuild with unchanged source bytes and no cross-project population. npm run check:boundaries passed 93 files with no errors; git diff --check and Context guard pass. No model calls, real credentials, bootstrap/provider DB mutation or full domain schemas; migration and source scanning limits documented.",
+  "ticket_id": "ticket-runtime-store-schema-migrations"
+}

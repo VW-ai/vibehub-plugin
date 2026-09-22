@@ -5,24 +5,45 @@
       "criterion": "Normalize an explicitly selected folder, detect its repository/common directory and linked worktrees via Git, including worktrees outside it. Dedupe main/linked selections; branches without checkouts remain refs. Do not scan unrelated home folders or conflate clones by remote URL.",
       "identity": "sha256:fd6272325e6938ae327a223ca40f6965755051808b15f034170ab16dbab89f2c",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "git-init-onboarding",
       "criterion": "For non-Git input expose an explicit initialize action that preserves files, handles unborn HEAD/errors and does not create remote, initial commit or push. Persist project/repo/worktree bindings independently of path/ref rename and retain prior provenance.",
       "identity": "sha256:2597f241f6f43c51470f6bf93cdd92b05d04763726a0bc6ae6a46c742ac6caf0",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "enrollment-conformance",
       "criterion": "Temporary Git fixtures cover external sibling worktrees, branch checkout, detached/unborn HEAD, spaces/symlinks, deletion/prune/recreate, independent clones and restart. Reconcile new/removed worktrees without rewriting old events; core multi-repo mapping remains supported.",
       "identity": "sha256:e61aafdaeeaaaea0182d06d9ed97e2f55d2a463d5b1c0399300f4d0742cb93c4",
       "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "selected-folder",
+      "criterion": "Expose a bounded local Git inspection API for an explicitly selected existing directory. Resolve symlinks and nested paths to the actual worktree root and common Git directory; use Git worktree inventory to discover linked worktrees outside that root and enumerate branch refs separately from checkouts. Return explicit detached/unborn, locked/prunable/unavailable worktree and non-Git/unsupported bare-repository states. Inspect only selected/Git-registered paths, execute fixed Git argv without shell/remote calls or inherited GIT_DIR/worktree overrides, and bound subprocess time/output. Main/linked selections of the same currently observed common directory identify one checkout candidate; matching remote URLs, branch names, paths or OIDs never unify independent clones or prove historic incarnation continuity.",
+      "identity": "sha256:46a1614e4ec905023958c3df8acc47f6b1d736a562883d138c7451d3dbd1ee10",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "git-init-onboarding",
+      "criterion": "Provide separate inspect/enroll/refresh and explicit initialize APIs. Initialize only a selected non-Git directory after a fresh ancestry check, preserving existing files and refusing to overwrite an existing/nested Git repository; create no commit, remote, hook, push or activation. Use the accepted DomainStore with explicit store:read/store:write actions, one versioned git-enrollment/catalog record per authenticated tenant/Project, caller expected-version CAS and an immutable enrollment-change source row in the same transaction. Git inspection stays outside the synchronous transaction, followed by bounded freshness recheck and CAS; report stale/changed discovery rather than claim atomicity with external Git. Persist opaque repository, checkout, worktree and ref-incarnation IDs and retain superseded/tombstoned metadata. Add another repository to the same Project explicitly; do not dedupe clones by remote. Refresh records observations without silently repairing ambiguous identities, moving a Project or auto-adopting exploration context. Exact old IDs may be associated with a moved instance only through an explicit authenticated continuity declaration with prior/current references; label that as operator-declared, not independently proven Git continuity. Persisted mappings remain usable across unchanged rescans/restart at an explicitly observed assurance level; do not require routine re-enrollment. Distinguish operational mapping from certified historical incarnation continuity. Actually observed disappearance/reappearance, conflicting metadata or ambiguous rename yields a recorded gap and unresolved/new-incarnation mapping rather than silently repairing old identity. Git admin-directory plus local stat identity may support observed worktree continuity, but equal stat/path/name/OID or unchanged snapshots do not certify an unobserved branch delete/recreate. Explicitly expose that historical limitation without disabling ordinary unchanged operation. Preserve historical origins and offer new-incarnation enrollment without rewriting past events or scope bases.",
+      "identity": "sha256:b5824ea465cb43d8ec54a562198328b1ea573d5d3321a4933cc2256063dece37",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "enrollment-conformance",
+      "criterion": "Real temporary Git plus SQLite fixtures cover main/linked/nested-folder selections; external sibling worktrees; spaces and symlinks; refs without checkouts; unborn and detached HEAD; branch switching/rename; deletion/prune/recreation at the old name/path; independent clones with the same remote; restart and path-move declarations; multiple repositories in one Project. Prove unchanged rescans/restart reuse operational mappings without re-enrollment. A same-name, same-OID delete/recreate between observations must not be falsely certified as uninterrupted historical incarnation; retain the observed-assurance limitation. Observed disappearance/reappearance must produce explicit gap/new-incarnation handling. Prove stable historical references, explicit ambiguity and idempotent selection association; stale catalog CAS loses without partial source-row writes; foreign/revoked/expired/read-only contexts fail before prohibited discovery or persistence. Verify failed initialization/storage/changed Git leaves user files and prior records intact and returns bounded errors without echoing process output, credentials or arbitrary file contents. Document version/bounds, current identity/branch-scope integration and migration limits; run affected public-entry integration tests, identity/branch-scope tests and component boundary checks. No watcher, graph projection, Git merge, UI, plugin activation or remote synchronization is delivered.",
+      "identity": "sha256:2ac67fbfb23f0eddc73c89ffca8c3a4880fa3857ff2b516872d2ce3493b00b99",
+      "revision": 2,
       "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Implement only inside semantic-runtime/ through documented public contracts; do not import sibling Skill or UI internals.",
     "Preserve original PRD/Tech Design and successful contract/provider Outcomes; completed reference fixtures are baseline, not proof of a live service.",
@@ -31,7 +52,7 @@
     "Branch/exploration scope, worktree execution provenance and Project overview remain distinct; awareness is not adoption.",
     "Honor App project activation and executor-independent Ticket contracts. No installation, real model use, or implementation is claimed by this planning record."
   ],
-  "context": "Own local project enrollment API and durable bindings, not file watcher/diff ingestion or UI. Refine exact identity/store calls after prerequisites.",
+  "context": "Local L1 enrollment adapter only. A trusted local caller supplies an opaque authenticated context already scoped to a Project; the App owns Project creation/pairing later. Use built-in Git CLI and accepted local SQLite DomainStore, with no additional package, daemon, generic registry framework or Git metadata marker protocol. Candidate APIs may be named inspectFolder(context, folder), initializeFolder(context, folder), enroll/refresh(context, expectedVersion, selection); exact names are ordinary implementation choices. Persist a bounded version-1 catalog under namespace git-enrollment/key catalog; retain immutable change snapshots using appendSource in the same CAS transaction. DomainStore getRecord(context, namespace, key) and transaction(context, tx => tx.compareAndSwap/appendSource) are the concrete integration; no raw database access and no Git command inside the synchronous transaction. Persist current observed mappings through routine unchanged rescans/restart so normal local work stays seamless. Operational mapping has observed assurance and is not a certificate of uninterrupted historical incarnation. Git admin-dir plus local stat continuity can support unchanged worktree mapping without becoming universal proof. Actually observed disappearance/reappearance or contradictory metadata requires explicit gap/new mapping; unobserved same-name/same-OID ref recreation remains a stated historical limitation, not a reason to halt every scan. Preserve prior provenance independently and never upgrade observational assurance into certified historical fact. Existing branch-scope contract supplies identity/view semantics; production Graph projections and enrollment generations remain separate. Start only when both preserved direct prerequisites are DONE; do not treat the currently developing store as already accepted.",
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
@@ -56,6 +77,26 @@
     {
       "purpose": "选择 Git 文件夹后识别同仓库的 branch 与所有登记 worktree",
       "ref": ".vibehub/rooms/semantic-runtime/contract-runtime-git-project-enrollment.yaml"
+    },
+    {
+      "purpose": "Stable repository/checkout/worktree/session identity and explicit many-to-many Project membership; paths/ref names are attributes.",
+      "ref": "semantic-runtime/docs/identity-contract-v0.md"
+    },
+    {
+      "purpose": "Accepted exploration/ref-incarnation and execution-workspace contract; no inferred scope, immutable base pins, retained history and immutable-catalog integration limits.",
+      "ref": "semantic-runtime/docs/branch-scope-v0.md"
+    },
+    {
+      "purpose": "Exact successful prerequisite acceptance and explicitly limited reference-contract scope.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-scope-contract-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Opaque local context, revocation/expiry and per-operation scope/action checks; provider keys are never service credentials.",
+      "ref": "semantic-runtime/docs/service-auth-v0.md"
+    },
+    {
+      "purpose": "Concrete scoped getRecord/transaction/CAS/appendSource integration under implementation; execution must first consume the successful store prerequisite Outcome and then verify this API remains compatible.",
+      "ref": "semantic-runtime/src/local/domain-store.mjs"
     }
   ],
   "contract_revisions": [
@@ -79,11 +120,32 @@
       ],
       "identity": "sha256:75f269d5baea918998a42b4ea6907994588724ca40c9e53c01d8444747522963",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "enrollment-conformance",
+          "identity": "sha256:2ac67fbfb23f0eddc73c89ffca8c3a4880fa3857ff2b516872d2ce3493b00b99",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "git-init-onboarding",
+          "identity": "sha256:b5824ea465cb43d8ec54a562198328b1ea573d5d3321a4933cc2256063dece37",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "selected-folder",
+          "identity": "sha256:46a1614e4ec905023958c3df8acc47f6b1d736a562883d138c7451d3dbd1ee10",
+          "revision": 2
+        }
+      ],
+      "identity": "sha256:4b08e43dbf6ac5539a3567f4fb73e8c95207aeec8a6e4d30de95cb4d7a214358",
+      "revision": 2
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
+  "maturity": "firm",
   "outcome": "Register a selected Git folder and discover linked worktrees and branch identities.",
   "provenance_refs": [
     "conversation:2026-09-21-runtime-local-app-goal",

@@ -1,0 +1,39 @@
+{
+  "acceptance_ids": [
+    "selected-folder",
+    "git-init-onboarding",
+    "enrollment-conformance"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "selected-folder",
+      "identity": "sha256:46a1614e4ec905023958c3df8acc47f6b1d736a562883d138c7451d3dbd1ee10",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "git-init-onboarding",
+      "identity": "sha256:b5824ea465cb43d8ec54a562198328b1ea573d5d3321a4933cc2256063dece37",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "enrollment-conformance",
+      "identity": "sha256:2ac67fbfb23f0eddc73c89ffca8c3a4880fa3857ff2b516872d2ce3493b00b99",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "git-project-enrollment-conformance-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T09:05:32.537Z",
+  "refs": [
+    "semantic-runtime/src/local/git-projects.mjs",
+    "semantic-runtime/test/git-projects.test.mjs",
+    "semantic-runtime/docs/git-project-enrollment-v0.md",
+    "semantic-runtime/src/index.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Implemented exact Contract v2 using bounded fixed Git argv and scoped DomainStore. 18 real Git/SQLite tests pass covering main/linked/nested/external/symlink/trailing-space selection, refs without checkouts, unborn/detached HEAD, explicit initialization preservation, same-remote clone and Project isolation, restart/idempotence, branch switch/rename/deletion/recreation, observed missing/prunable worktrees and returning incarnation, explicit directory move, vanished originally selected linked worktree with healthy sibling retention, denied/expired/revoked/foreign contexts, ignored inherited Git overrides, stale CAS before and during transaction including unchanged rescans, and Git changed during discovery. Immutable catalog-vN source snapshots retain prior head/path/ID bindings in same transaction as CAS. Latest full verification before final linked-selection regression passed 355 with one intentional native Keychain skip; related identity/branch-scope run passed38; newest Git focused suite18pass. Review caught selected-linked deletion marking healthy siblings unavailable, now fixed with explicit regression. Context guard passes, public import exercised. No source contents/private traces/models/remotes read; no App activation/UI, live Graph projection or historical incarnation certification claimed.",
+  "ticket_id": "ticket-runtime-git-project-enrollment-v0"
+}

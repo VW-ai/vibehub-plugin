@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "capture-boundaries",
+    "observed-capture",
+    "observed-delivery"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T08:43:51.915Z",
+  "contract_revision": {
+    "identity": "sha256:575e3568fbfc454537b3e975c652ce380a0a88cbc68e51943ce5a2bc2bd9d27a",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "codex-synthetic-capture-delivery-20260922",
+    "codex-probe-boundaries-20260922"
+  ],
+  "independence": {
+    "note": "Independent /root/provider_settings subagent did not implement or execute this Codex probe. It reviewed the exact Contract, Evidence, code, docs and saved sanitized live report, independently reproduced offline tests and checked installed version. Its only write for this Ticket is this Outcome; live calls were not repeated.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Accepts all three criteria of exact Contract v2 as a capability measurement, not a Collector or installed plugin. Installed codex-cli 0.155.1 matches the saved synthetic report. Source and report establish two completed CLI processes, clean exact-ID thread continuity, two MCP start/completed pairs and exact synthetic assistant acknowledgement followed by explicit next-turn acknowledgement. Reproduced all four offline parser/fixture tests; independently checked the actual report success predicate, monotonic per-process sequence/time, field allowlist, immutable report copies and cross-fixture nonce rejection. Actual live run was reviewed through its sanitized report and existing Evidence, not rerun by this reviewer. The source prints no raw IDs, messages, tool payloads, provider errors or credentials; unknown units remain opaque. Child invocations ignore user configuration/rules, disable unrelated tools, use an empty temporary repository and preserve only CLI-owned saved-login handling. The documented matrix distinguishes observed MCP/assistant units from missing user items, unverified intermediate model messages, app-server callbacks, hooks, compaction, crash replay and Desktop/plugin coverage. Two MCP completions plus an assistant ack are explicitly not an independently durable service receipt. Primary documentation links, installed-schema observations, Apache-2.0 executable reuse, absent recorder dependencies, collection scope, cursor loss and downstream gaps are documented. All eight Context refs resolved, Context guard passed, Ticket validation passed, and no private trace, real key, host configuration edit or additional model call was used for closeout. No blocking findings within this measured-inventory Contract; later plugin/Collector/receipt criteria still require their own live integration evidence.",
+  "ticket_id": "ticket-runtime-host-capability-probe-v0",
+  "unresolved_acceptance_ids": []
+}

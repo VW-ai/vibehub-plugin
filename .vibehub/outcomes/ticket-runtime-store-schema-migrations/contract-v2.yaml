@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "store-schema-integrity",
+    "store-migration-runner",
+    "store-rebuild-derived-state",
+    "store-concurrency-fixtures"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T08:47:37.219Z",
+  "contract_revision": {
+    "identity": "sha256:3d5c0456f4a0a55cae93e88b91b7e0f9e2e8e84122d6b2dfacb2d96e260eb36d",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "sqlite-domain-store-conformance-20260922",
+    "sqlite-core-schema-compatibility-fix-20260922"
+  ],
+  "independence": {
+    "note": "Independent subagent /root/branch_scope performed read-only plan validation earlier, but did not author or edit the storage implementation, its tests, or its Evidence. Storage execution and review-finding fix were authored by /root/provider_settings. This review inspected exact artifacts and reproduced tests plus separate adversarial probes; its only canonical write for this Ticket is this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all four current criteria in exact Contract v2. The isolated built-in SQLite adapter uses its own VHDS application ID and explicit owner migration boundary, with exact tenant/Project scope derived from opaque LocalCredentialAuthority contexts, per-operation action/audience/expiry/revocation checks and a precommit fence. Synchronous BEGIN IMMEDIATE transactions atomically combine CAS JSON records, immutable source IDs and durable unique outbox enqueue/ack; async callbacks, stale handles, nested transactions, forged/revoked/expired contexts and unregistered namespaces fail with bounded errors. Explicit read-only migration planning creates no missing path or changes domain schema/data; v1-to-v2 migrations retain source bytes, roll back on failure, reject downgrade and preserve foreign/newer/corrupt files. Review found and executor fixed a concrete missing-core-table compatibility gap: required records/sources/outbox DDL is now checked against the immutable migration artifact while the disposable projection remains rebuildable. Independently reran the original DROP TABLE records reproduction: plan/open/migrate all reject incompatible_store and preserve file bytes. Reproduced final 12/12 focused tests, including two independent CAS contenders (exactly one winner), SIGKILL before commit with rollback/restart, real bounded busy error, migration retry, scope isolation, projection corruption/drop/rebuild without source modification, and JSON accessor/toJSON inertness. Eight additional independent probes passed: foreign-authority contexts; inert prototype-like keys; stale handles after successful commit; write-only callback read failure rolling back outbox; cycle/symbol/nonenumerable/accessor rejection without hook execution; namespace/tuple scope separation; revoked callbacks not invoked; and unchanged migration-plan bytes with a live store connection. Reviewed parent pre-fix integration log: 334 passed, zero failed, one explicitly opt-in native Keychain skip; that broad run was not repeated by this reviewer. Boundary scan passed 93 files, zero errors; all six Ticket Context refs resolved, service-auth prerequisite Outcome was checked, governing authorities were empty, context guard passed, ticket validation and git diff --check passed. No remaining blocker. This accepts local store primitives and a disposable source-kind projection, not Semantic Graph/domain schemas, host collection, database isolation against hostile same-OS-account code, distributed delivery or destructive future migrations.",
+  "ticket_id": "ticket-runtime-store-schema-migrations",
+  "unresolved_acceptance_ids": []
+}

@@ -1,0 +1,39 @@
+{
+  "context_id": "note-runtime-codex-observed-host-boundary",
+  "detail": "这是工程实测笔记，不是用户选择了最终 Collector 方案。Codex CLI 0.155.1 的两轮隔离合成测试完成 MCP context query/nonce ack，第二进程按精确新建 thread ID resume 并确认下一轮输入。只证明所拥有 CLI 会话的这些公开边界；没有观察到独立 user-message item，没有验证每条底层模型消息、现有 Desktop 会话、插件 hook、compaction、崩溃重放或 durable service receipt。App-server schema/hook 文档的能力存在不等于这条路径已在线验证。后续 Collector 必须逐宿主维护能力/gap 表，按 Project activation 和明确授权接入，不能把本探针扩写成全量采集保证。保持原有 context 辅助与可执行工作请求/工具回执的区分。",
+  "evidence": [
+    {
+      "note": "实测矩阵、复现命令、版本、最小输入和明确覆盖缺口。",
+      "ref": "semantic-runtime/docs/codex-host-probe-v0.md"
+    },
+    {
+      "note": "独立验收接受观察结果，保留未测能力而非推断产品已接入。",
+      "ref": ".vibehub/outcomes/ticket-runtime-host-capability-probe-v0/contract-v2.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-runtime-collector-reuse-and-coverage",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-runtime-internal-capabilities-and-host-bridge",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-22T08:45:55.611Z",
+    "ref": "agent-measurement:2026-09-22-codex-synthetic-host-probe"
+  },
+  "state": "active",
+  "summary": "Codex 合成 MCP 查询与下一轮回送已实测，完整 Desktop 消息采集仍未验证",
+  "tags": [
+    "semantic-runtime",
+    "codex",
+    "collector",
+    "measured-capability"
+  ],
+  "type": "note"
+}
