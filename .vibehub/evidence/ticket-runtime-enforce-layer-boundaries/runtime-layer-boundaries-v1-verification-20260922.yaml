@@ -1,0 +1,41 @@
+{
+  "acceptance_ids": [
+    "production-sccs-are-measured",
+    "target-layer-directions-are-enforced",
+    "boundary-check-is-part-of-release-verification"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-sccs-are-measured",
+      "identity": "sha256:5d15c40aea66cda844a9844f8cc09f836d2567dafd9d84d430970cd423432dd5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "target-layer-directions-are-enforced",
+      "identity": "sha256:dbb6578e3aa8849122821acf36cabf673fbd477bddf95a69c899b073dd1cfc02",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "boundary-check-is-part-of-release-verification",
+      "identity": "sha256:f0cbb5a88f8bd786f8febfe26afbaf9c87eae32dcace388cd879f0a6e24dfa22",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-layer-boundaries-v1-verification-20260922",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-22T21:29:41Z",
+  "refs": [
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "The offline boundary checker now scans src, scripts, test, tools, verification and research while excluding nested node_modules and temporary .local state. Current src/core and target src/domain are pure: only the existing inert node:crypto and node:util/types built-ins are admitted, external packages such as ai are refused, and imports into application, adapters, app-local or generic production fail. Current src/local roles are derived from the accepted layout inventory's exact intended destination; target application and adapters cannot add app-local dependencies, and production cannot import research, verification or test code. The checker reports 15 exact pre-existing application/adapter -> src/local/auth.mjs edges as baselined_direction_exceptions; each exception requires the same normalized from/to edge in the accepted production import baseline, so a second importer or any new edge fails. Self-contained research packages may own installed dependencies through their nearest package.json, which preserves the planned Postgres research boundary without adding a Runtime dependency. Production SCC inspection covers .mjs, .cjs, .js and .ts static imports, re-exports and literal import() edges, reports the exact four-file canonical-source-reader/context-inputs/exploration-canonical/graph-store SCC, admits only the exact baselined component and rejects new or enlarged cycles with exact paths. Focused boundary/layout tests pass 13/13, including legacy-role, external-provider, nested-research and .js-cycle regressions. Updated full Runtime verification passes 1024 tests with 1022 passed, zero failed and two existing opt-in Keychain skips; updated standalone installation verification reports the same totals outside the repository. Root plugin artifact verification passes with 79 files and 3670088 bytes. Git diff checking, Context guard and VibeHub Ticket validation pass. Independent read-only review first found three false negatives, then reproduced the fixes and reported no remaining material acceptance gap. No production module was moved, no public API or Runtime behavior changed, and no dependency was added; this structural Ticket made no live model call because its acceptance is deterministic, while the full suites continued to cover the existing synthetic JEV paths.",
+  "ticket_id": "ticket-runtime-enforce-layer-boundaries"
+}

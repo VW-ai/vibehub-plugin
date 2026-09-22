@@ -370,7 +370,7 @@
         "path": "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs"
       },
       {
-        "blob": "68af9dcd0424fdfd9a13ef4270ee25b1de26b56c",
+        "blob": "3513259f18adafa54e0e50a45711aba94661d34e",
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
       },
       {
@@ -422,7 +422,7 @@
         "path": "semantic-runtime/scripts/probe-codex-host.mjs"
       },
       {
-        "blob": "05fcc8732ec3d173e55b648a7067433caf4d9a9b",
+        "blob": "59a50178fae0e1c60f2fbb338eb674963ada2c31",
         "path": "semantic-runtime/scripts/runtime-layout.mjs"
       },
       {
@@ -830,7 +830,7 @@
         "path": "semantic-runtime/test/app-transport.test.mjs"
       },
       {
-        "blob": "3274be1813ca4934758f7a94f816e467ca6a3dd9",
+        "blob": "5179122ef33cfd9ad7bc2142e966b56626376ad4",
         "path": "semantic-runtime/test/boundaries.test.mjs"
       },
       {
@@ -1434,8 +1434,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T21:04:58.721Z",
-    "last_aligned_commit": "28c5a98924c8bf5e6417303611dc7431a4f899db"
+    "checked_at": "2026-09-22T21:30:59.048Z",
+    "last_aligned_commit": "bc82f3fbee3518bfdda57a4a03fa145e3e8a2320"
   },
   "anchors": [
     "semantic-runtime/"

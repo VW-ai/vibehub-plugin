@@ -215,7 +215,7 @@ function contractConstants(root) {
 }
 
 function productionGraph(root) {
-  const files = listFiles(root, 'src').filter(path => path.endsWith('.mjs')).sort();
+  const files = listFiles(root, 'src').filter(path => /\.(?:mjs|cjs|js|ts)$/.test(path)).sort();
   const nodes = new Set(files);
   const edgeKeys = new Set();
   for (const from of files) {
@@ -270,6 +270,15 @@ function productionGraph(root) {
   return { edges, strongly_connected_components: components };
 }
 
+export function inspectProductionGraph(root = scriptRoot) {
+  return productionGraph(resolve(root));
+}
+
+export function readRuntimeLayoutBaseline(root = scriptRoot) {
+  const path = resolve(root, BASELINE_PATH);
+  return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : null;
+}
+
 function commandMode(name) {
   if (name === 'start' || name === 'app' || name === 'status') return 'local-runtime';
   if (name === 'example:gateway' || name === 'replay:jev' || name.startsWith('smoke:')
@@ -322,9 +331,8 @@ function compareSection(name, expected, actual, errors) {
 
 export function checkRuntimeLayout(root = scriptRoot) {
   root = resolve(root);
-  const path = resolve(root, BASELINE_PATH);
-  if (!existsSync(path)) return { ok: false, inventory_checked: false, errors: [`missing Runtime layout baseline: ${BASELINE_PATH}`] };
-  const baseline = JSON.parse(readFileSync(path, 'utf8'));
+  const baseline = readRuntimeLayoutBaseline(root);
+  if (!baseline) return { ok: false, inventory_checked: false, errors: [`missing Runtime layout baseline: ${BASELINE_PATH}`] };
   const current = inspectRuntimeLayout(root);
   const errors = [];
   for (const section of ['inventory_roots', 'root_exports', 'npm_commands', 'contract_constants', 'standalone_copy_paths', 'production_import_edges', 'production_sccs']) {

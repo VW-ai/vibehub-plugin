@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "production-sccs-are-measured",
+    "target-layer-directions-are-enforced",
+    "boundary-check-is-part-of-release-verification"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-22T21:41:14Z",
+  "contract_revision": {
+    "identity": "sha256:30a8c6735ead109fcae3051886640a7b1f1db246fe29a4449809e52af8827910",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-layer-boundaries-v1-verification-20260922"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent; I did not execute or author the implementation, Ticket, or Evidence, and independently reviewed the acceptance behavior and its corrections.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three criteria of exact Contract v1 through native Evidence runtime-layer-boundaries-v1-verification-20260922. The deterministic checker reports the exact four-file Graph/Context/Canonical SCC, accepts only that baselined component, and rejects new or enlarged cycles across supported JavaScript and TypeScript extensions. Current and target roles enforce domain purity, application/adapters-to-app-local boundaries, and production isolation from research, verification, and test; the 15 pre-existing auth edges remain visible as exact baseline-bound direction exceptions, while new edges fail, and nested research packages retain local dependency ownership. Existing check:boundaries and verify commands remain stable, required checker inputs survive standalone copying, deliberate violations produce focused failures, and the recorded focused, full Runtime, standalone, artifact, diff, Context-guard, and project-validation checks pass offline. Independent review reproduced the original false negatives, verified their fixes and the exact-edge exception behavior, and found no remaining material acceptance gap. No production module, public API, Runtime behavior, or dependency changed.",
+  "ticket_id": "ticket-runtime-enforce-layer-boundaries",
+  "unresolved_acceptance_ids": []
+}
