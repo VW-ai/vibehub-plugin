@@ -781,6 +781,11 @@
       "intended_destination": "src/application/graph/graph-capability.mjs"
     },
     {
+      "path": "src/application/graph/graph-selected.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-selected.mjs"
+    },
+    {
       "path": "src/application/query/query-contract.mjs",
       "current_role": "production",
       "intended_destination": "src/application/query/query-contract.mjs"
@@ -999,11 +1004,6 @@
       "path": "src/local/graph-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-inputs.mjs"
-    },
-    {
-      "path": "src/local/graph-selected.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/graph/graph-selected.mjs"
     },
     {
       "path": "src/local/graph-service-bundle.mjs",
@@ -2534,6 +2534,10 @@
     },
     {
       "from": "src/application/context/context-reader.mjs",
+      "to": "src/application/graph/graph-selected.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
       "to": "src/core/context-profile.mjs"
     },
     {
@@ -2557,16 +2561,20 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/application/context/context-reader.mjs",
-      "to": "src/local/graph-selected.mjs"
-    },
-    {
       "from": "src/application/context/context-store.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
     {
       "from": "src/application/context/context-store.mjs",
       "to": "src/local/local-runtime-composition.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-selected.mjs",
+      "to": "src/core/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-selected.mjs",
+      "to": "src/local/graph-inputs.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
@@ -3385,14 +3393,6 @@
       "to": "src/local/source-invalidation.mjs"
     },
     {
-      "from": "src/local/graph-selected.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/graph-selected.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
       "from": "src/local/graph-service-bundle.mjs",
       "to": "src/application/context/context-inputs.mjs"
     },
@@ -3438,6 +3438,10 @@
     },
     {
       "from": "src/local/graph-store.mjs",
+      "to": "src/application/graph/graph-selected.mjs"
+    },
+    {
+      "from": "src/local/graph-store.mjs",
       "to": "src/core/causal-ordering.mjs"
     },
     {
@@ -3471,10 +3475,6 @@
     {
       "from": "src/local/graph-store.mjs",
       "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/graph-selected.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",

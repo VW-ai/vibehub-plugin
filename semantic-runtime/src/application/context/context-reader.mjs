@@ -1,6 +1,6 @@
 import { GraphInputs, graphInput, graphFields, graphId, graphEqual, graphHash, graphKey, graphErrorCode, graphFail } from '../../local/graph-inputs.mjs';
 import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
-import { selectGraph } from '../../local/graph-selected.mjs';
+import { selectGraph } from '../graph/graph-selected.mjs';
 import { ExplorationInputs, readExplorationOwner, EXPLORATION_NAMESPACE } from '../../local/exploration-inputs.mjs';
 import { verifyExplorationPublication } from '../../local/exploration-adoption.mjs';
 import { resolveIncrementalGraph, pageIncrementalGraph, validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
