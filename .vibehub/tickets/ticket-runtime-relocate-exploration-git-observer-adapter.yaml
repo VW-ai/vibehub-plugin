@@ -1,0 +1,112 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "exploration-git-observer-adapter-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/exploration-physical.mjs moves byte-for-byte to semantic-runtime/src/adapters/git/exploration-physical.mjs. The old path is absent, no compatibility shim or re-export remains, every other production source file retains its path and bytes except that semantic-runtime/src/local/exploration-inputs.mjs changes only its one import specifier to the new path; focused tests, layout baseline, relocation provenance and Room metadata may change only to verify and record the move.",
+      "identity": "sha256:4fad55192f404aa10dde501c74df0fb6aa1b71d68fca65838c54d524ecbddede",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-git-observer-contract-is-preserved",
+      "criterion": "observeExplorationGit retains the same signature, return fields and exploration_physical_changed failure. It still performs bounded no-follow filesystem reads; verifies selected worktree, common Git directory and physical identities; handles directory and gitfile worktrees; validates symbolic, detached and unborn HEAD states plus loose or packed branch refs; rechecks HEAD, ref and directory identities against races; and never reads Git config or index or invokes Git.",
+      "identity": "sha256:4b9d86dfc5aa69c673e3b56e331ebfd4679076623a876e0a20815e74ec484314",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-git-observer-relocation-is-auditable-and-verifiable",
+      "criterion": "The regenerated Runtime layout baseline records src/adapters/git/exploration-physical.mjs with exactly one incoming production edge, zero outgoing production edges, 333 total production edges, zero production SCCs, zero direction exceptions and zero boundary errors. The relocation manifest and repository-aware focused test bind old blob dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed, the new path, the actual migration commit and git-exploration-observer-adapter category while historical Tickets, Evidence and Outcomes retain accepted old-path references. Focused Exploration input/projection/security/recovery/scale, branch-scope, layout and boundary tests, deterministic mocked JEV exploration checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:d3876b250cb5970570d6f227100a83f4d548349581921cdd26046209d6f4434e",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one byte-for-byte path-only adapter migration. Do not change exploration-physical.mjs executable bytes; change only the one import specifier in its single production consumer.",
+    "Do not move or refactor exploration-inputs, exploration-canonical, exploration-adoption, exploration-store, git-projects, git-worktree-sensor, Graph, Context, Judge, storage, app/local, research, verification, tests or documentation modules in this Ticket.",
+    "Do not add a compatibility shim, re-export, public export, port, dependency injection layer, Git subprocess, config/index read or broader filesystem access; do not alter schemas, namespaces, digests, receipts, authorization, transaction behavior, error codes or commands.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/exploration-physical.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic. Synthetic temporary Git fixtures are allowed; credential, Keychain lifecycle, external host, network, provider, live JEV and user-repository access are not authorized."
+  ],
+  "context": "Move the existing selected-Exploration physical Git observer from src/local to its declared adapters/git destination. Preserve the module byte-for-byte and change only its single production consumer import. This is one isolated adapter relocation after the Graph application seams were proven.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, adapter boundary and path-only migration rules.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, intended adapters/git destination, one-edge topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Successful Outcome establishing the selected Exploration projection and physical Git verification contract.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Accepted Exploration branch/worktree projection, current-head and fail-closed physical identity behavior.",
+      "ref": "semantic-runtime/docs/exploration-projection-v0.md"
+    },
+    {
+      "purpose": "Exact pre-relocation selected-Exploration Git observer source and blob.",
+      "ref": "commit:859e7a8663faaaf3ae5b09c6eec797fb7a7db973:semantic-runtime/src/local/exploration-physical.mjs"
+    },
+    {
+      "purpose": "The observer single production consumer and authorized Exploration input workflow.",
+      "ref": "semantic-runtime/src/local/exploration-inputs.mjs"
+    },
+    {
+      "purpose": "Focused behavior, race and filesystem-safety verification for the observer through its production consumer.",
+      "ref": "semantic-runtime/test/exploration-inputs.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exploration-git-observer-adapter-home-is-exact",
+          "identity": "sha256:4fad55192f404aa10dde501c74df0fb6aa1b71d68fca65838c54d524ecbddede",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-git-observer-contract-is-preserved",
+          "identity": "sha256:4b9d86dfc5aa69c673e3b56e331ebfd4679076623a876e0a20815e74ec484314",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-git-observer-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:d3876b250cb5970570d6f227100a83f4d548349581921cdd26046209d6f4434e",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8079a21aa052c463293562dd376624761ecc84571e61dcbb6962fc50a3795fec",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The bounded selected-Exploration Git observer lives under src/adapters/git with unchanged filesystem safety, HEAD/ref validation and fail-closed behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-capability-layout",
+    "subagent-audit:exploration-local-seam-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-exploration-git-observer-adapter"
+}
