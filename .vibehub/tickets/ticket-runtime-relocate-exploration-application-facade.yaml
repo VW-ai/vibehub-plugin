@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "exploration-application-facade-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/exploration-store.mjs moves to semantic-runtime/src/application/explorations/exploration-store.mjs. The source changes only its three relative import or re-export specifiers; lines 6 through 24 retain body SHA-256 e95a54735d713d6c26254b937bfa24c9fffd86b19f57202f652274a410f6fd6 and the transformed file has Git blob 55d21684c5183113cc0404d7ad21f6986a592bd6. The old path is absent, no compatibility shim or re-export remains, semantic-runtime/src/index.mjs and src/local/judge-inputs.mjs change only their one consumer specifier, test/judge-inputs.test.mjs and test/local-composition.test.mjs change only their one direct-test specifier, and every other production source file retains its path and bytes.",
+      "identity": "sha256:ea0854a24415a13ba43fc425896140e990cab8daeb0878dc4c2b3c5da6ba8e02",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-application-facade-contract-is-preserved",
+      "criterion": "LocalExplorationStore and EXPLORATION_NAMESPACE remain the same root public exports. LocalExplorationStore keeps one-options-object construction, validates and copies canonical_reader through graphInput, obtains the fixed composed Graph through composeLocalServices, and exposes the same bind, mutate, adopt, setProjectSelection, getBinding, getSelection, resolve, page, list and getReceipt delegations. Graph continues to own every admitted transaction; composition identity, authorization, schemas, namespaces, digests, receipts, errors and observable behavior remain unchanged.",
+      "identity": "sha256:f9272eb6002893968337915d51b9986c5070957613f4c5ab7099694ebc222dbb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-application-facade-relocation-is-auditable-and-verifiable",
+      "criterion": "The regenerated Runtime layout baseline records src/application/explorations/exploration-store.mjs with 333 total production edges, exactly two incoming and three outgoing edges, zero production SCCs, zero direction exceptions and zero boundary errors. The relocation manifest and repository-aware focused test bind old blob 0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b, the new path, the actual migration commit and exploration-application-facade category while historical Tickets, Evidence and Outcomes retain accepted old-path references. Focused Exploration, Judge, composition, layout and boundary tests, deterministic mocked JEV Exploration checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:495210b42f2e40edb98343bd99b89b1825cac54229d7a76f7dfee01c758cc3f4",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one path-first application-facade migration. Do not change executable logic beyond the three required relative specifiers, the two production consumer specifiers, two direct-test import specifiers and focused path/provenance assertions.",
+    "Do not move or refactor graph-inputs, local-runtime-composition, exploration-inputs, exploration-canonical, exploration-adoption, graph-service-bundle, Graph, Context, Judge, Query, adapters, app/local, research, verification or other tests and documentation modules in this Ticket.",
+    "Do not rename LocalExplorationStore, introduce dependency injection, ports, compatibility shims or public exports, or alter schemas, SQL, transactions, namespaces, digests, receipts, authorization order, error codes, provider routing or commands.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/exploration-store.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic. Credential, Keychain lifecycle, external host, network, provider, live JEV and user-repository access are not authorized."
+  ],
+  "context": "Move LocalExplorationStore from the transitional src/local tree to its declared src/application/explorations home. Preserve the facade body exactly and change only the three relative specifiers required by the new depth plus the two production and two direct-test consumer imports. This is an isolated path-first migration; the existing Graph composition and transaction seam remain authoritative.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, application boundary and path-first relocation rules.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, declared destination, 333-edge topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the selected Exploration projection contract consumed through the facade.",
+      "ref": ".vibehub/outcomes/ticket-runtime-branch-graph-projection-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining exact cross-Exploration adoption semantics consumed through the facade.",
+      "ref": ".vibehub/outcomes/ticket-runtime-exploration-adoption-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome establishing the fixed composition seam and zero-cycle architecture preserved by this move.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact pre-relocation facade source and old Git blob.",
+      "ref": "commit:55450923ec8ecc46e037075f65f4bb12ca0217af:semantic-runtime/src/local/exploration-store.mjs"
+    },
+    {
+      "purpose": "Root public export consumer whose specifier changes without changing its public names.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Judge application consumer whose fixed Exploration binding remains unchanged.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Direct composition and facade structural verification whose import follows the move.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Direct Judge-input behavior verification whose import follows the move.",
+      "ref": "semantic-runtime/test/judge-inputs.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exploration-application-facade-contract-is-preserved",
+          "identity": "sha256:f9272eb6002893968337915d51b9986c5070957613f4c5ab7099694ebc222dbb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-application-facade-home-is-exact",
+          "identity": "sha256:ea0854a24415a13ba43fc425896140e990cab8daeb0878dc4c2b3c5da6ba8e02",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-application-facade-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:495210b42f2e40edb98343bd99b89b1825cac54229d7a76f7dfee01c758cc3f4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b281d831dbdd65ccac964ef4273bab34be43b75ca14958aaaf3bdd19733762eb",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The selected Exploration application facade lives under src/application/explorations with unchanged public API, fixed Graph composition and Graph-owned transaction behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-capability-layout",
+    "subagent-audit:exploration-local-seam-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-exploration-application-facade"
+}
