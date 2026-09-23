@@ -1,5 +1,5 @@
 import { ExplorationCanonical } from './exploration-canonical.mjs';
-import { ContextInputs } from './context-inputs.mjs';
+import { ContextInputs } from '../application/context/context-inputs.mjs';
 import { ExplorationInputs } from './exploration-inputs.mjs';
 import { ContextReadService } from '../application/context/context-read-service.mjs';
 import { graphCapabilityFor, withGraphCapability } from './graph-capability.mjs';

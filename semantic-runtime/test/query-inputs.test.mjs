@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { QueryInputs } from '../src/application/query/query-inputs.mjs';
-import { LocalContextStore } from '../src/local/context-store.mjs';
+import { LocalContextStore } from '../src/application/context/context-store.mjs';
 import { fixture, CONTEXT_ACTIONS, publish, head, rows, adoption, canonicalRefs, gitCodeRef, bind } from './helpers/context-fixture.mjs';
 import { pin } from './helpers/exploration-fixture.mjs';
 

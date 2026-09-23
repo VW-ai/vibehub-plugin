@@ -1,10 +1,10 @@
-import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
-import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
-import { graphInput, graphFields, graphEqual, graphHash, graphErrorCode } from './graph-inputs.mjs';
-import { validateContextContent1, CONTEXT_PROFILE_ERROR_CODES } from '../core/context-profile.mjs';
-import { canonicalArtifactAddress, validateProvenanceClosure } from '../core/working-graph.mjs';
-import { eventObservationKey } from '../core/event-provenance.mjs';
-import { canonical } from '../core/contracts.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
+import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from '../../local/exploration-canonical.mjs';
+import { graphInput, graphFields, graphEqual, graphHash, graphErrorCode } from '../../local/graph-inputs.mjs';
+import { validateContextContent1, CONTEXT_PROFILE_ERROR_CODES } from '../../core/context-profile.mjs';
+import { canonicalArtifactAddress, validateProvenanceClosure } from '../../core/working-graph.mjs';
+import { eventObservationKey } from '../../core/event-provenance.mjs';
+import { canonical } from '../../core/contracts.mjs';
 
 export const CONTEXT_INPUT_ERROR_CODES = Object.freeze(['invalid_context_input', 'context_capacity', 'context_transition_invalid',
   'context_unauthorized', 'invalid_context_proof', 'context_ticket_unavailable', 'context_source_mismatch']);

@@ -5,7 +5,7 @@ import { fixture, publish, contextRequest, content, canonicalRefs, gitCodeRef, r
   boundedFailure, head, CONTEXT_ACTIONS, SCOPE } from './helpers/context-fixture.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
 import { DomainStore } from '../src/adapters/sqlite/domain-store.mjs';
-import { ContextInputs } from '../src/local/context-inputs.mjs';
+import { ContextInputs } from '../src/application/context/context-inputs.mjs';
 import { bindRequest, pin } from './helpers/exploration-fixture.mjs';
 
 test('all six methods require context read and mutations additionally require context write', t => {

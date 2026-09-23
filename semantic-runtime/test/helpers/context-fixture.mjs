@@ -1,6 +1,6 @@
 import { fixture as adoptionFixture, adoption, ADOPTION_ACTIONS } from './adoption-fixture.mjs';
 import { mutation, assertion, rows, register, capture, bind, git, SCOPE } from './exploration-fixture.mjs';
-import { LocalContextStore } from '../../src/local/context-store.mjs';
+import { LocalContextStore } from '../../src/application/context/context-store.mjs';
 import { graphHash } from '../../src/local/graph-inputs.mjs';
 import { canonicalArtifactAddress } from '../../src/core/working-graph.mjs';
 import { hashText } from './graph-store-fixture.mjs';

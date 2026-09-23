@@ -1,7 +1,7 @@
 import { exactRevisionAddress } from '../../core/working-graph.mjs';
 import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority } from '../../domain/identity/access-authority.mjs';
-import { ContextInputs, CONTEXT_INPUT_ERROR_CODES } from '../../local/context-inputs.mjs';
+import { ContextInputs, CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
 import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from '../../local/exploration-canonical.mjs';
 import { ExplorationInputs, EXPLORATION_ERROR_CODES, readExplorationOwner } from '../../local/exploration-inputs.mjs';
 import { GraphInputs, graphAssert, graphEqual, graphErrorCode, graphFail, graphHash, graphInput } from '../../local/graph-inputs.mjs';

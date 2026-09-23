@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateContextContent1, validateContextOperation1, isContextContent1 } from '../src/core/context-profile.mjs';
-import { ContextInputs } from '../src/local/context-inputs.mjs';
+import { ContextInputs } from '../src/application/context/context-inputs.mjs';
 import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
 import { exactRevisionAddress } from '../src/core/working-graph.mjs';

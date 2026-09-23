@@ -285,6 +285,27 @@ test('layout inspection captures public surface, command modes, constants and an
   ]);
   assert.equal(current.production_import_edges.filter(edge =>
     edge.from === 'src/application/context/context-reader.mjs').length, 8);
+  const contextWriteNodes = new Set([
+    'src/application/context/context-inputs.mjs',
+    'src/application/context/context-store.mjs',
+  ]);
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    contextWriteNodes.has(edge.from) || contextWriteNodes.has(edge.to)), [
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/context-profile.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/contracts.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/event-provenance.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/working-graph.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/identity/access-authority.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/local/exploration-canonical.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/context/context-read-service.mjs', to: 'src/application/context/context-inputs.mjs' },
+    { from: 'src/application/context/context-store.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/context/context-store.mjs', to: 'src/local/local-runtime-composition.mjs' },
+    { from: 'src/index.mjs', to: 'src/application/context/context-store.mjs' },
+    { from: 'src/local/graph-service-bundle.mjs', to: 'src/application/context/context-inputs.mjs' },
+    { from: 'src/local/graph-store.mjs', to: 'src/application/context/context-inputs.mjs' },
+    { from: 'src/local/judge-inputs.mjs', to: 'src/application/context/context-store.mjs' },
+  ]);
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
 

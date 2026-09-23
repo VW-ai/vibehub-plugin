@@ -3,7 +3,7 @@ import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-autho
 import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { LocalExplorationStore } from './exploration-store.mjs';
-import { LocalContextStore } from './context-store.mjs';
+import { LocalContextStore } from '../application/context/context-store.mjs';
 import { readContextSelection } from '../application/context/context-reader.mjs';
 import { composeLocalServices } from './local-runtime-composition.mjs';
 import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';

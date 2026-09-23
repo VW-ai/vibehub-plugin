@@ -98,7 +98,7 @@ export { CANONICAL_RECORD_PROFILE, parseCanonicalRecord, evaluateCanonicalRecord
 export { LocalExplorationStore, EXPLORATION_NAMESPACE } from './local/exploration-store.mjs';
 export { LocalJudgeRuntime, executeJudgeNode, executeContextJudgeNode } from './local/judge-runtime.mjs';
 export { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from './core/judge-node.mjs';
-export { LocalContextStore } from './local/context-store.mjs';
+export { LocalContextStore } from './application/context/context-store.mjs';
 export { validateContextContent1, validateContextOperation1 } from './core/context-profile.mjs';
 export { LocalQueryEngine } from './application/query/query-engine.mjs';
 export { rankContextWindowV1 } from './core/query-ranking.mjs';

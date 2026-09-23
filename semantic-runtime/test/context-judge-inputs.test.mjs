@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LocalContextStore } from '../src/local/context-store.mjs';
+import { LocalContextStore } from '../src/application/context/context-store.mjs';
 import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
 import { judgeInputHash } from '../src/core/contracts.mjs';

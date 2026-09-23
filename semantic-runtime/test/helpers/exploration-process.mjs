@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { DomainStore } from '../../src/adapters/sqlite/domain-store.mjs';
 import { connect } from './exploration-fixture.mjs';
-import { LocalContextStore } from '../../src/local/context-store.mjs';
+import { LocalContextStore } from '../../src/application/context/context-store.mjs';
 import { CONTEXT_ACTIONS } from './context-fixture.mjs';
 
 const [mode, filePath, commandPath] = process.argv.slice(2);
