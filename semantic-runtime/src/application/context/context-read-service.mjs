@@ -12,7 +12,7 @@ import {
   planContextSelection,
   readContextSelection,
   validateContextReadRequest,
-} from '../../local/context-reader.mjs';
+} from './context-reader.mjs';
 
 // Preserve the Graph facade's bounded error surface while DomainStore replaces
 // arbitrary callback failures with store_unavailable at its transaction edge.

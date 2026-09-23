@@ -761,6 +761,11 @@
       "intended_destination": "src/application/context/context-read-service.mjs"
     },
     {
+      "path": "src/application/context/context-reader.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/context/context-reader.mjs"
+    },
+    {
       "path": "src/application/query/query-contract.mjs",
       "current_role": "production",
       "intended_destination": "src/application/query/query-contract.mjs"
@@ -939,11 +944,6 @@
       "path": "src/local/context-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/context/context-inputs.mjs"
-    },
-    {
-      "path": "src/local/context-reader.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/context/context-reader.mjs"
     },
     {
       "path": "src/local/context-store.mjs",
@@ -2471,6 +2471,10 @@
     },
     {
       "from": "src/application/context/context-read-service.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
       "to": "src/core/working-graph.mjs"
     },
     {
@@ -2480,10 +2484,6 @@
     {
       "from": "src/application/context/context-read-service.mjs",
       "to": "src/local/context-inputs.mjs"
-    },
-    {
-      "from": "src/application/context/context-read-service.mjs",
-      "to": "src/local/context-reader.mjs"
     },
     {
       "from": "src/application/context/context-read-service.mjs",
@@ -2502,6 +2502,42 @@
       "to": "src/local/source-invalidation.mjs"
     },
     {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/core/context-profile.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/core/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/core/working-graph.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/local/exploration-adoption.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/local/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/local/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/local/graph-selected.mjs"
+    },
+    {
+      "from": "src/application/query/query-contract.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
       "from": "src/application/query/query-contract.mjs",
       "to": "src/core/causal-ordering.mjs"
     },
@@ -2512,10 +2548,6 @@
     {
       "from": "src/application/query/query-contract.mjs",
       "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/application/query/query-contract.mjs",
-      "to": "src/local/context-reader.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
@@ -2559,6 +2591,10 @@
     },
     {
       "from": "src/application/query/query-inputs.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/application/query/query-inputs.mjs",
       "to": "src/application/query/query-contract.mjs"
     },
     {
@@ -2580,10 +2616,6 @@
     {
       "from": "src/application/query/query-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/application/query/query-inputs.mjs",
-      "to": "src/local/context-reader.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
@@ -3114,38 +3146,6 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/adapters/sqlite/graph-storage.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/core/context-profile.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/local/exploration-adoption.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/local/graph-selected.mjs"
-    },
-    {
       "from": "src/local/context-store.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
@@ -3427,6 +3427,10 @@
     },
     {
       "from": "src/local/graph-store.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/local/graph-store.mjs",
       "to": "src/core/causal-ordering.mjs"
     },
     {
@@ -3448,10 +3452,6 @@
     {
       "from": "src/local/graph-store.mjs",
       "to": "src/local/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/context-reader.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
@@ -3527,6 +3527,10 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/local/judge-inputs.mjs",
       "to": "src/core/context-profile.mjs"
     },
     {
@@ -3552,10 +3556,6 @@
     {
       "from": "src/local/judge-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/context-reader.mjs"
     },
     {
       "from": "src/local/judge-inputs.mjs",

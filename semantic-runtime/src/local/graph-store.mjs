@@ -1,6 +1,6 @@
 import { CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
 import { validateContextContent1, validateContextOperation1 } from '../core/context-profile.mjs';
-import { materializeContextShared, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
+import { materializeContextShared, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from '../application/context/context-reader.mjs';
 import { selectGraph } from './graph-selected.mjs';
 import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority } from '../domain/identity/access-authority.mjs';

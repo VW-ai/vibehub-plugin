@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { fixture, contextRequest, selectedInput, head, content, canonicalRefs, CONTEXT_ACTIONS } from './helpers/context-fixture.mjs';
 import { GraphInputs } from '../src/local/graph-inputs.mjs';
 import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
-import { readContextSelection, planContextSelection, validateContextReadRequest } from '../src/local/context-reader.mjs';
+import { readContextSelection, planContextSelection, validateContextReadRequest } from '../src/application/context/context-reader.mjs';
 
 const append = (f, name, options = {}) => f.explorations.mutate(f.context, contextRequest(f, f.a, name, options));
 function reader(f) {

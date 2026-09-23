@@ -4,7 +4,7 @@ import { validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
 import { validateSemanticAddress } from '../../core/working-graph.mjs';
 import { validateFreshnessVector } from '../../core/causal-ordering.mjs';
 import { validateExplorationPin } from '../../local/exploration-inputs.mjs';
-import { validateContextReadRequest } from '../../local/context-reader.mjs';
+import { validateContextReadRequest } from '../context/context-reader.mjs';
 
 export const queryFailure = code => Object.assign(new Error(`Local Query: ${code}`), { code });
 export const queryCheck = (ok, code = 'query_invalid_request') => { if (!ok) throw queryFailure(code); };

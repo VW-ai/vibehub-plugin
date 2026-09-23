@@ -4,7 +4,7 @@ import { GraphInputs, graphHash, graphEqual, graphErrorCode } from '../../local/
 import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
 import { readExplorationOwner } from '../../local/exploration-inputs.mjs';
 import { composeLocalServices } from '../../local/local-runtime-composition.mjs';
-import { planContextSelection, readContextSelection } from '../../local/context-reader.mjs';
+import { planContextSelection, readContextSelection } from '../context/context-reader.mjs';
 import { verifyExplorationPublication } from '../../local/exploration-adoption.mjs';
 import { SourceInvalidationFeed } from '../../local/source-invalidation.mjs';
 import { queryRequest, queryCopy, queryCheck, queryFailure } from './query-contract.mjs';

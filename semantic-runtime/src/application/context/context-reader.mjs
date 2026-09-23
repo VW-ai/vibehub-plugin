@@ -1,11 +1,11 @@
-import { GraphInputs, graphInput, graphFields, graphId, graphEqual, graphHash, graphKey, graphErrorCode, graphFail } from './graph-inputs.mjs';
-import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
-import { selectGraph } from './graph-selected.mjs';
-import { ExplorationInputs, readExplorationOwner, EXPLORATION_NAMESPACE } from './exploration-inputs.mjs';
-import { verifyExplorationPublication } from './exploration-adoption.mjs';
-import { resolveIncrementalGraph, pageIncrementalGraph, validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
-import { exactRevisionAddress, semanticAddress, validateSemanticAddress } from '../core/working-graph.mjs';
-import { validateContextContent1, validateContextOperation1 } from '../core/context-profile.mjs';
+import { GraphInputs, graphInput, graphFields, graphId, graphEqual, graphHash, graphKey, graphErrorCode, graphFail } from '../../local/graph-inputs.mjs';
+import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
+import { selectGraph } from '../../local/graph-selected.mjs';
+import { ExplorationInputs, readExplorationOwner, EXPLORATION_NAMESPACE } from '../../local/exploration-inputs.mjs';
+import { verifyExplorationPublication } from '../../local/exploration-adoption.mjs';
+import { resolveIncrementalGraph, pageIncrementalGraph, validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
+import { exactRevisionAddress, semanticAddress, validateSemanticAddress } from '../../core/working-graph.mjs';
+import { validateContextContent1, validateContextOperation1 } from '../../core/context-profile.mjs';
 
 export const CONTEXT_READER_ERROR_CODES = Object.freeze(['context_invalid_request', 'context_cursor_mismatch',
   'context_graph_changed', 'context_capacity', 'context_unavailable', 'context_corrupt']);

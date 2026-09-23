@@ -219,6 +219,16 @@ test('layout inspection captures public surface, command modes, constants and an
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.to.startsWith('src/application/query/') && !edge.from.startsWith('src/application/query/')),
   [{ from: 'src/index.mjs', to: 'src/application/query/query-engine.mjs' }]);
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    edge.to === 'src/application/context/context-reader.mjs'), [
+    { from: 'src/application/context/context-read-service.mjs', to: 'src/application/context/context-reader.mjs' },
+    { from: 'src/application/query/query-contract.mjs', to: 'src/application/context/context-reader.mjs' },
+    { from: 'src/application/query/query-inputs.mjs', to: 'src/application/context/context-reader.mjs' },
+    { from: 'src/local/graph-store.mjs', to: 'src/application/context/context-reader.mjs' },
+    { from: 'src/local/judge-inputs.mjs', to: 'src/application/context/context-reader.mjs' },
+  ]);
+  assert.equal(current.production_import_edges.filter(edge =>
+    edge.from === 'src/application/context/context-reader.mjs').length, 8);
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
 
