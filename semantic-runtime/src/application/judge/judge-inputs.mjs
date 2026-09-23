@@ -9,7 +9,7 @@ import { composeLocalServices } from '../support/local-runtime-composition.mjs';
 import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
 import { SourceInvalidationFeed } from '../sources/source-invalidation.mjs';
 import { GraphInputs, graphInput, graphFields, graphEqual, graphHash, graphId, graphErrorCode } from '../graph/graph-inputs.mjs';
-import { canonical, FAMILIES, judgeInputHash } from '../../core/contracts.mjs';
+import { canonical, FAMILIES, judgeInputHash } from '../../domain/shared/contracts.mjs';
 import { scopedReference } from '../../domain/identity/service-access.mjs';
 import { effectiveEventAccess, eventObservationKey, verifyEventPayload } from '../../domain/sources/event-provenance.mjs';
 import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';

@@ -2,12 +2,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { replay } from './core/replay.mjs';
-import { compareRuns } from './core/evaluation.mjs';
-import { requireValue } from './core/contracts.mjs';
-import { HeuristicJudge } from './adapters/providers/heuristic-judge.mjs';
-import { JevJudge } from './adapters/providers/jev-judge.mjs';
-import { RecordedJudge } from './adapters/providers/recorded-judge.mjs';
+import { replay } from './src/replay.mjs';
+import { compareRuns } from './src/evaluation.mjs';
+import { requireValue } from '../../src/domain/shared/contracts.mjs';
+import { HeuristicJudge } from './adapters/heuristic-judge.mjs';
+import { JevJudge } from '../../src/adapters/providers/jev-judge.mjs';
+import { RecordedJudge } from './adapters/recorded-judge.mjs';
 import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
 
 const HELP = `Semantic Runtime — offline Phase 0 prototype
@@ -71,7 +71,7 @@ export async function main(argv) {
       : judgeKind === 'jev' ? new JevJudge() : new HeuristicJudge();
     const events = readEvents(options.events);
     const state = options.state ? readJson(options.state) : [];
-    const policy = readJson(options.policy ?? fileURLToPath(new URL('../policies/phase0.json', import.meta.url)));
+    const policy = readJson(options.policy ?? fileURLToPath(new URL('./policies/phase0.json', import.meta.url)));
     const labels = options.labels ? readJson(options.labels) : undefined;
     const store = new SqliteCandidateStore(database);
     try {

@@ -1,4 +1,4 @@
-import { FAMILIES, canonical, requireValue } from './contracts.mjs';
+import { FAMILIES, canonical, requireValue } from '../../../src/domain/shared/contracts.mjs';
 
 const ratio = (numerator, denominator) => denominator ? numerator / denominator : null;
 

@@ -4,7 +4,7 @@ import { isProxy } from 'node:util/types';
 import { TypeSafeJevJudge } from './typesafe-jev-judge.mjs';
 import { JevJudge } from './jev-judge.mjs';
 import { OpenRouterJevJudge } from './openrouter-jev-judge.mjs';
-import { validateDecision } from '../../core/contracts.mjs';
+import { validateDecision } from '../../domain/shared/contracts.mjs';
 import { graphInput, graphFields } from '../../application/graph/graph-inputs.mjs';
 import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY } from './provider-settings.mjs';
 

@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { fingerprint } from '../../src/core/contracts.mjs';
+import { fingerprint } from '../../src/domain/shared/contracts.mjs';
 import { compilePolicyArtifact } from '../../src/domain/decisions/policy-artifacts.mjs';
 import { CONTEXT_JUDGE_NODE_OPERATION, JUDGE_NODE_OPERATION } from '../../src/domain/judge/judge-node.mjs';
 import { LocalJudgeRuntime } from '../../src/application/judge/judge-runtime.mjs';

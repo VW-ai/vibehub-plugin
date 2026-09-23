@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildComparisonReport, verifyComparableRuns } from '../scripts/compare-peel-judges.mjs';
+import { buildComparisonReport, verifyComparableRuns } from '../compare-peel-judges.mjs';
 
 const families = ['acceptance_relevance', 'durable_cross_ticket_value', 'context_relevance', 'independently_schedulable_work'];
 const metrics = value => Object.fromEntries(families.map(family => [family, {

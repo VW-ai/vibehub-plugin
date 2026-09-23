@@ -3,7 +3,7 @@ import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from '../../adapters/git/git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';
-import { canonical, fingerprint } from '../../core/contracts.mjs';
+import { canonical, fingerprint } from '../../domain/shared/contracts.mjs';
 import { EVENT_TYPES, validateRawEvent, normalizeRawEvent, effectiveEventAccess,
   verifyEventPayload, eventIdempotencyKey, sourceObjectKey } from '../../domain/sources/event-provenance.mjs';
 import { sourcePartitionKey, sourceEventFingerprint, createSourceCursor, acceptSourceEvent } from '../../domain/sources/causal-ordering.mjs';

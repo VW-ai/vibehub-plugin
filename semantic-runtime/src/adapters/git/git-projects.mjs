@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { realpathSync, statSync, existsSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { fingerprint, sameScope } from '../../core/contracts.mjs';
+import { fingerprint, sameScope } from '../../domain/shared/contracts.mjs';
 import { validateIdentityCatalog } from '../../domain/identity/identity.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
 import { DomainStore } from '../sqlite/domain-store.mjs';

@@ -101,10 +101,16 @@ cd semantic-runtime
 npm ci --ignore-scripts
 npm run verify
 npm run verify:standalone
-npm run replay -- --events test/fixtures/events.jsonl \
-  --state test/fixtures/state.json --labels test/fixtures/labels.json \
+npm run replay -- --events research/phase0-replay/fixtures/synthetic/events.jsonl \
+  --state research/phase0-replay/fixtures/synthetic/state.json \
+  --labels research/phase0-replay/fixtures/synthetic/labels.json \
   --tenant demo --project auth --dataset-kind synthetic
 ```
+
+The isolated [Phase 0 replay research vertical](research/phase0-replay/phase0-contracts.md)
+contains the historical evaluator, policies, fixtures, benchmark runners and
+deterministic tests. It is exercised by the full checkout verification but is
+excluded from the independently installed production Runtime.
 
 The first curated real-trajectory fixture selects 20 sanitized events from the
 Peel project's VibeHub development trace. It keeps event input, point-in-time

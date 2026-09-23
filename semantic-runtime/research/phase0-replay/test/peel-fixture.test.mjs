@@ -1,14 +1,15 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { FAMILIES, normalizeEvent, normalizeState, visibleState } from '../src/core/contracts.mjs';
-import { HeuristicJudge } from '../src/adapters/providers/heuristic-judge.mjs';
-import { replay } from '../src/core/replay.mjs';
-import { PacedJudge, verifyBenchmarkReport } from '../scripts/benchmark-peel-jev.mjs';
-import { codexTurnIdentity, resolveProvenanceEntry } from '../scripts/verify-peel-provenance.mjs';
-import { fixture } from './helpers.mjs';
+import { FAMILIES } from '../../../src/domain/shared/contracts.mjs';
+import { normalizeEvent, normalizeState, visibleState } from '../src/contracts.mjs';
+import { HeuristicJudge } from '../adapters/heuristic-judge.mjs';
+import { replay } from '../src/replay.mjs';
+import { PacedJudge, verifyBenchmarkReport } from '../benchmark-peel-jev.mjs';
+import { codexTurnIdentity, resolveProvenanceEntry } from '../verify-peel-provenance.mjs';
+import { fixture } from './support.mjs';
 
-const base = new URL('fixtures/peel/', import.meta.url);
+const base = new URL('../fixtures/peel/', import.meta.url);
 const events = readFileSync(new URL('events.jsonl', base), 'utf8').trim().split('\n').map(line => JSON.parse(line));
 const state = JSON.parse(readFileSync(new URL('state.json', base), 'utf8'));
 const labels = JSON.parse(readFileSync(new URL('labels.json', base), 'utf8'));

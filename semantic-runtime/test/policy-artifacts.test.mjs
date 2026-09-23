@@ -1,10 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { compilePolicyArtifact, validatePolicyArtifact, createPolicyRegistry, loadPhaseZeroPolicyArtifact, POLICY_ARTIFACT_SCHEMA, POLICY_NODE_TYPES } from '../src/domain/decisions/policy-artifacts.mjs';
-import { fingerprint, judgeInputHash } from '../src/core/contracts.mjs';
-import { evaluateEvent } from '../src/core/policy.mjs';
-import { event, target, decision } from './helpers.mjs';
+import { compilePolicyArtifact, validatePolicyArtifact, createPolicyRegistry, POLICY_ARTIFACT_SCHEMA, POLICY_NODE_TYPES } from '../src/domain/decisions/policy-artifacts.mjs';
+import { fingerprint } from '../src/domain/shared/contracts.mjs';
 
 const fixture = JSON.parse(readFileSync(new URL('./fixtures/policy-artifacts/ingress.json', import.meta.url), 'utf8'));
 const source = () => structuredClone(fixture.definition);
@@ -178,19 +176,4 @@ test('activation/rollback and retirement require exact refs, compatibility and c
   assert.throws(() => incompatible.activate(ref(published.artifact), { expected_active: null, ...audit }), /incompatible runtime/);
   const missing = source(); missing.rollback_predecessor = {...first, version:'missing'};
   assert.throws(() => registry().publish(missing), /not found/);
-});
-
-test('Phase 0 loading preserves exact policy hash, four recorded judge inputs, results and candidate IDs', async () => {
-  const policy = JSON.parse(readFileSync(new URL('../policies/phase0.json', import.meta.url), 'utf8'));
-  const loaded = loadPhaseZeroPolicyArtifact(policy);
-  assert.deepEqual(loaded.policy, policy); assert.equal(loaded.policy_hash, fingerprint(policy));
-  const ledgers = [];
-  const execute = async value => { const calls = []; const judge = { evaluate(input) { calls.push(structuredClone(input)); return decision(); } }; const result = await evaluateEvent({ event: event(), state: [target()], policy: value, judge }); ledgers.push(calls); return result; };
-  const before = await execute(policy); const after = await execute(loaded.policy);
-  assert.equal(ledgers[0].length, 4); assert.deepEqual(ledgers[0], ledgers[1]);
-  assert.deepEqual(ledgers[0].map(judgeInputHash), ledgers[1].map(judgeInputHash));
-  const omitTiming = result => ({ ...result, decisions: result.decisions.map(({elapsed_ms, ...decision}) => decision) });
-  assert.deepEqual(omitTiming(before), omitTiming(after));
-  assert.throws(() => { loaded.policy.nodes.acceptance.question = 'mutated'; }, TypeError);
-  assert.throws(() => loadPhaseZeroPolicyArtifact(source()), /Unsupported policy schema_version/);
 });

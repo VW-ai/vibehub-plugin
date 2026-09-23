@@ -1,4 +1,4 @@
-import { FAMILIES, fingerprint } from '../../core/contracts.mjs';
+import { FAMILIES, fingerprint } from '../shared/contracts.mjs';
 
 const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };
 const configuration = {

@@ -1,7 +1,4 @@
-export { replay } from './core/replay.mjs';
-export { compareRuns } from './core/evaluation.mjs';
-export { validatePolicy } from './core/policy.mjs';
-export { normalizeEvent, normalizeState, judgeInputHash } from './core/contracts.mjs';
+export { judgeInputHash } from './domain/shared/contracts.mjs';
 export { JevJudge } from './adapters/providers/jev-judge.mjs';
 export { TypeSafeJevJudge } from './adapters/providers/typesafe-jev-judge.mjs';
 export { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from './adapters/providers/openrouter-jev-judge.mjs';
@@ -28,7 +25,6 @@ export {
 export {
   POLICY_ARTIFACT_SCHEMA, POLICY_NODE_TYPES, POLICY_PORT_TYPES,
   compilePolicyArtifact, validatePolicyArtifact, createPolicyRegistry,
-  loadPhaseZeroPolicyArtifact,
 } from './domain/decisions/policy-artifacts.mjs';
 export {
   OBSERVABILITY_CONTRACT_VERSION, AUDIT_SUBJECTS, AUDIT_STATUSES,

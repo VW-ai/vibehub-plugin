@@ -1,5 +1,5 @@
 import { isProxy } from 'node:util/types';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../shared/contracts.mjs';
 import { validateGraphCommitAddress2 } from '../graph/incremental-graph.mjs';
 import { canonicalArtifactAddress, exactRevisionAddress, validateSemanticAddress, validateSemanticRevision } from '../graph/working-graph.mjs';
 import { validateNormalizedEvent } from '../sources/event-provenance.mjs';

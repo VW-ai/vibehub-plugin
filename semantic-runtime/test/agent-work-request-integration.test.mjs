@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createAgentWorkRequest, createAgentWorkRequestState, createAgentWorkResult,
   agentWorkReturnParameters, transitionAgentWorkRequest, validateAgentWorkReceipt } from '../src/index.mjs';
-import { fingerprint } from '../src/core/contracts.mjs';
+import { fingerprint } from '../src/domain/shared/contracts.mjs';
 import { fixture, register, capture, initialize, assertion, mutation, SCOPE } from './helpers/graph-store-fixture.mjs';
 
 const hash = value => `sha256:${fingerprint(value)}`;

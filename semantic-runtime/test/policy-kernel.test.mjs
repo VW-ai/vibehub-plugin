@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { executePolicyRun, createInMemoryPolicyTransactionPort, validatePolicyActionCommand } from '../src/domain/decisions/policy-kernel.mjs';
 import { compilePolicyArtifact } from '../src/domain/decisions/policy-artifacts.mjs';
-import { fingerprint } from '../src/core/contracts.mjs';
+import { fingerprint } from '../src/domain/shared/contracts.mjs';
 import { normalizeAuditEnvelope } from '../src/domain/decisions/observability-contract.mjs';
 import { kernelFixture } from './fixtures/policy-kernel/scenario.mjs';
 

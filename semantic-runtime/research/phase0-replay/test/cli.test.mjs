@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
+import { SqliteCandidateStore } from '../adapters/sqlite-store.mjs';
 
-const cli = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
-const fixtures = fileURLToPath(new URL('fixtures/', import.meta.url));
+const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
+const fixtures = fileURLToPath(new URL('../fixtures/synthetic/', import.meta.url));
 function temp(t) {
   const path = mkdtempSync(join(tmpdir(), 'semantic-cli-'));
   t.after(() => rmSync(path, { recursive: true, force: true }));

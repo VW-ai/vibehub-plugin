@@ -1,4 +1,4 @@
-import { validateDecision } from '../src/core/contracts.mjs';
+import { validateDecision } from '../src/domain/shared/contracts.mjs';
 import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 

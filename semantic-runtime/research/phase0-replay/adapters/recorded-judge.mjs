@@ -1,4 +1,4 @@
-import { fingerprint, judgeInputHash, requireValue } from '../../core/contracts.mjs';
+import { fingerprint, judgeInputHash, requireValue } from '../../../src/domain/shared/contracts.mjs';
 
 export class RecordedJudge {
   constructor(recording) {

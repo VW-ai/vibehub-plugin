@@ -16,7 +16,7 @@ import { EXPLORATION_NAMESPACE, readExplorationOwner } from './exploration-input
 import { validateSemanticRevision, exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
 import { eventObservationKey, sourceObjectKey, effectiveEventAccess } from '../../domain/sources/event-provenance.mjs';
 import { sourcePartitionKey } from '../../domain/sources/causal-ordering.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 
 const GRAPH = 'working-graph', NS = EXPLORATION_NAMESPACE;
 const check = (ok, code = 'exploration_corrupt') => graphAssert(ok, code);

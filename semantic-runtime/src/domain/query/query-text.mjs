@@ -1,5 +1,5 @@
 import { isProxy } from 'node:util/types';
-import { canonical, fingerprint, compareText } from '../../core/contracts.mjs';
+import { canonical, fingerprint, compareText } from '../shared/contracts.mjs';
 
 export const CONTEXT_TEXT_VERSION = 'context-text-v1';
 const INDEX_BYTES = 262144, INDEX_POSTINGS = 65536;

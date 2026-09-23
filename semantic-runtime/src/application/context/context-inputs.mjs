@@ -4,7 +4,7 @@ import { graphInput, graphFields, graphEqual, graphHash, graphErrorCode } from '
 import { validateContextContent1, CONTEXT_PROFILE_ERROR_CODES } from '../../domain/context/context-profile.mjs';
 import { canonicalArtifactAddress, validateProvenanceClosure } from '../../domain/graph/working-graph.mjs';
 import { eventObservationKey } from '../../domain/sources/event-provenance.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 
 export const CONTEXT_INPUT_ERROR_CODES = Object.freeze(['invalid_context_input', 'context_capacity', 'context_transition_invalid',
   'context_unauthorized', 'invalid_context_proof', 'context_ticket_unavailable', 'context_source_mismatch']);

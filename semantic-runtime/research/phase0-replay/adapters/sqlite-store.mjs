@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { canonical, fingerprint, normalizeScope, requireValue, sameScope } from '../core/contracts.mjs';
+import { canonical, fingerprint, normalizeScope, requireValue, sameScope } from '../../../src/domain/shared/contracts.mjs';
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS runs (

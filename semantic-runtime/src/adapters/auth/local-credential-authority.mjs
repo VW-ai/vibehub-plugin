@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID, createHash } from 'node:crypto';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
-import { identifier, normalizeScope } from '../../core/contracts.mjs';
+import { identifier, normalizeScope } from '../../domain/shared/contracts.mjs';
 import { PRINCIPAL_KINDS, evaluateServiceAccess, evaluateMaterialization } from '../../domain/identity/service-access.mjs';
 
 export { LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';

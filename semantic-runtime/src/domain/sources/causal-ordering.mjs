@@ -1,4 +1,4 @@
-import { canonical, fingerprint } from '../../core/contracts.mjs';
+import { canonical, fingerprint } from '../shared/contracts.mjs';
 import { validateNormalizedEvent, sourceObjectKey, eventIdempotencyKey } from './event-provenance.mjs';
 import { compilePolicyArtifact } from '../decisions/policy-artifacts.mjs';
 

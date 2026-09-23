@@ -1,7 +1,7 @@
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
+import { SqliteCandidateStore } from '../adapters/sqlite-store.mjs';
 
 export const scope = { tenant_id: 'test-tenant', project_id: 'test-project' };
 export const policy = JSON.parse(readFileSync(new URL('../policies/phase0.json', import.meta.url), 'utf8'));

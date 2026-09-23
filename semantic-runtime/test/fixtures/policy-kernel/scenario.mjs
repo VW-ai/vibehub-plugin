@@ -1,5 +1,5 @@
 import { compilePolicyArtifact } from '../../../src/domain/decisions/policy-artifacts.mjs';
-import { fingerprint } from '../../../src/core/contracts.mjs';
+import { fingerprint } from '../../../src/domain/shared/contracts.mjs';
 import { graph, event, assertion } from '../working-graph/scenario.mjs';
 
 export function kernelFixture({ action = 'INGEST', parallel = false, attempts = 1, timeout = 100 } = {}) {

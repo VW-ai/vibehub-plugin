@@ -7,7 +7,7 @@ import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from '../../application/project/project-activation.mjs';
 import { DurableIngress } from '../../application/project/durable-ingress.mjs';
 import { observeGitWorktree } from './git-worktree-observer.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 import { GIT_SENSOR_LIMITS as L, SENSOR_CODES, sensorInput, sensorFields, sensorId,
   sensorAssert as check, sensorError, validateGitWorktreeObservation } from '../../domain/sources/git-worktree-observation.mjs';
 export const GIT_SENSOR_ERROR_CODES = SENSOR_CODES;

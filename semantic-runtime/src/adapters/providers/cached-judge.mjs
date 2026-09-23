@@ -1,6 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { canonical, fingerprint, judgeInputHash, validateDecision } from '../../core/contracts.mjs';
+import { canonical, fingerprint, judgeInputHash, validateDecision } from '../../domain/shared/contracts.mjs';
 
 function boundedTelemetry(input) {
   if (!input || typeof input !== 'object') return null;

@@ -1,14 +1,15 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { replay } from '../src/core/replay.mjs';
-import { normalizeEvent, normalizeState, judgeInputHash, visibleState } from '../src/core/contracts.mjs';
-import { validatePolicy } from '../src/core/policy.mjs';
-import { compareRuns } from '../src/core/evaluation.mjs';
-import { HeuristicJudge } from '../src/adapters/providers/heuristic-judge.mjs';
-import { RecordedJudge } from '../src/adapters/providers/recorded-judge.mjs';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { scope, policy, event, target, decision, judge, fixture } from './helpers.mjs';
+import { replay } from '../src/replay.mjs';
+import { judgeInputHash } from '../../../src/domain/shared/contracts.mjs';
+import { normalizeEvent, normalizeState, visibleState } from '../src/contracts.mjs';
+import { validatePolicy } from '../src/policy.mjs';
+import { compareRuns } from '../src/evaluation.mjs';
+import { HeuristicJudge } from '../adapters/heuristic-judge.mjs';
+import { RecordedJudge } from '../adapters/recorded-judge.mjs';
+import { SqliteCandidateStore } from '../adapters/sqlite-store.mjs';
+import { scope, policy, event, target, decision, judge, fixture } from './support.mjs';
 
 const run = (store, options = {}) => replay({ store, events: [event()], state: [target()], scope, policy, judge: judge(), ...options });
 
@@ -200,7 +201,7 @@ test('conditional graph edges select routes by action and audit skipped families
 
 test('synthetic demo executes end-to-end with baseline quality metrics explicitly scoped', async t => {
   const { store } = fixture(t);
-  const base = new URL('fixtures/', import.meta.url);
+  const base = new URL('../fixtures/synthetic/', import.meta.url);
   const events = readFileSync(new URL('events.jsonl', base), 'utf8').trim().split('\n').map(line => JSON.parse(line));
   const state = JSON.parse(readFileSync(new URL('state.json', base), 'utf8'));
   const labels = JSON.parse(readFileSync(new URL('labels.json', base), 'utf8'));

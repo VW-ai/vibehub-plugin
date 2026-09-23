@@ -15,7 +15,7 @@ try {
     mkdirSync(dirname(target), { recursive: true });
     cpSync(join(root, path), target, { recursive: true });
   }
-  for (const args of [['ci', '--ignore-scripts', '--no-audit', '--no-fund'], ['run', 'verify']]) {
+  for (const args of [['ci', '--ignore-scripts', '--no-audit', '--no-fund'], ['run', 'verify:runtime']]) {
     const result = spawnSync('npm', args, { cwd: destination, stdio: 'inherit', timeout: 180_000 });
     if (result.status !== 0) throw new Error(`Standalone npm ${args[0]} failed`);
   }

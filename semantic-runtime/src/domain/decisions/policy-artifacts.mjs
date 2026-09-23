@@ -1,5 +1,4 @@
-import { canonical, fingerprint, timestamp } from '../../core/contracts.mjs';
-import { validatePolicy } from '../../core/policy.mjs';
+import { canonical, fingerprint, timestamp } from '../shared/contracts.mjs';
 
 export const POLICY_NODE_TYPES = Object.freeze(['deterministic', 'judge', 'retrieve', 'aggregate', 'guard', 'action', 'worker']);
 export const POLICY_PORT_TYPES = Object.freeze(['event_ref', 'snapshot_ref', 'signal_ref', 'candidates_ref', 'job_ref', 'error_ref', 'boolean', 'number', 'string']);
@@ -275,14 +274,6 @@ export function compilePolicyArtifact(input, { operations } = {}) {
 }
 
 export function validatePolicyArtifact(input, options) { return compilePolicyArtifact(input, options).definition; }
-
-/** Load the old format unchanged. It remains executable only by the Phase 0 evaluator. */
-export function loadPhaseZeroPolicyArtifact(input) {
-  const policy = validatePolicy(jsonCopy(input));
-  return freeze({ kind: 'phase_zero_policy', schema_version: 1, policy_id: policy.policy_id, version: policy.version,
-    policy_hash: fingerprint(policy), policy,
-  });
-}
 
 /** Synchronous reference contract, not hosted persistence or an authorization system. */
 export function createPolicyRegistry({ operations, runtime_version = 1 } = {}) {

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { canonical } from '../src/core/contracts.mjs';
+import { canonical } from '../src/domain/shared/contracts.mjs';
 import { graph, assertion, event, scope, catalog, watermarks } from './fixtures/working-graph/scenario.mjs';
 import { semanticAddress, canonicalArtifactAddress, graphRevisionAddress, applyGraphAssertion, resolveGraphConflict,
   updateGraphSourceAccess, resolveWorkingGraphAddress } from '../src/domain/graph/working-graph.mjs';

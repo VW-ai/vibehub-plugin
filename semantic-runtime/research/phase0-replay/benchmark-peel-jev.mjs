@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { JevJudge } from '../src/adapters/providers/jev-judge.mjs';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { replay } from '../src/core/replay.mjs';
+import { JevJudge } from '../../src/adapters/providers/jev-judge.mjs';
+import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
+import { replay } from './src/replay.mjs';
 
 const REQUEST_SPACING_MS = 2500;
 
@@ -58,10 +58,10 @@ async function preflight() {
 
 export async function runPeelBenchmark() {
   await preflight();
-  const events = readFileSync('test/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
-  const state = JSON.parse(readFileSync('test/fixtures/peel/state.json', 'utf8'));
-  const labels = JSON.parse(readFileSync('test/fixtures/peel/labels.json', 'utf8'));
-  const policy = JSON.parse(readFileSync('policies/peel-benchmark.json', 'utf8'));
+  const events = readFileSync('research/phase0-replay/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
+  const state = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/state.json', 'utf8'));
+  const labels = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/labels.json', 'utf8'));
+  const policy = JSON.parse(readFileSync(new URL('./policies/peel-benchmark.json', import.meta.url), 'utf8'));
   const database = resolve('.local/peel-jev-v3.sqlite');
   const store = new SqliteCandidateStore(database);
   try {

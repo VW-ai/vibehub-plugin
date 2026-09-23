@@ -1,8 +1,8 @@
 # Runtime layout contract v0
 
-Status: migration baseline. This document describes where the Runtime is going
-and the order that keeps current behavior reviewable. It does not claim that
-the target directories already exist.
+Status: active migration contract. Production source and Phase 0 replay now use
+the target ownership boundaries; test, live-verification, documentation and
+report grouping continue in later batches.
 
 ## Business boundary
 
@@ -92,8 +92,10 @@ today continue to commit atomically.
 6. Move pure domain contracts, application services, adapters, and the local
    app by capability. Refine these Tickets only after the seam is proven.
 7. Separate live verification and Phase 0 replay, then group deterministic
-   tests and current documentation by capability.
-8. Review and narrow the public API as its own product change.
+   tests and current documentation by capability. Phase 0 isolation removes
+   only its replay-specific root exports because production cannot re-export
+   research code; that exact narrowing belongs to the semantic extraction.
+8. Review any remaining public API narrowing as its own product change.
 
 No durable compatibility shims are required for old internal paths because the
 package exports only `.`. Each move updates repository imports, current docs,

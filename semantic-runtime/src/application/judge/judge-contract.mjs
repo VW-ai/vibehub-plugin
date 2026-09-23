@@ -1,4 +1,4 @@
-import { FAMILIES, SENSITIVITIES, canonical } from '../../core/contracts.mjs';
+import { FAMILIES, SENSITIVITIES, canonical } from '../../domain/shared/contracts.mjs';
 import { compilePolicyArtifact } from '../../domain/decisions/policy-artifacts.mjs';
 import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION } from '../../domain/judge/judge-node.mjs';
 import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';

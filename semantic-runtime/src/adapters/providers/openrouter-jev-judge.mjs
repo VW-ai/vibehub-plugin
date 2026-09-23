@@ -1,6 +1,6 @@
 import { experimental_evaluate as evaluate } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { FAMILIES, identifier } from '../../core/contracts.mjs';
+import { FAMILIES, identifier } from '../../domain/shared/contracts.mjs';
 import { RELATIONAL_FAMILIES, minimizedJudgeState } from './judge-input.mjs';
 
 export const OPENROUTER_JEV_MODEL = 'typesafe/jev-1.13';

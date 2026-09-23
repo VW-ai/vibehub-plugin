@@ -8,7 +8,7 @@ import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIEN
   scopedReference, GitProjectRegistry, ProjectActivation, ACTIVATION_NAMESPACE,
   GIT_ENROLLMENT_NAMESPACE, DurableIngress, INGRESS_NAMESPACE, SOURCE_INVALIDATION_NAMESPACE,
   verifyEventPayload, TypeSafeJevJudge, LocalGraphStore, WORKING_GRAPH_NAMESPACE } from '../src/index.mjs';
-import { validateDecision, canonical } from '../src/core/contracts.mjs';
+import { validateDecision, canonical } from '../src/domain/shared/contracts.mjs';
 import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 import { checkSyntheticJev, edgeCases } from './check-jev-synthetic.mjs';
 

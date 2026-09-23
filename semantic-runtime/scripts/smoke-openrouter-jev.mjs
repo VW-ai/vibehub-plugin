@@ -1,5 +1,5 @@
 import { OpenRouterJevJudge } from '../src/adapters/providers/openrouter-jev-judge.mjs';
-import { validateDecision } from '../src/core/contracts.mjs';
+import { validateDecision } from '../src/domain/shared/contracts.mjs';
 
 const input = {
   event: { type: 'HUMAN_DECISION', timestamp: '2026-09-22T00:00:00.000Z',

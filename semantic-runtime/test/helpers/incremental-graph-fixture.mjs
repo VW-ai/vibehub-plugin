@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fingerprint, canonical } from '../../src/core/contracts.mjs';
+import { fingerprint, canonical } from '../../src/domain/shared/contracts.mjs';
 import { eventObservationKey, validateNormalizedEvent } from '../../src/domain/sources/event-provenance.mjs';
 import { validateIdentityCatalog } from '../../src/domain/identity/identity.mjs';
 import { validateGraphEffectPlan2 } from '../../src/domain/graph/incremental-graph.mjs';

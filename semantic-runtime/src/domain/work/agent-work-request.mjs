@@ -1,5 +1,5 @@
 import { isProxy } from 'node:util/types';
-import { fingerprint, canonical } from '../../core/contracts.mjs';
+import { fingerprint, canonical } from '../shared/contracts.mjs';
 
 export const AGENT_WORK_REQUEST_VERSION = 1;
 export const AGENT_WORK_ACTIONS = Object.freeze(['read_context', 'submit_proposal', 'propose_context', 'propose_ticket', 'propose_resolution', 'propose_plan']);

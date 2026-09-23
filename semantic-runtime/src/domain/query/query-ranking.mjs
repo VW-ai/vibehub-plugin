@@ -1,4 +1,4 @@
-import { canonical, fingerprint, compareText } from '../../core/contracts.mjs';
+import { canonical, fingerprint, compareText } from '../shared/contracts.mjs';
 import { validateSemanticAddress } from '../graph/working-graph.mjs';
 import { validateGraphCommitAddress2 } from '../graph/incremental-graph.mjs';
 import { copyQueryFacts, CONTEXT_TEXT_VERSION } from './query-text.mjs';

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fingerprint } from '../src/core/contracts.mjs';
+import { fingerprint } from '../src/domain/shared/contracts.mjs';
 import { AGENT_WORK_ACTIONS, agentWorkReturnParameters, agentWorkSubmissionArguments, createAgentWorkRequest, validateAgentWorkRequest,
   createAgentWorkResult, validateAgentWorkResult, validateAgentWorkAdmission, createAgentWorkRequestState, validateAgentWorkRequestState,
   validateAgentWorkReceipt, transitionAgentWorkRequest } from '../src/domain/work/agent-work-request.mjs';

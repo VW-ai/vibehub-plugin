@@ -19,7 +19,7 @@ function copyComponent(t) {
 
 test('checked Runtime layout baseline matches the complete component', () => {
   const result = checkRuntimeLayout();
-  assert.equal(result.inventory_checked, existsSync(new URL('../research', import.meta.url)));
+  assert.equal(result.inventory_checked, existsSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url)));
   assert.deepEqual(result.errors, []);
 });
 
@@ -47,19 +47,11 @@ test('complete production source layout relocation is recorded as one exact batc
     && record.path !== record.intended_destination
     && record.intended_destination.startsWith('src/')), []);
   assert.deepEqual(current.inventory.filter(record => record.path.startsWith('src/')
-    && record.path !== record.intended_destination
-    && record.intended_destination.startsWith('research/phase0-replay/')).map(record => record.path), [
-    'src/adapters/sqlite-store.mjs',
-    'src/cli.mjs',
-    'src/core/contracts.mjs',
-    'src/core/evaluation.mjs',
-    'src/core/policy.mjs',
-    'src/core/replay.mjs',
-  ]);
+    && record.path !== record.intended_destination), []);
 });
 
 test('UX research relocation is complete and recorded', t => {
-  if (!existsSync(new URL('../research', import.meta.url))) {
+  if (!existsSync(new URL('../research/ux/project-exploration', import.meta.url))) {
     t.skip('standalone production verification deliberately excludes research');
     return;
   }
@@ -78,7 +70,7 @@ test('UX research relocation is complete and recorded', t => {
 });
 
 test('PostgreSQL research relocation is complete and recorded', t => {
-  if (!existsSync(new URL('../research', import.meta.url))) {
+  if (!existsSync(new URL('../research/platform/node-postgres', import.meta.url))) {
     t.skip('standalone production verification deliberately excludes research');
     return;
   }
@@ -97,7 +89,7 @@ test('PostgreSQL research relocation is complete and recorded', t => {
 });
 
 test('host probe research relocation is complete and recorded', t => {
-  if (!existsSync(new URL('../research', import.meta.url))) {
+  if (!existsSync(new URL('../research/host-probes', import.meta.url))) {
     t.skip('standalone production verification deliberately excludes research');
     return;
   }
@@ -445,7 +437,7 @@ test('layout inspection captures public surface, command modes, constants and an
     current.inventory.filter(item => !item.path.includes('/')).map(item => item.path),
     expectedRootFiles,
   );
-  assert.equal(current.root_exports.length, 206);
+  assert.equal(current.root_exports.length, 200);
   assert.equal(current.npm_commands.find(item => item.name === 'check:jev:query')?.mode, 'explicit-live');
   assert.equal(current.npm_commands.find(item => item.name === 'test:host-probes')?.mode, 'offline');
   assert.equal(current.npm_commands.find(item => item.name === 'probe:codex:live')?.mode, 'explicit-live');
@@ -456,7 +448,7 @@ test('layout inspection captures public surface, command modes, constants and an
     mode: 'explicit-live',
   });
   const gatewayExample = current.inventory.find(item => item.path === 'research/examples/ai-gateway/index.ts');
-  if (existsSync(new URL('../research', import.meta.url))) {
+  if (existsSync(new URL('../research/examples/ai-gateway', import.meta.url))) {
     assert.deepEqual(gatewayExample, {
       path: 'research/examples/ai-gateway/index.ts',
       current_role: 'research',
@@ -491,7 +483,7 @@ test('layout inspection captures public surface, command modes, constants and an
   assert.deepEqual(current.production_import_edges.filter(edge =>
     contextWriteNodes.has(edge.from) || contextWriteNodes.has(edge.to)), [
     { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/context/context-profile.mjs' },
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/contracts.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/shared/contracts.mjs' },
     { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/sources/event-provenance.mjs' },
     { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/graph/working-graph.mjs' },
     { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/identity/access-authority.mjs' },
@@ -520,7 +512,7 @@ test('layout inspection captures public surface, command modes, constants and an
     { from: 'src/application/context/context-reader.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/adapters/sqlite/graph-storage.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/sources/causal-ordering.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/contracts.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/shared/contracts.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/sources/event-provenance.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/graph/working-graph.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/application/explorations/exploration-inputs.mjs' },
@@ -544,7 +536,7 @@ test('layout check gives focused additions and removals without external capabil
   mkdirSync(dirname(extra), { recursive: true });
   writeFileSync(extra, 'export const value = 1;\n');
   result = checkRuntimeLayout(root);
-  if (existsSync(new URL('../research', import.meta.url))) {
+  if (existsSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url))) {
     assert.equal(result.ok, false);
     assert.match(result.errors.join('\n'), /inventory: added or changed/);
   } else {
@@ -554,7 +546,7 @@ test('layout check gives focused additions and removals without external capabil
   rmSync(extra);
   writeFileSync(join(root, 'unexpected.md'), '# unclassified root document\n');
   result = checkRuntimeLayout(root);
-  if (existsSync(new URL('../research', import.meta.url))) {
+  if (existsSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url))) {
     assert.equal(result.ok, false);
     assert.match(result.errors.join('\n'), /inventory: added or changed.*unexpected\.md/);
   } else {

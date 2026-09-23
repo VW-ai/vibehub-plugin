@@ -8,7 +8,7 @@ import { GraphStorage, WORKING_GRAPH_NAMESPACE as NS, checkGraphFormat } from '.
 import { DomainStore, migrateDomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../src/domain/identity/service-access.mjs';
-import { fingerprint } from '../src/core/contracts.mjs';
+import { fingerprint } from '../src/domain/shared/contracts.mjs';
 import { eventObservationKey } from '../src/domain/sources/event-provenance.mjs';
 import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph } from '../src/domain/graph/incremental-graph.mjs';
 import { semanticAddress, exactRevisionAddress } from '../src/domain/graph/working-graph.mjs';

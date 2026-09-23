@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { JevJudge } from '../src/adapters/providers/jev-judge.mjs';
-import { validateDecision } from '../src/core/contracts.mjs';
+import { validateDecision } from '../src/domain/shared/contracts.mjs';
 
 const event = {
   type: 'HUMAN_DECISION', timestamp: '2026-09-20T00:00:00.000Z',

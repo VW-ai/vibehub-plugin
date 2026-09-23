@@ -1,5 +1,5 @@
 import { validateIdentityCatalog, resolveIdentity } from '../identity/identity.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../shared/contracts.mjs';
 
 export const BRANCH_SCOPE_VERSION = 1;
 const assert = (ok, message) => { if (!ok) throw new TypeError(`Branch scope: ${message}`); };

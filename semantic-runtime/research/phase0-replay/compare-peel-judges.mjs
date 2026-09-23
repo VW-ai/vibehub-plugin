@@ -1,14 +1,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CachedJudge } from '../src/adapters/providers/cached-judge.mjs';
-import { ClaudeCliJudge } from '../src/adapters/providers/claude-cli-judge.mjs';
-import { HaikuJudge } from '../src/adapters/providers/haiku-judge.mjs';
-import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { canonical, fingerprint, requireValue } from '../src/core/contracts.mjs';
-import { compareRuns } from '../src/core/evaluation.mjs';
-import { replay } from '../src/core/replay.mjs';
+import { CachedJudge } from '../../src/adapters/providers/cached-judge.mjs';
+import { ClaudeCliJudge } from '../../src/adapters/providers/claude-cli-judge.mjs';
+import { HaikuJudge } from '../../src/adapters/providers/haiku-judge.mjs';
+import { ResilientJudge } from '../../src/adapters/providers/resilient-judge.mjs';
+import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
+import { canonical, fingerprint, requireValue } from '../../src/domain/shared/contracts.mjs';
+import { compareRuns } from './src/evaluation.mjs';
+import { replay } from './src/replay.mjs';
 
 const SCOPE = { tenant_id: 'benchmark', project_id: 'peel' };
 const DEFAULT_JEV_RUN = 'b6854e64-6104-4ee3-8cb2-84a054c84a44';
@@ -140,10 +140,10 @@ export async function runComparison({
   judgeTimeoutMs = 60_000,
   transport = 'claude-cli',
 } = {}) {
-  const events = readFileSync('test/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
-  const state = JSON.parse(readFileSync('test/fixtures/peel/state.json', 'utf8'));
-  const labels = JSON.parse(readFileSync('test/fixtures/peel/labels.json', 'utf8'));
-  const policy = JSON.parse(readFileSync('policies/peel-benchmark.json', 'utf8'));
+  const events = readFileSync('research/phase0-replay/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
+  const state = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/state.json', 'utf8'));
+  const labels = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/labels.json', 'utf8'));
+  const policy = JSON.parse(readFileSync(new URL('./policies/peel-benchmark.json', import.meta.url), 'utf8'));
   for (const node of Object.values(policy.nodes)) {
     if (node.type === 'judge') node.timeout_ms = judgeTimeoutMs;
   }

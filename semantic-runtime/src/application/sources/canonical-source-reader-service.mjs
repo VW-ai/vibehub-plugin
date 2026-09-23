@@ -10,7 +10,7 @@ import { SourceInvalidationFeed } from './source-invalidation.mjs';
 import { GitProvenance } from '../../adapters/git/git-provenance.mjs';
 import { parseCanonicalRecord, evaluateCanonicalRecords, CANONICAL_RECORD_PROFILE } from '../../domain/sources/canonical-records.mjs';
 import { validateSemanticRevision, validateSemanticAddress, canonicalArtifactAddress, exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';
 import { graphInput, graphFields, graphHash, graphEqual, graphId, graphUint, graphErrorCode } from '../graph/graph-inputs.mjs';
 

@@ -20,7 +20,7 @@ not an enterprise authorization system.
 
 Supported event types cover agent messages, user intent, tools, file changes,
 Git changes, lifecycle records, human decisions, and checkpoints. External
-connectors are outside this slice. See `test/fixtures/events.jsonl` for examples.
+connectors are outside this slice. See `fixtures/synthetic/events.jsonl` for examples.
 The normalizer copies only supported fields; embedded gold labels are discarded.
 
 `--state` is an optional JSON array of acceptance/context candidates. Each has
@@ -44,7 +44,7 @@ request. The original demo fixture is synthetic. Real trajectories need
 deliberate selection, sanitization, point-in-time state, and independently
 established labels.
 
-`test/fixtures/peel/` is the first such selected corpus. Its event excerpts,
+`fixtures/peel/` is the first such selected corpus. Its event excerpts,
 state snapshot, labels, sanitized source-provenance ledger, and curation ledger
 are separate files. Automated
 checks require 20 bounded chronological excerpts, one label per event and
@@ -63,7 +63,7 @@ record locators bind a semantic Ticket or Outcome ID to exact file bytes; and
 private Codex turns resolve by hashing raw thread ID, turn ID, and lifecycle
 phase from an ignored local index. The verifier also authenticates source time
 from the Git commit, Outcome `closed_at`, or indexed Codex turn timestamp.
-`scripts/verify-peel-provenance.mjs` implements all three paths.
+`verify-peel-provenance.mjs` implements all three paths.
 
 ## Policy and judge
 

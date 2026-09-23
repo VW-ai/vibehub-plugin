@@ -1,5 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { canonical, compareText, fingerprint, normalizeEvent, normalizeScope, normalizeState, requireValue, sameScope } from './contracts.mjs';
+import {
+  canonical, compareText, fingerprint, normalizeScope, requireValue, sameScope,
+} from '../../../src/domain/shared/contracts.mjs';
+import { normalizeEvent, normalizeState } from './contracts.mjs';
 import { evaluateEvent, validatePolicy } from './policy.mjs';
 import { evaluateLabels } from './evaluation.mjs';
 

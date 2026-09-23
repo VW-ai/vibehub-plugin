@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CachedJudge } from '../src/adapters/providers/cached-judge.mjs';
-import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
-import { replay } from '../src/core/replay.mjs';
+import { CachedJudge } from '../../src/adapters/providers/cached-judge.mjs';
+import { ResilientJudge } from '../../src/adapters/providers/resilient-judge.mjs';
+import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
+import { TypeSafeJevJudge } from '../../src/adapters/providers/typesafe-jev-judge.mjs';
+import { replay } from './src/replay.mjs';
 import { verifyBenchmarkReport } from './benchmark-peel-jev.mjs';
 
 const SCOPE = { tenant_id: 'benchmark', project_id: 'peel' };
@@ -37,10 +37,10 @@ export async function runDirectPeelBenchmark({
   maxAttempts = 4,
 } = {}) {
   if (!process.env.TYPESAFE_API_KEY) throw new Error('TYPESAFE_API_KEY is required');
-  const events = readFileSync('test/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
-  const state = JSON.parse(readFileSync('test/fixtures/peel/state.json', 'utf8'));
-  const labels = JSON.parse(readFileSync('test/fixtures/peel/labels.json', 'utf8'));
-  const policy = JSON.parse(readFileSync('policies/peel-benchmark.json', 'utf8'));
+  const events = readFileSync('research/phase0-replay/fixtures/peel/events.jsonl', 'utf8').trim().split('\n').map(line => JSON.parse(line));
+  const state = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/state.json', 'utf8'));
+  const labels = JSON.parse(readFileSync('research/phase0-replay/fixtures/peel/labels.json', 'utf8'));
+  const policy = JSON.parse(readFileSync(new URL('./policies/peel-benchmark.json', import.meta.url), 'utf8'));
   const transport = new ResilientJudge(new TypeSafeJevJudge(), {
     minIntervalMs, maxAttempts, baseDelayMs: 500, maxDelayMs: 8_000,
   });

@@ -1,4 +1,4 @@
-import { identifier, normalizeScope, sameScope, SENSITIVITIES } from '../../core/contracts.mjs';
+import { identifier, normalizeScope, sameScope, SENSITIVITIES } from '../shared/contracts.mjs';
 
 export const PRINCIPAL_KINDS = Object.freeze(['human', 'host-adapter', 'service', 'connector', 'worker']);
 const BOUNDARIES = ['http', 'object', 'queue', 'subscription'];

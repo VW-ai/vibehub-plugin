@@ -8,7 +8,7 @@ import { planContextSelection, readContextSelection } from '../context/context-r
 import { verifyExplorationPublication } from '../explorations/exploration-adoption.mjs';
 import { SourceInvalidationFeed } from '../sources/source-invalidation.mjs';
 import { queryRequest, queryCopy, queryCheck, queryFailure } from './query-contract.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 import { exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
 import { eventObservationKey } from '../../domain/sources/event-provenance.mjs';
 import { sourcePartitionKey } from '../../domain/sources/causal-ordering.mjs';

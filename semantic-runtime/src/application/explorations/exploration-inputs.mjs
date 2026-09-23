@@ -20,7 +20,7 @@ import { GIT_ENROLLMENT_NAMESPACE } from '../../adapters/git/git-projects.mjs';
 import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphUint, graphErrorCode } from '../graph/graph-inputs.mjs';
 import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';
 import { validateSemanticAddress } from '../../domain/graph/working-graph.mjs';
-import { canonical } from '../../core/contracts.mjs';
+import { canonical } from '../../domain/shared/contracts.mjs';
 import { observeExplorationGit } from '../../adapters/git/exploration-physical.mjs';
 
 const NS = EXPLORATION_NAMESPACE, GRAPH = 'working-graph';

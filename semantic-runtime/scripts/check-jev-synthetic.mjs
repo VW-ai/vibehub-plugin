@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
-import { validateDecision } from '../src/core/contracts.mjs';
+import { validateDecision } from '../src/domain/shared/contracts.mjs';
 
 // Labels stay local. Only event text and point-in-time target text enter the Judge.
 export const cases = [

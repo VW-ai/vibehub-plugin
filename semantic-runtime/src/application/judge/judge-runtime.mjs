@@ -6,7 +6,7 @@ import { invokeJudgeProvider } from '../../adapters/providers/judge-provider.mjs
 import { judgeConfiguration, judgeRequest, judgeCopy, judgeCheck, judgeFailure } from './judge-contract.mjs';
 import { graphHash, graphEqual, graphFields, graphErrorCode } from '../graph/graph-inputs.mjs';
 import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from '../../domain/judge/judge-node.mjs';
-import { validateDecision } from '../../core/contracts.mjs';
+import { validateDecision } from '../../domain/shared/contracts.mjs';
 import { types } from 'node:util';
 
 const BRIDGE = Symbol('selected JudgeNode invocation');

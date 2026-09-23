@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { fingerprint, requireValue } from '../src/core/contracts.mjs';
-import { compareRuns } from '../src/core/evaluation.mjs';
+import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
+import { fingerprint, requireValue } from '../../src/domain/shared/contracts.mjs';
+import { compareRuns } from './src/evaluation.mjs';
 import { verifyComparableRuns } from './compare-peel-judges.mjs';
 
 const SCOPE = { tenant_id: 'benchmark', project_id: 'peel' };

@@ -1,4 +1,4 @@
-import { canonical, fingerprint, timestamp } from '../../core/contracts.mjs';
+import { canonical, fingerprint, timestamp } from '../shared/contracts.mjs';
 import { compilePolicyArtifact } from './policy-artifacts.mjs';
 import { validateNormalizedEvent, eventObservationKey } from '../sources/event-provenance.mjs';
 import { validateGraphRevision, validateGraphRevisionAddress, graphRevisionAddress, validateWorkingGraph,

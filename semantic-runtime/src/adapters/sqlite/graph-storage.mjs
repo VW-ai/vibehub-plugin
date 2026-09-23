@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { types } from 'node:util';
-import { fingerprint, canonical } from '../../core/contracts.mjs';
+import { fingerprint, canonical } from '../../domain/shared/contracts.mjs';
 import { validateGraphCommitAddress2, validateGraphCommit2, validateGraphEffectPlan2,
   validateGraphPageCursor2 } from '../../domain/graph/incremental-graph.mjs';
 

@@ -5,7 +5,7 @@ import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-au
 import { GitProjectRegistry } from '../../adapters/git/git-projects.mjs';
 import { DurableIngress, INGRESS_NAMESPACE } from '../project/durable-ingress.mjs';
 import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from '../sources/source-invalidation.mjs';
-import { canonical, fingerprint } from '../../core/contracts.mjs';
+import { canonical, fingerprint } from '../../domain/shared/contracts.mjs';
 import { validateIdentityCatalog } from '../../domain/identity/identity.mjs';
 import { validateNormalizedEvent, eventObservationKey, effectiveEventAccess } from '../../domain/sources/event-provenance.mjs';
 import { projectFreshness, sourcePartitionKey } from '../../domain/sources/causal-ordering.mjs';

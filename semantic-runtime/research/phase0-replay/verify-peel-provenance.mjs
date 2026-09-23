@@ -127,7 +127,7 @@ function argument(name) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const fixture = resolve(argument('--fixture') ?? 'test/fixtures/peel');
+    const fixture = resolve(argument('--fixture') ?? 'research/phase0-replay/fixtures/peel');
     const sourceRepo = argument('--source-repo');
     const turnIndex = argument('--codex-turn-index');
     const result = verifyProvenanceLedger({

@@ -15,7 +15,6 @@ export const STANDALONE_COPY_PATHS = Object.freeze([
   'src',
   'scripts',
   'test',
-  'policies',
   BASELINE_PATH,
 ]);
 
@@ -82,11 +81,15 @@ function capabilityFromName(path) {
 function sourceDestination(path) {
   const basename = path.split('/').at(-1);
   if (path === 'src/index.mjs') return 'src/index.mjs';
+  if (['src/adapters/providers/heuristic-judge.mjs', 'src/adapters/providers/recorded-judge.mjs'].includes(path)) {
+    return `research/phase0-replay/adapters/${basename}`;
+  }
   if (path.startsWith('src/domain/') || path.startsWith('src/application/')
     || path.startsWith('src/app/local/') || /^src\/adapters\/[^/]+\//.test(path)) return path;
   if (path === 'src/cli.mjs') return `research/phase0-replay/${basename}`;
   if (path.startsWith('src/core/')) {
-    if (['replay.mjs', 'evaluation.mjs', 'policy.mjs', 'contracts.mjs'].includes(basename)) {
+    if (basename === 'contracts.mjs') return 'src/domain/shared/contracts.mjs';
+    if (['replay.mjs', 'evaluation.mjs', 'policy.mjs'].includes(basename)) {
       return `research/phase0-replay/src/${basename}`;
     }
     return `src/domain/${capabilityFromName(path)}/${basename}`;
@@ -120,10 +123,13 @@ function scriptDestination(path) {
 
 function testDestination(path) {
   const basename = path.split('/').at(-1);
-  if (path.startsWith('test/fixtures/peel/')) return `research/phase0-replay/fixtures/${basename}`;
+  if (path.startsWith('test/fixtures/peel/')) return `research/phase0-replay/fixtures/peel/${basename}`;
+  if (['test/fixtures/README.md', 'test/fixtures/events.jsonl', 'test/fixtures/labels.json', 'test/fixtures/state.json'].includes(path)) {
+    return `research/phase0-replay/fixtures/synthetic/${basename}`;
+  }
   if (path.startsWith('test/fixtures/')) return path;
   if (path.startsWith('test/helpers/')) return `test/support/${basename}`;
-  if (path === 'test/helpers.mjs') return 'test/support/index.mjs';
+  if (path === 'test/helpers.mjs') return 'research/phase0-replay/test/support.mjs';
   if (/^(?:codex|claude)-host-probe/.test(basename)) {
     const host = basename.includes('codex') ? 'codex' : 'claude';
     return `research/host-probes/${host}/test/${basename}`;
@@ -342,7 +348,7 @@ export function checkRuntimeLayout(root = scriptRoot) {
   for (const section of ['inventory_roots', 'root_exports', 'npm_commands', 'contract_constants', 'standalone_copy_paths', 'production_import_edges', 'production_sccs']) {
     compareSection(section, baseline[section], current[section], errors);
   }
-  const inventoryChecked = INVENTORY_ROOTS.every(area => existsSync(resolve(root, area)));
+  const inventoryChecked = existsSync(resolve(root, 'docs/history/runtime-relocations-v1.json'));
   if (inventoryChecked) compareSection('inventory', baseline.inventory, current.inventory, errors);
   return { ok: errors.length === 0, inventory_checked: inventoryChecked, errors };
 }

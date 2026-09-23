@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { DurableIngress, TypeSafeJevJudge, verifyEventPayload } from '../src/index.mjs';
 import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
-import { canonical, validateDecision } from '../src/core/contracts.mjs';
+import { canonical, validateDecision } from '../src/domain/shared/contracts.mjs';
 import { edgeCases } from './check-jev-synthetic.mjs';
 import { fixture, bind, executionFor, git, register, rows } from '../test/helpers/exploration-fixture.mjs';
 

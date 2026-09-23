@@ -1,6 +1,6 @@
 import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
-import { canonical, fingerprint } from '../../core/contracts.mjs';
+import { canonical, fingerprint } from '../../domain/shared/contracts.mjs';
 import { validateNormalizedEvent, effectiveEventAccess, sourceObjectKey } from '../../domain/sources/event-provenance.mjs';
 import { sourcePartitionKey } from '../../domain/sources/causal-ordering.mjs';
 import { types as utilTypes } from 'node:util';
