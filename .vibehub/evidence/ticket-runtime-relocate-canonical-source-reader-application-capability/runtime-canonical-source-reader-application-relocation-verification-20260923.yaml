@@ -1,0 +1,51 @@
+{
+  "acceptance_ids": [
+    "canonical-source-reader-application-home-is-exact",
+    "canonical-source-reader-relocation-preserves-contracts",
+    "canonical-source-reader-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "canonical-source-reader-application-home-is-exact",
+      "identity": "sha256:5c96bd0d74bdd22ef9df6eec66895beb32ae33aa19f6f552429f69154622e089",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "canonical-source-reader-relocation-preserves-contracts",
+      "identity": "sha256:53da6787aaa5b61876cda68adbfa7f638f9663e2f3cf7e47fea061b606898531",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "canonical-source-reader-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:8adeafce9996fc5e76e272f2435a33ba5d6942169d6220399eec62ef6e73821d",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-canonical-source-reader-application-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T07:00:52Z",
+  "refs": [
+    "commit:be6c9e11a07089d5376853c62da792f88b792461",
+    "commit:54f893ed724bb0078c0eb367c87f4fec8f5a0b60",
+    "commit:e51270c3f8fcbe84cba2414c3c3793236323ece5:semantic-runtime/src/local/canonical-source-reader.mjs",
+    "commit:e51270c3f8fcbe84cba2414c3c3793236323ece5:semantic-runtime/src/local/canonical-source-reader-service.mjs",
+    "semantic-runtime/src/application/sources/canonical-source-reader.mjs",
+    "semantic-runtime/src/application/sources/canonical-source-reader-service.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/src/local/exploration-canonical.mjs",
+    "semantic-runtime/src/local/local-runtime-composition.mjs",
+    "semantic-runtime/test/canonical-source-reader.test.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-canonical-source-reader-application-capability.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit be6c9e11a07089d5376853c62da792f88b792461 records exactly two production moves: canonical-source-reader.mjs and canonical-source-reader-service.mjs from src/local to src/application/sources. Direct normalization against immutable pre-move blobs proves the facade is byte-identical after exactly one required relative import replacement and the service after exactly thirteen; both Node built-in imports and all non-import lines are unchanged. Both old paths are absent, no compatibility shim remains, every other production source file retains its path, and all production and test consumers resolve the new paths. CanonicalSourceReader remains the same root public export with unchanged one-options-object construction and resolve and refresh methods. CanonicalSourceReaderService preserves the opaque Graph capability, DomainStore and authority checks, selected Git-record bounds, admission and publication order, source-fence and ACL rechecks, retries, receipts, error codes and citations, and still neither imports nor constructs LocalGraphStore. The regenerated layout baseline preserves all 333 production edges after old-to-new node mapping; the relocated capability has exactly seventeen incident edges, zero production SCCs, zero direction exceptions and zero boundary errors across 247 checked files. Provenance commit 54f893ed724bb0078c0eb367c87f4fec8f5a0b60 appends exactly two relocation records binding old blobs 7c910d4a1595b39a3c98a269905047e49ff66d3c and daa00dc4e0b0c0be6cc273415de5098152767f52, new paths, the actual migration commit and canonical-source-reader-application-capability category; all prior manifest entries and historical Ticket, Evidence and Outcome references remain unchanged. Focused canonical reader, Git provenance, ingress, Graph, source invalidation, Exploration and composition verification passes 157/157. Layout and boundary verification passes 25/25, and a separate boundary command reports 247 files with zero SCCs, exceptions or errors. Deterministic JEV contract verification passes 17/17 without a live provider call. Full Runtime verification passes 1,031 total, 1,029 passed, zero failed and two expected Keychain skips. Standalone locked-install verification passes 1,032 total, 1,018 passed, zero failed and fourteen expected skips. Plugin artifact verification passes with 79 files and 3,670,088 bytes. An independent subagent verified the import-only changes, old blobs, complete consumers, public contract and edge-equivalent topology with no findings. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH and the remote branch equals the committed work. No credential, Keychain lifecycle, host, network, provider, live JEV or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-canonical-source-reader-application-capability"
+}

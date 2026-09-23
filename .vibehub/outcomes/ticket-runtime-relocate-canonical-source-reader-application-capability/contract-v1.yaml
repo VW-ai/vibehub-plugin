@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "canonical-source-reader-application-home-is-exact",
+    "canonical-source-reader-relocation-preserves-contracts",
+    "canonical-source-reader-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T07:14:05Z",
+  "contract_revision": {
+    "identity": "sha256:3328be271a1047ba0853dd093a5b8eeb704ef1c80bad6867cd3895f8c764e599",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-canonical-source-reader-application-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; did not plan or implement this Ticket and modified no implementation or Evidence. The installed skill bundle lacks its referenced agent-session.md contract, so no session report was fabricated.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent subagent adjudication accepted all three Contract v1 criteria. Direct comparison to the immutable accepted blobs proves the facade differs only by one relative import and the service only by thirteen relative imports, with Node built-ins and every non-import byte unchanged; the old paths are absent, no shim remains, and only the expected consumer paths changed. The unchanged implementation bytes, root export, opaque Graph capability assertions, and focused behavioral suite establish preserved CanonicalSourceReader and service contracts. The regenerated graph remains edge-equivalent at 333 production edges, with exactly seventeen edges incident to the relocated pair, zero SCCs, zero direction exceptions and zero boundary errors. The manifest binds both required old blobs and the actual migration commit, historical references remain intact, and the repository-aware test passes. Independent offline reruns passed focused capability tests 199/199, deterministic JEV checks 17/17, layout/composition 20/20, full Runtime 1032 total with 1030 passed and two expected Keychain skips, standalone locked-install 1032 total with 1018 passed and fourteen expected skips, and the 79-file plugin artifact check. Project and Ticket validation, dirty-worktree Context guard, git diff checking, remote equality and the FRESH semantic-runtime Room also passed. No live provider, secret, Keychain lifecycle or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-canonical-source-reader-application-capability",
+  "unresolved_acceptance_ids": []
+}
