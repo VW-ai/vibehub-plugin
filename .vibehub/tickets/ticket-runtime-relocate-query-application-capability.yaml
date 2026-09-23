@@ -1,0 +1,122 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "query-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/query-contract.mjs, query-inputs.mjs, and query-engine.mjs move to semantic-runtime/src/application/query/ with the same filenames. Each implementation is byte-equivalent except for required relative import specifiers, every old path is absent, no compatibility shim or re-export remains, and all other production source files retain their paths.",
+      "identity": "sha256:3fdbee52a4e6f90a572f960bb4f14e73ec6cd55519747bda8f34cb9b8186b065",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-relocation-preserves-public-and-runtime-contracts",
+      "criterion": "semantic-runtime/src/index.mjs remains the sole production importer outside the Query capability and exports the same LocalQueryEngine symbol from its new path. Query contract, authorized input assembly, constructor shape, query and next behavior, cursor identity and expiry, window LRU and byte/result budgets, text matching and ranking trace, optional Judge binding and routing, degradation and cancellation, snapshot/source/head/authority rechecks, error codes, JSON results, schemas, digests, database/SQL, providers, transaction ownership and public export set remain observably unchanged.",
+      "identity": "sha256:d0a56fdbfef840a4a27598551967b6516f947621c4ec7a6b424a6e7aa7f79864",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "query-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production and test imports resolve the new Query paths. The regenerated Runtime layout baseline records the three application/query nodes and equivalent rewired edges with zero production SCCs, boundary errors or direction exceptions. The relocation manifest and repository-aware focused test bind the exact three old blobs, new paths, actual migration commit and query-application-capability category while historical Tickets, Evidence and Outcomes retain their accepted old-path references. Focused Query/composition/layout tests, full Runtime, standalone locked-install, plugin artifact, project/Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:53d2dffd8bcee484b6744564877586bc640d16821d31fb288e5faf6873428e26",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one three-file path-only capability migration; do not change executable logic beyond required relative import paths and focused path assertions.",
+    "Do not rename Query files or symbols, extract new ports, add dependency injection, change the public interface, or move Judge, Context, Exploration, Graph, source, adapter, app/local, test, research, verification or documentation modules in this Ticket.",
+    "Do not change schemas, SQL, cursors, digests, error codes, authorization order, provider routing, transaction boundaries or the root public export set.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/query-*.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "LocalQueryEngine, QueryInputs, and the Query wire contract already form one cohesive, acyclic application capability. Move exactly that three-file cluster from src/local into src/application/query as a path-only migration. Preserve the root LocalQueryEngine export, all request, ranking, Judge, cursor, budget, cancellation, degradation, authorization and freshness behavior, and update only current imports, tests, the generated layout baseline, relocation provenance, and Room alignment.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, path-only rules and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current complete source inventory, intended Query destinations, import graph, public surface and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted Query behavior that this path-only move must preserve.",
+      "ref": ".vibehub/outcomes/ticket-runtime-query-engine-v0/contract-v4.yaml"
+    },
+    {
+      "purpose": "Exact accepted Query contract source and old Git blob to relocate.",
+      "ref": "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-contract.mjs"
+    },
+    {
+      "purpose": "Exact accepted Query input assembly source and old Git blob to relocate.",
+      "ref": "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-inputs.mjs"
+    },
+    {
+      "purpose": "Exact accepted Query engine source and old Git blob to relocate.",
+      "ref": "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-engine.mjs"
+    },
+    {
+      "purpose": "Sole external production importer and unchanged public export surface.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Shared Query test composition imports that must move atomically.",
+      "ref": "semantic-runtime/test/helpers/query-fixture.mjs"
+    },
+    {
+      "purpose": "Constructor and local composition contract to preserve.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Repository/standalone-aware relocation manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "query-application-home-is-exact",
+          "identity": "sha256:3fdbee52a4e6f90a572f960bb4f14e73ec6cd55519747bda8f34cb9b8186b065",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:53d2dffd8bcee484b6744564877586bc640d16821d31fb288e5faf6873428e26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "query-relocation-preserves-public-and-runtime-contracts",
+          "identity": "sha256:d0a56fdbfef840a4a27598551967b6516f947621c4ec7a6b424a6e7aa7f79864",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:478debe65684911b6d69eccf19062271d3e54ba6e7efa7f053c3d935a3d2e2d1",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The complete accepted Query capability lives under src/application/query with auditable relocation provenance and unchanged public and runtime behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:next-local-capability-audit",
+    "subagent-audit:dependency-cycle-naming-audit",
+    "subagent-audit:verification-research-layout-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-query-application-capability"
+}
