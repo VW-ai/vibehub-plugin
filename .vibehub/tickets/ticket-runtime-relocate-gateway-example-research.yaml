@@ -1,0 +1,120 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "gateway-example-research-home-is-exact",
+      "criterion": "Exactly semantic-runtime/index.ts moves byte-for-byte to semantic-runtime/research/examples/ai-gateway/index.ts. The old path is absent, no compatibility shim or re-export remains, no other Runtime implementation or research file moves, and relocation provenance binds old blob 87b091203b62a18940ba4395890d84385271c0df, the new path, actual migration commit and gateway-example-research category.",
+      "identity": "sha256:b0b07076aaaeffed7ba9e1c65754fab6a5d1235391c59d40c6970301bb1fb540",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "gateway-example-live-contract-is-preserved",
+      "criterion": "The package command remains named example:gateway and retains node --experimental-strip-types with ignored semantic-runtime/.env.local, changing only its script path. The moved source still imports generateText from ai, uses model openai/gpt-5.5, asks it to invent a new holiday and describe its traditions, rejects empty text and prints the generated text. Runtime layout continues classifying the command as explicit-live, README points to the new path, ai remains a production dependency for existing adapters, and no model/provider/JEV request is made by this relocation.",
+      "identity": "sha256:323f96ab68e1869b8f1e8f5950301f539b3088a243ed2cc2f467ca03eeca2edf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "gateway-example-relocation-is-offline-verifiable",
+      "criterion": "Boundary and layout tooling no longer special-case root index.ts as production; the moved example is covered through the research inventory and is excluded from standalone copy paths without changing production imports, SCCs or direction exceptions. The regenerated layout baseline, repository-aware relocation test, focused layout/boundary tests, full Runtime, standalone locked-install, plugin artifact, project/Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline while historical Ticket and Evidence references retain the accepted old path.",
+      "identity": "sha256:8018b6741787d9e0f1659590d4f150527e9a1b0a7210c21b2cb44ba23f06a455",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one byte-for-byte research relocation plus exact ownership/path updates; do not change example behavior.",
+    "Do not call Vercel AI Gateway, JEV or any model and do not read, print, write or inspect .env.local, Keychain or any credential.",
+    "Do not change the model, prompt, AI SDK/provider adapters, JEV behavior, dependency versions, package lock, public exports, schemas, SQLite or command name.",
+    "Do not move any other live verification, Phase 0 replay, research, source, test or documentation file.",
+    "Keep historical Ticket, Evidence and Outcome references to semantic-runtime/index.ts unchanged because they identify the accepted original installation."
+  ],
+  "context": "The root index.ts is a verified but explicitly live Vercel AI Gateway example, not Runtime production code. Its intended destination is already declared as research/examples/ai-gateway/index.ts. Move that file byte-for-byte, keep the example:gateway command and live behavior intact, and update the layout, boundary, standalone, README, relocation provenance and Room records so research and production ownership are honest.",
+  "context_refs": [
+    {
+      "purpose": "Standalone component and deterministic ordinary verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted production, research and relocation ownership contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current inventory marks root index.ts as a gateway example with the exact research destination.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Historical contract that installed and live-verified the exact example behavior; its accepted old path remains historical.",
+      "ref": ".vibehub/tickets/ticket-connect-jev-through-ai-gateway.yaml"
+    },
+    {
+      "purpose": "Historical Evidence for the exact model, prompt and non-empty response behavior.",
+      "ref": ".vibehub/evidence/ticket-connect-jev-through-ai-gateway/evidence-ai-gateway-example-installed.yaml"
+    },
+    {
+      "purpose": "Exact pre-move source and old Git blob to relocate.",
+      "ref": "commit:bca36fe4c644c6295aeea95556469739e19ec296:semantic-runtime/index.ts"
+    },
+    {
+      "purpose": "Stable example:gateway command name, explicit live invocation and retained ai dependency.",
+      "ref": "semantic-runtime/package.json"
+    },
+    {
+      "purpose": "Current root-index production special case that must be removed when research owns the file.",
+      "ref": "semantic-runtime/scripts/check-boundaries.mjs"
+    },
+    {
+      "purpose": "Inventory roles, intended destination, explicit-live command mode and standalone copy contract.",
+      "ref": "semantic-runtime/scripts/runtime-layout.mjs"
+    },
+    {
+      "purpose": "User-facing path and explicit live invocation documentation.",
+      "ref": "semantic-runtime/README.md"
+    },
+    {
+      "purpose": "Root inventory, standalone copy and repository-aware relocation assertions.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "gateway-example-live-contract-is-preserved",
+          "identity": "sha256:323f96ab68e1869b8f1e8f5950301f539b3088a243ed2cc2f467ca03eeca2edf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "gateway-example-relocation-is-offline-verifiable",
+          "identity": "sha256:8018b6741787d9e0f1659590d4f150527e9a1b0a7210c21b2cb44ba23f06a455",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "gateway-example-research-home-is-exact",
+          "identity": "sha256:b0b07076aaaeffed7ba9e1c65754fab6a5d1235391c59d40c6970301bb1fb540",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:00fdedff44382c6a2d4f41507d261ef86f217f6cec36002a65195e7e717c81ee",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Vercel AI Gateway text-generation example lives under research/examples/ai-gateway, remains an explicit live command, and no longer appears in the production Runtime or standalone component boundary.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:gateway-example-relocation-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-gateway-example-research"
+}
