@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-runtime-project-knowledge-lives-in-rooms",
+  "detail": "The Semantic Runtime governance migration must remove duplicate ownership between semantic-runtime/docs and .vibehub/rooms/semantic-runtime. Evolving product intent, architectural decisions, tradeoffs, findings, status and project history should be expressed as bounded Context in the Semantic Runtime Room and referenced from Tickets rather than maintained again as long-form component documents. semantic-runtime/docs remains for artifacts that code users or operators must read directly, normative protocol detail that cannot be reduced to one Context claim, generated machine baselines and manifests, and explicit runbooks. The documentation phase must audit each existing file and choose keep, absorb into Context, archive as historical source, or remove after references are rewritten; this decision does not itself authorize deleting current files. README.md and AGENTS.md remain the component entry and working boundary. The current 52-file production-source migration remains mechanical and does not absorb this documentation work.",
+  "evidence": [
+    {
+      "note": "The owner explicitly added Room-owned project knowledge and removal of duplicate semantic-runtime/docs tracking to the overall governance scope.",
+      "ref": "conversation:2026-09-23-runtime-governance-scope"
+    },
+    {
+      "note": "The current component has product thought logs, PRD, technical design, delivery planning, accepted contract explanations, operations notes and measurements under one docs tree while many corresponding decisions and findings already exist in the Semantic Runtime Room.",
+      "ref": "semantic-runtime/docs"
+    },
+    {
+      "note": "The Room already owns durable Semantic Runtime decisions, intents, constraints, contracts, findings and implementation notes.",
+      "ref": ".vibehub/rooms/semantic-runtime"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-23T21:11:18Z",
+    "quote": "我们有的文档很多东西其实应该放在我们vibehub的rooms里就行了，没必要semantic 的docs 下也keep track。",
+    "ref": "conversation:2026-09-23-runtime-governance-scope"
+  },
+  "state": "active",
+  "summary": "Semantic Runtime project knowledge belongs in its VibeHub Room; component docs remain only when they are executable, externally readable, or machine-consumed artifacts",
+  "tags": [
+    "semantic-runtime",
+    "documentation",
+    "rooms",
+    "context",
+    "governance"
+  ],
+  "type": "decision"
+}
