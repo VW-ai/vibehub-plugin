@@ -1,0 +1,54 @@
+{
+  "acceptance_ids": [
+    "exploration-application-facade-home-is-exact",
+    "exploration-application-facade-contract-is-preserved",
+    "exploration-application-facade-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "exploration-application-facade-home-is-exact",
+      "identity": "sha256:ab0f797c618e8fae25794f78546c0f74aa61b21c0137ee647888879304896304",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "exploration-application-facade-contract-is-preserved",
+      "identity": "sha256:f9272eb6002893968337915d51b9986c5070957613f4c5ab7099694ebc222dbb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exploration-application-facade-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:495210b42f2e40edb98343bd99b89b1825cac54229d7a76f7dfee01c758cc3f4",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-exploration-application-facade-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T09:51:08Z",
+  "refs": [
+    "commit:ee0e605a5fbbd7aa13ad628b26721150acb09289",
+    "commit:95a0b14c74b2f0f13ae20fd99ec42c0843e6a586",
+    "commit:fee3ed27f30d0f82a801fb1bc1507489d4286673",
+    "commit:55450923ec8ecc46e037075f65f4bb12ca0217af:semantic-runtime/src/local/exploration-store.mjs",
+    "semantic-runtime/src/application/explorations/exploration-store.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/src/local/judge-inputs.mjs",
+    "semantic-runtime/test/judge-inputs.test.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/exploration-projection.test.mjs",
+    "semantic-runtime/test/exploration-projection-security.test.mjs",
+    "semantic-runtime/test/exploration-adoption.test.mjs",
+    "semantic-runtime/test/jev-exploration-check.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-exploration-application-facade.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit ee0e605a5fbbd7aa13ad628b26721150acb09289 moves semantic-runtime/src/local/exploration-store.mjs to semantic-runtime/src/application/explorations/exploration-store.mjs and changes only the three relative specifiers required by the new depth, the two production consumer specifiers and the two direct-test specifiers. The historical source blob is 0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b, relocated blob is exactly 55d21684c5183113cc0404d7ad21f6986a592bd6, and lines 6 through 24 retain SHA-256 e95a54735d713d6c26254b937bfa24c9fffd86b19f57202f652274a410f6fd6d. The old path is absent and no shim remains. LocalExplorationStore and EXPLORATION_NAMESPACE remain root exports; the one-options-object constructor, inert graphInput copy, composeLocalServices binding and all ten Graph delegations are unchanged, so the Graph retains transaction ownership. Provenance commit 95a0b14c74b2f0f13ae20fd99ec42c0843e6a586 appends one exploration-application-facade relocation record, repository-aware layout assertion, regenerated baseline and current Room alignment. Contract correction commit fee3ed27f30d0f82a801fb1bc1507489d4286673 appends Acceptance revision 2 solely to correct the original 63-character body-hash typo; independent validation recomputed its identity and Contract v2 identity. The current production graph has 333 edges, exactly two incoming and three outgoing facade edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 files. Historical Tickets and Evidence retain their old-path references. Independent subagent verification passed 76 focused offline tests, including mocked JEV, Exploration, Judge inputs, composition, layout and boundary checks, with no material findings against Contract v2. Executor behavior checks passed 60/60 and mocked JEV checks passed 2/2. Full Runtime verification passed 1,036 total, 1,034 passed, zero failed and two expected Keychain skips. Standalone locked-install verification installed fourteen packages from local cache and passed 1,036 total, 1,018 passed, zero failed and eighteen documented standalone skips. Plugin artifact verification passed with 79 files and 3,670,088 bytes. Project and Ticket validation passed with 232 Tickets, 540 prior Evidence and 179 Outcomes; Context guard since planning commit ad32a325bdb9617f5cbf7337218d267c3d8879ee returned no governing authorities or violations; semantic-runtime Room is FRESH; git diff checking passed; and HEAD equaled origin/codex/semantic-runtime at fee3ed27f30d0f82a801fb1bc1507489d4286673 before this Evidence. Two unrelated untracked Ticket files remained untouched. The live-only npm check exited before credential lookup and no credential, Keychain lifecycle, external host, provider, live JEV, network or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-exploration-application-facade"
+}
