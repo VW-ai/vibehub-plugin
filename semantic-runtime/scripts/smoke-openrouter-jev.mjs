@@ -1,4 +1,4 @@
-import { OpenRouterJevJudge } from '../src/adapters/openrouter-jev-judge.mjs';
+import { OpenRouterJevJudge } from '../src/adapters/providers/openrouter-jev-judge.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
 
 const input = {

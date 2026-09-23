@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { invokeJudgeProvider } from '../src/local/judge-provider.mjs';
 import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY } from '../src/local/provider-settings.mjs';
-import { TypeSafeJevJudge } from '../src/adapters/typesafe-jev-judge.mjs';
-import { JevJudge } from '../src/adapters/jev-judge.mjs';
-import { OpenRouterJevJudge } from '../src/adapters/openrouter-jev-judge.mjs';
+import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
+import { JevJudge } from '../src/adapters/providers/jev-judge.mjs';
+import { OpenRouterJevJudge } from '../src/adapters/providers/openrouter-jev-judge.mjs';
 
 const selected = provider => ({ provider, model: PROVIDER_MODELS[provider], capability: JUDGE_CAPABILITY });
 const input = { event: { type: 'HUMAN_DECISION', timestamp: '2026-09-22T00:00:00.000Z', payload: { text: 'Use explicit credentials.' } },

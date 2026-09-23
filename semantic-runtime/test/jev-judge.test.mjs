@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { JevJudge } from '../src/adapters/jev-judge.mjs';
+import { JevJudge } from '../src/adapters/providers/jev-judge.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
 
 const event = {

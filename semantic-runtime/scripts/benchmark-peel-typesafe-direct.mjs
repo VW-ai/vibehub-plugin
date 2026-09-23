@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { CachedJudge } from '../src/adapters/cached-judge.mjs';
 import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
 import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
-import { TypeSafeJevJudge } from '../src/adapters/typesafe-jev-judge.mjs';
+import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 import { replay } from '../src/core/replay.mjs';
 import { verifyBenchmarkReport } from './benchmark-peel-jev.mjs';
 

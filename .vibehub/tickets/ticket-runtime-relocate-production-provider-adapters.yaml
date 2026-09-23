@@ -1,0 +1,116 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "production-provider-home-is-exact",
+      "criterion": "jev-judge.mjs, typesafe-jev-judge.mjs, openrouter-jev-judge.mjs and judge-input.mjs move from src/adapters/ to src/adapters/providers/ as one coherent production provider cluster; mixed application modules and comparison, replay, benchmark, verification, Git, SQLite and secret adapters remain in their current homes.",
+      "identity": "sha256:8d3a2086ae08887c88cef56ca3f4261c82bf485fba4b12e742af7910ab3613ac",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "provider-behavior-and-surface-are-preserved",
+      "criterion": "All production, research-script and test consumers resolve the new paths; provider request shaping, model selection, schema parsing, errors, public export names and LocalJudgeRuntime provider routing remain unchanged under focused offline provider, comparison and layout tests.",
+      "identity": "sha256:778265637261ece6c7d3652fa57ea7546469d97a228c433c1ec228dc9fac1c12",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "provider-relocation-is-fully-verifiable",
+      "criterion": "The current layout baseline, relocation manifest and semantic-runtime Room record the completed four-file move with immutable old blobs and the migration commit; boundary checking reports zero errors and zero production SCCs, and full Runtime, standalone locked-install, plugin artifact, project/Ticket, Context guard and git diff verification pass without a credential, host, network, provider or live JEV call.",
+      "identity": "sha256:8278685e8887e65e76b1868377c090070fb6429b6013dbf82b46254f0aab23d6",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not change provider models, prompts, request schemas, response interpretation, timeout, retry, cache, telemetry, credential or security behavior.",
+    "Do not move judge-provider.mjs, provider-settings.mjs, Haiku or Claude comparison adapters, Phase 0 replay adapters, benchmark/verification helpers, Git, SQLite, secret, research, verification or test files beyond required import updates.",
+    "Keep src/index.mjs as the only package entry and preserve its exact public export set.",
+    "Keep historical Ticket, Evidence and Outcome source references unchanged; record the old locations through immutable Git and the relocation manifest.",
+    "Ordinary verification stays offline and deterministic; no real host, credential store, model provider or JEV call is authorized for this Ticket."
+  ],
+  "context": "The capability layout baseline currently places all Judge-like files in one flat adapter directory, but a read-only consumer audit found that only JevJudge, TypeSafeJevJudge and OpenRouterJevJudge are production provider routes used by LocalJudgeRuntime. Their shared judge-input helper is provider-boundary serialization. Haiku and Claude CLI are comparison transports; heuristic, recorded and SQLite are Phase 0 replay; cached and resilient serve benchmark or verification flows. This Ticket performs the smallest truthful production move and leaves those other roles for their own research or verification migrations.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, adapter, standalone and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted capability layout, migration order and historical-path preservation rules.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current complete inventory, intended provider destinations, public surface and dependency graph.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Existing immutable relocation provenance format to extend after the migration commit exists.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Successful current structural baseline and drift contract.",
+      "ref": ".vibehub/outcomes/ticket-runtime-layout-contract-baseline/contract-v2.yaml"
+    },
+    {
+      "purpose": "Successful capability direction and standalone enforcement baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-enforce-layer-boundaries/contract-v1.yaml"
+    },
+    {
+      "purpose": "Most recent successful zero-exception, zero-SCC Runtime boundary state.",
+      "ref": ".vibehub/outcomes/ticket-runtime-local-access-seam/contract-v1.yaml"
+    },
+    {
+      "purpose": "Pre-move Vercel AI Gateway production adapter implementation.",
+      "ref": "commit:f69c194eb4b5c89a7fab752c1a920e998ac3844f:semantic-runtime/src/adapters/jev-judge.mjs"
+    },
+    {
+      "purpose": "Pre-move TypeSafe direct production adapter implementation.",
+      "ref": "commit:f69c194eb4b5c89a7fab752c1a920e998ac3844f:semantic-runtime/src/adapters/typesafe-jev-judge.mjs"
+    },
+    {
+      "purpose": "Pre-move OpenRouter production adapter implementation.",
+      "ref": "commit:f69c194eb4b5c89a7fab752c1a920e998ac3844f:semantic-runtime/src/adapters/openrouter-jev-judge.mjs"
+    },
+    {
+      "purpose": "Pre-move provider-boundary minimized-input helper.",
+      "ref": "commit:f69c194eb4b5c89a7fab752c1a920e998ac3844f:semantic-runtime/src/adapters/judge-input.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "production-provider-home-is-exact",
+          "identity": "sha256:8d3a2086ae08887c88cef56ca3f4261c82bf485fba4b12e742af7910ab3613ac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "provider-behavior-and-surface-are-preserved",
+          "identity": "sha256:778265637261ece6c7d3652fa57ea7546469d97a228c433c1ec228dc9fac1c12",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "provider-relocation-is-fully-verifiable",
+          "identity": "sha256:8278685e8887e65e76b1868377c090070fb6429b6013dbf82b46254f0aab23d6",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8b9f977337677686c41912e3212dddc84c5ec151414878c8007d8c25b89dc212",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The three production JEV provider adapters and their shared minimized-input helper live under the formal providers adapter capability without changing provider, Judge runtime, replay or public API behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:runtime-adapter-app-map",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-production-provider-adapters"
+}

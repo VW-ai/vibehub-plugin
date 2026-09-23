@@ -2,9 +2,9 @@ export { replay } from './core/replay.mjs';
 export { compareRuns } from './core/evaluation.mjs';
 export { validatePolicy } from './core/policy.mjs';
 export { normalizeEvent, normalizeState, judgeInputHash } from './core/contracts.mjs';
-export { JevJudge } from './adapters/jev-judge.mjs';
-export { TypeSafeJevJudge } from './adapters/typesafe-jev-judge.mjs';
-export { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from './adapters/openrouter-jev-judge.mjs';
+export { JevJudge } from './adapters/providers/jev-judge.mjs';
+export { TypeSafeJevJudge } from './adapters/providers/typesafe-jev-judge.mjs';
+export { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from './adapters/providers/openrouter-jev-judge.mjs';
 export { BRANCH_SCOPE_VERSION, createBranchScope, validateBranchScope, applyBranchScopeChange,
   resolveExploration, recordTicketWorkspaceProvenance, selectExplorationView } from './core/branch-scope.mjs';
 export { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from './local/provider-settings.mjs';

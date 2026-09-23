@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
-import { TypeSafeJevJudge } from '../src/adapters/typesafe-jev-judge.mjs';
+import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
 

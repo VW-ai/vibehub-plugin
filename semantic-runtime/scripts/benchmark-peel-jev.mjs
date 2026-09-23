@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { JevJudge } from '../src/adapters/jev-judge.mjs';
+import { JevJudge } from '../src/adapters/providers/jev-judge.mjs';
 import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
 import { replay } from '../src/core/replay.mjs';
 

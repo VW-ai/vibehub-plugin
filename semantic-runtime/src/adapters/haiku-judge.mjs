@@ -1,5 +1,5 @@
 import { Output, generateText, jsonSchema } from 'ai';
-import { RELATIONAL_FAMILIES, minimizedJudgeState } from './judge-input.mjs';
+import { RELATIONAL_FAMILIES, minimizedJudgeState } from './providers/judge-input.mjs';
 
 export const HAIKU_GATEWAY_MODEL = 'anthropic/claude-haiku-4.5';
 export const HAIKU_CLI_MODEL = 'claude-haiku-4-5-20251001';

@@ -8,7 +8,7 @@ import {
   probabilityOutputSchema,
   probabilityPrompt,
 } from './haiku-judge.mjs';
-import { RELATIONAL_FAMILIES, minimizedJudgeState } from './judge-input.mjs';
+import { RELATIONAL_FAMILIES, minimizedJudgeState } from './providers/judge-input.mjs';
 
 const SYSTEM_PROMPT = 'You are a bounded semantic classifier. Return only the requested structured classification output. Probabilities are estimates, not canonical truth.';
 const MAX_OUTPUT_BYTES = 1024 * 1024;

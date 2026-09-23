@@ -696,19 +696,24 @@
       "intended_destination": "src/adapters/providers/heuristic-judge.mjs"
     },
     {
-      "path": "src/adapters/jev-judge.mjs",
+      "path": "src/adapters/providers/jev-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/jev-judge.mjs"
     },
     {
-      "path": "src/adapters/judge-input.mjs",
+      "path": "src/adapters/providers/judge-input.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/judge-input.mjs"
     },
     {
-      "path": "src/adapters/openrouter-jev-judge.mjs",
+      "path": "src/adapters/providers/openrouter-jev-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/openrouter-jev-judge.mjs"
+    },
+    {
+      "path": "src/adapters/providers/typesafe-jev-judge.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/providers/typesafe-jev-judge.mjs"
     },
     {
       "path": "src/adapters/recorded-judge.mjs",
@@ -724,11 +729,6 @@
       "path": "src/adapters/sqlite-store.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/adapters/sqlite-store.mjs"
-    },
-    {
-      "path": "src/adapters/typesafe-jev-judge.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/typesafe-jev-judge.mjs"
     },
     {
       "path": "src/app/local/http/authorize-local-request.mjs",
@@ -2406,7 +2406,7 @@
     },
     {
       "from": "src/adapters/claude-cli-judge.mjs",
-      "to": "src/adapters/judge-input.mjs"
+      "to": "src/adapters/providers/judge-input.mjs"
     },
     {
       "from": "src/adapters/git-provenance.mjs",
@@ -2422,19 +2422,23 @@
     },
     {
       "from": "src/adapters/haiku-judge.mjs",
-      "to": "src/adapters/judge-input.mjs"
+      "to": "src/adapters/providers/judge-input.mjs"
     },
     {
-      "from": "src/adapters/jev-judge.mjs",
-      "to": "src/adapters/judge-input.mjs"
+      "from": "src/adapters/providers/jev-judge.mjs",
+      "to": "src/adapters/providers/judge-input.mjs"
     },
     {
-      "from": "src/adapters/openrouter-jev-judge.mjs",
-      "to": "src/adapters/judge-input.mjs"
+      "from": "src/adapters/providers/openrouter-jev-judge.mjs",
+      "to": "src/adapters/providers/judge-input.mjs"
     },
     {
-      "from": "src/adapters/openrouter-jev-judge.mjs",
+      "from": "src/adapters/providers/openrouter-jev-judge.mjs",
       "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/providers/typesafe-jev-judge.mjs",
+      "to": "src/adapters/providers/judge-input.mjs"
     },
     {
       "from": "src/adapters/recorded-judge.mjs",
@@ -2445,16 +2449,12 @@
       "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/adapters/typesafe-jev-judge.mjs",
-      "to": "src/adapters/judge-input.mjs"
-    },
-    {
       "from": "src/cli.mjs",
       "to": "src/adapters/heuristic-judge.mjs"
     },
     {
       "from": "src/cli.mjs",
-      "to": "src/adapters/jev-judge.mjs"
+      "to": "src/adapters/providers/jev-judge.mjs"
     },
     {
       "from": "src/cli.mjs",
@@ -2674,15 +2674,15 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/adapters/jev-judge.mjs"
+      "to": "src/adapters/providers/jev-judge.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/adapters/openrouter-jev-judge.mjs"
+      "to": "src/adapters/providers/openrouter-jev-judge.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/adapters/typesafe-jev-judge.mjs"
+      "to": "src/adapters/providers/typesafe-jev-judge.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3442,15 +3442,15 @@
     },
     {
       "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/jev-judge.mjs"
+      "to": "src/adapters/providers/jev-judge.mjs"
     },
     {
       "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/openrouter-jev-judge.mjs"
+      "to": "src/adapters/providers/openrouter-jev-judge.mjs"
     },
     {
       "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/typesafe-jev-judge.mjs"
+      "to": "src/adapters/providers/typesafe-jev-judge.mjs"
     },
     {
       "from": "src/local/judge-provider.mjs",

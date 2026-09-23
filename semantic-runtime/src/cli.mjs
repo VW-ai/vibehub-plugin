@@ -6,7 +6,7 @@ import { replay } from './core/replay.mjs';
 import { compareRuns } from './core/evaluation.mjs';
 import { requireValue } from './core/contracts.mjs';
 import { HeuristicJudge } from './adapters/heuristic-judge.mjs';
-import { JevJudge } from './adapters/jev-judge.mjs';
+import { JevJudge } from './adapters/providers/jev-judge.mjs';
 import { RecordedJudge } from './adapters/recorded-judge.mjs';
 import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
 

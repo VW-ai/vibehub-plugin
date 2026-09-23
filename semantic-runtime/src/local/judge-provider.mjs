@@ -1,9 +1,9 @@
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { createGateway, experimental_evaluate as evaluate } from 'ai';
 import { isProxy } from 'node:util/types';
-import { TypeSafeJevJudge } from '../adapters/typesafe-jev-judge.mjs';
-import { JevJudge } from '../adapters/jev-judge.mjs';
-import { OpenRouterJevJudge } from '../adapters/openrouter-jev-judge.mjs';
+import { TypeSafeJevJudge } from '../adapters/providers/typesafe-jev-judge.mjs';
+import { JevJudge } from '../adapters/providers/jev-judge.mjs';
+import { OpenRouterJevJudge } from '../adapters/providers/openrouter-jev-judge.mjs';
 import { validateDecision } from '../core/contracts.mjs';
 import { graphInput, graphFields } from './graph-inputs.mjs';
 import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY } from './provider-settings.mjs';
