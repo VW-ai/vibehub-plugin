@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "exploration-application-facade-contract-is-preserved",
+    "exploration-application-facade-home-is-exact",
+    "exploration-application-facade-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T09:57:37Z",
+  "contract_revision": {
+    "identity": "sha256:ce9866958d3e65729e1a726f8ef6602946a2879c36daa6a118337b4f7edb027c",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "runtime-exploration-application-facade-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/exploration_application_closeout did not plan or execute this Ticket and did not author its implementation, provenance, tests, Ticket or Evidence. I read exact Contract v2, native Evidence, immutable source and implementation/provenance/correction commits, current source/layout/manifest/Room and historical records; recomputed revision identities; reproduced focused offline behavior, topology, guard, validation and artifact checks; and authored only this Outcome. The installed agent-session contract is absent, so no session report was fabricated.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active Acceptance revisions of exact Contract 2. Identity recomputation matches Contract sha256:ce9866958d3e65729e1a726f8ef6602946a2879c36daa6a118337b4f7edb027c and its native Evidence bindings. The implementation commit ee0e605a5fbbd7aa13ad628b26721150acb09289 removes exactly semantic-runtime/src/local/exploration-store.mjs, adds semantic-runtime/src/application/explorations/exploration-store.mjs, changes only its three relative specifiers, and updates exactly two production consumers and two direct tests; no other production source path or bytes change. The immutable old blob is 0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b, the current blob is 55d21684c5183113cc0404d7ad21f6986a592bd6, and old and new lines 6 through 24 both hash to e95a54735d713d6c26254b937bfa24c9fffd86b19f57202f652274a410f6fd6d. The old path is absent with no shim. Source and root-export inspection preserve LocalExplorationStore, EXPLORATION_NAMESPACE, one-options-object construction, inert graphInput canonical_reader copy, fixed composeLocalServices Graph binding and all ten Graph delegations. Independent focused offline execution passes 91/91 across boundary, Exploration projection/security/adoption, Judge inputs, composition, mocked JEV and layout tests. The boundary scan covers 247 files and reports 333 production edges, exactly two incoming and three outgoing facade edges, zero production SCCs, zero direction exceptions and zero errors. The manifest has exactly one exploration-application-facade entry binding the old blob, new path and migration commit; repository-aware tests pass and four pre-existing historical Ticket/Evidence records retaining the old path are byte-unchanged. Native Evidence records full Runtime verification at 1,036 total, 1,034 passed, zero failed and two expected Keychain skips; standalone locked-install verification at fourteen cached packages, 1,036 total, 1,018 passed, zero failed and eighteen documented skips; and plugin artifact verification at 79 files and 3,670,088 bytes. I independently reproduced the artifact result exactly. Ticket validation passes at 232 Tickets, 541 Evidence and 179 pre-closeout Outcomes; project format 4 validation has no unverifiable Context refs; Context guard since planning commit ad32a325bdb9617f5cbf7337218d267c3d8879ee has no authorities or violations; semantic-runtime Room drift is FRESH; git diff checking passes; and HEAD equals origin/codex/semantic-runtime at 0cce5c0ece6c1262fb178a89dd017548b5b36430. The two unrelated untracked Ticket files remain untouched. No credential, Keychain lifecycle, external host, provider, live JEV, external network or user repository was used. The installed closeout Skill references a missing contracts/agent-session.md, so no session report or completion claim was invented. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-exploration-application-facade",
+  "unresolved_acceptance_ids": []
+}
