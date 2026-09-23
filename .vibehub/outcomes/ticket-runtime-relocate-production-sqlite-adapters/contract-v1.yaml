@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "production-sqlite-home-is-exact",
+    "sqlite-transaction-and-surface-are-preserved",
+    "sqlite-relocation-is-fully-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T02:27:20Z",
+  "contract_revision": {
+    "identity": "sha256:96c4144bad16835137965e16488bbb73c0697a3602cfc01d56f4caf662e1fc60",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-production-sqlite-adapter-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; I did not execute or author the migration, Ticket or Evidence and was authorized only to adjudicate and write this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts every criterion of exact Contract v1 through the native bound Evidence. Migration commit ba3564612253b99b9346d7ebe7673e28b4505a72 contains exactly two R099 source moves, DomainStore and GraphStorage from src/local to src/adapters/sqlite, plus required consumer imports, layout baseline, Ticket and Room updates. Normalizing only the moved files' relative import depth produces zero semantic diff; the manifest's old blob IDs exactly match commit 7c680744dc05c1a5e14c4d6e24e90bd4f695196f. Current source and deterministic tests contain no live old-path imports, the 206-name root export set and 34 npm commands are unchanged, and all 29 contract constants are unchanged after path normalization. Independent offline checks passed 30 focused layout, DomainStore and GraphStorage tests; boundary checking scanned 246 files with zero errors, zero production SCCs and zero direction exceptions; Ticket/project validation, git diff checking and the Context guard from the migration parent passed; and the semantic-runtime Room is FRESH. The bound Evidence records sequential full Runtime verification at 1025 total / 1023 passed / 0 failed / 2 expected skips, standalone locked-install verification at 1025 total / 1017 passed / 0 failed / 8 expected skips, and plugin artifact verification at 79 files / 3670088 bytes. This reviewer used no credential, Keychain lifecycle, host, network, provider or live JEV capability. No acceptance criterion remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-production-sqlite-adapters",
+  "unresolved_acceptance_ids": []
+}

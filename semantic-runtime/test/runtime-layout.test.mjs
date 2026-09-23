@@ -119,6 +119,26 @@ test('macOS secret adapter relocation is complete and recorded', t => {
   assert.ok(entries.every(entry => entry.new_path.startsWith('semantic-runtime/src/adapters/secrets/')));
 });
 
+test('production SQLite adapter relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'sqlite-adapter');
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(entries.length, 2);
+  assert.equal(new Set(entries.map(item => item.migration_commit)).size, 1);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.match(entry.migration_commit, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+  assert.ok(entries.every(entry => entry.new_path.startsWith('semantic-runtime/src/adapters/sqlite/')));
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);

@@ -1,0 +1,46 @@
+{
+  "acceptance_ids": [
+    "production-sqlite-home-is-exact",
+    "sqlite-transaction-and-surface-are-preserved",
+    "sqlite-relocation-is-fully-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-sqlite-home-is-exact",
+      "identity": "sha256:b2217be27a37b561787ac91935e708b25795d040d0f9d650cc0d45caa62d47e9",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "sqlite-transaction-and-surface-are-preserved",
+      "identity": "sha256:a2bfc39893fa5846d46ec2df05c6d46ae2defba516649560b4c6d0482b8f9d5f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "sqlite-relocation-is-fully-verifiable",
+      "identity": "sha256:1afa113b4516b86f46acd2495bb518f4388a852048d22d3a2815779c98f6fea3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-production-sqlite-adapter-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T02:20:36Z",
+  "refs": [
+    "commit:ba3564612253b99b9346d7ebe7673e28b4505a72",
+    "semantic-runtime/src/adapters/sqlite/domain-store.mjs",
+    "semantic-runtime/src/adapters/sqlite/graph-storage.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/test/domain-store.test.mjs",
+    "semantic-runtime/test/graph-storage.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    ".vibehub/tickets/ticket-runtime-relocate-production-sqlite-adapters.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit ba3564612253b99b9346d7ebe7673e28b4505a72 records exactly two R099 production moves: DomainStore and transaction-scoped GraphStorage from src/local into src/adapters/sqlite. Their implementation changes are limited to the relative import depth required by the new directory; public exports, constants, schemas, SQL, transaction ownership, authorization, CAS/rollback behavior, bounded reads and errors remain unchanged. All production, test and helper references resolve the new paths. Phase 0 sqlite-store.mjs, ProviderSettings, local service bootstrap and Graph/Exploration/Context/Query/Judge orchestration remain outside this move. The relocation manifest binds the old DomainStore blob f930b80ee47ee6e57fb8425512f3e514d4c7229a and GraphStorage blob c9d180bcdee34405c938089b31d1966db5f5cad2 to the migration commit; the repository-only manifest test skips when standalone packaging omits docs/history. Focused layout/DomainStore/GraphStorage checks pass 30/30 after an earlier 108/108 transaction/storage run. Boundary checking scans 246 files with zero errors, zero production SCCs and zero baselined direction exceptions. Full Runtime verification passes sequentially with 1025 total / 1023 passed / zero failed / two expected skips. Standalone locked-install verification passes sequentially with 1025 total / 1017 passed / zero failed / eight expected skips. An earlier attempt to run both exhaustive suites concurrently made the unchanged Context Judge capacity test exceed its five-second wall-clock budget; the test passed 24/24 when isolated, an independent read-only subagent confirmed the migration changes no Judge, storage or deadline behavior, and both required suites then passed separately. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. No credential, Keychain lifecycle, host, network, provider or live JEV call was used.",
+  "ticket_id": "ticket-runtime-relocate-production-sqlite-adapters"
+}

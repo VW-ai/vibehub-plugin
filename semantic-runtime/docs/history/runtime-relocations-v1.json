@@ -266,6 +266,20 @@
       "old_blob": "80aa48bb142dcd72330d2905c51668df0d64d069",
       "migration_commit": "23d3b2352888c0fbdf2a12830ef1caebec7cdd74",
       "category": "secret-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/domain-store.mjs",
+      "new_path": "semantic-runtime/src/adapters/sqlite/domain-store.mjs",
+      "old_blob": "f930b80ee47ee6e57fb8425512f3e514d4c7229a",
+      "migration_commit": "ba3564612253b99b9346d7ebe7673e28b4505a72",
+      "category": "sqlite-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-storage.mjs",
+      "new_path": "semantic-runtime/src/adapters/sqlite/graph-storage.mjs",
+      "old_blob": "c9d180bcdee34405c938089b31d1966db5f5cad2",
+      "migration_commit": "ba3564612253b99b9346d7ebe7673e28b4505a72",
+      "category": "sqlite-adapter"
     }
   ]
 }
