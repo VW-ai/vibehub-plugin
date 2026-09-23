@@ -1,0 +1,52 @@
+{
+  "acceptance_ids": [
+    "graph-selected-application-home-is-exact",
+    "graph-selected-port-contract-is-preserved",
+    "graph-selected-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-selected-application-home-is-exact",
+      "identity": "sha256:360607ac03da587f8b37ecb1d060e03f0b34e0fad95ffc66cb37ae4930ae3c0c",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-selected-port-contract-is-preserved",
+      "identity": "sha256:bc9562cd6d9a4288b3a7396030f00e606897f6240ddb65c70ae754858540c182",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-selected-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:87014e7bf530ef2b9f7b108e6568e4098088552640976f73fda2a938bf6160a3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-graph-selected-application-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T08:28:37.027Z",
+  "refs": [
+    "commit:68b2cf2efe64bdf296ea899917eaf019e1d4af87",
+    "commit:b44732bea6efdf4666547fbe55cf86c677048b8d",
+    "commit:19582de643f17ac9389bb5d0ec355de89062ff66:semantic-runtime/src/local/graph-selected.mjs",
+    "semantic-runtime/src/application/graph/graph-selected.mjs",
+    "semantic-runtime/src/application/context/context-reader.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/graph-store.test.mjs",
+    "semantic-runtime/test/graph-source-invalidation.test.mjs",
+    "semantic-runtime/test/context-reader.test.mjs",
+    "semantic-runtime/test/context-security.test.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-graph-selected-application-port.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 68b2cf2efe64bdf296ea899917eaf019e1d4af87 moves semantic-runtime/src/local/graph-selected.mjs to semantic-runtime/src/application/graph/graph-selected.mjs. The moved module changes only its two relative import specifiers; its selectGraph signature and every line from line 3 onward remain identical. Exactly two production consumers, context-reader.mjs and graph-store.mjs, change only their import specifier, and no other production source path or executable logic changes. Provenance commit b44732bea6efdf4666547fbe55cf86c677048b8d records the unique graph-application-selection-port manifest entry, exact old blob 3cd81a840ffee9931ebb2e29703e3091b8b04bef, migration commit and repository-aware path assertion, and aligns the semantic-runtime Room. The regenerated layout retains 333 production edges, exactly two incoming and two outgoing selected-port edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 files. Root focused Graph, Context, lifecycle, composition, layout and boundary verification passes 81/81. Independent implementation audit reconstructs the expected source transform exactly, confirms unchanged selectGraph logic and passes its focused suite 59/59 with no material findings. Deterministic mocked JEV checks pass 17/17 without a live call. Full Runtime verification passes 1,034 total, 1,032 passed, zero failed and two expected Keychain skips. Standalone locked-install verification installs fourteen packages from local cache and passes 1,034 total, 1,018 passed, zero failed and sixteen documented standalone skips. Plugin artifact verification passes with 79 files and 3,670,088 bytes. Ticket/project validation, Context guard since planning commit d93946c9, semantic-runtime Room drift, git diff checking and remote equality pass; the two unrelated untracked Ticket files remain untouched. No credential, Keychain lifecycle, external host, provider, live JEV, network or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-graph-selected-application-port"
+}
