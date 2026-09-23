@@ -138,5 +138,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   } else if (process.argv.length === 3 && process.argv[2] === '--live-synthetic') {
     try { const report = await probeCodexHost(); process.stdout.write(`${JSON.stringify(report, null, 2)}\n`); if (!probeSucceeded(report)) process.exitCode = 1; }
     catch (error) { process.stderr.write(`${error?.code === 'codex_unavailable' ? 'codex_unavailable' : 'probe_failed'}\n`); process.exitCode = 1; }
-  } else { process.stdout.write('Opt-in: node scripts/probe-codex-host.mjs --live-synthetic (at most two subscription turns; synthetic project only)\n'); }
+  } else { process.stdout.write('Opt-in: npm run probe:codex:live (at most two subscription turns; synthetic project only)\n'); }
 }

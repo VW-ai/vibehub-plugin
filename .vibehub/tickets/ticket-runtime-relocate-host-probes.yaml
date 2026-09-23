@@ -47,11 +47,11 @@
     },
     {
       "purpose": "Current Codex host probe entry.",
-      "ref": "semantic-runtime/scripts/probe-codex-host.mjs"
+      "ref": "semantic-runtime/research/host-probes/codex/probe-codex-host.mjs"
     },
     {
       "purpose": "Current Claude host probe entry.",
-      "ref": "semantic-runtime/scripts/probe-claude-host.mjs"
+      "ref": "semantic-runtime/research/host-probes/claude/probe-claude-host.mjs"
     }
   ],
   "contract_revisions": [

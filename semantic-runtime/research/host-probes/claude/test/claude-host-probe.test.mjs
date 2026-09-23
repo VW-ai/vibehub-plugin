@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { admitClaudeCollection, projectClaudeHook, createClaudeObserver, claudeProbeSucceeded, claudeProbeInvocation, classifyClaudeCompaction } from '../scripts/probe-claude-host.mjs';
+import { admitClaudeCollection, projectClaudeHook, createClaudeObserver, claudeProbeSucceeded, claudeProbeInvocation, classifyClaudeCompaction } from '../probe-claude-host.mjs';
 
 test('trusted registration requires exact active project/session and excludes Worker/probe-origin recursion', () => {
   const registration = { projectRoot: '/synthetic/project', sessionId: 'session-1', enabled: true, origin: 'interactive' };

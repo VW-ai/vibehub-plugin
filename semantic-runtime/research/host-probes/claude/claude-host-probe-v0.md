@@ -6,8 +6,8 @@ an installed interactive plugin, TTY coverage, full conversation capture or a
 completed Worker service.
 
 ```sh
-node --test test/claude-host-probe.test.mjs
-node scripts/probe-claude-host.mjs --live-synthetic
+node --test research/host-probes/claude/test/claude-host-probe.test.mjs
+npm run probe:claude:live
 ```
 
 Without the live flag, no Claude call runs. A live invocation creates a temporary
@@ -21,7 +21,7 @@ type was read, so neither is certified by this measurement.
 ## Measured result
 
 The final minimized host report is retained as
-[`claude-host-compaction-20260922.json`](measurements/claude-host-compaction-20260922.json).
+[`claude-host-compaction-20260922.json`](reports/claude-host-compaction-20260922.json).
 The earlier two-turn measurement remains separately retained; it does not prove
 fresh delivery after compaction.
 

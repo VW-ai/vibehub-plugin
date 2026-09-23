@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
-import { createProbeToolHandler } from './probe-codex-host.mjs';
+import { createProbeToolHandler } from '../codex/probe-codex-host.mjs';
 
 const self = fileURLToPath(import.meta.url);
 const HOOKS = new Set(['SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop', 'SessionEnd', 'PreCompact', 'PostCompact']);
@@ -167,5 +167,5 @@ if (process.argv[1] === self) {
   } else if (process.argv.length === 3 && process.argv[2] === '--live-synthetic') {
     try { const report = await probeClaudeHost(); process.stdout.write(`${JSON.stringify(report, null, 2)}\n`); if (!claudeProbeSucceeded(report)) process.exitCode = 1; }
     catch { process.stderr.write('claude_probe_failed\n'); process.exitCode = 1; }
-  } else process.stdout.write('Opt-in: node scripts/probe-claude-host.mjs --live-synthetic (at most three saved-login invocations, including /compact; synthetic project only)\n');
+  } else process.stdout.write('Opt-in: npm run probe:claude:live (at most three saved-login invocations, including /compact; synthetic project only)\n');
 }

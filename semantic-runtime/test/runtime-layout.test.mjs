@@ -59,6 +59,26 @@ test('PostgreSQL research relocation is complete and recorded', t => {
   assert.ok(entries.every(entry => entry.new_path.startsWith('semantic-runtime/research/platform/node-postgres/')));
 });
 
+test('host probe research relocation is complete and recorded', t => {
+  if (!existsSync(new URL('../research', import.meta.url))) {
+    t.skip('standalone production verification deliberately excludes research');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url), 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'host-research');
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(entries.length, 9);
+  assert.equal(new Set(entries.map(item => item.migration_commit)).size, 1);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.match(entry.migration_commit, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+  assert.ok(entries.every(entry => entry.new_path.startsWith('semantic-runtime/research/host-probes/')));
+  assert.deepEqual(new Set(entries.map(entry => entry.new_path.split('/')[3])), new Set(['claude', 'codex']));
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);
@@ -70,6 +90,9 @@ test('layout inspection captures public surface, command modes, constants and an
   );
   assert.equal(current.root_exports.length, 206);
   assert.equal(current.npm_commands.find(item => item.name === 'check:jev:query')?.mode, 'explicit-live');
+  assert.equal(current.npm_commands.find(item => item.name === 'test:host-probes')?.mode, 'offline');
+  assert.equal(current.npm_commands.find(item => item.name === 'probe:codex:live')?.mode, 'explicit-live');
+  assert.equal(current.npm_commands.find(item => item.name === 'probe:claude:live')?.mode, 'explicit-live');
   assert.deepEqual(current.production_sccs, []);
   assert.ok(current.production_import_edges.some(edge =>
     edge.from === 'src/local/cli.mjs' && edge.to === 'src/local/service.mjs'));

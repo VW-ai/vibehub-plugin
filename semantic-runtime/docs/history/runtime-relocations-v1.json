@@ -161,6 +161,69 @@
       "old_blob": "d065e0f58f5f22c6fe007505f0ee43fda20f728f",
       "migration_commit": "2ed5abd489f93591b2236ab579109b170d0de238",
       "category": "platform-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/claude-host-probe-v0.md",
+      "new_path": "semantic-runtime/research/host-probes/claude/claude-host-probe-v0.md",
+      "old_blob": "a13e98a80fe8ec9ff83ca8904783fc5f0b866ecc",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/probe-claude-host.mjs",
+      "new_path": "semantic-runtime/research/host-probes/claude/probe-claude-host.mjs",
+      "old_blob": "730f921dd4f93d71919438708d7b6d89377c3c81",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/claude-host-20260922.json",
+      "new_path": "semantic-runtime/research/host-probes/claude/reports/claude-host-20260922.json",
+      "old_blob": "8c0a23adbc1691357c582da02634ffb731373dd0",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/claude-host-compaction-20260922.json",
+      "new_path": "semantic-runtime/research/host-probes/claude/reports/claude-host-compaction-20260922.json",
+      "old_blob": "a2fc5c7fb622c74be9076e4841c6df660deb4b83",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/claude-host-probe.test.mjs",
+      "new_path": "semantic-runtime/research/host-probes/claude/test/claude-host-probe.test.mjs",
+      "old_blob": "94848bbc9e24f31a7ffc3633bcae35563488a6bd",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/codex-host-probe-v0.md",
+      "new_path": "semantic-runtime/research/host-probes/codex/codex-host-probe-v0.md",
+      "old_blob": "37e2ac23bcaeeaa8089737c897e00d504021fed1",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/probe-codex-host.mjs",
+      "new_path": "semantic-runtime/research/host-probes/codex/probe-codex-host.mjs",
+      "old_blob": "5412c2d139bbd02e5cb98220b77b59647f99aa48",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/codex-host-20260922.json",
+      "new_path": "semantic-runtime/research/host-probes/codex/reports/codex-host-20260922.json",
+      "old_blob": "8b6228b0a638c8cdb9af6919be5c493177c4495b",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/codex-host-probe.test.mjs",
+      "new_path": "semantic-runtime/research/host-probes/codex/test/codex-host-probe.test.mjs",
+      "old_blob": "88651670e87a1c5e7593061d75e11ba656c57595",
+      "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+      "category": "host-research"
     }
   ]
 }

@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "197f55ead5ed202ade090b696b135cf5a5d5190e",
+        "blob": "99db185bfdc3d92c4fc9aa656682a2b51231a977",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "875b0fba9b310d92abb817f794c2e306e0ee5474",
+        "blob": "7cd5011a6181339d329c1cba8df69c6deea05458",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -52,14 +52,6 @@
       {
         "blob": "b8959a00d9ab262e21e90ea0fba3a4f8faf633ba",
         "path": "semantic-runtime/docs/causal-ordering-v0.md"
-      },
-      {
-        "blob": "a13e98a80fe8ec9ff83ca8904783fc5f0b866ecc",
-        "path": "semantic-runtime/docs/claude-host-probe-v0.md"
-      },
-      {
-        "blob": "37e2ac23bcaeeaa8089737c897e00d504021fed1",
-        "path": "semantic-runtime/docs/codex-host-probe-v0.md"
       },
       {
         "blob": "166c0f42e8ff5532131ee2e21d38332e7a3ae784",
@@ -102,7 +94,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "e1089f3e993964339bd9fe1d87129445bc26b790",
+        "blob": "9e899199ebc20b3364e20c5caf1c45520c936e5c",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -144,18 +136,6 @@
       {
         "blob": "f6bf7e41a6c6d7c0f2169b5b1954dd8ca2e9e663",
         "path": "semantic-runtime/docs/measurements/canonical-reader-verification-20260922.json"
-      },
-      {
-        "blob": "8c0a23adbc1691357c582da02634ffb731373dd0",
-        "path": "semantic-runtime/docs/measurements/claude-host-20260922.json"
-      },
-      {
-        "blob": "a2fc5c7fb622c74be9076e4841c6df660deb4b83",
-        "path": "semantic-runtime/docs/measurements/claude-host-compaction-20260922.json"
-      },
-      {
-        "blob": "8b6228b0a638c8cdb9af6919be5c493177c4495b",
-        "path": "semantic-runtime/docs/measurements/codex-host-20260922.json"
       },
       {
         "blob": "badfd224f2cc60dfba814fca95d4a9a872566841",
@@ -262,7 +242,7 @@
         "path": "semantic-runtime/docs/observability-contract-v0.md"
       },
       {
-        "blob": "a282e7f9dbd34677bbc8f7d6a0b8afcab290b09a",
+        "blob": "a673ae131bf84faf334d18157711c840f1c38f0d",
         "path": "semantic-runtime/docs/online-delivery-plan.md"
       },
       {
@@ -322,7 +302,7 @@
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "479a79ee31077e91cf21eb97f6e8e45661912c00",
+        "blob": "730e967fb4362ed40cd8de34ef1b6281928791ab",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -332,6 +312,42 @@
       {
         "blob": "089f5e449244de79c4c14a0c5e6b9f39551613a1",
         "path": "semantic-runtime/policies/phase0.json"
+      },
+      {
+        "blob": "f3b896cc603970e9480a33e969330311410c853f",
+        "path": "semantic-runtime/research/host-probes/claude/claude-host-probe-v0.md"
+      },
+      {
+        "blob": "ce505ed1955d0ea243f8968ff641ff4abaa02d7a",
+        "path": "semantic-runtime/research/host-probes/claude/probe-claude-host.mjs"
+      },
+      {
+        "blob": "8c0a23adbc1691357c582da02634ffb731373dd0",
+        "path": "semantic-runtime/research/host-probes/claude/reports/claude-host-20260922.json"
+      },
+      {
+        "blob": "a2fc5c7fb622c74be9076e4841c6df660deb4b83",
+        "path": "semantic-runtime/research/host-probes/claude/reports/claude-host-compaction-20260922.json"
+      },
+      {
+        "blob": "ebb9652d403619ac82a4c6c735031cbb873faedf",
+        "path": "semantic-runtime/research/host-probes/claude/test/claude-host-probe.test.mjs"
+      },
+      {
+        "blob": "35d88d0e37210d17f8c1290e247493cbb0704a7a",
+        "path": "semantic-runtime/research/host-probes/codex/codex-host-probe-v0.md"
+      },
+      {
+        "blob": "a64eab45332090e89d3e0ad0fb3a8d157032efa8",
+        "path": "semantic-runtime/research/host-probes/codex/probe-codex-host.mjs"
+      },
+      {
+        "blob": "8b6228b0a638c8cdb9af6919be5c493177c4495b",
+        "path": "semantic-runtime/research/host-probes/codex/reports/codex-host-20260922.json"
+      },
+      {
+        "blob": "a5f09277948b672f567e89a4564122d6449b94c7",
+        "path": "semantic-runtime/research/host-probes/codex/test/codex-host-probe.test.mjs"
       },
       {
         "blob": "2b134400fb570e426ddec905a2a51c39c6b1748b",
@@ -482,15 +498,7 @@
         "path": "semantic-runtime/scripts/compare-peel-judges.mjs"
       },
       {
-        "blob": "730f921dd4f93d71919438708d7b6d89377c3c81",
-        "path": "semantic-runtime/scripts/probe-claude-host.mjs"
-      },
-      {
-        "blob": "5412c2d139bbd02e5cb98220b77b59647f99aa48",
-        "path": "semantic-runtime/scripts/probe-codex-host.mjs"
-      },
-      {
-        "blob": "8b90df217df4ae98ed03945f2ff533e41839d913",
+        "blob": "0fd1019262069498dfe6e68d68efe225d28ab3ea",
         "path": "semantic-runtime/scripts/runtime-layout.mjs"
       },
       {
@@ -890,16 +898,8 @@
         "path": "semantic-runtime/test/claude-cli-judge.test.mjs"
       },
       {
-        "blob": "94848bbc9e24f31a7ffc3633bcae35563488a6bd",
-        "path": "semantic-runtime/test/claude-host-probe.test.mjs"
-      },
-      {
         "blob": "e1a11ad2701ddd451a6734098bfacc664908d4fe",
         "path": "semantic-runtime/test/cli.test.mjs"
-      },
-      {
-        "blob": "88651670e87a1c5e7593061d75e11ba656c57595",
-        "path": "semantic-runtime/test/codex-host-probe.test.mjs"
       },
       {
         "blob": "897657e89729a8ff42245454ad2b4b685a0fcedb",
@@ -1418,7 +1418,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "647ae195f7702cfd5b8a7cfa4bac35b47aef5c5a",
+        "blob": "fc231da8a3a7b4c1320ff56f7cc0a133a4330b5d",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1462,8 +1462,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-22T23:29:11.880Z",
-    "last_aligned_commit": "2ed5abd489f93591b2236ab579109b170d0de238"
+    "checked_at": "2026-09-22T23:58:59.846Z",
+    "last_aligned_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2"
   },
   "anchors": [
     "semantic-runtime/"

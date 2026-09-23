@@ -286,7 +286,8 @@ function commandMode(name) {
   if (name === 'start' || name === 'app' || name === 'status') return 'local-runtime';
   if (name === 'example:gateway' || name === 'replay:jev' || name.startsWith('smoke:')
     || name.startsWith('check:jev:') || name === 'benchmark:peel:compare'
-    || name === 'benchmark:peel:compare:gateway' || name.startsWith('benchmark:peel:jev')) return 'explicit-live';
+    || name === 'benchmark:peel:compare:gateway' || name.startsWith('benchmark:peel:jev')
+    || name.startsWith('probe:')) return 'explicit-live';
   return 'offline';
 }
 

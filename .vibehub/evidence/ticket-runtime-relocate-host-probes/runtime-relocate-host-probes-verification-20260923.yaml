@@ -1,0 +1,56 @@
+{
+  "acceptance_ids": [
+    "host-probes-are-self-contained",
+    "host-probes-remain-opt-in",
+    "host-probe-paths-and-checks-follow"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "host-probes-are-self-contained",
+      "identity": "sha256:aae847b8ec7640983003ce447ef7f39a7b6053797d031f759212aeb4d30740b0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "host-probes-remain-opt-in",
+      "identity": "sha256:9c5304e47536609ab72ce9354e3f7847d9d951237f1b702203bc720ea627d13e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "host-probe-paths-and-checks-follow",
+      "identity": "sha256:ce13acd7d1b1920312c569c198778f0818fd47065fa25860cf3b42dacb8e33c1",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-relocate-host-probes-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T00:00:37Z",
+  "refs": [
+    "git:474e36d8b29c0639c4b48aa92dc06545e4873fa2",
+    "semantic-runtime/research/host-probes/codex/codex-host-probe-v0.md",
+    "semantic-runtime/research/host-probes/codex/probe-codex-host.mjs",
+    "semantic-runtime/research/host-probes/codex/test/codex-host-probe.test.mjs",
+    "semantic-runtime/research/host-probes/codex/reports/codex-host-20260922.json",
+    "semantic-runtime/research/host-probes/claude/claude-host-probe-v0.md",
+    "semantic-runtime/research/host-probes/claude/probe-claude-host.mjs",
+    "semantic-runtime/research/host-probes/claude/test/claude-host-probe.test.mjs",
+    "semantic-runtime/research/host-probes/claude/reports/claude-host-20260922.json",
+    "semantic-runtime/research/host-probes/claude/reports/claude-host-compaction-20260922.json",
+    "semantic-runtime/package.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/README.md",
+    "semantic-runtime/docs/online-delivery-plan.md",
+    ".vibehub/tickets/ticket-runtime-relocate-host-probes.yaml",
+    ".vibehub/rooms/semantic-runtime/note-runtime-codex-observed-host-boundary.yaml",
+    ".vibehub/rooms/semantic-runtime/note-runtime-claude-observed-host-boundary.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit 474e36d8b29c0639c4b48aa92dc06545e4873fa2 moves the complete Codex and Claude host-probe research set as nine 100% Git renames into semantic-runtime/research/host-probes/{codex,claude}: two runners, two deterministic test files, two usage/limitations documents and three historical observation reports. An executable manifest audit verifies all nine old blobs in the migration parent, the same nine blobs at the new migration paths, and absence of all old paths. Follow-up imports, current docs and package commands use the new locations. npm run test:host-probes passes 10/10 offline; invoking either runner without its live switch only prints its opt-in command. Ordinary npm test/verify still excludes research, while probe:codex:live and probe:claude:live are classified explicit-live. Boundary checking reports 244 files, no errors and no production SCCs. Full Runtime verification passes 1022 total / 1020 passed / 0 failed / 2 expected skips. Standalone locked-install verification passes 1022 total / 1017 passed / 0 failed / 5 expected skips, including three explicit research-exclusion skips. Plugin artifact verification passes with 79 files and 3670088 bytes. The focused layout suite passes 6/6; project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass. The prior capability-probe Tickets, five Evidence records, two Outcomes and three moved observation reports remain byte-unchanged. No Codex, Claude, Keychain, network, model-provider or JEV live call was made for this structural Ticket.",
+  "ticket_id": "ticket-runtime-relocate-host-probes"
+}

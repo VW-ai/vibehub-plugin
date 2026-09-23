@@ -7,8 +7,8 @@ or capture of the user's existing Desktop conversations.
 ## Reproduce the selected synthetic path
 
 ```sh
-node --test test/codex-host-probe.test.mjs
-node scripts/probe-codex-host.mjs --live-synthetic
+node --test research/host-probes/codex/test/codex-host-probe.test.mjs
+npm run probe:codex:live
 ```
 
 Without the explicit live flag the script prints usage and makes no model call.
@@ -37,7 +37,7 @@ existing IDs, transcript paths, or project payloads.
 Both CLI processes exited 0, completed their turns and emitted the exact requested
 assistant acknowledgements. The second process returned the same thread identity.
 No timeout, malformed stream or error event occurred.
-The [sanitized report](measurements/codex-host-20260922.json) retains only the
+The [sanitized report](reports/codex-host-20260922.json) retains only the
 allowlisted timing/lifecycle fields described below.
 
 | Observation | First turn | Exact-ID resume / next turn |

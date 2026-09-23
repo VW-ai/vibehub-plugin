@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createProbeObserver, createProbeToolHandler, probeSucceeded } from '../scripts/probe-codex-host.mjs';
+import { createProbeObserver, createProbeToolHandler, probeSucceeded } from '../probe-codex-host.mjs';
 
 test('probe exposes bounded event metadata, stable per-run item labels and exact synthetic ack only', () => {
   const observer = createProbeObserver('ACK');

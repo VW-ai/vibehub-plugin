@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "实测版本、覆盖与原始失败尝试保留。",
-      "ref": "semantic-runtime/docs/claude-host-probe-v0.md"
+      "ref": "semantic-runtime/research/host-probes/claude/claude-host-probe-v0.md"
     },
     {
       "note": "独立验收以补充实测解决 compaction 和 fresh marker 缺口。",

@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "实测矩阵、复现命令、版本、最小输入和明确覆盖缺口。",
-      "ref": "semantic-runtime/docs/codex-host-probe-v0.md"
+      "ref": "semantic-runtime/research/host-probes/codex/codex-host-probe-v0.md"
     },
     {
       "note": "独立验收接受观察结果，保留未测能力而非推断产品已接入。",

@@ -53,14 +53,14 @@ UI yet. The [real synthetic JEV check](jev-synthetic-check.md) completed 8/8 cas
 through TypeSafe with 8/8 expected classifications and no observed rate limit.
 It is a basic route check, not evidence of nuanced semantic quality.
 The additional JEV edge suite completed another 8/8 matching cases, including
-exact multiple-target association. The [Codex host probe](codex-host-probe-v0.md)
+exact multiple-target association. The [Codex host probe](../research/host-probes/codex/codex-host-probe-v0.md)
 also verified synthetic MCP query/ack and next-turn input after exact-ID resume;
 existing Desktop sessions, complete message coverage and compaction remain gaps.
 The [domain store](domain-store-v0.md) now supplies scoped durable CAS/source/outbox
 transactions. The [Git registry](git-project-enrollment-v0.md) enrolls selected
 folders and registered worktrees, retaining observed identities and immutable
 history; it is still a module awaiting App composition.
-The [Claude capability probe](claude-host-probe-v0.md) verified invocation-local
+The [Claude capability probe](../research/host-probes/claude/claude-host-probe-v0.md) verified invocation-local
 hooks/MCP and exact-session delivery after native manual compaction. This remains
 a synthetic CLI probe; TTY/plugin installation and crash replay are still gaps.
 The [Project activation module](project-activation-v0.md) now persists explicit

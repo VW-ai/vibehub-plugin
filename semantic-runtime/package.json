@@ -16,6 +16,7 @@
     "app": "node src/local/cli.mjs --setup",
     "status": "node src/local/cli.mjs --status",
     "test": "node --test test/*.test.mjs",
+    "test:host-probes": "node --test research/host-probes/codex/test/codex-host-probe.test.mjs research/host-probes/claude/test/claude-host-probe.test.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "verify": "npm run check:boundaries && npm test",
     "verify:standalone": "node scripts/verify-standalone.mjs",
@@ -42,7 +43,9 @@
     "check:jev:judge": "node scripts/check-jev-judge.mjs",
     "check:jev:adoption": "node scripts/check-jev-adoption.mjs",
     "check:jev:context": "node scripts/check-jev-context.mjs",
-    "check:jev:query": "node scripts/check-jev-query.mjs"
+    "check:jev:query": "node scripts/check-jev-query.mjs",
+    "probe:codex:live": "node research/host-probes/codex/probe-codex-host.mjs --live-synthetic",
+    "probe:claude:live": "node research/host-probes/claude/probe-claude-host.mjs --live-synthetic"
   },
   "devDependencies": {
     "acorn": "8.15.0"

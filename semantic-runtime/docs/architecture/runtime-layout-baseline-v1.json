@@ -71,16 +71,6 @@
       "intended_destination": "docs/contracts/causal-ordering-v0.md"
     },
     {
-      "path": "docs/claude-host-probe-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/host-probes/claude/claude-host-probe-v0.md"
-    },
-    {
-      "path": "docs/codex-host-probe-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/host-probes/codex/codex-host-probe-v0.md"
-    },
-    {
       "path": "docs/context-judge-bridge-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/context-judge-bridge-v0.md"
@@ -184,21 +174,6 @@
       "path": "docs/measurements/canonical-reader-verification-20260922.json",
       "current_role": "documentation-or-report",
       "intended_destination": "verification/reports/sources/canonical-reader-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/claude-host-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/host-probes/claude/reports/claude-host-20260922.json"
-    },
-    {
-      "path": "docs/measurements/claude-host-compaction-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/host-probes/claude/reports/claude-host-compaction-20260922.json"
-    },
-    {
-      "path": "docs/measurements/codex-host-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/host-probes/codex/reports/codex-host-20260922.json"
     },
     {
       "path": "docs/measurements/context-judge-verification-20260922.json",
@@ -426,6 +401,51 @@
       "intended_destination": "README.md"
     },
     {
+      "path": "research/host-probes/claude/claude-host-probe-v0.md",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/claude/claude-host-probe-v0.md"
+    },
+    {
+      "path": "research/host-probes/claude/probe-claude-host.mjs",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/claude/probe-claude-host.mjs"
+    },
+    {
+      "path": "research/host-probes/claude/reports/claude-host-20260922.json",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/claude/reports/claude-host-20260922.json"
+    },
+    {
+      "path": "research/host-probes/claude/reports/claude-host-compaction-20260922.json",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/claude/reports/claude-host-compaction-20260922.json"
+    },
+    {
+      "path": "research/host-probes/claude/test/claude-host-probe.test.mjs",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/claude/test/claude-host-probe.test.mjs"
+    },
+    {
+      "path": "research/host-probes/codex/codex-host-probe-v0.md",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/codex/codex-host-probe-v0.md"
+    },
+    {
+      "path": "research/host-probes/codex/probe-codex-host.mjs",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/codex/probe-codex-host.mjs"
+    },
+    {
+      "path": "research/host-probes/codex/reports/codex-host-20260922.json",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/codex/reports/codex-host-20260922.json"
+    },
+    {
+      "path": "research/host-probes/codex/test/codex-host-probe.test.mjs",
+      "current_role": "host-research",
+      "intended_destination": "research/host-probes/codex/test/codex-host-probe.test.mjs"
+    },
+    {
       "path": "research/platform/node-postgres/app-spec.template.yaml",
       "current_role": "platform-research",
       "intended_destination": "research/platform/node-postgres/app-spec.template.yaml"
@@ -609,16 +629,6 @@
       "path": "scripts/compare-peel-judges.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "research/phase0-replay/compare-peel-judges.mjs"
-    },
-    {
-      "path": "scripts/probe-claude-host.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/host-probes/claude/probe-claude-host.mjs"
-    },
-    {
-      "path": "scripts/probe-codex-host.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/host-probes/codex/probe-codex-host.mjs"
     },
     {
       "path": "scripts/runtime-layout.mjs",
@@ -1121,19 +1131,9 @@
       "intended_destination": "test/judge/claude-cli-judge.test.mjs"
     },
     {
-      "path": "test/claude-host-probe.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/host-probes/claude/test/claude-host-probe.test.mjs"
-    },
-    {
       "path": "test/cli.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "research/phase0-replay/test/cli.test.mjs"
-    },
-    {
-      "path": "test/codex-host-probe.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/host-probes/codex/test/codex-host-probe.test.mjs"
     },
     {
       "path": "test/context-capacity.test.mjs",
@@ -2141,6 +2141,16 @@
       "mode": "explicit-live"
     },
     {
+      "name": "probe:claude:live",
+      "command": "node research/host-probes/claude/probe-claude-host.mjs --live-synthetic",
+      "mode": "explicit-live"
+    },
+    {
+      "name": "probe:codex:live",
+      "command": "node research/host-probes/codex/probe-codex-host.mjs --live-synthetic",
+      "mode": "explicit-live"
+    },
+    {
       "name": "replay",
       "command": "node src/cli.mjs replay",
       "mode": "offline"
@@ -2183,6 +2193,11 @@
     {
       "name": "test",
       "command": "node --test test/*.test.mjs",
+      "mode": "offline"
+    },
+    {
+      "name": "test:host-probes",
+      "command": "node --test research/host-probes/codex/test/codex-host-probe.test.mjs research/host-probes/claude/test/claude-host-probe.test.mjs",
       "mode": "offline"
     },
     {

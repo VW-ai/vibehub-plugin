@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "host-probes-are-self-contained",
+    "host-probes-remain-opt-in",
+    "host-probe-paths-and-checks-follow"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T00:12:34Z",
+  "contract_revision": {
+    "identity": "sha256:971a31fa70199aba902dd5c2401e498a6434840868eae6a8fb36fb72a025a22b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-relocate-host-probes-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh delegated closeout Agent with no participation in execution; independently read the current Ticket, exact bound Evidence, migration commit, working diff, contracts and reproducible validation outputs before adjudicating each criterion.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three current criteria. Migration commit 474e36d8b29c0639c4b48aa92dc06545e4873fa2 is exactly nine 100% renames into research/host-probes/{codex,claude}; current runners, tests, reports, usage documents, imports, package commands, docs, Ticket refs, layout baseline and relocation manifest consistently use the new paths. No-flag runner checks remained opt-in, focused host-probe and layout suites passed, the full Runtime verification passed 1020/1022 with two expected skips, artifact verification passed, and Ticket/project validation, Context guard and diff checking passed. The exact bound Evidence also records the successful standalone locked-install verification and preservation checks.",
+  "ticket_id": "ticket-runtime-relocate-host-probes",
+  "unresolved_acceptance_ids": []
+}

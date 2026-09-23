@@ -87,7 +87,7 @@ configured locally; add `-- edge` for the targeted edge suite.
 `npm run check:jev:ingress` additionally verifies that approved synthetic text
 survives actual local intake, SQLite reopen and retry before being read back
 and sent to JEV. It uses a disposable synthetic Project, never existing traces.
-A [real Codex capability probe](docs/codex-host-probe-v0.md) also measures
+A [real Codex capability probe](research/host-probes/codex/codex-host-probe-v0.md) also measures
 MCP query/ack and exact-session next-turn delivery on synthetic inputs; it does
 not install a recorder into existing sessions.
 
