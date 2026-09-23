@@ -756,6 +756,11 @@
       "intended_destination": "src/app/local/http/authorize-local-request.mjs"
     },
     {
+      "path": "src/application/context/context-read-service.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/context/context-read-service.mjs"
+    },
+    {
       "path": "src/cli.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/cli.mjs"
@@ -919,11 +924,6 @@
       "path": "src/local/context-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/context/context-inputs.mjs"
-    },
-    {
-      "path": "src/local/context-read-service.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/context/context-read-service.mjs"
     },
     {
       "path": "src/local/context-reader.mjs",
@@ -2466,6 +2466,42 @@
       "to": "src/core/incremental-graph.mjs"
     },
     {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/core/working-graph.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/context-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/context-reader.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/local/source-invalidation.mjs"
+    },
+    {
       "from": "src/cli.mjs",
       "to": "src/adapters/heuristic-judge.mjs"
     },
@@ -2974,42 +3010,6 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/context-reader.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/context-read-service.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
       "from": "src/local/context-reader.mjs",
       "to": "src/adapters/sqlite/graph-storage.mjs"
     },
@@ -3291,11 +3291,11 @@
     },
     {
       "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/local/context-inputs.mjs"
+      "to": "src/application/context/context-read-service.mjs"
     },
     {
       "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/local/context-read-service.mjs"
+      "to": "src/local/context-inputs.mjs"
     },
     {
       "from": "src/local/graph-service-bundle.mjs",

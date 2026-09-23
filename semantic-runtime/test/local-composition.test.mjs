@@ -6,7 +6,7 @@ import { LocalContextStore } from '../src/local/context-store.mjs';
 import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
 import { LocalQueryEngine } from '../src/local/query-engine.mjs';
-import { ContextReadService } from '../src/local/context-read-service.mjs';
+import { ContextReadService } from '../src/application/context/context-read-service.mjs';
 import { graphCapabilityFor, graphGetHead } from '../src/local/graph-capability.mjs';
 import { graphServiceBundle } from '../src/local/graph-service-bundle.mjs';
 import { readerFixture } from './helpers/canonical-reader-fixture.mjs';
@@ -64,9 +64,10 @@ test('Graph capabilities are opaque and bound to the exact Graph, store and auth
 });
 
 test('canonical, exploration and Context services do not import or construct LocalGraphStore', () => {
-  for (const path of ['canonical-source-reader.mjs', 'exploration-canonical.mjs', 'context-inputs.mjs', 'context-read-service.mjs']) {
-    const source = readFileSync(new URL(`../src/local/${path}`, import.meta.url), 'utf8');
-    assert.doesNotMatch(source, /from ['"]\.\/graph-store\.mjs['"]/);
+  for (const path of ['../src/local/canonical-source-reader.mjs', '../src/local/exploration-canonical.mjs',
+    '../src/local/context-inputs.mjs', '../src/application/context/context-read-service.mjs']) {
+    const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /from\s+['"][^'"]*graph-store\.mjs['"]/);
     assert.doesNotMatch(source, /new\s+LocalGraphStore\b/);
   }
 });

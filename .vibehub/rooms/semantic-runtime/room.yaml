@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "9391ae81bac306c43ce63bdcb86a6106877eed09",
+        "blob": "117a94485727004573cf252fa8adf6fbe7e69789",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -598,6 +598,10 @@
         "path": "semantic-runtime/src/app/local/http/authorize-local-request.mjs"
       },
       {
+        "blob": "a599a295e394e431e7cfcb544ebe724b36b80ef2",
+        "path": "semantic-runtime/src/application/context/context-read-service.mjs"
+      },
+      {
         "blob": "b2c98a7cd13511144cce4aededad6b6df8ee6ad3",
         "path": "semantic-runtime/src/cli.mjs"
       },
@@ -730,10 +734,6 @@
         "path": "semantic-runtime/src/local/context-inputs.mjs"
       },
       {
-        "blob": "6263eba17a321765a099688ad273a2dc51fda862",
-        "path": "semantic-runtime/src/local/context-read-service.mjs"
-      },
-      {
         "blob": "9e90df27380fc32739543889bb372e03cb7c0dd5",
         "path": "semantic-runtime/src/local/context-reader.mjs"
       },
@@ -786,7 +786,7 @@
         "path": "semantic-runtime/src/local/graph-selected.mjs"
       },
       {
-        "blob": "966fab113f23e2b482f7e17ad2541ad7cd8a5f6e",
+        "blob": "4e93300a696f1080481f43f30fe320dbbba5da70",
         "path": "semantic-runtime/src/local/graph-service-bundle.mjs"
       },
       {
@@ -1354,7 +1354,7 @@
         "path": "semantic-runtime/test/judge-runtime.test.mjs"
       },
       {
-        "blob": "c279a94c493e0a5fd2bfcb9307636340e606bca4",
+        "blob": "cfa1475d85d95394cf549f9fa063b62a3a59ad5c",
         "path": "semantic-runtime/test/local-composition.test.mjs"
       },
       {
@@ -1474,8 +1474,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T03:16:52.920Z",
-    "last_aligned_commit": "9bd4bd093f12938d4f2e80da1e29cb9a47c096d6"
+    "checked_at": "2026-09-23T03:46:00.108Z",
+    "last_aligned_commit": "6498371feaeec17d57b1f33556d40699aeb78b97"
   },
   "anchors": [
     "semantic-runtime/"

@@ -54,7 +54,7 @@
     },
     {
       "purpose": "Exact service implementation and old Git blob to relocate.",
-      "ref": "semantic-runtime/src/local/context-read-service.mjs"
+      "ref": "commit:6498371feaeec17d57b1f33556d40699aeb78b97:semantic-runtime/src/local/context-read-service.mjs"
     },
     {
       "purpose": "Sole production composition/import edge to update.",
