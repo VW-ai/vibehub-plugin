@@ -1,5 +1,5 @@
 import { GraphInputs, graphInput, graphFields, graphId, graphEqual, graphHash, graphKey, graphErrorCode, graphFail } from './graph-inputs.mjs';
-import { GraphStorage } from './graph-storage.mjs';
+import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { selectGraph } from './graph-selected.mjs';
 import { ExplorationInputs, readExplorationOwner, EXPLORATION_NAMESPACE } from './exploration-inputs.mjs';
 import { verifyExplorationPublication } from './exploration-adoption.mjs';

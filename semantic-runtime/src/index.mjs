@@ -13,7 +13,7 @@ export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMateri
 export { LOCAL_AUDIENCE } from './domain/identity/access-authority.mjs';
 export { LocalCredentialAuthority } from './adapters/auth/local-credential-authority.mjs';
 export { authorizeLocalRequest } from './app/local/http/authorize-local-request.mjs';
-export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './local/domain-store.mjs';
+export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './adapters/sqlite/domain-store.mjs';
 export { LocalGraphStore, WORKING_GRAPH_NAMESPACE, GRAPH_ERROR_CODES } from './local/graph-store.mjs';
 export {
   AGENT_WORK_REQUEST_VERSION, AGENT_WORK_ACTIONS, AGENT_WORK_PHASES,

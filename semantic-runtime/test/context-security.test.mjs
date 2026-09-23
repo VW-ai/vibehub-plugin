@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { fixture, publish, contextRequest, content, canonicalRefs, gitCodeRef, read, selectedInput, adoption, rows,
   boundedFailure, head, CONTEXT_ACTIONS, SCOPE } from './helpers/context-fixture.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
-import { DomainStore } from '../src/local/domain-store.mjs';
+import { DomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { ContextInputs } from '../src/local/context-inputs.mjs';
 import { bindRequest, pin } from './helpers/exploration-fixture.mjs';
 

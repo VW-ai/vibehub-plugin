@@ -1,7 +1,7 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GraphInputs, graphHash, graphEqual, graphErrorCode } from './graph-inputs.mjs';
-import { GraphStorage } from './graph-storage.mjs';
+import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { readExplorationOwner } from './exploration-inputs.mjs';
 import { composeLocalServices } from './local-runtime-composition.mjs';
 import { planContextSelection, readContextSelection } from './context-reader.mjs';

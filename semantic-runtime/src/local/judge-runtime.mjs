@@ -1,4 +1,4 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority } from '../domain/identity/access-authority.mjs';
 import { ProviderSettings, validateProviderConfig } from './provider-settings.mjs';
 import { JudgeInputs } from './judge-inputs.mjs';

@@ -1,4 +1,4 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 

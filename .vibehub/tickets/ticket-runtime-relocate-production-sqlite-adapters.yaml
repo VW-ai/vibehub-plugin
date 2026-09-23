@@ -1,0 +1,112 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "production-sqlite-home-is-exact",
+      "criterion": "domain-store.mjs and graph-storage.mjs move from src/local/ to src/adapters/sqlite/ as one production storage cluster; Phase 0 sqlite-store.mjs, provider settings, app bootstrap storage, graph-store and other Graph, Exploration, Context, Query, Judge and local composition modules remain in their current homes except for required import and layout-record updates.",
+      "identity": "sha256:b2217be27a37b561787ac91935e708b25795d040d0f9d650cc0d45caa62d47e9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "sqlite-transaction-and-surface-are-preserved",
+      "criterion": "Every production and deterministic-test consumer resolves the new paths while DomainStore and GraphStorage implementations, public DomainStore exports, schema/application/version constants, namespaces, SQL, nominal identity, authorization order, transaction ownership, rollback/CAS behavior, bounded reads and error codes remain unchanged apart from relative import depth.",
+      "identity": "sha256:a2bfc39893fa5846d46ec2df05c6d46ae2defba516649560b4c6d0482b8f9d5f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "sqlite-relocation-is-fully-verifiable",
+      "criterion": "The current layout baseline, relocation manifest and semantic-runtime Room record the completed two-file move with immutable old blobs and the migration commit; boundary checking reports zero errors and zero production SCCs, and focused transaction/storage, full Runtime, standalone locked-install, plugin artifact, project/Ticket, Context guard and git diff verification pass without a credential, host, network, provider, Keychain lifecycle or live JEV call.",
+      "identity": "sha256:1afa113b4516b86f46acd2495bb518f4388a852048d22d3a2815779c98f6fea3",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not change database bytes, schema/application/version constants, migrations, SQL, statement lifetime, transaction/rollback/CAS ordering, access checks, Graph wire formats, namespaces, limits, errors or public API.",
+    "Do not move or modify Phase 0 sqlite-store.mjs, ProviderSettings, service bootstrap storage, graph-store, context-store, exploration-store, canonical/query/judge/input orchestration, research or verification code beyond required import and migration-record updates.",
+    "Keep src/index.mjs as the only package entry and preserve its exact public export set.",
+    "Keep historical Ticket, Evidence and Outcome source references unchanged; record the old locations through immutable Git and the relocation manifest.",
+    "Ordinary verification stays offline and deterministic; no credential store, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "The capability layout baseline identifies DomainStore and GraphStorage as the smallest coherent production SQLite cluster. DomainStore owns the real SQLite connection and synchronous transaction boundary; GraphStorage is already a finite adapter over a caller-owned scoped transaction view. Relocating them together does not split atomicity or require the later application-service transaction seam. Phase 0 SqliteCandidateStore, provider settings, app bootstrap storage and Graph/Context/Exploration orchestration have different roles and remain outside this Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, storage, adapter, private-state and standalone boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted SQLite role, transaction-seam rule, migration order and historical-path preservation.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current inventory, exact SQLite destinations, public surface, constants and dependency graph.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Immutable relocation provenance format to extend after the migration commit exists.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Successful capability direction, SCC and standalone enforcement baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-enforce-layer-boundaries/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted composition seam and zero-SCC transaction-preservation baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted access port and current zero-direction-exception baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-local-access-seam/contract-v1.yaml"
+    },
+    {
+      "purpose": "Most recent successful production adapter relocation pattern and verification contract.",
+      "ref": ".vibehub/outcomes/ticket-runtime-relocate-macos-secret-adapter/contract-v1.yaml"
+    },
+    {
+      "purpose": "Pre-move production SQLite connection, migration, authorization and transaction implementation.",
+      "ref": "commit:7c680744dc05c1a5e14c4d6e24e90bd4f695196f:semantic-runtime/src/local/domain-store.mjs"
+    },
+    {
+      "purpose": "Pre-move transaction-scoped Graph storage implementation.",
+      "ref": "commit:7c680744dc05c1a5e14c4d6e24e90bd4f695196f:semantic-runtime/src/local/graph-storage.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "production-sqlite-home-is-exact",
+          "identity": "sha256:b2217be27a37b561787ac91935e708b25795d040d0f9d650cc0d45caa62d47e9",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "sqlite-relocation-is-fully-verifiable",
+          "identity": "sha256:1afa113b4516b86f46acd2495bb518f4388a852048d22d3a2815779c98f6fea3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "sqlite-transaction-and-surface-are-preserved",
+          "identity": "sha256:a2bfc39893fa5846d46ec2df05c6d46ae2defba516649560b4c6d0482b8f9d5f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:96c4144bad16835137965e16488bbb73c0697a3602cfc01d56f4caf662e1fc60",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The production DomainStore and transaction-scoped GraphStorage implementations live under the formal SQLite adapter capability without changing schema, authorization, transaction or Graph behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:sqlite-adapter-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-production-sqlite-adapters"
+}

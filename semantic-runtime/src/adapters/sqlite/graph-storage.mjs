@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { types } from 'node:util';
-import { fingerprint, canonical } from '../core/contracts.mjs';
+import { fingerprint, canonical } from '../../core/contracts.mjs';
 import { validateGraphCommitAddress2, validateGraphCommit2, validateGraphEffectPlan2,
-  validateGraphPageCursor2 } from '../core/incremental-graph.mjs';
+  validateGraphPageCursor2 } from '../../core/incremental-graph.mjs';
 
 export const WORKING_GRAPH_NAMESPACE = 'working-graph';
 const NS = WORKING_GRAPH_NAMESPACE;

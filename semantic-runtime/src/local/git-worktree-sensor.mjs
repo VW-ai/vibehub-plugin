@@ -1,7 +1,7 @@
 import { isProxy } from 'node:util/types';
 import { randomUUID, createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';

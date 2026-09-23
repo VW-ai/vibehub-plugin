@@ -12,7 +12,7 @@ test('selected SQLite ranges retain their statement through forced GC and releas
     import { mkdtempSync, rmSync } from 'node:fs';
     import { tmpdir } from 'node:os';
     import { join } from 'node:path';
-    import { DomainStore, migrateDomainStore } from ${JSON.stringify(moduleURL('../src/local/domain-store.mjs'))};
+    import { DomainStore, migrateDomainStore } from ${JSON.stringify(moduleURL('../src/adapters/sqlite/domain-store.mjs'))};
     import { LocalCredentialAuthority, LOCAL_AUDIENCE } from ${JSON.stringify(moduleURL('../src/adapters/auth/local-credential-authority.mjs'))};
     import { scopedReference } from ${JSON.stringify(moduleURL('../src/core/service-access.mjs'))};
     const directory=mkdtempSync(join(tmpdir(),'vh-sqlite-gc-')),filePath=join(directory,'store.sqlite');

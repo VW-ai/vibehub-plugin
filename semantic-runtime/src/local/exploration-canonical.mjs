@@ -1,8 +1,8 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { CanonicalSourceReaderService } from './canonical-source-reader-service.mjs';
 import { graphCapabilityFrom, graphGetHead, withGraphCapability } from './graph-capability.mjs';
-import { GraphStorage } from './graph-storage.mjs';
+import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { GraphInputs, GRAPH_NS, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphErrorCode } from './graph-inputs.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';

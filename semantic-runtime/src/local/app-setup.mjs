@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { statSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
-import { DomainStore, migrateDomainStore } from './domain-store.mjs';
+import { DomainStore, migrateDomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { scopedReference } from '../core/service-access.mjs';
 import { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';

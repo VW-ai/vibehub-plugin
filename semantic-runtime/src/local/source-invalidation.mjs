@@ -1,4 +1,4 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { canonical, fingerprint } from '../core/contracts.mjs';
 import { validateNormalizedEvent, effectiveEventAccess, sourceObjectKey } from '../core/event-provenance.mjs';

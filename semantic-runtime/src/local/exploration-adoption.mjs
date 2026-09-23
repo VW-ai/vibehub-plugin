@@ -10,7 +10,7 @@
  * [{source:<exact A ref>,destination:<exact B ref>,resolved:<authorized B result>}].
  * The same read-only helper is used on retry with the original execution_id.
  */
-import { GraphStorage } from './graph-storage.mjs';
+import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphAssert, graphFail, graphErrorCode, graphId } from './graph-inputs.mjs';
 import { EXPLORATION_NAMESPACE, readExplorationOwner } from './exploration-inputs.mjs';
 import { validateSemanticRevision, exactRevisionAddress } from '../core/working-graph.mjs';

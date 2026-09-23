@@ -1,4 +1,4 @@
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
@@ -6,7 +6,7 @@ import { LocalExplorationStore } from './exploration-store.mjs';
 import { LocalContextStore } from './context-store.mjs';
 import { readContextSelection } from './context-reader.mjs';
 import { composeLocalServices } from './local-runtime-composition.mjs';
-import { GraphStorage } from './graph-storage.mjs';
+import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { SourceInvalidationFeed } from './source-invalidation.mjs';
 import { GraphInputs, graphInput, graphFields, graphEqual, graphHash, graphId, graphErrorCode } from './graph-inputs.mjs';
 import { canonical, FAMILIES, judgeInputHash } from '../core/contracts.mjs';

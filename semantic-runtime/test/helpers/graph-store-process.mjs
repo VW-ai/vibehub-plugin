@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { DomainStore } from '../../src/local/domain-store.mjs';
+import { DomainStore } from '../../src/adapters/sqlite/domain-store.mjs';
 import { connect } from './graph-store-fixture.mjs';
 
 const [mode, filePath, requestPath] = process.argv.slice(2);

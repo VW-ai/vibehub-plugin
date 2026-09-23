@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { DomainStore, migrateDomainStore } from '../src/local/domain-store.mjs';
+import { DomainStore, migrateDomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../src/core/service-access.mjs';
 import { GitProjectRegistry } from '../src/local/git-projects.mjs';

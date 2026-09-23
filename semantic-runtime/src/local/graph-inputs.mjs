@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { types } from 'node:util';
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { DurableIngress, INGRESS_NAMESPACE } from './durable-ingress.mjs';

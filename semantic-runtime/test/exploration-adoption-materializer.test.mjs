@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { fixture, adoption, ADOPTION_ACTIONS } from './helpers/adoption-fixture.mjs';
 import { mutation, assertion, rows, resolve, capture, register, bind, SCOPE } from './helpers/exploration-fixture.mjs';
 import { GraphInputs, graphKey, graphHash } from '../src/local/graph-inputs.mjs';
-import { GraphStorage } from '../src/local/graph-storage.mjs';
+import { GraphStorage } from '../src/adapters/sqlite/graph-storage.mjs';
 import { materializeExplorationAdoption } from '../src/local/exploration-adoption.mjs';
 import { ExplorationInputs } from '../src/local/exploration-inputs.mjs';
 import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';

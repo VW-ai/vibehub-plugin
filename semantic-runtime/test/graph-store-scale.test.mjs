@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { performance } from 'node:perf_hooks';
 import { writeFileSync } from 'node:fs';
 import { fixture, register, capture, initialize, assertion, mutation, NS } from './helpers/graph-store-fixture.mjs';
-import { GraphStorage } from '../src/local/graph-storage.mjs';
+import { GraphStorage } from '../src/adapters/sqlite/graph-storage.mjs';
 
 // Temporary synthetic database, one generation, no pruning or fixture reset.
 test('real SQLite retains1040 transitions/600 objects with bounded indexed reads and resumable projection rebuild', t => {

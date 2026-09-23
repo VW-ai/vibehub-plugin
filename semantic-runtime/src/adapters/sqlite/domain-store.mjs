@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, existsSync, chmodSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { types } from 'node:util';
-import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
 
 const APPLICATION_ID = 0x56484453; // VHDS, separate from bootstrap and provider settings.
 export const DOMAIN_SCHEMA_VERSION = 2;

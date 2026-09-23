@@ -14,7 +14,7 @@
  * Routes and observations are branded by this instance; JSON cannot create them.
  */
 export const EXPLORATION_NAMESPACE = 'exploration-projection';
-import { DomainStore } from './domain-store.mjs';
+import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphUint, graphErrorCode } from './graph-inputs.mjs';

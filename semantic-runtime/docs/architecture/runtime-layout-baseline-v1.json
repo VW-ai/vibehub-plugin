@@ -741,6 +741,16 @@
       "intended_destination": "research/phase0-replay/adapters/sqlite-store.mjs"
     },
     {
+      "path": "src/adapters/sqlite/domain-store.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "path": "src/adapters/sqlite/graph-storage.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
       "path": "src/app/local/http/authorize-local-request.mjs",
       "current_role": "production",
       "intended_destination": "src/app/local/http/authorize-local-request.mjs"
@@ -921,11 +931,6 @@
       "intended_destination": "src/application/context/context-store.mjs"
     },
     {
-      "path": "src/local/domain-store.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
       "path": "src/local/durable-ingress.mjs",
       "current_role": "production",
       "intended_destination": "src/application/project/durable-ingress.mjs"
@@ -984,11 +989,6 @@
       "path": "src/local/graph-service-bundle.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-service-bundle.mjs"
-    },
-    {
-      "path": "src/local/graph-storage.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/sqlite/graph-storage.mjs"
     },
     {
       "path": "src/local/graph-store.mjs",
@@ -2238,6 +2238,21 @@
       "value": "ordered-probabilities-v1"
     },
     {
+      "module": "src/adapters/sqlite/domain-store.mjs",
+      "name": "DOMAIN_SCHEMA_VERSION",
+      "value": 2
+    },
+    {
+      "module": "src/adapters/sqlite/domain-store.mjs",
+      "name": "SOURCE_KIND_PROJECTION_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/adapters/sqlite/graph-storage.mjs",
+      "name": "WORKING_GRAPH_NAMESPACE",
+      "value": "working-graph"
+    },
+    {
       "module": "src/core/agent-work-request.mjs",
       "name": "AGENT_WORK_REQUEST_VERSION",
       "value": 1
@@ -2333,16 +2348,6 @@
       "value": 1
     },
     {
-      "module": "src/local/domain-store.mjs",
-      "name": "DOMAIN_SCHEMA_VERSION",
-      "value": 2
-    },
-    {
-      "module": "src/local/domain-store.mjs",
-      "name": "SOURCE_KIND_PROJECTION_VERSION",
-      "value": 1
-    },
-    {
       "module": "src/local/durable-ingress.mjs",
       "name": "INGRESS_NAMESPACE",
       "value": "durable-ingress"
@@ -2356,11 +2361,6 @@
       "module": "src/local/git-projects.mjs",
       "name": "GIT_ENROLLMENT_NAMESPACE",
       "value": "git-enrollment"
-    },
-    {
-      "module": "src/local/graph-storage.mjs",
-      "name": "WORKING_GRAPH_NAMESPACE",
-      "value": "working-graph"
     },
     {
       "module": "src/local/project-activation.mjs",
@@ -2447,6 +2447,18 @@
     {
       "from": "src/adapters/sqlite-store.mjs",
       "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/sqlite/domain-store.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/adapters/sqlite/graph-storage.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/sqlite/graph-storage.mjs",
+      "to": "src/core/incremental-graph.mjs"
     },
     {
       "from": "src/cli.mjs",
@@ -2690,6 +2702,10 @@
     },
     {
       "from": "src/index.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/index.mjs",
       "to": "src/app/local/http/authorize-local-request.mjs"
     },
     {
@@ -2798,10 +2814,6 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/index.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
@@ -2846,15 +2858,15 @@
     },
     {
       "from": "src/local/app-setup.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/app-setup.mjs",
       "to": "src/core/service-access.mjs"
     },
     {
       "from": "src/local/app-setup.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/local/domain-store.mjs"
     },
     {
       "from": "src/local/app-setup.mjs",
@@ -2871,6 +2883,10 @@
     {
       "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/adapters/git-provenance.mjs"
+    },
+    {
+      "from": "src/local/canonical-source-reader-service.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/canonical-source-reader-service.mjs",
@@ -2891,10 +2907,6 @@
     {
       "from": "src/local/canonical-source-reader-service.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/domain-store.mjs"
     },
     {
       "from": "src/local/canonical-source-reader-service.mjs",
@@ -2958,6 +2970,10 @@
     },
     {
       "from": "src/local/context-reader.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/local/context-reader.mjs",
       "to": "src/core/context-profile.mjs"
     },
     {
@@ -2985,10 +3001,6 @@
       "to": "src/local/graph-selected.mjs"
     },
     {
-      "from": "src/local/context-reader.mjs",
-      "to": "src/local/graph-storage.mjs"
-    },
-    {
       "from": "src/local/context-store.mjs",
       "to": "src/local/graph-inputs.mjs"
     },
@@ -2997,8 +3009,8 @@
       "to": "src/local/local-runtime-composition.mjs"
     },
     {
-      "from": "src/local/domain-store.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "from": "src/local/durable-ingress.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/durable-ingress.mjs",
@@ -3018,10 +3030,6 @@
     },
     {
       "from": "src/local/durable-ingress.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
       "to": "src/local/git-projects.mjs"
     },
     {
@@ -3031,6 +3039,10 @@
     {
       "from": "src/local/durable-ingress.mjs",
       "to": "src/local/source-invalidation.mjs"
+    },
+    {
+      "from": "src/local/exploration-adoption.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
     },
     {
       "from": "src/local/exploration-adoption.mjs",
@@ -3057,8 +3069,12 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/local/exploration-adoption.mjs",
-      "to": "src/local/graph-storage.mjs"
+      "from": "src/local/exploration-canonical.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/exploration-canonical.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
@@ -3082,10 +3098,6 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
@@ -3098,11 +3110,11 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/graph-storage.mjs"
+      "to": "src/local/source-invalidation.mjs"
     },
     {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/source-invalidation.mjs"
+      "from": "src/local/exploration-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/exploration-inputs.mjs",
@@ -3119,10 +3131,6 @@
     {
       "from": "src/local/exploration-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/local/domain-store.mjs"
     },
     {
       "from": "src/local/exploration-inputs.mjs",
@@ -3150,6 +3158,10 @@
     },
     {
       "from": "src/local/git-projects.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/git-projects.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
@@ -3161,12 +3173,12 @@
       "to": "src/domain/identity/access-authority.mjs"
     },
     {
-      "from": "src/local/git-projects.mjs",
-      "to": "src/local/domain-store.mjs"
+      "from": "src/local/git-worktree-sensor.mjs",
+      "to": "src/adapters/git-worktree-observer.mjs"
     },
     {
       "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/adapters/git-worktree-observer.mjs"
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/git-worktree-sensor.mjs",
@@ -3182,10 +3194,6 @@
     },
     {
       "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
@@ -3195,6 +3203,10 @@
     {
       "from": "src/local/git-worktree-sensor.mjs",
       "to": "src/local/project-activation.mjs"
+    },
+    {
+      "from": "src/local/graph-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/graph-inputs.mjs",
@@ -3215,10 +3227,6 @@
     {
       "from": "src/local/graph-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/local/domain-store.mjs"
     },
     {
       "from": "src/local/graph-inputs.mjs",
@@ -3261,12 +3269,12 @@
       "to": "src/local/graph-inputs.mjs"
     },
     {
-      "from": "src/local/graph-storage.mjs",
-      "to": "src/core/contracts.mjs"
+      "from": "src/local/graph-store.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
-      "from": "src/local/graph-storage.mjs",
-      "to": "src/core/incremental-graph.mjs"
+      "from": "src/local/graph-store.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
@@ -3302,10 +3310,6 @@
     },
     {
       "from": "src/local/graph-store.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
       "to": "src/local/exploration-adoption.mjs"
     },
     {
@@ -3331,10 +3335,6 @@
     {
       "from": "src/local/graph-store.mjs",
       "to": "src/local/graph-service-bundle.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/graph-storage.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
@@ -3374,6 +3374,14 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/judge-inputs.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/local/judge-inputs.mjs",
       "to": "src/core/context-profile.mjs"
     },
     {
@@ -3410,10 +3418,6 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
@@ -3423,10 +3427,6 @@
     {
       "from": "src/local/judge-inputs.mjs",
       "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/graph-storage.mjs"
     },
     {
       "from": "src/local/judge-inputs.mjs",
@@ -3466,6 +3466,10 @@
     },
     {
       "from": "src/local/judge-runtime.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/judge-runtime.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
@@ -3475,10 +3479,6 @@
     {
       "from": "src/local/judge-runtime.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/domain-store.mjs"
     },
     {
       "from": "src/local/judge-runtime.mjs",
@@ -3518,11 +3518,11 @@
     },
     {
       "from": "src/local/project-activation.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/local/project-activation.mjs",
-      "to": "src/local/domain-store.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/project-activation.mjs",
@@ -3578,6 +3578,14 @@
     },
     {
       "from": "src/local/query-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/query-inputs.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/local/query-inputs.mjs",
       "to": "src/core/causal-ordering.mjs"
     },
     {
@@ -3602,10 +3610,6 @@
     },
     {
       "from": "src/local/query-inputs.mjs",
-      "to": "src/local/domain-store.mjs"
-    },
-    {
-      "from": "src/local/query-inputs.mjs",
       "to": "src/local/exploration-adoption.mjs"
     },
     {
@@ -3615,10 +3619,6 @@
     {
       "from": "src/local/query-inputs.mjs",
       "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/query-inputs.mjs",
-      "to": "src/local/graph-storage.mjs"
     },
     {
       "from": "src/local/query-inputs.mjs",
@@ -3662,6 +3662,10 @@
     },
     {
       "from": "src/local/source-invalidation.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/local/source-invalidation.mjs",
       "to": "src/core/causal-ordering.mjs"
     },
     {
@@ -3675,10 +3679,6 @@
     {
       "from": "src/local/source-invalidation.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/local/domain-store.mjs"
     }
   ],
   "production_sccs": []
