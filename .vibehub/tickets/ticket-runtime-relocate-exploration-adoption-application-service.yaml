@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "exploration-adoption-application-service-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/exploration-adoption.mjs moves to semantic-runtime/src/application/explorations/exploration-adoption.mjs. The source changes only its seven relative import specifiers; lines 21 through 255 retain body SHA-256 81e1ecf9dca58a41a98a15dff99bbd65a7c7eb7e9d8557c9a56a2c5c34379f65 and the transformed file has Git blob 9513471340447245befc31de392b8f9dde48692b. The old path is absent, no compatibility shim or re-export remains, semantic-runtime/src/local/graph-store.mjs, src/application/context/context-reader.mjs and src/application/query/query-inputs.mjs change only their one consumer specifier, test/exploration-adoption-materializer.test.mjs changes only its one direct-test specifier, and every other production source file retains its path and bytes.",
+      "identity": "sha256:0f83b033440f97c5a31e68a343f7cddaf49358157cea35de8f4bc8a133e24622",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-adoption-application-contract-is-preserved",
+      "criterion": "verifyExplorationPublication, materializeExplorationAdoption and verifyExplorationAdoptionResult retain their exact signatures and selected-view, immutable-publication, endpoint, capacity, source-access, authorization, race and retry checks. The module still opens and commits no transaction, accepts no caller callback or proof, exposes no new root public API, and LocalGraphStore continues to own admission, source and destination proof rechecks, destination Graph mutation, repeated materialization comparison, Context result and operation receipt in one existing SQLite transaction. Schemas, namespaces, digests, receipts, errors and observable behavior remain unchanged.",
+      "identity": "sha256:1d2b839bebff72299f2145e7ffbb753cddafbee0dd46b66701d608139daf9353",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-adoption-application-relocation-is-auditable-and-verifiable",
+      "criterion": "The regenerated Runtime layout baseline records src/application/explorations/exploration-adoption.mjs with 333 total production edges, exactly three incoming and seven outgoing edges, zero production SCCs, zero direction exceptions and zero boundary errors. The relocation manifest and repository-aware focused test bind old blob d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a, the new path, the actual migration commit and exploration-adoption-application-service category while historical Tickets, Evidence and Outcomes retain accepted old-path references. Focused Exploration adoption, Context reader, Query input, layout and boundary tests, deterministic mocked JEV adoption checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:5102d32cde37fddf68047a654fa70d5e6e164dac331ec81f9eeb146d405e7549",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one path-first application-service migration. Do not change executable logic beyond the seven required relative specifiers, three production consumer specifiers, one direct-test import specifier and focused path/provenance assertions.",
+    "Do not move or refactor graph-store, graph-inputs, exploration-inputs, exploration-canonical, Exploration facade, Context, Query, GraphStorage, adapters, app/local, research, verification or other tests and documentation modules in this Ticket.",
+    "Do not introduce dependency injection, ports, callbacks, compatibility shims or root public exports, or alter schemas, SQL, transactions, namespaces, digests, receipts, authorization order, capacity, endpoint, retry, race or error-code semantics.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/exploration-adoption.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic. Credential, Keychain lifecycle, external host, network, provider, live JEV and user-repository access are not authorized."
+  ],
+  "context": "Move the accepted internal Exploration adoption materializer from the transitional src/local tree to its declared src/application/explorations home. Preserve the business body exactly and change only the seven relative specifiers required by the new depth plus three production and one direct-test consumer imports. This is a path-first migration: LocalGraphStore continues to own the surrounding transaction, selected reads, mutation and retry verification.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, application boundary and path-first relocation rules.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, declared destination, 333-edge topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining exact cross-Exploration adoption semantics preserved by this move.",
+      "ref": ".vibehub/outcomes/ticket-runtime-exploration-adoption-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining Context lineage behavior that consumes the publication verifier.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-lifecycle-lineage-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome establishing the fixed zero-cycle composition and Graph-owned transaction seam.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact pre-relocation adoption service source and old Git blob.",
+      "ref": "commit:b0824b7d9b1fdb7d5f4536c919e297e133a2e417:semantic-runtime/src/local/exploration-adoption.mjs"
+    },
+    {
+      "purpose": "Graph transaction owner and adoption consumer whose specifier changes without changing orchestration.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Context lineage consumer of the publication verifier.",
+      "ref": "semantic-runtime/src/application/context/context-reader.mjs"
+    },
+    {
+      "purpose": "Query authorization consumer of the publication verifier.",
+      "ref": "semantic-runtime/src/application/query/query-inputs.mjs"
+    },
+    {
+      "purpose": "Direct adoption materializer verification whose import follows the move.",
+      "ref": "semantic-runtime/test/exploration-adoption-materializer.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exploration-adoption-application-contract-is-preserved",
+          "identity": "sha256:1d2b839bebff72299f2145e7ffbb753cddafbee0dd46b66701d608139daf9353",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-adoption-application-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:5102d32cde37fddf68047a654fa70d5e6e164dac331ec81f9eeb146d405e7549",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-adoption-application-service-home-is-exact",
+          "identity": "sha256:0f83b033440f97c5a31e68a343f7cddaf49358157cea35de8f4bc8a133e24622",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7eeb3ccbd24c637b5ddb2ed2f73608e059fa0768f17a0d53500dfa6de5f0d287",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted cross-Exploration adoption materializer and publication verifier live under src/application/explorations with unchanged proof, authorization, retry and Graph-owned transaction behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-capability-layout",
+    "subagent-audit:exploration-adoption-relocation",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-exploration-adoption-application-service"
+}
