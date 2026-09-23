@@ -21,7 +21,7 @@
     "verify": "npm run check:boundaries && npm test",
     "verify:standalone": "node scripts/verify-standalone.mjs",
     "verify:peel:provenance": "node scripts/verify-peel-provenance.mjs",
-    "example:gateway": "node --experimental-strip-types --env-file=.env.local index.ts",
+    "example:gateway": "node --experimental-strip-types --env-file=.env.local research/examples/ai-gateway/index.ts",
     "smoke:jev": "node --env-file=.env.local scripts/smoke-jev.mjs",
     "smoke:jev:direct": "node --env-file=.env.local scripts/smoke-typesafe-direct.mjs",
     "check:jev:synthetic": "node scripts/check-jev-synthetic.mjs",

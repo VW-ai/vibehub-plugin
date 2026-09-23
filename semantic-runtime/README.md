@@ -150,7 +150,7 @@ unrelated conversation. A real-data label report remains an experiment;
 Keep `AI_GATEWAY_API_KEY` in the ignored `.env.local` file. The checked-in
 examples load that file at process start; they never log the credential.
 
-The requested text-generation example lives at `index.ts`:
+The requested text-generation example lives at `research/examples/ai-gateway/index.ts`:
 
 ```sh
 npm run example:gateway
@@ -386,8 +386,8 @@ concrete adapters. Host lifecycle details and model-provider APIs stay in adapte
 
 `check:boundaries` parses ESM imports, rejects cross-component imports, core-to-
 adapter dependencies, undeclared/parent dependencies, source symlinks, and
-computed imports. It checks `index.ts`, `src/`, `scripts/`, and `test/`; it is a development
-dependency check, not a security sandbox. `verify:standalone` copies just the
+computed imports. It checks `src/`, `scripts/`, `test/`, `tools/`, `verification/`,
+and `research/`; it is a development dependency check, not a security sandbox. `verify:standalone` copies just the
 component's source, policies, tooling, fixtures, and manifests to a temporary
 directory, installs from its own lockfile, and repeats verification there.
 

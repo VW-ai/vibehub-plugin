@@ -35,8 +35,6 @@ function files(root, errors) {
     }
   }
   for (const area of SCANNED_AREAS) scan(resolve(root, area));
-  const example = resolve(root, 'index.ts');
-  if (existsSync(example)) found.push(example);
   return found;
 }
 
@@ -62,7 +60,7 @@ function pathRole(root, path, layoutBaseline) {
   if (name.startsWith('tools/') || name.startsWith('scripts/')) return 'tools';
   if (name.startsWith('verification/')) return 'verification';
   if (name.startsWith('research/')) return 'research';
-  return name.startsWith('src/') || name === 'index.ts' ? 'production' : 'other';
+  return name.startsWith('src/') ? 'production' : 'other';
 }
 
 const componentKey = component => JSON.stringify([...component].sort());
@@ -108,7 +106,7 @@ export function checkBoundaries(root = defaultRoot) {
     const name = relative(root, path);
     const role = pathRole(root, path, layoutBaseline);
     const domain = role === 'domain';
-    const production = within(resolve(root, 'src'), path) || path === resolve(root, 'index.ts');
+    const production = within(resolve(root, 'src'), path);
     const fail = message => errors.push(`${name}: ${message}`);
     const failDirection = (message, targetPath) => {
       const from = name.split(sep).join('/');

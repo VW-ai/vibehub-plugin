@@ -371,11 +371,6 @@
       "intended_destination": "docs/contracts/working-graph-v0.md"
     },
     {
-      "path": "index.ts",
-      "current_role": "gateway-example",
-      "intended_destination": "research/examples/ai-gateway/index.ts"
-    },
-    {
       "path": "package-lock.json",
       "current_role": "component-metadata",
       "intended_destination": "package-lock.json"
@@ -399,6 +394,11 @@
       "path": "README.md",
       "current_role": "component-documentation",
       "intended_destination": "README.md"
+    },
+    {
+      "path": "research/examples/ai-gateway/index.ts",
+      "current_role": "research",
+      "intended_destination": "research/examples/ai-gateway/index.ts"
     },
     {
       "path": "research/host-probes/claude/claude-host-probe-v0.md",
@@ -2152,7 +2152,7 @@
     },
     {
       "name": "example:gateway",
-      "command": "node --experimental-strip-types --env-file=.env.local index.ts",
+      "command": "node --experimental-strip-types --env-file=.env.local research/examples/ai-gateway/index.ts",
       "mode": "explicit-live"
     },
     {
@@ -2381,7 +2381,6 @@
   "standalone_copy_paths": [
     "package.json",
     "package-lock.json",
-    "index.ts",
     "src",
     "scripts",
     "test",

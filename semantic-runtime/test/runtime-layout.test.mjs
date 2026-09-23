@@ -8,7 +8,7 @@ import { checkRuntimeLayout, inspectRuntimeLayout } from '../scripts/runtime-lay
 function copyComponent(t) {
   const root = mkdtempSync(join(tmpdir(), 'semantic-layout-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'index.ts', 'src', 'scripts', 'test', 'research', 'policies', 'docs']) {
+  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'src', 'scripts', 'test', 'research', 'policies', 'docs']) {
     const source = new URL(`../${path}`, import.meta.url);
     if (existsSync(source)) cpSync(source, join(root, path), { recursive: true });
   }
@@ -220,7 +220,7 @@ test('Context reader application relocation is complete and recorded', t => {
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);
-  const expectedRootFiles = ['.env.example', '.gitignore', 'AGENTS.md', 'index.ts', 'package-lock.json', 'package.json', 'README.md']
+  const expectedRootFiles = ['.env.example', '.gitignore', 'AGENTS.md', 'package-lock.json', 'package.json', 'README.md']
     .filter(path => existsSync(new URL(`../${path}`, import.meta.url)));
   assert.deepEqual(
     current.inventory.filter(item => !item.path.includes('/')).map(item => item.path),
@@ -231,6 +231,22 @@ test('layout inspection captures public surface, command modes, constants and an
   assert.equal(current.npm_commands.find(item => item.name === 'test:host-probes')?.mode, 'offline');
   assert.equal(current.npm_commands.find(item => item.name === 'probe:codex:live')?.mode, 'explicit-live');
   assert.equal(current.npm_commands.find(item => item.name === 'probe:claude:live')?.mode, 'explicit-live');
+  assert.deepEqual(current.npm_commands.find(item => item.name === 'example:gateway'), {
+    name: 'example:gateway',
+    command: 'node --experimental-strip-types --env-file=.env.local research/examples/ai-gateway/index.ts',
+    mode: 'explicit-live',
+  });
+  const gatewayExample = current.inventory.find(item => item.path === 'research/examples/ai-gateway/index.ts');
+  if (existsSync(new URL('../research', import.meta.url))) {
+    assert.deepEqual(gatewayExample, {
+      path: 'research/examples/ai-gateway/index.ts',
+      current_role: 'research',
+      intended_destination: 'research/examples/ai-gateway/index.ts',
+    });
+  } else {
+    assert.equal(gatewayExample, undefined);
+  }
+  assert.equal(current.standalone_copy_paths.includes('index.ts'), false);
   assert.deepEqual(current.production_sccs, []);
   assert.ok(current.production_import_edges.some(edge =>
     edge.from === 'src/local/cli.mjs' && edge.to === 'src/local/service.mjs'));

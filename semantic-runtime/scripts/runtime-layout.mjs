@@ -12,7 +12,6 @@ const BASELINE_PATH = 'docs/architecture/runtime-layout-baseline-v1.json';
 export const STANDALONE_COPY_PATHS = Object.freeze([
   'package.json',
   'package-lock.json',
-  'index.ts',
   'src',
   'scripts',
   'test',
@@ -166,7 +165,6 @@ function documentDestination(path) {
 
 function inventoryRecord(path) {
   if (!path.includes('/')) {
-    if (path === 'index.ts') return { path, current_role: 'gateway-example', intended_destination: 'research/examples/ai-gateway/index.ts' };
     if (path === '.env.example') return { path, current_role: 'configuration-example', intended_destination: path };
     if (path === 'README.md') return { path, current_role: 'component-documentation', intended_destination: path };
     if (path === 'AGENTS.md') return { path, current_role: 'component-instructions', intended_destination: path };
@@ -344,7 +342,7 @@ export function checkRuntimeLayout(root = scriptRoot) {
   for (const section of ['inventory_roots', 'root_exports', 'npm_commands', 'contract_constants', 'standalone_copy_paths', 'production_import_edges', 'production_sccs']) {
     compareSection(section, baseline[section], current[section], errors);
   }
-  const inventoryChecked = INVENTORY_ROOTS.every(area => existsSync(resolve(root, area))) && existsSync(resolve(root, 'index.ts'));
+  const inventoryChecked = INVENTORY_ROOTS.every(area => existsSync(resolve(root, area)));
   if (inventoryChecked) compareSection('inventory', baseline.inventory, current.inventory, errors);
   return { ok: errors.length === 0, inventory_checked: inventoryChecked, errors };
 }
