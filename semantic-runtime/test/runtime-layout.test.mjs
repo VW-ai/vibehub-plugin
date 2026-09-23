@@ -217,6 +217,37 @@ test('Context reader application relocation is complete and recorded', t => {
   assert.equal(existsSync(new URL('../src/application/context/context-reader.mjs', import.meta.url)), true);
 });
 
+test('Context write application capability relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'context-application-write-capability');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [
+    {
+      old_path: 'semantic-runtime/src/local/context-inputs.mjs',
+      new_path: 'semantic-runtime/src/application/context/context-inputs.mjs',
+      old_blob: 'ae3755749f0a1213d9e096787a61c1ac6e270b6f',
+      migration_commit: '55a16865b8ec66e0bcb018a69fb4f4225569e4f5',
+      category: 'context-application-write-capability',
+    },
+    {
+      old_path: 'semantic-runtime/src/local/context-store.mjs',
+      new_path: 'semantic-runtime/src/application/context/context-store.mjs',
+      old_blob: 'b4e60c49282ba92dd053bb3aa85f8e92bb06bad3',
+      migration_commit: '55a16865b8ec66e0bcb018a69fb4f4225569e4f5',
+      category: 'context-application-write-capability',
+    },
+  ]);
+  for (const entry of entries) {
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {

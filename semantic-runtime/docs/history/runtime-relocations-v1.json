@@ -322,6 +322,20 @@
       "old_blob": "87b091203b62a18940ba4395890d84385271c0df",
       "migration_commit": "add8029a9121714e30dd6b22e661d93e1ea65129",
       "category": "gateway-example-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/context-inputs.mjs",
+      "new_path": "semantic-runtime/src/application/context/context-inputs.mjs",
+      "old_blob": "ae3755749f0a1213d9e096787a61c1ac6e270b6f",
+      "migration_commit": "55a16865b8ec66e0bcb018a69fb4f4225569e4f5",
+      "category": "context-application-write-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/context-store.mjs",
+      "new_path": "semantic-runtime/src/application/context/context-store.mjs",
+      "old_blob": "b4e60c49282ba92dd053bb3aa85f8e92bb06bad3",
+      "migration_commit": "55a16865b8ec66e0bcb018a69fb4f4225569e4f5",
+      "category": "context-application-write-capability"
     }
   ]
 }

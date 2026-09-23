@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "context-write-application-home-is-exact",
+    "context-write-relocation-preserves-lifecycle-contracts",
+    "context-write-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T06:22:58Z",
+  "contract_revision": {
+    "identity": "sha256:0754238c8716f82a4fbb0796225e699dd19c6e26f525ce3c435e9a0e11ea3f4b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-context-write-application-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/context_write_closeout did not plan or execute this relocation and received only a bounded adjudication handoff. I independently read the exact Ticket, native Evidence, immutable pre-move sources, implementation commit, dirty provenance changes, accepted lifecycle/Judge/Query Outcomes and current diff; reproduced the byte/path/topology audit and focused offline behavior; and authored only this Outcome. The installed agent-session contract is absent, so no session report or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active Acceptance revisions of exact Contract 1. context-write-application-home-is-exact: direct comparison against immutable commit d9e949597f23be29171538e1c23ecdd3e36fca7a resolved the declared old blobs ae3755749f0a1213d9e096787a61c1ac6e270b6f and b4e60c49282ba92dd053bb3aa85f8e92bb06bad3 and proved the new files byte-identical after exactly seven and two relative import replacements. Migration commit 55a16865b8ec66e0bcb018a69fb4f4225569e4f5 removes exactly those two old production paths, adds exactly the two application/context paths and moves no other production file; old paths are absent and no shim or re-export remains. context-write-relocation-preserves-lifecycle-contracts: source and root-export inspection preserves CONTEXT_INPUT_ERROR_CODES, ContextInputs and LocalContextStore, its one-options-object constructor and mutate, adopt, resolve, page, lineage and getReceipt facade. The accepted lifecycle, Judge and Query Outcomes remain successful, and independent focused execution of their Context, Judge, Query, composition and layout contracts passed 181/181, covering authorization/error mapping, Ticket/code proof, provenance, idempotency, fencing, limits, shared Graph transaction ownership, receipts and composition. The complete repository Runtime verify independently passed 1031 total, 1029 passed, zero failed and two explicitly skipped native Keychain opt-in cases; no live provider, credential, Keychain lifecycle, host probe or external network was used. context-write-relocation-is-auditable-and-verifiable: every production and test consumer now resolves the new paths; the regenerated baseline carries exactly fourteen incident edges for the two nodes, zero production SCCs, and the boundary checker passes 247 files with zero direction exceptions or errors. The append-only manifest has exactly two category entries binding both old blobs, new paths and migration commit. The native Evidence faithfully records the executor's complete Runtime and standalone locked-install results; an independent standalone attempt confirmed an offline local-cache install of fourteen locked packages and a 232-file boundary pass before the parent stopped that redundant broad rerun after focused verification was complete. Independent plugin artifact verification passed at 79 files and 3670088 bytes. Ticket validation passed 227 Tickets, 536 Evidence and 174 pre-closeout Outcomes; project validation passed format 4 with no unverifiable Context refs; Context guard since the migration parent reported no authorities or violations; semantic-runtime Room drift is FRESH; git diff check passes. Historical Ticket, Evidence and Outcome old-path references remain unchanged. The installed closeout Skill references a missing contracts/agent-session.md, so no session API or completion claim was invented. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-context-write-application-capability",
+  "unresolved_acceptance_ids": []
+}

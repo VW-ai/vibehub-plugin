@@ -1,0 +1,51 @@
+{
+  "acceptance_ids": [
+    "context-write-application-home-is-exact",
+    "context-write-relocation-preserves-lifecycle-contracts",
+    "context-write-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "context-write-application-home-is-exact",
+      "identity": "sha256:ad6f7261bb3266a0fac1b69fb289c06d6ceea41ebddd38ccf78dcead0aa4dfd0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-write-relocation-preserves-lifecycle-contracts",
+      "identity": "sha256:7d1221a3516d0eafe2817225affbe75978c4427b4695e5127b8ce51b05f0cd07",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-write-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:78f86cb0e8247c880554d9320ee1635db1d78145c08705935c1609432f026df2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-context-write-application-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T06:10:19Z",
+  "refs": [
+    "commit:55a16865b8ec66e0bcb018a69fb4f4225569e4f5",
+    "commit:d9e949597f23be29171538e1c23ecdd3e36fca7a:semantic-runtime/src/local/context-inputs.mjs",
+    "commit:d9e949597f23be29171538e1c23ecdd3e36fca7a:semantic-runtime/src/local/context-store.mjs",
+    "semantic-runtime/src/application/context/context-inputs.mjs",
+    "semantic-runtime/src/application/context/context-store.mjs",
+    "semantic-runtime/src/application/context/context-read-service.mjs",
+    "semantic-runtime/src/local/graph-service-bundle.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/judge-inputs.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-context-write-application-capability.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit 55a16865b8ec66e0bcb018a69fb4f4225569e4f5 records exactly two production moves: context-inputs.mjs and context-store.mjs from src/local to src/application/context. Direct normalization against immutable pre-move sources proves ContextInputs is byte-identical after exactly seven required relative import replacements and LocalContextStore after exactly two; both old paths are absent, no shim remains, and all other production files retain their paths. CONTEXT_INPUT_ERROR_CODES, ContextInputs, LocalContextStore, the root public export, one-options-object construction and mutate, adopt, resolve, page, lineage and getReceipt methods remain unchanged. Existing Context authorization, error mapping, canonical Ticket/code source selection, proof and provenance checks, idempotency, source fencing, capacity limits, shared Graph transaction ownership, Judge and Query composition, receipts, schemas, namespaces, digests and SQL are covered by the accepted lifecycle, Judge and Query behavioral baselines and current offline tests. The regenerated layout baseline records both application/context nodes with exactly fourteen incident production edges, zero production SCCs, zero boundary errors and zero direction exceptions. The append-only relocation manifest binds old blobs ae3755749f0a1213d9e096787a61c1ac6e270b6f and b4e60c49282ba92dd053bb3aa85f8e92bb06bad3, the new paths, actual migration commit and context-application-write-capability category; its focused test skips only when standalone packaging deliberately omits historical records. Focused Context, Query, Judge, composition, layout and boundary verification passes 168/168; deterministic JEV verification passes 37/37 without a live provider. Final provenance, layout and boundary verification passes 24/24. Full Runtime verification passes 1030 total, 1028 passed, zero failed and two expected skips. Standalone locked-install verification passes 1030 total, 1018 passed, zero failed and twelve expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. Historical Ticket, Evidence and Outcome references retain their accepted old paths. No credential, Keychain lifecycle, host, network, provider or live JEV call was used.",
+  "ticket_id": "ticket-runtime-relocate-context-write-application-capability"
+}
