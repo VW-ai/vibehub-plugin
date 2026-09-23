@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "563311f345089198073d8433959d6112e28a0c79",
+        "blob": "b8e217c7afd7216e60b29f2df56f5e7e9e484084",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -94,7 +94,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "07ff6a94b225c1f7867814b0ddab3100fd96f6cc",
+        "blob": "e4383779e9aced01b8c0bd43408c56109681d03a",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -610,12 +610,16 @@
         "path": "semantic-runtime/src/application/context/context-read-service.mjs"
       },
       {
-        "blob": "aeb883e3f1aa001db86d32451290a1889a0d9da6",
+        "blob": "9348a6833b1bdc5aa45df68f25466eb841ed1b7f",
         "path": "semantic-runtime/src/application/context/context-reader.mjs"
       },
       {
         "blob": "0f37e781891b67dfd46309d1a03ad89ebca0a28a",
         "path": "semantic-runtime/src/application/context/context-store.mjs"
+      },
+      {
+        "blob": "9513471340447245befc31de392b8f9dde48692b",
+        "path": "semantic-runtime/src/application/explorations/exploration-adoption.mjs"
       },
       {
         "blob": "55d21684c5183113cc0404d7ad21f6986a592bd6",
@@ -638,7 +642,7 @@
         "path": "semantic-runtime/src/application/query/query-engine.mjs"
       },
       {
-        "blob": "4d1926237ac2913c495c15820dc9d610ad59db29",
+        "blob": "8c8b32c1b2b13098ebe502e8fd66e24980318b86",
         "path": "semantic-runtime/src/application/query/query-inputs.mjs"
       },
       {
@@ -774,10 +778,6 @@
         "path": "semantic-runtime/src/local/durable-ingress.mjs"
       },
       {
-        "blob": "d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a",
-        "path": "semantic-runtime/src/local/exploration-adoption.mjs"
-      },
-      {
         "blob": "c7f2aa06e261bf2b54dfe1fac63b0c1ecfccb15c",
         "path": "semantic-runtime/src/local/exploration-canonical.mjs"
       },
@@ -802,7 +802,7 @@
         "path": "semantic-runtime/src/local/graph-service-bundle.mjs"
       },
       {
-        "blob": "b1393833be5222666284f509a2d07b267bb1a879",
+        "blob": "175613b9c1f0b8d0d1b2aea1e26133410e1703a6",
         "path": "semantic-runtime/src/local/graph-store.mjs"
       },
       {
@@ -1010,7 +1010,7 @@
         "path": "semantic-runtime/test/exploration-adoption-inputs.test.mjs"
       },
       {
-        "blob": "9fa1ece532e4a4e41de77ee3ec131e24ec5bd6d8",
+        "blob": "3433be401ab52fe6e567729c0de62040f5ba775f",
         "path": "semantic-runtime/test/exploration-adoption-materializer.test.mjs"
       },
       {
@@ -1430,7 +1430,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "dc19f90babde0e15e00d55fe64f33dbc4325c07d",
+        "blob": "b39d499c70a58df95ccb022e489d4a5832694fee",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1474,8 +1474,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T09:37:02.562Z",
-    "last_aligned_commit": "ee0e605a5fbbd7aa13ad628b26721150acb09289"
+    "checked_at": "2026-09-23T10:24:05.697Z",
+    "last_aligned_commit": "9eb1509117eb441c94e94aaaa4a25a1dd2500099"
   },
   "anchors": [
     "semantic-runtime/"

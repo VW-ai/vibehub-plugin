@@ -378,6 +378,13 @@
       "old_blob": "0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b",
       "migration_commit": "ee0e605a5fbbd7aa13ad628b26721150acb09289",
       "category": "exploration-application-facade"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/exploration-adoption.mjs",
+      "new_path": "semantic-runtime/src/application/explorations/exploration-adoption.mjs",
+      "old_blob": "d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a",
+      "migration_commit": "9eb1509117eb441c94e94aaaa4a25a1dd2500099",
+      "category": "exploration-adoption-application-service"
     }
   ]
 }

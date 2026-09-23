@@ -359,6 +359,26 @@ test('Exploration application facade relocation is complete and recorded', t => 
   assert.equal(existsSync(new URL('../src/application/explorations/exploration-store.mjs', import.meta.url)), true);
 });
 
+test('Exploration adoption application service relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'exploration-adoption-application-service');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/exploration-adoption.mjs',
+    new_path: 'semantic-runtime/src/application/explorations/exploration-adoption.mjs',
+    old_blob: 'd5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a',
+    migration_commit: '9eb1509117eb441c94e94aaaa4a25a1dd2500099',
+    category: 'exploration-adoption-application-service',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/exploration-adoption.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/application/explorations/exploration-adoption.mjs', import.meta.url)), true);
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {
@@ -456,6 +476,20 @@ test('layout inspection captures public surface, command modes, constants and an
     { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/local-runtime-composition.mjs' },
     { from: 'src/index.mjs', to: 'src/application/explorations/exploration-store.mjs' },
     { from: 'src/local/judge-inputs.mjs', to: 'src/application/explorations/exploration-store.mjs' },
+  ]);
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    edge.from === 'src/application/explorations/exploration-adoption.mjs'
+      || edge.to === 'src/application/explorations/exploration-adoption.mjs'), [
+    { from: 'src/application/context/context-reader.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/adapters/sqlite/graph-storage.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/causal-ordering.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/contracts.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/event-provenance.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/working-graph.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/local/exploration-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/query/query-inputs.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
+    { from: 'src/local/graph-store.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
   ]);
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
