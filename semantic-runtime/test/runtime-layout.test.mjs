@@ -178,6 +178,9 @@ test('layout inspection captures public surface, command modes, constants and an
     edge.from === 'src/local/cli.mjs' && edge.to === 'src/local/service.mjs'));
   assert.ok(current.production_import_edges.some(edge =>
     edge.from === 'src/local/service.mjs' && edge.to === 'src/local/app-setup.mjs'));
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    edge.to.startsWith('src/application/query/') && !edge.from.startsWith('src/application/query/')),
+  [{ from: 'src/index.mjs', to: 'src/application/query/query-engine.mjs' }]);
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
 

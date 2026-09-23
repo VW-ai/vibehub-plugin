@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queryFixture, QUERY_ACTIONS, publish, rows, judgeTransport, judgeResponse } from './helpers/query-fixture.mjs';
-import { LocalQueryEngine } from '../src/local/query-engine.mjs';
+import { LocalQueryEngine } from '../src/application/query/query-engine.mjs';
 import { rankContextWindowV1 } from '../src/core/query-ranking.mjs';
 
 const query = (f, extra = {}, engine = f.engine) => engine.query(f.context, f.queryRequest(extra));

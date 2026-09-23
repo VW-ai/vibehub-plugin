@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queryFixture } from './helpers/query-fixture.mjs';
-import { queryRequest } from '../src/local/query-contract.mjs';
+import { queryRequest } from '../src/application/query/query-contract.mjs';
 
 test('Query wire rejects executable properties without running them and refuses caller authority overrides', async t => {
   const f = await queryFixture(t), request = f.queryRequest(); let invoked = false;

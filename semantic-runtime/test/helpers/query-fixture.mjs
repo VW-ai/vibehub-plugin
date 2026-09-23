@@ -1,6 +1,6 @@
 import { contextJudgeFixture, CONTEXT_JUDGE_ACTIONS, head } from './context-judge-fixture.mjs';
-import { LocalQueryEngine } from '../../src/local/query-engine.mjs';
-import { QueryInputs } from '../../src/local/query-inputs.mjs';
+import { LocalQueryEngine } from '../../src/application/query/query-engine.mjs';
+import { QueryInputs } from '../../src/application/query/query-inputs.mjs';
 
 export const QUERY_ACTIONS = [...new Set([...CONTEXT_JUDGE_ACTIONS, 'query:read'])];
 export async function queryFixture(t, options = {}) {

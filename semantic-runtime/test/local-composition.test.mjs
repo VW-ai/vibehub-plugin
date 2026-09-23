@@ -5,7 +5,7 @@ import { CanonicalSourceReader } from '../src/local/canonical-source-reader.mjs'
 import { LocalContextStore } from '../src/local/context-store.mjs';
 import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
-import { LocalQueryEngine } from '../src/local/query-engine.mjs';
+import { LocalQueryEngine } from '../src/application/query/query-engine.mjs';
 import { ContextReadService } from '../src/application/context/context-read-service.mjs';
 import { graphCapabilityFor, graphGetHead } from '../src/local/graph-capability.mjs';
 import { graphServiceBundle } from '../src/local/graph-service-bundle.mjs';

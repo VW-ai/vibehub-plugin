@@ -1,10 +1,10 @@
 import { types } from 'node:util';
-import { graphInput, graphFields, graphId, graphEqual, graphHash, graphErrorCode } from './graph-inputs.mjs';
-import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
-import { validateSemanticAddress } from '../core/working-graph.mjs';
-import { validateFreshnessVector } from '../core/causal-ordering.mjs';
-import { validateExplorationPin } from './exploration-inputs.mjs';
-import { validateContextReadRequest } from './context-reader.mjs';
+import { graphInput, graphFields, graphId, graphEqual, graphHash, graphErrorCode } from '../../local/graph-inputs.mjs';
+import { validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
+import { validateSemanticAddress } from '../../core/working-graph.mjs';
+import { validateFreshnessVector } from '../../core/causal-ordering.mjs';
+import { validateExplorationPin } from '../../local/exploration-inputs.mjs';
+import { validateContextReadRequest } from '../../local/context-reader.mjs';
 
 export const queryFailure = code => Object.assign(new Error(`Local Query: ${code}`), { code });
 export const queryCheck = (ok, code = 'query_invalid_request') => { if (!ok) throw queryFailure(code); };
