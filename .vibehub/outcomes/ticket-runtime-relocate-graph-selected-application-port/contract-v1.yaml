@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "graph-selected-application-home-is-exact",
+    "graph-selected-port-contract-is-preserved",
+    "graph-selected-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T08:32:37.742Z",
+  "contract_revision": {
+    "identity": "sha256:89fa49e355ae0379ade81fedd4c8f06ad179340e9c008173c15e250d90e25c19",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-graph-selected-application-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "A separate closeout subagent independently read the exact Ticket, Contract and Evidence; inspected commits d93946c9, 68b2cf2e, b44732be and 321e83bd; reconstructed the required source transform and production topology; and reran focused offline tests without access to credentials, Keychain, live providers, network or user repositories.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout confirms the transaction-scoped selected Graph port moved exactly to src/application/graph. The source differs from the accepted pre-relocation blob only in its two required relative import specifiers, exactly two production consumers now resolve the new path, and selectGraph behavior remains covered by the same Graph, Context, lifecycle and composition tests. Relocation provenance binds the exact old blob and migration commit; the checked layout retains 333 production edges, two incoming and two outgoing selected-port edges, no production SCCs or boundary failures. Focused offline verification passed 81/81 and deterministic mocked JEV verification passed 17/17; the bound Evidence records successful full Runtime, standalone, artifact, project, Context guard, Room and git verification. No material issue or unresolved acceptance remains.",
+  "ticket_id": "ticket-runtime-relocate-graph-selected-application-port",
+  "unresolved_acceptance_ids": []
+}
