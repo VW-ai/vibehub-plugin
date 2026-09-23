@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { compilePolicyArtifact, validatePolicyArtifact, createPolicyRegistry, loadPhaseZeroPolicyArtifact, POLICY_ARTIFACT_SCHEMA, POLICY_NODE_TYPES } from '../src/core/policy-artifacts.mjs';
+import { compilePolicyArtifact, validatePolicyArtifact, createPolicyRegistry, loadPhaseZeroPolicyArtifact, POLICY_ARTIFACT_SCHEMA, POLICY_NODE_TYPES } from '../src/domain/decisions/policy-artifacts.mjs';
 import { fingerprint, judgeInputHash } from '../src/core/contracts.mjs';
 import { evaluateEvent } from '../src/core/policy.mjs';
 import { event, target, decision } from './helpers.mjs';

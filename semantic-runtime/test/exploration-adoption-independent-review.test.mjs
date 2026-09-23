@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { fixture, adoption } from './helpers/adoption-fixture.mjs';
 import { rows, bind, mutation, git, resolve } from './helpers/exploration-fixture.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 
 // One damaged selected row still has a valid local seal, but contradicts the
 // independent retained publication facts. No other database row is rewritten.

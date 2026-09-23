@@ -1,7 +1,7 @@
-import { graphInput } from '../../local/graph-inputs.mjs';
-import { composeLocalServices } from '../../local/local-runtime-composition.mjs';
+import { graphInput } from '../graph/graph-inputs.mjs';
+import { composeLocalServices } from '../support/local-runtime-composition.mjs';
 
-export { EXPLORATION_NAMESPACE } from '../../local/exploration-inputs.mjs';
+export { EXPLORATION_NAMESPACE } from './exploration-inputs.mjs';
 
 /** Selected in-process exploration API. The Graph owns every admitted transaction. */
 export class LocalExplorationStore {

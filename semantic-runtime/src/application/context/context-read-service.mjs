@@ -1,11 +1,11 @@
-import { exactRevisionAddress } from '../../core/working-graph.mjs';
+import { exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
 import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority } from '../../domain/identity/access-authority.mjs';
 import { ContextInputs, CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
-import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from '../../local/exploration-canonical.mjs';
-import { ExplorationInputs, EXPLORATION_ERROR_CODES, readExplorationOwner } from '../../local/exploration-inputs.mjs';
-import { GraphInputs, graphAssert, graphEqual, graphErrorCode, graphFail, graphHash, graphInput } from '../../local/graph-inputs.mjs';
-import { SourceInvalidationFeed } from '../../local/source-invalidation.mjs';
+import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from '../explorations/exploration-canonical.mjs';
+import { ExplorationInputs, EXPLORATION_ERROR_CODES, readExplorationOwner } from '../explorations/exploration-inputs.mjs';
+import { GraphInputs, graphAssert, graphEqual, graphErrorCode, graphFail, graphHash, graphInput } from '../graph/graph-inputs.mjs';
+import { SourceInvalidationFeed } from '../sources/source-invalidation.mjs';
 import {
   CONTEXT_READER_ERROR_CODES,
   materializeContextShared,

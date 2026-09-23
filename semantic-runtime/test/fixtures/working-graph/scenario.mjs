@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { normalizeRawEvent } from '../../../src/core/event-provenance.mjs';
-import { createSourceCursor, acceptSourceEvent, completeSourceEvent, projectFreshness } from '../../../src/core/causal-ordering.mjs';
-import { createWorkingGraph, applyGraphAssertion, graphRevisionAddress } from '../../../src/core/working-graph.mjs';
+import { normalizeRawEvent } from '../../../src/domain/sources/event-provenance.mjs';
+import { createSourceCursor, acceptSourceEvent, completeSourceEvent, projectFreshness } from '../../../src/domain/sources/causal-ordering.mjs';
+import { createWorkingGraph, applyGraphAssertion, graphRevisionAddress } from '../../../src/domain/graph/working-graph.mjs';
 const fixture = name => JSON.parse(readFileSync(new URL(`../${name}`, import.meta.url), 'utf8'));
 export const scope = { tenant_id: 'acme', project_id: 'product' };
 export function catalog() {

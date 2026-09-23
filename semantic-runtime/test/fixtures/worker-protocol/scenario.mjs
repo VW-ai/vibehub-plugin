@@ -2,9 +2,9 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { catalog, graph, assertion, apply } from '../working-graph/scenario.mjs';
-import { graphRevisionAddress } from '../../../src/core/working-graph.mjs';
-import { compilePolicyArtifact } from '../../../src/core/policy-artifacts.mjs';
-import { WORKER_OUTPUT_SCHEMA, workerResultDigest, createWorkerJobState, transitionWorkerJob } from '../../../src/core/worker-protocol.mjs';
+import { graphRevisionAddress } from '../../../src/domain/graph/working-graph.mjs';
+import { compilePolicyArtifact } from '../../../src/domain/decisions/policy-artifacts.mjs';
+import { WORKER_OUTPUT_SCHEMA, workerResultDigest, createWorkerJobState, transitionWorkerJob } from '../../../src/domain/work/worker-protocol.mjs';
 const clone = x => structuredClone(x);
 const stable = v => JSON.stringify(Array.isArray(v) ? v.map(x => JSON.parse(stable(x))) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, JSON.parse(stable(v[k]))])) : v);
 const hash = v => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;

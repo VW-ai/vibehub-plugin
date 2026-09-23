@@ -4,7 +4,7 @@ import { experimental_evaluate as evaluate } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from '../src/index.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
-import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
+import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 
 const apiKey = 'synthetic-test-key';
 const input = {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LocalExplorationStore } from '../src/application/explorations/exploration-store.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { judgeInputHash } from '../src/core/contracts.mjs';
 import { judgeFixture, question, JUDGE_ACTIONS } from './helpers/judge-fixture.mjs';
 import { bind, capture, register, pin, git, rows } from './helpers/exploration-fixture.mjs';

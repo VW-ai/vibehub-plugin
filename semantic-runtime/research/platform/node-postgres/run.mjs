@@ -147,7 +147,10 @@ try {
   report.deletion={selected_project_remaining_rows:remaining,other_tenant_preserved:true,other_project_preserved:true};
   const sources=['auth.mjs','service.mjs','executor.mjs','run.mjs','schema.sql','fixture.json','package.json','package-lock.json'];
   report.input_sha256=Object.fromEntries(sources.map(file=>[file,createHash('sha256').update(readFileSync(join(here,file))).digest('hex')]));
-  report.protocol_sha256=Object.fromEntries(['worker-protocol.mjs','observability-contract.mjs'].map(file=>[file,createHash('sha256').update(readFileSync(join(here,'../../../src/core',file))).digest('hex')]));
+  report.protocol_sha256=Object.fromEntries([
+    ['worker-protocol.mjs','../../../src/domain/work/worker-protocol.mjs'],
+    ['observability-contract.mjs','../../../src/domain/decisions/observability-contract.mjs'],
+  ].map(([file,path])=>[file,createHash('sha256').update(readFileSync(join(here,path))).digest('hex')]));
   report.status='passed';
 } catch {
   // Never include exceptions, connection strings, bearer tokens or raw payloads.

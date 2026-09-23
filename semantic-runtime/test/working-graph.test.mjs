@@ -6,7 +6,7 @@ import {
   validateSemanticRevision, validateSemanticAddress, validateGraphConflict, validateProvenanceClosure,
   createWorkingGraph, graphRevisionAddress, semanticAddress, exactRevisionAddress, canonicalArtifactAddress,
   applyGraphAssertion, resolveGraphConflict, updateGraphSourceAccess, resolveWorkingGraphAddress, validateWorkerGraphInput,
-} from '../src/core/working-graph.mjs';
+} from '../src/domain/graph/working-graph.mjs';
 import { graph, assertion, apply, event, scope, catalog, watermarks } from './fixtures/working-graph/scenario.mjs';
 const clone = structuredClone;
 function rehashSnapshot(snapshot) {

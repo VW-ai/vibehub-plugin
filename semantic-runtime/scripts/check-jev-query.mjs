@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { queryFixture, QUERY_ACTIONS, capture } from '../test/helpers/query-fixture.mjs';
 
 export const QUERY_JEV_CASES = Object.freeze([

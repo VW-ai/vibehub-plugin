@@ -5,11 +5,11 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { DomainStore, migrateDomainStore } from '../../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../../src/adapters/auth/local-credential-authority.mjs';
-import { scopedReference } from '../../src/core/service-access.mjs';
-import { GitProjectRegistry } from '../../src/local/git-projects.mjs';
-import { ProjectActivation } from '../../src/local/project-activation.mjs';
-import { DurableIngress } from '../../src/local/durable-ingress.mjs';
-import { LocalGitWorktreeSensor } from '../../src/local/git-worktree-sensor.mjs';
+import { scopedReference } from '../../src/domain/identity/service-access.mjs';
+import { GitProjectRegistry } from '../../src/adapters/git/git-projects.mjs';
+import { ProjectActivation } from '../../src/application/project/project-activation.mjs';
+import { DurableIngress } from '../../src/application/project/durable-ingress.mjs';
+import { LocalGitWorktreeSensor } from '../../src/adapters/git/git-worktree-sensor.mjs';
 export const SENSOR_SCOPE = { tenant_id: 'synthetic', project_id: 'git-sensor' };
 export const SENSOR_ACTIONS = ['store:read', 'store:write', 'project:inspect', 'project:enroll', 'activation:read', 'activation:write', 'activation:admit',
   'ingress:register', 'ingress:read', 'ingress:submit', 'sensor:capture', 'sensor:read'];

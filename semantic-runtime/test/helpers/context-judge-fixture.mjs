@@ -1,10 +1,10 @@
 import { join } from 'node:path';
 import { fingerprint } from '../../src/core/contracts.mjs';
-import { compilePolicyArtifact } from '../../src/core/policy-artifacts.mjs';
-import { CONTEXT_JUDGE_NODE_OPERATION, JUDGE_NODE_OPERATION } from '../../src/core/judge-node.mjs';
-import { LocalJudgeRuntime } from '../../src/local/judge-runtime.mjs';
-import { JudgeInputs } from '../../src/local/judge-inputs.mjs';
-import { ProviderSettings } from '../../src/local/provider-settings.mjs';
+import { compilePolicyArtifact } from '../../src/domain/decisions/policy-artifacts.mjs';
+import { CONTEXT_JUDGE_NODE_OPERATION, JUDGE_NODE_OPERATION } from '../../src/domain/judge/judge-node.mjs';
+import { LocalJudgeRuntime } from '../../src/application/judge/judge-runtime.mjs';
+import { JudgeInputs } from '../../src/application/judge/judge-inputs.mjs';
+import { ProviderSettings } from '../../src/adapters/providers/provider-settings.mjs';
 import { fixture, publish, head, CONTEXT_ACTIONS, register, capture, SCOPE } from './context-fixture.mjs';
 import { JUDGE_ACTIONS } from './judge-fixture.mjs';
 import { bind, pin } from './exploration-fixture.mjs';

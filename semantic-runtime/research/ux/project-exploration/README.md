@@ -2,7 +2,7 @@
 
 This directory keeps the disconnected Project / Exploration interaction study,
 its synthetic fixtures, and its design record together. It is research input
-for the product; it is not the connected local Runtime App in `src/local`.
+for the product; it is not the connected local Runtime App in `src/app/local`.
 
 From the repository root:
 

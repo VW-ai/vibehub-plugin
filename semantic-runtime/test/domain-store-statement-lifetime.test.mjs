@@ -14,7 +14,7 @@ test('selected SQLite ranges retain their statement through forced GC and releas
     import { join } from 'node:path';
     import { DomainStore, migrateDomainStore } from ${JSON.stringify(moduleURL('../src/adapters/sqlite/domain-store.mjs'))};
     import { LocalCredentialAuthority, LOCAL_AUDIENCE } from ${JSON.stringify(moduleURL('../src/adapters/auth/local-credential-authority.mjs'))};
-    import { scopedReference } from ${JSON.stringify(moduleURL('../src/core/service-access.mjs'))};
+    import { scopedReference } from ${JSON.stringify(moduleURL('../src/domain/identity/service-access.mjs'))};
     const directory=mkdtempSync(join(tmpdir(),'vh-sqlite-gc-')),filePath=join(directory,'store.sqlite');
     migrateDomainStore({filePath});
     const authority=new LocalCredentialAuthority(),scope={tenant_id:'synthetic',project_id:'statement-lifetime'};

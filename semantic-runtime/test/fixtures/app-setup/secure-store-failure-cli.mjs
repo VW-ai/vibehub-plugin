@@ -1,6 +1,6 @@
 // Browser-only failure fixture. No native Keychain or model calls; never an App mode.
 import { createInterface } from 'node:readline';
-import { startLocalRuntime } from '../../../src/local/service.mjs';
+import { startLocalRuntime } from '../../../src/app/local/service.mjs';
 const [dataDir, port] = process.argv.slice(2);
 if (!dataDir || !process.stdin.isTTY || !process.stdout.isTTY) throw new Error('Use a disposable data directory and interactive terminal.');
 const unavailable = () => { throw new Error('Synthetic secure-store failure'); };

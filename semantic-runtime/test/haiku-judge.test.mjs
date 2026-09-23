@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { HaikuJudge } from '../src/adapters/haiku-judge.mjs';
+import { HaikuJudge } from '../src/adapters/providers/haiku-judge.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
 
 const event = {

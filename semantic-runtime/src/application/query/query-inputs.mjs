@@ -1,17 +1,17 @@
 import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
-import { GraphInputs, graphHash, graphEqual, graphErrorCode } from '../../local/graph-inputs.mjs';
+import { GraphInputs, graphHash, graphEqual, graphErrorCode } from '../graph/graph-inputs.mjs';
 import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
-import { readExplorationOwner } from '../../local/exploration-inputs.mjs';
-import { composeLocalServices } from '../../local/local-runtime-composition.mjs';
+import { readExplorationOwner } from '../explorations/exploration-inputs.mjs';
+import { composeLocalServices } from '../support/local-runtime-composition.mjs';
 import { planContextSelection, readContextSelection } from '../context/context-reader.mjs';
 import { verifyExplorationPublication } from '../explorations/exploration-adoption.mjs';
-import { SourceInvalidationFeed } from '../../local/source-invalidation.mjs';
+import { SourceInvalidationFeed } from '../sources/source-invalidation.mjs';
 import { queryRequest, queryCopy, queryCheck, queryFailure } from './query-contract.mjs';
 import { canonical } from '../../core/contracts.mjs';
-import { exactRevisionAddress } from '../../core/working-graph.mjs';
-import { eventObservationKey } from '../../core/event-provenance.mjs';
-import { sourcePartitionKey } from '../../core/causal-ordering.mjs';
+import { exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
+import { eventObservationKey } from '../../domain/sources/event-provenance.mjs';
+import { sourcePartitionKey } from '../../domain/sources/causal-ordering.mjs';
 
 const ACTIONS = ['query:read', 'context:read', 'store:read', 'graph:read', 'exploration:read', 'ingress:read', 'source:invalidation:read'];
 const check = (condition, code = 'invalid_query_input') => queryCheck(condition, code);

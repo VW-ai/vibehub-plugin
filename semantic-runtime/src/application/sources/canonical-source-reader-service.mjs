@@ -2,17 +2,17 @@ import { realpathSync, lstatSync, statSync, existsSync, openSync, fstatSync, rea
 import { isAbsolute, join, resolve } from 'node:path';
 import { DomainStore } from '../../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
-import { GitProjectRegistry } from '../../local/git-projects.mjs';
-import { ProjectActivation } from '../../local/project-activation.mjs';
-import { DurableIngress } from '../../local/durable-ingress.mjs';
+import { GitProjectRegistry } from '../../adapters/git/git-projects.mjs';
+import { ProjectActivation } from '../project/project-activation.mjs';
+import { DurableIngress } from '../project/durable-ingress.mjs';
 import { graphCapabilityFrom, graphGetHead, graphGetReceipt, graphMutate, graphResolve } from '../graph/graph-capability.mjs';
-import { SourceInvalidationFeed } from '../../local/source-invalidation.mjs';
-import { GitProvenance } from '../../adapters/git-provenance.mjs';
-import { parseCanonicalRecord, evaluateCanonicalRecords, CANONICAL_RECORD_PROFILE } from '../../core/canonical-records.mjs';
-import { validateSemanticRevision, validateSemanticAddress, canonicalArtifactAddress, exactRevisionAddress } from '../../core/working-graph.mjs';
+import { SourceInvalidationFeed } from './source-invalidation.mjs';
+import { GitProvenance } from '../../adapters/git/git-provenance.mjs';
+import { parseCanonicalRecord, evaluateCanonicalRecords, CANONICAL_RECORD_PROFILE } from '../../domain/sources/canonical-records.mjs';
+import { validateSemanticRevision, validateSemanticAddress, canonicalArtifactAddress, exactRevisionAddress } from '../../domain/graph/working-graph.mjs';
 import { canonical } from '../../core/contracts.mjs';
-import { validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
-import { graphInput, graphFields, graphHash, graphEqual, graphId, graphUint, graphErrorCode } from '../../local/graph-inputs.mjs';
+import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';
+import { graphInput, graphFields, graphHash, graphEqual, graphId, graphUint, graphErrorCode } from '../graph/graph-inputs.mjs';
 
 const KINDS = new Set(['context', 'room', 'ticket', 'ticket_evidence', 'ticket_outcome']);
 const fail = code => Object.assign(new Error(`Canonical reader: ${code}`), { code,

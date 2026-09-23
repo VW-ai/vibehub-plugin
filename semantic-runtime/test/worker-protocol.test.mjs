@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateWorkerJob, validateWorkerResult, validateWorkerAdmission, validateWorkerJobState, createWorkerJobState, transitionWorkerJob, WORKER_OUTPUT_SCHEMA } from '../src/core/worker-protocol.mjs';
+import { validateWorkerJob, validateWorkerResult, validateWorkerAdmission, validateWorkerJobState, createWorkerJobState, transitionWorkerJob, WORKER_OUTPUT_SCHEMA } from '../src/domain/work/worker-protocol.mjs';
 import { scenario, context, running, result, resign, unknownUsage, rehashState } from './fixtures/worker-protocol/scenario.mjs';
 import { graph, assertion, apply, event } from './fixtures/working-graph/scenario.mjs';
-import { graphRevisionAddress, updateGraphSourceAccess } from '../src/core/working-graph.mjs';
-import { projectFreshness } from '../src/core/causal-ordering.mjs';
+import { graphRevisionAddress, updateGraphSourceAccess } from '../src/domain/graph/working-graph.mjs';
+import { projectFreshness } from '../src/domain/sources/causal-ordering.mjs';
 const clone = structuredClone;
 const command = (s, type, extras = {}) => ({ type, expected_revision: s.revision, ...extras });
 const workerCommand = (s, type, extras = {}) => command(s, type, { attempt_id: s.attempts.at(-1).attempt_id, fencing_token: s.attempts.at(-1).fencing_token, ...extras });

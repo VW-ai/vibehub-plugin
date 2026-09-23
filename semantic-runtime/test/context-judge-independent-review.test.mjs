@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { executeContextJudgeNode } from '../src/local/judge-runtime.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
-import { judgeRequest } from '../src/local/judge-contract.mjs';
+import { executeContextJudgeNode } from '../src/application/judge/judge-runtime.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
+import { judgeRequest } from '../src/application/judge/judge-contract.mjs';
 import { contextJudgeFixture, judgeTransport, judgeResponse, contextRequest, publish, adoption, rows, SCOPE } from './helpers/context-judge-fixture.mjs';
 
 test('independent review: caller mutation cannot relax the frozen Context source policy', async t => {

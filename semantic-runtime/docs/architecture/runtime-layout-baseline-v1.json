@@ -666,37 +666,47 @@
       "intended_destination": "src/adapters/auth/local-credential-authority.mjs"
     },
     {
-      "path": "src/adapters/cached-judge.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/cached-judge.mjs"
-    },
-    {
-      "path": "src/adapters/claude-cli-judge.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/claude-cli-judge.mjs"
-    },
-    {
-      "path": "src/adapters/git-provenance.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/git/git-provenance.mjs"
-    },
-    {
-      "path": "src/adapters/git-worktree-observer.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/git/git-worktree-observer.mjs"
-    },
-    {
       "path": "src/adapters/git/exploration-physical.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/git/exploration-physical.mjs"
     },
     {
-      "path": "src/adapters/haiku-judge.mjs",
+      "path": "src/adapters/git/git-projects.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "path": "src/adapters/git/git-provenance.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/git/git-provenance.mjs"
+    },
+    {
+      "path": "src/adapters/git/git-worktree-observer.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/git/git-worktree-observer.mjs"
+    },
+    {
+      "path": "src/adapters/git/git-worktree-sensor.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/git/git-worktree-sensor.mjs"
+    },
+    {
+      "path": "src/adapters/providers/cached-judge.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/providers/cached-judge.mjs"
+    },
+    {
+      "path": "src/adapters/providers/claude-cli-judge.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/providers/claude-cli-judge.mjs"
+    },
+    {
+      "path": "src/adapters/providers/haiku-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/haiku-judge.mjs"
     },
     {
-      "path": "src/adapters/heuristic-judge.mjs",
+      "path": "src/adapters/providers/heuristic-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/heuristic-judge.mjs"
     },
@@ -711,24 +721,34 @@
       "intended_destination": "src/adapters/providers/judge-input.mjs"
     },
     {
+      "path": "src/adapters/providers/judge-provider.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/providers/judge-provider.mjs"
+    },
+    {
       "path": "src/adapters/providers/openrouter-jev-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/openrouter-jev-judge.mjs"
     },
     {
-      "path": "src/adapters/providers/typesafe-jev-judge.mjs",
+      "path": "src/adapters/providers/provider-settings.mjs",
       "current_role": "production",
-      "intended_destination": "src/adapters/providers/typesafe-jev-judge.mjs"
+      "intended_destination": "src/adapters/providers/provider-settings.mjs"
     },
     {
-      "path": "src/adapters/recorded-judge.mjs",
+      "path": "src/adapters/providers/recorded-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/recorded-judge.mjs"
     },
     {
-      "path": "src/adapters/resilient-judge.mjs",
+      "path": "src/adapters/providers/resilient-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/resilient-judge.mjs"
+    },
+    {
+      "path": "src/adapters/providers/typesafe-jev-judge.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/providers/typesafe-jev-judge.mjs"
     },
     {
       "path": "src/adapters/secrets/keychain-helper.swift",
@@ -756,9 +776,49 @@
       "intended_destination": "src/adapters/sqlite/graph-storage.mjs"
     },
     {
+      "path": "src/app/local/app-session.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/app-session.mjs"
+    },
+    {
+      "path": "src/app/local/app-setup.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/app-setup.mjs"
+    },
+    {
+      "path": "src/app/local/cli.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/cli.mjs"
+    },
+    {
       "path": "src/app/local/http/authorize-local-request.mjs",
       "current_role": "production",
       "intended_destination": "src/app/local/http/authorize-local-request.mjs"
+    },
+    {
+      "path": "src/app/local/service.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/service.mjs"
+    },
+    {
+      "path": "src/app/local/setup-http.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/setup-http.mjs"
+    },
+    {
+      "path": "src/app/local/ui/app.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/ui/app.mjs"
+    },
+    {
+      "path": "src/app/local/ui/index.html",
+      "current_role": "production",
+      "intended_destination": "src/app/local/ui/index.html"
+    },
+    {
+      "path": "src/app/local/ui/style.css",
+      "current_role": "production",
+      "intended_destination": "src/app/local/ui/style.css"
     },
     {
       "path": "src/application/context/context-inputs.mjs",
@@ -786,6 +846,16 @@
       "intended_destination": "src/application/explorations/exploration-adoption.mjs"
     },
     {
+      "path": "src/application/explorations/exploration-canonical.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/explorations/exploration-canonical.mjs"
+    },
+    {
+      "path": "src/application/explorations/exploration-inputs.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
       "path": "src/application/explorations/exploration-store.mjs",
       "current_role": "production",
       "intended_destination": "src/application/explorations/exploration-store.mjs"
@@ -796,9 +866,49 @@
       "intended_destination": "src/application/graph/graph-capability.mjs"
     },
     {
+      "path": "src/application/graph/graph-inputs.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-inputs.mjs"
+    },
+    {
       "path": "src/application/graph/graph-selected.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-selected.mjs"
+    },
+    {
+      "path": "src/application/graph/graph-service-bundle.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-service-bundle.mjs"
+    },
+    {
+      "path": "src/application/graph/graph-store.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/graph/graph-store.mjs"
+    },
+    {
+      "path": "src/application/judge/judge-contract.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/judge/judge-contract.mjs"
+    },
+    {
+      "path": "src/application/judge/judge-inputs.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/judge/judge-inputs.mjs"
+    },
+    {
+      "path": "src/application/judge/judge-runtime.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/judge/judge-runtime.mjs"
+    },
+    {
+      "path": "src/application/project/durable-ingress.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "path": "src/application/project/project-activation.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/project/project-activation.mjs"
     },
     {
       "path": "src/application/query/query-contract.mjs",
@@ -826,34 +936,19 @@
       "intended_destination": "src/application/sources/canonical-source-reader.mjs"
     },
     {
+      "path": "src/application/sources/source-invalidation.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "path": "src/application/support/local-runtime-composition.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/support/local-runtime-composition.mjs"
+    },
+    {
       "path": "src/cli.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/cli.mjs"
-    },
-    {
-      "path": "src/core/agent-work-request.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/work/agent-work-request.mjs"
-    },
-    {
-      "path": "src/core/branch-scope.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/explorations/branch-scope.mjs"
-    },
-    {
-      "path": "src/core/canonical-records.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/sources/canonical-records.mjs"
-    },
-    {
-      "path": "src/core/causal-ordering.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/sources/causal-ordering.mjs"
-    },
-    {
-      "path": "src/core/context-profile.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/context/context-profile.mjs"
     },
     {
       "path": "src/core/contracts.mjs",
@@ -866,69 +961,9 @@
       "intended_destination": "research/phase0-replay/src/evaluation.mjs"
     },
     {
-      "path": "src/core/event-provenance.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/sources/event-provenance.mjs"
-    },
-    {
-      "path": "src/core/git-provenance.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/sources/git-provenance.mjs"
-    },
-    {
-      "path": "src/core/git-worktree-observation.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/sources/git-worktree-observation.mjs"
-    },
-    {
-      "path": "src/core/identity.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/identity/identity.mjs"
-    },
-    {
-      "path": "src/core/incremental-graph.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/graph/incremental-graph.mjs"
-    },
-    {
-      "path": "src/core/judge-node.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/judge/judge-node.mjs"
-    },
-    {
-      "path": "src/core/observability-contract.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/decisions/observability-contract.mjs"
-    },
-    {
-      "path": "src/core/policy-artifacts.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/decisions/policy-artifacts.mjs"
-    },
-    {
-      "path": "src/core/policy-kernel.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/decisions/policy-kernel.mjs"
-    },
-    {
       "path": "src/core/policy.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/src/policy.mjs"
-    },
-    {
-      "path": "src/core/query-ranking.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/query/query-ranking.mjs"
-    },
-    {
-      "path": "src/core/query-text.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/query/query-text.mjs"
-    },
-    {
-      "path": "src/core/reconciliation.mjs",
-      "current_role": "production",
-      "intended_destination": "src/domain/work/reconciliation.mjs"
     },
     {
       "path": "src/core/replay.mjs",
@@ -936,17 +971,37 @@
       "intended_destination": "research/phase0-replay/src/replay.mjs"
     },
     {
-      "path": "src/core/service-access.mjs",
+      "path": "src/domain/context/context-profile.mjs",
       "current_role": "production",
-      "intended_destination": "src/domain/identity/service-access.mjs"
+      "intended_destination": "src/domain/context/context-profile.mjs"
     },
     {
-      "path": "src/core/worker-protocol.mjs",
+      "path": "src/domain/decisions/observability-contract.mjs",
       "current_role": "production",
-      "intended_destination": "src/domain/work/worker-protocol.mjs"
+      "intended_destination": "src/domain/decisions/observability-contract.mjs"
     },
     {
-      "path": "src/core/working-graph.mjs",
+      "path": "src/domain/decisions/policy-artifacts.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "path": "src/domain/decisions/policy-kernel.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/decisions/policy-kernel.mjs"
+    },
+    {
+      "path": "src/domain/explorations/branch-scope.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/explorations/branch-scope.mjs"
+    },
+    {
+      "path": "src/domain/graph/incremental-graph.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "path": "src/domain/graph/working-graph.mjs",
       "current_role": "production",
       "intended_destination": "src/domain/graph/working-graph.mjs"
     },
@@ -956,129 +1011,74 @@
       "intended_destination": "src/domain/identity/access-authority.mjs"
     },
     {
+      "path": "src/domain/identity/identity.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/identity/identity.mjs"
+    },
+    {
+      "path": "src/domain/identity/service-access.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/identity/service-access.mjs"
+    },
+    {
+      "path": "src/domain/judge/judge-node.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/judge/judge-node.mjs"
+    },
+    {
+      "path": "src/domain/query/query-ranking.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/query/query-ranking.mjs"
+    },
+    {
+      "path": "src/domain/query/query-text.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/query/query-text.mjs"
+    },
+    {
+      "path": "src/domain/sources/canonical-records.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/sources/canonical-records.mjs"
+    },
+    {
+      "path": "src/domain/sources/causal-ordering.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "path": "src/domain/sources/event-provenance.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "path": "src/domain/sources/git-provenance.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/sources/git-provenance.mjs"
+    },
+    {
+      "path": "src/domain/sources/git-worktree-observation.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/sources/git-worktree-observation.mjs"
+    },
+    {
+      "path": "src/domain/work/agent-work-request.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/work/agent-work-request.mjs"
+    },
+    {
+      "path": "src/domain/work/reconciliation.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/work/reconciliation.mjs"
+    },
+    {
+      "path": "src/domain/work/worker-protocol.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/work/worker-protocol.mjs"
+    },
+    {
       "path": "src/index.mjs",
       "current_role": "production",
       "intended_destination": "src/index.mjs"
-    },
-    {
-      "path": "src/local/app-session.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/app-session.mjs"
-    },
-    {
-      "path": "src/local/app-setup.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/app-setup.mjs"
-    },
-    {
-      "path": "src/local/cli.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/cli.mjs"
-    },
-    {
-      "path": "src/local/durable-ingress.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/project/durable-ingress.mjs"
-    },
-    {
-      "path": "src/local/exploration-canonical.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/explorations/exploration-canonical.mjs"
-    },
-    {
-      "path": "src/local/exploration-inputs.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/explorations/exploration-inputs.mjs"
-    },
-    {
-      "path": "src/local/git-projects.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/git/git-projects.mjs"
-    },
-    {
-      "path": "src/local/git-worktree-sensor.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/git/git-worktree-sensor.mjs"
-    },
-    {
-      "path": "src/local/graph-inputs.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/graph/graph-inputs.mjs"
-    },
-    {
-      "path": "src/local/graph-service-bundle.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/graph/graph-service-bundle.mjs"
-    },
-    {
-      "path": "src/local/graph-store.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/graph/graph-store.mjs"
-    },
-    {
-      "path": "src/local/judge-contract.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/judge/judge-contract.mjs"
-    },
-    {
-      "path": "src/local/judge-inputs.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/judge/judge-inputs.mjs"
-    },
-    {
-      "path": "src/local/judge-provider.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/judge-provider.mjs"
-    },
-    {
-      "path": "src/local/judge-runtime.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/judge/judge-runtime.mjs"
-    },
-    {
-      "path": "src/local/local-runtime-composition.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/support/local-runtime-composition.mjs"
-    },
-    {
-      "path": "src/local/project-activation.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/project/project-activation.mjs"
-    },
-    {
-      "path": "src/local/provider-settings.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/provider-settings.mjs"
-    },
-    {
-      "path": "src/local/service.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/service.mjs"
-    },
-    {
-      "path": "src/local/setup-http.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/setup-http.mjs"
-    },
-    {
-      "path": "src/local/setup-ui/app.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/ui/app.mjs"
-    },
-    {
-      "path": "src/local/setup-ui/index.html",
-      "current_role": "production",
-      "intended_destination": "src/app/local/ui/index.html"
-    },
-    {
-      "path": "src/local/setup-ui/style.css",
-      "current_role": "production",
-      "intended_destination": "src/app/local/ui/style.css"
-    },
-    {
-      "path": "src/local/source-invalidation.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/sources/source-invalidation.mjs"
     },
     {
       "path": "test/agent-work-request-integration.test.mjs",
@@ -2062,7 +2062,7 @@
   "npm_commands": [
     {
       "name": "app",
-      "command": "node src/local/cli.mjs --setup",
+      "command": "node src/app/local/cli.mjs --setup",
       "mode": "local-runtime"
     },
     {
@@ -2197,12 +2197,12 @@
     },
     {
       "name": "start",
-      "command": "node src/local/cli.mjs",
+      "command": "node src/app/local/cli.mjs",
       "mode": "local-runtime"
     },
     {
       "name": "status",
-      "command": "node src/local/cli.mjs --status",
+      "command": "node src/app/local/cli.mjs --status",
       "mode": "local-runtime"
     },
     {
@@ -2233,12 +2233,17 @@
   ],
   "contract_constants": [
     {
-      "module": "src/adapters/haiku-judge.mjs",
+      "module": "src/adapters/git/git-projects.mjs",
+      "name": "GIT_ENROLLMENT_NAMESPACE",
+      "value": "git-enrollment"
+    },
+    {
+      "module": "src/adapters/providers/haiku-judge.mjs",
       "name": "HAIKU_PROMPT_VERSION",
       "value": "peel-semantic-probabilities-v1"
     },
     {
-      "module": "src/adapters/haiku-judge.mjs",
+      "module": "src/adapters/providers/haiku-judge.mjs",
       "name": "HAIKU_SCHEMA_VERSION",
       "value": "ordered-probabilities-v1"
     },
@@ -2258,124 +2263,119 @@
       "value": "working-graph"
     },
     {
-      "module": "src/core/agent-work-request.mjs",
-      "name": "AGENT_WORK_REQUEST_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/branch-scope.mjs",
-      "name": "BRANCH_SCOPE_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/causal-ordering.mjs",
-      "name": "CAUSAL_CONTRACT_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/event-provenance.mjs",
-      "name": "EVENT_CONTRACT_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/git-provenance.mjs",
-      "name": "GIT_PROVENANCE_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/identity.mjs",
-      "name": "IDENTITY_CONTRACT_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/incremental-graph.mjs",
-      "name": "INCREMENTAL_GRAPH_CONTRACT_VERSION",
-      "value": 2
-    },
-    {
-      "module": "src/core/judge-node.mjs",
-      "name": "JUDGE_DECISION_SCHEMA",
-      "source_sha256": "05ead973dd75515c4927c59ef5c550acc6d97f6071ddbf8d8771327063b79190"
-    },
-    {
-      "module": "src/core/observability-contract.mjs",
-      "name": "OBSERVABILITY_CONTRACT_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/policy-artifacts.mjs",
-      "name": "POLICY_ARTIFACT_SCHEMA",
-      "source_sha256": "e3aaa572174eafaec6a151c7adf1983778f05bcf6cf195f48f7140ff119eb171"
-    },
-    {
-      "module": "src/core/policy-kernel.mjs",
-      "name": "POLICY_KERNEL_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/query-ranking.mjs",
-      "name": "CONTEXT_RANK_VERSION",
-      "value": "context-rank-v1"
-    },
-    {
-      "module": "src/core/query-text.mjs",
-      "name": "CONTEXT_TEXT_VERSION",
-      "value": "context-text-v1"
-    },
-    {
-      "module": "src/core/reconciliation.mjs",
-      "name": "RECONCILIATION_CONFIG_SCHEMA",
-      "source_sha256": "4426a947604ac61746915112be1ff038596c70399e3886353f4c8342ed1a6150"
-    },
-    {
-      "module": "src/core/reconciliation.mjs",
-      "name": "RECONCILIATION_OUTPUT_SCHEMA",
-      "source_sha256": "1947204e5e1e74431ce35bcc4016293f1b6ade95bd89e9436de20a84ed0a8195"
-    },
-    {
-      "module": "src/core/reconciliation.mjs",
-      "name": "RECONCILIATION_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/worker-protocol.mjs",
-      "name": "WORKER_OUTPUT_SCHEMA",
-      "source_sha256": "5c72da164725399462aad62616facd13b2d51b9d57ae8bd198d6ef62a33899a1"
-    },
-    {
-      "module": "src/core/worker-protocol.mjs",
-      "name": "WORKER_PROTOCOL_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/core/working-graph.mjs",
-      "name": "WORKING_GRAPH_CONTRACT_VERSION",
-      "value": 1
-    },
-    {
-      "module": "src/local/durable-ingress.mjs",
-      "name": "INGRESS_NAMESPACE",
-      "value": "durable-ingress"
-    },
-    {
-      "module": "src/local/exploration-inputs.mjs",
+      "module": "src/application/explorations/exploration-inputs.mjs",
       "name": "EXPLORATION_NAMESPACE",
       "value": "exploration-projection"
     },
     {
-      "module": "src/local/git-projects.mjs",
-      "name": "GIT_ENROLLMENT_NAMESPACE",
-      "value": "git-enrollment"
+      "module": "src/application/project/durable-ingress.mjs",
+      "name": "INGRESS_NAMESPACE",
+      "value": "durable-ingress"
     },
     {
-      "module": "src/local/project-activation.mjs",
+      "module": "src/application/project/project-activation.mjs",
       "name": "ACTIVATION_NAMESPACE",
       "value": "project-activation"
     },
     {
-      "module": "src/local/source-invalidation.mjs",
+      "module": "src/application/sources/source-invalidation.mjs",
       "name": "SOURCE_INVALIDATION_NAMESPACE",
       "value": "source-invalidation"
+    },
+    {
+      "module": "src/domain/decisions/observability-contract.mjs",
+      "name": "OBSERVABILITY_CONTRACT_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/decisions/policy-artifacts.mjs",
+      "name": "POLICY_ARTIFACT_SCHEMA",
+      "source_sha256": "e3aaa572174eafaec6a151c7adf1983778f05bcf6cf195f48f7140ff119eb171"
+    },
+    {
+      "module": "src/domain/decisions/policy-kernel.mjs",
+      "name": "POLICY_KERNEL_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/explorations/branch-scope.mjs",
+      "name": "BRANCH_SCOPE_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/graph/incremental-graph.mjs",
+      "name": "INCREMENTAL_GRAPH_CONTRACT_VERSION",
+      "value": 2
+    },
+    {
+      "module": "src/domain/graph/working-graph.mjs",
+      "name": "WORKING_GRAPH_CONTRACT_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/identity/identity.mjs",
+      "name": "IDENTITY_CONTRACT_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/judge/judge-node.mjs",
+      "name": "JUDGE_DECISION_SCHEMA",
+      "source_sha256": "05ead973dd75515c4927c59ef5c550acc6d97f6071ddbf8d8771327063b79190"
+    },
+    {
+      "module": "src/domain/query/query-ranking.mjs",
+      "name": "CONTEXT_RANK_VERSION",
+      "value": "context-rank-v1"
+    },
+    {
+      "module": "src/domain/query/query-text.mjs",
+      "name": "CONTEXT_TEXT_VERSION",
+      "value": "context-text-v1"
+    },
+    {
+      "module": "src/domain/sources/causal-ordering.mjs",
+      "name": "CAUSAL_CONTRACT_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/sources/event-provenance.mjs",
+      "name": "EVENT_CONTRACT_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/sources/git-provenance.mjs",
+      "name": "GIT_PROVENANCE_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/work/agent-work-request.mjs",
+      "name": "AGENT_WORK_REQUEST_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/work/reconciliation.mjs",
+      "name": "RECONCILIATION_CONFIG_SCHEMA",
+      "source_sha256": "4426a947604ac61746915112be1ff038596c70399e3886353f4c8342ed1a6150"
+    },
+    {
+      "module": "src/domain/work/reconciliation.mjs",
+      "name": "RECONCILIATION_OUTPUT_SCHEMA",
+      "source_sha256": "1947204e5e1e74431ce35bcc4016293f1b6ade95bd89e9436de20a84ed0a8195"
+    },
+    {
+      "module": "src/domain/work/reconciliation.mjs",
+      "name": "RECONCILIATION_VERSION",
+      "value": 1
+    },
+    {
+      "module": "src/domain/work/worker-protocol.mjs",
+      "name": "WORKER_OUTPUT_SCHEMA",
+      "source_sha256": "5c72da164725399462aad62616facd13b2d51b9d57ae8bd198d6ef62a33899a1"
+    },
+    {
+      "module": "src/domain/work/worker-protocol.mjs",
+      "name": "WORKER_PROTOCOL_VERSION",
+      "value": 1
     }
   ],
   "standalone_copy_paths": [
@@ -2394,38 +2394,86 @@
     },
     {
       "from": "src/adapters/auth/local-credential-authority.mjs",
-      "to": "src/core/service-access.mjs"
-    },
-    {
-      "from": "src/adapters/auth/local-credential-authority.mjs",
       "to": "src/domain/identity/access-authority.mjs"
     },
     {
-      "from": "src/adapters/cached-judge.mjs",
+      "from": "src/adapters/auth/local-credential-authority.mjs",
+      "to": "src/domain/identity/service-access.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-projects.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-projects.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/adapters/claude-cli-judge.mjs",
-      "to": "src/adapters/haiku-judge.mjs"
+      "from": "src/adapters/git/git-projects.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
-      "from": "src/adapters/claude-cli-judge.mjs",
+      "from": "src/adapters/git/git-projects.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-provenance.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-provenance.mjs",
+      "to": "src/domain/sources/git-provenance.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-observer.mjs",
+      "to": "src/domain/sources/git-worktree-observation.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/adapters/git/git-worktree-observer.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-worktree-sensor.mjs",
+      "to": "src/domain/sources/git-worktree-observation.mjs"
+    },
+    {
+      "from": "src/adapters/providers/cached-judge.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/providers/claude-cli-judge.mjs",
+      "to": "src/adapters/providers/haiku-judge.mjs"
+    },
+    {
+      "from": "src/adapters/providers/claude-cli-judge.mjs",
       "to": "src/adapters/providers/judge-input.mjs"
     },
     {
-      "from": "src/adapters/git-provenance.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/adapters/git-provenance.mjs",
-      "to": "src/core/git-provenance.mjs"
-    },
-    {
-      "from": "src/adapters/git-worktree-observer.mjs",
-      "to": "src/core/git-worktree-observation.mjs"
-    },
-    {
-      "from": "src/adapters/haiku-judge.mjs",
+      "from": "src/adapters/providers/haiku-judge.mjs",
       "to": "src/adapters/providers/judge-input.mjs"
     },
     {
@@ -2433,20 +2481,44 @@
       "to": "src/adapters/providers/judge-input.mjs"
     },
     {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/adapters/providers/jev-judge.mjs"
+    },
+    {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/adapters/providers/openrouter-jev-judge.mjs"
+    },
+    {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/adapters/providers/provider-settings.mjs"
+    },
+    {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/adapters/providers/typesafe-jev-judge.mjs"
+    },
+    {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/adapters/providers/judge-provider.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
       "from": "src/adapters/providers/openrouter-jev-judge.mjs",
       "to": "src/adapters/providers/judge-input.mjs"
     },
     {
       "from": "src/adapters/providers/openrouter-jev-judge.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/providers/recorded-judge.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
       "from": "src/adapters/providers/typesafe-jev-judge.mjs",
       "to": "src/adapters/providers/judge-input.mjs"
-    },
-    {
-      "from": "src/adapters/recorded-judge.mjs",
-      "to": "src/core/contracts.mjs"
     },
     {
       "from": "src/adapters/sqlite-store.mjs",
@@ -2462,11 +2534,75 @@
     },
     {
       "from": "src/adapters/sqlite/graph-storage.mjs",
-      "to": "src/core/incremental-graph.mjs"
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/adapters/providers/provider-settings.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/adapters/secrets/macos-secret-store.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/app/local/app-setup.mjs",
+      "to": "src/domain/identity/service-access.mjs"
+    },
+    {
+      "from": "src/app/local/cli.mjs",
+      "to": "src/app/local/service.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/adapters/auth/local-credential-authority.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/app/local/app-session.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/app/local/app-setup.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/app/local/http/authorize-local-request.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/app/local/setup-http.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/app/local/service.mjs",
+      "to": "src/domain/identity/service-access.mjs"
     },
     {
       "from": "src/application/context/context-inputs.mjs",
-      "to": "src/core/context-profile.mjs"
+      "to": "src/application/explorations/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/application/context/context-inputs.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/context/context-inputs.mjs",
@@ -2474,11 +2610,11 @@
     },
     {
       "from": "src/application/context/context-inputs.mjs",
-      "to": "src/core/event-provenance.mjs"
+      "to": "src/domain/context/context-profile.mjs"
     },
     {
       "from": "src/application/context/context-inputs.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/context/context-inputs.mjs",
@@ -2486,11 +2622,7 @@
     },
     {
       "from": "src/application/context/context-inputs.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/application/context/context-inputs.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/application/context/context-read-service.mjs",
@@ -2506,27 +2638,27 @@
     },
     {
       "from": "src/application/context/context-read-service.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/application/explorations/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/context/context-read-service.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/context/context-read-service.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/application/context/context-read-service.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/application/context/context-read-service.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/application/context/context-read-service.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/application/context/context-read-service.mjs",
-      "to": "src/local/source-invalidation.mjs"
     },
     {
       "from": "src/application/context/context-reader.mjs",
@@ -2538,35 +2670,35 @@
     },
     {
       "from": "src/application/context/context-reader.mjs",
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/context/context-reader.mjs",
       "to": "src/application/graph/graph-selected.mjs"
     },
     {
       "from": "src/application/context/context-reader.mjs",
-      "to": "src/core/context-profile.mjs"
+      "to": "src/domain/context/context-profile.mjs"
     },
     {
       "from": "src/application/context/context-reader.mjs",
-      "to": "src/core/incremental-graph.mjs"
+      "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
       "from": "src/application/context/context-reader.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/application/context/context-reader.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/application/context/context-reader.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/context/context-store.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/context/context-store.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
+      "to": "src/application/support/local-runtime-composition.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
@@ -2574,7 +2706,11 @@
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/core/causal-ordering.mjs"
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-adoption.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
@@ -2582,39 +2718,419 @@
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/core/event-provenance.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/sources/causal-ordering.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/local/exploration-inputs.mjs"
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
-      "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/application/graph/graph-capability.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/application/sources/canonical-source-reader-service.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-canonical.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/adapters/git/exploration-physical.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/explorations/exploration-store.mjs",
-      "to": "src/local/exploration-inputs.mjs"
+      "to": "src/application/explorations/exploration-inputs.mjs"
     },
     {
       "from": "src/application/explorations/exploration-store.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/explorations/exploration-store.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
+      "to": "src/application/support/local-runtime-composition.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/application/graph/graph-selected.mjs",
-      "to": "src/core/event-provenance.mjs"
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/graph/graph-selected.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/context/context-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/context/context-read-service.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/explorations/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/graph/graph-capability.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-service-bundle.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/context/context-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/explorations/exploration-adoption.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/explorations/exploration-canonical.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/graph/graph-capability.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/graph/graph-selected.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/graph/graph-service-bundle.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/domain/context/context-profile.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-store.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/adapters/providers/provider-settings.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/domain/judge/judge-node.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/adapters/sqlite/graph-storage.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/context/context-reader.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/context/context-store.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/explorations/exploration-store.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/application/support/local-runtime-composition.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/context/context-profile.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/identity/service-access.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/adapters/providers/judge-provider.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/adapters/providers/provider-settings.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/application/judge/judge-contract.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/application/judge/judge-inputs.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/domain/judge/judge-node.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/application/project/durable-ingress.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/project/project-activation.mjs",
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/application/project/project-activation.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/project/project-activation.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
@@ -2622,23 +3138,31 @@
     },
     {
       "from": "src/application/query/query-contract.mjs",
-      "to": "src/core/causal-ordering.mjs"
+      "to": "src/application/explorations/exploration-inputs.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
-      "to": "src/core/incremental-graph.mjs"
+      "to": "src/application/graph/graph-inputs.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
-      "to": "src/local/exploration-inputs.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/query/query-contract.mjs",
-      "to": "src/local/graph-inputs.mjs"
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/application/query/query-engine.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/query/query-engine.mjs",
+      "to": "src/application/judge/judge-runtime.mjs"
     },
     {
       "from": "src/application/query/query-engine.mjs",
@@ -2650,19 +3174,11 @@
     },
     {
       "from": "src/application/query/query-engine.mjs",
-      "to": "src/core/query-ranking.mjs"
+      "to": "src/domain/query/query-ranking.mjs"
     },
     {
       "from": "src/application/query/query-engine.mjs",
-      "to": "src/core/query-text.mjs"
-    },
-    {
-      "from": "src/application/query/query-engine.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/application/query/query-engine.mjs",
-      "to": "src/local/judge-runtime.mjs"
+      "to": "src/domain/query/query-text.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
@@ -2682,11 +3198,23 @@
     },
     {
       "from": "src/application/query/query-inputs.mjs",
+      "to": "src/application/explorations/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/query/query-inputs.mjs",
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/query/query-inputs.mjs",
       "to": "src/application/query/query-contract.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
-      "to": "src/core/causal-ordering.mjs"
+      "to": "src/application/sources/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/query/query-inputs.mjs",
+      "to": "src/application/support/local-runtime-composition.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
@@ -2694,11 +3222,7 @@
     },
     {
       "from": "src/application/query/query-inputs.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/application/query/query-inputs.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
@@ -2706,23 +3230,19 @@
     },
     {
       "from": "src/application/query/query-inputs.mjs",
-      "to": "src/local/exploration-inputs.mjs"
+      "to": "src/domain/sources/causal-ordering.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/application/query/query-inputs.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
-    },
-    {
-      "from": "src/application/query/query-inputs.mjs",
-      "to": "src/local/source-invalidation.mjs"
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/adapters/git-provenance.mjs"
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/adapters/git/git-provenance.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
@@ -2734,7 +3254,19 @@
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/core/canonical-records.mjs"
+      "to": "src/application/graph/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/application/project/project-activation.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/application/sources/source-invalidation.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
@@ -2742,11 +3274,11 @@
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/core/incremental-graph.mjs"
+      "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
@@ -2754,31 +3286,51 @@
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/local/source-invalidation.mjs"
+      "to": "src/domain/sources/canonical-records.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
+      "to": "src/application/support/local-runtime-composition.mjs"
+    },
+    {
+      "from": "src/application/sources/source-invalidation.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/sources/source-invalidation.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/sources/source-invalidation.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/sources/source-invalidation.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/application/sources/source-invalidation.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/application/support/local-runtime-composition.mjs",
+      "to": "src/application/graph/graph-capability.mjs"
+    },
+    {
+      "from": "src/application/support/local-runtime-composition.mjs",
+      "to": "src/application/graph/graph-service-bundle.mjs"
+    },
+    {
+      "from": "src/application/support/local-runtime-composition.mjs",
+      "to": "src/application/graph/graph-store.mjs"
+    },
+    {
+      "from": "src/application/support/local-runtime-composition.mjs",
+      "to": "src/application/sources/canonical-source-reader-service.mjs"
     },
     {
       "from": "src/cli.mjs",
-      "to": "src/adapters/heuristic-judge.mjs"
+      "to": "src/adapters/providers/heuristic-judge.mjs"
     },
     {
       "from": "src/cli.mjs",
@@ -2786,7 +3338,7 @@
     },
     {
       "from": "src/cli.mjs",
-      "to": "src/adapters/recorded-judge.mjs"
+      "to": "src/adapters/providers/recorded-judge.mjs"
     },
     {
       "from": "src/cli.mjs",
@@ -2805,140 +3357,12 @@
       "to": "src/core/replay.mjs"
     },
     {
-      "from": "src/core/agent-work-request.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/branch-scope.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/branch-scope.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/core/causal-ordering.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/causal-ordering.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/core/causal-ordering.mjs",
-      "to": "src/core/policy-artifacts.mjs"
-    },
-    {
-      "from": "src/core/context-profile.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/context-profile.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/core/context-profile.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/core/context-profile.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
       "from": "src/core/evaluation.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/core/event-provenance.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/core/git-provenance.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/core/git-provenance.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/core/incremental-graph.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/core/incremental-graph.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/core/incremental-graph.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/core/incremental-graph.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/core/judge-node.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/policy-artifacts.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/policy-artifacts.mjs",
-      "to": "src/core/policy.mjs"
-    },
-    {
-      "from": "src/core/policy-kernel.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/policy-kernel.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/core/policy-kernel.mjs",
-      "to": "src/core/observability-contract.mjs"
-    },
-    {
-      "from": "src/core/policy-kernel.mjs",
-      "to": "src/core/policy-artifacts.mjs"
-    },
-    {
-      "from": "src/core/policy-kernel.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
       "from": "src/core/policy.mjs",
       "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/query-ranking.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/query-ranking.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/core/query-ranking.mjs",
-      "to": "src/core/query-text.mjs"
-    },
-    {
-      "from": "src/core/query-ranking.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/core/query-text.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/reconciliation.mjs",
-      "to": "src/core/worker-protocol.mjs"
-    },
-    {
-      "from": "src/core/reconciliation.mjs",
-      "to": "src/core/working-graph.mjs"
     },
     {
       "from": "src/core/replay.mjs",
@@ -2953,44 +3377,172 @@
       "to": "src/core/policy.mjs"
     },
     {
-      "from": "src/core/service-access.mjs",
+      "from": "src/domain/context/context-profile.mjs",
       "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/causal-ordering.mjs"
+      "from": "src/domain/context/context-profile.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/event-provenance.mjs"
+      "from": "src/domain/context/context-profile.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/identity.mjs"
+      "from": "src/domain/context/context-profile.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/observability-contract.mjs"
+      "from": "src/domain/decisions/policy-artifacts.mjs",
+      "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/policy-artifacts.mjs"
+      "from": "src/domain/decisions/policy-artifacts.mjs",
+      "to": "src/core/policy.mjs"
     },
     {
-      "from": "src/core/worker-protocol.mjs",
-      "to": "src/core/working-graph.mjs"
+      "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/core/contracts.mjs"
     },
     {
-      "from": "src/core/working-graph.mjs",
-      "to": "src/core/causal-ordering.mjs"
+      "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/domain/decisions/observability-contract.mjs"
     },
     {
-      "from": "src/core/working-graph.mjs",
-      "to": "src/core/event-provenance.mjs"
+      "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/domain/decisions/policy-artifacts.mjs"
     },
     {
-      "from": "src/core/working-graph.mjs",
-      "to": "src/core/identity.mjs"
+      "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/domain/explorations/branch-scope.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/explorations/branch-scope.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/domain/graph/incremental-graph.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/domain/graph/incremental-graph.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/domain/graph/incremental-graph.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/domain/graph/incremental-graph.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/domain/graph/working-graph.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/domain/graph/working-graph.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/domain/graph/working-graph.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/domain/identity/service-access.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/judge/judge-node.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/query/query-ranking.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/query/query-ranking.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/domain/query/query-ranking.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/domain/query/query-ranking.mjs",
+      "to": "src/domain/query/query-text.mjs"
+    },
+    {
+      "from": "src/domain/query/query-text.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/sources/causal-ordering.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/sources/causal-ordering.mjs",
+      "to": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "from": "src/domain/sources/causal-ordering.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/domain/sources/event-provenance.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/domain/sources/git-provenance.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/domain/sources/git-provenance.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
+    },
+    {
+      "from": "src/domain/work/agent-work-request.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/domain/work/reconciliation.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/domain/work/reconciliation.mjs",
+      "to": "src/domain/work/worker-protocol.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/decisions/observability-contract.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/sources/causal-ordering.mjs"
+    },
+    {
+      "from": "src/domain/work/worker-protocol.mjs",
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -2998,7 +3550,15 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/adapters/git-provenance.mjs"
+      "to": "src/adapters/git/git-projects.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/adapters/git/git-provenance.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/adapters/git/git-worktree-sensor.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3007,6 +3567,10 @@
     {
       "from": "src/index.mjs",
       "to": "src/adapters/providers/openrouter-jev-judge.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/adapters/providers/provider-settings.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3031,6 +3595,22 @@
     {
       "from": "src/index.mjs",
       "to": "src/application/explorations/exploration-store.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/application/graph/graph-store.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/application/judge/judge-runtime.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/application/project/durable-ingress.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/application/project/project-activation.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3042,23 +3622,7 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/agent-work-request.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/branch-scope.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/canonical-records.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/context-profile.mjs"
+      "to": "src/application/sources/source-invalidation.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3070,51 +3634,7 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/git-provenance.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/git-worktree-observation.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/judge-node.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/observability-contract.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/policy-artifacts.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/policy-kernel.mjs"
-    },
-    {
-      "from": "src/index.mjs",
       "to": "src/core/policy.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/query-ranking.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/reconciliation.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3122,15 +3642,31 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/service-access.mjs"
+      "to": "src/domain/context/context-profile.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/worker-protocol.mjs"
+      "to": "src/domain/decisions/observability-contract.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/working-graph.mjs"
+      "to": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/domain/decisions/policy-kernel.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/domain/explorations/branch-scope.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/domain/graph/incremental-graph.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3138,587 +3674,51 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/durable-ingress.mjs"
+      "to": "src/domain/identity/identity.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/git-projects.mjs"
+      "to": "src/domain/identity/service-access.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/git-worktree-sensor.mjs"
+      "to": "src/domain/judge/judge-node.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/graph-store.mjs"
+      "to": "src/domain/query/query-ranking.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/judge-runtime.mjs"
+      "to": "src/domain/sources/canonical-records.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/project-activation.mjs"
+      "to": "src/domain/sources/causal-ordering.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/provider-settings.mjs"
+      "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/source-invalidation.mjs"
+      "to": "src/domain/sources/git-provenance.mjs"
     },
     {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/adapters/secrets/macos-secret-store.mjs"
+      "from": "src/index.mjs",
+      "to": "src/domain/sources/git-worktree-observation.mjs"
     },
     {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
+      "from": "src/index.mjs",
+      "to": "src/domain/work/agent-work-request.mjs"
     },
     {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/core/service-access.mjs"
+      "from": "src/index.mjs",
+      "to": "src/domain/work/reconciliation.mjs"
     },
     {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/cli.mjs",
-      "to": "src/local/service.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/durable-ingress.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/adapters/sqlite/graph-storage.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/application/graph/graph-capability.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/application/sources/canonical-source-reader-service.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/adapters/git/exploration-physical.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/git-projects.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/git-projects.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/git-projects.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/local/git-projects.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/adapters/git-worktree-observer.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/core/git-worktree-observation.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/core/identity.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/graph-inputs.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/application/context/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/application/context/context-read-service.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/application/graph/graph-capability.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-service-bundle.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/adapters/sqlite/graph-storage.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/application/context/context-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/application/context/context-reader.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/application/explorations/exploration-adoption.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/application/graph/graph-capability.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/application/graph/graph-selected.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/core/context-profile.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/exploration-canonical.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/graph-service-bundle.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/graph-store.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/core/judge-node.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/core/policy-artifacts.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-contract.mjs",
-      "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/adapters/sqlite/graph-storage.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/application/context/context-reader.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/application/context/context-store.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/application/explorations/exploration-store.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/context-profile.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/service-access.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/providers/jev-judge.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/providers/openrouter-jev-judge.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/adapters/providers/typesafe-jev-judge.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-provider.mjs",
-      "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/core/judge-node.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/judge-contract.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/judge-inputs.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/judge-provider.mjs"
-    },
-    {
-      "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/local-runtime-composition.mjs",
-      "to": "src/application/graph/graph-capability.mjs"
-    },
-    {
-      "from": "src/local/local-runtime-composition.mjs",
-      "to": "src/application/sources/canonical-source-reader-service.mjs"
-    },
-    {
-      "from": "src/local/local-runtime-composition.mjs",
-      "to": "src/local/graph-service-bundle.mjs"
-    },
-    {
-      "from": "src/local/local-runtime-composition.mjs",
-      "to": "src/local/graph-store.mjs"
-    },
-    {
-      "from": "src/local/project-activation.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/project-activation.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/project-activation.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/adapters/auth/local-credential-authority.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/app/local/http/authorize-local-request.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/core/service-access.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/local/app-session.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/local/app-setup.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/local/setup-http.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/core/causal-ordering.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/core/event-provenance.mjs"
-    },
-    {
-      "from": "src/local/source-invalidation.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "from": "src/index.mjs",
+      "to": "src/domain/work/worker-protocol.mjs"
     }
   ],
   "production_sccs": []

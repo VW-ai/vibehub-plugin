@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity } from '../src/core/identity.mjs';
+import { IDENTITY_CONTRACT_VERSION, identityKey, validateIdentityCatalog, resolveIdentity } from '../src/domain/identity/identity.mjs';
 
 const fixture = JSON.parse(readFileSync(new URL('./fixtures/identity/multi-source.json', import.meta.url), 'utf8'));
 const catalog = () => structuredClone(fixture);

@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { request } from 'node:http';
-import { startLocalRuntime } from '../src/local/service.mjs';
+import { startLocalRuntime } from '../src/app/local/service.mjs';
 
-const cli = fileURLToPath(new URL('../src/local/cli.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../src/app/local/cli.mjs', import.meta.url));
 function temporary(t) {
   const dir = mkdtempSync(join(tmpdir(), 'vh-local-test-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));

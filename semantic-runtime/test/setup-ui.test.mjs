@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { SetupClient, ROUTES, providerConfig, credentialLabel, errorMessage, mainMarkup } from '../src/local/setup-ui/app.mjs';
+import { SetupClient, ROUTES, providerConfig, credentialLabel, errorMessage, mainMarkup } from '../src/app/local/ui/app.mjs';
 
 const capabilities = { secure_store: 'macos-keychain', plugins: 'not_connected', workers: 'not_connected', models: 'unverified' };
 const entry = id => ({ project_id: id, name: `Project ${id}`, folder: `/synthetic/${id}`, state: 'ready', error: null });
@@ -186,7 +186,7 @@ test('a failed enrollment can be recovered from the saved Project list without a
 });
 
 test('setup assets are local, keyboard-accessible and contain no browser credential persistence or network dependencies', () => {
-  const base = new URL('../src/local/setup-ui/', import.meta.url), html = readFileSync(new URL('index.html', base), 'utf8');
+  const base = new URL('../src/app/local/ui/', import.meta.url), html = readFileSync(new URL('index.html', base), 'utf8');
   const js = readFileSync(new URL('app.mjs', base), 'utf8'), css = readFileSync(new URL('style.css', base), 'utf8');
   assert.match(html, /href="#main"/); assert.match(html, /<dialog[^>]*aria-labelledby="stop-title"/);
   assert.match(html, /src="\/setup\/app.mjs"/); assert.match(html, /href="\/setup\/style.css"/);

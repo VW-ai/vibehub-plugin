@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { QueryInputs } from './query-inputs.mjs';
 import { queryRequest, queryCopy, queryCheck, queryFailure, querySignal } from './query-contract.mjs';
-import { graphFields, graphHash, graphEqual, graphErrorCode } from '../../local/graph-inputs.mjs';
-import { LocalJudgeRuntime, assertJudgeRuntimeBinding } from '../../local/judge-runtime.mjs';
-import { matchContextTextV1 } from '../../core/query-text.mjs';
-import { rankContextWindowV1 } from '../../core/query-ranking.mjs';
+import { graphFields, graphHash, graphEqual, graphErrorCode } from '../graph/graph-inputs.mjs';
+import { LocalJudgeRuntime, assertJudgeRuntimeBinding } from '../judge/judge-runtime.mjs';
+import { matchContextTextV1 } from '../../domain/query/query-text.mjs';
+import { rankContextWindowV1 } from '../../domain/query/query-ranking.mjs';
 
 const evaluateContext = LocalJudgeRuntime.prototype.evaluateContext;
 const stop = signal => { if (signal?.aborted) throw queryFailure('query_cancelled'); };

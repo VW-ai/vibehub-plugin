@@ -1,4 +1,4 @@
-import { compilePolicyArtifact } from '../../../src/core/policy-artifacts.mjs';
+import { compilePolicyArtifact } from '../../../src/domain/decisions/policy-artifacts.mjs';
 import { fingerprint } from '../../../src/core/contracts.mjs';
 import { graph, event, assertion } from '../working-graph/scenario.mjs';
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from '../src/local/provider-settings.mjs';
+import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from '../src/adapters/providers/provider-settings.mjs';
 
 const selected = provider => ({ provider, model: PROVIDER_MODELS[provider], capability: JUDGE_CAPABILITY });
 const config = { primary: selected('typesafe'), fallbacks: [selected('vercel')], timeout_ms: 30_000, max_attempts: 2 };

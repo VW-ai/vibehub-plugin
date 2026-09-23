@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LocalContextStore } from '../src/application/context/context-store.mjs';
-import { ExplorationCanonical } from '../src/local/exploration-canonical.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { ExplorationCanonical } from '../src/application/explorations/exploration-canonical.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { judgeInputHash } from '../src/core/contracts.mjs';
 import { contextJudgeFixture, CONTEXT_JUDGE_ACTIONS, publish, canonicalRefs, gitCodeRef, contextRequest, rows } from './helpers/context-judge-fixture.mjs';
 import { records, digest } from './helpers/canonical-reader-fixture.mjs';

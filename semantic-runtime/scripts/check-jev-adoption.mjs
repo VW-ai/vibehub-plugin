@@ -1,7 +1,7 @@
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { LocalJudgeRuntime, ProviderSettings } from '../src/index.mjs';
-import { graphEqual } from '../src/local/graph-inputs.mjs';
+import { graphEqual } from '../src/application/graph/graph-inputs.mjs';
 import { fixture, adoption, ADOPTION_ACTIONS } from '../test/helpers/adoption-fixture.mjs';
 import { mutation, assertion, capture, SCOPE, rows } from '../test/helpers/exploration-fixture.mjs';
 import { JUDGE_ACTIONS } from '../test/helpers/judge-fixture.mjs';

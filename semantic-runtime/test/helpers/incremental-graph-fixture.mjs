@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { fingerprint, canonical } from '../../src/core/contracts.mjs';
-import { eventObservationKey, validateNormalizedEvent } from '../../src/core/event-provenance.mjs';
-import { validateIdentityCatalog } from '../../src/core/identity.mjs';
-import { validateGraphEffectPlan2 } from '../../src/core/incremental-graph.mjs';
+import { eventObservationKey, validateNormalizedEvent } from '../../src/domain/sources/event-provenance.mjs';
+import { validateIdentityCatalog } from '../../src/domain/identity/identity.mjs';
+import { validateGraphEffectPlan2 } from '../../src/domain/graph/incremental-graph.mjs';
 
 const hash = value => `sha256:${fingerprint(value)}`;
 const keyOf = (kind, key) => JSON.stringify(canonical([kind, key]));

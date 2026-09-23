@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { ExplorationInputs, EXPLORATION_NAMESPACE } from '../src/local/exploration-inputs.mjs';
-import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
-import { graphHash, graphErrorCode } from '../src/local/graph-inputs.mjs';
+import { ExplorationInputs, EXPLORATION_NAMESPACE } from '../src/application/explorations/exploration-inputs.mjs';
+import { composeLocalServices } from '../src/application/support/local-runtime-composition.mjs';
+import { graphHash, graphErrorCode } from '../src/application/graph/graph-inputs.mjs';
 import { fixture, adoption, ADOPTION_ACTIONS } from './helpers/adoption-fixture.mjs';
 import { bind, mutation, pin, rows } from './helpers/exploration-fixture.mjs';
 

@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { unlinkSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { CanonicalSourceReader } from '../src/application/sources/canonical-source-reader.mjs';
-import { GitProvenance } from '../src/adapters/git-provenance.mjs';
+import { GitProvenance } from '../src/adapters/git/git-provenance.mjs';
 import { readerFixture, records, writeRecords, makeReader, git, digest, READER_ACTIONS } from './helpers/canonical-reader-fixture.mjs';
-import { exactRevisionAddress } from '../src/core/working-graph.mjs';
+import { exactRevisionAddress } from '../src/domain/graph/working-graph.mjs';
 
 const code = (operation, expected) => assert.throws(operation, error => error.code === expected);
 const head = f => f.graph.getHead(f.context, { generation_id: f.request.expected_graph.generation_id }).graph_revision;

@@ -5,8 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { request } from 'node:http';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
-import { scopedReference, accessDiagnostic } from '../src/core/service-access.mjs';
-import { startLocalRuntime } from '../src/local/service.mjs';
+import { scopedReference, accessDiagnostic } from '../src/domain/identity/service-access.mjs';
+import { startLocalRuntime } from '../src/app/local/service.mjs';
 
 const scope = { tenant_id: 'tenant', project_id: 'project' };
 const grant = { principal_id: 'developer', kind: 'human', scope,

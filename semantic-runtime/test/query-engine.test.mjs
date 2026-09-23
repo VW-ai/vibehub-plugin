@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queryFixture, QUERY_ACTIONS, publish, rows, judgeTransport, judgeResponse } from './helpers/query-fixture.mjs';
 import { LocalQueryEngine } from '../src/application/query/query-engine.mjs';
-import { rankContextWindowV1 } from '../src/core/query-ranking.mjs';
+import { rankContextWindowV1 } from '../src/domain/query/query-ranking.mjs';
 
 const query = (f, extra = {}, engine = f.engine) => engine.query(f.context, f.queryRequest(extra));
 const scores = result => result.items.map(item => [item.key, item.rank.score]);

@@ -12,9 +12,9 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "start": "node src/local/cli.mjs",
-    "app": "node src/local/cli.mjs --setup",
-    "status": "node src/local/cli.mjs --status",
+    "start": "node src/app/local/cli.mjs",
+    "app": "node src/app/local/cli.mjs --setup",
+    "status": "node src/app/local/cli.mjs --status",
     "test": "node --test test/*.test.mjs",
     "test:host-probes": "node --test research/host-probes/codex/test/codex-host-probe.test.mjs research/host-probes/claude/test/claude-host-probe.test.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from '../src/local/source-invalidation.mjs';
+import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from '../src/application/sources/source-invalidation.mjs';
 import { fixture, register, capture, initialize, assertion, mutation, rows, hashText, SCOPE, ACTIONS } from './helpers/graph-store-fixture.mjs';
 
 const actions = [...ACTIONS, 'source:invalidate', 'source:invalidation:capture', 'source:invalidation:read', 'source:invalidation:consume'];

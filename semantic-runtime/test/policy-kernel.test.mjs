@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { executePolicyRun, createInMemoryPolicyTransactionPort, validatePolicyActionCommand } from '../src/core/policy-kernel.mjs';
-import { compilePolicyArtifact } from '../src/core/policy-artifacts.mjs';
+import { executePolicyRun, createInMemoryPolicyTransactionPort, validatePolicyActionCommand } from '../src/domain/decisions/policy-kernel.mjs';
+import { compilePolicyArtifact } from '../src/domain/decisions/policy-artifacts.mjs';
 import { fingerprint } from '../src/core/contracts.mjs';
-import { normalizeAuditEnvelope } from '../src/core/observability-contract.mjs';
+import { normalizeAuditEnvelope } from '../src/domain/decisions/observability-contract.mjs';
 import { kernelFixture } from './fixtures/policy-kernel/scenario.mjs';
 
 const clone = value => structuredClone(value);

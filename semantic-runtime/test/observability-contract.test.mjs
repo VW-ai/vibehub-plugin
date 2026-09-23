@@ -6,7 +6,7 @@ import {
   normalizeResourceBudgets, decideResourceAdmission, normalizeUsageObservation,
   AUDIT_SUBJECTS, AUDIT_STATUSES, AUDIT_REASON_CODES, TELEMETRY_LIMITS,
   ALPHA_WORKLOAD, ALPHA_SLO_TARGETS, DEFAULT_RESOURCE_BUDGETS, selectAlphaWorkloadEvent,
-} from '../src/core/observability-contract.mjs';
+} from '../src/domain/decisions/observability-contract.mjs';
 
 const fixture = JSON.parse(readFileSync(new URL('./fixtures/observability/audit.json', import.meta.url)));
 const rejected = JSON.parse(readFileSync(new URL('./fixtures/observability/rejected-fields.json', import.meta.url)));

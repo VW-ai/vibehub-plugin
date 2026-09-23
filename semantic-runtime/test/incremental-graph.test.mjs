@@ -5,8 +5,8 @@ import { performance } from 'node:perf_hooks';
 import { canonical } from '../src/core/contracts.mjs';
 import { graph, assertion, event, scope, catalog, watermarks } from './fixtures/working-graph/scenario.mjs';
 import { semanticAddress, canonicalArtifactAddress, graphRevisionAddress, applyGraphAssertion, resolveGraphConflict,
-  updateGraphSourceAccess, resolveWorkingGraphAddress } from '../src/core/working-graph.mjs';
-import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph } from '../src/core/incremental-graph.mjs';
+  updateGraphSourceAccess, resolveWorkingGraphAddress } from '../src/domain/graph/working-graph.mjs';
+import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph } from '../src/domain/graph/incremental-graph.mjs';
 import { IndexedGraphFixture } from './helpers/incremental-graph-fixture.mjs';
 
 const canonicalBytes = value => Buffer.from(JSON.stringify(canonical(value)));

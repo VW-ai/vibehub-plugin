@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CachedJudge } from '../src/adapters/cached-judge.mjs';
-import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
+import { CachedJudge } from '../src/adapters/providers/cached-judge.mjs';
+import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
 import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 import { replay } from '../src/core/replay.mjs';

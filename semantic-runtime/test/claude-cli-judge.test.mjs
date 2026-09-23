@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ClaudeCliJudge } from '../src/adapters/claude-cli-judge.mjs';
+import { ClaudeCliJudge } from '../src/adapters/providers/claude-cli-judge.mjs';
 import { validateDecision } from '../src/core/contracts.mjs';
 
 const event = {

@@ -6,10 +6,10 @@ import {
   RECONCILIATION_BUNDLE, RECONCILIATION_OUTPUT_SCHEMA, RECONCILIATION_CONFIG_SCHEMA,
   reconciliationPolicyConfig, createReconciliationInput, validateReconciliationProposal,
   encodeReconciliationProposal, validateReconciliationResult,
-} from '../src/core/reconciliation.mjs';
-import { validateWorkerAdmission, validateWorkerResult, transitionWorkerJob } from '../src/core/worker-protocol.mjs';
-import { graphRevisionAddress, updateGraphSourceAccess } from '../src/core/working-graph.mjs';
-import { compilePolicyArtifact } from '../src/core/policy-artifacts.mjs';
+} from '../src/domain/work/reconciliation.mjs';
+import { validateWorkerAdmission, validateWorkerResult, transitionWorkerJob } from '../src/domain/work/worker-protocol.mjs';
+import { graphRevisionAddress, updateGraphSourceAccess } from '../src/domain/graph/working-graph.mjs';
+import { compilePolicyArtifact } from '../src/domain/decisions/policy-artifacts.mjs';
 import { context, resign } from './fixtures/worker-protocol/scenario.mjs';
 import { assertion, apply, event } from './fixtures/working-graph/scenario.mjs';
 import { scenario, caseIds, recordedProposal, resultEnvelope } from './fixtures/reconciliation/scenario.mjs';

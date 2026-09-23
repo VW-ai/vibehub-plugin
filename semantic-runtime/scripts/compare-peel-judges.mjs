@@ -1,10 +1,10 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CachedJudge } from '../src/adapters/cached-judge.mjs';
-import { ClaudeCliJudge } from '../src/adapters/claude-cli-judge.mjs';
-import { HaikuJudge } from '../src/adapters/haiku-judge.mjs';
-import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
+import { CachedJudge } from '../src/adapters/providers/cached-judge.mjs';
+import { ClaudeCliJudge } from '../src/adapters/providers/claude-cli-judge.mjs';
+import { HaikuJudge } from '../src/adapters/providers/haiku-judge.mjs';
+import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
 import { canonical, fingerprint, requireValue } from '../src/core/contracts.mjs';
 import { compareRuns } from '../src/core/evaluation.mjs';

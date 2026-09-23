@@ -1,5 +1,5 @@
-import { graphInput } from '../../local/graph-inputs.mjs';
-import { composeLocalServices } from '../../local/local-runtime-composition.mjs';
+import { graphInput } from '../graph/graph-inputs.mjs';
+import { composeLocalServices } from '../support/local-runtime-composition.mjs';
 
 /** Typed Context lifecycle over the existing exploration-owned Graph transaction. */
 export class LocalContextStore {

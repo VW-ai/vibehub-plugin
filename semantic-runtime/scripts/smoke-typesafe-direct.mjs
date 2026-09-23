@@ -1,5 +1,5 @@
 import { validateDecision } from '../src/core/contracts.mjs';
-import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
+import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 import { TypeSafeJevJudge } from '../src/adapters/providers/typesafe-jev-judge.mjs';
 
 if (!process.env.TYPESAFE_API_KEY) throw new Error('TYPESAFE_API_KEY is required');

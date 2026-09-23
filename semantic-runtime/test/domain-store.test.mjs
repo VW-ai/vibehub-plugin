@@ -9,7 +9,7 @@ import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { DomainStore, planDomainStore, migrateDomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
-import { scopedReference } from '../src/core/service-access.mjs';
+import { scopedReference } from '../src/domain/identity/service-access.mjs';
 
 const ns = 'git-enrollment';
 function identity(auth, tenant = 'tenant', project = 'project', options = {}) {
@@ -206,7 +206,7 @@ test('disposable projection corruption/drop can be rebuilt without changing sour
 
 const domainUrl = pathToFileURL(new URL('../src/adapters/sqlite/domain-store.mjs', import.meta.url).pathname).href;
 const authUrl = new URL('../src/adapters/auth/local-credential-authority.mjs', import.meta.url).href;
-const accessUrl = new URL('../src/core/service-access.mjs', import.meta.url).href;
+const accessUrl = new URL('../src/domain/identity/service-access.mjs', import.meta.url).href;
 function childProgram(filePath, body) {
   return `import {DomainStore} from ${JSON.stringify(domainUrl)};import {LocalCredentialAuthority,LOCAL_AUDIENCE} from ${JSON.stringify(authUrl)};import {scopedReference} from ${JSON.stringify(accessUrl)};
   const authority=new LocalCredentialAuthority(),scope={tenant_id:'tenant',project_id:'project'};const issued=authority.issue({principal_id:'child',kind:'service',scope,actions:['store:read','store:write']});

@@ -5,7 +5,7 @@ import {
   EVENT_CONTRACT_VERSION, EVENT_TYPES, validateRawEvent, validateNormalizedEvent,
   normalizeRawEvent, sourceObjectKey, eventObservationKey, eventIdempotencyKey,
   effectiveEventAccess, verifyEventPayload,
-} from '../src/core/event-provenance.mjs';
+} from '../src/domain/sources/event-provenance.mjs';
 
 const fixture = name => JSON.parse(readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8'));
 const fresh = () => fixture('event-provenance/git-observation.json');

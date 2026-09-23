@@ -6,9 +6,9 @@ import {
   createSourceCursor, validateSourceCursor, acceptSourceEvent, completeSourceEvent, projectFreshness,
   validateFreshnessVector, classifyGitRefMovement, validateGraphGenerationPin,
   createReplayManifest, validateReplayManifest, assertReplayEffect, createReplayState, applyReplayEffect,
-} from '../src/core/causal-ordering.mjs';
-import { normalizeRawEvent } from '../src/core/event-provenance.mjs';
-import { compilePolicyArtifact } from '../src/core/policy-artifacts.mjs';
+} from '../src/domain/sources/causal-ordering.mjs';
+import { normalizeRawEvent } from '../src/domain/sources/event-provenance.mjs';
+import { compilePolicyArtifact } from '../src/domain/decisions/policy-artifacts.mjs';
 
 const fixture = name => JSON.parse(readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8'));
 const clone = value => structuredClone(value);

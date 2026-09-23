@@ -7,11 +7,11 @@ import { join } from 'node:path';
 import { GraphStorage, WORKING_GRAPH_NAMESPACE as NS, checkGraphFormat } from '../src/adapters/sqlite/graph-storage.mjs';
 import { DomainStore, migrateDomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
-import { scopedReference } from '../src/core/service-access.mjs';
+import { scopedReference } from '../src/domain/identity/service-access.mjs';
 import { fingerprint } from '../src/core/contracts.mjs';
-import { eventObservationKey } from '../src/core/event-provenance.mjs';
-import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph } from '../src/core/incremental-graph.mjs';
-import { semanticAddress, exactRevisionAddress } from '../src/core/working-graph.mjs';
+import { eventObservationKey } from '../src/domain/sources/event-provenance.mjs';
+import { planGraphGenesis, planGraphMutation, resolveIncrementalGraph, pageIncrementalGraph } from '../src/domain/graph/incremental-graph.mjs';
+import { semanticAddress, exactRevisionAddress } from '../src/domain/graph/working-graph.mjs';
 import { catalog, scope, watermarks, event, assertion } from './fixtures/working-graph/scenario.mjs';
 
 const generation_id = 'live-1', hash = v => `sha256:${fingerprint(v)}`;

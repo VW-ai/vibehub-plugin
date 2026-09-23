@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIENCE, scopedReference,
   GitProjectRegistry, ProjectActivation, DurableIngress } from '../../src/index.mjs';
-import { LocalGraphStore } from '../../src/local/graph-store.mjs';
+import { LocalGraphStore } from '../../src/application/graph/graph-store.mjs';
 
 export const SCOPE = { tenant_id: 'synthetic', project_id: 'graph-store' };
 export const NS = 'working-graph';

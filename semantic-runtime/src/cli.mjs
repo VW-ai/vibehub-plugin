@@ -5,9 +5,9 @@ import { fileURLToPath } from 'node:url';
 import { replay } from './core/replay.mjs';
 import { compareRuns } from './core/evaluation.mjs';
 import { requireValue } from './core/contracts.mjs';
-import { HeuristicJudge } from './adapters/heuristic-judge.mjs';
+import { HeuristicJudge } from './adapters/providers/heuristic-judge.mjs';
 import { JevJudge } from './adapters/providers/jev-judge.mjs';
-import { RecordedJudge } from './adapters/recorded-judge.mjs';
+import { RecordedJudge } from './adapters/providers/recorded-judge.mjs';
 import { SqliteCandidateStore } from './adapters/sqlite-store.mjs';
 
 const HELP = `Semantic Runtime — offline Phase 0 prototype

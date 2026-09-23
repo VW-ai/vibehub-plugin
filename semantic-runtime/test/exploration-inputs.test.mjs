@@ -7,10 +7,10 @@ import { execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { DomainStore, migrateDomainStore } from '../src/adapters/sqlite/domain-store.mjs';
 import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
-import { scopedReference } from '../src/core/service-access.mjs';
-import { GitProjectRegistry } from '../src/local/git-projects.mjs';
-import { ExplorationInputs, EXPLORATION_NAMESPACE, readExplorationOwner } from '../src/local/exploration-inputs.mjs';
-import { GraphInputs, graphHash, graphErrorCode } from '../src/local/graph-inputs.mjs';
+import { scopedReference } from '../src/domain/identity/service-access.mjs';
+import { GitProjectRegistry } from '../src/adapters/git/git-projects.mjs';
+import { ExplorationInputs, EXPLORATION_NAMESPACE, readExplorationOwner } from '../src/application/explorations/exploration-inputs.mjs';
+import { GraphInputs, graphHash, graphErrorCode } from '../src/application/graph/graph-inputs.mjs';
 
 const scope = { tenant_id: 'synthetic', project_id: 'exploration-metadata' }, NS = EXPLORATION_NAMESPACE;
 const actions = ['store:read','store:write','graph:read','graph:write','graph:publish','ingress:read','source:invalidation:read','exploration:read','exploration:write','project:inspect','project:enroll'];

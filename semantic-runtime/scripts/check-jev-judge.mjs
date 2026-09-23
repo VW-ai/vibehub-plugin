@@ -2,7 +2,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { LocalJudgeRuntime, ProviderSettings, DurableIngress } from '../src/index.mjs';
-import { graphHash, graphEqual } from '../src/local/graph-inputs.mjs';
+import { graphHash, graphEqual } from '../src/application/graph/graph-inputs.mjs';
 import { cases } from './check-jev-synthetic.mjs';
 import { fixture, bind, executionFor, git, SCOPE, register, mutation, assertion, rows } from '../test/helpers/exploration-fixture.mjs';
 import { JUDGE_ACTIONS } from '../test/helpers/judge-fixture.mjs';

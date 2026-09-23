@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CANONICAL_RECORD_PROFILE, parseCanonicalRecord,
-  evaluateCanonicalRecords } from '../src/core/canonical-records.mjs';
+  evaluateCanonicalRecords } from '../src/domain/sources/canonical-records.mjs';
 
 const WORKS_IDENTITY = 'sha256:008835b1bf673139d7651cd6539973c892915a4beb98663e3f6e234a790e0aed';
 const WORKS_V2_IDENTITY = 'sha256:709165d9accd2779bf6c216d738a3223e33c8ee845fd18ed2db0f0773af96990';

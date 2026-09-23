@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
-import { GitProvenance, GIT_SELECTED_READ_LIMITS as L } from '../src/adapters/git-provenance.mjs';
+import { GitProvenance, GIT_SELECTED_READ_LIMITS as L } from '../src/adapters/git/git-provenance.mjs';
 import { temporaryGitRepository, historyFixture } from './fixtures/git-provenance/repository.mjs';
 
 const digest = b => `sha256:${createHash('sha256').update(b).digest('hex')}`;
@@ -182,7 +182,7 @@ test('injected cumulative Git-I/O clock exhaustion denies even the final complet
     const original = cp.execFileSync, options = []; let elapsed = 0;
     cp.execFileSync = (...args) => { options.push({timeout:args[2].timeout,killSignal:args[2].killSignal}); return original(...args); };
     syncBuiltinESMExports(); Object.defineProperty(performance, 'now', {value:() => (elapsed += 6001)});
-    const { GitProvenance } = await import(${JSON.stringify(new URL('../src/adapters/git-provenance.mjs', import.meta.url).href)});
+    const { GitProvenance } = await import(${JSON.stringify(new URL('../src/adapters/git/git-provenance.mjs', import.meta.url).href)});
     const api = new GitProvenance(${JSON.stringify({ repository_path: f.repository_path, repository: repository('sha1'), object_directory: realpathSync(join(f.repository_path, '.git', 'objects')) })});
     const result = api.readFileAtCommit({commit_oid:${JSON.stringify(oid)},path:'record.json'});
     assert.equal(result.reason, 'limit_exceeded'); assert.equal(result.bytes, null); assert.equal(api.metrics().commands, 5);

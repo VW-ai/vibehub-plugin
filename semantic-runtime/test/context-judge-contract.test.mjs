@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compilePolicyArtifact } from '../src/core/policy-artifacts.mjs';
-import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION } from '../src/core/judge-node.mjs';
-import { judgeConfiguration } from '../src/local/judge-contract.mjs';
+import { compilePolicyArtifact } from '../src/domain/decisions/policy-artifacts.mjs';
+import { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION } from '../src/domain/judge/judge-node.mjs';
+import { judgeConfiguration } from '../src/application/judge/judge-contract.mjs';
 import { runtimeFixture, judgeArtifact, judgeTransport } from './helpers/judge-runtime-fixture.mjs';
 import { rows } from './helpers/exploration-fixture.mjs';
 

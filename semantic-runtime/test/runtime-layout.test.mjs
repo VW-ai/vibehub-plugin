@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { checkRuntimeLayout, inspectRuntimeLayout } from '../scripts/runtime-layout.mjs';
 
+const compareEdges = (left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to);
+
 function copyComponent(t) {
   const root = mkdtempSync(join(tmpdir(), 'semantic-layout-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
@@ -431,9 +433,9 @@ test('layout inspection captures public surface, command modes, constants and an
   assert.equal(current.standalone_copy_paths.includes('index.ts'), false);
   assert.deepEqual(current.production_sccs, []);
   assert.ok(current.production_import_edges.some(edge =>
-    edge.from === 'src/local/cli.mjs' && edge.to === 'src/local/service.mjs'));
+    edge.from === 'src/app/local/cli.mjs' && edge.to === 'src/app/local/service.mjs'));
   assert.ok(current.production_import_edges.some(edge =>
-    edge.from === 'src/local/service.mjs' && edge.to === 'src/local/app-setup.mjs'));
+    edge.from === 'src/app/local/service.mjs' && edge.to === 'src/app/local/app-setup.mjs'));
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.to.startsWith('src/application/query/') && !edge.from.startsWith('src/application/query/')),
   [{ from: 'src/index.mjs', to: 'src/application/query/query-engine.mjs' }]);
@@ -442,9 +444,9 @@ test('layout inspection captures public surface, command modes, constants and an
     { from: 'src/application/context/context-read-service.mjs', to: 'src/application/context/context-reader.mjs' },
     { from: 'src/application/query/query-contract.mjs', to: 'src/application/context/context-reader.mjs' },
     { from: 'src/application/query/query-inputs.mjs', to: 'src/application/context/context-reader.mjs' },
-    { from: 'src/local/graph-store.mjs', to: 'src/application/context/context-reader.mjs' },
-    { from: 'src/local/judge-inputs.mjs', to: 'src/application/context/context-reader.mjs' },
-  ]);
+    { from: 'src/application/graph/graph-store.mjs', to: 'src/application/context/context-reader.mjs' },
+    { from: 'src/application/judge/judge-inputs.mjs', to: 'src/application/context/context-reader.mjs' },
+  ].sort(compareEdges));
   assert.equal(current.production_import_edges.filter(edge =>
     edge.from === 'src/application/context/context-reader.mjs').length, 8);
   const contextWriteNodes = new Set([
@@ -453,44 +455,44 @@ test('layout inspection captures public surface, command modes, constants and an
   ]);
   assert.deepEqual(current.production_import_edges.filter(edge =>
     contextWriteNodes.has(edge.from) || contextWriteNodes.has(edge.to)), [
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/context-profile.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/context/context-profile.mjs' },
     { from: 'src/application/context/context-inputs.mjs', to: 'src/core/contracts.mjs' },
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/event-provenance.mjs' },
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/core/working-graph.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/sources/event-provenance.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/graph/working-graph.mjs' },
     { from: 'src/application/context/context-inputs.mjs', to: 'src/domain/identity/access-authority.mjs' },
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/local/exploration-canonical.mjs' },
-    { from: 'src/application/context/context-inputs.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/application/explorations/exploration-canonical.mjs' },
+    { from: 'src/application/context/context-inputs.mjs', to: 'src/application/graph/graph-inputs.mjs' },
     { from: 'src/application/context/context-read-service.mjs', to: 'src/application/context/context-inputs.mjs' },
-    { from: 'src/application/context/context-store.mjs', to: 'src/local/graph-inputs.mjs' },
-    { from: 'src/application/context/context-store.mjs', to: 'src/local/local-runtime-composition.mjs' },
+    { from: 'src/application/context/context-store.mjs', to: 'src/application/graph/graph-inputs.mjs' },
+    { from: 'src/application/context/context-store.mjs', to: 'src/application/support/local-runtime-composition.mjs' },
     { from: 'src/index.mjs', to: 'src/application/context/context-store.mjs' },
-    { from: 'src/local/graph-service-bundle.mjs', to: 'src/application/context/context-inputs.mjs' },
-    { from: 'src/local/graph-store.mjs', to: 'src/application/context/context-inputs.mjs' },
-    { from: 'src/local/judge-inputs.mjs', to: 'src/application/context/context-store.mjs' },
-  ]);
+    { from: 'src/application/graph/graph-service-bundle.mjs', to: 'src/application/context/context-inputs.mjs' },
+    { from: 'src/application/graph/graph-store.mjs', to: 'src/application/context/context-inputs.mjs' },
+    { from: 'src/application/judge/judge-inputs.mjs', to: 'src/application/context/context-store.mjs' },
+  ].sort(compareEdges));
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.from === 'src/application/explorations/exploration-store.mjs'
       || edge.to === 'src/application/explorations/exploration-store.mjs'), [
-    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/exploration-inputs.mjs' },
-    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/graph-inputs.mjs' },
-    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/local-runtime-composition.mjs' },
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/application/explorations/exploration-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/application/graph/graph-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/application/support/local-runtime-composition.mjs' },
     { from: 'src/index.mjs', to: 'src/application/explorations/exploration-store.mjs' },
-    { from: 'src/local/judge-inputs.mjs', to: 'src/application/explorations/exploration-store.mjs' },
-  ]);
+    { from: 'src/application/judge/judge-inputs.mjs', to: 'src/application/explorations/exploration-store.mjs' },
+  ].sort(compareEdges));
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.from === 'src/application/explorations/exploration-adoption.mjs'
       || edge.to === 'src/application/explorations/exploration-adoption.mjs'), [
     { from: 'src/application/context/context-reader.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/adapters/sqlite/graph-storage.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/causal-ordering.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/sources/causal-ordering.mjs' },
     { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/contracts.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/event-provenance.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/core/working-graph.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/local/exploration-inputs.mjs' },
-    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/sources/event-provenance.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/domain/graph/working-graph.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/application/explorations/exploration-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-adoption.mjs', to: 'src/application/graph/graph-inputs.mjs' },
     { from: 'src/application/query/query-inputs.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
-    { from: 'src/local/graph-store.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
-  ]);
+    { from: 'src/application/graph/graph-store.mjs', to: 'src/application/explorations/exploration-adoption.mjs' },
+  ].sort(compareEdges));
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
 

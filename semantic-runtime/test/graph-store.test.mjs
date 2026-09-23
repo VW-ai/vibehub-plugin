@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { fixture, register, capture, initialize, assertion, mutation, rows, git, SCOPE, ACTIONS, NS } from './helpers/graph-store-fixture.mjs';
-import { semanticAddress, createWorkingGraph, applyGraphAssertion, graphRevisionAddress } from '../src/core/working-graph.mjs';
+import { semanticAddress, createWorkingGraph, applyGraphAssertion, graphRevisionAddress } from '../src/domain/graph/working-graph.mjs';
 
 const logical = (entity_id = 'context-a', generation_id = 'generation-1') => semanticAddress({ scope: SCOPE, generation_id, entity_kind: 'entity', entity_id });
 const head = f => f.graph.getHead(f.context, { generation_id: 'generation-1' }).graph_revision;

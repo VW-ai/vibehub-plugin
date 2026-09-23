@@ -1,4 +1,4 @@
-import { composeCanonicalReader } from '../../local/local-runtime-composition.mjs';
+import { composeCanonicalReader } from '../support/local-runtime-composition.mjs';
 
 const invalid = () => Object.assign(new Error('Canonical reader: invalid_canonical_reader_input'), {
   code: 'invalid_canonical_reader_input',

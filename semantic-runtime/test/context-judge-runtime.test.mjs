@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { executeContextJudgeNode } from '../src/local/judge-runtime.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { executeContextJudgeNode } from '../src/application/judge/judge-runtime.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { contextJudgeFixture, judgeTransport, judgeResponse, judgeJSON, publish, rows, adoption, capture,
   contextRequest, canonicalRefs, gitCodeRef, CONTEXT_JUDGE_ACTIONS } from './helpers/context-judge-fixture.mjs';
 

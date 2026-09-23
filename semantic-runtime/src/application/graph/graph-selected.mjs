@@ -1,5 +1,5 @@
-import { graphAssert, graphKey, graphHash, graphEqual, graphErrorCode } from '../../local/graph-inputs.mjs';
-import { eventObservationKey, sourceObjectKey } from '../../core/event-provenance.mjs';
+import { graphAssert, graphKey, graphHash, graphEqual, graphErrorCode } from './graph-inputs.mjs';
+import { eventObservationKey, sourceObjectKey } from '../../domain/sources/event-provenance.mjs';
 
 const scopeOf = g => ({ tenant_id: g.tenant_id, project_id: g.project_id });
 

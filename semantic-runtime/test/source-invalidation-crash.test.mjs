@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { fixture, register, capture, hashText, SCOPE, ACTIONS } from './helpers/graph-store-fixture.mjs';
-import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from '../src/local/source-invalidation.mjs';
+import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from '../src/application/sources/source-invalidation.mjs';
 
 const actions = [...ACTIONS, 'source:invalidation:capture', 'source:invalidation:read', 'source:invalidation:consume'];
 function setup(t) {

@@ -5,9 +5,9 @@ import { mkdtempSync, mkdirSync, realpathSync, rmSync, writeFileSync, readFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { LocalAppSetup, setupProviderKey } from '../src/local/app-setup.mjs';
+import { LocalAppSetup, setupProviderKey } from '../src/app/local/app-setup.mjs';
 import { LocalCredentialAuthority } from '../src/adapters/auth/local-credential-authority.mjs';
-import { PROVIDER_MODELS } from '../src/local/provider-settings.mjs';
+import { PROVIDER_MODELS } from '../src/adapters/providers/provider-settings.mjs';
 import { MacOSSecretStore } from '../src/adapters/secrets/macos-secret-store.mjs';
 
 function git(folder, ...args) {

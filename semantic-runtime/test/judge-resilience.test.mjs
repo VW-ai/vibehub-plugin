@@ -3,8 +3,8 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { CachedJudge } from '../src/adapters/cached-judge.mjs';
-import { ResilientJudge } from '../src/adapters/resilient-judge.mjs';
+import { CachedJudge } from '../src/adapters/providers/cached-judge.mjs';
+import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
 
 const input = {
   event: { type: 'USER_INTENT', timestamp: '2026-09-20T00:00:00.000Z', payload: { text: 'Keep this decision.' } },

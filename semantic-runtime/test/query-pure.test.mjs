@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { matchContextTextV1 } from '../src/core/query-text.mjs';
-import { rankContextWindowV1 } from '../src/core/query-ranking.mjs';
+import { matchContextTextV1 } from '../src/domain/query/query-text.mjs';
+import { rankContextWindowV1 } from '../src/domain/query/query-ranking.mjs';
 import { queryFixture, publish } from './helpers/query-fixture.mjs';
 
 test('positional full-text search distinguishes terms, phrases, field boundaries and Unicode normalization', () => {

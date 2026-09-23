@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { DomainStore, DurableIngress } from '../src/index.mjs';
 import { SourceInvalidationDomain, SourceInvalidationFeed,
-  sourceLifecycleInvalidationId } from '../src/local/source-invalidation.mjs';
+  sourceLifecycleInvalidationId } from '../src/application/sources/source-invalidation.mjs';
 import { fixture, register, capture, hashText, SCOPE, ACTIONS } from './helpers/graph-store-fixture.mjs';
 
 const actions = [...ACTIONS, 'ingress:handoff', 'source:invalidate', 'source:invalidation:capture',

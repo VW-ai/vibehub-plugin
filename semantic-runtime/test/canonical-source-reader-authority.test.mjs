@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { SourceInvalidationFeed } from '../src/local/source-invalidation.mjs';
+import { SourceInvalidationFeed } from '../src/application/sources/source-invalidation.mjs';
 import { fixture, register, capture, initialize, assertion, mutation, rows, hashText, SCOPE, ACTIONS, git } from './helpers/graph-store-fixture.mjs';
 
 const actions = [...ACTIONS, 'source:invalidate', 'source:invalidation:capture', 'source:invalidation:read'];

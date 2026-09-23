@@ -1,9 +1,9 @@
 import { types } from 'node:util';
-import { graphInput, graphFields, graphId, graphEqual, graphHash, graphErrorCode } from '../../local/graph-inputs.mjs';
-import { validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
-import { validateSemanticAddress } from '../../core/working-graph.mjs';
-import { validateFreshnessVector } from '../../core/causal-ordering.mjs';
-import { validateExplorationPin } from '../../local/exploration-inputs.mjs';
+import { graphInput, graphFields, graphId, graphEqual, graphHash, graphErrorCode } from '../graph/graph-inputs.mjs';
+import { validateGraphCommitAddress2 } from '../../domain/graph/incremental-graph.mjs';
+import { validateSemanticAddress } from '../../domain/graph/working-graph.mjs';
+import { validateFreshnessVector } from '../../domain/sources/causal-ordering.mjs';
+import { validateExplorationPin } from '../explorations/exploration-inputs.mjs';
 import { validateContextReadRequest } from '../context/context-reader.mjs';
 
 export const queryFailure = code => Object.assign(new Error(`Local Query: ${code}`), { code });

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { executeJudgeNode } from '../src/local/judge-runtime.mjs';
-import { graphHash } from '../src/local/graph-inputs.mjs';
+import { executeJudgeNode } from '../src/application/judge/judge-runtime.mjs';
+import { graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { runtimeFixture, judgeTransport, judgeResponse, judgeJSON, judgeRoute } from './helpers/judge-runtime-fixture.mjs';
 import { JUDGE_ACTIONS } from './helpers/judge-fixture.mjs';
 import { bind, rows, git } from './helpers/exploration-fixture.mjs';

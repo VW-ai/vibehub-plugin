@@ -1,5 +1,5 @@
 import { fixture, ACTIONS, SCOPE, bind, mutation, register, capture, assertion, pin } from './exploration-fixture.mjs';
-import { JudgeInputs } from '../../src/local/judge-inputs.mjs';
+import { JudgeInputs } from '../../src/application/judge/judge-inputs.mjs';
 
 export const JUDGE_ACTIONS = [...ACTIONS, 'judge:execute', 'judge:read', 'source:read', 'model:dispatch'];
 export const question = (family = 'context_relevance') => ({ family, text: 'Is the selected event relevant to this exact candidate?' });

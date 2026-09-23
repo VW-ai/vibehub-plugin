@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { fixture, adoption, ADOPTION_ACTIONS } from './helpers/adoption-fixture.mjs';
 import { mutation, assertion, rows, resolve, capture, register, bind, SCOPE } from './helpers/exploration-fixture.mjs';
-import { GraphInputs, graphKey, graphHash } from '../src/local/graph-inputs.mjs';
+import { GraphInputs, graphKey, graphHash } from '../src/application/graph/graph-inputs.mjs';
 import { GraphStorage } from '../src/adapters/sqlite/graph-storage.mjs';
 import { materializeExplorationAdoption } from '../src/application/explorations/exploration-adoption.mjs';
-import { ExplorationInputs } from '../src/local/exploration-inputs.mjs';
-import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
-import { canonicalArtifactAddress } from '../src/core/working-graph.mjs';
-import { sourceLifecycleInvalidationId } from '../src/local/source-invalidation.mjs';
+import { ExplorationInputs } from '../src/application/explorations/exploration-inputs.mjs';
+import { composeLocalServices } from '../src/application/support/local-runtime-composition.mjs';
+import { canonicalArtifactAddress } from '../src/domain/graph/working-graph.mjs';
+import { sourceLifecycleInvalidationId } from '../src/application/sources/source-invalidation.mjs';
 
 function selected(f, request) {
   return { source: f.graph.resolve(f.context, { at: request.source.at, address: request.source.address }),

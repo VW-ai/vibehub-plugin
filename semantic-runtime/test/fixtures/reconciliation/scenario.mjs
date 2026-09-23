@@ -2,9 +2,9 @@
 import { readFileSync } from 'node:fs';
 import { scenario as workerScenario, running, result as workerResult, resign } from '../worker-protocol/scenario.mjs';
 import { graph, assertion, apply, event } from '../working-graph/scenario.mjs';
-import { graphRevisionAddress } from '../../../src/core/working-graph.mjs';
-import { compilePolicyArtifact } from '../../../src/core/policy-artifacts.mjs';
-import { RECONCILIATION_CONFIG_SCHEMA, reconciliationPolicyConfig, createReconciliationInput, encodeReconciliationProposal } from '../../../src/core/reconciliation.mjs';
+import { graphRevisionAddress } from '../../../src/domain/graph/working-graph.mjs';
+import { compilePolicyArtifact } from '../../../src/domain/decisions/policy-artifacts.mjs';
+import { RECONCILIATION_CONFIG_SCHEMA, reconciliationPolicyConfig, createReconciliationInput, encodeReconciliationProposal } from '../../../src/domain/work/reconciliation.mjs';
 const clone = v => structuredClone(v);
 const corpus = JSON.parse(readFileSync(new URL('./cases.json', import.meta.url), 'utf8'));
 export const caseIds = Object.freeze(corpus.cases.map(c => c.id));

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { fixture, bind, bindRequest, mutation, resolve, executionFor, git, rows, rejected, assertion, SCOPE } from './helpers/exploration-fixture.mjs';
-import { semanticAddress } from '../src/core/working-graph.mjs';
+import { semanticAddress } from '../src/domain/graph/working-graph.mjs';
 
 test('same-theme alternatives in real external worktrees have separate owned generations and exact origins', t => {
   const f = fixture(t), outside = join(f.root, 'outside-selected-folder');

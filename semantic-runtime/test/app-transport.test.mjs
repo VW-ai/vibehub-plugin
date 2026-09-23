@@ -7,9 +7,9 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { Readable } from 'node:stream';
 import { EventEmitter } from 'node:events';
-import { AppSessions } from '../src/local/app-session.mjs';
-import { createSetupHandler } from '../src/local/setup-http.mjs';
-import { startLocalRuntime } from '../src/local/service.mjs';
+import { AppSessions } from '../src/app/local/app-session.mjs';
+import { createSetupHandler } from '../src/app/local/setup-http.mjs';
+import { startLocalRuntime } from '../src/app/local/service.mjs';
 
 const cookie = response => response.headers['set-cookie']?.[0].split(';')[0];
 function call(url, { method = 'GET', headers = {}, value, raw } = {}) {
@@ -217,7 +217,7 @@ test('setup integrates real controller readiness and typed authenticated actions
 
 test('noninteractive setup CLI visibly refuses pairing and ignores approval text on stdin', { timeout: 15000 }, async t => {
   const dir = mkdtempSync(join(tmpdir(), 'vh-setup-cli-'));
-  const child = spawn(process.execPath, [new URL('../src/local/cli.mjs', import.meta.url).pathname, '--setup', '--port', '0', '--data-dir', dir], { stdio: ['pipe', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, [new URL('../src/app/local/cli.mjs', import.meta.url).pathname, '--setup', '--port', '0', '--data-dir', dir], { stdio: ['pipe', 'pipe', 'pipe'] });
   let output = '', errors = '';
   child.stdout.on('data', chunk => { output += chunk; }); child.stderr.on('data', chunk => { errors += chunk; });
   const done = new Promise(resolve => child.on('close', (code, signal) => resolve({ code, signal })));
@@ -232,5 +232,5 @@ test('noninteractive setup CLI visibly refuses pairing and ignores approval text
   child.kill('SIGTERM'); assert.equal((await done).code, 0); assert.match(output, /Saved data retained/);
   assert(!errors.includes('credential'));
   const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
-  assert.equal(scripts.app, 'node src/local/cli.mjs --setup');
+  assert.equal(scripts.app, 'node src/app/local/cli.mjs --setup');
 });

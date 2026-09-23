@@ -1,9 +1,9 @@
 import { join } from 'node:path';
 import { fingerprint } from '../../src/core/contracts.mjs';
-import { compilePolicyArtifact } from '../../src/core/policy-artifacts.mjs';
-import { JUDGE_NODE_OPERATION } from '../../src/core/judge-node.mjs';
-import { LocalJudgeRuntime } from '../../src/local/judge-runtime.mjs';
-import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY } from '../../src/local/provider-settings.mjs';
+import { compilePolicyArtifact } from '../../src/domain/decisions/policy-artifacts.mjs';
+import { JUDGE_NODE_OPERATION } from '../../src/domain/judge/judge-node.mjs';
+import { LocalJudgeRuntime } from '../../src/application/judge/judge-runtime.mjs';
+import { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY } from '../../src/adapters/providers/provider-settings.mjs';
 import { judgeFixture } from './judge-fixture.mjs';
 
 export const judgeRoute = provider => ({ provider, model: PROVIDER_MODELS[provider], capability: JUDGE_CAPABILITY });

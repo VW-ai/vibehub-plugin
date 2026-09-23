@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { FAMILIES, normalizeEvent, normalizeState, visibleState } from '../src/core/contracts.mjs';
-import { HeuristicJudge } from '../src/adapters/heuristic-judge.mjs';
+import { HeuristicJudge } from '../src/adapters/providers/heuristic-judge.mjs';
 import { replay } from '../src/core/replay.mjs';
 import { PacedJudge, verifyBenchmarkReport } from '../scripts/benchmark-peel-jev.mjs';
 import { codexTurnIdentity, resolveProvenanceEntry } from '../scripts/verify-peel-provenance.mjs';

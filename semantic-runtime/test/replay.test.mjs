@@ -5,8 +5,8 @@ import { replay } from '../src/core/replay.mjs';
 import { normalizeEvent, normalizeState, judgeInputHash, visibleState } from '../src/core/contracts.mjs';
 import { validatePolicy } from '../src/core/policy.mjs';
 import { compareRuns } from '../src/core/evaluation.mjs';
-import { HeuristicJudge } from '../src/adapters/heuristic-judge.mjs';
-import { RecordedJudge } from '../src/adapters/recorded-judge.mjs';
+import { HeuristicJudge } from '../src/adapters/providers/heuristic-judge.mjs';
+import { RecordedJudge } from '../src/adapters/providers/recorded-judge.mjs';
 import { SqliteCandidateStore } from '../src/adapters/sqlite-store.mjs';
 import { scope, policy, event, target, decision, judge, fixture } from './helpers.mjs';
 
