@@ -1,0 +1,109 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "context-read-service-owns-complete-workflow",
+      "criterion": "A single internal ContextReadService owns the existing resolve, page and lineage read workflow, including request validation, metadata snapshot, bounded planning snapshot, canonical preparation, final authorized snapshot, applicability assembly and shared Authority materialization. It opens synchronous DomainStore read snapshots internally, never imports or constructs LocalGraphStore, never calls a public Graph method, and never accepts, returns or retains a transaction handle.",
+      "identity": "sha256:b3c11811825fa7039f98986c4bbb7a86d9b160966038f3dd3a4be2eae916a811",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-read-composition-and-compatibility-are-exact",
+      "criterion": "graphServiceBundle constructs and caches ContextReadService from the exact proof-owning canonical, ContextInputs and ExplorationInputs instances for one Graph/store/authority/configuration identity. LocalGraphStore retains resolveContext, pageContexts and contextLineage as compatibility delegates, while root exports, constructors, wire/schema/constants, cursors, digests, JSON results, error codes, snapshot order, callback error recovery and every pre/post authorization, source-fence, ownership, head and canonical-proof recheck remain observably unchanged.",
+      "identity": "sha256:449d8178062be064cf4e08b45555a02cb97d5fb8e541cc1dce7758d6c387c2fe",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-read-seam-is-bounded-and-verifiable",
+      "criterion": "Focused composition, Context reader/security/independent-review/lifecycle/recovery, Query/Judge integration, layout and boundary tests prove the new acyclic service boundary and the absence of nested or escaping transactions; full Runtime, standalone locked-install, plugin artifact, project/Ticket, Context guard, Room and git diff verification pass offline. Context mutate/adopt/receipt, Exploration and Graph writes, Query/Judge behavior, adapters, database bytes and public API remain outside this Ticket, and no relocation-manifest entry is added because no historical path is moved.",
+      "identity": "sha256:3d3cfe5d8c15f6da8025d091f01c69d1485ab859d3368af2ecd08a5dcb761833",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Preserve the exact metadata, planning and final-snapshot order and all callback-before/callback-after authorization checks; do not weaken the current revocation race defenses.",
+    "Preserve original domain error codes across DomainStore callback wrapping, including context_transition_invalid and all current Context, Exploration, Graph, canonical and storage codes.",
+    "Do not move or change Context mutate, adopt or receipt flows; Exploration bind/mutate/adopt/selection; Graph initialize/mutate/read/rebuild; Query or Judge behavior; SQLite schema/SQL; providers; secrets; CLI, HTTP or UI.",
+    "Do not introduce a generic dependency-injection container, repository interface, event bus, transaction abstraction, new public export or new durable compatibility shim.",
+    "Keep the new boundary under src/local for this seam-proving Ticket; moving it to src/application/context is a later path-only migration after the boundary is independently accepted.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "LocalGraphStore still mixes Graph, Exploration and Context use cases. Its typed Context read path is the smallest safe leaf because it is read-only yet already has a complete three-snapshot authorization workflow. Extracting that workflow establishes the first real Context application boundary before any directory move. The service must own its synchronous DomainStore read snapshots and reuse the exact canonical, ContextInputs and ExplorationInputs instances from the existing graph service bundle; it must not receive or expose a transaction handle, call public Graph operations, or touch the shared write transaction.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, local private-state, standalone and verification boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted migration order and requirement to split application services around the preserved transaction seam before directory moves.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, public surface, commands, constants, dependencies and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Accepted exact proof-owner composition and zero-cycle baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted access port and repeated authorization boundary.",
+      "ref": ".vibehub/outcomes/ticket-runtime-local-access-seam/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted DomainStore and GraphStorage ownership, transaction and offline verification baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-relocate-production-sqlite-adapters/contract-v1.yaml"
+    },
+    {
+      "purpose": "Current compatibility facade, Context read orchestration and shared write transaction owner.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Current strict Context read wire and selected-reader algorithms to preserve.",
+      "ref": "semantic-runtime/src/local/context-reader.mjs"
+    },
+    {
+      "purpose": "Current exact Graph and canonical configuration composition/caching boundary to extend.",
+      "ref": "semantic-runtime/src/local/graph-service-bundle.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-read-composition-and-compatibility-are-exact",
+          "identity": "sha256:449d8178062be064cf4e08b45555a02cb97d5fb8e541cc1dce7758d6c387c2fe",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-read-seam-is-bounded-and-verifiable",
+          "identity": "sha256:3d3cfe5d8c15f6da8025d091f01c69d1485ab859d3368af2ecd08a5dcb761833",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-read-service-owns-complete-workflow",
+          "identity": "sha256:b3c11811825fa7039f98986c4bbb7a86d9b160966038f3dd3a4be2eae916a811",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:41b6ddfd25df3543596c0af9a7df27ca02bd8503adb3532cae2d754a623f9efc",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Typed Context resolve, page and lineage reads are owned by one internal application service with exact proof-owner composition and unchanged public behavior, while coordinated Context and Exploration writes remain in LocalGraphStore.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:next-application-seam-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-extract-context-read-application-service"
+}
