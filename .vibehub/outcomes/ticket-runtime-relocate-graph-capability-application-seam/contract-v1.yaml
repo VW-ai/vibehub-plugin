@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "graph-capability-application-home-is-exact",
+    "graph-capability-relocation-preserves-contract",
+    "graph-capability-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T07:59:32Z",
+  "contract_revision": {
+    "identity": "sha256:ac7a3aed9a7e41b6a06e122f96162fc0031c4e2d3ae11df0ef1bb57337fa6c6c",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-graph-capability-application-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/graph_capability_closeout did not plan, implement or author Evidence for this Ticket. I received a bounded adjudication handoff, independently read the exact Ticket, Evidence, accepted predecessor Outcome, contracts, context refs, planning/implementation/provenance commits and current diff; reproduced structural, behavior, full Runtime, standalone, artifact and project checks; and authored only this Outcome. The parent owns presentation and publication.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active Acceptance revisions of exact Contract 1. The implementation commit is a 100% Git rename of immutable blob afae727cf3ac13539e40e798a468d28d65d7d293 from src/local/graph-capability.mjs to src/application/graph/graph-capability.mjs; the old path is absent, no shim or public export exists, exactly five production imports and one test import changed, and no other production source path or executable logic changed. Direct source comparison and a twenty-check in-memory probe confirm the private WeakMaps and Symbol brand, one-registration and required-method checks, exact owner/store/authority identity, invalid_graph_input rejection for absent, forged, cloned, proxied and wrong-identity handles, and dynamic owner-method forwarding. Focused Graph, canonical reader, Exploration and composition tests pass 54/54; mocked deterministic JEV checks pass 17/17. The baseline has 333 production edges, exactly five incoming edges to the application/graph capability, zero SCCs, zero direction exceptions and zero boundary errors across 247 repository files. The manifest contains one exact graph-application-capability row binding the old blob, new path and migration commit 8845a0c43fcea1ea68520c35d93e81e05cf3346c; the repository-aware relocation test passes and historical Ticket, Evidence and Outcome records remain unchanged. Full offline Runtime verification passes 1033 total, 1031 passed, zero failed and two expected native Keychain skips. A fresh standalone copy installed fourteen locked packages strictly from the local cache, passed its 232-file boundary check and completed 1033 tests with 1018 passed, zero failed and fifteen documented standalone skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Ticket validation passes at 229 Tickets, 538 Evidence and 176 pre-closeout Outcomes; project format 4 validation has no unverifiable Context refs; Context guard since planning commit 6343e276faa1c7b1a462fd73c677f15b1df70f1b has no governing authorities or violations; semantic-runtime Room drift is FRESH; and git diff check passes. The two unrelated untracked Ticket files were not modified. No credential, Keychain lifecycle, live provider, live JEV, external network or user repository was accessed. The installed closeout Skill references a missing contracts/agent-session.md, so no session report or completion claim was invented. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-graph-capability-application-seam",
+  "unresolved_acceptance_ids": []
+}
