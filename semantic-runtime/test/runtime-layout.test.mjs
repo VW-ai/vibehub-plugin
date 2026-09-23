@@ -197,6 +197,26 @@ test('Query application capability relocation is complete and recorded', t => {
   }
 });
 
+test('Context reader application relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'context-application-reader');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/context-reader.mjs',
+    new_path: 'semantic-runtime/src/application/context/context-reader.mjs',
+    old_blob: '9e90df27380fc32739543889bb372e03cb7c0dd5',
+    migration_commit: '5102e1a260f58fe0af7d82d9421e62ccf327a8d3',
+    category: 'context-application-reader',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/context-reader.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/application/context/context-reader.mjs', import.meta.url)), true);
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);

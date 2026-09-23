@@ -1,0 +1,49 @@
+{
+  "acceptance_ids": [
+    "context-reader-application-home-is-exact",
+    "context-reader-relocation-preserves-context-contracts",
+    "context-reader-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "context-reader-application-home-is-exact",
+      "identity": "sha256:09b71ed5303553c6ee86027789fc6521b0d6cf52779322e9717107c77e70d4ca",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-reader-relocation-preserves-context-contracts",
+      "identity": "sha256:3e72bb3d11db7f823ad281ed1b5056b3d458eabe1b9d828d5a53a40a44f6f784",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-reader-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:e3f092fc00878112e3391e288545dfe64916b40b6cf5046aef16dd5ce3d75eb0",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-context-reader-application-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T05:12:28Z",
+  "refs": [
+    "commit:5102e1a260f58fe0af7d82d9421e62ccf327a8d3",
+    "commit:2cde7db2c39ea6c7a710a213099aef5347cd177c:semantic-runtime/src/local/context-reader.mjs",
+    "semantic-runtime/src/application/context/context-reader.mjs",
+    "semantic-runtime/src/application/context/context-read-service.mjs",
+    "semantic-runtime/src/application/query/query-contract.mjs",
+    "semantic-runtime/src/application/query/query-inputs.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/judge-inputs.mjs",
+    "semantic-runtime/test/context-reader.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-context-reader-application-capability.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit 5102e1a260f58fe0af7d82d9421e62ccf327a8d3 records exactly one R097 production move from semantic-runtime/src/local/context-reader.mjs to semantic-runtime/src/application/context/context-reader.mjs. A normalized source comparison proves the 20,797-byte moved implementation is byte-identical after replacing only eight required relative import specifiers. The old path is absent and no compatibility shim remains; every other production source retains its path. The five exported symbols remain unchanged. Exactly five production consumers resolve the new path: ContextReadService, Query contract, Query inputs, GraphStore and Judge inputs. A focused structural assertion fixes the five incoming and eight outgoing edges. Request validation, resolve/page/lineage and cursor behavior, bounds and errors, exploration ownership, caller-owned transaction and snapshot behavior, selected Graph authorization, typed publication/adoption proof, assertion/projection separation, provenance/access facts, Ticket pins, final source/head checks, shared origin/Project/Authority materialization, Query candidate generation, Judge selection, ContextReadService workflow, Graph facade compatibility, schemas, SQL, providers and public Runtime exports remain unchanged. The regenerated layout baseline records the application/context node with the same thirteen-edge topology. The relocation manifest binds old blob 9e90df27380fc32739543889bb372e03cb7c0dd5, new path, category context-application-reader and the actual migration commit; its focused test skips only when standalone packaging deliberately omits historical records. Focused Context/Query/Judge/composition/layout verification passes 183/183, including deterministic Context and Query JEV checker coverage. Final provenance/layout/boundary verification passes 22/22. Boundary checking scans 247 production files with zero errors, zero SCCs and zero direction exceptions. Full Runtime verification passes 1028 total / 1026 passed / zero failed / two expected skips. Standalone locked-install verification passes 1028 total / 1018 passed / zero failed / ten expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. Historical Ticket, Evidence and Outcome references retain their accepted old path. No credential, Keychain lifecycle, host, network, provider or live JEV call was used.",
+  "ticket_id": "ticket-runtime-relocate-context-reader-application-capability"
+}

@@ -308,6 +308,13 @@
       "old_blob": "f7f22f70a68439809c385a48a53270ee8125570f",
       "migration_commit": "d9017df27b8407d7db30f772f48e324f7014a73f",
       "category": "query-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/context-reader.mjs",
+      "new_path": "semantic-runtime/src/application/context/context-reader.mjs",
+      "old_blob": "9e90df27380fc32739543889bb372e03cb7c0dd5",
+      "migration_commit": "5102e1a260f58fe0af7d82d9421e62ccf327a8d3",
+      "category": "context-application-reader"
     }
   ]
 }

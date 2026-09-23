@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "context-reader-application-home-is-exact",
+    "context-reader-relocation-preserves-context-contracts",
+    "context-reader-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T05:17:40Z",
+  "contract_revision": {
+    "identity": "sha256:7164c93c40c5520a3a3c47eae55929f2ca608ada9438f0e39bf2be95e06754f0",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-context-reader-application-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent did not execute the relocation. I inspected the exact Ticket and bound Evidence, immutable pre-move source, implementation commit, current provenance/test/Room changes and accepted Context lifecycle, Judge and Query Outcomes, then ran focused offline tests and repository guards. The installed vibehub-core package lacks the closeout Skill's referenced contracts/agent-session.md, so no session API or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication accepted all three active Contract v1 criteria. Commit 5102e1a260f58fe0af7d82d9421e62ccf327a8d3 records one R097 production move from semantic-runtime/src/local/context-reader.mjs to semantic-runtime/src/application/context/context-reader.mjs; direct source diff shows only the eight required relative import specifiers changed, the old Git blob resolves to 9e90df27380fc32739543889bb372e03cb7c0dd5, the old path is absent and no shim remains. The moved module still exports exactly CONTEXT_READER_ERROR_CODES, materializeContextShared, validateContextReadRequest, planContextSelection and readContextSelection, and the five production consumers now import the application path. The successful accepted Context lifecycle, Context Judge bridge and Query Outcomes remain the governing behavioral baselines. Independent focused Context, Query, Judge, Graph, composition and layout verification passed 207/207 offline, including deterministic mocked JEV checker coverage and without any live provider, credential or network call. The boundary checker scanned 247 production files with zero errors, production SCCs or direction exceptions. Direct review confirms the layout baseline retains the thirteen-edge reader topology, the append-only relocation manifest binds the old blob, new path, actual migration commit and context-application-reader category, and historical records keep their accepted old-path references. Ticket validation passes, dirty-worktree Context guard reports no authorities or violations, git diff checking passes, and the semantic-runtime Room is FRESH. The bound Evidence additionally records successful sequential full Runtime, standalone locked-install and plugin artifact verification. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-context-reader-application-capability",
+  "unresolved_acceptance_ids": []
+}
