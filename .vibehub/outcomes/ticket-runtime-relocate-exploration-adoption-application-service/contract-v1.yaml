@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "exploration-adoption-application-service-home-is-exact",
+    "exploration-adoption-application-contract-is-preserved",
+    "exploration-adoption-application-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T10:40:06Z",
+  "contract_revision": {
+    "identity": "sha256:7eeb3ccbd24c637b5ddb2ed2f73608e059fa0768f17a0d53500dfa6de5f0d287",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-exploration-adoption-application-service-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent subagent with no participation in planning or implementation; reviewed the checked-in Contract, native Evidence, commits, source, Room and offline verification results before adjudication.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout verified Contract v1 against the implementation and provenance commits, current source, layout baseline, relocation manifest, Room and native Evidence. The old source blob d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a is replaced only by the declared application path with blob 9513471340447245befc31de392b8f9dde48692b; the preserved body hash is 81e1ecf9dca58a41a98a15dff99bbd65a7c7eb7e9d8557c9a56a2c5c34379f65, and only seven internal specifiers, three production consumers and one direct test import changed. Export signatures and Graph-owned transaction orchestration remain unchanged, with no compatibility shim or root public export. Independent focused verification passed 107 of 107 adoption, Context, Query, layout, boundary and mocked-JEV tests; topology independently resolves to 333 edges, exactly three incoming and seven outgoing adoption edges, zero SCCs, zero direction exceptions and zero boundary errors. Ticket/project validation, Context guard and semantic-runtime Room checks pass. The native Evidence records successful full Runtime, standalone locked-install and plugin artifact verification; this restricted reviewer sandbox independently reproduced all non-loopback checks, while loopback-only tests were unavailable solely because listener binding is denied with EPERM. No credential, live provider, external host or network was accessed.",
+  "ticket_id": "ticket-runtime-relocate-exploration-adoption-application-service",
+  "unresolved_acceptance_ids": []
+}
