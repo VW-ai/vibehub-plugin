@@ -319,6 +319,26 @@ test('selected Graph application port relocation is complete and recorded', t =>
   assert.equal(existsSync(new URL('../src/application/graph/graph-selected.mjs', import.meta.url)), true);
 });
 
+test('selected Exploration Git observer adapter relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'git-exploration-observer-adapter');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/exploration-physical.mjs',
+    new_path: 'semantic-runtime/src/adapters/git/exploration-physical.mjs',
+    old_blob: 'dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed',
+    migration_commit: '64b238c02201ce631299ad5bc0e2e9b1479017e3',
+    category: 'git-exploration-observer-adapter',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/exploration-physical.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/adapters/git/exploration-physical.mjs', import.meta.url)), true);
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {

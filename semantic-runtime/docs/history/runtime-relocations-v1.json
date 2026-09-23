@@ -364,6 +364,13 @@
       "old_blob": "3cd81a840ffee9931ebb2e29703e3091b8b04bef",
       "migration_commit": "68b2cf2efe64bdf296ea899917eaf019e1d4af87",
       "category": "graph-application-selection-port"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/exploration-physical.mjs",
+      "new_path": "semantic-runtime/src/adapters/git/exploration-physical.mjs",
+      "old_blob": "dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed",
+      "migration_commit": "64b238c02201ce631299ad5bc0e2e9b1479017e3",
+      "category": "git-exploration-observer-adapter"
     }
   ]
 }

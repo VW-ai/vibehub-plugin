@@ -686,6 +686,11 @@
       "intended_destination": "src/adapters/git/git-worktree-observer.mjs"
     },
     {
+      "path": "src/adapters/git/exploration-physical.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/git/exploration-physical.mjs"
+    },
+    {
       "path": "src/adapters/haiku-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/haiku-judge.mjs"
@@ -979,11 +984,6 @@
       "path": "src/local/exploration-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/explorations/exploration-inputs.mjs"
-    },
-    {
-      "path": "src/local/exploration-physical.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/git/exploration-physical.mjs"
     },
     {
       "path": "src/local/exploration-store.mjs",
@@ -3266,6 +3266,10 @@
     },
     {
       "from": "src/local/exploration-inputs.mjs",
+      "to": "src/adapters/git/exploration-physical.mjs"
+    },
+    {
+      "from": "src/local/exploration-inputs.mjs",
       "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
@@ -3283,10 +3287,6 @@
     {
       "from": "src/local/exploration-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/exploration-inputs.mjs",
-      "to": "src/local/exploration-physical.mjs"
     },
     {
       "from": "src/local/exploration-inputs.mjs",
