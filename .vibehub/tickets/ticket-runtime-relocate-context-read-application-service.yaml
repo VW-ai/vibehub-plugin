@@ -1,0 +1,109 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "context-read-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/context-read-service.mjs moves to semantic-runtime/src/application/context/context-read-service.mjs. The implementation is byte-equivalent except for required relative import specifiers, the old path is absent, no compatibility shim or re-export remains, and context-reader.mjs, context-inputs.mjs and every other production source retain their paths.",
+      "identity": "sha256:493797d48fcfa76e5d8238641db3a807f5f52711bd2f192f778122eb862c8852",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-read-relocation-preserves-composition-and-contracts",
+      "criterion": "graphServiceBundle remains the sole production importer and constructs/caches the moved ContextReadService with the same exact proof-owning canonical, ContextInputs and ExplorationInputs instances. The structural test reads the new path and rejects any graph-store.mjs import independent of relative depth. Public exports, constructors, wire/schema/constants, cursors, digests, JSON results, error codes, snapshot and authorization order, transaction ownership, Query/Judge behavior, database schema/SQL and providers remain observably unchanged.",
+      "identity": "sha256:21c79b1c287fc52ec473ffa6b0559ff1d0b8578bec5a8814a1faa3e49ee2305a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-read-relocation-is-auditable-and-verifiable",
+      "criterion": "The regenerated Runtime layout baseline records the new direct application path and rewired import edges with zero production SCCs, boundary errors or direction exceptions. The relocation manifest and focused layout test bind the exact old blob, new path, actual migration commit and context-application-service category while preserving historical Ticket, Evidence and Outcome records. Focused Context/composition/Query/Judge/layout tests, full Runtime, standalone locked-install, plugin artifact, project/Ticket, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:9b8807f68a8e0eba8783dd433e807390b3a1fcd3adc6d46df523c2e8700eac91",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as a one-file path-only migration; do not change executable logic beyond relative import paths and the path-independent structural assertion.",
+    "Do not move context-reader.mjs, context-inputs.mjs, Graph, Exploration, source or app/local modules; do not reorganize tests or documents by capability in this Ticket.",
+    "Do not add an old-path compatibility shim, public export, dependency-injection layer, transaction abstraction, schema/SQL change or model/provider behavior.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/context-read-service.mjs unchanged because they identify the accepted pre-relocation revision.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "ContextReadService has already been independently accepted as the complete typed Context resolve/page/lineage application seam. Move that one internal service from src/local to its declared src/application/context destination as a path-only migration. Update the sole production importer, exact structural tests, generated layout baseline, relocation provenance and Room alignment without moving its ContextInputs or context-reader dependencies.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted migration order, path-only rules and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, exact imports, public surface, standalone roots and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and existing category examples.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent acceptance of the Context read application seam and explicit next path-only migration boundary.",
+      "ref": ".vibehub/outcomes/ticket-runtime-extract-context-read-application-service/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact service implementation and old Git blob to relocate.",
+      "ref": "semantic-runtime/src/local/context-read-service.mjs"
+    },
+    {
+      "purpose": "Sole production composition/import edge to update.",
+      "ref": "semantic-runtime/src/local/graph-service-bundle.mjs"
+    },
+    {
+      "purpose": "Exact composition caching and reverse-dependency structural assertions to preserve and strengthen.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Existing repository/standalone-aware relocation manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-read-application-home-is-exact",
+          "identity": "sha256:493797d48fcfa76e5d8238641db3a807f5f52711bd2f192f778122eb862c8852",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-read-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:9b8807f68a8e0eba8783dd433e807390b3a1fcd3adc6d46df523c2e8700eac91",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-read-relocation-preserves-composition-and-contracts",
+          "identity": "sha256:21c79b1c287fc52ec473ffa6b0559ff1d0b8578bec5a8814a1faa3e49ee2305a",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ad3c3d13d0b0ffc28f0c69afd498c6964f464df06b0abdaeebcf2295eea682b7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted ContextReadService lives at src/application/context with one auditable historical relocation and unchanged Runtime behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:next-context-migration-audit",
+    "subagent-audit:context-migration-mechanics-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-context-read-application-service"
+}
