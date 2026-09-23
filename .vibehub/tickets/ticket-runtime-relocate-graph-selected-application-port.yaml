@@ -1,0 +1,120 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-selected-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/graph-selected.mjs moves to semantic-runtime/src/application/graph/graph-selected.mjs. The old path is absent, no compatibility shim or re-export remains, every other production source file retains its path, the moved file changes only its two relative import specifiers, and exactly its two production consumers change only their import specifier to the new path; focused tests, layout baseline, relocation provenance and Room metadata may change only to verify and record the move.",
+      "identity": "sha256:360607ac03da587f8b37ecb1d060e03f0b34e0fad95ffc66cb37ae4930ae3c0c",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-selected-port-contract-is-preserved",
+      "criterion": "selectGraph retains the same function signature and returns the same port, staged facts, selected events and authority references. It still binds reads to the authorized principal, generation, current head and access view; resolves catalog and accepted-event selections through GraphInputs; refuses unretained read-side events; bounds and proves source-access lifecycle fallback; delegates ordinary fact and page reads to the same GraphStorage view; and stages lifecycle authority facts inside the caller-owned transaction without a nested public mutation.",
+      "identity": "sha256:bc9562cd6d9a4288b3a7396030f00e606897f6240ddb65c70ae754858540c182",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-selected-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production consumers resolve the new path. The regenerated Runtime layout baseline records the application/graph node with the same two incoming edges, two outgoing edges, total production-edge count, zero production SCCs, boundary errors or new direction exceptions. The relocation manifest and repository-aware focused test bind old blob 3cd81a840ffee9931ebb2e29703e3091b8b04bef, the new path, the actual migration commit and graph-application-selection-port category while historical Tickets, Evidence and Outcomes retain accepted old-path references. Focused Graph, Context, source-invalidation, composition and layout tests, deterministic mocked JEV checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:87014e7bf530ef2b9f7b108e6568e4098088552640976f73fda2a938bf6160a3",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one one-file path-only application-port migration. Change only the two relative import specifiers inside graph-selected.mjs and the one import specifier in each of its two production consumers; do not change executable logic.",
+    "Do not move or refactor graph-inputs, graph-store, context-reader, graph-service-bundle, Exploration, Context, storage, adapters, app/local, research, verification, tests or documentation modules in this Ticket.",
+    "Do not introduce ports, dependency injection, compatibility shims, transaction nesting, SQLite exposure or public exports; do not alter schema, SQL, namespaces, digests, receipts, authorization order, access fences, providers, commands or errors.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/graph-selected.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider, live JEV or user-repository access is authorized."
+  ],
+  "context": "Move the existing transaction-scoped selected Graph port from src/local to its already-declared application/graph destination. Preserve its exact public function, Graph selection semantics, two consumers, and zero-cycle production topology. This is one path-only migration with only the relative import strings required by the new location.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, transaction-scoped Graph seam and path-only migration rules.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, intended application/graph destination, incident topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Successful Outcome defining the accepted transaction-scoped Graph selection seam and zero-cycle topology.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Most recent successful application/graph relocation and verification baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-relocate-graph-capability-application-seam/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact pre-relocation selected Graph port source and blob.",
+      "ref": "commit:19582de643f17ac9389bb5d0ec355de89062ff66:semantic-runtime/src/local/graph-selected.mjs"
+    },
+    {
+      "purpose": "Selected Graph input authority and fact source dependency whose behavior stays unchanged.",
+      "ref": "semantic-runtime/src/local/graph-inputs.mjs"
+    },
+    {
+      "purpose": "Event and source-object identity dependency whose behavior stays unchanged.",
+      "ref": "semantic-runtime/src/core/event-provenance.mjs"
+    },
+    {
+      "purpose": "Transaction-owning selected Graph consumer.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Authorized Context reader consumer of the selected Graph port.",
+      "ref": "semantic-runtime/src/application/context/context-reader.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-selected-application-home-is-exact",
+          "identity": "sha256:360607ac03da587f8b37ecb1d060e03f0b34e0fad95ffc66cb37ae4930ae3c0c",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-selected-port-contract-is-preserved",
+          "identity": "sha256:bc9562cd6d9a4288b3a7396030f00e606897f6240ddb65c70ae754858540c182",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-selected-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:87014e7bf530ef2b9f7b108e6568e4098088552640976f73fda2a938bf6160a3",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:89fa49e355ae0379ade81fedd4c8f06ad179340e9c008173c15e250d90e25c19",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted selected Graph port lives under src/application/graph with unchanged authorization, current-head fencing, lifecycle selection and transaction staging behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-capability-layout",
+    "subagent-audit:next-local-seam-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-graph-selected-application-port"
+}
