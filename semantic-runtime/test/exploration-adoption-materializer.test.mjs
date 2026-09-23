@@ -5,7 +5,7 @@ import { fixture, adoption, ADOPTION_ACTIONS } from './helpers/adoption-fixture.
 import { mutation, assertion, rows, resolve, capture, register, bind, SCOPE } from './helpers/exploration-fixture.mjs';
 import { GraphInputs, graphKey, graphHash } from '../src/local/graph-inputs.mjs';
 import { GraphStorage } from '../src/adapters/sqlite/graph-storage.mjs';
-import { materializeExplorationAdoption } from '../src/local/exploration-adoption.mjs';
+import { materializeExplorationAdoption } from '../src/application/explorations/exploration-adoption.mjs';
 import { ExplorationInputs } from '../src/local/exploration-inputs.mjs';
 import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { canonicalArtifactAddress } from '../src/core/working-graph.mjs';

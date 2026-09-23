@@ -2,7 +2,7 @@ import { GraphInputs, graphInput, graphFields, graphId, graphEqual, graphHash, g
 import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
 import { selectGraph } from '../graph/graph-selected.mjs';
 import { ExplorationInputs, readExplorationOwner, EXPLORATION_NAMESPACE } from '../../local/exploration-inputs.mjs';
-import { verifyExplorationPublication } from '../../local/exploration-adoption.mjs';
+import { verifyExplorationPublication } from '../explorations/exploration-adoption.mjs';
 import { resolveIncrementalGraph, pageIncrementalGraph, validateGraphCommitAddress2 } from '../../core/incremental-graph.mjs';
 import { exactRevisionAddress, semanticAddress, validateSemanticAddress } from '../../core/working-graph.mjs';
 import { validateContextContent1, validateContextOperation1 } from '../../core/context-profile.mjs';

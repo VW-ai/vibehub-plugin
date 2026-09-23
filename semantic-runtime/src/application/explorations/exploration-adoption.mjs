@@ -10,13 +10,13 @@
  * [{source:<exact A ref>,destination:<exact B ref>,resolved:<authorized B result>}].
  * The same read-only helper is used on retry with the original execution_id.
  */
-import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
-import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphAssert, graphFail, graphErrorCode, graphId } from './graph-inputs.mjs';
-import { EXPLORATION_NAMESPACE, readExplorationOwner } from './exploration-inputs.mjs';
-import { validateSemanticRevision, exactRevisionAddress } from '../core/working-graph.mjs';
-import { eventObservationKey, sourceObjectKey, effectiveEventAccess } from '../core/event-provenance.mjs';
-import { sourcePartitionKey } from '../core/causal-ordering.mjs';
-import { canonical } from '../core/contracts.mjs';
+import { GraphStorage } from '../../adapters/sqlite/graph-storage.mjs';
+import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphAssert, graphFail, graphErrorCode, graphId } from '../../local/graph-inputs.mjs';
+import { EXPLORATION_NAMESPACE, readExplorationOwner } from '../../local/exploration-inputs.mjs';
+import { validateSemanticRevision, exactRevisionAddress } from '../../core/working-graph.mjs';
+import { eventObservationKey, sourceObjectKey, effectiveEventAccess } from '../../core/event-provenance.mjs';
+import { sourcePartitionKey } from '../../core/causal-ordering.mjs';
+import { canonical } from '../../core/contracts.mjs';
 
 const GRAPH = 'working-graph', NS = EXPLORATION_NAMESPACE;
 const check = (ok, code = 'exploration_corrupt') => graphAssert(ok, code);
