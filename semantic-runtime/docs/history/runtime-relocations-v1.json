@@ -357,6 +357,13 @@
       "old_blob": "afae727cf3ac13539e40e798a468d28d65d7d293",
       "migration_commit": "8845a0c43fcea1ea68520c35d93e81e05cf3346c",
       "category": "graph-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-selected.mjs",
+      "new_path": "semantic-runtime/src/application/graph/graph-selected.mjs",
+      "old_blob": "3cd81a840ffee9931ebb2e29703e3091b8b04bef",
+      "migration_commit": "68b2cf2efe64bdf296ea899917eaf019e1d4af87",
+      "category": "graph-application-selection-port"
     }
   ]
 }

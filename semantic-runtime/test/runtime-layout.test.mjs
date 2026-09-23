@@ -299,6 +299,26 @@ test('Graph application capability relocation is complete and recorded', t => {
   assert.equal(existsSync(new URL('../src/application/graph/graph-capability.mjs', import.meta.url)), true);
 });
 
+test('selected Graph application port relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'graph-application-selection-port');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/graph-selected.mjs',
+    new_path: 'semantic-runtime/src/application/graph/graph-selected.mjs',
+    old_blob: '3cd81a840ffee9931ebb2e29703e3091b8b04bef',
+    migration_commit: '68b2cf2efe64bdf296ea899917eaf019e1d4af87',
+    category: 'graph-application-selection-port',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/graph-selected.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/application/graph/graph-selected.mjs', import.meta.url)), true);
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {
