@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "exploration-adoption-application-service-home-is-exact",
+    "exploration-adoption-application-contract-is-preserved",
+    "exploration-adoption-application-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "exploration-adoption-application-service-home-is-exact",
+      "identity": "sha256:0f83b033440f97c5a31e68a343f7cddaf49358157cea35de8f4bc8a133e24622",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exploration-adoption-application-contract-is-preserved",
+      "identity": "sha256:1d2b839bebff72299f2145e7ffbb753cddafbee0dd46b66701d608139daf9353",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exploration-adoption-application-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:5102d32cde37fddf68047a654fa70d5e6e164dac331ec81f9eeb146d405e7549",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-exploration-adoption-application-service-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T10:32:41Z",
+  "refs": [
+    "commit:9eb1509117eb441c94e94aaaa4a25a1dd2500099",
+    "commit:f8f27ee443b6ac3c201631129cb6e20ca469833b",
+    "commit:b0824b7d9b1fdb7d5f4536c919e297e133a2e417:semantic-runtime/src/local/exploration-adoption.mjs",
+    "semantic-runtime/src/application/explorations/exploration-adoption.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/application/context/context-reader.mjs",
+    "semantic-runtime/src/application/query/query-inputs.mjs",
+    "semantic-runtime/test/exploration-adoption-materializer.test.mjs",
+    "semantic-runtime/test/jev-exploration-check.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-exploration-adoption-application-service.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 9eb1509117eb441c94e94aaaa4a25a1dd2500099 moves semantic-runtime/src/local/exploration-adoption.mjs to semantic-runtime/src/application/explorations/exploration-adoption.mjs and changes only the seven relative specifiers required by the new depth, the three production consumer specifiers and the one direct-test specifier. The historical source blob is d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a, the relocated blob is exactly 9513471340447245befc31de392b8f9dde48692b, and lines 21 through 255 retain SHA-256 81e1ecf9dca58a41a98a15dff99bbd65a7c7eb7e9d8557c9a56a2c5c34379f65. The old path is absent and no shim or root public export remains. verifyExplorationPublication, materializeExplorationAdoption and verifyExplorationAdoptionResult keep their existing exports and behavior; LocalGraphStore continues to own admission, proof rechecks, mutation, materialization comparison, Context result and receipt in the existing SQLite transaction. Provenance commit f8f27ee443b6ac3c201631129cb6e20ca469833b appends one exploration-adoption-application-service relocation record, a repository-aware path and exact 3-in/7-out topology assertion, the regenerated baseline and current Room alignment. The production graph has 333 edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 files. Independent subagent audit found no blocking issue and reproduced 97 focused tests plus one separate mocked JEV adoption check, all passing. Executor focused adoption, Context, Query and mocked Exploration JEV checks passed 77/77; layout and boundary tests passed 30/30. Full Runtime verification passed 1,037 total, 1,035 passed, zero failed and two expected native Keychain skips. Standalone locked-install verification installed fourteen packages and passed 1,037 total, 1,018 passed, zero failed and nineteen documented research/history/native skips. Plugin artifact verification passed with 79 files and 3,670,088 bytes. Project and Ticket validation passed; Context guard since planning commit 83611159 returned no governing authorities or violations; semantic-runtime Room is FRESH; git diff checking passed; and HEAD equaled origin/codex/semantic-runtime at f8f27ee443b6ac3c201631129cb6e20ca469833b before this Evidence. Two unrelated untracked Ticket files remained untouched. No credential, external host, provider, live JEV, user repository or external network was accessed; JEV verification used deterministic mocked adapters.",
+  "ticket_id": "ticket-runtime-relocate-exploration-adoption-application-service"
+}
