@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GraphInputs, graphHash, graphEqual, graphErrorCode } from './graph-inputs.mjs';
 import { GraphStorage } from './graph-storage.mjs';
 import { readExplorationOwner } from './exploration-inputs.mjs';
@@ -31,7 +31,7 @@ const selectedItems = (recipe, selected) => recipe.method === 'page' ? selected.
 export class QueryInputs {
   #store; #authority; #graph; #metadata; #canonical; #contexts; #feed; #proofs = new WeakMap();
   constructor({ store, authority, canonical_reader }) {
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority, 'invalid_query_configuration');
+    check(store instanceof DomainStore && authority instanceof AccessAuthority, 'invalid_query_configuration');
     this.#store = store; this.#authority = authority;
     this.#graph = new GraphInputs({ store, authority });
     const services = composeLocalServices({ store, authority, canonical_reader });

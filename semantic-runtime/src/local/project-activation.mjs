@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 
 export const ACTIVATION_NAMESPACE = 'project-activation';
@@ -27,7 +27,7 @@ function state(row) {
 export class ProjectActivation {
   #store; #authority; #now;
   constructor({ store, authority, now = () => Date.now() }) {
-    if (!(store instanceof DomainStore) || !(authority instanceof LocalCredentialAuthority) || typeof now !== 'function') throw fail('invalid_activation_input');
+    if (!(store instanceof DomainStore) || !(authority instanceof AccessAuthority) || typeof now !== 'function') throw fail('invalid_activation_input');
     this.#store = store; this.#authority = authority; this.#now = now;
   }
   #grant(context, action, { write = false, switcher = false, enrollment = false } = {}) {

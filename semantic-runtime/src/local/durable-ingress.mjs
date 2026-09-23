@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { canonical, fingerprint } from '../core/contracts.mjs';
@@ -112,7 +112,7 @@ const outboxKey = event_id => key('pending', event_id);
 export class DurableIngress {
   #store; #authority; #registry; #activation; #invalidation; #policy; #now;
   constructor({ store, authority, snapshotPolicy, now = () => Date.now() }) {
-    assert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority
+    assert(store instanceof DomainStore && authority instanceof AccessAuthority
       && (snapshotPolicy === undefined || typeof snapshotPolicy === 'function') && typeof now === 'function');
     this.#store = store; this.#authority = authority; this.#policy = snapshotPolicy; this.#now = now;
     this.#registry = new GitProjectRegistry({ store, authority });

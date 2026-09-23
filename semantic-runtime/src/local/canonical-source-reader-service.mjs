@@ -1,7 +1,7 @@
 import { realpathSync, lstatSync, statSync, existsSync, openSync, fstatSync, readSync, closeSync, constants } from 'node:fs';
 import { isAbsolute, join, resolve } from 'node:path';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
@@ -52,7 +52,7 @@ export class CanonicalSourceReaderService {
   constructor(options) {
     const { store, authority, repository_path, execution: requestedExecution, registration_id, selection: requestedSelection } = options;
     let execution = requestedExecution, selection = requestedSelection;
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    check(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#graph = graphCapabilityFrom(options, { store, authority });
     check(typeof repository_path === 'string' && isAbsolute(repository_path) && !/[\x00-\x1f]/.test(repository_path));
     execution = graphInput(execution); graphFields(execution, ['repository_id', 'checkout_id', 'worktree_id']); Object.values(execution).forEach(id); id(registration_id);

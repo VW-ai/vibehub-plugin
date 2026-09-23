@@ -10,7 +10,9 @@ export { BRANCH_SCOPE_VERSION, createBranchScope, validateBranchScope, applyBran
 export { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from './local/provider-settings.mjs';
 export { MacOSSecretStore } from './local/macos-secret-store.mjs';
 export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMaterialization, accessDiagnostic } from './core/service-access.mjs';
-export { LOCAL_AUDIENCE, LocalCredentialAuthority, authorizeLocalRequest } from './local/auth.mjs';
+export { LOCAL_AUDIENCE } from './domain/identity/access-authority.mjs';
+export { LocalCredentialAuthority } from './adapters/auth/local-credential-authority.mjs';
+export { authorizeLocalRequest } from './app/local/http/authorize-local-request.mjs';
 export { DOMAIN_SCHEMA_VERSION, SOURCE_KIND_PROJECTION_VERSION, planDomainStore, migrateDomainStore, DomainStore } from './local/domain-store.mjs';
 export { LocalGraphStore, WORKING_GRAPH_NAMESPACE, GRAPH_ERROR_CODES } from './local/graph-store.mjs';
 export {

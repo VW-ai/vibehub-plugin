@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "access-ownership-is-separated",
+      "criterion": "A pure internal access-authority contract and LOCAL_AUDIENCE live under src/domain/identity; LocalCredentialAuthority lives under src/adapters/auth; HTTP Authorization header parsing lives under src/app/local/http. Application and non-HTTP adapter modules consume only the domain access contract, src/local/auth.mjs is removed, and the package root continues exporting the same LocalCredentialAuthority, LOCAL_AUDIENCE and authorizeLocalRequest names.",
+      "identity": "sha256:5e987dbb3ae3ac5f43fa7bc6cb5d2300abd86a95f03b10b355f77d439273364e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "access-direction-exceptions-are-eliminated",
+      "criterion": "The Runtime boundary checker reports zero baselined direction exceptions and zero production SCCs, rejects any new application or adapter import of app/local, and the checked layout baseline records the new domain, adapter and app ownership without weakening another boundary.",
+      "identity": "sha256:b7a6f6c31de05343ea24123b26ac3d02479a9ce80fbfd37e6bea289a0be2aed0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "credential-and-request-semantics-are-preserved",
+      "criterion": "Credential token format, TTL bounds, grant capacity, audience/scope/action/principal checks, opaque context ownership, expiry, revocation, close behavior, materialization checks, HTTP duplicate/malformed Bearer handling, diagnostic bounds and mid-operation authorization rechecks remain byte- and behavior-compatible under focused auth, store, Graph, exploration, Context, Judge, Query and local HTTP tests.",
+      "identity": "sha256:39759ab19cff5efa6f670ca0b4bf7d943e2292d62e4205770b524f2f16c280c8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "access-seam-verifies-standalone",
+      "criterion": "Public export names and contract constants remain unchanged; focused boundary/auth tests, full Runtime verification, standalone locked-install verification, plugin artifact verification, project/Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass without a host, Keychain, provider or live JEV call.",
+      "identity": "sha256:e16d261b0a82ea1c881f17252412be3718cdb7566846244b16de2c0c72d7e4e6",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not change credential generation, persist credentials, expose raw grants, add an HTTP token-minting path, or weaken exact current-authority rechecks.",
+    "Do not move or split DomainStore, Git enrollment, provider settings, Graph, Exploration, Context, Query, Judge, local service composition or Phase 0 replay beyond the exact imports required by this access seam.",
+    "Keep src/index.mjs as the single package entry and preserve its complete public export set.",
+    "Ordinary verification stays offline and deterministic; no real Keychain, host subscription, model provider or JEV call is authorized for this Ticket."
+  ],
+  "context": "The capability-oriented layout guard currently reports fifteen grandfathered application/adapter imports of src/local/auth.mjs because that file mixes the in-process credential authority with HTTP request parsing and is classified as app-local. This Ticket creates the smallest access seam before Graph/Exploration/Context service extraction or formal directory moves: a pure domain identity port, one concrete local credential adapter, and one HTTP authorization adapter at the local App edge.",
+  "context_refs": [
+    {
+      "purpose": "Component, domain purity, adapter, app-local, private-state and standalone verification boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted capability roles and order requiring application seams before formal source movement.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current fifteen direction exceptions, production graph, public exports and per-file migration baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Successful current layout baseline and structural drift contract.",
+      "ref": ".vibehub/outcomes/ticket-runtime-layout-contract-baseline/contract-v2.yaml"
+    },
+    {
+      "purpose": "Successful layer direction and standalone enforcement baseline.",
+      "ref": ".vibehub/outcomes/ticket-runtime-enforce-layer-boundaries/contract-v1.yaml"
+    },
+    {
+      "purpose": "Successful zero-SCC baseline that must remain intact.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted tenant, Project, source and principal identity behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-scope-source-identity-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Accepted credential, local HTTP, confused-deputy, private-state and diagnostic behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-service-auth-isolation/contract-v3.yaml"
+    },
+    {
+      "purpose": "Current mixed credential-authority and HTTP authorization implementation to separate.",
+      "ref": "commit:5f7912b271c1f40afa6de8d0dac608f0d7acd4a5:semantic-runtime/src/local/auth.mjs"
+    },
+    {
+      "purpose": "Current pure access/materialization decisions reused without semantic change.",
+      "ref": "semantic-runtime/src/core/service-access.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "access-direction-exceptions-are-eliminated",
+          "identity": "sha256:b7a6f6c31de05343ea24123b26ac3d02479a9ce80fbfd37e6bea289a0be2aed0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "access-ownership-is-separated",
+          "identity": "sha256:5e987dbb3ae3ac5f43fa7bc6cb5d2300abd86a95f03b10b355f77d439273364e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "access-seam-verifies-standalone",
+          "identity": "sha256:e16d261b0a82ea1c881f17252412be3718cdb7566846244b16de2c0c72d7e4e6",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "credential-and-request-semantics-are-preserved",
+          "identity": "sha256:39759ab19cff5efa6f670ca0b4bf7d943e2292d62e4205770b524f2f16c280c8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:6867f13a1817cb065bd687e868f34c0821dfd16dcdecc269c98493474a2ca455",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Runtime application and adapter modules depend on a pure identity access port instead of the concrete local HTTP credential implementation, while the concrete credential authority and HTTP Bearer parsing occupy their correct adapter and app boundaries.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:runtime-domain-application-map",
+    "subagent-audit:runtime-adapter-app-map",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-local-access-seam"
+}

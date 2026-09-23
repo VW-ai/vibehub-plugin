@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DomainStore, DOMAIN_SCHEMA_VERSION, planDomainStore, migrateDomainStore } from '../src/local/domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/local/auth.mjs';
+import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../src/core/service-access.mjs';
 import { DomainStore as PublicDomainStore } from '../src/index.mjs';
 

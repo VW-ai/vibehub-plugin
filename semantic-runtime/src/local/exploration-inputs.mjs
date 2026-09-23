@@ -15,7 +15,7 @@
  */
 export const EXPLORATION_NAMESPACE = 'exploration-projection';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphUint, graphErrorCode } from './graph-inputs.mjs';
 import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
@@ -105,7 +105,7 @@ export function readExplorationOwner(view, { scope, generation_id }) {
 export class ExplorationInputs {
   #store; #authority; #config; #graphInputs; #observations = new WeakMap(); #routes = new WeakMap();
   constructor({ store, authority, config_digest }) {
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority); digest(config_digest);
+    check(store instanceof DomainStore && authority instanceof AccessAuthority); digest(config_digest);
     this.#store = store; this.#authority = authority; this.#config = config_digest;
     this.#graphInputs = new GraphInputs({ store, authority });
   }

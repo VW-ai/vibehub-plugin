@@ -18,12 +18,7 @@ test('actual component imports and dependency ownership pass', () => {
   const result = checkBoundaries();
   assert.deepEqual(result.errors, []);
   assert.deepEqual(result.production_sccs, []);
-  assert.equal(result.baselined_direction_exceptions.length, 15);
-  assert.deepEqual(result.baselined_direction_exceptions[0], {
-    from: 'src/local/canonical-source-reader-service.mjs',
-    to: 'src/local/auth.mjs',
-    reason: 'application cannot import app-local: ./auth.mjs',
-  });
+  assert.deepEqual(result.baselined_direction_exceptions, []);
 });
 
 test('rejects sibling imports, reexports, computed imports and undeclared packages', t => {

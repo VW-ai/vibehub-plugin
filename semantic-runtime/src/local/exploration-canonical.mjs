@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { CanonicalSourceReaderService } from './canonical-source-reader-service.mjs';
 import { graphCapabilityFrom, graphGetHead, withGraphCapability } from './graph-capability.mjs';
 import { GraphStorage } from './graph-storage.mjs';
@@ -37,7 +37,7 @@ export class ExplorationCanonical {
   #store; #authority; #reader; #graph; #inputs; #ingress; #feed; #config; #digest; #keys; #proofs = new WeakMap();
   constructor(options) {
     const { store, authority, canonical_reader } = options;
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority, 'invalid_canonical_reader_input');
+    check(store instanceof DomainStore && authority instanceof AccessAuthority, 'invalid_canonical_reader_input');
     this.#graph = graphCapabilityFrom(options, { store, authority });
     // Inspect/copy the complete configuration before destructuring any caller data.
     const config = graphInput(canonical_reader);

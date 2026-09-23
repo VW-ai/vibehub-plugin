@@ -83,6 +83,8 @@ function capabilityFromName(path) {
 function sourceDestination(path) {
   const basename = path.split('/').at(-1);
   if (path === 'src/index.mjs') return 'src/index.mjs';
+  if (path.startsWith('src/domain/') || path.startsWith('src/application/')
+    || path.startsWith('src/app/local/') || /^src\/adapters\/[^/]+\//.test(path)) return path;
   if (path === 'src/cli.mjs') return `research/phase0-replay/${basename}`;
   if (path.startsWith('src/core/')) {
     if (['replay.mjs', 'evaluation.mjs', 'policy.mjs', 'contracts.mjs'].includes(basename)) {

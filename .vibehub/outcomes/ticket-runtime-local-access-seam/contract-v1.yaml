@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "access-ownership-is-separated",
+    "access-direction-exceptions-are-eliminated",
+    "credential-and-request-semantics-are-preserved",
+    "access-seam-verifies-standalone"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T01:03:08Z",
+  "contract_revision": {
+    "identity": "sha256:6867f13a1817cb065bd687e868f34c0821dfd16dcdecc269c98493474a2ca455",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-local-access-seam-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout Agent, separate from the implementation Agent; reran acceptance checks against the current worktree.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four current criteria. The domain AccessAuthority/LOCAL_AUDIENCE contract, local credential adapter, and HTTP Bearer parser occupy their specified boundaries; src/local/auth.mjs is removed, and the exact 206-name public export list is unchanged. Direct comparison confirms credential issuance, grant checks, context ownership, expiry, revocation, materialization, and close behavior are unchanged apart from inheritance from the new port; HTTP duplicate and malformed Bearer handling is preserved. Boundary verification scans 246 files with zero baselined direction exceptions, zero production SCCs, and zero errors; the layout baseline passes with the intended domain, adapter, and app destinations. The Runtime suite passes 1022 tests (1020 passed, 2 expected skips), standalone locked-install verification passes 1022 tests (1017 passed, 5 expected skips), and Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking, and semantic-runtime Room alignment pass; the Room is FRESH. No host, Keychain, provider, network, or live JEV call was used. Two unrelated untracked Tickets remained untouched.",
+  "ticket_id": "ticket-runtime-local-access-seam",
+  "unresolved_acceptance_ids": []
+}

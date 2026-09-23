@@ -4,7 +4,7 @@ import { isAbsolute, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { fingerprint, sameScope } from '../core/contracts.mjs';
 import { validateIdentityCatalog } from '../core/identity.mjs';
-import { LOCAL_AUDIENCE, LocalCredentialAuthority } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { DomainStore } from './domain-store.mjs';
 
 export const GIT_ENROLLMENT_NAMESPACE = 'git-enrollment';
@@ -97,7 +97,7 @@ function inspect(folder) {
 export class GitProjectRegistry {
   #store; #authority;
   constructor({ store, authority }) {
-    if (!(store instanceof DomainStore) || !(authority instanceof LocalCredentialAuthority)) throw error('unauthorized');
+    if (!(store instanceof DomainStore) || !(authority instanceof AccessAuthority)) throw error('unauthorized');
     this.#store = store; this.#authority = authority;
   }
   #grant(context, action, write = false) {

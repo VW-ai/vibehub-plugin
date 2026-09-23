@@ -661,6 +661,11 @@
       "intended_destination": "tools/verify-standalone.mjs"
     },
     {
+      "path": "src/adapters/auth/local-credential-authority.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/auth/local-credential-authority.mjs"
+    },
+    {
       "path": "src/adapters/cached-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/cached-judge.mjs"
@@ -724,6 +729,11 @@
       "path": "src/adapters/typesafe-jev-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/typesafe-jev-judge.mjs"
+    },
+    {
+      "path": "src/app/local/http/authorize-local-request.mjs",
+      "current_role": "production",
+      "intended_destination": "src/app/local/http/authorize-local-request.mjs"
     },
     {
       "path": "src/cli.mjs",
@@ -851,6 +861,11 @@
       "intended_destination": "src/domain/graph/working-graph.mjs"
     },
     {
+      "path": "src/domain/identity/access-authority.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/identity/access-authority.mjs"
+    },
+    {
       "path": "src/index.mjs",
       "current_role": "production",
       "intended_destination": "src/index.mjs"
@@ -864,11 +879,6 @@
       "path": "src/local/app-setup.mjs",
       "current_role": "production",
       "intended_destination": "src/app/local/app-setup.mjs"
-    },
-    {
-      "path": "src/local/auth.mjs",
-      "current_role": "production",
-      "intended_destination": "src/app/local/auth.mjs"
     },
     {
       "path": "src/local/canonical-source-reader-service.mjs",
@@ -2375,6 +2385,18 @@
   ],
   "production_import_edges": [
     {
+      "from": "src/adapters/auth/local-credential-authority.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/adapters/auth/local-credential-authority.mjs",
+      "to": "src/core/service-access.mjs"
+    },
+    {
+      "from": "src/adapters/auth/local-credential-authority.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
       "from": "src/adapters/cached-judge.mjs",
       "to": "src/core/contracts.mjs"
     },
@@ -2644,6 +2666,10 @@
     },
     {
       "from": "src/index.mjs",
+      "to": "src/adapters/auth/local-credential-authority.mjs"
+    },
+    {
+      "from": "src/index.mjs",
       "to": "src/adapters/git-provenance.mjs"
     },
     {
@@ -2657,6 +2683,10 @@
     {
       "from": "src/index.mjs",
       "to": "src/adapters/typesafe-jev-judge.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/app/local/http/authorize-local-request.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -2752,7 +2782,7 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -2816,7 +2846,7 @@
     },
     {
       "from": "src/local/app-setup.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/app-setup.mjs",
@@ -2837,14 +2867,6 @@
     {
       "from": "src/local/app-setup.mjs",
       "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/auth.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/auth.mjs",
-      "to": "src/core/service-access.mjs"
     },
     {
       "from": "src/local/canonical-source-reader-service.mjs",
@@ -2868,7 +2890,7 @@
     },
     {
       "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/canonical-source-reader-service.mjs",
@@ -2924,7 +2946,7 @@
     },
     {
       "from": "src/local/context-inputs.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/context-inputs.mjs",
@@ -2976,7 +2998,7 @@
     },
     {
       "from": "src/local/domain-store.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/durable-ingress.mjs",
@@ -2992,7 +3014,7 @@
     },
     {
       "from": "src/local/durable-ingress.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/durable-ingress.mjs",
@@ -3052,7 +3074,7 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
@@ -3096,7 +3118,7 @@
     },
     {
       "from": "src/local/exploration-inputs.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/exploration-inputs.mjs",
@@ -3136,7 +3158,7 @@
     },
     {
       "from": "src/local/git-projects.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/git-projects.mjs",
@@ -3156,7 +3178,7 @@
     },
     {
       "from": "src/local/git-worktree-sensor.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/git-worktree-sensor.mjs",
@@ -3192,7 +3214,7 @@
     },
     {
       "from": "src/local/graph-inputs.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/graph-inputs.mjs",
@@ -3268,7 +3290,7 @@
     },
     {
       "from": "src/local/graph-store.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/graph-store.mjs",
@@ -3376,7 +3398,7 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/judge-inputs.mjs",
@@ -3452,7 +3474,7 @@
     },
     {
       "from": "src/local/judge-runtime.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/judge-runtime.mjs",
@@ -3496,7 +3518,7 @@
     },
     {
       "from": "src/local/project-activation.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/project-activation.mjs",
@@ -3572,7 +3594,7 @@
     },
     {
       "from": "src/local/query-inputs.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/query-inputs.mjs",
@@ -3612,7 +3634,19 @@
     },
     {
       "from": "src/local/service.mjs",
+      "to": "src/adapters/auth/local-credential-authority.mjs"
+    },
+    {
+      "from": "src/local/service.mjs",
+      "to": "src/app/local/http/authorize-local-request.mjs"
+    },
+    {
+      "from": "src/local/service.mjs",
       "to": "src/core/service-access.mjs"
+    },
+    {
+      "from": "src/local/service.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/service.mjs",
@@ -3621,10 +3655,6 @@
     {
       "from": "src/local/service.mjs",
       "to": "src/local/app-setup.mjs"
-    },
-    {
-      "from": "src/local/service.mjs",
-      "to": "src/local/auth.mjs"
     },
     {
       "from": "src/local/service.mjs",
@@ -3644,7 +3674,7 @@
     },
     {
       "from": "src/local/source-invalidation.mjs",
-      "to": "src/local/auth.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/local/source-invalidation.mjs",

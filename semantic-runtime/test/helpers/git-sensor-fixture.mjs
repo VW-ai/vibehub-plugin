@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { DomainStore, migrateDomainStore } from '../../src/local/domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../../src/local/auth.mjs';
+import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../../src/core/service-access.mjs';
 import { GitProjectRegistry } from '../../src/local/git-projects.mjs';
 import { ProjectActivation } from '../../src/local/project-activation.mjs';

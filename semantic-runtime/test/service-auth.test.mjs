@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { request } from 'node:http';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/local/auth.mjs';
+import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference, accessDiagnostic } from '../src/core/service-access.mjs';
 import { startLocalRuntime } from '../src/local/service.mjs';
 

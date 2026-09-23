@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, existsSync, chmodSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { types } from 'node:util';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 
 const APPLICATION_ID = 0x56484453; // VHDS, separate from bootstrap and provider settings.
 export const DOMAIN_SCHEMA_VERSION = 2;
@@ -177,7 +177,7 @@ export function migrateDomainStore({ filePath, targetVersion = DOMAIN_SCHEMA_VER
 export class DomainStore {
   #db; #authority; #namespaces; #version; #closed = false; #inTransaction = false; #rangeStatements = new Set();
   constructor({ filePath, authority, namespaces }) {
-    if (!(authority instanceof LocalCredentialAuthority) || !Array.isArray(namespaces) || !namespaces.length || namespaces.length > 64) throw failure('invalid_store_input');
+    if (!(authority instanceof AccessAuthority) || !Array.isArray(namespaces) || !namespaces.length || namespaces.length > 64) throw failure('invalid_store_input');
     namespaces.forEach(id);
     this.#authority = authority; this.#namespaces = new Set(namespaces);
     try {

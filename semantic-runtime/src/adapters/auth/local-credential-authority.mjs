@@ -1,18 +1,20 @@
 import { randomBytes, randomUUID, createHash } from 'node:crypto';
-import { identifier, normalizeScope } from '../core/contracts.mjs';
-import { PRINCIPAL_KINDS, evaluateServiceAccess, evaluateMaterialization } from '../core/service-access.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
+import { identifier, normalizeScope } from '../../core/contracts.mjs';
+import { PRINCIPAL_KINDS, evaluateServiceAccess, evaluateMaterialization } from '../../core/service-access.mjs';
 
-export const LOCAL_AUDIENCE = 'vibehub-local-api';
+export { LOCAL_AUDIENCE } from '../../domain/identity/access-authority.mjs';
+
 const digest = token => createHash('sha256').update(token).digest('hex');
 const denied = () => ({ allowed: false, reason: 'unauthenticated' });
 const copy = value => structuredClone(value);
 
 /** Trusted process capability owner. No token creation/refresh HTTP endpoint. */
-export class LocalCredentialAuthority {
+export class LocalCredentialAuthority extends AccessAuthority {
   #grants = new Map();
   #contexts = new WeakMap();
   #now;
-  constructor({ now = Date.now } = {}) { this.#now = now; }
+  constructor({ now = Date.now } = {}) { super(); this.#now = now; }
 
   issue({ principal_id, kind, scope, audience = LOCAL_AUDIENCE, actions, ttl_ms = 900_000 }) {
     identifier(principal_id, 'principal'); identifier(audience, 'audience');
@@ -64,12 +66,4 @@ export class LocalCredentialAuthority {
     return false;
   }
   close() { this.#grants.clear(); this.#contexts = new WeakMap(); }
-}
-
-export function authorizeLocalRequest(authority, request, policy) {
-  // Multiple Authorization fields are rejected rather than letting Node choose one.
-  const count = (request.rawHeaders ?? []).filter((_, i, headers) => i % 2 === 0 && headers[i].toLowerCase() === 'authorization').length;
-  const value = request.headers.authorization;
-  if (count !== 1 || typeof value !== 'string' || !value.startsWith('Bearer ')) return denied();
-  return authority.authorize(value.slice(7), policy);
 }

@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { statSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
 import { DomainStore, migrateDomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { scopedReference } from '../core/service-access.mjs';
 import { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 import { ProjectActivation, ACTIVATION_NAMESPACE } from './project-activation.mjs';
@@ -59,7 +59,7 @@ export class LocalAppSetup {
   #ownerGuard = () => { throw fail('setup_unauthorized'); };
   #ownerExpiry = 0;
   constructor({ dataDir, authority, secretStore, now = Date.now, fault = () => {} }) {
-    if (!(authority instanceof LocalCredentialAuthority) || typeof dataDir !== 'string' || !dataDir
+    if (!(authority instanceof AccessAuthority) || typeof dataDir !== 'string' || !dataDir
       || typeof now !== 'function' || typeof fault !== 'function') throw fail('invalid_setup_input');
     this.#auth = authority; this.#now = now; this.#fault = fault;
     try {

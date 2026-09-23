@@ -5,7 +5,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, realpathSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DomainStore, migrateDomainStore } from '../src/local/domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/local/auth.mjs';
+import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../src/core/service-access.mjs';
 import { validateIdentityCatalog } from '../src/core/identity.mjs';
 import { GitProjectRegistry } from '../src/index.mjs';

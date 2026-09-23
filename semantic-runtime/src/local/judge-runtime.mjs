@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority } from './auth.mjs';
+import { AccessAuthority } from '../domain/identity/access-authority.mjs';
 import { ProviderSettings, validateProviderConfig } from './provider-settings.mjs';
 import { JudgeInputs } from './judge-inputs.mjs';
 import { invokeJudgeProvider } from './judge-provider.mjs';
@@ -58,7 +58,7 @@ export class LocalJudgeRuntime {
   #settings; #configuration; #inputs; #cache = new Map(); #cacheBytes = 0; #inflight = new Map();
   constructor({ store, authority, provider_settings, canonical_reader, configuration }) {
     try {
-      judgeCheck(store instanceof DomainStore && authority instanceof LocalCredentialAuthority && provider_settings instanceof ProviderSettings);
+      judgeCheck(store instanceof DomainStore && authority instanceof AccessAuthority && provider_settings instanceof ProviderSettings);
       this.#configuration = judgeConfiguration(configuration); this.#settings = provider_settings;
       this.#inputs = new JudgeInputs({ store, authority, canonical_reader, configuration: this.#configuration });
       bindings.set(this, { store, authority, canonical_digest: this.#inputs.canonical_config_digest, scope: this.#configuration.scope });

@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { canonical, fingerprint } from '../core/contracts.mjs';
 import { validateNormalizedEvent, effectiveEventAccess, sourceObjectKey } from '../core/event-provenance.mjs';
 import { sourcePartitionKey } from '../core/causal-ordering.mjs';
@@ -149,7 +149,7 @@ function lifecycleRecord(value) {
 export class SourceInvalidationDomain {
   #store; #authority;
   constructor({ store, authority }) {
-    assert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    assert(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#store = store; this.#authority = authority;
   }
   grant(context, action, options) { return grantFor(this.#authority, context, action, options); }
@@ -374,7 +374,7 @@ export class SourceInvalidationDomain {
 export class SourceInvalidationFeed {
   #store; #authority;
   constructor({ store, authority }) {
-    assert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    assert(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#store = store; this.#authority = authority;
   }
   #call(operation) {

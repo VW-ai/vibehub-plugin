@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "access-ownership-is-separated",
+    "access-direction-exceptions-are-eliminated",
+    "credential-and-request-semantics-are-preserved",
+    "access-seam-verifies-standalone"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "access-ownership-is-separated",
+      "identity": "sha256:5e987dbb3ae3ac5f43fa7bc6cb5d2300abd86a95f03b10b355f77d439273364e",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "access-direction-exceptions-are-eliminated",
+      "identity": "sha256:b7a6f6c31de05343ea24123b26ac3d02479a9ce80fbfd37e6bea289a0be2aed0",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "credential-and-request-semantics-are-preserved",
+      "identity": "sha256:39759ab19cff5efa6f670ca0b4bf7d943e2292d62e4205770b524f2f16c280c8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "access-seam-verifies-standalone",
+      "identity": "sha256:e16d261b0a82ea1c881f17252412be3718cdb7566846244b16de2c0c72d7e4e6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-local-access-seam-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T00:53:44Z",
+  "refs": [
+    "semantic-runtime/src/domain/identity/access-authority.mjs",
+    "semantic-runtime/src/adapters/auth/local-credential-authority.mjs",
+    "semantic-runtime/src/app/local/http/authorize-local-request.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/test/service-auth.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    ".vibehub/tickets/ticket-runtime-local-access-seam.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "The mixed local auth module is split into a pure AccessAuthority/LOCAL_AUDIENCE domain contract, the unchanged in-process LocalCredentialAuthority implementation under adapters/auth, and HTTP Bearer parsing under app/local/http; src/local/auth.mjs is removed. All application-oriented and non-HTTP adapter consumers now depend on the domain port, while the local service alone wires the concrete authority and HTTP parser. The package root still exposes exactly 206 names, including the same LocalCredentialAuthority, LOCAL_AUDIENCE and authorizeLocalRequest names. Boundary verification reports 246 scanned files, zero errors, zero production SCCs and zero baselined direction exceptions, down from fifteen; targeted layout and boundary tests pass 16/16. Credential generation, expiry, grant capacity, opaque contexts, revocation, materialization, duplicate/malformed Bearer handling, store/Graph/exploration/Judge/Query rechecks and local setup behavior are covered by the unchanged integration suites. Full Runtime verification passes 1022 total / 1020 passed / 0 failed / 2 expected skips. Final standalone locked-install verification passes 1022 total / 1017 passed / 0 failed / 5 expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; that Room is FRESH. No host subscription, Keychain, network, model-provider or live JEV call was made.",
+  "ticket_id": "ticket-runtime-local-access-seam"
+}

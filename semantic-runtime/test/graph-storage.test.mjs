@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { GraphStorage, WORKING_GRAPH_NAMESPACE as NS, checkGraphFormat } from '../src/local/graph-storage.mjs';
 import { DomainStore, migrateDomainStore } from '../src/local/domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/local/auth.mjs';
+import { LocalCredentialAuthority, LOCAL_AUDIENCE } from '../src/adapters/auth/local-credential-authority.mjs';
 import { scopedReference } from '../src/core/service-access.mjs';
 import { fingerprint } from '../src/core/contracts.mjs';
 import { eventObservationKey } from '../src/core/event-provenance.mjs';

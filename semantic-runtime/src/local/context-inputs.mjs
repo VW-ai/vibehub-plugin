@@ -1,4 +1,4 @@
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { ExplorationCanonical, EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
 import { graphInput, graphFields, graphEqual, graphHash, graphErrorCode } from './graph-inputs.mjs';
 import { validateContextContent1, CONTEXT_PROFILE_ERROR_CODES } from '../core/context-profile.mjs';
@@ -18,7 +18,7 @@ const eventRef = event => ({ kind: 'event_ref', observation_key: eventObservatio
 export class ContextInputs {
   #authority; #canonical; #proofs = new WeakMap(); #selections = new WeakMap();
   constructor({ authority, canonical }) {
-    check(authority instanceof LocalCredentialAuthority && canonical instanceof ExplorationCanonical);
+    check(authority instanceof AccessAuthority && canonical instanceof ExplorationCanonical);
     this.#authority = authority; this.#canonical = canonical;
   }
   #call(fn) {

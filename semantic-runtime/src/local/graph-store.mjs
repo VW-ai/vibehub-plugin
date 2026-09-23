@@ -4,7 +4,7 @@ import { validateContextContent1, validateContextOperation1 } from '../core/cont
 import { planContextSelection, readContextSelection, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
 import { selectGraph } from './graph-selected.mjs';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority } from './auth.mjs';
+import { AccessAuthority } from '../domain/identity/access-authority.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { GraphStorage, checkGraphFormat, WORKING_GRAPH_NAMESPACE } from './graph-storage.mjs';
 import { GraphInputs, GRAPH_NS, graphFail, graphAssert, graphHash, graphKey, graphEqual, graphId,
@@ -47,7 +47,7 @@ const planner = fn => { try { return fn(); } catch (error) { if (CODES.has(graph
 export class LocalGraphStore {
   #store; #authority; #inputs; #activation; #invalidations;
   constructor({ store, authority }) {
-    graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    graphAssert(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#store = store; this.#authority = authority; this.#inputs = new GraphInputs({ store, authority });
     this.#activation = new ProjectActivation({ store, authority });
     this.#invalidations = new SourceInvalidationFeed({ store, authority });

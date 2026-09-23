@@ -2,7 +2,7 @@ import { isProxy } from 'node:util/types';
 import { randomUUID, createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
@@ -32,7 +32,7 @@ export class LocalGitWorktreeSensor {
   #authority; #registry; #activation; #ingress; #clock; #lastClock = 0; #bindings = new Map(); #pending = null;
   #closed = false; #running = false; #abort = null; #approval = null;
   constructor({ store, authority, monotonicNow = () => performance.now() }) {
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority && typeof monotonicNow === 'function');
+    check(store instanceof DomainStore && authority instanceof AccessAuthority && typeof monotonicNow === 'function');
     this.#authority = authority; this.#clock = monotonicNow;
     this.#registry = new GitProjectRegistry({ store, authority }); this.#activation = new ProjectActivation({ store, authority });
     this.#ingress = new DurableIngress({ store, authority, snapshotPolicy: ({ text, event }) =>

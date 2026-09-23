@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { types } from 'node:util';
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { GitProjectRegistry } from './git-projects.mjs';
 import { DurableIngress, INGRESS_NAMESPACE } from './durable-ingress.mjs';
 import { SourceInvalidationFeed, sourceLifecycleInvalidationId } from './source-invalidation.mjs';
@@ -67,7 +67,7 @@ function publisherShape(run) {
 export class GraphInputs {
   #store; #authority; #registry; #ingress; #invalidations;
   constructor({ store, authority }) {
-    graphAssert(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    graphAssert(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#store = store; this.#authority = authority;
     this.#registry = new GitProjectRegistry({ store, authority });
     this.#ingress = new DurableIngress({ store, authority });

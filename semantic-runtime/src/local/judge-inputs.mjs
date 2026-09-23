@@ -1,5 +1,5 @@
 import { DomainStore } from './domain-store.mjs';
-import { LocalCredentialAuthority, LOCAL_AUDIENCE } from './auth.mjs';
+import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
 import { LocalExplorationStore } from './exploration-store.mjs';
@@ -35,7 +35,7 @@ const summary = value => Object.fromEntries(['pin', 'status', 'configured_record
 export class JudgeInputs {
   #store; #authority; #config; #explorations; #contexts; #contextInputs; #metadata; #canonical; #graph; #ingress; #activation; #feed; #proofs = new WeakMap();
   constructor({ store, authority, canonical_reader, configuration }) {
-    check(store instanceof DomainStore && authority instanceof LocalCredentialAuthority);
+    check(store instanceof DomainStore && authority instanceof AccessAuthority);
     this.#config = copy(configuration);
     graphFields(this.#config.scope, ['tenant_id', 'project_id']); Object.values(this.#config.scope).forEach(graphId);
     check(this.#config.egress_policy && Array.isArray(this.#config.egress_policy.sources) && this.#config.egress_policy.sources.length <= 32);
