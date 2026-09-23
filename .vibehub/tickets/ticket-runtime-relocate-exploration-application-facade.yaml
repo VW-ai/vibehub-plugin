@@ -5,7 +5,7 @@
       "criterion": "Exactly semantic-runtime/src/local/exploration-store.mjs moves to semantic-runtime/src/application/explorations/exploration-store.mjs. The source changes only its three relative import or re-export specifiers; lines 6 through 24 retain body SHA-256 e95a54735d713d6c26254b937bfa24c9fffd86b19f57202f652274a410f6fd6 and the transformed file has Git blob 55d21684c5183113cc0404d7ad21f6986a592bd6. The old path is absent, no compatibility shim or re-export remains, semantic-runtime/src/index.mjs and src/local/judge-inputs.mjs change only their one consumer specifier, test/judge-inputs.test.mjs and test/local-composition.test.mjs change only their one direct-test specifier, and every other production source file retains its path and bytes.",
       "identity": "sha256:ea0854a24415a13ba43fc425896140e990cab8daeb0878dc4c2b3c5da6ba8e02",
       "revision": 1,
-      "state": "active"
+      "state": "retired"
     },
     {
       "acceptance_id": "exploration-application-facade-contract-is-preserved",
@@ -20,9 +20,16 @@
       "identity": "sha256:495210b42f2e40edb98343bd99b89b1825cac54229d7a76f7dfee01c758cc3f4",
       "revision": 1,
       "state": "active"
+    },
+    {
+      "acceptance_id": "exploration-application-facade-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/exploration-store.mjs moves to semantic-runtime/src/application/explorations/exploration-store.mjs. The source changes only its three relative import or re-export specifiers; lines 6 through 24 retain body SHA-256 e95a54735d713d6c26254b937bfa24c9fffd86b19f57202f652274a410f6fd6d and the transformed file has Git blob 55d21684c5183113cc0404d7ad21f6986a592bd6. The old path is absent, no compatibility shim or re-export remains, semantic-runtime/src/index.mjs and src/local/judge-inputs.mjs change only their one consumer specifier, test/judge-inputs.test.mjs and test/local-composition.test.mjs change only their one direct-test specifier, and every other production source file retains its path and bytes.",
+      "identity": "sha256:ab0f797c618e8fae25794f78546c0f74aa61b21c0137ee647888879304896304",
+      "revision": 2,
+      "state": "active"
     }
   ],
-  "active_contract_revision": 1,
+  "active_contract_revision": 2,
   "constraints": [
     "Treat this as one path-first application-facade migration. Do not change executable logic beyond the three required relative specifiers, the two production consumer specifiers, two direct-test import specifiers and focused path/provenance assertions.",
     "Do not move or refactor graph-inputs, local-runtime-composition, exploration-inputs, exploration-canonical, exploration-adoption, graph-service-bundle, Graph, Context, Judge, Query, adapters, app/local, research, verification or other tests and documentation modules in this Ticket.",
@@ -106,6 +113,27 @@
       ],
       "identity": "sha256:b281d831dbdd65ccac964ef4273bab34be43b75ca14958aaaf3bdd19733762eb",
       "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "exploration-application-facade-contract-is-preserved",
+          "identity": "sha256:f9272eb6002893968337915d51b9986c5070957613f4c5ab7099694ebc222dbb",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "exploration-application-facade-home-is-exact",
+          "identity": "sha256:ab0f797c618e8fae25794f78546c0f74aa61b21c0137ee647888879304896304",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "exploration-application-facade-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:495210b42f2e40edb98343bd99b89b1825cac54229d7a76f7dfee01c758cc3f4",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ce9866958d3e65729e1a726f8ef6602946a2879c36daa6a118337b4f7edb027c",
+      "revision": 2
     }
   ],
   "deliveries": [],
