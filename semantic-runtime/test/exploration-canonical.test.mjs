@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { CanonicalSourceReader } from '../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../src/application/sources/canonical-source-reader.mjs';
 import { composeLocalServices } from '../src/local/local-runtime-composition.mjs';
 import { readerFixture, records, writeRecords, git, READER_ACTIONS } from './helpers/canonical-reader-fixture.mjs';
 import { mutation } from './helpers/graph-store-fixture.mjs';

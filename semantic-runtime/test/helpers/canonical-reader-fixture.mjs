@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fixture as graphFixture, git, initialize, SCOPE, ACTIONS } from './graph-store-fixture.mjs';
-import { CanonicalSourceReader } from '../../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../../src/application/sources/canonical-source-reader.mjs';
 
 const stable = value => Array.isArray(value) ? value.map(stable) : value && typeof value === 'object'
   ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;

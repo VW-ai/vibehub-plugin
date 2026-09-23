@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { unlinkSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
-import { CanonicalSourceReader } from '../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../src/application/sources/canonical-source-reader.mjs';
 import { GitProvenance } from '../src/adapters/git-provenance.mjs';
 import { readerFixture, records, writeRecords, makeReader, git, digest, READER_ACTIONS } from './helpers/canonical-reader-fixture.mjs';
 import { exactRevisionAddress } from '../src/core/working-graph.mjs';

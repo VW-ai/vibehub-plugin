@@ -791,6 +791,16 @@
       "intended_destination": "src/application/query/query-inputs.mjs"
     },
     {
+      "path": "src/application/sources/canonical-source-reader-service.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/sources/canonical-source-reader-service.mjs"
+    },
+    {
+      "path": "src/application/sources/canonical-source-reader.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/sources/canonical-source-reader.mjs"
+    },
+    {
       "path": "src/cli.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/cli.mjs"
@@ -934,16 +944,6 @@
       "path": "src/local/app-setup.mjs",
       "current_role": "production",
       "intended_destination": "src/app/local/app-setup.mjs"
-    },
-    {
-      "path": "src/local/canonical-source-reader-service.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/sources/canonical-source-reader-service.mjs"
-    },
-    {
-      "path": "src/local/canonical-source-reader.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/sources/canonical-source-reader.mjs"
     },
     {
       "path": "src/local/cli.mjs",
@@ -2673,6 +2673,62 @@
       "to": "src/local/source-invalidation.mjs"
     },
     {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/adapters/git-provenance.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/adapters/sqlite/domain-store.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/core/canonical-records.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/core/contracts.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/core/incremental-graph.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/core/working-graph.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/durable-ingress.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/git-projects.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/graph-capability.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/project-activation.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/local/source-invalidation.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader.mjs",
+      "to": "src/local/local-runtime-composition.mjs"
+    },
+    {
       "from": "src/cli.mjs",
       "to": "src/adapters/heuristic-judge.mjs"
     },
@@ -2930,6 +2986,10 @@
     },
     {
       "from": "src/index.mjs",
+      "to": "src/application/sources/canonical-source-reader.mjs"
+    },
+    {
+      "from": "src/index.mjs",
       "to": "src/core/agent-work-request.mjs"
     },
     {
@@ -3026,10 +3086,6 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/canonical-source-reader.mjs"
-    },
-    {
-      "from": "src/index.mjs",
       "to": "src/local/durable-ingress.mjs"
     },
     {
@@ -3091,62 +3147,6 @@
     {
       "from": "src/local/app-setup.mjs",
       "to": "src/local/provider-settings.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/adapters/git-provenance.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/core/canonical-records.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/core/incremental-graph.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/core/working-graph.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/graph-capability.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/project-activation.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader-service.mjs",
-      "to": "src/local/source-invalidation.mjs"
-    },
-    {
-      "from": "src/local/canonical-source-reader.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/cli.mjs",
@@ -3222,6 +3222,10 @@
     },
     {
       "from": "src/local/exploration-canonical.mjs",
+      "to": "src/application/sources/canonical-source-reader-service.mjs"
+    },
+    {
+      "from": "src/local/exploration-canonical.mjs",
       "to": "src/core/event-provenance.mjs"
     },
     {
@@ -3235,10 +3239,6 @@
     {
       "from": "src/local/exploration-canonical.mjs",
       "to": "src/domain/identity/access-authority.mjs"
-    },
-    {
-      "from": "src/local/exploration-canonical.mjs",
-      "to": "src/local/canonical-source-reader-service.mjs"
     },
     {
       "from": "src/local/exploration-canonical.mjs",
@@ -3646,7 +3646,7 @@
     },
     {
       "from": "src/local/local-runtime-composition.mjs",
-      "to": "src/local/canonical-source-reader-service.mjs"
+      "to": "src/application/sources/canonical-source-reader-service.mjs"
     },
     {
       "from": "src/local/local-runtime-composition.mjs",

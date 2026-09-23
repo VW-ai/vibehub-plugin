@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { DurableIngress } from '../../src/local/durable-ingress.mjs';
 import { LocalGraphStore } from '../../src/local/graph-store.mjs';
-import { CanonicalSourceReader } from '../../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../../src/application/sources/canonical-source-reader.mjs';
 import { connect } from './graph-store-fixture.mjs';
 import { READER_ACTIONS } from './canonical-reader-fixture.mjs';
 

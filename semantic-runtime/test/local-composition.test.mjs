@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { CanonicalSourceReader } from '../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../src/application/sources/canonical-source-reader.mjs';
 import { LocalContextStore } from '../src/application/context/context-store.mjs';
 import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
@@ -64,7 +64,7 @@ test('Graph capabilities are opaque and bound to the exact Graph, store and auth
 });
 
 test('canonical, exploration and Context services do not import or construct LocalGraphStore', () => {
-  for (const path of ['../src/local/canonical-source-reader.mjs', '../src/local/exploration-canonical.mjs',
+  for (const path of ['../src/application/sources/canonical-source-reader.mjs', '../src/local/exploration-canonical.mjs',
     '../src/application/context/context-inputs.mjs', '../src/application/context/context-read-service.mjs']) {
     const source = readFileSync(new URL(path, import.meta.url), 'utf8');
     assert.doesNotMatch(source, /from\s+['"][^'"]*graph-store\.mjs['"]/);

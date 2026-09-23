@@ -6,7 +6,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIENCE, scopedReference,
   GitProjectRegistry, ProjectActivation, DurableIngress, LocalGraphStore, LocalExplorationStore,
   EXPLORATION_NAMESPACE, SourceInvalidationFeed } from '../../src/index.mjs';
-import { CanonicalSourceReader } from '../../src/local/canonical-source-reader.mjs';
+import { CanonicalSourceReader } from '../../src/application/sources/canonical-source-reader.mjs';
 import { records, writeRecords, READER_ACTIONS } from './canonical-reader-fixture.mjs';
 import { git, SCOPE, register, capture, assertion } from './graph-store-fixture.mjs';
 
