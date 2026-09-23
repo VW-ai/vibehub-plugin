@@ -336,6 +336,20 @@
       "old_blob": "b4e60c49282ba92dd053bb3aa85f8e92bb06bad3",
       "migration_commit": "55a16865b8ec66e0bcb018a69fb4f4225569e4f5",
       "category": "context-application-write-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/canonical-source-reader.mjs",
+      "new_path": "semantic-runtime/src/application/sources/canonical-source-reader.mjs",
+      "old_blob": "7c910d4a1595b39a3c98a269905047e49ff66d3c",
+      "migration_commit": "be6c9e11a07089d5376853c62da792f88b792461",
+      "category": "canonical-source-reader-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/canonical-source-reader-service.mjs",
+      "new_path": "semantic-runtime/src/application/sources/canonical-source-reader-service.mjs",
+      "old_blob": "daa00dc4e0b0c0be6cc273415de5098152767f52",
+      "migration_commit": "be6c9e11a07089d5376853c62da792f88b792461",
+      "category": "canonical-source-reader-application-capability"
     }
   ]
 }

@@ -248,6 +248,37 @@ test('Context write application capability relocation is complete and recorded',
   }
 });
 
+test('Canonical source reader application capability relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'canonical-source-reader-application-capability');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [
+    {
+      old_path: 'semantic-runtime/src/local/canonical-source-reader.mjs',
+      new_path: 'semantic-runtime/src/application/sources/canonical-source-reader.mjs',
+      old_blob: '7c910d4a1595b39a3c98a269905047e49ff66d3c',
+      migration_commit: 'be6c9e11a07089d5376853c62da792f88b792461',
+      category: 'canonical-source-reader-application-capability',
+    },
+    {
+      old_path: 'semantic-runtime/src/local/canonical-source-reader-service.mjs',
+      new_path: 'semantic-runtime/src/application/sources/canonical-source-reader-service.mjs',
+      old_blob: 'daa00dc4e0b0c0be6cc273415de5098152767f52',
+      migration_commit: 'be6c9e11a07089d5376853c62da792f88b792461',
+      category: 'canonical-source-reader-application-capability',
+    },
+  ]);
+  for (const entry of entries) {
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {
