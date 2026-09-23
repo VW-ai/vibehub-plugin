@@ -30,11 +30,11 @@
         "path": "skills/vibehub-core/scripts/revision-contract.mjs"
       },
       {
-        "blob": "2accf00d45597f75070701e1a6aa8902f1736bdd",
+        "blob": "0ef03e11f46ac4ea602319ca0d6e39afff2b5b94",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
-        "blob": "937d63268f3139aa99b4012236451a6d684adf1f",
+        "blob": "40b44c07b899d70e2a0550d6dc2a6e4aab173c53",
         "path": "skills/vibehub-ticket-closeout/SKILL.md"
       },
       {
@@ -42,7 +42,7 @@
         "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
       },
       {
-        "blob": "296bfd1b6c774d1760e586938011c7e1c75ffa58",
+        "blob": "92d654ecc49977c60bb156c5c2a37dfed0f23edf",
         "path": "skills/vibehub-ticket-plan/SKILL.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
       },
       {
-        "blob": "abfb33ef7d1c6c28ebfae2c55cace293ff22923a",
+        "blob": "9cd29666687d6ee3936f451453db0df29192b692",
         "path": "skills/vibehub-ticket-run/SKILL.md"
       },
       {
@@ -58,7 +58,7 @@
         "path": "skills/vibehub-ticket-run/agents/openai.yaml"
       },
       {
-        "blob": "ee2a67d6fbde6aaef3c386c0e567d85177f61e04",
+        "blob": "8dd40e909b52bb02ffadf191b628a0527737ca05",
         "path": "skills/vibehub-ticket-validate/SKILL.md"
       },
       {
@@ -66,8 +66,8 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-07T06:55:01.794Z",
-    "last_aligned_commit": "c3515c4635cc293fdde49a2cbcdf794fd5cdb305"
+    "checked_at": "2026-09-23T18:20:58.223Z",
+    "last_aligned_commit": "d11a46525d9e181f02f88c7fae59d5d19d76857e"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
@@ -88,6 +88,5 @@
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": true,
-  "stale_reason": "drift:authority change validation and optional local Ticket workflow changed; existing shared Context claims need a follow-up review against the updated lifecycle"
+  "stale": false
 }

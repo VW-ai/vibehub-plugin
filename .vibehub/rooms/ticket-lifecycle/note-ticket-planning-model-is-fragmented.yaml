@@ -1,0 +1,50 @@
+{
+  "context_id": "note-ticket-planning-model-is-fragmented",
+  "detail": "The checked-in Ticket schema defines an independently executable record with only depends_on relations. The product concept document separately describes Goal → Epic → Ticket containment and links a planning-hierarchy contract that is absent from the repository. The dashboard can read personal Goal relations named task_of and sub_goal_of, while the current product decision rejects a canonical Parent/Child Task ontology in favor of dependency edges and topology-derived clusters unless dogfood proves durable containment operations. This fragmentation makes it unclear whether Goal, Epic, parent/child, dependency, and visual cluster are product entities, execution semantics, or presentation only. The new design work must reconcile these sources rather than adding another parallel hierarchy.",
+  "evidence": [
+    {
+      "note": "Current repository Ticket contract permits only depends_on relations and has no parent, child, Goal, or Epic ownership field.",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "note": "Current product prose defines Goal, Epic, and Ticket containment and points to a missing planning-hierarchy contract.",
+      "ref": "docs/CONCEPT.md"
+    },
+    {
+      "note": "Dashboard documentation names task_of and sub_goal_of relations supplied by the connected personal store.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "note": "Current product decision keeps canonical Tasks dependency-linked and treats hierarchy as a derived projection unless durable containment operations are proven.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-scope-with-derived-task-hierarchy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-topology-derived-task-clusters",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-23T18:18:42Z",
+    "quote": "后面我们可以研究一下 goal 和 ticket 之间到底应该是什么关系。",
+    "ref": "conversation:2026-09-23-ticket-definition-granularity"
+  },
+  "state": "active",
+  "summary": "VibeHub currently describes Ticket hierarchy in several incompatible layers, so ticket definition and containment are not one coherent contract",
+  "tags": [
+    "tickets",
+    "goals",
+    "epics",
+    "hierarchy",
+    "granularity",
+    "planning-contract"
+  ],
+  "type": "note"
+}

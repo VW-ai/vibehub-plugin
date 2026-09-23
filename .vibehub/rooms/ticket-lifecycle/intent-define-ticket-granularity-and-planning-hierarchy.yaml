@@ -1,0 +1,47 @@
+{
+  "context_id": "intent-define-ticket-granularity-and-planning-hierarchy",
+  "detail": "VibeHub's procedure is strong and reviewable, but the unit it operates on is underdefined. The design must state what makes work one Ticket, when a deliverable should remain whole, when independently schedulable child work is justified, and when dependencies, Goal or Epic containment, or derived visual clusters express the relationship better than parent/child Tickets. It must account for human review capacity: a graph with many mechanically tiny Tickets is not acceptable merely because every node is individually valid. The recent Semantic Runtime refactor is the primary failure case: file-level Tickets repeatedly paid planning, evidence, closeout, validation, and reporting overhead while obscuring the capability-level outcome. This is a product and prompt-design problem, not just a one-off planning mistake.",
+  "evidence": [
+    {
+      "note": "The owner identified Ticket definition, granularity, review load, Goal relation, and parent/child semantics as a current product bottleneck.",
+      "ref": "conversation:2026-09-23-ticket-definition-granularity"
+    },
+    {
+      "note": "The refactor produced many small Tickets and repeated lifecycle overhead for one broader architectural outcome.",
+      "ref": "conversation:2026-09-23-semantic-runtime-refactor-accounting"
+    },
+    {
+      "note": "The current repository contains several partially conflicting hierarchy descriptions that the design must reconcile.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/note-ticket-planning-model-is-fragmented.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "note-ticket-planning-model-is-fragmented",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-draft-ticket-maturity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-23T18:18:42Z",
+    "quote": "我们现在对于 ticket 是什么，其实定义相对没有那么明确。关于 ticket 的粒度以及 parent-child 关系，现在很多时候 ticket 一多，人根本就审不过来。",
+    "ref": "conversation:2026-09-23-ticket-definition-granularity"
+  },
+  "state": "active",
+  "summary": "Design one explicit Ticket definition and a practical granularity model before continuing to scale Ticket-driven development",
+  "tags": [
+    "tickets",
+    "definition",
+    "granularity",
+    "parent-child",
+    "goals",
+    "prompt-design",
+    "reviewability"
+  ],
+  "type": "intent"
+}

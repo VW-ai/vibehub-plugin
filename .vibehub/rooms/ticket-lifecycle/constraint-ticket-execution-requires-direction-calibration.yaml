@@ -1,0 +1,38 @@
+{
+  "context_id": "constraint-ticket-execution-requires-direction-calibration",
+  "detail": "A clear procedure is insufficient if an Agent can execute it correctly while moving in the wrong direction. The Ticket design must include an explicit calibration mechanism before and during execution: name the intended user-visible or architectural outcome, identify material progress signals, budget ceremony relative to implementation risk, and stop or replan when repeated work produces no proportional outcome. A 60–90 minute material-result checkpoint is a useful starting example, with task-size and risk-aware override rules to be designed. A checkpoint must evaluate outcome progress rather than count commands, commits, tests, Evidence, or elapsed effort. The mechanism belongs in the prompt and validation contract so it is difficult to omit during autonomous long-running work.",
+  "evidence": [
+    {
+      "note": "The owner explicitly requires direction calibration and cited visible delivery every 60–90 minutes as a useful example.",
+      "ref": "conversation:2026-09-23-ticket-definition-granularity"
+    },
+    {
+      "note": "A long-running refactor demonstrated that locally correct procedure and verification can still consume disproportionate time without enough capability-level progress.",
+      "ref": "conversation:2026-09-23-semantic-runtime-refactor-accounting"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-define-ticket-granularity-and-planning-hierarchy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-23T18:18:42Z",
+    "quote": "目前的 ticket 里面需要有一个强制的机制来校准方向：它要能够感知到当前做的事情是对是错，避免朝着错误的方向狂奔。",
+    "ref": "conversation:2026-09-23-ticket-definition-granularity"
+  },
+  "state": "active",
+  "summary": "Ticket planning and execution prompts must periodically prove material progress toward the intended outcome and replan when overhead or direction dominates",
+  "tags": [
+    "tickets",
+    "direction-calibration",
+    "execution",
+    "prompt-design",
+    "replanning",
+    "overhead"
+  ],
+  "type": "constraint"
+}
