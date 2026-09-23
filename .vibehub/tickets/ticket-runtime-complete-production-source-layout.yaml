@@ -1,0 +1,120 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "formal-runtime-source-tree-is-complete",
+      "criterion": "The 52 records selected from commit 99a682553618b98ffbd06a9975e25637e1c4ddbb:semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json by path under src/, path unequal to intended_destination, and intended_destination under src/ are moved to those exact destinations in one batch. Their old paths are absent, src/local contains no files, and the only source records still outside their intended destinations are exactly the six Phase-0-coupled records whose declared destinations begin research/phase0-replay/. No compatibility shim, duplicate implementation, symlink, package alias, or second entry point remains.",
+      "identity": "sha256:c36d3ff95b09d4f9cad60038a78dd2c76f3454d2676eb888261f315e2027d75d",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "source-layout-migration-preserves-behavior",
+      "criterion": "Moved JavaScript modules change only relative import or re-export specifiers required by relocation; moved UI assets remain byte-identical; current production and test consumers change only their affected specifiers; and package command names, root export names, constructors, method signatures, schema and namespace constants, authorization order, transactions, SQL and database schema, digests, receipts, error codes, provider routing, cancellation, retry and observable results remain unchanged. npm start, app and status target the new app/local entry paths without changing their behavior.",
+      "identity": "sha256:602ba49ab9c4c74117ff23bbc494149d897f9951c454f15a01a3c69a14df7de5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "source-layout-batch-is-auditable-and-verified",
+      "criterion": "The regenerated Runtime layout baseline records the complete moved topology, zero production SCCs, zero direction exceptions and zero boundary errors. The relocation manifest records each of the 52 old paths, new paths and old blobs against the actual migration commit under one production-source-layout category, while historical Ticket, Evidence and Outcome references remain unchanged. Focused layout, boundary, local composition and public-entry tests, full npm run verify, locked standalone verification, root plugin artifact verification, VibeHub project and Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking all pass offline.",
+      "identity": "sha256:ad41988dc83777f1c9ca97748231a20772a6cf1cdf9428e5df0e5fc6698f9575",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "migration-execution-calibrates-before-expanding",
+      "criterion": "Before the full verification run, execution produces a visible checkpoint comparing the planned and actual move sets, confirming 52 moved records and the exact six deferred Phase-0 records, and checking that executable changes are limited to relocation and import specifiers. Any unexpected semantic edit, seventh deferred source, new dependency cycle or direction exception, public-surface change, or need to split Phase-0 contracts stops this Ticket for replanning instead of being absorbed into the migration.",
+      "identity": "sha256:2d5709353f0dec4540e6b5f485310708a145e58b756ce9f50cb24cca6e5696d5",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one coherent mechanical source-layout Ticket. Do not create one Ticket per file, folder or capability; split only if execution discovers an independently schedulable semantic change or authority boundary.",
+    "Do not move or split src/cli.mjs, src/adapters/sqlite-store.mjs, or src/core/contracts.mjs, evaluation.mjs, policy.mjs and replay.mjs in this Ticket. Their research extraction is a later semantic migration.",
+    "Do not reorganize tests, scripts, policies, verification reports or general documentation except affected imports, package entry paths, the generated layout baseline, focused structural assertions, relocation provenance, Evidence and Room alignment required by this batch.",
+    "Do not redesign the public API, application ports, composition, storage, transactions, providers or local App while moving paths. Do not add compatibility shims or aliases.",
+    "Ordinary verification stays offline and deterministic. No credential, Keychain lifecycle, external host, network, provider, live JEV or user-repository access is authorized by this Ticket.",
+    "Keep historical VibeHub records immutable and leave unrelated untracked repository files untouched."
+  ],
+  "context": "Complete the formal Runtime source-tree migration as one mechanical batch instead of continuing one-file relocation Tickets. At commit 99a682553618b98ffbd06a9975e25637e1c4ddbb, the accepted layout inventory contains 52 source records whose paths differ from their intended destinations and whose destinations remain under src/. Move exactly that set together, update relative imports and current consumers, regenerate the layout baseline, and record one reviewable relocation batch. Leave the six source records destined for research/phase0-replay in place because their shared contracts require a later semantic split rather than a path-only move.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, independent build and verification boundaries that every moved source must preserve.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted target roles, dependency rules, migration order and path-only relocation contract.",
+      "ref": "commit:99a682553618b98ffbd06a9975e25637e1c4ddbb:semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen source-to-destination inventory, public exports, commands, constants and zero-cycle topology from which the exact 52-file batch is selected.",
+      "ref": "commit:99a682553618b98ffbd06a9975e25637e1c4ddbb:semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and prior migration examples.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Current structural inventory and topology generator whose classification defines the batch.",
+      "ref": "semantic-runtime/scripts/runtime-layout.mjs"
+    },
+    {
+      "purpose": "Current target-role, import-direction, dependency and SCC enforcement.",
+      "ref": "semantic-runtime/scripts/check-boundaries.mjs"
+    },
+    {
+      "purpose": "Root public API whose exported names remain stable while its internal specifiers move.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Successful zero-cycle composition baseline and preserved transaction/proof behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Project-wide requirement that long execution calibrate against outcome evidence and stop on directional drift.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "formal-runtime-source-tree-is-complete",
+          "identity": "sha256:c36d3ff95b09d4f9cad60038a78dd2c76f3454d2676eb888261f315e2027d75d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "migration-execution-calibrates-before-expanding",
+          "identity": "sha256:2d5709353f0dec4540e6b5f485310708a145e58b756ce9f50cb24cca6e5696d5",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "source-layout-batch-is-auditable-and-verified",
+          "identity": "sha256:ad41988dc83777f1c9ca97748231a20772a6cf1cdf9428e5df0e5fc6698f9575",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "source-layout-migration-preserves-behavior",
+          "identity": "sha256:602ba49ab9c4c74117ff23bbc494149d897f9951c454f15a01a3c69a14df7de5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7a9546fd7c42e576f95ec15118eb4d4492415c0d3f8310f3244713877c669f1a",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every non-Phase-0 Runtime source module lives in the declared domain, application, adapter, or local-app capability tree, with the current public surface and runtime behavior preserved and the remaining Phase-0 coupling made explicit.",
+  "provenance_refs": [
+    "conversation:2026-09-23-prepare-runtime-layout-migration",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-complete-production-source-layout"
+}
