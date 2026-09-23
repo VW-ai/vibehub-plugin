@@ -7,7 +7,7 @@ import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
 import { LocalQueryEngine } from '../src/application/query/query-engine.mjs';
 import { ContextReadService } from '../src/application/context/context-read-service.mjs';
-import { graphCapabilityFor, graphGetHead } from '../src/local/graph-capability.mjs';
+import { graphCapabilityFor, graphGetHead } from '../src/application/graph/graph-capability.mjs';
 import { graphServiceBundle } from '../src/local/graph-service-bundle.mjs';
 import { readerFixture } from './helpers/canonical-reader-fixture.mjs';
 

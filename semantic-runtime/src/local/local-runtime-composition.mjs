@@ -1,6 +1,6 @@
 import { LocalGraphStore } from './graph-store.mjs';
 import { CanonicalSourceReaderService } from '../application/sources/canonical-source-reader-service.mjs';
-import { graphCapabilityFor, withGraphCapability } from './graph-capability.mjs';
+import { graphCapabilityFor, withGraphCapability } from '../application/graph/graph-capability.mjs';
 import { graphServiceBundle } from './graph-service-bundle.mjs';
 
 /** Fixed local composition. No capability or transaction handle is returned to callers. */

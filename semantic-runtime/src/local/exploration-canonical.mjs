@@ -1,7 +1,7 @@
 import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { CanonicalSourceReaderService } from '../application/sources/canonical-source-reader-service.mjs';
-import { graphCapabilityFrom, graphGetHead, withGraphCapability } from './graph-capability.mjs';
+import { graphCapabilityFrom, graphGetHead, withGraphCapability } from '../application/graph/graph-capability.mjs';
 import { GraphStorage } from '../adapters/sqlite/graph-storage.mjs';
 import { GraphInputs, GRAPH_NS, graphInput, graphFields, graphHash, graphKey, graphEqual, graphId, graphErrorCode } from './graph-inputs.mjs';
 import { DurableIngress } from './durable-ingress.mjs';

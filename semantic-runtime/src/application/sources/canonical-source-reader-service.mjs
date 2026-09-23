@@ -5,7 +5,7 @@ import { AccessAuthority, LOCAL_AUDIENCE } from '../../domain/identity/access-au
 import { GitProjectRegistry } from '../../local/git-projects.mjs';
 import { ProjectActivation } from '../../local/project-activation.mjs';
 import { DurableIngress } from '../../local/durable-ingress.mjs';
-import { graphCapabilityFrom, graphGetHead, graphGetReceipt, graphMutate, graphResolve } from '../../local/graph-capability.mjs';
+import { graphCapabilityFrom, graphGetHead, graphGetReceipt, graphMutate, graphResolve } from '../graph/graph-capability.mjs';
 import { SourceInvalidationFeed } from '../../local/source-invalidation.mjs';
 import { GitProvenance } from '../../adapters/git-provenance.mjs';
 import { parseCanonicalRecord, evaluateCanonicalRecords, CANONICAL_RECORD_PROFILE } from '../../core/canonical-records.mjs';

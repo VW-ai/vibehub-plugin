@@ -16,7 +16,7 @@ import { SourceInvalidationFeed } from './source-invalidation.mjs';
 import { readExplorationOwner, EXPLORATION_ERROR_CODES } from './exploration-inputs.mjs';
 import { EXPLORATION_CANONICAL_ERROR_CODES } from './exploration-canonical.mjs';
 import { materializeExplorationAdoption, verifyExplorationAdoptionResult, verifyExplorationPublication } from './exploration-adoption.mjs';
-import { registerGraphCapability } from './graph-capability.mjs';
+import { registerGraphCapability } from '../application/graph/graph-capability.mjs';
 import { graphServiceBundle } from './graph-service-bundle.mjs';
 
 export { WORKING_GRAPH_NAMESPACE };
