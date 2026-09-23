@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "macos-secret-adapter-home-is-exact",
+    "secret-store-behavior-and-surface-are-preserved",
+    "secret-relocation-is-fully-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T01:58:01Z",
+  "contract_revision": {
+    "identity": "sha256:26de05aa54ca36e1dd64c6d3f0eae6ddd6e0ec5ac1a41de484e67ac5daccb42b",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-macos-secret-adapter-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "A fresh independent closeout subagent adjudicated the committed migration and recorded Evidence; it did not execute the relocation.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independently accepts all three criteria of exact Contract v1. Migration commit 23d3b2352888c0fbdf2a12830ef1caebec7cdd74 moves only macos-secret-store.mjs and its adjacent Swift helper from src/local to src/adapters/secrets, apart from required import, baseline, Room and Ticket updates. Git proves the helper is a byte-identical rename and the store differs only in the relative build-directory expression required to keep the same semantic-runtime/.local/keychain target; immutable parent blobs and migration destinations match the relocation manifest. The public MacOSSecretStore export, helper wire protocol, Keychain service identity, opaque reference grammar, bounded process I/O, minimal child environment, timeouts, compiler flags and error behavior remain intact. An independent offline rerun passed 35 focused secret-store, app-setup, layout and boundary tests: 33 passed, zero failed and two expected native-Keychain skips. Boundary checking scanned 246 files with zero errors, zero production SCCs and zero baselined direction exceptions. Project and Ticket validation, exact CLOSE_OUT readback, Context guard with no authorities or violations, semantic-runtime Room freshness, git diff checking, manifest blob audit and default build-path equivalence all pass. The recorded full Runtime result is 1024 total / 1022 passed / zero failed / two expected native-Keychain skips; recorded standalone locked-install is 1024 total / 1017 passed / zero failed / seven expected skips; recorded plugin artifact verification is 79 files and 3670088 bytes. This reviewer did not enable VIBEHUB_TEST_KEYCHAIN, touch a real Keychain item, read a credential, or call a host, network, provider or live JEV capability. No criterion remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-macos-secret-adapter",
+  "unresolved_acceptance_ids": []
+}

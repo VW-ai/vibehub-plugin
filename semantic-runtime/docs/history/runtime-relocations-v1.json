@@ -252,6 +252,20 @@
       "old_blob": "5043b7850a5a082d336578e287bb827c86f5bc47",
       "migration_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
       "category": "provider-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/keychain-helper.swift",
+      "new_path": "semantic-runtime/src/adapters/secrets/keychain-helper.swift",
+      "old_blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
+      "migration_commit": "23d3b2352888c0fbdf2a12830ef1caebec7cdd74",
+      "category": "secret-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/macos-secret-store.mjs",
+      "new_path": "semantic-runtime/src/adapters/secrets/macos-secret-store.mjs",
+      "old_blob": "80aa48bb142dcd72330d2905c51668df0d64d069",
+      "migration_commit": "23d3b2352888c0fbdf2a12830ef1caebec7cdd74",
+      "category": "secret-adapter"
     }
   ]
 }
