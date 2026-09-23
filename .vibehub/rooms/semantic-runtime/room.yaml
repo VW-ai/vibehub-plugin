@@ -94,7 +94,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "9e899199ebc20b3364e20c5caf1c45520c936e5c",
+        "blob": "023908287db9bfee10c40df4c5b87285b3a3d110",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -1426,7 +1426,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "fc231da8a3a7b4c1320ff56f7cc0a133a4330b5d",
+        "blob": "5fa6f03d455f5e855d18efc4c7bfd0f050c3b9a1",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1470,8 +1470,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T01:19:45.466Z",
-    "last_aligned_commit": "f69c194eb4b5c89a7fab752c1a920e998ac3844f"
+    "checked_at": "2026-09-23T01:27:10.045Z",
+    "last_aligned_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503"
   },
   "anchors": [
     "semantic-runtime/"

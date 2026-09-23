@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "production-provider-home-is-exact",
+    "provider-behavior-and-surface-are-preserved",
+    "provider-relocation-is-fully-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T01:35:19Z",
+  "contract_revision": {
+    "identity": "sha256:8b9f977337677686c41912e3212dddc84c5ec151414878c8007d8c25b89dc212",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-production-provider-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/provider_move_closeout, with no executor turn history and no authored implementation, tests, manifest, Room alignment or Evidence. I read the exact Ticket, Evidence, migration commit, current diff, baseline, manifest, Room and acceptance contract, then reran focused offline checks. I relied on the recorded full Runtime, standalone locked-install and plugin-artifact results only after finding them consistent with the focused reproduction. This Outcome is my only canonical project-record write. I reused the parent dashboard entry; the installed agent-session contract referenced by the Skill was absent, so no session API or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three agent-authority criteria against the exact contract-v1 revision. production-provider-home-is-exact: commit 656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503 moves exactly JevJudge, TypeSafeJevJudge, OpenRouterJevJudge and judge-input into src/adapters/providers; Git detects three byte-identical renames and one 98% rename, while comparison, replay, benchmark, verification, Git, SQLite, secret and mixed application modules stay in their prior homes. provider-behavior-and-surface-are-preserved: direct source comparison shows the only implementation change inside the moved cluster is OpenRouter's required ../../core/contracts.mjs relative import; all consumer changes are path-only, src/index.mjs preserves its named exports, and 54 focused offline provider, routing, replay, comparison and layout tests pass with zero failures. provider-relocation-is-fully-verifiable: the baseline contains exactly the four production destinations; the relocation manifest binds the four old paths to blob IDs that independently match commit f69c194eb4b5c89a7fab752c1a920e998ac3844f and to migration commit 656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503; the aligned Room points at that commit; boundary checking scans 246 files with zero errors, zero production SCCs and zero direction exceptions; Ticket/project validation and Context guard pass. The recorded Evidence additionally supplies consistent successful full Runtime, standalone locked-install and plugin-artifact results. All adjudication and rerun checks were offline and made no host, credential, network, provider or live JEV call.",
+  "ticket_id": "ticket-runtime-relocate-production-provider-adapters",
+  "unresolved_acceptance_ids": []
+}

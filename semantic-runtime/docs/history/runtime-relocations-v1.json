@@ -224,6 +224,34 @@
       "old_blob": "88651670e87a1c5e7593061d75e11ba656c57595",
       "migration_commit": "474e36d8b29c0639c4b48aa92dc06545e4873fa2",
       "category": "host-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/jev-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/jev-judge.mjs",
+      "old_blob": "0bb2780fd3122a901161880650efe053fac69489",
+      "migration_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
+      "category": "provider-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/judge-input.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/judge-input.mjs",
+      "old_blob": "92be1965e40889767e986096aea0555c13de6778",
+      "migration_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
+      "category": "provider-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/openrouter-jev-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/openrouter-jev-judge.mjs",
+      "old_blob": "81b4c0d99fd83fd1a6d6d77f891eb08b18995526",
+      "migration_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
+      "category": "provider-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/typesafe-jev-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/typesafe-jev-judge.mjs",
+      "old_blob": "5043b7850a5a082d336578e287bb827c86f5bc47",
+      "migration_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
+      "category": "provider-adapter"
     }
   ]
 }

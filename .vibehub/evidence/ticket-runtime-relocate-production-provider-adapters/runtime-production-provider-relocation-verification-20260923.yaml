@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "production-provider-home-is-exact",
+    "provider-behavior-and-surface-are-preserved",
+    "provider-relocation-is-fully-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "production-provider-home-is-exact",
+      "identity": "sha256:8d3a2086ae08887c88cef56ca3f4261c82bf485fba4b12e742af7910ab3613ac",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "provider-behavior-and-surface-are-preserved",
+      "identity": "sha256:778265637261ece6c7d3652fa57ea7546469d97a228c433c1ec228dc9fac1c12",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "provider-relocation-is-fully-verifiable",
+      "identity": "sha256:8278685e8887e65e76b1868377c090070fb6429b6013dbf82b46254f0aab23d6",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-production-provider-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T01:32:24Z",
+  "refs": [
+    "commit:656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503",
+    "semantic-runtime/src/adapters/providers/jev-judge.mjs",
+    "semantic-runtime/src/adapters/providers/typesafe-jev-judge.mjs",
+    "semantic-runtime/src/adapters/providers/openrouter-jev-judge.mjs",
+    "semantic-runtime/src/adapters/providers/judge-input.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/src/local/judge-provider.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    ".vibehub/tickets/ticket-runtime-relocate-production-provider-adapters.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "The production provider cluster moved to src/adapters/providers in migration commit 656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503: JevJudge, TypeSafeJevJudge, OpenRouterJevJudge and their minimized judge-input helper. Git detected three byte-identical renames and one 98% rename whose only source change is the required ../../core/contracts.mjs path. LocalJudgeRuntime, root exports, replay/live scripts, provider tests and Haiku/Claude comparison consumers now resolve the new paths; comparison, replay, cache, retry, Git, SQLite and secret adapters remain unmoved. The relocation manifest binds all four old paths and blobs to that commit, and its repository-only test explicitly skips when standalone packaging omits docs/history. Focused provider/layout tests pass 50/50 before the manifest test, the final layout suite passes 7/7, and boundaries scan 246 files with zero errors, zero production SCCs and zero baselined direction exceptions. Full Runtime verification passes 1023 total / 1021 passed / 0 failed / 2 expected skips. Standalone locked-install verification passes 1023 total / 1017 passed / 0 failed / 6 expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. No host, Keychain, network, credential, model-provider or live JEV call was made.",
+  "ticket_id": "ticket-runtime-relocate-production-provider-adapters"
+}
