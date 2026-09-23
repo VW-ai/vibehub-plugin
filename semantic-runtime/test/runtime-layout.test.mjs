@@ -279,6 +279,26 @@ test('Canonical source reader application capability relocation is complete and 
   }
 });
 
+test('Graph application capability relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'graph-application-capability');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/graph-capability.mjs',
+    new_path: 'semantic-runtime/src/application/graph/graph-capability.mjs',
+    old_blob: 'afae727cf3ac13539e40e798a468d28d65d7d293',
+    migration_commit: '8845a0c43fcea1ea68520c35d93e81e05cf3346c',
+    category: 'graph-application-capability',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/graph-capability.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/application/graph/graph-capability.mjs', import.meta.url)), true);
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {

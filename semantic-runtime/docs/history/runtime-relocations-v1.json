@@ -350,6 +350,13 @@
       "old_blob": "daa00dc4e0b0c0be6cc273415de5098152767f52",
       "migration_commit": "be6c9e11a07089d5376853c62da792f88b792461",
       "category": "canonical-source-reader-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-capability.mjs",
+      "new_path": "semantic-runtime/src/application/graph/graph-capability.mjs",
+      "old_blob": "afae727cf3ac13539e40e798a468d28d65d7d293",
+      "migration_commit": "8845a0c43fcea1ea68520c35d93e81e05cf3346c",
+      "category": "graph-application-capability"
     }
   ]
 }
