@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "graph-capability-application-home-is-exact",
+    "graph-capability-relocation-preserves-contract",
+    "graph-capability-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "graph-capability-application-home-is-exact",
+      "identity": "sha256:ea246dfb4c1510097f3c98d480a5146dbca87b65d0e7b8fe60539b9a921f7757",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-capability-relocation-preserves-contract",
+      "identity": "sha256:ee1081e3570c7e63019de0cda7057a1234667525e8c5492b869dcd6d5304b3fb",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "graph-capability-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:4f0b28e4c27d2bf8f636a6acbb031b2c9d9a31287b2ccd3d1aaa7ff918febabc",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-graph-capability-application-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T07:45:54.954Z",
+  "refs": [
+    "commit:8845a0c43fcea1ea68520c35d93e81e05cf3346c",
+    "commit:67b8cda0b55259a94d7b866b02bbc4ac8c317cb4",
+    "commit:66f0b74118a5958a8efa33860c078d5be36db3aa:semantic-runtime/src/local/graph-capability.mjs",
+    "semantic-runtime/src/application/graph/graph-capability.mjs",
+    "semantic-runtime/src/application/sources/canonical-source-reader-service.mjs",
+    "semantic-runtime/src/local/exploration-canonical.mjs",
+    "semantic-runtime/src/local/graph-service-bundle.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/src/local/local-runtime-composition.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-graph-capability-application-seam.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 8845a0c43fcea1ea68520c35d93e81e05cf3346c records a 100% Git rename of semantic-runtime/src/local/graph-capability.mjs to semantic-runtime/src/application/graph/graph-capability.mjs. The old and new files share exact Git blob afae727cf3ac13539e40e798a468d28d65d7d293; the old path is absent, the new path is present and there is no shim. Exactly five production consumers and one test consumer replace one import specifier each, with no other production source path or executable logic change. The private WeakMaps, Symbol brand, one-registration rule, required getHead/getReceipt/resolve/mutate methods, exact owner/store/authority identity checks, invalid_graph_input failures and dynamic forwarding remain byte-identical. The regenerated layout baseline preserves 333 normalized production edges, exactly five incoming capability edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 files. Provenance commit 67b8cda0b55259a94d7b866b02bbc4ac8c317cb4 adds one exact graph-application-capability manifest record, a repository-aware path assertion and refreshed semantic-runtime Room alignment while leaving historical records unchanged. Root focused Graph, canonical reader, Exploration and composition tests pass 54/54; independent audit runs a broader focused set at 67/67 and reports no material findings. Layout and boundary tests pass 26/26. Deterministic mocked JEV contract checks pass 17/17 without a live call. Full Runtime verification passes 1,033 total, 1,031 passed, zero failed and two expected Keychain skips. Standalone locked-install verification passes 1,033 total, 1,018 passed, zero failed and fifteen expected skips. Plugin artifact verification passes with 79 files and 3,670,088 bytes. Ticket/project validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH and the remote branch equals the committed work. No credential, Keychain lifecycle, external host, provider, live JEV or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-graph-capability-application-seam"
+}
