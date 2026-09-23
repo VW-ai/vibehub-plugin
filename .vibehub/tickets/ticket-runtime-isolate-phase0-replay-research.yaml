@@ -1,0 +1,129 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "formal-runtime-has-no-phase0-replay-coupling",
+      "criterion": "src/core/contracts.mjs is split into a pure src/domain/shared/contracts.mjs containing exactly the formal shared symbols FAMILIES, SENSITIVITIES, requireValue, text, identifier, timestamp, canonical, fingerprint, compareText, normalizeScope, sameScope, judgeInputHash and validateDecision, plus research/phase0-replay/src/contracts.mjs containing EVENT_TYPES, normalizeEvent, normalizeState and visibleState. Every formal consumer imports the production shared module; src/core is empty; no src module imports research; policy-artifacts no longer imports the Phase 0 policy validator or exposes loadPhaseZeroPolicyArtifact; and heuristic-judge, recorded-judge, the Phase 0 policy evaluator, replay engine, evaluation, candidate SQLite store and replay CLI have no implementation or shim left under src.",
+      "identity": "sha256:16155c5bbe5dd57478e6301bccc8993ae865163450db4d7bafb9c87dbe267afa",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "phase0-research-vertical-is-complete",
+      "criterion": "research/phase0-replay contains the complete coherent Phase 0 vertical: replay CLI and src contracts/policy/evaluation/replay; candidate SQLite, heuristic and recorded judge adapters; both policies; the five Peel benchmark/comparison/provenance runners; namespaced synthetic and Peel fixtures without filename collisions; the Phase 0 contract document; the five whole Phase 0 tests, their support helper, and the compatibility-loader test extracted from the formal policy-artifact suite. All 32 old paths in the audited closure are absent: 31 records move whole and src/core/contracts.mjs is split between the formal shared module and replay-only contracts. The split and compatibility-test extraction have explicit lineage, and no tracked Peel report is invented from ignored .local outputs.",
+      "identity": "sha256:80d785d3998658cf2be147008e1a4fa105ac629d281fc3dfed2341faa651dbd1",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "phase0-contract-and-command-behavior-is-preserved",
+      "criterion": "The existing replay, replay:jev, replay:peel, audit, compare, benchmark:peel:jev, benchmark:peel:jev:direct, benchmark:peel:jev:routes, benchmark:peel:compare, benchmark:peel:compare:gateway and verify:peel:provenance command names continue to reach the same offline or explicit-live behavior from research/phase0-replay. Replay normalization, policy validation, deterministic ordering and hashes, candidate persistence, comparison and benchmark results remain equivalent. The formal root export surface removes exactly replay, compareRuns, validatePolicy, normalizeEvent, normalizeState and loadPhaseZeroPolicyArtifact as research-only APIs, retains judgeInputHash from the production shared module, and otherwise preserves exported names and Runtime behavior.",
+      "identity": "sha256:52d36459250cfb36863cb648f347a34931668ef314cf71e9f90694d74f9d1e27",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "production-and-research-verification-stay-honest",
+      "criterion": "Package verification exposes a production-only target and a deterministic test:phase0 target; full npm run verify runs both, while verify:standalone copies no research directory and runs only the production target. Runtime layout classification, boundary rules, baseline and relocation provenance describe the split accurately, with zero production SCCs, zero direction exceptions and zero boundary errors. Focused formal and Phase 0 tests, full verification, locked standalone verification, root plugin artifact verification, VibeHub project and Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking all pass offline without reading credentials or calling a live provider.",
+      "identity": "sha256:6b0b549dd10e2092f0e0d4d27d681037015451d6a05e09336e4ce017f7ae3241",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "phase0-extraction-calibrates-before-expanding",
+      "criterion": "Before broad verification, execution records a visible checkpoint comparing the planned and actual research closure: 31 whole tracked moves, one shared-contract split, one policy compatibility-loader extraction, one compatibility-test extraction, and the exact six root export removals. Any extra formal API removal, production-to-research import, unclassified Phase 0 implementation left in src, additional research family, behavior change, new cycle or direction exception stops this Ticket for replanning instead of being absorbed.",
+      "identity": "sha256:2e4894d415e3daf226a43ef614ee915cefd951c48eafa3564d6dfa3d0ae76846",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one vertical Phase 0 isolation Ticket, not one Ticket per file or folder. Split only if execution discovers a separately schedulable product, authority or compatibility decision beyond the exact public narrowing already stated here.",
+    "Do not reorganize unrelated formal tests, live JEV verification, host probes, UX research, platform research, general documentation or measurement reports in this Ticket.",
+    "Do not redesign replay semantics, policy semantics, providers, SQLite schema, benchmark methodology or formal Runtime contracts while separating ownership. Do not add aliases, compatibility shims, a package subpath or a second package.",
+    "Ordinary verification remains offline and deterministic. Do not read .env.local, Keychain or credentials and do not call JEV, Claude, Codex, Vercel, OpenRouter, TypeSafe or another live provider.",
+    "Historical VibeHub records remain immutable. Record new split and relocation provenance without rewriting old Ticket, Evidence or Outcome paths, and leave unrelated untracked repository files untouched."
+  ],
+  "context": "The completed production source migration deliberately deferred six files classified as Phase 0. Dependency audit now shows that four are clean research units, while contracts.mjs and policy.mjs are mixed with formal Runtime consumers. Finish the boundary as one semantic extraction: retain the shared formal value/judge/scope contracts in a pure production module; move replay-only contracts, evaluator, policies, candidate store, CLI, Phase 0-only judges, synthetic and Peel fixtures, runners and tests into research/phase0-replay; remove the obsolete formal compatibility edge and Phase 0 root exports; and preserve the existing explicit commands and offline behavior from their new paths.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, pure-domain, Phase 0 prototype and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability layout, dependency directions and research ownership model before this semantic extraction.",
+      "ref": "commit:2c9e0cc527c017836cc1839314623748f96a3422:semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen pre-extraction inventory, commands, exports and production graph; its provisional Phase 0 mapping is corrected by the audited closure in this Ticket.",
+      "ref": "commit:2c9e0cc527c017836cc1839314623748f96a3422:semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Successful predecessor outcome that leaves exactly the mixed Phase 0 source cluster for a semantic split.",
+      "ref": ".vibehub/outcomes/ticket-runtime-complete-production-source-layout/contract-v1.yaml"
+    },
+    {
+      "purpose": "Append-only path provenance to extend without rewriting historical evidence.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Formal public surface whose exact Phase 0 narrowing and judgeInputHash preservation are acceptance-bound.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Existing command names and full/standalone verification entry points to preserve or separate explicitly.",
+      "ref": "semantic-runtime/package.json"
+    },
+    {
+      "purpose": "Project execution rule requiring a visible outcome-based checkpoint before work expands.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "formal-runtime-has-no-phase0-replay-coupling",
+          "identity": "sha256:16155c5bbe5dd57478e6301bccc8993ae865163450db4d7bafb9c87dbe267afa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "phase0-contract-and-command-behavior-is-preserved",
+          "identity": "sha256:52d36459250cfb36863cb648f347a34931668ef314cf71e9f90694d74f9d1e27",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "phase0-extraction-calibrates-before-expanding",
+          "identity": "sha256:2e4894d415e3daf226a43ef614ee915cefd951c48eafa3564d6dfa3d0ae76846",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "phase0-research-vertical-is-complete",
+          "identity": "sha256:80d785d3998658cf2be147008e1a4fa105ac629d281fc3dfed2341faa651dbd1",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "production-and-research-verification-stay-honest",
+          "identity": "sha256:6b0b549dd10e2092f0e0d4d27d681037015451d6a05e09336e4ce017f7ae3241",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:1383234f8288bab889803a7906c7c02384d599aa45ed46bd8a8236aab1035c84",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The historical Phase 0 replay and Peel benchmark form one self-contained research vertical, while the formal Runtime source tree contains only production contracts and capabilities and remains independently installable and verifiable.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-code-governance",
+    "audit:phase0-dependency-closure-2026-09-23",
+    "audit:phase0-artifact-map-2026-09-23",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-isolate-phase0-replay-research"
+}
