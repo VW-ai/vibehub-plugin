@@ -1,0 +1,29 @@
+{
+  "accepted_acceptance_ids": [
+    "formal-runtime-source-tree-is-complete",
+    "source-layout-migration-preserves-behavior",
+    "source-layout-batch-is-auditable-and-verified",
+    "migration-execution-calibrates-before-expanding"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T21:49:21.441Z",
+  "contract_revision": {
+    "identity": "sha256:7a9546fd7c42e576f95ec15118eb4d4492415c0d3f8310f3244713877c669f1a",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-complete-production-source-layout-v1"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/source_layout_closeout did not plan or execute this migration and received only a bounded adjudication handoff. I independently read the exact Ticket, native Evidence, immutable frozen baseline and pre-move blobs, executor commit/diff, current manifest, layout baseline, focused tests, Room alignment and Context guard, and authored only this Outcome. The installed agent-session contract is absent, so no session report or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all four active Acceptance revisions of exact Contract 1. The frozen 99a68255 layout inventory selects exactly 52 src-to-src moves and the migration commit 84b1f1c20c56f5b14534f838c0bb77e81a8bade8 contains exactly 52 detected source renames. The append-only production-source-layout manifest has the exact same 52 old/new tuples, each old_blob resolves to the migration parent, every old path is absent, every new path exists as a regular file, src/local has no records, and current layout inspection leaves no src-to-src move while retaining exactly the six declared Phase-0 files. Direct source comparison covers 50 JavaScript modules and two non-JavaScript assets: after normalizing only module or relocation-required file URL specifiers, all moved modules match their immutable parent blobs; the setup UI app, HTML and CSS are byte-identical. Review of all 96 modified JavaScript consumers found only affected import, file URL, fixture/module path and package-command expectation changes outside the focused structural test. Root export names, npm command names, contract constant names/values/schema hashes, constructors and public composition remain stable; start, app and status target app/local. The regenerated baseline has 333 production edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 files. Focused layout, composition, public foundation, setup UI and local transport checks pass; the exact nine transport tests passed with loopback enabled after the managed sandbox correctly refused listener binds. The native Evidence records the successful complete Runtime, locked standalone and root plugin artifact verification; no concrete gap warranted repeating those broad runs. Ticket validation passes at 235 Tickets, 543 Evidence and 181 pre-closeout Outcomes; project format 4 validation has no unverifiable Context refs; Context guard since migration parent 0f6dc655df22098d396d6130629f0f00c5aaac79 reports no governing authorities or violations; semantic-runtime Room drift is FRESH; and git diff check passes. The two unrelated untracked Ticket files were untouched. No credential, Keychain lifecycle, external host, provider, live JEV, user repository or external network was used. The installed closeout Skill references a missing contracts/agent-session.md, so no session report or completion claim was invented. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-complete-production-source-layout",
+  "unresolved_acceptance_ids": []
+}

@@ -385,6 +385,370 @@
       "old_blob": "d5acf698ee2a294c6c6d3a2d7ef6e3a5a8790e9a",
       "migration_commit": "9eb1509117eb441c94e94aaaa4a25a1dd2500099",
       "category": "exploration-adoption-application-service"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/cached-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/cached-judge.mjs",
+      "old_blob": "bbdf414e6dcc182eaad4c00ad20c5287a18c2039",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/claude-cli-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/claude-cli-judge.mjs",
+      "old_blob": "c15681c0393619d45c16153a632eb70ff04f3d4e",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/git-provenance.mjs",
+      "new_path": "semantic-runtime/src/adapters/git/git-provenance.mjs",
+      "old_blob": "2eafaa85c43afaa263e705e42866d224e18173df",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/git-worktree-observer.mjs",
+      "new_path": "semantic-runtime/src/adapters/git/git-worktree-observer.mjs",
+      "old_blob": "1bba81fb925dbd2127805a8fe4352c3ce4f23d8c",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/haiku-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/haiku-judge.mjs",
+      "old_blob": "82881fdd436bcc9bf69fd0eb6f873f7e7c8e6a71",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/heuristic-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/heuristic-judge.mjs",
+      "old_blob": "2a98223837f13e55084193462a2e3fe1e4588f38",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/recorded-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/recorded-judge.mjs",
+      "old_blob": "c38400e51d5b9ec03df189e65520e5a2271157db",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/resilient-judge.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/resilient-judge.mjs",
+      "old_blob": "60b5843f6f49fcaba7946753c3cf5f3c6380a938",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/agent-work-request.mjs",
+      "new_path": "semantic-runtime/src/domain/work/agent-work-request.mjs",
+      "old_blob": "5ecbf2e77be0076e7f4de13f54efe96288512c33",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/branch-scope.mjs",
+      "new_path": "semantic-runtime/src/domain/explorations/branch-scope.mjs",
+      "old_blob": "d8f3fae6ae73ec033170ac11dca5cd1d19244379",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/canonical-records.mjs",
+      "new_path": "semantic-runtime/src/domain/sources/canonical-records.mjs",
+      "old_blob": "ec7cfa9ee4d49928a29dfa41a91365fa4957687b",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/causal-ordering.mjs",
+      "new_path": "semantic-runtime/src/domain/sources/causal-ordering.mjs",
+      "old_blob": "4185a5000b92b287f1a65324b759e49b2ba05d03",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/context-profile.mjs",
+      "new_path": "semantic-runtime/src/domain/context/context-profile.mjs",
+      "old_blob": "a5f57e039788b1cea9d3d1e0dbdaa4d26ef709ce",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/event-provenance.mjs",
+      "new_path": "semantic-runtime/src/domain/sources/event-provenance.mjs",
+      "old_blob": "0b527be149a763dccfd5e90b04fead456484d6bf",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/git-provenance.mjs",
+      "new_path": "semantic-runtime/src/domain/sources/git-provenance.mjs",
+      "old_blob": "c8dd91dae2c5d37d354947ecd319df10ae3c658d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/git-worktree-observation.mjs",
+      "new_path": "semantic-runtime/src/domain/sources/git-worktree-observation.mjs",
+      "old_blob": "3463a9d46e77a8455aa607a721334683a2336844",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/identity.mjs",
+      "new_path": "semantic-runtime/src/domain/identity/identity.mjs",
+      "old_blob": "204737beb850d8bfdc05a4575a898af71558b334",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/incremental-graph.mjs",
+      "new_path": "semantic-runtime/src/domain/graph/incremental-graph.mjs",
+      "old_blob": "19cd7e733a90ad97a02bdde46f7b8ef50699f146",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/judge-node.mjs",
+      "new_path": "semantic-runtime/src/domain/judge/judge-node.mjs",
+      "old_blob": "03b172b8a4c8906f176d68292343974949af8112",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/observability-contract.mjs",
+      "new_path": "semantic-runtime/src/domain/decisions/observability-contract.mjs",
+      "old_blob": "2be7f10f24537dfd4aee50bc97e8ed263b7f0d04",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/policy-artifacts.mjs",
+      "new_path": "semantic-runtime/src/domain/decisions/policy-artifacts.mjs",
+      "old_blob": "34e6fa0f529eb417ade10944eb9a61719cb7a346",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/policy-kernel.mjs",
+      "new_path": "semantic-runtime/src/domain/decisions/policy-kernel.mjs",
+      "old_blob": "f774aa87c52bb2815c74c5e22cfa6f61136448db",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/query-ranking.mjs",
+      "new_path": "semantic-runtime/src/domain/query/query-ranking.mjs",
+      "old_blob": "2dbb5fece5b89c7992f906dbb932c1f31624a22c",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/query-text.mjs",
+      "new_path": "semantic-runtime/src/domain/query/query-text.mjs",
+      "old_blob": "201b931333528d22178317921352792b7dd76a97",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/reconciliation.mjs",
+      "new_path": "semantic-runtime/src/domain/work/reconciliation.mjs",
+      "old_blob": "cb9f94374fadaa85306d4a3c8a2a829b1bef4a4e",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/service-access.mjs",
+      "new_path": "semantic-runtime/src/domain/identity/service-access.mjs",
+      "old_blob": "f01dbec19334dd7e0fda6078217ab152858286ae",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/worker-protocol.mjs",
+      "new_path": "semantic-runtime/src/domain/work/worker-protocol.mjs",
+      "old_blob": "eb1326a105c066b8d2b80b593f71d8cdfc666b67",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/working-graph.mjs",
+      "new_path": "semantic-runtime/src/domain/graph/working-graph.mjs",
+      "old_blob": "1707d7d0a7eaa80120503efd2e2c770e4be5233d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/app-session.mjs",
+      "new_path": "semantic-runtime/src/app/local/app-session.mjs",
+      "old_blob": "dd46fd664fc451005ef594b7502e9c72e9671d60",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/app-setup.mjs",
+      "new_path": "semantic-runtime/src/app/local/app-setup.mjs",
+      "old_blob": "7f022af4e1cb5165bed98e6047cc054af1abcb60",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/cli.mjs",
+      "new_path": "semantic-runtime/src/app/local/cli.mjs",
+      "old_blob": "3c4aa1982ec60211811f7fc6e0af4973f5e282e3",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/durable-ingress.mjs",
+      "new_path": "semantic-runtime/src/application/project/durable-ingress.mjs",
+      "old_blob": "2f1d7a4f4f67d47d973ef114f7b477bda016db9d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/exploration-canonical.mjs",
+      "new_path": "semantic-runtime/src/application/explorations/exploration-canonical.mjs",
+      "old_blob": "c7f2aa06e261bf2b54dfe1fac63b0c1ecfccb15c",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/exploration-inputs.mjs",
+      "new_path": "semantic-runtime/src/application/explorations/exploration-inputs.mjs",
+      "old_blob": "2af1e58d8b7faf598962fdd0b6e8979d83243ec3",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/git-projects.mjs",
+      "new_path": "semantic-runtime/src/adapters/git/git-projects.mjs",
+      "old_blob": "92be05de4048b0390104f796b096df1eb65e11ec",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/git-worktree-sensor.mjs",
+      "new_path": "semantic-runtime/src/adapters/git/git-worktree-sensor.mjs",
+      "old_blob": "5275cbbf5b0df6ee0cba17858bd08ed5a6dc3be8",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-inputs.mjs",
+      "new_path": "semantic-runtime/src/application/graph/graph-inputs.mjs",
+      "old_blob": "78a43c8ce5e4343685d2de27fed00c469b9646ea",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-service-bundle.mjs",
+      "new_path": "semantic-runtime/src/application/graph/graph-service-bundle.mjs",
+      "old_blob": "b0e1b88271458339b4895c27ac64684aa7efaa35",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/graph-store.mjs",
+      "new_path": "semantic-runtime/src/application/graph/graph-store.mjs",
+      "old_blob": "175613b9c1f0b8d0d1b2aea1e26133410e1703a6",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/judge-contract.mjs",
+      "new_path": "semantic-runtime/src/application/judge/judge-contract.mjs",
+      "old_blob": "0548bd743f82c99076ee350bf36cb974b9b5f201",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/judge-inputs.mjs",
+      "new_path": "semantic-runtime/src/application/judge/judge-inputs.mjs",
+      "old_blob": "8f49a6b62e0a184254bd119657a6c008e10ad746",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/judge-provider.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/judge-provider.mjs",
+      "old_blob": "6b03bdc1ab03f0fb8022363fe53e0075546f415a",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/judge-runtime.mjs",
+      "new_path": "semantic-runtime/src/application/judge/judge-runtime.mjs",
+      "old_blob": "9bde22e0f527ff90da2b161c9404766c1bb5ae4f",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/local-runtime-composition.mjs",
+      "new_path": "semantic-runtime/src/application/support/local-runtime-composition.mjs",
+      "old_blob": "25d1e1846dcd544696c6df4fbeec54fc09d26acf",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/project-activation.mjs",
+      "new_path": "semantic-runtime/src/application/project/project-activation.mjs",
+      "old_blob": "392b4bfb045d78c9ceeed7d2f348c0de846b4f3f",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/provider-settings.mjs",
+      "new_path": "semantic-runtime/src/adapters/providers/provider-settings.mjs",
+      "old_blob": "1325e13763cb7acd66ba1b7b32177e242fdfa09d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/service.mjs",
+      "new_path": "semantic-runtime/src/app/local/service.mjs",
+      "old_blob": "5f318d130497cea0179a515bd04c13b99623668d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/setup-http.mjs",
+      "new_path": "semantic-runtime/src/app/local/setup-http.mjs",
+      "old_blob": "dfba5296e8e2c01e3d35fe6a63d2e7d0a49e383e",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/setup-ui/app.mjs",
+      "new_path": "semantic-runtime/src/app/local/ui/app.mjs",
+      "old_blob": "7817804fcbb8aef2863545a4e98d43fd450cd67d",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/setup-ui/index.html",
+      "new_path": "semantic-runtime/src/app/local/ui/index.html",
+      "old_blob": "7b9e74169d041082b4cedcd1027b8c1525ac2685",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/setup-ui/style.css",
+      "new_path": "semantic-runtime/src/app/local/ui/style.css",
+      "old_blob": "18b97707705a7821cc76cf16a0b9c97b4638592b",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/source-invalidation.mjs",
+      "new_path": "semantic-runtime/src/application/sources/source-invalidation.mjs",
+      "old_blob": "6f0018d967ea3181398eaba1dd161e6fa3ab8762",
+      "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+      "category": "production-source-layout"
     }
   ]
 }

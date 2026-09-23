@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "formal-runtime-source-tree-is-complete",
+    "source-layout-migration-preserves-behavior",
+    "source-layout-batch-is-auditable-and-verified",
+    "migration-execution-calibrates-before-expanding"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "formal-runtime-source-tree-is-complete",
+      "identity": "sha256:c36d3ff95b09d4f9cad60038a78dd2c76f3454d2676eb888261f315e2027d75d",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "source-layout-migration-preserves-behavior",
+      "identity": "sha256:602ba49ab9c4c74117ff23bbc494149d897f9951c454f15a01a3c69a14df7de5",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "source-layout-batch-is-auditable-and-verified",
+      "identity": "sha256:ad41988dc83777f1c9ca97748231a20772a6cf1cdf9428e5df0e5fc6698f9575",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "migration-execution-calibrates-before-expanding",
+      "identity": "sha256:2d5709353f0dec4540e6b5f485310708a145e58b756ce9f50cb24cca6e5696d5",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-complete-production-source-layout-v1",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T21:40:08.837Z",
+  "refs": [
+    "commit:84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Completed the frozen 52-file production source-layout batch in migration commit 84b1f1c20c56f5b14534f838c0bb77e81a8bade8. The direction checkpoint matched 52 planned/actual moves and the exact six deferred Phase-0 records; src/local is empty, no src-to-src moves remain, moved production modules have no semantic differences beyond required relative dependency and local UI asset paths, UI assets are byte-identical, public exports and command names are preserved, and production SCCs/direction exceptions are zero. The relocation manifest records all 52 old paths, new paths and old blobs against that commit. Focused layout/boundary/composition checks passed; npm run verify passed 1035 with 2 skips and 0 failures; npm run verify:standalone passed outside the repository with 1018 passes, 19 skips and 0 failures; root npm run verify:artifact passed. Project/Ticket validation, Context guard with zero violations, and semantic-runtime Room alignment also passed. Verification was offline and used no live JEV, network provider, credentials or user repository.",
+  "ticket_id": "ticket-runtime-complete-production-source-layout"
+}
