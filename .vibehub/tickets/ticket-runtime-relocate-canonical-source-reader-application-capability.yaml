@@ -1,0 +1,128 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonical-source-reader-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/canonical-source-reader.mjs and canonical-source-reader-service.mjs move with the same filenames to semantic-runtime/src/application/sources/. The facade is byte-equivalent except for one required relative import specifier and the service except for thirteen required relative import specifiers; the two Node built-in imports remain unchanged. Both old paths are absent, no compatibility shim or re-export remains, and every other production source file retains its path.",
+      "identity": "sha256:5c96bd0d74bdd22ef9df6eec66895beb32ae33aa19f6f552429f69154622e089",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-source-reader-relocation-preserves-contracts",
+      "criterion": "CanonicalSourceReader remains the same root public export with one-options-object construction and unchanged resolve and refresh methods. CanonicalSourceReaderService preserves the opaque Graph capability, DomainStore and authority identity checks, bounded selected Git-record reads, admission and publication order, current, historical, quarantined and unavailable states, source-fence and ACL rechecks, deterministic retry and idempotency behavior, receipts, error codes and canonical citations; it continues neither importing nor constructing LocalGraphStore.",
+      "identity": "sha256:53da6787aaa5b61876cda68adbfa7f638f9663e2f3cf7e47fea061b606898531",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "canonical-source-reader-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production and test consumers resolve the new paths. The regenerated Runtime layout baseline records both application/sources nodes with equivalent seventeen-edge topology and zero production SCCs, boundary errors or new direction exceptions. The relocation manifest and repository-aware focused test bind old blobs 7c910d4a1595b39a3c98a269905047e49ff66d3c and daa00dc4e0b0c0be6cc273415de5098152767f52, new paths, actual migration commit and canonical-source-reader-application-capability category while historical Tickets, Evidence and Outcomes retain their accepted old-path references. Focused canonical reader, Git provenance, ingress, Graph, source invalidation, Exploration, composition, layout and boundary tests, deterministic JEV checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:8adeafce9996fc5e76e272f2435a33ba5d6942169d6220399eec62ef6e73821d",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one two-file path-only capability migration; do not change executable logic beyond fourteen required relative import paths and focused path assertions.",
+    "Do not move or refactor GitProvenance, Graph capability or storage, Project activation, DurableIngress, source invalidation, Exploration canonical, local composition, adapters, app/local, research, verification, tests or documentation modules in this Ticket.",
+    "Do not introduce ports, dependency injection, compatibility shims or new transaction seams; do not alter public exports, schema, SQL, namespaces, digests, receipts, authorization order, capacity limits, providers or commands.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/canonical-source-reader.mjs and canonical-source-reader-service.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider, live JEV or user-repository access is authorized."
+  ],
+  "context": "CanonicalSourceReader and CanonicalSourceReaderService already form one accepted application capability: a nominal public facade over the bounded selected-Git-record read, validation, ingestion and Graph projection workflow. Move exactly this pair from src/local to src/application/sources as a path-only migration, preserving the existing opaque Graph capability seam, root export, all consumers and the zero-SCC dependency topology.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, path-only rules and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, intended application/sources destinations, seventeen-edge topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted canonical reader behavior to preserve.",
+      "ref": ".vibehub/outcomes/ticket-runtime-canonical-source-reader-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted facade, internal service and opaque Graph capability seam.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact accepted canonical reader facade source and old Git blob to relocate.",
+      "ref": "commit:e51270c3f8fcbe84cba2414c3c3793236323ece5:semantic-runtime/src/local/canonical-source-reader.mjs"
+    },
+    {
+      "purpose": "Exact accepted canonical reader service source and old Git blob to relocate.",
+      "ref": "commit:e51270c3f8fcbe84cba2414c3c3793236323ece5:semantic-runtime/src/local/canonical-source-reader-service.mjs"
+    },
+    {
+      "purpose": "Root CanonicalSourceReader public export surface.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Exploration consumer of the internal canonical reader service.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Proof-owning local composition consumer of the internal service.",
+      "ref": "semantic-runtime/src/local/local-runtime-composition.mjs"
+    },
+    {
+      "purpose": "Public facade and canonical reader behavior baseline.",
+      "ref": "semantic-runtime/test/canonical-source-reader.test.mjs"
+    },
+    {
+      "purpose": "Opaque Graph capability and local composition structural baseline.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "canonical-source-reader-application-home-is-exact",
+          "identity": "sha256:5c96bd0d74bdd22ef9df6eec66895beb32ae33aa19f6f552429f69154622e089",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-source-reader-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:8adeafce9996fc5e76e272f2435a33ba5d6942169d6220399eec62ef6e73821d",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "canonical-source-reader-relocation-preserves-contracts",
+          "identity": "sha256:53da6787aaa5b61876cda68adbfa7f638f9663e2f3cf7e47fea061b606898531",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3328be271a1047ba0853dd093a5b8eeb704ef1c80bad6867cd3895f8c764e599",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted canonical Git source reader facade and service live under src/application/sources with unchanged bounded selected-record ingestion, projection, authorization and retry behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:next-local-capability-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-canonical-source-reader-application-capability"
+}
