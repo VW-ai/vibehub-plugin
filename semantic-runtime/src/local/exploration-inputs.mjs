@@ -21,7 +21,7 @@ import { GraphInputs, graphInput, graphFields, graphHash, graphKey, graphEqual, 
 import { validateGraphCommitAddress2 } from '../core/incremental-graph.mjs';
 import { validateSemanticAddress } from '../core/working-graph.mjs';
 import { canonical } from '../core/contracts.mjs';
-import { observeExplorationGit } from './exploration-physical.mjs';
+import { observeExplorationGit } from '../adapters/git/exploration-physical.mjs';
 
 const NS = EXPLORATION_NAMESPACE, GRAPH = 'working-graph';
 export const EXPLORATION_ERROR_CODES = Object.freeze(['invalid_exploration_input', 'exploration_capacity', 'exploration_unauthorized',
