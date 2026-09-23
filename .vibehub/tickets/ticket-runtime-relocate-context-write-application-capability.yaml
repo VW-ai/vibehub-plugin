@@ -1,0 +1,132 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "context-write-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/context-inputs.mjs and context-store.mjs move with the same filenames to semantic-runtime/src/application/context/. context-inputs.mjs is byte-equivalent except for seven required relative import specifiers and context-store.mjs except for two; both old paths are absent, no compatibility shim or re-export remains, and every other production source file retains its path.",
+      "identity": "sha256:ad6f7261bb3266a0fac1b69fb289c06d6ceea41ebddd38ccf78dcead0aa4dfd0",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-write-relocation-preserves-lifecycle-contracts",
+      "criterion": "CONTEXT_INPUT_ERROR_CODES, ContextInputs and LocalContextStore remain the same exports; LocalContextStore remains the root public export with one-options-object construction and unchanged mutate, adopt, resolve, page, lineage and getReceipt methods. Context authorization and error mapping, canonical Ticket/code selection, immutable proof and provenance checks, idempotency, source fencing, capacity limits, Graph/Exploration atomic transaction ownership, Judge/Query composition, receipts, schemas, namespaces, digests, SQL and public export set remain observably unchanged.",
+      "identity": "sha256:7d1221a3516d0eafe2817225affbe75978c4427b4695e5127b8ce51b05f0cd07",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-write-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production and test consumers resolve the new paths. The regenerated Runtime layout baseline records both application/context nodes with equivalent fourteen-edge topology and zero production SCCs, boundary errors or direction exceptions. The relocation manifest and repository-aware focused test bind old blobs ae3755749f0a1213d9e096787a61c1ac6e270b6f and b4e60c49282ba92dd053bb3aa85f8e92bb06bad3, new paths, actual migration commit and context-application-write-capability category while historical Tickets, Evidence and Outcomes retain their accepted old-path references. Focused Context/Query/Judge/composition/layout tests, full Runtime, standalone locked-install, plugin artifact, project/Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:78f86cb0e8247c880554d9320ee1635db1d78145c08705935c1609432f026df2",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one two-file path-only capability migration; do not change executable logic beyond nine required relative import paths and focused path assertions.",
+    "Do not move Context reader/service, Graph, Exploration, Judge, Query, adapters, app/local, research, verification, tests or documentation modules in this Ticket.",
+    "Do not introduce ports, dependency injection, compatibility shims or new transaction seams; do not split GraphStore or alter schema, SQL, namespace, receipt, cursor, digest, authorization order, providers or public exports.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/context-inputs.mjs and context-store.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "ContextInputs and LocalContextStore together form the remaining typed Context application write/lifecycle capability: input authorization and source proof plus the six-method public facade over the existing Graph-owned transaction. Move exactly these two files to src/application/context as a path-only migration. Preserve the existing Context lifecycle Contract, transaction ownership, public export, all production consumers and the zero-SCC dependency topology.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, path-only rules and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, intended Context destinations, fourteen-edge topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted Context write/read/lifecycle behavior to preserve.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-lifecycle-lineage-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted Context input selection consumed by Judge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-judge-bridge-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining accepted Query use of LocalContextStore.",
+      "ref": ".vibehub/outcomes/ticket-runtime-query-engine-v0/contract-v4.yaml"
+    },
+    {
+      "purpose": "Exact accepted Context input validation source and old Git blob to relocate.",
+      "ref": "commit:b3a26a89706287578f7fa181bc5a1c96bf8e5c1f:semantic-runtime/src/local/context-inputs.mjs"
+    },
+    {
+      "purpose": "Exact accepted Context lifecycle facade source and old Git blob to relocate.",
+      "ref": "commit:b3a26a89706287578f7fa181bc5a1c96bf8e5c1f:semantic-runtime/src/local/context-store.mjs"
+    },
+    {
+      "purpose": "Context read workflow consumer whose ContextInputs import must move with the capability.",
+      "ref": "semantic-runtime/src/application/context/context-read-service.mjs"
+    },
+    {
+      "purpose": "Graph service composition consumer whose ContextInputs binding must remain unchanged.",
+      "ref": "semantic-runtime/src/local/graph-service-bundle.mjs"
+    },
+    {
+      "purpose": "Judge composition consumer whose LocalContextStore binding must remain unchanged.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Root LocalContextStore public export surface.",
+      "ref": "semantic-runtime/src/index.mjs"
+    },
+    {
+      "purpose": "Constructor and transaction-composition contract plus direct old-path structural assertion.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository/standalone-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-write-application-home-is-exact",
+          "identity": "sha256:ad6f7261bb3266a0fac1b69fb289c06d6ceea41ebddd38ccf78dcead0aa4dfd0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-write-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:78f86cb0e8247c880554d9320ee1635db1d78145c08705935c1609432f026df2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-write-relocation-preserves-lifecycle-contracts",
+          "identity": "sha256:7d1221a3516d0eafe2817225affbe75978c4427b4695e5127b8ce51b05f0cd07",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:0754238c8716f82a4fbb0796225e699dd19c6e26f525ce3c435e9a0e11ea3f4b",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted Context input validation and lifecycle facade live beside the Context read services under src/application/context with unchanged atomic Graph behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:remaining-local-capability-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-context-write-application-capability"
+}
