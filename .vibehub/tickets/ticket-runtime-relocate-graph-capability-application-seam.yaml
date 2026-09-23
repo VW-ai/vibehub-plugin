@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-capability-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/graph-capability.mjs moves byte-for-byte to semantic-runtime/src/application/graph/graph-capability.mjs. The old path is absent, no compatibility shim or re-export remains, every other production source file retains its path, exactly five production import specifiers and one test import specifier change to the new path, and no production executable logic beyond those import strings changes; focused tests, layout baseline, relocation provenance and Room metadata may change only to verify and record the move.",
+      "identity": "sha256:ea246dfb4c1510097f3c98d480a5146dbca87b65d0e7b8fe60539b9a921f7757",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-capability-relocation-preserves-contract",
+      "criterion": "The capability remains an opaque WeakMap- and Symbol-branded internal handle: each owner registers once only after exposing getHead, getReceipt, resolve and mutate; retained Graph store and authority identities must match exactly; forged, cloned, proxied, absent or wrong-identity handles still fail with invalid_graph_input; and dynamic forwarding continues to preserve prototype instrumentation and authorization order.",
+      "identity": "sha256:ee1081e3570c7e63019de0cda7057a1234667525e8c5492b869dcd6d5304b3fb",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-capability-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production and test consumers resolve the new path. The regenerated Runtime layout baseline records the application/graph node with the same five incoming edges, 333 total production edges, zero production SCCs, boundary errors or new direction exceptions. The relocation manifest and repository-aware focused test bind old blob afae727cf3ac13539e40e798a468d28d65d7d293, the new path, the actual migration commit and graph-application-capability category while historical Tickets, Evidence and Outcomes retain accepted old-path references. Focused Graph, canonical reader, Exploration and composition tests, deterministic JEV checks, full Runtime, standalone locked-install, plugin artifact, project and Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:4f0b28e4c27d2bf8f636a6acbb031b2c9d9a31287b2ccd3d1aaa7ff918febabc",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one one-file path-only capability migration; do not change graph-capability.mjs bytes or executable behavior.",
+    "Do not move or refactor graph-service-bundle, graph-store, graph-inputs, graph-selected, canonical reader, Exploration, Context, storage, adapters, app/local, research, verification, tests or documentation modules in this Ticket.",
+    "Do not introduce ports, dependency injection, compatibility shims, new transaction seams or public exports; do not alter schema, SQL, namespaces, digests, receipts, authorization order, providers, commands or errors.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/graph-capability.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider, live JEV or user-repository access is authorized."
+  ],
+  "context": "The opaque Graph capability is the already-accepted application seam that removed the Graph, Context, and canonical reader dependency cycle. Move exactly this module from src/local to src/application/graph as a path-only migration. Preserve its private WeakMap and Symbol branding, object-identity checks, dynamic forwarding, all current consumers, and the existing shared transaction composition.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, path-only rules, opaque capability seam and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current source inventory, intended application/graph destination, five-edge incident topology, 333-edge graph and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the accepted opaque Graph capability seam and behavior to preserve.",
+      "ref": ".vibehub/outcomes/ticket-runtime-remove-graph-context-cycle/contract-v1.yaml"
+    },
+    {
+      "purpose": "Exact accepted Graph capability source and old Git blob to relocate.",
+      "ref": "commit:66f0b74118a5958a8efa33860c078d5be36db3aa:semantic-runtime/src/local/graph-capability.mjs"
+    },
+    {
+      "purpose": "Application source reader consumer of the opaque capability.",
+      "ref": "semantic-runtime/src/application/sources/canonical-source-reader-service.mjs"
+    },
+    {
+      "purpose": "Exploration consumer of the opaque capability.",
+      "ref": "semantic-runtime/src/local/exploration-canonical.mjs"
+    },
+    {
+      "purpose": "Composition bundle consumer of the capability.",
+      "ref": "semantic-runtime/src/local/graph-service-bundle.mjs"
+    },
+    {
+      "purpose": "Sole owner registration site for the capability.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Local composition consumer of the capability.",
+      "ref": "semantic-runtime/src/local/local-runtime-composition.mjs"
+    },
+    {
+      "purpose": "Opaque identity, forged handle, dynamic forwarding and composition behavior baseline.",
+      "ref": "semantic-runtime/test/local-composition.test.mjs"
+    },
+    {
+      "purpose": "Topology and repository-aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "graph-capability-application-home-is-exact",
+          "identity": "sha256:ea246dfb4c1510097f3c98d480a5146dbca87b65d0e7b8fe60539b9a921f7757",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-capability-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:4f0b28e4c27d2bf8f636a6acbb031b2c9d9a31287b2ccd3d1aaa7ff918febabc",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-capability-relocation-preserves-contract",
+          "identity": "sha256:ee1081e3570c7e63019de0cda7057a1234667525e8c5492b869dcd6d5304b3fb",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:ac7a3aed9a7e41b6a06e122f96162fc0031c4e2d3ae11df0ef1bb57337fa6c6c",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted opaque Graph capability seam lives under src/application/graph with unchanged identity binding, forwarding, authorization order, consumers, and zero-cycle production topology.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-capability-layout",
+    "subagent-audit:next-capability-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-graph-capability-application-seam"
+}
