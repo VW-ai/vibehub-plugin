@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "exploration-git-observer-adapter-home-is-exact",
+    "exploration-git-observer-contract-is-preserved",
+    "exploration-git-observer-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T09:12:45Z",
+  "contract_revision": {
+    "identity": "sha256:8079a21aa052c463293562dd376624761ecc84571e61dcbb6962fc50a3795fec",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-exploration-git-observer-adapter-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent; did not plan or implement this Ticket and did not author its implementation, tests, Ticket or Evidence. I inspected the exact Ticket and Contract, bound Evidence, implementation and provenance commits, current source and history, and independently reran the deterministic checks. This Outcome is my only repository write. The installed skill bundle and repository both lack the referenced agent-session.md contract, so no Session API or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three active Contract revision 1 criteria. Git records implementation commit 64b238c02201ce631299ad5bc0e2e9b1479017e3 as an R100 move, and the immutable pre-move source, moved source and current file all resolve to blob dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed. The old path is absent; the only other production edit in that commit is the single import-specifier change in the sole consumer semantic-runtime/src/local/exploration-inputs.mjs. Byte identity therefore preserves observeExplorationGit's exact signature, return shape, exploration_physical_changed error and bounded no-follow Git metadata behavior; the independently rerun focused suite covers directory and gitfile worktrees, symbolic, detached and unborn HEAD, loose and packed refs, config non-access, FIFO and symlink refusal, identity and race rechecks, and fail-closed behavior. The relocation manifest contains exactly one matching record with the required paths, blob, actual migration commit and category. Independently recomputed production topology has 333 edges, one incoming edge from exploration-inputs, no outgoing edge from the adapter, no SCC, no baselined direction exception and no boundary error across 247 checked files; the layout baseline matches and the semantic-runtime Room is FRESH. Focused tests pass 95/95 including deterministic mocked JEV checks. A sequential unrestricted offline verification passes the full Runtime suite at 1,035 total, 1,033 passed, two expected native Keychain skips and zero failures; forced-offline standalone installation uses fourteen cached packages and passes 1,035 total, 1,018 passed, seventeen documented standalone skips and zero failures. Plugin artifact verification passes at 79 files and 3,670,088 bytes. Project and Ticket validation, Context guard since planning commit 29bfd58710fb631820183f4f9cef8c73f7c559ba, git diff checking and manifest/history checks pass. The only worktree dirt is two unrelated pre-existing untracked Ticket files. No network, live provider, credential, Keychain lifecycle or user-repository access was used; the credential-gated live JEV command was not run past its preflight refusal.",
+  "ticket_id": "ticket-runtime-relocate-exploration-git-observer-adapter",
+  "unresolved_acceptance_ids": []
+}
