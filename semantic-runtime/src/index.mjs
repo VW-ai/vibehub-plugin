@@ -95,7 +95,7 @@ export { LocalGitWorktreeSensor, GIT_SENSOR_ERROR_CODES } from './local/git-work
 export { validateGitWorktreeObservation, GIT_SENSOR_LIMITS } from './core/git-worktree-observation.mjs';
 export { CanonicalSourceReader } from './application/sources/canonical-source-reader.mjs';
 export { CANONICAL_RECORD_PROFILE, parseCanonicalRecord, evaluateCanonicalRecords } from './core/canonical-records.mjs';
-export { LocalExplorationStore, EXPLORATION_NAMESPACE } from './local/exploration-store.mjs';
+export { LocalExplorationStore, EXPLORATION_NAMESPACE } from './application/explorations/exploration-store.mjs';
 export { LocalJudgeRuntime, executeJudgeNode, executeContextJudgeNode } from './local/judge-runtime.mjs';
 export { JUDGE_NODE_OPERATION, CONTEXT_JUDGE_NODE_OPERATION, JUDGE_DECISION_SCHEMA } from './core/judge-node.mjs';
 export { LocalContextStore } from './application/context/context-store.mjs';

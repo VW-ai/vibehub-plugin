@@ -2,7 +2,7 @@ import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority, LOCAL_AUDIENCE } from '../domain/identity/access-authority.mjs';
 import { DurableIngress } from './durable-ingress.mjs';
 import { ProjectActivation } from './project-activation.mjs';
-import { LocalExplorationStore } from './exploration-store.mjs';
+import { LocalExplorationStore } from '../application/explorations/exploration-store.mjs';
 import { LocalContextStore } from '../application/context/context-store.mjs';
 import { readContextSelection } from '../application/context/context-reader.mjs';
 import { composeLocalServices } from './local-runtime-composition.mjs';

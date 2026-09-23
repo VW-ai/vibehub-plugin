@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CanonicalSourceReader } from '../src/application/sources/canonical-source-reader.mjs';
 import { LocalContextStore } from '../src/application/context/context-store.mjs';
-import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
+import { LocalExplorationStore } from '../src/application/explorations/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
 import { LocalQueryEngine } from '../src/application/query/query-engine.mjs';
 import { ContextReadService } from '../src/application/context/context-read-service.mjs';

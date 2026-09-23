@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
+import { LocalExplorationStore } from '../src/application/explorations/exploration-store.mjs';
 import { graphHash } from '../src/local/graph-inputs.mjs';
 import { judgeInputHash } from '../src/core/contracts.mjs';
 import { judgeFixture, question, JUDGE_ACTIONS } from './helpers/judge-fixture.mjs';
