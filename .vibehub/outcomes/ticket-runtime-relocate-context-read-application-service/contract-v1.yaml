@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "context-read-application-home-is-exact",
+    "context-read-relocation-preserves-composition-and-contracts",
+    "context-read-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T04:04:05Z",
+  "contract_revision": {
+    "identity": "sha256:ad3c3d13d0b0ffc28f0c69afd498c6964f464df06b0abdaeebcf2295eea682b7",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-context-read-service-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "A fresh closeout subagent independent from the executor inspected the exact Contract, bound Evidence, implementation commit and current provenance/Room diffs, then ran focused deterministic checks before adjudicating every active criterion.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication accepted all three active criteria. Commit 8746a0112e78facb6d49ca95a58fddf4c30f23f5 has planning commit 6498371feaeec17d57b1f33556d40699aeb78b97 as its parent and records exactly one R094 production move from src/local/context-read-service.mjs to src/application/context/context-read-service.mjs plus the sole graphServiceBundle import rewire; every other production source path is unchanged. Resolving relative imports proves the old and new service sources are otherwise byte-equivalent across 10,284 original bytes, with exactly nine changed line positions, and the old blob 6263eba17a321765a099688ad273a2dc51fda862 and old path are absent from the current tree. graphServiceBundle still constructs and caches ContextReadService with the exact canonical, ContextInputs and ExplorationInputs instances, while the strengthened structural assertion rejects graph-store.mjs at any relative depth. Direct diff review found no executable change to public exports, constructors, wire/schema/constants, cursor/digest/JSON/error behavior, authorization and snapshot order, transaction ownership, Query/Judge, database schema/SQL or providers. The baseline records the new path and all ten rewired import edges with no production SCCs. The append-only relocation manifest binds the old blob, new path, actual migration commit and context-application-service category; existing historical Ticket, Evidence and Outcome documents were not modified. Independent focused composition and layout verification passed 15/15, and the boundary checker scanned 247 production files with zero errors, SCCs or direction exceptions. The exact-revision Evidence additionally records successful focused Context/Query/Judge verification, full Runtime, standalone locked-install and plugin artifact checks. Independent project and Ticket validation, Context guard, git diff checking and Room drift verification pass; semantic-runtime is FRESH.",
+  "ticket_id": "ticket-runtime-relocate-context-read-application-service",
+  "unresolved_acceptance_ids": []
+}

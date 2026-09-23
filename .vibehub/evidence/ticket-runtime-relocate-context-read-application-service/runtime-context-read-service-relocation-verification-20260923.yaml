@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "context-read-application-home-is-exact",
+    "context-read-relocation-preserves-composition-and-contracts",
+    "context-read-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "context-read-application-home-is-exact",
+      "identity": "sha256:493797d48fcfa76e5d8238641db3a807f5f52711bd2f192f778122eb862c8852",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-read-relocation-preserves-composition-and-contracts",
+      "identity": "sha256:21c79b1c287fc52ec473ffa6b0559ff1d0b8578bec5a8814a1faa3e49ee2305a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-read-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:9b8807f68a8e0eba8783dd433e807390b3a1fcd3adc6d46df523c2e8700eac91",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-context-read-service-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T03:58:39Z",
+  "refs": [
+    "commit:8746a0112e78facb6d49ca95a58fddf4c30f23f5",
+    "commit:6498371feaeec17d57b1f33556d40699aeb78b97:semantic-runtime/src/local/context-read-service.mjs",
+    "semantic-runtime/src/application/context/context-read-service.mjs",
+    "semantic-runtime/src/local/graph-service-bundle.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-context-read-application-service.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit 8746a0112e78facb6d49ca95a58fddf4c30f23f5 records exactly one R094 production move from semantic-runtime/src/local/context-read-service.mjs to semantic-runtime/src/application/context/context-read-service.mjs. A normalized source comparison proves the moved implementation is byte-identical after replacing only its nine required relative import specifiers; the old path is absent and has no compatibility shim. graphServiceBundle remains the sole production importer and the strengthened structural assertion rejects any graph-store.mjs import independent of relative depth. context-reader.mjs, context-inputs.mjs, every other production source path, public exports, constructors, wire/schema/constants, authorization and transaction behavior, Query/Judge behavior, database schema/SQL and providers remain unchanged. The regenerated layout baseline records the new application path and rewired edges. The relocation manifest binds old blob 6263eba17a321765a099688ad273a2dc51fda862, target path, category context-application-service and the actual migration commit; its repository-aware test skips only when standalone packaging deliberately omits historical records. Focused Context/composition/Query/Judge/layout/boundary verification passes 86/86 before the move commit, and final relocation/layout/composition verification passes 15/15 after provenance was added. Boundary checking scans 247 production files with zero errors, zero SCCs and zero direction exceptions. Full Runtime verification passes 1026 total / 1024 passed / zero failed / two expected skips. Standalone locked-install verification passes 1026 total / 1018 passed / zero failed / eight expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. The active Ticket's pre-move source reference was made immutable at planning commit 6498371feaeec17d57b1f33556d40699aeb78b97 so it remains resolvable after relocation without changing Acceptance or Contract identity. Historical Ticket, Evidence and Outcome references remain unchanged. No credential, Keychain lifecycle, host, network, provider or live JEV call was used; deterministic JEV contract and integration coverage remained in both full suites.",
+  "ticket_id": "ticket-runtime-relocate-context-read-application-service"
+}
