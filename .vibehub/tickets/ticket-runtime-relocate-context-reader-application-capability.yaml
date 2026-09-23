@@ -1,0 +1,124 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "context-reader-application-home-is-exact",
+      "criterion": "Exactly semantic-runtime/src/local/context-reader.mjs moves to semantic-runtime/src/application/context/context-reader.mjs. The implementation is byte-equivalent except for the eight required relative import specifiers, the old path is absent, no compatibility shim or re-export remains, and every other production source file retains its path.",
+      "identity": "sha256:09b71ed5303553c6ee86027789fc6521b0d6cf52779322e9717107c77e70d4ca",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-reader-relocation-preserves-context-contracts",
+      "criterion": "The moved module retains exactly CONTEXT_READER_ERROR_CODES, materializeContextShared, validateContextReadRequest, planContextSelection and readContextSelection; all five production consumers resolve the new path. Request validation, resolve/page/lineage and cursor behavior, errors and bounds, exploration ownership, transaction and snapshot ownership, selected Graph authorization, typed publication/adoption proof, assertion/projection separation, provenance and access facts, Ticket pins, final source/head checks, shared origin/Project/Authority materialization, Query candidate generation, Judge selection, ContextReadService workflow, Graph facade compatibility and the Runtime public surface remain observably unchanged.",
+      "identity": "sha256:3e72bb3d11db7f823ad281ed1b5056b3d458eabe1b9d828d5a53a40a44f6f784",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "context-reader-relocation-is-auditable-and-verifiable",
+      "criterion": "All current production and test imports resolve the new Context reader path. The regenerated Runtime layout baseline records the application/context node with equivalent thirteen-edge topology and zero production SCCs, boundary errors or direction exceptions. The relocation manifest and repository-aware focused test bind old blob 9e90df27380fc32739543889bb372e03cb7c0dd5, the new path, actual migration commit and context-application-reader category while historical Tickets, Evidence and Outcomes retain their accepted old-path references. Focused Context/Query/Judge/composition/layout tests, full Runtime, standalone locked-install, plugin artifact, project/Ticket validation, Context guard, semantic-runtime Room and git diff verification pass offline.",
+      "identity": "sha256:e3f092fc00878112e3391e288545dfe64916b40b6cf5046aef16dd5ce3d75eb0",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one single-file path-only migration; do not change executable logic beyond the eight required relative import paths and focused path assertions.",
+    "Do not move context-inputs.mjs, tests, Graph, Exploration, Judge, Query, adapters, app/local, research, verification or documentation modules in this Ticket.",
+    "Do not introduce a port, dependency injection or compatibility shim; do not split GraphStorage, change transaction ownership, schemas, SQL, namespaces, cursors, digests, error codes, authorization order, providers or the public export set.",
+    "Keep historical Ticket, Evidence and Outcome references to src/local/context-reader.mjs unchanged because they identify accepted pre-relocation revisions.",
+    "Ordinary verification stays offline and deterministic; no credential, Keychain lifecycle, host, network, provider or live JEV call is authorized."
+  ],
+  "context": "context-reader.mjs is already classified as an application component and has one declared destination under src/application/context. Move exactly that file as a path-only migration. Preserve its five exports, transaction-scoped Graph selection, resolve/page/lineage wire behavior, typed publication proof, authorization/freshness checks, shared Context materialization, Query/Judge consumers and Graph facade behavior. Update only current imports, focused structural tests, the generated layout baseline, relocation provenance and Room alignment.",
+  "context_refs": [
+    {
+      "purpose": "Component purity, standalone and deterministic verification boundary.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted business-capability migration order, path-only rules and relocation manifest contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Current complete source inventory, intended Context reader destination, thirteen-edge import topology and zero-SCC baseline.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification precedent.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Independent successful Outcome defining accepted typed Context read, lineage and lifecycle behavior.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-lifecycle-lineage-v0/contract-v2.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining the selected Context proof boundary consumed by Judge.",
+      "ref": ".vibehub/outcomes/ticket-runtime-context-judge-bridge-v0/contract-v1.yaml"
+    },
+    {
+      "purpose": "Independent successful Outcome defining accepted Query use of Context selection.",
+      "ref": ".vibehub/outcomes/ticket-runtime-query-engine-v0/contract-v4.yaml"
+    },
+    {
+      "purpose": "Exact accepted Context reader source and old Git blob to relocate.",
+      "ref": "commit:2cde7db2c39ea6c7a710a213099aef5347cd177c:semantic-runtime/src/local/context-reader.mjs"
+    },
+    {
+      "purpose": "Typed Context application-service consumer whose import must follow the reader.",
+      "ref": "semantic-runtime/src/application/context/context-read-service.mjs"
+    },
+    {
+      "purpose": "Graph facade consumer whose request-first validation and shared materialization behavior must remain unchanged.",
+      "ref": "semantic-runtime/src/local/graph-store.mjs"
+    },
+    {
+      "purpose": "Judge consumer whose selected Context proof behavior must remain unchanged.",
+      "ref": "semantic-runtime/src/local/judge-inputs.mjs"
+    },
+    {
+      "purpose": "Direct Context reader behavior and current path consumer.",
+      "ref": "semantic-runtime/test/context-reader.test.mjs"
+    },
+    {
+      "purpose": "Repository and standalone aware relocation-manifest verification pattern.",
+      "ref": "semantic-runtime/test/runtime-layout.test.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "context-reader-application-home-is-exact",
+          "identity": "sha256:09b71ed5303553c6ee86027789fc6521b0d6cf52779322e9717107c77e70d4ca",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-reader-relocation-is-auditable-and-verifiable",
+          "identity": "sha256:e3f092fc00878112e3391e288545dfe64916b40b6cf5046aef16dd5ce3d75eb0",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "context-reader-relocation-preserves-context-contracts",
+          "identity": "sha256:3e72bb3d11db7f823ad281ed1b5056b3d458eabe1b9d828d5a53a40a44f6f784",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:7164c93c40c5520a3a3c47eae55929f2ca608ada9438f0e39bf2be95e06754f0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The accepted typed Context reader lives under src/application/context with auditable relocation provenance and unchanged Context, Query, Judge and Graph behavior.",
+  "provenance_refs": [
+    "conversation:2026-09-22-runtime-capability-layout",
+    "subagent-audit:context-reader-relocation-audit",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-relocate-context-reader-application-capability"
+}
