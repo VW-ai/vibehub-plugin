@@ -217,6 +217,26 @@ test('Context reader application relocation is complete and recorded', t => {
   assert.equal(existsSync(new URL('../src/application/context/context-reader.mjs', import.meta.url)), true);
 });
 
+test('Gateway example research relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'gateway-example-research');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/index.ts',
+    new_path: 'semantic-runtime/research/examples/ai-gateway/index.ts',
+    old_blob: '87b091203b62a18940ba4395890d84385271c0df',
+    migration_commit: 'add8029a9121714e30dd6b22e661d93e1ea65129',
+    category: 'gateway-example-research',
+  }]);
+  assert.equal(existsSync(new URL('../index.ts', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../research/examples/ai-gateway/index.ts', import.meta.url)), true);
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);

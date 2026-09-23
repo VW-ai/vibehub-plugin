@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "99db185bfdc3d92c4fc9aa656682a2b51231a977",
+        "blob": "284adbe1ad67c3f616409f44e5a3ee81c3b76f27",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "92418b775d3896ed4c891908d7eda2de33db8716",
+        "blob": "7ffcd4056e420631a4f0334ec539b99975cb71a7",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -94,7 +94,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "4fae71c4fe7c5c6d7c6ef1e90938583a7826d912",
+        "blob": "1c2c9aeb30540d312d9566a61923df36a10ecf55",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -294,15 +294,11 @@
         "path": "semantic-runtime/docs/working-graph-v0.md"
       },
       {
-        "blob": "87b091203b62a18940ba4395890d84385271c0df",
-        "path": "semantic-runtime/index.ts"
-      },
-      {
         "blob": "909f650fdc383bbe92345bb90b1365be115a83c5",
         "path": "semantic-runtime/package-lock.json"
       },
       {
-        "blob": "730e967fb4362ed40cd8de34ef1b6281928791ab",
+        "blob": "f4b534a7eb09fe94ea2297dfa70d0892b4b10ffa",
         "path": "semantic-runtime/package.json"
       },
       {
@@ -312,6 +308,10 @@
       {
         "blob": "089f5e449244de79c4c14a0c5e6b9f39551613a1",
         "path": "semantic-runtime/policies/phase0.json"
+      },
+      {
+        "blob": "87b091203b62a18940ba4395890d84385271c0df",
+        "path": "semantic-runtime/research/examples/ai-gateway/index.ts"
       },
       {
         "blob": "f3b896cc603970e9480a33e969330311410c853f",
@@ -454,7 +454,7 @@
         "path": "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs"
       },
       {
-        "blob": "3513259f18adafa54e0e50a45711aba94661d34e",
+        "blob": "31e9a3beee3ac2502d6b4199915354c0ba2cbdae",
         "path": "semantic-runtime/scripts/check-boundaries.mjs"
       },
       {
@@ -498,7 +498,7 @@
         "path": "semantic-runtime/scripts/compare-peel-judges.mjs"
       },
       {
-        "blob": "0a8bf92ed89b349cb8bf43b348b17c08de005f35",
+        "blob": "f9728d01e5c0baff4c8382efe3713ff4b3227f10",
         "path": "semantic-runtime/scripts/runtime-layout.mjs"
       },
       {
@@ -1430,7 +1430,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "2de0a685b45f75dce741338f31f28bfdd036c129",
+        "blob": "e25ba9e02d22d0eeae64641b0c0df30247021b28",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1474,8 +1474,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T05:20:21.178Z",
-    "last_aligned_commit": "5102e1a260f58fe0af7d82d9421e62ccf327a8d3"
+    "checked_at": "2026-09-23T05:45:00.783Z",
+    "last_aligned_commit": "add8029a9121714e30dd6b22e661d93e1ea65129"
   },
   "anchors": [
     "semantic-runtime/"

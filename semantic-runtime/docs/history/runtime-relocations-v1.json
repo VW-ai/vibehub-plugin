@@ -315,6 +315,13 @@
       "old_blob": "9e90df27380fc32739543889bb372e03cb7c0dd5",
       "migration_commit": "5102e1a260f58fe0af7d82d9421e62ccf327a8d3",
       "category": "context-application-reader"
+    },
+    {
+      "old_path": "semantic-runtime/index.ts",
+      "new_path": "semantic-runtime/research/examples/ai-gateway/index.ts",
+      "old_blob": "87b091203b62a18940ba4395890d84385271c0df",
+      "migration_commit": "add8029a9121714e30dd6b22e661d93e1ea65129",
+      "category": "gateway-example-research"
     }
   ]
 }

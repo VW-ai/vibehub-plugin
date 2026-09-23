@@ -1,0 +1,47 @@
+{
+  "acceptance_ids": [
+    "gateway-example-research-home-is-exact",
+    "gateway-example-live-contract-is-preserved",
+    "gateway-example-relocation-is-offline-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "gateway-example-research-home-is-exact",
+      "identity": "sha256:b0b07076aaaeffed7ba9e1c65754fab6a5d1235391c59d40c6970301bb1fb540",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "gateway-example-live-contract-is-preserved",
+      "identity": "sha256:323f96ab68e1869b8f1e8f5950301f539b3088a243ed2cc2f467ca03eeca2edf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "gateway-example-relocation-is-offline-verifiable",
+      "identity": "sha256:8018b6741787d9e0f1659590d4f150527e9a1b0a7210c21b2cb44ba23f06a455",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-gateway-example-research-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T05:40:35Z",
+  "refs": [
+    "commit:add8029a9121714e30dd6b22e661d93e1ea65129",
+    "commit:bca36fe4c644c6295aeea95556469739e19ec296:semantic-runtime/index.ts",
+    "semantic-runtime/research/examples/ai-gateway/index.ts",
+    "semantic-runtime/package.json",
+    "semantic-runtime/README.md",
+    "semantic-runtime/scripts/check-boundaries.mjs",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-gateway-example-research.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit add8029a9121714e30dd6b22e661d93e1ea65129 records one R100 byte-for-byte move from semantic-runtime/index.ts to semantic-runtime/research/examples/ai-gateway/index.ts. The moved file hashes to the exact old blob 87b091203b62a18940ba4395890d84385271c0df; the old path is absent and no shim remains. The example:gateway npm command keeps its name, node --experimental-strip-types and ignored .env.local boundary and changes only the script path. The source still imports generateText from ai, uses openai/gpt-5.5, retains the holiday prompt, rejects empty text and prints the result. The ai dependency and lockfile remain unchanged. Runtime layout still classifies example:gateway as explicit-live, inventories the moved file as research, and removes root index.ts from standalone copy paths. Boundary tooling no longer scans or classifies a root index.ts as production; the same example is covered by the existing research scan. README names the new location and current scan roots. Production import edges, SCCs, direction exceptions, public exports and plugin artifact remain unchanged. The relocation manifest binds the exact old blob, new path, gateway-example-research category and actual migration commit; historical Ticket and Evidence old-path references remain unchanged. Focused layout/boundary checks pass 22/22 before the implementation commit and final provenance checks pass 23/23. Full Runtime verification passes 1029 total / 1027 passed / zero failed / two expected skips. The first standalone run exposed that a new research inventory assertion needed to tolerate the deliberate absence of research in the production copy; after that test-only correction, standalone locked-install verification passes 1029 total / 1018 passed / zero failed / eleven expected skips with 232 scanned files, zero SCCs, errors or exceptions. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. No credential, .env.local, Keychain, provider, model, Gateway, JEV or network call was read or made.",
+  "ticket_id": "ticket-runtime-relocate-gateway-example-research"
+}

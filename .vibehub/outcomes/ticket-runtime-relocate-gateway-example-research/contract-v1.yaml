@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "gateway-example-research-home-is-exact",
+    "gateway-example-live-contract-is-preserved",
+    "gateway-example-relocation-is-offline-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T05:43:41Z",
+  "contract_revision": {
+    "identity": "sha256:00fdedff44382c6a2d4f41507d261ef86f217f6cec36002a65195e7e717c81ee",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-gateway-example-research-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent did not execute the relocation. I inspected the exact Ticket and bound Evidence, immutable pre-move source, implementation commit, current manifest/test/Room diff and historical AI Gateway Ticket/Evidence, then ran only focused offline layout, boundary, validation, guard and source-contract checks. The installed vibehub-core package lacks the closeout Skill's referenced contracts/agent-session.md, so no session report or completion claim was invented.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication accepted all three active Contract v1 criteria. Commit add8029a9121714e30dd6b22e661d93e1ea65129 records one R100 byte-for-byte move from semantic-runtime/index.ts to semantic-runtime/research/examples/ai-gateway/index.ts; independent Git blob comparison resolves both paths to 87b091203b62a18940ba4395890d84385271c0df, the old path is absent and no compatibility shim remains. The example:gateway command retains node --experimental-strip-types and ignored .env.local loading while changing only its source path, remains classified explicit-live, and the moved source preserves generateText from ai, model openai/gpt-5.5, the holiday prompt, non-empty rejection and text output. The ai dependency remains 7.0.107 and the migration commit does not change the lockfile, provider adapters, public exports or other research files. Boundary and layout tooling now treat the example as research, remove the root index.ts production special case and omit it from standalone copy paths. The README, regenerated baseline and append-only relocation manifest point to the new location; provenance binds the exact old blob, new path, actual migration commit and gateway-example-research category, while the accepted historical Gateway Ticket and Evidence retain the old path. Independent focused layout verification passed 13/13 and the boundary checker scanned 247 files with zero errors, production SCCs or direction exceptions. Ticket validation passes for 226 Tickets, dirty-worktree Context guard reports no authorities or violations, and direct relocation assertions pass. The exact bound Evidence additionally records successful full Runtime, standalone locked-install, plugin artifact, project, Ticket, Context, Room and diff verification. No provider, model, Gateway, JEV, credential, Keychain, .env.local or network access was used during closeout. No acceptance obligation remains unresolved.",
+  "ticket_id": "ticket-runtime-relocate-gateway-example-research",
+  "unresolved_acceptance_ids": []
+}
