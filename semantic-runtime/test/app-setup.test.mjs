@@ -8,7 +8,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { LocalAppSetup, setupProviderKey } from '../src/local/app-setup.mjs';
 import { LocalCredentialAuthority } from '../src/adapters/auth/local-credential-authority.mjs';
 import { PROVIDER_MODELS } from '../src/local/provider-settings.mjs';
-import { MacOSSecretStore } from '../src/local/macos-secret-store.mjs';
+import { MacOSSecretStore } from '../src/adapters/secrets/macos-secret-store.mjs';
 
 function git(folder, ...args) {
   return execFileSync('git', ['-c', 'user.name=Setup Fixture', '-c', 'user.email=fixture@example.invalid',

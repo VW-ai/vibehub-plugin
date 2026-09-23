@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "172f06b5fbb82b3b26bf868c79fc275194ba69e9",
+        "blob": "17bc279707e04ae2e5c82adc14b9ae84f734f342",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -574,6 +574,14 @@
         "path": "semantic-runtime/src/adapters/resilient-judge.mjs"
       },
       {
+        "blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
+        "path": "semantic-runtime/src/adapters/secrets/keychain-helper.swift"
+      },
+      {
+        "blob": "7ff54baa4202ea0f6cd4ba307b8ba1966d86830a",
+        "path": "semantic-runtime/src/adapters/secrets/macos-secret-store.mjs"
+      },
+      {
         "blob": "d8048bf083c41f22648612290c97c6066463c438",
         "path": "semantic-runtime/src/adapters/sqlite-store.mjs"
       },
@@ -686,7 +694,7 @@
         "path": "semantic-runtime/src/domain/identity/access-authority.mjs"
       },
       {
-        "blob": "2803bd874560ec3bbcd4128ef4f56a76e0ecd870",
+        "blob": "ab7623d5f90428c06ecb7801211378583e6f44bd",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -694,7 +702,7 @@
         "path": "semantic-runtime/src/local/app-session.mjs"
       },
       {
-        "blob": "9469b4c5dc8906537d5f413116e1bc65e99ca1b8",
+        "blob": "baefcbba6f37b87c693f73134be385f21cadd41b",
         "path": "semantic-runtime/src/local/app-setup.mjs"
       },
       {
@@ -798,16 +806,8 @@
         "path": "semantic-runtime/src/local/judge-runtime.mjs"
       },
       {
-        "blob": "4dd407322c155bb51381deb669dd676bb14b9af9",
-        "path": "semantic-runtime/src/local/keychain-helper.swift"
-      },
-      {
         "blob": "415627269e8f9528fd4644b588ee279ac4ae4b45",
         "path": "semantic-runtime/src/local/local-runtime-composition.mjs"
-      },
-      {
-        "blob": "80aa48bb142dcd72330d2905c51668df0d64d069",
-        "path": "semantic-runtime/src/local/macos-secret-store.mjs"
       },
       {
         "blob": "cd4742db6692e78f6ed0ae1e3b96410159e80eac",
@@ -862,7 +862,7 @@
         "path": "semantic-runtime/test/agent-work-request.test.mjs"
       },
       {
-        "blob": "bdca621685d0d459b6abdd4ed59cb10316b5c1e3",
+        "blob": "ed451d3492d018f784563fda83c10f37ec53ee24",
         "path": "semantic-runtime/test/app-setup.test.mjs"
       },
       {
@@ -1358,7 +1358,7 @@
         "path": "semantic-runtime/test/local-service.test.mjs"
       },
       {
-        "blob": "ef9cf9f696b9f4c3fd9a7b40e4a52a08339daaa2",
+        "blob": "76d8c868d026c3e9aacdbc9a794cc56d1944eb7c",
         "path": "semantic-runtime/test/macos-secret-store.test.mjs"
       },
       {
@@ -1470,8 +1470,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T01:27:10.045Z",
-    "last_aligned_commit": "656a9fb617dddcd57ae2cc5cdf7d85fd9f53a503"
+    "checked_at": "2026-09-23T01:48:16.815Z",
+    "last_aligned_commit": "219d754bb492e977a7711d8b288a8004ab89a49f"
   },
   "anchors": [
     "semantic-runtime/"

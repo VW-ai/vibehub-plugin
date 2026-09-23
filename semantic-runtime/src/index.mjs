@@ -8,7 +8,7 @@ export { OpenRouterJevJudge, OPENROUTER_JEV_MODEL } from './adapters/providers/o
 export { BRANCH_SCOPE_VERSION, createBranchScope, validateBranchScope, applyBranchScopeChange,
   resolveExploration, recordTicketWorkspaceProvenance, selectExplorationView } from './core/branch-scope.mjs';
 export { ProviderSettings, PROVIDER_MODELS, JUDGE_CAPABILITY, validateProviderConfig } from './local/provider-settings.mjs';
-export { MacOSSecretStore } from './local/macos-secret-store.mjs';
+export { MacOSSecretStore } from './adapters/secrets/macos-secret-store.mjs';
 export { PRINCIPAL_KINDS, scopedReference, evaluateServiceAccess, evaluateMaterialization, accessDiagnostic } from './core/service-access.mjs';
 export { LOCAL_AUDIENCE } from './domain/identity/access-authority.mjs';
 export { LocalCredentialAuthority } from './adapters/auth/local-credential-authority.mjs';

@@ -31,7 +31,7 @@ function processCall(command, args, input, readSecret = false, timeout = 10_000)
 
 export class MacOSSecretStore {
   #binary; #prepare;
-  constructor({ buildDir = fileURLToPath(new URL('../../.local/keychain/', import.meta.url)) } = {}) {
+  constructor({ buildDir = fileURLToPath(new URL('../../../.local/keychain/', import.meta.url)) } = {}) {
     this.#prepare = async () => {
       if (process.platform !== 'darwin') throw failure('secure_store_unsupported');
       const hash = createHash('sha256').update(await readFile(source)).digest('hex').slice(0, 16);

@@ -726,6 +726,16 @@
       "intended_destination": "src/adapters/providers/resilient-judge.mjs"
     },
     {
+      "path": "src/adapters/secrets/keychain-helper.swift",
+      "current_role": "production",
+      "intended_destination": "src/adapters/secrets/keychain-helper.swift"
+    },
+    {
+      "path": "src/adapters/secrets/macos-secret-store.mjs",
+      "current_role": "production",
+      "intended_destination": "src/adapters/secrets/macos-secret-store.mjs"
+    },
+    {
       "path": "src/adapters/sqlite-store.mjs",
       "current_role": "production",
       "intended_destination": "research/phase0-replay/adapters/sqlite-store.mjs"
@@ -1006,19 +1016,9 @@
       "intended_destination": "src/application/judge/judge-runtime.mjs"
     },
     {
-      "path": "src/local/keychain-helper.swift",
-      "current_role": "production",
-      "intended_destination": "src/adapters/secrets/keychain-helper.swift"
-    },
-    {
       "path": "src/local/local-runtime-composition.mjs",
       "current_role": "production",
       "intended_destination": "src/application/support/local-runtime-composition.mjs"
-    },
-    {
-      "path": "src/local/macos-secret-store.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/secrets/macos-secret-store.mjs"
     },
     {
       "path": "src/local/project-activation.mjs",
@@ -2686,6 +2686,10 @@
     },
     {
       "from": "src/index.mjs",
+      "to": "src/adapters/secrets/macos-secret-store.mjs"
+    },
+    {
+      "from": "src/index.mjs",
       "to": "src/app/local/http/authorize-local-request.mjs"
     },
     {
@@ -2822,10 +2826,6 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/local/macos-secret-store.mjs"
-    },
-    {
-      "from": "src/index.mjs",
       "to": "src/local/project-activation.mjs"
     },
     {
@@ -2842,6 +2842,10 @@
     },
     {
       "from": "src/local/app-setup.mjs",
+      "to": "src/adapters/secrets/macos-secret-store.mjs"
+    },
+    {
+      "from": "src/local/app-setup.mjs",
       "to": "src/core/service-access.mjs"
     },
     {
@@ -2855,10 +2859,6 @@
     {
       "from": "src/local/app-setup.mjs",
       "to": "src/local/git-projects.mjs"
-    },
-    {
-      "from": "src/local/app-setup.mjs",
-      "to": "src/local/macos-secret-store.mjs"
     },
     {
       "from": "src/local/app-setup.mjs",

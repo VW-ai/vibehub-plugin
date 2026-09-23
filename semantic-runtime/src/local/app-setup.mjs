@@ -7,7 +7,7 @@ import { scopedReference } from '../core/service-access.mjs';
 import { GitProjectRegistry, GIT_ENROLLMENT_NAMESPACE } from './git-projects.mjs';
 import { ProjectActivation, ACTIVATION_NAMESPACE } from './project-activation.mjs';
 import { ProviderSettings, PROVIDER_MODELS, validateProviderConfig } from './provider-settings.mjs';
-import { MacOSSecretStore } from './macos-secret-store.mjs';
+import { MacOSSecretStore } from '../adapters/secrets/macos-secret-store.mjs';
 
 export const SETUP_ERROR_CODES = Object.freeze(['setup_unauthorized', 'setup_closed', 'setup_busy', 'setup_failed',
   'invalid_setup_input', 'invalid_setup_catalog', 'project_not_found', 'project_limit', 'preview_expired',

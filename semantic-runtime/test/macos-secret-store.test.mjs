@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
-import { MacOSSecretStore } from '../src/local/macos-secret-store.mjs';
+import { MacOSSecretStore } from '../src/adapters/secrets/macos-secret-store.mjs';
 
 test('macOS secret store rejects non-app references and malformed secret before invoking a helper', async () => {
   const store = new MacOSSecretStore();
