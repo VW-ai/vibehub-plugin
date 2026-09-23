@@ -1,6 +1,7 @@
 import { ExplorationCanonical } from './exploration-canonical.mjs';
 import { ContextInputs } from './context-inputs.mjs';
 import { ExplorationInputs } from './exploration-inputs.mjs';
+import { ContextReadService } from './context-read-service.mjs';
 import { graphCapabilityFor, withGraphCapability } from './graph-capability.mjs';
 import { graphHash, graphInput } from './graph-inputs.mjs';
 
@@ -17,11 +18,14 @@ export function graphServiceBundle({ graph, store, authority, canonical_reader }
   const retained = byConfiguration.get(canonical_reader);
   if (retained?.fingerprint === fingerprint) return retained.bundle;
   const canonical = new ExplorationCanonical(withGraphCapability({ store, authority, canonical_reader }, capability));
+  const contexts = new ContextInputs({ authority, canonical });
+  const inputs = new ExplorationInputs({ store, authority, config_digest: canonical.config_digest });
   const bundle = Object.freeze({
     graph,
     canonical,
-    contexts: new ContextInputs({ authority, canonical }),
-    inputs: new ExplorationInputs({ store, authority, config_digest: canonical.config_digest }),
+    contexts,
+    inputs,
+    contextReads: new ContextReadService({ store, authority, canonical, contexts, explorations: inputs }),
   });
   byConfiguration.set(canonical_reader, { fingerprint, bundle });
   return bundle;

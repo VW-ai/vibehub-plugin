@@ -85,6 +85,17 @@ test('read wire and cursors reject hidden fields, getters, proxies and mismatche
   assert.throws(() => selected.run('page', { ...page, cursor }), { code: 'context_cursor_mismatch' });
 });
 
+test('public Context reads validate requests before composing the canonical reader', t => {
+  const f = fixture(t);
+  assert.throws(() => f.graph.resolveContext(f.context, null, null), {
+    code: 'context_invalid_request', category: 'rejected', message: 'Local Graph: context_invalid_request',
+  });
+  const selected = append(f, 'reader-order');
+  assert.throws(() => f.graph.resolveContext(f.context, selectedInput(f, f.a, selected), null), {
+    code: 'invalid_graph_input', category: 'rejected', message: 'Local Graph: invalid_graph_input',
+  });
+});
+
 test('selected Ticket proof is reused per opaque context and pin while each content checks only its own support', t => {
   const f = fixture(t, { canonical: true }), refs = canonicalRefs(f);
   const { canonical, contexts } = composeLocalServices({ store: f.store, authority: f.authority, canonical_reader: f.config });

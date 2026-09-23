@@ -6,6 +6,7 @@ import { LocalContextStore } from '../src/local/context-store.mjs';
 import { LocalExplorationStore } from '../src/local/exploration-store.mjs';
 import { LocalGraphStore } from '../src/local/graph-store.mjs';
 import { LocalQueryEngine } from '../src/local/query-engine.mjs';
+import { ContextReadService } from '../src/local/context-read-service.mjs';
 import { graphCapabilityFor, graphGetHead } from '../src/local/graph-capability.mjs';
 import { graphServiceBundle } from '../src/local/graph-service-bundle.mjs';
 import { readerFixture } from './helpers/canonical-reader-fixture.mjs';
@@ -23,11 +24,13 @@ test('local composition retains one proof-owning bundle per exact Graph and conf
   const graph = new LocalGraphStore({ store: f.store, authority: f.authority });
   const first = graphServiceBundle({ graph, store: f.store, authority: f.authority, canonical_reader });
   assert.strictEqual(graphServiceBundle({ graph, store: f.store, authority: f.authority, canonical_reader }), first);
+  assert.ok(first.contextReads instanceof ContextReadService);
 
   const equivalentConfiguration = structuredClone(canonical_reader);
   const equivalent = graphServiceBundle({ graph, store: f.store, authority: f.authority, canonical_reader: equivalentConfiguration });
   assert.notStrictEqual(equivalent, first);
   assert.notStrictEqual(equivalent.canonical, first.canonical);
+  assert.notStrictEqual(equivalent.contextReads, first.contextReads);
   assert.equal(equivalent.canonical.config_digest, first.canonical.config_digest);
 
   const reopenedGraph = new LocalGraphStore({ store: f.store, authority: f.authority });
@@ -61,7 +64,7 @@ test('Graph capabilities are opaque and bound to the exact Graph, store and auth
 });
 
 test('canonical, exploration and Context services do not import or construct LocalGraphStore', () => {
-  for (const path of ['canonical-source-reader.mjs', 'exploration-canonical.mjs', 'context-inputs.mjs']) {
+  for (const path of ['canonical-source-reader.mjs', 'exploration-canonical.mjs', 'context-inputs.mjs', 'context-read-service.mjs']) {
     const source = readFileSync(new URL(`../src/local/${path}`, import.meta.url), 'utf8');
     assert.doesNotMatch(source, /from ['"]\.\/graph-store\.mjs['"]/);
     assert.doesNotMatch(source, /new\s+LocalGraphStore\b/);

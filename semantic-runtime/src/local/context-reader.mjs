@@ -14,6 +14,22 @@ const scopeOf = grant => ({ tenant_id: grant.tenant_id, project_id: grant.projec
 const digest = value => check(typeof value === 'string' && /^sha256:[0-9a-f]{64}$/.test(value));
 const shape = (value, required) => { try { graphFields(value, required); } catch { throw graphFail('context_invalid_request'); } };
 
+/** Materialize the shared Context layers after their exact canonical proofs have been asserted. */
+export function materializeContextShared(canonical, origin, project, version) {
+  const origin_base = canonical.material(origin);
+  const current_project = { ...canonical.material(project), version };
+  const governing = [];
+  for (const [layer, material] of Object.entries({ origin_base, current_project })) {
+    for (const entry of material.data?.records ?? []) {
+      if (entry.status !== 'usable' || entry.kind !== 'context' || entry.record?.type !== 'authority' || entry.record.state !== 'active') continue;
+      const artifact = material.canonical_refs[entry.canonical_ref_index];
+      check(artifact, 'canonical_record_corrupt');
+      governing.push({ layer, pin: material.pin, status: material.status, record: entry.record, artifact });
+    }
+  }
+  return { origin_base, current_project, governing, coverage: current_project.coverage };
+}
+
 function collection(value) {
   check(value && ['heads', 'history', 'conflicts'].includes(value.kind));
   shape(value, value.kind === 'heads' ? ['kind'] : value.kind === 'history' ? ['kind', 'entity_kind', 'entity_id'] : ['kind', 'entity']);

@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "d787692f42bfff971c8608bece73627efd170276",
+        "blob": "9391ae81bac306c43ce63bdcb86a6106877eed09",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -730,7 +730,11 @@
         "path": "semantic-runtime/src/local/context-inputs.mjs"
       },
       {
-        "blob": "464cc795f13192a40adc7c9b621bf1bf921163e0",
+        "blob": "6263eba17a321765a099688ad273a2dc51fda862",
+        "path": "semantic-runtime/src/local/context-read-service.mjs"
+      },
+      {
+        "blob": "9e90df27380fc32739543889bb372e03cb7c0dd5",
         "path": "semantic-runtime/src/local/context-reader.mjs"
       },
       {
@@ -782,11 +786,11 @@
         "path": "semantic-runtime/src/local/graph-selected.mjs"
       },
       {
-        "blob": "926c9e7a3ed9d2d06a1f3c1187001fad48eca471",
+        "blob": "966fab113f23e2b482f7e17ad2541ad7cd8a5f6e",
         "path": "semantic-runtime/src/local/graph-service-bundle.mjs"
       },
       {
-        "blob": "52709fe982d1e24fb534776b2cc304aa08411fef",
+        "blob": "18608e7f4aa70b920131f22d8a492ac387fa4e44",
         "path": "semantic-runtime/src/local/graph-store.mjs"
       },
       {
@@ -958,7 +962,7 @@
         "path": "semantic-runtime/test/context-profile.test.mjs"
       },
       {
-        "blob": "271fa68094e31599f28f4dfe749d5af642cc956b",
+        "blob": "8d3a92b0bc95d6a142bdf9edd0605943f06e638d",
         "path": "semantic-runtime/test/context-reader.test.mjs"
       },
       {
@@ -1350,7 +1354,7 @@
         "path": "semantic-runtime/test/judge-runtime.test.mjs"
       },
       {
-        "blob": "8dd58156bf657daac4f75980572efccc2a9ca8c9",
+        "blob": "c279a94c493e0a5fd2bfcb9307636340e606bca4",
         "path": "semantic-runtime/test/local-composition.test.mjs"
       },
       {
@@ -1470,8 +1474,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T02:10:52.694Z",
-    "last_aligned_commit": "ba3564612253b99b9346d7ebe7673e28b4505a72"
+    "checked_at": "2026-09-23T03:16:52.920Z",
+    "last_aligned_commit": "9bd4bd093f12938d4f2e80da1e29cb9a47c096d6"
   },
   "anchors": [
     "semantic-runtime/"

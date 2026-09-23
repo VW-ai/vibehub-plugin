@@ -1,7 +1,6 @@
-import { exactRevisionAddress } from '../core/working-graph.mjs';
 import { CONTEXT_INPUT_ERROR_CODES } from './context-inputs.mjs';
 import { validateContextContent1, validateContextOperation1 } from '../core/context-profile.mjs';
-import { planContextSelection, readContextSelection, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
+import { materializeContextShared, validateContextReadRequest, CONTEXT_READER_ERROR_CODES } from './context-reader.mjs';
 import { selectGraph } from './graph-selected.mjs';
 import { DomainStore } from '../adapters/sqlite/domain-store.mjs';
 import { AccessAuthority } from '../domain/identity/access-authority.mjs';
@@ -294,19 +293,6 @@ export class LocalGraphStore {
     validateContextContent1(selected.revision.assertion.content);
     services.contexts.assert(tx, context, proof, { assertion: selected.revision.assertion, provenance: selected.revision.provenance });
   }
-  #contextShared(canonical, origin, project, version) {
-    const origin_base = canonical.material(origin);
-    const current_project = { ...canonical.material(project), version };
-    const governing = [];
-    for (const [layer, material] of Object.entries({ origin_base, current_project })) {
-      for (const entry of material.data?.records ?? []) {
-        if (entry.status !== 'usable' || entry.kind !== 'context' || entry.record?.type !== 'authority' || entry.record.state !== 'active') continue;
-        const artifact = material.canonical_refs[entry.canonical_ref_index]; graphAssert(artifact, 'canonical_record_corrupt');
-        governing.push({ layer, pin: material.pin, status: material.status, record: entry.record, artifact });
-      }
-    }
-    return { origin_base, current_project, governing, coverage: current_project.coverage };
-  }
   #explorationProofs(context, canonical, shared, { requireCurrent = false } = {}) {
     this.#invalidations.assertFence(context, { sequence: shared.source_fence });
     const origin = canonical.prepare(context, shared.origin_base);
@@ -374,7 +360,7 @@ export class LocalGraphStore {
       if (currentProject) {
         graphAssert(graphEqual(currentProject, services.inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
         services.canonical.assert(tx, context, currentProjectProof);
-        const shared = this.#contextShared(services.canonical, proofs.origin, currentProjectProof, currentProject.version);
+        const shared = materializeContextShared(services.canonical, proofs.origin, currentProjectProof, currentProject.version);
         this.#invalidations.assertFence(context, { sequence: proofs.shared.source_fence });
         return { ...publicReceipt, shared };
       }
@@ -587,90 +573,26 @@ export class LocalGraphStore {
       });
     });
   }
-  #readContext(context, options, canonical_reader, kind) {
-    return this.#call(() => {
-      const request = validateContextReadRequest(options, kind);
-      const services = this.#explorationServices(canonical_reader, true), { inputs, canonical, contexts } = services;
-      contexts.grant(context);
-      const metadata = this.#view(context, 'graph:read', false, tx => {
-        contexts.grant(context);
-        const exploration = inputs.getExploration(tx, context, { exploration_id: request.exploration_id });
-        graphAssert(exploration && exploration.generation_id === request.at.generation_id, 'exploration_unavailable');
-        return { exploration, project: inputs.projectSelection(tx, context) };
-      });
-      const fence = canonical.fence(context);
-      const origin = canonical.prepare(context, metadata.exploration.origin.shared_base);
-      const project = canonical.prepare(context, metadata.project.pin);
-      const read_pins = { project_selection: metadata.project, source_fence: fence };
-      // This pass reads bounded immutable locators only. It never materializes
-      // authorized semantic results; the final selected pass does that once.
-      const planned = this.#view(context, 'graph:read', false, tx => {
-        contexts.grant(context);
-        const selected = planContextSelection({ view: tx, context, inputs: this.#inputs, explorations: inputs,
-          config_digest: canonical.config_digest, request, kind, read_pins });
-        // Canonical preparation needs only exact locators and typed content.
-        // Repeated private provenance is verified inside the final snapshot,
-        // and must not consume the public response's aggregate byte budget.
-        return { revisions: selected.revisions.map(revision => ({ ref: exactRevisionAddress(revision),
-          content: revision.assertion.content })), ticket_refs: selected.ticket_refs, selection: selected.selection };
-      });
-      const prepared = new Map();
-      for (const candidate of planned.revisions) {
-        const key = graphHash(candidate.ref);
-        try { prepared.set(key, { candidate, proof: contexts.prepare(context, candidate.content, planned.ticket_refs) }); }
-        catch (error) { prepared.set(key, { candidate, error }); }
-      }
-      return this.#view(context, 'graph:read', false, tx => {
-        contexts.grant(context);
-        inputs.grant(context);
-        graphAssert(graphEqual(metadata.exploration, inputs.getExploration(tx, context, { exploration_id: request.exploration_id }))
-          && graphEqual(metadata.project, inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
-        this.#invalidations.assertFence(context, { sequence: fence });
-        canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
-        const selected = readContextSelection({ view: tx, context, inputs: this.#inputs, explorations: inputs,
-          config_digest: canonical.config_digest, request, kind, read_pins });
-        const { source_heads: plannedHeads, ...plannedPins } = planned.selection;
-        const { source_heads: selectedHeads, ...selectedPins } = selected.selection;
-        graphAssert(graphEqual(plannedPins, selectedPins) && selectedHeads.every(head =>
-          plannedHeads.some(before => graphEqual(before, head))), 'graph_storage_conflict');
-        const applicability = new Map();
-        for (const revision of selected.revisions) {
-          const key = graphHash(exactRevisionAddress(revision)), p = prepared.get(key);
-          graphAssert(p && graphEqual(p.candidate.ref, exactRevisionAddress(revision))
-            && graphEqual(p.candidate.content, revision.assertion.content), 'graph_storage_conflict');
-          if (p.error) throw p.error;
-          applicability.set(key, contexts.assert(tx, context, p.proof, { assertion: revision.assertion, provenance: revision.provenance }));
-        }
-        const item = value => {
-          if (!value) return value;
-          const verified = applicability.get(graphHash(value.ref)); graphAssert(verified, 'graph_corrupt');
-          const owner = readExplorationOwner(tx, { scope: value.ref.scope, generation_id: value.ref.generation_id });
-          graphAssert(owner, 'exploration_corrupt');
-          return { ...value, applicability: { ...verified, scope: value.ref.scope,
-            exploration_id: owner.exploration_id } };
-        };
-        const local = { ...selected.local };
-        if (Object.hasOwn(local, 'item')) local.item = item(local.item);
-        if (Object.hasOwn(local, 'root')) local.root = item(local.root);
-        if (local.items) local.items = local.items.map(item);
-        if (local.links) local.links = local.links.map(link => Object.hasOwn(link, 'item') ? { ...link, item: item(link.item) } : link);
-        // Recheck selected canonical source material and opaque grants after
-        // assembly, before any fragment can escape the snapshot.
-        for (const revision of selected.revisions) contexts.assert(tx, context, prepared.get(graphHash(exactRevisionAddress(revision))).proof, { assertion: revision.assertion, provenance: revision.provenance });
-        canonical.assert(tx, context, origin); canonical.assert(tx, context, project);
-        graphAssert(graphEqual(metadata.project, inputs.projectSelection(tx, context)), 'exploration_selection_conflict');
-        this.#invalidations.assertFence(context, { sequence: fence }); contexts.grant(context);
-        const shared = this.#contextShared(canonical, origin, project, metadata.project.version);
-        return { exploration_id: request.exploration_id, generation_id: request.at.generation_id,
-          graph_revision: request.at, mode: request.mode, selection: selectedPins,
-          local, shared, availability: { local: local.status ?? 'selected', origin_base: shared.origin_base.status,
-            current_project: shared.current_project.status } };
-      });
-    });
+  #contextReadService(options, canonical_reader, kind) {
+    try {
+      // Preserve the public facade's request-first failure order without
+      // moving the read workflow back out of the application service.
+      validateContextReadRequest(options, kind);
+      return this.#explorationServices(canonical_reader, true).contextReads;
+    } catch (error) {
+      const code = graphErrorCode(error);
+      throw graphFail(CODES.has(code) ? code : 'invalid_graph_input');
+    }
   }
-  resolveContext(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'resolve'); }
-  pageContexts(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'page'); }
-  contextLineage(context, options, canonical_reader) { return this.#readContext(context, options, canonical_reader, 'lineage'); }
+  resolveContext(context, options, canonical_reader) {
+    return this.#contextReadService(options, canonical_reader, 'resolve').resolve(context, options);
+  }
+  pageContexts(context, options, canonical_reader) {
+    return this.#contextReadService(options, canonical_reader, 'page').page(context, options);
+  }
+  contextLineage(context, options, canonical_reader) {
+    return this.#contextReadService(options, canonical_reader, 'lineage').lineage(context, options);
+  }
   #readExploration(context, options, canonical_reader, paging, selectionOnly = false) {
     return this.#call(() => {
       const input = graphInput(options);
