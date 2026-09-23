@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "exploration-git-observer-adapter-home-is-exact",
+    "exploration-git-observer-contract-is-preserved",
+    "exploration-git-observer-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "exploration-git-observer-adapter-home-is-exact",
+      "identity": "sha256:4fad55192f404aa10dde501c74df0fb6aa1b71d68fca65838c54d524ecbddede",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exploration-git-observer-contract-is-preserved",
+      "identity": "sha256:4b9d86dfc5aa69c673e3b56e331ebfd4679076623a876e0a20815e74ec484314",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "exploration-git-observer-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:d3876b250cb5970570d6f227100a83f4d548349581921cdd26046209d6f4434e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-exploration-git-observer-adapter-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T08:59:00Z",
+  "refs": [
+    "commit:64b238c02201ce631299ad5bc0e2e9b1479017e3",
+    "commit:6d55677a0c461f48f3f78c11edf0ba587561a008",
+    "commit:29bfd58710fb631820183f4f9cef8c73f7c559ba:semantic-runtime/src/local/exploration-physical.mjs",
+    "semantic-runtime/src/adapters/git/exploration-physical.mjs",
+    "semantic-runtime/src/local/exploration-inputs.mjs",
+    "semantic-runtime/test/exploration-inputs.test.mjs",
+    "semantic-runtime/test/exploration-projection.test.mjs",
+    "semantic-runtime/test/exploration-projection-security.test.mjs",
+    "semantic-runtime/test/exploration-projection-recovery.test.mjs",
+    "semantic-runtime/test/exploration-projection-scale.test.mjs",
+    "semantic-runtime/test/branch-scope.test.mjs",
+    "semantic-runtime/test/jev-exploration-check.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/test/boundaries.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-exploration-git-observer-adapter.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 64b238c02201ce631299ad5bc0e2e9b1479017e3 moves semantic-runtime/src/local/exploration-physical.mjs byte-for-byte to semantic-runtime/src/adapters/git/exploration-physical.mjs. Git records R100; both paths resolve to blob dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed, the old path is absent, no shim remains, and the only other production change is the single import specifier in the sole consumer semantic-runtime/src/local/exploration-inputs.mjs. Provenance commit 6d55677a0c461f48f3f78c11edf0ba587561a008 appends one unique git-exploration-observer-adapter relocation record binding the old and new paths, exact old blob and actual migration commit; its repository-aware layout assertion, regenerated baseline and semantic-runtime Room all point to the new path while accepted historical Evidence retains the old path. The current topology has 333 production edges, exactly one incoming edge to the adapter, zero internal outgoing edges, zero SCCs, zero direction exceptions and zero boundary errors across 247 checked files. An independent subagent reconstructed the move and consumer diff, verified manifest uniqueness, Room freshness and topology, and passed focused Exploration input, projection, security, recovery, scale, branch-scope, layout, boundary and mocked JEV checks 95/95 with no material findings. The same observer contract remains covered for directory and gitfile worktrees; symbolic, detached and unborn HEAD; loose and packed refs; bounded no-follow reads; identity/race rechecks; fail-closed exploration_physical_changed behavior; and the absence of config, index or Git subprocess access. Executor-side deterministic mocked JEV verification passes 17/17 without a live provider call. Full Runtime verification passes 1,035 total, 1,033 passed, zero failed and two expected Keychain skips. Standalone locked-install verification installs fourteen packages from local cache and passes 1,035 total, 1,018 passed, zero failed and seventeen documented standalone skips. Plugin artifact verification passes with 79 files and 3,670,088 bytes. Project and Ticket validation pass with 231 Tickets, 539 prior Evidence and 178 Outcomes; Context guard since planning commit 29bfd587 has no governing authorities or violations; semantic-runtime Room drift is FRESH; git diff checking passes; and HEAD equals the remote branch at 6d55677a0c461f48f3f78c11edf0ba587561a008 before this Evidence. Two unrelated untracked Ticket files remain untouched. No credential, Keychain lifecycle, external host, provider, live JEV, network or user-repository access was used.",
+  "ticket_id": "ticket-runtime-relocate-exploration-git-observer-adapter"
+}
