@@ -1,0 +1,50 @@
+{
+  "acceptance_ids": [
+    "query-application-home-is-exact",
+    "query-relocation-preserves-public-and-runtime-contracts",
+    "query-relocation-is-auditable-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "query-application-home-is-exact",
+      "identity": "sha256:3fdbee52a4e6f90a572f960bb4f14e73ec6cd55519747bda8f34cb9b8186b065",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "query-relocation-preserves-public-and-runtime-contracts",
+      "identity": "sha256:d0a56fdbfef840a4a27598551967b6516f947621c4ec7a6b424a6e7aa7f79864",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "query-relocation-is-auditable-and-verifiable",
+      "identity": "sha256:53d2dffd8bcee484b6744564877586bc640d16821d31fb288e5faf6873428e26",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-query-application-capability-relocation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T04:36:11Z",
+  "refs": [
+    "commit:d9017df27b8407d7db30f772f48e324f7014a73f",
+    "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-contract.mjs",
+    "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-inputs.mjs",
+    "commit:1a75efb7ac17a52df7f88c0c57a1525fca68e1a4:semantic-runtime/src/local/query-engine.mjs",
+    "semantic-runtime/src/application/query/query-contract.mjs",
+    "semantic-runtime/src/application/query/query-inputs.mjs",
+    "semantic-runtime/src/application/query/query-engine.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/test/helpers/query-fixture.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-relocate-query-application-capability.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Migration commit d9017df27b8407d7db30f772f48e324f7014a73f records exactly three production moves from src/local into src/application/query: query-contract.mjs, query-inputs.mjs and query-engine.mjs. Normalized source comparisons prove the moved implementations are byte-identical after replacing only their six, thirteen and four required relative import specifiers. All old paths are absent with no compatibility shim. src/index.mjs remains the sole production importer outside the Query capability and exports the same LocalQueryEngine symbol; a focused structural assertion fixes that boundary. Current test fixtures and direct tests resolve the new paths. No other production source moved. The existing Query contract validation, authorized input composition, constructor, query/next, cursor and LRU behavior, budgets, text/ranking trace, optional Judge behavior, degradation/cancellation, authorization/source/head/freshness rechecks, errors, schemas, digests, SQL, providers, transaction ownership and public export set remain unchanged. The regenerated layout baseline records the three new application/query nodes and equivalent edges. The relocation manifest binds old blobs b62d715e0043462f05feb5d0e769e8a3b93456bc, fe159875ac1db76cfc7f0edea6a21de44e70caf4 and f7f22f70a68439809c385a48a53270ee8125570f to the new paths, category query-application-capability and the actual migration commit; its focused test skips only when standalone packaging deliberately omits historical records. Focused Query/composition/layout/boundary verification passes 51/51 before the move commit, and final provenance/layout/boundary verification passes 21/21. Boundary checking scans 247 production files with zero errors, zero SCCs and zero direction exceptions. Full Runtime verification passes 1027 total / 1025 passed / zero failed / two expected skips. Standalone locked-install verification passes 1027 total / 1018 passed / zero failed / nine expected skips. Plugin artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. Historical Ticket, Evidence and Outcome references retain their accepted old paths. No credential, Keychain lifecycle, host, network, provider or live JEV call was used; deterministic JEV and Query/Judge integration coverage remained in both full suites.",
+  "ticket_id": "ticket-runtime-relocate-query-application-capability"
+}

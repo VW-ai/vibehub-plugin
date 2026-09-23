@@ -287,6 +287,27 @@
       "old_blob": "6263eba17a321765a099688ad273a2dc51fda862",
       "migration_commit": "8746a0112e78facb6d49ca95a58fddf4c30f23f5",
       "category": "context-application-service"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/query-contract.mjs",
+      "new_path": "semantic-runtime/src/application/query/query-contract.mjs",
+      "old_blob": "b62d715e0043462f05feb5d0e769e8a3b93456bc",
+      "migration_commit": "d9017df27b8407d7db30f772f48e324f7014a73f",
+      "category": "query-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/query-inputs.mjs",
+      "new_path": "semantic-runtime/src/application/query/query-inputs.mjs",
+      "old_blob": "fe159875ac1db76cfc7f0edea6a21de44e70caf4",
+      "migration_commit": "d9017df27b8407d7db30f772f48e324f7014a73f",
+      "category": "query-application-capability"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/query-engine.mjs",
+      "new_path": "semantic-runtime/src/application/query/query-engine.mjs",
+      "old_blob": "f7f22f70a68439809c385a48a53270ee8125570f",
+      "migration_commit": "d9017df27b8407d7db30f772f48e324f7014a73f",
+      "category": "query-application-capability"
     }
   ]
 }

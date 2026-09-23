@@ -159,6 +159,44 @@ test('Context read application service relocation is complete and recorded', t =
   assert.equal(existsSync(new URL('../src/application/context/context-read-service.mjs', import.meta.url)), true);
 });
 
+test('Query application capability relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'query-application-capability');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [
+    {
+      old_path: 'semantic-runtime/src/local/query-contract.mjs',
+      new_path: 'semantic-runtime/src/application/query/query-contract.mjs',
+      old_blob: 'b62d715e0043462f05feb5d0e769e8a3b93456bc',
+      migration_commit: 'd9017df27b8407d7db30f772f48e324f7014a73f',
+      category: 'query-application-capability',
+    },
+    {
+      old_path: 'semantic-runtime/src/local/query-inputs.mjs',
+      new_path: 'semantic-runtime/src/application/query/query-inputs.mjs',
+      old_blob: 'fe159875ac1db76cfc7f0edea6a21de44e70caf4',
+      migration_commit: 'd9017df27b8407d7db30f772f48e324f7014a73f',
+      category: 'query-application-capability',
+    },
+    {
+      old_path: 'semantic-runtime/src/local/query-engine.mjs',
+      new_path: 'semantic-runtime/src/application/query/query-engine.mjs',
+      old_blob: 'f7f22f70a68439809c385a48a53270ee8125570f',
+      migration_commit: 'd9017df27b8407d7db30f772f48e324f7014a73f',
+      category: 'query-application-capability',
+    },
+  ]);
+  for (const entry of entries) {
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);

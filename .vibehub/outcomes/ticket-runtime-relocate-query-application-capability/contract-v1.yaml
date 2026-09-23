@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "query-application-home-is-exact",
+    "query-relocation-preserves-public-and-runtime-contracts",
+    "query-relocation-is-auditable-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T04:44:41Z",
+  "contract_revision": {
+    "identity": "sha256:478debe65684911b6d69eccf19062271d3e54ba6e7efa7f053c3d935a3d2e2d1",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-query-application-capability-relocation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Independent closeout subagent with no executor role; inspected the exact Ticket, bound Evidence, accepted pre-move Query Outcome, migration commit, current provenance diff and repository guards, and reproduced focused structural and boundary checks before adjudication.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent subagent adjudication accepts all three Acceptance revisions in exact Contract v1. For query-application-home-is-exact, direct comparison against commit 1a75efb7ac17a52df7f88c0c57a1525fca68e1a4 verifies the three recorded old blobs, absence of every old path, presence of every new path, and normalized byte equality after exactly six, thirteen and four relative import-specifier changes; comparing the complete production path sets proves no other source moved. For query-relocation-preserves-public-and-runtime-contracts, migration commit d9017df27b8407d7db30f772f48e324f7014a73f changes src/index.mjs only by the LocalQueryEngine export path, leaves it the sole production importer outside application/query, and retains the accepted Query implementation byte-for-byte beyond import paths, so the independently accepted pre-move Query Contract v4 behavior and public surface are unchanged. For query-relocation-is-auditable-and-verifiable, the manifest and repository-aware test bind the exact old paths, old blobs, new paths, category and migration commit; the generated layout names all three new nodes and sole external edge; current imports resolve; historical records remain intact. Bound Evidence records passing focused 51/51 and final provenance 21/21 checks, full Runtime 1027 total with 1025 passed and zero failed, standalone 1027 total with 1018 passed and zero failed, and artifact verification at 79 files and 3670088 bytes. I independently reran the boundary checker over 247 files with zero errors, SCCs or direction exceptions, and reproduced successful Ticket/project validation, Context guard with no violations, semantic-runtime Room FRESH, and git diff checking. No live provider, JEV, network, credential or Keychain call was made. No acceptance gap remains.",
+  "ticket_id": "ticket-runtime-relocate-query-application-capability",
+  "unresolved_acceptance_ids": []
+}
