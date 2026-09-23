@@ -371,6 +371,13 @@
       "old_blob": "dc41cf05dfcb3bd8733a5c28bdc3a93567ab75ed",
       "migration_commit": "64b238c02201ce631299ad5bc0e2e9b1479017e3",
       "category": "git-exploration-observer-adapter"
+    },
+    {
+      "old_path": "semantic-runtime/src/local/exploration-store.mjs",
+      "new_path": "semantic-runtime/src/application/explorations/exploration-store.mjs",
+      "old_blob": "0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b",
+      "migration_commit": "ee0e605a5fbbd7aa13ad628b26721150acb09289",
+      "category": "exploration-application-facade"
     }
   ]
 }

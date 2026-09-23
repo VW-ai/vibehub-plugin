@@ -781,6 +781,11 @@
       "intended_destination": "src/application/context/context-store.mjs"
     },
     {
+      "path": "src/application/explorations/exploration-store.mjs",
+      "current_role": "production",
+      "intended_destination": "src/application/explorations/exploration-store.mjs"
+    },
+    {
       "path": "src/application/graph/graph-capability.mjs",
       "current_role": "production",
       "intended_destination": "src/application/graph/graph-capability.mjs"
@@ -984,11 +989,6 @@
       "path": "src/local/exploration-inputs.mjs",
       "current_role": "production",
       "intended_destination": "src/application/explorations/exploration-inputs.mjs"
-    },
-    {
-      "path": "src/local/exploration-store.mjs",
-      "current_role": "production",
-      "intended_destination": "src/application/explorations/exploration-store.mjs"
     },
     {
       "path": "src/local/git-projects.mjs",
@@ -2569,6 +2569,18 @@
       "to": "src/local/local-runtime-composition.mjs"
     },
     {
+      "from": "src/application/explorations/exploration-store.mjs",
+      "to": "src/local/exploration-inputs.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-store.mjs",
+      "to": "src/local/graph-inputs.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-store.mjs",
+      "to": "src/local/local-runtime-composition.mjs"
+    },
+    {
       "from": "src/application/graph/graph-selected.mjs",
       "to": "src/core/event-provenance.mjs"
     },
@@ -2990,6 +3002,10 @@
     },
     {
       "from": "src/index.mjs",
+      "to": "src/application/explorations/exploration-store.mjs"
+    },
+    {
+      "from": "src/index.mjs",
       "to": "src/application/query/query-engine.mjs"
     },
     {
@@ -3095,10 +3111,6 @@
     {
       "from": "src/index.mjs",
       "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/local/exploration-store.mjs"
     },
     {
       "from": "src/index.mjs",
@@ -3295,18 +3307,6 @@
     {
       "from": "src/local/exploration-inputs.mjs",
       "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/exploration-store.mjs",
-      "to": "src/local/exploration-inputs.mjs"
-    },
-    {
-      "from": "src/local/exploration-store.mjs",
-      "to": "src/local/graph-inputs.mjs"
-    },
-    {
-      "from": "src/local/exploration-store.mjs",
-      "to": "src/local/local-runtime-composition.mjs"
     },
     {
       "from": "src/local/git-projects.mjs",
@@ -3534,6 +3534,10 @@
     },
     {
       "from": "src/local/judge-inputs.mjs",
+      "to": "src/application/explorations/exploration-store.mjs"
+    },
+    {
+      "from": "src/local/judge-inputs.mjs",
       "to": "src/core/context-profile.mjs"
     },
     {
@@ -3563,10 +3567,6 @@
     {
       "from": "src/local/judge-inputs.mjs",
       "to": "src/local/durable-ingress.mjs"
-    },
-    {
-      "from": "src/local/judge-inputs.mjs",
-      "to": "src/local/exploration-store.mjs"
     },
     {
       "from": "src/local/judge-inputs.mjs",

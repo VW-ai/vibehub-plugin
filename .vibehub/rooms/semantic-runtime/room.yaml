@@ -34,7 +34,7 @@
         "path": "semantic-runtime/docs/agent-work-request-v0.md"
       },
       {
-        "blob": "f35124932e8d40b4ba91ac4a62341bc4e7ade423",
+        "blob": "563311f345089198073d8433959d6112e28a0c79",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -94,7 +94,7 @@
         "path": "semantic-runtime/docs/graph-store-v0.md"
       },
       {
-        "blob": "eb90a40eaae2b8e35980433ba03c1964af8980e6",
+        "blob": "07ff6a94b225c1f7867814b0ddab3100fd96f6cc",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
@@ -618,6 +618,10 @@
         "path": "semantic-runtime/src/application/context/context-store.mjs"
       },
       {
+        "blob": "55d21684c5183113cc0404d7ad21f6986a592bd6",
+        "path": "semantic-runtime/src/application/explorations/exploration-store.mjs"
+      },
+      {
         "blob": "afae727cf3ac13539e40e798a468d28d65d7d293",
         "path": "semantic-runtime/src/application/graph/graph-capability.mjs"
       },
@@ -750,7 +754,7 @@
         "path": "semantic-runtime/src/domain/identity/access-authority.mjs"
       },
       {
-        "blob": "e40f94e81d2e1b06d0d3de5b183feafc0e031d21",
+        "blob": "272416d7272fbf7cfeced5105e1f157ff3ac4fb0",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -782,10 +786,6 @@
         "path": "semantic-runtime/src/local/exploration-inputs.mjs"
       },
       {
-        "blob": "0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b",
-        "path": "semantic-runtime/src/local/exploration-store.mjs"
-      },
-      {
         "blob": "92be05de4048b0390104f796b096df1eb65e11ec",
         "path": "semantic-runtime/src/local/git-projects.mjs"
       },
@@ -810,7 +810,7 @@
         "path": "semantic-runtime/src/local/judge-contract.mjs"
       },
       {
-        "blob": "72c7cc670a8f006133ed41a2f52402f84ca15834",
+        "blob": "8f49a6b62e0a184254bd119657a6c008e10ad746",
         "path": "semantic-runtime/src/local/judge-inputs.mjs"
       },
       {
@@ -1334,7 +1334,7 @@
         "path": "semantic-runtime/test/judge-comparison.test.mjs"
       },
       {
-        "blob": "9c963a4f90563380cfb85a0e41abf377a195149d",
+        "blob": "43426393df3995055c9e0aa8275df51e3d13d8ec",
         "path": "semantic-runtime/test/judge-inputs.test.mjs"
       },
       {
@@ -1354,7 +1354,7 @@
         "path": "semantic-runtime/test/judge-runtime.test.mjs"
       },
       {
-        "blob": "450c3222e696fd82e4468f0473d6f010c96806a8",
+        "blob": "b06fb2488b7086498c60cee566dfe08fae54ce2f",
         "path": "semantic-runtime/test/local-composition.test.mjs"
       },
       {
@@ -1430,7 +1430,7 @@
         "path": "semantic-runtime/test/replay.test.mjs"
       },
       {
-        "blob": "8002077a0524973497974782ca138e09bd725027",
+        "blob": "dc19f90babde0e15e00d55fe64f33dbc4325c07d",
         "path": "semantic-runtime/test/runtime-layout.test.mjs"
       },
       {
@@ -1474,8 +1474,8 @@
         "path": "semantic-runtime/test/working-graph.test.mjs"
       }
     ],
-    "checked_at": "2026-09-23T08:50:28.794Z",
-    "last_aligned_commit": "64b238c02201ce631299ad5bc0e2e9b1479017e3"
+    "checked_at": "2026-09-23T09:37:02.562Z",
+    "last_aligned_commit": "ee0e605a5fbbd7aa13ad628b26721150acb09289"
   },
   "anchors": [
     "semantic-runtime/"

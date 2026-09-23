@@ -339,6 +339,26 @@ test('selected Exploration Git observer adapter relocation is complete and recor
   assert.equal(existsSync(new URL('../src/adapters/git/exploration-physical.mjs', import.meta.url)), true);
 });
 
+test('Exploration application facade relocation is complete and recorded', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'exploration-application-facade');
+  assert.equal(manifest.schema_version, 1);
+  assert.deepEqual(entries, [{
+    old_path: 'semantic-runtime/src/local/exploration-store.mjs',
+    new_path: 'semantic-runtime/src/application/explorations/exploration-store.mjs',
+    old_blob: '0c6d944acf7b967adc891f4aa6ba3ecd18e22e9b',
+    migration_commit: 'ee0e605a5fbbd7aa13ad628b26721150acb09289',
+    category: 'exploration-application-facade',
+  }]);
+  assert.equal(existsSync(new URL('../src/local/exploration-store.mjs', import.meta.url)), false);
+  assert.equal(existsSync(new URL('../src/application/explorations/exploration-store.mjs', import.meta.url)), true);
+});
+
 test('Gateway example research relocation is complete and recorded', t => {
   const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {
@@ -427,6 +447,15 @@ test('layout inspection captures public surface, command modes, constants and an
     { from: 'src/local/graph-service-bundle.mjs', to: 'src/application/context/context-inputs.mjs' },
     { from: 'src/local/graph-store.mjs', to: 'src/application/context/context-inputs.mjs' },
     { from: 'src/local/judge-inputs.mjs', to: 'src/application/context/context-store.mjs' },
+  ]);
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    edge.from === 'src/application/explorations/exploration-store.mjs'
+      || edge.to === 'src/application/explorations/exploration-store.mjs'), [
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/exploration-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/graph-inputs.mjs' },
+    { from: 'src/application/explorations/exploration-store.mjs', to: 'src/local/local-runtime-composition.mjs' },
+    { from: 'src/index.mjs', to: 'src/application/explorations/exploration-store.mjs' },
+    { from: 'src/local/judge-inputs.mjs', to: 'src/application/explorations/exploration-store.mjs' },
   ]);
   assert.equal(current.contract_constants.find(item => item.name === 'DOMAIN_SCHEMA_VERSION')?.value, 2);
 });
