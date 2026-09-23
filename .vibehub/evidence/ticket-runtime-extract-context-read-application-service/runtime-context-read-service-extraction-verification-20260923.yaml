@@ -1,0 +1,45 @@
+{
+  "acceptance_ids": [
+    "context-read-service-owns-complete-workflow",
+    "context-read-composition-and-compatibility-are-exact",
+    "context-read-seam-is-bounded-and-verifiable"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "context-read-service-owns-complete-workflow",
+      "identity": "sha256:b3c11811825fa7039f98986c4bbb7a86d9b160966038f3dd3a4be2eae916a811",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-read-composition-and-compatibility-are-exact",
+      "identity": "sha256:449d8178062be064cf4e08b45555a02cb97d5fb8e541cc1dce7758d6c387c2fe",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "context-read-seam-is-bounded-and-verifiable",
+      "identity": "sha256:3d3cfe5d8c15f6da8025d091f01c69d1485ab859d3368af2ecd08a5dcb761833",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-context-read-service-extraction-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-23T03:18:30Z",
+  "refs": [
+    "commit:6e5bf90830a3a49412f7ae723c07a8c48d36daf3",
+    "semantic-runtime/src/local/context-read-service.mjs",
+    "semantic-runtime/src/local/context-reader.mjs",
+    "semantic-runtime/src/local/graph-service-bundle.mjs",
+    "semantic-runtime/src/local/graph-store.mjs",
+    "semantic-runtime/test/context-reader.test.mjs",
+    "semantic-runtime/test/local-composition.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    ".vibehub/tickets/ticket-runtime-extract-context-read-application-service.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 6e5bf90830a3a49412f7ae723c07a8c48d36daf3 extracts the complete typed Context resolve, page and lineage workflow into one internal ContextReadService. The service owns its three synchronous DomainStore read snapshots, uses the exact cached ExplorationCanonical, ContextInputs and ExplorationInputs proof owners from graphServiceBundle, never imports or constructs LocalGraphStore, and accepts or returns no transaction handle. LocalGraphStore keeps compatibility delegates plus a request-first preflight that preserves the prior error order and Local Graph error shape; an independent review found that ordering regression before commit, and a new regression test proves malformed requests win over malformed reader configuration while valid requests still normalize malformed readers. Existing snapshot order, planned/final selection comparison, applicability assembly, shared Authority materialization, callback domain-code recovery, pre/post graph and ingress grants, Context grants, canonical proofs, Project selection, head and source-fence rechecks remain intact. Context writes, Exploration and Graph writes, Query/Judge behavior, adapters, schemas, SQL, public exports and relocation history remain unchanged. Focused Context/composition/Query/Judge/layout/boundary verification passes 86/86. Boundary checking scans 247 files with zero errors, zero production SCCs and zero exceptions. Full Runtime verification passes 1026 total / 1024 passed / zero failed / two expected skips. Standalone locked-install verification passes 1026 total / 1018 passed / zero failed / eight expected skips; an earlier run exceeded the verifier's fixed 180-second process timeout under concurrent review load without reporting an assertion failure, then the clean sequential rerun completed in 130.48 seconds. Plugin artifact verification passes with 79 files and 3670088 bytes. Ticket and Project validation, Context guard, git diff checking and semantic-runtime Room alignment pass; the Room is FRESH. No credential, Keychain lifecycle, host, network, provider or live JEV call was used; ordinary deterministic JEV contract and integration tests remained in both full suites.",
+  "ticket_id": "ticket-runtime-extract-context-read-application-service"
+}

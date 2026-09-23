@@ -1,0 +1,28 @@
+{
+  "accepted_acceptance_ids": [
+    "context-read-service-owns-complete-workflow",
+    "context-read-composition-and-compatibility-are-exact",
+    "context-read-seam-is-bounded-and-verifiable"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-23T03:26:04Z",
+  "contract_revision": {
+    "identity": "sha256:41b6ddfd25df3543596c0af9a7df27ca02bd8503adb3532cae2d754a623f9efc",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-context-read-service-extraction-verification-20260923"
+  ],
+  "independence": {
+    "note": "A read-only closeout session separate from the executor inspected the exact Contract, implementation commit 6e5bf90830a3a49412f7ae723c07a8c48d36daf3, bound Evidence and relevant pre-change implementation, then ran only focused deterministic checks before adjudicating every active criterion.",
+    "source": "separate_session"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent adjudication accepted all three active criteria. The committed ContextReadService owns request validation, metadata, planning and final authorized synchronous read snapshots plus applicability and shared Authority materialization; its public methods neither accept nor return a transaction handle, and static inspection confirms it neither imports nor constructs LocalGraphStore nor calls public Graph operations. graphServiceBundle caches it with the exact canonical, ContextInputs and ExplorationInputs proof owners, while LocalGraphStore preserves its three compatibility methods and request-first error order. Direct diff review found no change to the root public index, database schema/SQL, Query/Judge implementations, adapters, durable relocation manifest, or Context and Exploration write ownership. Independent focused verification passed 86/86, including source, Project and head movement defenses, final authority rechecks, fixed-view Judge admission without nested snapshots, composition, layout and boundaries; the standalone boundary command additionally scanned 247 files with zero errors, SCCs or exceptions. The exact-revision Evidence records successful offline full Runtime, standalone locked-install, plugin artifact, Ticket/Project, Context guard, Room and diff verification, and the independent rerun confirmed the semantic-runtime Room is FRESH, project records are valid, Context guard has no violations, and tracked worktree diff is clean.",
+  "ticket_id": "ticket-runtime-extract-context-read-application-service",
+  "unresolved_acceptance_ids": []
+}
