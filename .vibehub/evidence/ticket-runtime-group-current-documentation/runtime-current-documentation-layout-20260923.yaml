@@ -1,0 +1,65 @@
+{
+  "acceptance_ids": [
+    "current-documentation-layout-is-exact",
+    "current-documentation-links-remain-resolvable",
+    "current-documentation-content-is-preserved",
+    "current-documentation-relocation-is-traceable",
+    "documentation-layout-keeps-runtime-invariants",
+    "documentation-layout-calibrates-before-expanding"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "current-documentation-layout-is-exact",
+      "identity": "sha256:1a28c9d1115962063726829b9ec4c1643af1f447b55e0d84ad6fc4f7963774c8",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "current-documentation-links-remain-resolvable",
+      "identity": "sha256:45724ef803d20333aa63ddc128a2dd0d58586990c60bc100c533542527e42376",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "current-documentation-content-is-preserved",
+      "identity": "sha256:a98c5b346bab8bbc2c863240c2996038643abab7729fe89eba6d736d80ead30b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "current-documentation-relocation-is-traceable",
+      "identity": "sha256:9deff36e433566e5f0099d0f27ba4464662475d8a076262d76309b5ea217108a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "documentation-layout-keeps-runtime-invariants",
+      "identity": "sha256:886836ad7e3187dd59f167ec059045aa65fcf1ffb9d8fd3050b17dd93eb72edf",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "documentation-layout-calibrates-before-expanding",
+      "identity": "sha256:d0c6705be2612d9c34aced5c9900fad21d57e23e0ced09599ca3a3fadbf528d3",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-current-documentation-layout-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T01:44:02.897Z",
+  "refs": [
+    "commit:35a8d06c43633061fc9c1ba670b932723ca9e706",
+    "semantic-runtime/docs/product",
+    "semantic-runtime/docs/architecture",
+    "semantic-runtime/docs/contracts",
+    "semantic-runtime/docs/operations",
+    "semantic-runtime/docs/history",
+    "semantic-runtime/README.md",
+    "semantic-runtime/test/support/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-group-current-documentation.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 35a8d06c43633061fc9c1ba670b932723ca9e706 moves the exact 37 current Markdown documents without renaming into history 1, product 2, architecture 2, contracts 27 and operations 5; every old path is absent and every destination exists. Ten linked documents differ only by 245 mechanically rebased relative hrefs, while 27 documents retain their exact pre-move Git blobs; all relative links in the moved documents resolve. The implementation also applies exact path-only transforms to one README with 39 migration references, 45 active Tickets with 95 context refs, and 21 semantic-runtime Room Context records with 28 refs (4 source.ref and 24 evidence[].ref). The repository-aware guard found and the proof change repairs one pre-existing README link to the already relocated Phase 0 contract; no other prose changed. The append-only manifest preserves all prior 272 entries unchanged and appends 37 current-documentation-layout records bound to the actual implementation commit; every original blob matches that commit parent. Protected history remains byte-identical: 45 completed Tickets retain 187 old-location mentions (186 complete repository paths plus one Runtime-relative path), 82 Evidence files retain 82 mentions, and Outcomes contain no such mention. The 27 measurement JSON reports remain in place for the separate metadata-policy batch. The visible calibration checkpoint matched the frozen move, link, live-reference, protected-history and deferred-report counts before broad verification. Focused layout/boundary checks pass 35/35 and boundary inspection scans 249 files with zero errors, direction exceptions or production SCCs. Full Runtime verification passes 1010 cases (1008 pass, two platform skips, zero failures) plus Phase 0 32/32. Standalone install and verification passes 1010 cases (986 pass, 24 deliberate history/research/platform skips, zero failures) and scans 214 files. Root artifact verification passes with 79 files and 3670088 bytes. The regenerated 370-record baseline preserves 200 root exports, 315 production import edges, 29 contract constants, 37 npm commands and zero SCCs; production/package hashes and standalone-copy roots are unchanged. Project and Ticket validation pass, Context guard reports no authority or violation, git diff checking passes, and the semantic-runtime Room is FRESH. No credential was read and no provider call occurred; existing JEV coverage ran only through offline mocked transports.",
+  "ticket_id": "ticket-runtime-group-current-documentation"
+}

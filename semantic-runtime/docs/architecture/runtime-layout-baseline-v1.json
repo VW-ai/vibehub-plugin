@@ -28,24 +28,14 @@
       "intended_destination": "AGENTS.md"
     },
     {
-      "path": "docs/01_thought_log_semantic_runtime.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/history/01_thought_log_semantic_runtime.md"
-    },
-    {
-      "path": "docs/02_prd_vibehub_semantic_runtime.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/product/02_prd_vibehub_semantic_runtime.md"
-    },
-    {
-      "path": "docs/03_tech_design_semantic_runtime.md",
+      "path": "docs/architecture/03_tech_design_semantic_runtime.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
-      "path": "docs/agent-work-request-v0.md",
+      "path": "docs/architecture/local-app-integration-notes.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/agent-work-request-v0.md"
+      "intended_destination": "docs/architecture/local-app-integration-notes.md"
     },
     {
       "path": "docs/architecture/runtime-layout-baseline-v1.json",
@@ -58,109 +48,149 @@
       "intended_destination": "docs/architecture/runtime-layout-v0.md"
     },
     {
-      "path": "docs/branch-scope-v0.md",
+      "path": "docs/contracts/agent-work-request-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/agent-work-request-v0.md"
+    },
+    {
+      "path": "docs/contracts/branch-scope-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/branch-scope-v0.md"
     },
     {
-      "path": "docs/canonical-source-reader-v0.md",
+      "path": "docs/contracts/canonical-source-reader-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/canonical-source-reader-v0.md"
     },
     {
-      "path": "docs/causal-ordering-v0.md",
+      "path": "docs/contracts/causal-ordering-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/causal-ordering-v0.md"
     },
     {
-      "path": "docs/context-judge-bridge-v0.md",
+      "path": "docs/contracts/context-judge-bridge-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/context-judge-bridge-v0.md"
     },
     {
-      "path": "docs/context-lifecycle-v0.md",
+      "path": "docs/contracts/context-lifecycle-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/context-lifecycle-v0.md"
     },
     {
-      "path": "docs/domain-store-v0.md",
+      "path": "docs/contracts/domain-store-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/domain-store-v0.md"
     },
     {
-      "path": "docs/durable-ingress-v0.md",
+      "path": "docs/contracts/durable-ingress-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/durable-ingress-v0.md"
     },
     {
-      "path": "docs/event-provenance-v0.md",
+      "path": "docs/contracts/event-provenance-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/event-provenance-v0.md"
     },
     {
-      "path": "docs/exploration-adoption-v0.md",
+      "path": "docs/contracts/exploration-adoption-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/exploration-adoption-v0.md"
     },
     {
-      "path": "docs/exploration-projection-v0.md",
+      "path": "docs/contracts/exploration-projection-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/exploration-projection-v0.md"
     },
     {
-      "path": "docs/git-project-enrollment-v0.md",
+      "path": "docs/contracts/git-project-enrollment-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/git-project-enrollment-v0.md"
     },
     {
-      "path": "docs/git-provenance-v0.md",
+      "path": "docs/contracts/git-provenance-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/git-provenance-v0.md"
     },
     {
-      "path": "docs/graph-store-v0.md",
+      "path": "docs/contracts/graph-store-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/graph-store-v0.md"
+    },
+    {
+      "path": "docs/contracts/identity-contract-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/identity-contract-v0.md"
+    },
+    {
+      "path": "docs/contracts/incremental-graph-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/incremental-graph-v0.md"
+    },
+    {
+      "path": "docs/contracts/judge-runtime-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/judge-runtime-v0.md"
+    },
+    {
+      "path": "docs/contracts/observability-contract-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/observability-contract-v0.md"
+    },
+    {
+      "path": "docs/contracts/openrouter-jev-adapter.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/openrouter-jev-adapter.md"
+    },
+    {
+      "path": "docs/contracts/policy-artifacts-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/policy-artifacts-v0.md"
+    },
+    {
+      "path": "docs/contracts/policy-kernel-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/policy-kernel-v0.md"
+    },
+    {
+      "path": "docs/contracts/project-activation-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/project-activation-v0.md"
+    },
+    {
+      "path": "docs/contracts/query-engine-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/query-engine-v0.md"
+    },
+    {
+      "path": "docs/contracts/reconciliation-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/reconciliation-v0.md"
+    },
+    {
+      "path": "docs/contracts/source-invalidation-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/source-invalidation-v0.md"
+    },
+    {
+      "path": "docs/contracts/worker-protocol-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/worker-protocol-v0.md"
+    },
+    {
+      "path": "docs/contracts/working-graph-v0.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/contracts/working-graph-v0.md"
+    },
+    {
+      "path": "docs/history/01_thought_log_semantic_runtime.md",
+      "current_role": "documentation-or-report",
+      "intended_destination": "docs/history/01_thought_log_semantic_runtime.md"
     },
     {
       "path": "docs/history/runtime-relocations-v1.json",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/history/runtime-relocations-v1.json"
-    },
-    {
-      "path": "docs/identity-contract-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/identity-contract-v0.md"
-    },
-    {
-      "path": "docs/incremental-graph-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/incremental-graph-v0.md"
-    },
-    {
-      "path": "docs/judge-runtime-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/judge-runtime-v0.md"
-    },
-    {
-      "path": "docs/local-app-integration-notes.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/architecture/local-app-integration-notes.md"
-    },
-    {
-      "path": "docs/local-app-setup-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/operations/local-app-setup-v0.md"
-    },
-    {
-      "path": "docs/local-git-worktree-sensor-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/operations/local-git-worktree-sensor-v0.md"
-    },
-    {
-      "path": "docs/local-service-profile.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/operations/local-service-profile.md"
     },
     {
       "path": "docs/measurements/canonical-reader-20260922.json",
@@ -298,69 +328,39 @@
       "intended_destination": "verification/reports/query/query-verification-20260922.json"
     },
     {
-      "path": "docs/observability-contract-v0.md",
+      "path": "docs/operations/local-app-setup-v0.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/observability-contract-v0.md"
+      "intended_destination": "docs/operations/local-app-setup-v0.md"
     },
     {
-      "path": "docs/online-delivery-plan.md",
+      "path": "docs/operations/local-git-worktree-sensor-v0.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/product/online-delivery-plan.md"
+      "intended_destination": "docs/operations/local-git-worktree-sensor-v0.md"
     },
     {
-      "path": "docs/openrouter-jev-adapter.md",
+      "path": "docs/operations/local-service-profile.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/openrouter-jev-adapter.md"
+      "intended_destination": "docs/operations/local-service-profile.md"
     },
     {
-      "path": "docs/policy-artifacts-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/policy-artifacts-v0.md"
-    },
-    {
-      "path": "docs/policy-kernel-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/policy-kernel-v0.md"
-    },
-    {
-      "path": "docs/project-activation-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/project-activation-v0.md"
-    },
-    {
-      "path": "docs/provider-settings-v0.md",
+      "path": "docs/operations/provider-settings-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/operations/provider-settings-v0.md"
     },
     {
-      "path": "docs/query-engine-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/query-engine-v0.md"
-    },
-    {
-      "path": "docs/reconciliation-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/reconciliation-v0.md"
-    },
-    {
-      "path": "docs/service-auth-v0.md",
+      "path": "docs/operations/service-auth-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/operations/service-auth-v0.md"
     },
     {
-      "path": "docs/source-invalidation-v0.md",
+      "path": "docs/product/02_prd_vibehub_semantic_runtime.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/source-invalidation-v0.md"
+      "intended_destination": "docs/product/02_prd_vibehub_semantic_runtime.md"
     },
     {
-      "path": "docs/worker-protocol-v0.md",
+      "path": "docs/product/online-delivery-plan.md",
       "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/worker-protocol-v0.md"
-    },
-    {
-      "path": "docs/working-graph-v0.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "docs/contracts/working-graph-v0.md"
+      "intended_destination": "docs/product/online-delivery-plan.md"
     },
     {
       "path": "package-lock.json",

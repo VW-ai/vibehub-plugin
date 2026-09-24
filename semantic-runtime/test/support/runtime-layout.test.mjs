@@ -6,6 +6,22 @@ import { dirname, join } from 'node:path';
 import { checkRuntimeLayout, inspectRuntimeLayout } from '../../tools/runtime-layout.mjs';
 
 const compareEdges = (left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to);
+const markdownLinkPattern = /!?\[[^\]\n]*\]\((<[^>\n]+>|[^)\s]+)(?:\s+["'][^"'\n]*["'])?\)/g;
+
+function assertRelativeMarkdownLinksResolve(paths) {
+  for (const path of paths) {
+    const documentUrl = new URL(`../../${path}`, import.meta.url);
+    const content = readFileSync(documentUrl, 'utf8');
+    for (const match of content.matchAll(markdownLinkPattern)) {
+      let href = match[1];
+      if (href.startsWith('<') && href.endsWith('>')) href = href.slice(1, -1);
+      if (/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(href)) continue;
+      const targetPath = href.split(/[?#]/, 1)[0];
+      if (!targetPath) continue;
+      assert.equal(existsSync(new URL(targetPath, documentUrl)), true, `${path} has unresolved link ${href}`);
+    }
+  }
+}
 
 function copyComponent(t) {
   const root = mkdtempSync(join(tmpdir(), 'semantic-layout-'));
@@ -123,6 +139,45 @@ test('deterministic tests and governance tools form one exact relocation batch',
   assert.equal(current.standalone_copy_paths.includes('scripts'), false);
   assert.equal(current.standalone_copy_paths.includes('research'), false);
   assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
+});
+
+test('current documentation layout is one exact linked relocation batch', t => {
+  const manifestUrl = new URL('../../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'current-documentation-layout');
+  assert.equal(entries.length, 37);
+  assert.deepEqual([...new Set(entries.map(item => item.migration_commit))], [
+    '35a8d06c43633061fc9c1ba670b932723ca9e706',
+  ]);
+  assert.equal(new Set(entries.map(item => item.old_path)).size, 37);
+  assert.equal(new Set(entries.map(item => item.new_path)).size, 37);
+  assert.deepEqual(Object.fromEntries(['history', 'product', 'architecture', 'contracts', 'operations']
+    .map(group => [group, entries.filter(item => item.new_path.startsWith(`semantic-runtime/docs/${group}/`)).length])), {
+    history: 1,
+    product: 2,
+    architecture: 2,
+    contracts: 27,
+    operations: 5,
+  });
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    const currentPath = resolveRelocationDestination(manifest, entry.new_path);
+    assert.equal(existsSync(new URL(`../../${currentPath.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+  assertRelativeMarkdownLinksResolve([
+    'README.md',
+    ...entries.map(entry => entry.new_path.slice('semantic-runtime/'.length)),
+  ]);
+
+  const unsettledDocuments = inspectRuntimeLayout().inventory.filter(record =>
+    record.current_role === 'documentation-or-report' && record.path !== record.intended_destination);
+  assert.equal(unsettledDocuments.length, 27);
+  assert.ok(unsettledDocuments.every(record => record.path.startsWith('docs/measurements/')));
 });
 
 test('Phase 0 replay is one complete research vertical with explicit split lineage', t => {

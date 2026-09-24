@@ -255,7 +255,7 @@ processed once. Reusing an event identity with different contents is rejected.
 Comparison requires matching tenant, project, normalized events, and state.
 
 The CLI accepts the explicit replay format, not arbitrary Codex/Claude session
-logs. [Phase 0 contracts](docs/phase0-contracts.md) documents inputs, policy,
+logs. [Phase 0 contracts](research/phase0-replay/phase0-contracts.md) documents inputs, policy,
 judge adapters, metrics, and remaining work. Only an explicit `--judge jev`
 selection makes network/model calls. No host hooks, background capture, context
 injection, worker execution, or canonical writes occur in this prototype.

@@ -14,27 +14,19 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "75c1de2eac798716b9d73b5537f188e23852558b",
+        "blob": "ddbe4181c07bbaa1a5e1cfca9a419e150a6951f0",
         "path": "semantic-runtime/README.md"
       },
       {
-        "blob": "c9a4225ed166f045d3c77f335d470f7b887c9a25",
-        "path": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
-      },
-      {
-        "blob": "e0c2c4046f0e71a1880a70d87e112d264711b5c2",
-        "path": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
-      },
-      {
         "blob": "494508454c04b67d2cfe05fc7eec8982723eb3a7",
-        "path": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+        "path": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
       },
       {
-        "blob": "132e5decc1f2612cc686e5ad0c9a2e667e2e084c",
-        "path": "semantic-runtime/docs/agent-work-request-v0.md"
+        "blob": "ded3ba71e74d23daabd112909246572369321259",
+        "path": "semantic-runtime/docs/architecture/local-app-integration-notes.md"
       },
       {
-        "blob": "492bc23d8cedfa30312b558cbfe84ce3214a399f",
+        "blob": "8b2ad6771af748808f4238b11d7d257914070b05",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -42,88 +34,120 @@
         "path": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
       },
       {
-        "blob": "eef18b5927fdb6ad54419636784e7959238a4091",
-        "path": "semantic-runtime/docs/branch-scope-v0.md"
+        "blob": "132e5decc1f2612cc686e5ad0c9a2e667e2e084c",
+        "path": "semantic-runtime/docs/contracts/agent-work-request-v0.md"
       },
       {
-        "blob": "55b9ee13d8c91cdd88081903d4a037c127ba6afc",
-        "path": "semantic-runtime/docs/canonical-source-reader-v0.md"
+        "blob": "eef18b5927fdb6ad54419636784e7959238a4091",
+        "path": "semantic-runtime/docs/contracts/branch-scope-v0.md"
+      },
+      {
+        "blob": "e058d58583bdb435068170009b7783a84d964c1e",
+        "path": "semantic-runtime/docs/contracts/canonical-source-reader-v0.md"
       },
       {
         "blob": "ae5f2aa7fba6f44f119c893fa6e13f7b4ec6fccf",
-        "path": "semantic-runtime/docs/causal-ordering-v0.md"
+        "path": "semantic-runtime/docs/contracts/causal-ordering-v0.md"
       },
       {
-        "blob": "2ed0a6a8ec22f0165ad751264dcada0940289863",
-        "path": "semantic-runtime/docs/context-judge-bridge-v0.md"
+        "blob": "4edd9e7a5e01f01a2bf2f6efcbad019f21bf0668",
+        "path": "semantic-runtime/docs/contracts/context-judge-bridge-v0.md"
       },
       {
-        "blob": "bfe6031836fe695f0e6298c7cbfcc2644dcfa1be",
-        "path": "semantic-runtime/docs/context-lifecycle-v0.md"
+        "blob": "71f560d4a01ee37af364f149c23ef199f4a5a05f",
+        "path": "semantic-runtime/docs/contracts/context-lifecycle-v0.md"
       },
       {
-        "blob": "881f77ee2c67fb09b0efabf683ec438af4d2ab22",
-        "path": "semantic-runtime/docs/domain-store-v0.md"
+        "blob": "e068354ea513bcc8f40bd9e771ce74a8f5ce2711",
+        "path": "semantic-runtime/docs/contracts/domain-store-v0.md"
       },
       {
         "blob": "9f475603f629dea3ed385d3eb878926bf4eb6c08",
-        "path": "semantic-runtime/docs/durable-ingress-v0.md"
+        "path": "semantic-runtime/docs/contracts/durable-ingress-v0.md"
       },
       {
         "blob": "d9ca54856b850f50dbb0fd4861d56b48e80fd2a9",
-        "path": "semantic-runtime/docs/event-provenance-v0.md"
+        "path": "semantic-runtime/docs/contracts/event-provenance-v0.md"
       },
       {
-        "blob": "53f9e892d8c215189d173a99ea65e70ca05cfd12",
-        "path": "semantic-runtime/docs/exploration-adoption-v0.md"
+        "blob": "804878d13dc2b3c5730d595686a4458c1804d11e",
+        "path": "semantic-runtime/docs/contracts/exploration-adoption-v0.md"
       },
       {
-        "blob": "9890266269fc780f596911fa2eea2e465789f56b",
-        "path": "semantic-runtime/docs/exploration-projection-v0.md"
+        "blob": "ed3b7a571cf0fedefd553d207c7c2173fb593a88",
+        "path": "semantic-runtime/docs/contracts/exploration-projection-v0.md"
       },
       {
         "blob": "01cf9431d8e8768ff71cee2fab3e4708d8610c4f",
-        "path": "semantic-runtime/docs/git-project-enrollment-v0.md"
+        "path": "semantic-runtime/docs/contracts/git-project-enrollment-v0.md"
       },
       {
         "blob": "e008790e739baec4b309589c9787fb85cd562581",
-        "path": "semantic-runtime/docs/git-provenance-v0.md"
+        "path": "semantic-runtime/docs/contracts/git-provenance-v0.md"
       },
       {
-        "blob": "d652b1ecced8c523e52214e984e39a006c988a68",
-        "path": "semantic-runtime/docs/graph-store-v0.md"
-      },
-      {
-        "blob": "103481864de9d11165af533716ea8ab939eb99bf",
-        "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+        "blob": "c6ced1c3e97c2ca4d62213656a7d3ece14a9afb3",
+        "path": "semantic-runtime/docs/contracts/graph-store-v0.md"
       },
       {
         "blob": "a38b2e306aa35793896dc89e4cfdd7dcd8278ae8",
-        "path": "semantic-runtime/docs/identity-contract-v0.md"
+        "path": "semantic-runtime/docs/contracts/identity-contract-v0.md"
       },
       {
         "blob": "f1d758c78a9d5dc69d275cf5df564909a57bc922",
-        "path": "semantic-runtime/docs/incremental-graph-v0.md"
+        "path": "semantic-runtime/docs/contracts/incremental-graph-v0.md"
       },
       {
-        "blob": "3e01f8fccc2a01fc11ad82ac53fa1eb572e570e4",
-        "path": "semantic-runtime/docs/judge-runtime-v0.md"
+        "blob": "2087d232a556eeaedb443ca9324acc019618e29d",
+        "path": "semantic-runtime/docs/contracts/judge-runtime-v0.md"
       },
       {
-        "blob": "ded3ba71e74d23daabd112909246572369321259",
-        "path": "semantic-runtime/docs/local-app-integration-notes.md"
+        "blob": "039b0ef4582ab7d1ac525807f4bc8120f7819dfc",
+        "path": "semantic-runtime/docs/contracts/observability-contract-v0.md"
       },
       {
-        "blob": "95ea788f17b3b1eb28414dc312470b0acb807752",
-        "path": "semantic-runtime/docs/local-app-setup-v0.md"
+        "blob": "cc71c90ea12148f96d0c72ecb87c5b549c0d99e1",
+        "path": "semantic-runtime/docs/contracts/openrouter-jev-adapter.md"
       },
       {
-        "blob": "fff1328cb3624217406f67e08f05eee4aebafc93",
-        "path": "semantic-runtime/docs/local-git-worktree-sensor-v0.md"
+        "blob": "8f1f1e2334176eb972c2280925babbd0d303fbcd",
+        "path": "semantic-runtime/docs/contracts/policy-artifacts-v0.md"
       },
       {
-        "blob": "b5fa2cea83e4860c5bdbcdbb72cae3c7294bad9a",
-        "path": "semantic-runtime/docs/local-service-profile.md"
+        "blob": "5c4355d56314c8c8c9e5456930f66bb8da9dbacd",
+        "path": "semantic-runtime/docs/contracts/policy-kernel-v0.md"
+      },
+      {
+        "blob": "eaaab39929406ea8472f2aa60b6ec8ec9b573c1e",
+        "path": "semantic-runtime/docs/contracts/project-activation-v0.md"
+      },
+      {
+        "blob": "31c468cb1b90989dc1cca792dcdb8b0eac2b30e2",
+        "path": "semantic-runtime/docs/contracts/query-engine-v0.md"
+      },
+      {
+        "blob": "ac8422b729021299c7519d32e14c2ac41eb095ec",
+        "path": "semantic-runtime/docs/contracts/reconciliation-v0.md"
+      },
+      {
+        "blob": "89464e06f284aa6066ce62e1bffdfd8e55cab470",
+        "path": "semantic-runtime/docs/contracts/source-invalidation-v0.md"
+      },
+      {
+        "blob": "551b815659d011fe03ce72ad93e2e4b1f8b3834f",
+        "path": "semantic-runtime/docs/contracts/worker-protocol-v0.md"
+      },
+      {
+        "blob": "378ff308ed3682b08cca2e4abd657c5966284385",
+        "path": "semantic-runtime/docs/contracts/working-graph-v0.md"
+      },
+      {
+        "blob": "c9a4225ed166f045d3c77f335d470f7b887c9a25",
+        "path": "semantic-runtime/docs/history/01_thought_log_semantic_runtime.md"
+      },
+      {
+        "blob": "e9de1444f0a56762ac1dd4bda5d9fcd7ed99dc08",
+        "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
       },
       {
         "blob": "c935d9d8c66ab048e657d5e1070db8e13c8fc849",
@@ -234,56 +258,32 @@
         "path": "semantic-runtime/docs/measurements/query-verification-20260922.json"
       },
       {
-        "blob": "039b0ef4582ab7d1ac525807f4bc8120f7819dfc",
-        "path": "semantic-runtime/docs/observability-contract-v0.md"
+        "blob": "95ea788f17b3b1eb28414dc312470b0acb807752",
+        "path": "semantic-runtime/docs/operations/local-app-setup-v0.md"
       },
       {
-        "blob": "6c488c50ecdfd48c8cd51499d37600057fcb7f31",
-        "path": "semantic-runtime/docs/online-delivery-plan.md"
+        "blob": "fff1328cb3624217406f67e08f05eee4aebafc93",
+        "path": "semantic-runtime/docs/operations/local-git-worktree-sensor-v0.md"
       },
       {
-        "blob": "cc71c90ea12148f96d0c72ecb87c5b549c0d99e1",
-        "path": "semantic-runtime/docs/openrouter-jev-adapter.md"
-      },
-      {
-        "blob": "8f1f1e2334176eb972c2280925babbd0d303fbcd",
-        "path": "semantic-runtime/docs/policy-artifacts-v0.md"
-      },
-      {
-        "blob": "5c4355d56314c8c8c9e5456930f66bb8da9dbacd",
-        "path": "semantic-runtime/docs/policy-kernel-v0.md"
-      },
-      {
-        "blob": "eaaab39929406ea8472f2aa60b6ec8ec9b573c1e",
-        "path": "semantic-runtime/docs/project-activation-v0.md"
+        "blob": "b5fa2cea83e4860c5bdbcdbb72cae3c7294bad9a",
+        "path": "semantic-runtime/docs/operations/local-service-profile.md"
       },
       {
         "blob": "3330b010c4e077119e4c6793f88a9d205c933fab",
-        "path": "semantic-runtime/docs/provider-settings-v0.md"
-      },
-      {
-        "blob": "41ed90d4a7ae20456f743eb82f57b0927c1b81e0",
-        "path": "semantic-runtime/docs/query-engine-v0.md"
-      },
-      {
-        "blob": "ac8422b729021299c7519d32e14c2ac41eb095ec",
-        "path": "semantic-runtime/docs/reconciliation-v0.md"
+        "path": "semantic-runtime/docs/operations/provider-settings-v0.md"
       },
       {
         "blob": "fe7701d5fea4eb82b57feb033b7ea5a9a1ebb47c",
-        "path": "semantic-runtime/docs/service-auth-v0.md"
+        "path": "semantic-runtime/docs/operations/service-auth-v0.md"
       },
       {
-        "blob": "89464e06f284aa6066ce62e1bffdfd8e55cab470",
-        "path": "semantic-runtime/docs/source-invalidation-v0.md"
+        "blob": "e0c2c4046f0e71a1880a70d87e112d264711b5c2",
+        "path": "semantic-runtime/docs/product/02_prd_vibehub_semantic_runtime.md"
       },
       {
-        "blob": "551b815659d011fe03ce72ad93e2e4b1f8b3834f",
-        "path": "semantic-runtime/docs/worker-protocol-v0.md"
-      },
-      {
-        "blob": "378ff308ed3682b08cca2e4abd657c5966284385",
-        "path": "semantic-runtime/docs/working-graph-v0.md"
+        "blob": "5a366329db614fef0afdec2ee48a24027768e933",
+        "path": "semantic-runtime/docs/product/online-delivery-plan.md"
       },
       {
         "blob": "909f650fdc383bbe92345bb90b1365be115a83c5",
@@ -1358,7 +1358,7 @@
         "path": "semantic-runtime/test/support/query-fixture.mjs"
       },
       {
-        "blob": "1d9847d3f20c5601577fbd45d95c61b7454201d8",
+        "blob": "243ec2ff693d132f34e614b266113cb9be313584",
         "path": "semantic-runtime/test/support/runtime-layout.test.mjs"
       },
       {
@@ -1482,8 +1482,8 @@
         "path": "semantic-runtime/verification/live/jev/test/synthetic-jev-check.test.mjs"
       }
     ],
-    "checked_at": "2026-09-24T01:10:46.728Z",
-    "last_aligned_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54"
+    "checked_at": "2026-09-24T01:37:58.934Z",
+    "last_aligned_commit": "35a8d06c43633061fc9c1ba670b932723ca9e706"
   },
   "anchors": [
     "semantic-runtime/"
