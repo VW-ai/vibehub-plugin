@@ -1266,7 +1266,7 @@
         "path": "semantic-runtime/test/support/query-fixture.mjs"
       },
       {
-        "blob": "51f6f663e388c4d8c449acbd2025620a72dc6888",
+        "blob": "ff7b6a3ce5ff4401d5fdfe221beb8e386dbaec36",
         "path": "semantic-runtime/test/support/runtime-layout.test.mjs"
       },
       {
@@ -1502,8 +1502,8 @@
         "path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json"
       }
     ],
-    "checked_at": "2026-09-24T04:08:38.656Z",
-    "last_aligned_commit": "ae1d53f910cf098b7da8b1fa9020a812c3f6398f"
+    "checked_at": "2026-09-24T04:18:18.219Z",
+    "last_aligned_commit": "3ccd9249bdda5666dc84102552b29166a534392e"
   },
   "anchors": [
     "semantic-runtime/"

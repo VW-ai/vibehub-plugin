@@ -1,0 +1,53 @@
+{
+  "acceptance_ids": [
+    "budgeting-preserves-semantics",
+    "compiler-does-not-own-delivery",
+    "compiler-enforces-layer-order",
+    "package-is-reproducible"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "budgeting-preserves-semantics",
+      "identity": "sha256:8aa8bca21df261d23e036156472f268d513754ffbd9f2226d98dedc58161571b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "compiler-does-not-own-delivery",
+      "identity": "sha256:7dcae33fce61e2fb1f26a56131d61aaf12b4654db1ec2f78147e4cbb81ef279d",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "compiler-enforces-layer-order",
+      "identity": "sha256:6e7602a1a8f6a599cd82f1fc1446994f9b32488a8ab8e958c08d00457b0b4f1c",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "package-is-reproducible",
+      "identity": "sha256:80e843ac3f5d3064dec54989504e0b73cbee3cefc6dc39e72b1b7787633d8f5a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "context-compiler-conformance-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T04:18:38Z",
+  "refs": [
+    "git:ae1d53f910cf098b7da8b1fa9020a812c3f6398f",
+    "git:3ccd9249bdda5666dc84102552b29166a534392e",
+    "semantic-runtime/src/domain/context/context-package.mjs",
+    "semantic-runtime/src/application/context/context-compiler.mjs",
+    "semantic-runtime/src/index.mjs",
+    "semantic-runtime/docs/contracts/context-compiler-v0.md",
+    "semantic-runtime/test/context/context-compiler.test.mjs",
+    "semantic-runtime/test/support/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/tools/check-boundaries.mjs",
+    "semantic-runtime/tools/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Context Compiler v1 consumes only an actual LocalQueryEngine capability, exhausts one selected Query snapshot, and emits a deterministic immutable ContextPackage with fixed semantic layers, explicit other-exploration awareness, shared-base/update pins, complete source and adoption lineage, conflict plurality, and exact-retrieval pointers that recheck current permission. Budgeting uses a conservative UTF-8 upper bound, semantic deduplication, pointer substitution, and explicit omissions without dropping source pointers or conflicting alternatives. Recommendations remain informational and downgrade unsafe hard delivery; no WorkRequest, callback, host prompt mutation, provider request, credential access, or model call occurs. Six focused compiler scenarios pass. Full verification reports 1017 tests, 1015 passed, two opt-in Keychain skips, zero failures; Phase 0 replay passes 32/32. Clean standalone installation outside the repository reports 1017 tests, 992 passed, 25 deliberate history/environment skips, zero failures. Boundary validation covers 252 repository files with zero errors or production cycles; the shipped plugin artifact passes with 79 files and 3670088 bytes. Context guard from the pre-implementation commit reports no authority violations.",
+  "ticket_id": "ticket-runtime-context-compiler-v0"
+}
