@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "deterministic-test-and-tool-layout-is-exact",
+    "deterministic-suite-behavior-and-command-coverage-are-preserved",
+    "deterministic-layout-relocation-is-traceable",
+    "grouped-tests-and-tools-keep-layout-boundaries-honest",
+    "deterministic-layout-calibrates-before-expanding"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-24T01:17:19.000Z",
+  "contract_revision": {
+    "identity": "sha256:3ba47a49d6be265f3cb2da19aa016df2f4e81eacf87cf6d8b1b609ee658fc870",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-deterministic-test-tool-layout-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/deterministic_layout_closeout with no executor context. I did not plan or implement the Ticket and did not author its code, tests, Ticket, Evidence, manifest, baseline or Room update. I read the exact Contract and bound Evidence, inspected immutable commits and current repository state, reran focused offline checks, and authored only this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all five active Acceptance revisions of exact Contract 1. Direct inspection of implementation commit abf2d88f6e24869846dda3309365e8689b0f4f54, proof commit 0c5d7773fe44360992458055652e666e7f4124da and their immutable parent confirms one exact relocation batch: 93 former top-level deterministic tests, 17 former test/helpers files and three governance tools. The append-only manifest has 113 unique old paths, 113 unique destinations, one deterministic-test-tool-layout category and one migration commit; every declared old_blob resolves exactly from the migration parent, every old path is absent and every destination exists. Destination counts are exactly app 4, context 14, decisions 4, explorations 13, graph 9, identity 2, judge 11, project 3, query 4, sources 15, support 25 and work 6. test/fixtures is unchanged.\n\nThe migration changes no production source, dependency, lockfile, research, report, response, fixture, measurement JSON, completed Outcome or historical Context. The 110 moved test/support files contain relocation-required relative import, fixture URL, subprocess, and measurement-output path changes only; the three tools preserve their behavior, with runtime-layout changing only for the tools root and standalone-copy path. Nine live JEV consumers contain only the corresponding helper-path rewrites. Proof commit 0c5d7773 adds the single repository-aware relocation test, the native Evidence, updated baseline/manifest and semantic-runtime Room alignment; no other test case is added. All 37 package command names remain, with only test globbing recursively through the grouped tree and check:boundaries plus verify:standalone targeting tools. The current test command covers all 93 deterministic files and eight live offline harness files; test:phase0 remains separate. Current README and 25 contract/operations Markdown files contain the required grouped test/tool references, and an independent stale-path scan finds no remaining top-level deterministic-test or moved-tool reference in current Markdown.\n\nIndependent focused verification passes: manifest/parent-blob/path/count audit; layout plus boundary tests 34/34; offline live JEV harness 17/17 with mocked transports; boundary scan across 249 files with zero errors, direction exceptions or production SCCs; runtime layout check; Ticket validation at 238 Tickets, 546 Evidence records and 184 pre-closeout Outcomes; project format-4 validation with no unverifiable Context refs; Context guard since planning commit d030b108f30f9dd75a3340f9184f492dc099e54d with no authorities or violations; semantic-runtime Room FRESH; and git diff checking. Production invariants remain 200 root exports, 315 production import edges, 29 contract constants and zero SCCs. Standalone copying includes test, tools and verification/live, excludes research, verification reports and legacy scripts, and runs verify:runtime.\n\nThe bound native Evidence records the prior authorized full Runtime result at 1009 total, 1007 passed, two expected platform skips and zero failures; Phase 0 at 32/32; locked standalone verification at 1009 total, 986 passed, 23 documented skips and zero failures; and root plugin artifact verification at 79 files and 3670088 bytes. I relied on those expensive-suite results only after the focused reproduction and static inspection supported them. A fresh root artifact attempt in this restricted sandbox reached its loopback verifier but could not bind 127.0.0.1 because the host denied listen with EPERM; the implementation/proof range changes no root artifact verifier, root package/lockfile, plugin source or packaging allowlist, so this environment limitation does not contradict the committed pass.\n\nThe visible calibration is corroborated by the exact plan, manifest, diff and Evidence: 93 tests, 17 helpers, three tools, twelve destination groups and the complete current Markdown update set. The Evidence's count of 25 Markdown files is the 25 contract/operations documents; README is separately referenced and carries the required layout wording, for 26 changed Markdown files in the implementation diff. No stop condition occurred: no production source or semantic test change beyond the relocation guard, command rename, provider call, dependency change, new production edge, cycle, direction exception, documentation/report move or historical-record rewrite. No credential, .env.local content, Keychain, provider or external network was accessed. The two unrelated untracked Ticket files were left untouched. The installed and repository closeout Skill references a missing contracts/agent-session.md, so no Session report or completion claim was invented; this missing auxiliary contract does not change the Git-native acceptance result.",
+  "ticket_id": "ticket-runtime-group-deterministic-tests-and-tools",
+  "unresolved_acceptance_ids": []
+}
