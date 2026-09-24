@@ -1,0 +1,139 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-documentation-layout-is-exact",
+      "criterion": "Exactly the thirty-seven baseline-declared Markdown files directly under semantic-runtime/docs move without renaming into docs/history (1), docs/product (2), docs/architecture (2), docs/contracts (27) and docs/operations (5). All thirty-seven old paths are absent, all thirty-seven unique destinations exist, no target or case-fold collision exists, and no shim or duplicate remains. The three already-settled documentation governance files stay in place and the only remaining layout mismatches are the twenty-seven deferred docs/measurements JSON reports.",
+      "identity": "sha256:1a28c9d1115962063726829b9ec4c1643af1f447b55e0d84ad6fc4f7963774c8",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "current-documentation-links-remain-resolvable",
+      "criterion": "Every live reference follows the move: semantic-runtime/README.md updates its thirty-nine links; exactly forty-five still-active Tickets update ninety-five context refs; twenty-one semantic-runtime Room Context records update twenty-eight source refs; the Room inventory and layout baseline use the new paths. Exactly 245 relative Markdown hrefs across the ten identified linked documents are rebased, all moved-document and README relative links resolve, and the twenty-one same-directory document links that remain valid do not receive needless edits.",
+      "identity": "sha256:45724ef803d20333aa63ddc128a2dd0d58586990c60bc100c533542527e42376",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "current-documentation-content-is-preserved",
+      "criterion": "Normalized comparison against the migration parent proves twenty-seven moved documents are byte-identical and the other ten differ only by the exact 245 relative href rebases. Current Tickets and Room Context records change only the source paths required by this migration. No semantic prose, filename, code sample, command, acceptance contract, authority, Context claim or product decision changes.",
+      "identity": "sha256:a98c5b346bab8bbc2c863240c2996038643abab7729fe89eba6d736d80ead30b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "current-documentation-relocation-is-traceable",
+      "criterion": "The append-only relocation manifest preserves its existing 272 entries unchanged and in order, then records exactly thirty-seven unique old/new paths, original Git blobs, one actual migration commit and one current-documentation-layout category. Every original blob resolves from that commit parent. The forty-five completed Ticket files containing 187 old-path mentions and eighty-two existing Evidence files containing eighty-two old-path mentions remain byte-for-byte unchanged; existing Outcomes have no old-path mention and remain unchanged.",
+      "identity": "sha256:9deff36e433566e5f0099d0f27ba4464662475d8a076262d76309b5ea217108a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "documentation-layout-keeps-runtime-invariants",
+      "criterion": "The regenerated 370-record Runtime layout baseline, one repository-aware relocation/link guard, focused link/layout/boundary checks, full npm run verify, serial npm run verify:standalone, root npm run verify:artifact, VibeHub project/Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking pass. Root exports remain 200, production import edges 315, contract constants 29, npm command names 37, production SCCs and direction exceptions zero, and package dependencies plus standalone-copy roots are unchanged. No credential or provider call occurs.",
+      "identity": "sha256:886836ad7e3187dd59f167ec059045aa65fcf1ffb9d8fd3050b17dd93eb72edf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "documentation-layout-calibrates-before-expanding",
+      "criterion": "Before broad verification, execution records a visible planned-versus-actual checkpoint for 37 moves, destination counts 1/2/2/27/5, README 39 links, 45 active Tickets with 95 refs, 21 Room Context files with 28 refs, 245 href rebases across ten documents, 27 byte-identical documents, 27 deferred reports and the protected completed-record counts. Any semantic prose edit, report move, metadata-policy work, historical rewrite, command or dependency change, Runtime behavior change, provider call, extra file or count mismatch stops this Ticket for replanning instead of being absorbed.",
+      "identity": "sha256:d0c6705be2612d9c34aced5c9900fad21d57e23e0ced09599ca3a3fadbf528d3",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat the exact 37 current Markdown files as one coherent linked-document migration; do not split it by destination directory or individual file.",
+    "Do not edit product meaning or prose. Twenty-seven documents remain byte-identical; the ten linked documents may change only for the enumerated relative href rebases.",
+    "Update only current live references: Runtime README, still-active Tickets, semantic-runtime Room Context sources, the Room inventory, layout baseline and the new relocation guard. Keep completed Tickets, existing Evidence, Outcomes and prior relocation entries byte-for-byte unchanged.",
+    "Do not move or regenerate the 27 docs/measurements JSON files, introduce report metadata policy, or create verification/reports content in this Ticket.",
+    "Do not change production source, research, live runners, provider behavior, prompts, deterministic test semantics beyond one relocation/link guard, fixtures, dependencies, lockfiles, exports, schemas, npm command names or standalone-copy policy.",
+    "Do not read .env.local, Keychain or credentials and do not call JEV, Claude, Codex, Vercel, OpenRouter, TypeSafe or another provider.",
+    "Leave unrelated untracked repository files untouched."
+  ],
+  "context": "The production tree, research, live verification, deterministic tests and governance tools now follow the accepted Runtime layout. The next coherent boundary is the 37 current Markdown documents still flat under docs/: move them as one linked documentation graph, repair only live references and relative hrefs, and preserve the historical records that describe earlier paths. This is one reviewable directory-only deliverable; the 27 measurement JSON reports and their metadata policy remain a separate later batch.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, deterministic verification, live-provider and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted documentation ownership, migration order, historical-record rule and separate report-metadata boundary.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen exact destinations for the thirty-seven Markdown documents and Runtime invariants.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and existing-entry preservation boundary.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Current component navigation whose live document links must follow the move.",
+      "ref": "semantic-runtime/README.md"
+    },
+    {
+      "purpose": "Successful precedent for one coherent capability batch, visible calibration and path-only verification.",
+      "ref": ".vibehub/outcomes/ticket-runtime-group-deterministic-tests-and-tools/contract-v1.yaml"
+    },
+    {
+      "purpose": "Project execution rule requiring a visible outcome-based checkpoint before work expands.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "current-documentation-content-is-preserved",
+          "identity": "sha256:a98c5b346bab8bbc2c863240c2996038643abab7729fe89eba6d736d80ead30b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-documentation-layout-is-exact",
+          "identity": "sha256:1a28c9d1115962063726829b9ec4c1643af1f447b55e0d84ad6fc4f7963774c8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-documentation-links-remain-resolvable",
+          "identity": "sha256:45724ef803d20333aa63ddc128a2dd0d58586990c60bc100c533542527e42376",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "current-documentation-relocation-is-traceable",
+          "identity": "sha256:9deff36e433566e5f0099d0f27ba4464662475d8a076262d76309b5ea217108a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "documentation-layout-calibrates-before-expanding",
+          "identity": "sha256:d0c6705be2612d9c34aced5c9900fad21d57e23e0ced09599ca3a3fadbf528d3",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "documentation-layout-keeps-runtime-invariants",
+          "identity": "sha256:886836ad7e3187dd59f167ec059045aa65fcf1ffb9d8fd3050b17dd93eb72edf",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:b8b2e925c661675a98a93d6ac65a4e639b21f6914e0ff6d0264ad565729fc5c7",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Current Semantic Runtime Markdown is organized into product, architecture, contracts, operations and history homes, with every live reference and relative link still resolving and no prose or Runtime behavior changed.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-code-governance",
+    "audit:runtime-current-documentation-batch-2026-09-23",
+    "inventory:runtime-layout-baseline-v1",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-group-current-documentation"
+}
