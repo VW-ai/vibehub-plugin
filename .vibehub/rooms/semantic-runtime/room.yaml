@@ -14,7 +14,7 @@
         "path": "semantic-runtime/AGENTS.md"
       },
       {
-        "blob": "ddbe4181c07bbaa1a5e1cfca9a419e150a6951f0",
+        "blob": "a0c8e481ff7f5754bedbbdaf682790bd17373d0d",
         "path": "semantic-runtime/README.md"
       },
       {
@@ -26,7 +26,7 @@
         "path": "semantic-runtime/docs/architecture/local-app-integration-notes.md"
       },
       {
-        "blob": "72d3bfebcf3072df25dcabd04f96e2188a8d751a",
+        "blob": "220be79953534a4efeb91b1a838b1963196dfb31",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -34,11 +34,11 @@
         "path": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
       },
       {
-        "blob": "132e5decc1f2612cc686e5ad0c9a2e667e2e084c",
+        "blob": "ddfd677e983e6aea1a6eb8552e76cee899c9fda5",
         "path": "semantic-runtime/docs/contracts/agent-work-request-v0.md"
       },
       {
-        "blob": "eef18b5927fdb6ad54419636784e7959238a4091",
+        "blob": "30a6187277ec172dceeaa2b87a1abf87b1aed13f",
         "path": "semantic-runtime/docs/contracts/branch-scope-v0.md"
       },
       {
@@ -48,6 +48,10 @@
       {
         "blob": "ae5f2aa7fba6f44f119c893fa6e13f7b4ec6fccf",
         "path": "semantic-runtime/docs/contracts/causal-ordering-v0.md"
+      },
+      {
+        "blob": "5085a283569efe63b1b56df4be6ba35a4bc9bbb4",
+        "path": "semantic-runtime/docs/contracts/context-compiler-v0.md"
       },
       {
         "blob": "6ad86237ed6704006f488aa179cce1a3d6491e17",
@@ -90,7 +94,7 @@
         "path": "semantic-runtime/docs/contracts/graph-store-v0.md"
       },
       {
-        "blob": "a38b2e306aa35793896dc89e4cfdd7dcd8278ae8",
+        "blob": "8926001f676fe168922e31672cf9dd1ba18fc163",
         "path": "semantic-runtime/docs/contracts/identity-contract-v0.md"
       },
       {
@@ -102,7 +106,7 @@
         "path": "semantic-runtime/docs/contracts/judge-runtime-v0.md"
       },
       {
-        "blob": "039b0ef4582ab7d1ac525807f4bc8120f7819dfc",
+        "blob": "8c9c572bd946dce3a47d4859b43b5f4f51178cc9",
         "path": "semantic-runtime/docs/contracts/observability-contract-v0.md"
       },
       {
@@ -138,7 +142,7 @@
         "path": "semantic-runtime/docs/contracts/worker-protocol-v0.md"
       },
       {
-        "blob": "378ff308ed3682b08cca2e4abd657c5966284385",
+        "blob": "5b0ddae53a8cc9a6d4ee461f24e13914fdec6958",
         "path": "semantic-runtime/docs/contracts/working-graph-v0.md"
       },
       {
@@ -570,6 +574,10 @@
         "path": "semantic-runtime/src/app/local/ui/style.css"
       },
       {
+        "blob": "a60399902ec3ba6742b68c9a019ff7f558f29bf3",
+        "path": "semantic-runtime/src/application/context/context-compiler.mjs"
+      },
+      {
         "blob": "1ac1f36ff654f1ec1cef6c330ef5a6a6bc5cc9cb",
         "path": "semantic-runtime/src/application/context/context-inputs.mjs"
       },
@@ -670,6 +678,10 @@
         "path": "semantic-runtime/src/application/support/local-runtime-composition.mjs"
       },
       {
+        "blob": "7cecf593ca93e859ed76b1da05315066b39921fd",
+        "path": "semantic-runtime/src/domain/context/context-package.mjs"
+      },
+      {
         "blob": "258c18b56652f4a5b1a677725dec07e0792f6a4d",
         "path": "semantic-runtime/src/domain/context/context-profile.mjs"
       },
@@ -758,7 +770,7 @@
         "path": "semantic-runtime/src/domain/work/worker-protocol.mjs"
       },
       {
-        "blob": "73777715fe7c391b7a10b67f1005203601264883",
+        "blob": "ee7689657e9caf271377dd667ff7d9339fb0b15a",
         "path": "semantic-runtime/src/index.mjs"
       },
       {
@@ -780,6 +792,10 @@
       {
         "blob": "b5f03e7a9d9e9fb200991ba0364bac8bdaa8357c",
         "path": "semantic-runtime/test/context/context-capacity.test.mjs"
+      },
+      {
+        "blob": "aa47382fcfaa2e67ccb260e4656455869c3229a5",
+        "path": "semantic-runtime/test/context/context-compiler.test.mjs"
       },
       {
         "blob": "51f92dba81eeb207914f477bd34544c562ceb796",
@@ -1486,8 +1502,8 @@
         "path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json"
       }
     ],
-    "checked_at": "2026-09-24T02:13:06.795Z",
-    "last_aligned_commit": "0126decaf4d6d948cd478657650acdd4770615a6"
+    "checked_at": "2026-09-24T04:08:38.656Z",
+    "last_aligned_commit": "ae1d53f910cf098b7da8b1fa9020a812c3f6398f"
   },
   "anchors": [
     "semantic-runtime/"

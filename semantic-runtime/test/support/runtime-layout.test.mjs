@@ -125,7 +125,7 @@ test('deterministic tests and governance tools form one exact relocation batch',
   });
 
   const current = inspectRuntimeLayout();
-  assert.equal(current.inventory.filter(record => /^test\/(?:app|context|decisions|explorations|graph|identity|judge|project|query|sources|support|work)\/[^/]+\.test\.mjs$/.test(record.path)).length, 93);
+  assert.equal(current.inventory.filter(record => /^test\/(?:app|context|decisions|explorations|graph|identity|judge|project|query|sources|support|work)\/[^/]+\.test\.mjs$/.test(record.path)).length, 94);
   assert.deepEqual(current.inventory.filter(record => /^(?:test|tools|scripts)\//.test(record.path)
     && record.path !== record.intended_destination), []);
   assert.equal(current.inventory_roots.includes('scripts'), true);
@@ -273,7 +273,7 @@ test('verification reports form one exact byte-preserving capability batch', t =
   assert.equal(reportInventory.filter(item => item.current_role === 'verification-report').length, 27);
   assert.equal(reportInventory.filter(item => item.current_role === 'verification-report-manifest').length, 1);
   assert.ok(reportInventory.every(item => item.path === item.intended_destination));
-  assert.equal(current.inventory.length, 371);
+  assert.equal(current.inventory.length, 375);
   assert.equal(current.inventory_roots.includes('verification/reports'), true);
   assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
 });
@@ -759,7 +759,7 @@ test('layout inspection captures public surface, command modes, constants and an
     current.inventory.filter(item => !item.path.includes('/')).map(item => item.path),
     expectedRootFiles,
   );
-  assert.equal(current.root_exports.length, 200);
+  assert.equal(current.root_exports.length, 208);
   assert.equal(current.npm_commands.find(item => item.name === 'check:jev:query')?.mode, 'explicit-live');
   assert.equal(current.npm_commands.find(item => item.name === 'test:host-probes')?.mode, 'offline');
   assert.equal(current.npm_commands.find(item => item.name === 'probe:codex:live')?.mode, 'explicit-live');
@@ -798,7 +798,20 @@ test('layout inspection captures public surface, command modes, constants and an
     edge.from === 'src/app/local/service.mjs' && edge.to === 'src/app/local/app-setup.mjs'));
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.to.startsWith('src/application/query/') && !edge.from.startsWith('src/application/query/')),
-  [{ from: 'src/index.mjs', to: 'src/application/query/query-engine.mjs' }]);
+  [
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/application/query/query-contract.mjs' },
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/application/query/query-engine.mjs' },
+    { from: 'src/index.mjs', to: 'src/application/query/query-engine.mjs' },
+  ].sort(compareEdges));
+  assert.deepEqual(current.production_import_edges.filter(edge =>
+    edge.from === 'src/application/context/context-compiler.mjs'
+      || edge.to === 'src/application/context/context-compiler.mjs'), [
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/application/query/query-contract.mjs' },
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/application/query/query-engine.mjs' },
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/domain/context/context-package.mjs' },
+    { from: 'src/application/context/context-compiler.mjs', to: 'src/domain/shared/contracts.mjs' },
+    { from: 'src/index.mjs', to: 'src/application/context/context-compiler.mjs' },
+  ].sort(compareEdges));
   assert.deepEqual(current.production_import_edges.filter(edge =>
     edge.to === 'src/application/context/context-reader.mjs'), [
     { from: 'src/application/context/context-read-service.mjs', to: 'src/application/context/context-reader.mjs' },
