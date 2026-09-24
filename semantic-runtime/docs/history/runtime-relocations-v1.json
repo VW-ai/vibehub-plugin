@@ -973,6 +973,146 @@
       "old_blob": "90f00522bdbb959a2f92f3441aa93f799f6926c1",
       "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
       "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/jev-synthetic-check.md",
+      "new_path": "semantic-runtime/verification/live/jev/jev-synthetic-check.md",
+      "old_blob": "70a22f743bc2c0befdd104f2c8fb098d8ca926cf",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-adoption.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-adoption.mjs",
+      "old_blob": "e104c08c88495942455417657907aa19461bf98a",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-context.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-context.mjs",
+      "old_blob": "6a42803a4e0ea90d499541d3a6607bad52fc4545",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-exploration.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-exploration.mjs",
+      "old_blob": "3b87df82add81ae77f2f200b3ad5660efcc0de73",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-ingress.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-ingress.mjs",
+      "old_blob": "b83b55df2dc28500859754a82729f812ac20b909",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-judge.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-judge.mjs",
+      "old_blob": "da2b5f4e74a9da54a14442706cdb17476203157f",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-query.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-query.mjs",
+      "old_blob": "4df8535809f9ddffdf7759008c7e5da5e30a91cf",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-source-fence.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-source-fence.mjs",
+      "old_blob": "814386461e6ec357a8d86a2b5efb9b9b7593d9b5",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-jev-synthetic.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/check-jev-synthetic.mjs",
+      "old_blob": "afe458451245a813af2793b23578c27ccd8c10c6",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/smoke-jev.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/smoke-jev.mjs",
+      "old_blob": "215091acb8761d557a6faa1b921620784f68769b",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/smoke-openrouter-jev.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/smoke-openrouter-jev.mjs",
+      "old_blob": "b5ad00e63c60aaefe2e8ca2517568b5d32903289",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/smoke-typesafe-direct.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/smoke-typesafe-direct.mjs",
+      "old_blob": "bea1e74b0010de33624596a7888bca36d451f235",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-jev-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/context-judge-jev-check.test.mjs",
+      "old_blob": "c9b27706848c53a54246d987579282f12ed7d4a6",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-adoption-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/jev-adoption-check.test.mjs",
+      "old_blob": "06932fff0eba65a2eee8d05398aa5339c1697621",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-exploration-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/jev-exploration-check.test.mjs",
+      "old_blob": "9b6d3045c02cd507abc97d41b2045e6f8ff873d3",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-ingress-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/jev-ingress-check.test.mjs",
+      "old_blob": "e51b5aeeee9af1738f8263d3ab9efc3ac4de2898",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-judge-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/jev-judge-check.test.mjs",
+      "old_blob": "3470064c96d89cc6f68909841274ee877a5627cc",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-source-fence-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/jev-source-fence-check.test.mjs",
+      "old_blob": "dc6e6015d750023a5bc34e67ccbe3060a96a9f68",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/query-jev-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/query-jev-check.test.mjs",
+      "old_blob": "40e1a3298999dd5e26eebb3652bdf457a7dccc37",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/test/synthetic-jev-check.test.mjs",
+      "new_path": "semantic-runtime/verification/live/jev/test/synthetic-jev-check.test.mjs",
+      "old_blob": "3dda90fbcdecdbe48a3807ede10b9cf8b523f7e8",
+      "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
+      "category": "live-jev-verification"
     }
   ]
 }

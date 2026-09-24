@@ -471,6 +471,70 @@ test('Gateway example research relocation is complete and recorded', t => {
   assert.equal(existsSync(new URL('../research/examples/ai-gateway/index.ts', import.meta.url)), true);
 });
 
+test('live JEV verification is one exact traceable vertical', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'live-jev-verification');
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(entries.length, 20);
+  assert.deepEqual([...new Set(entries.map(item => item.migration_commit))], [
+    '7f479715bb661a25449320f0399e5f966a2b09d0',
+  ]);
+  assert.equal(new Set(entries.map(item => item.old_path)).size, 20);
+  assert.equal(new Set(entries.map(item => item.new_path)).size, 20);
+  assert.equal(entries.filter(item => item.old_path.startsWith('semantic-runtime/scripts/')).length, 11);
+  assert.equal(entries.filter(item => item.old_path.startsWith('semantic-runtime/test/')).length, 8);
+  assert.equal(entries.filter(item => item.old_path === 'semantic-runtime/docs/jev-synthetic-check.md').length, 1);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.match(entry.migration_commit, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    const currentPath = resolveRelocationDestination(manifest, entry.new_path);
+    assert.equal(existsSync(new URL(`../${currentPath.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+
+  const expectedCommands = new Map([
+    ['smoke:jev', 'node --env-file=.env.local verification/live/jev/smoke-jev.mjs'],
+    ['smoke:jev:direct', 'node --env-file=.env.local verification/live/jev/smoke-typesafe-direct.mjs'],
+    ['smoke:jev:openrouter', 'node verification/live/jev/smoke-openrouter-jev.mjs'],
+    ['check:jev:synthetic', 'node verification/live/jev/check-jev-synthetic.mjs'],
+    ['check:jev:ingress', 'node verification/live/jev/check-jev-ingress.mjs'],
+    ['check:jev:graph', 'node verification/live/jev/check-jev-ingress.mjs --graph'],
+    ['check:jev:source-fence', 'node verification/live/jev/check-jev-source-fence.mjs'],
+    ['check:jev:exploration', 'node verification/live/jev/check-jev-exploration.mjs'],
+    ['check:jev:judge', 'node verification/live/jev/check-jev-judge.mjs'],
+    ['check:jev:adoption', 'node verification/live/jev/check-jev-adoption.mjs'],
+    ['check:jev:context', 'node verification/live/jev/check-jev-context.mjs'],
+    ['check:jev:query', 'node verification/live/jev/check-jev-query.mjs'],
+  ]);
+  const current = inspectRuntimeLayout();
+  for (const [name, command] of expectedCommands) {
+    assert.deepEqual(current.npm_commands.find(item => item.name === name), {
+      name,
+      command,
+      mode: 'explicit-live',
+    });
+  }
+  assert.deepEqual(current.npm_commands.find(item => item.name === 'test:live:jev:offline'), {
+    name: 'test:live:jev:offline',
+    command: 'node --test verification/live/jev/test/*.test.mjs',
+    mode: 'offline',
+  });
+  assert.equal(current.npm_commands.find(item => item.name === 'test')?.command,
+    'node --test test/*.test.mjs verification/live/jev/test/*.test.mjs');
+  assert.equal(current.standalone_copy_paths.includes('verification/live'), true);
+  assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
+  assert.equal(current.standalone_copy_paths.includes('research'), false);
+  const liveVerification = current.inventory.filter(item => item.path.startsWith('verification/live/'));
+  assert.equal(liveVerification.length, 20);
+  assert.ok(liveVerification.every(item => item.current_role === 'live-verification'
+    && item.intended_destination === item.path));
+});
+
 test('layout inspection captures public surface, command modes, constants and an acyclic production graph', () => {
   const current = inspectRuntimeLayout();
   assert.ok(current.inventory.length > 200);

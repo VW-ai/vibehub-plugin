@@ -4,6 +4,7 @@
     "src",
     "scripts",
     "test",
+    "verification/live",
     "research",
     "policies",
     "docs",
@@ -134,11 +135,6 @@
       "path": "docs/incremental-graph-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/incremental-graph-v0.md"
-    },
-    {
-      "path": "docs/jev-synthetic-check.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/live/jev/jev-synthetic-check.md"
     },
     {
       "path": "docs/judge-runtime-v0.md",
@@ -721,64 +717,9 @@
       "intended_destination": "tools/check-boundaries.mjs"
     },
     {
-      "path": "scripts/check-jev-adoption.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-adoption.mjs"
-    },
-    {
-      "path": "scripts/check-jev-context.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-context.mjs"
-    },
-    {
-      "path": "scripts/check-jev-exploration.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-exploration.mjs"
-    },
-    {
-      "path": "scripts/check-jev-ingress.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-ingress.mjs"
-    },
-    {
-      "path": "scripts/check-jev-judge.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-judge.mjs"
-    },
-    {
-      "path": "scripts/check-jev-query.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-query.mjs"
-    },
-    {
-      "path": "scripts/check-jev-source-fence.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-source-fence.mjs"
-    },
-    {
-      "path": "scripts/check-jev-synthetic.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/check-jev-synthetic.mjs"
-    },
-    {
       "path": "scripts/runtime-layout.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "tools/runtime-layout.mjs"
-    },
-    {
-      "path": "scripts/smoke-jev.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/smoke-jev.mjs"
-    },
-    {
-      "path": "scripts/smoke-openrouter-jev.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/smoke-openrouter-jev.mjs"
-    },
-    {
-      "path": "scripts/smoke-typesafe-direct.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "verification/live/jev/smoke-typesafe-direct.mjs"
     },
     {
       "path": "scripts/verify-standalone.mjs",
@@ -1261,11 +1202,6 @@
       "intended_destination": "test/context/context-judge-inputs.test.mjs"
     },
     {
-      "path": "test/context-judge-jev-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/context-judge-jev-check.test.mjs"
-    },
-    {
       "path": "test/context-judge-publication-capacity.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-publication-capacity.test.mjs"
@@ -1666,34 +1602,9 @@
       "intended_destination": "test/graph/incremental-graph.test.mjs"
     },
     {
-      "path": "test/jev-adoption-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/jev-adoption-check.test.mjs"
-    },
-    {
-      "path": "test/jev-exploration-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/jev-exploration-check.test.mjs"
-    },
-    {
-      "path": "test/jev-ingress-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/jev-ingress-check.test.mjs"
-    },
-    {
-      "path": "test/jev-judge-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/jev-judge-check.test.mjs"
-    },
-    {
       "path": "test/jev-judge.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/jev-judge.test.mjs"
-    },
-    {
-      "path": "test/jev-source-fence-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/jev-source-fence-check.test.mjs"
     },
     {
       "path": "test/judge-inputs.test.mjs",
@@ -1786,11 +1697,6 @@
       "intended_destination": "test/query/query-inputs.test.mjs"
     },
     {
-      "path": "test/query-jev-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/query-jev-check.test.mjs"
-    },
-    {
       "path": "test/query-pure.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/query/query-pure.test.mjs"
@@ -1831,11 +1737,6 @@
       "intended_destination": "test/sources/source-invalidation.test.mjs"
     },
     {
-      "path": "test/synthetic-jev-check.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "verification/live/jev/test/synthetic-jev-check.test.mjs"
-    },
-    {
       "path": "test/typesafe-jev-judge.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/typesafe-jev-judge.test.mjs"
@@ -1859,6 +1760,106 @@
       "path": "test/working-graph.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/working-graph.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-adoption.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-adoption.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-context.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-context.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-exploration.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-exploration.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-ingress.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-ingress.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-judge.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-judge.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-query.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-query.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-source-fence.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-source-fence.mjs"
+    },
+    {
+      "path": "verification/live/jev/check-jev-synthetic.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/check-jev-synthetic.mjs"
+    },
+    {
+      "path": "verification/live/jev/jev-synthetic-check.md",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/jev-synthetic-check.md"
+    },
+    {
+      "path": "verification/live/jev/smoke-jev.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/smoke-jev.mjs"
+    },
+    {
+      "path": "verification/live/jev/smoke-openrouter-jev.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/smoke-openrouter-jev.mjs"
+    },
+    {
+      "path": "verification/live/jev/smoke-typesafe-direct.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/smoke-typesafe-direct.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/context-judge-jev-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/context-judge-jev-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/jev-adoption-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/jev-adoption-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/jev-exploration-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/jev-exploration-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/jev-ingress-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/jev-ingress-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/jev-judge-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/jev-judge-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/jev-source-fence-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/jev-source-fence-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/query-jev-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/query-jev-check.test.mjs"
+    },
+    {
+      "path": "verification/live/jev/test/synthetic-jev-check.test.mjs",
+      "current_role": "live-verification",
+      "intended_destination": "verification/live/jev/test/synthetic-jev-check.test.mjs"
     }
   ],
   "root_exports": [
@@ -2106,47 +2107,47 @@
     },
     {
       "name": "check:jev:adoption",
-      "command": "node scripts/check-jev-adoption.mjs",
+      "command": "node verification/live/jev/check-jev-adoption.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:context",
-      "command": "node scripts/check-jev-context.mjs",
+      "command": "node verification/live/jev/check-jev-context.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:exploration",
-      "command": "node scripts/check-jev-exploration.mjs",
+      "command": "node verification/live/jev/check-jev-exploration.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:graph",
-      "command": "node scripts/check-jev-ingress.mjs --graph",
+      "command": "node verification/live/jev/check-jev-ingress.mjs --graph",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:ingress",
-      "command": "node scripts/check-jev-ingress.mjs",
+      "command": "node verification/live/jev/check-jev-ingress.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:judge",
-      "command": "node scripts/check-jev-judge.mjs",
+      "command": "node verification/live/jev/check-jev-judge.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:query",
-      "command": "node scripts/check-jev-query.mjs",
+      "command": "node verification/live/jev/check-jev-query.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:source-fence",
-      "command": "node scripts/check-jev-source-fence.mjs",
+      "command": "node verification/live/jev/check-jev-source-fence.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "check:jev:synthetic",
-      "command": "node scripts/check-jev-synthetic.mjs",
+      "command": "node verification/live/jev/check-jev-synthetic.mjs",
       "mode": "explicit-live"
     },
     {
@@ -2186,17 +2187,17 @@
     },
     {
       "name": "smoke:jev",
-      "command": "node --env-file=.env.local scripts/smoke-jev.mjs",
+      "command": "node --env-file=.env.local verification/live/jev/smoke-jev.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "smoke:jev:direct",
-      "command": "node --env-file=.env.local scripts/smoke-typesafe-direct.mjs",
+      "command": "node --env-file=.env.local verification/live/jev/smoke-typesafe-direct.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "smoke:jev:openrouter",
-      "command": "node scripts/smoke-openrouter-jev.mjs",
+      "command": "node verification/live/jev/smoke-openrouter-jev.mjs",
       "mode": "explicit-live"
     },
     {
@@ -2211,12 +2212,17 @@
     },
     {
       "name": "test",
-      "command": "node --test test/*.test.mjs",
+      "command": "node --test test/*.test.mjs verification/live/jev/test/*.test.mjs",
       "mode": "offline"
     },
     {
       "name": "test:host-probes",
       "command": "node --test research/host-probes/codex/test/codex-host-probe.test.mjs research/host-probes/claude/test/claude-host-probe.test.mjs",
+      "mode": "offline"
+    },
+    {
+      "name": "test:live:jev:offline",
+      "command": "node --test verification/live/jev/test/*.test.mjs",
       "mode": "offline"
     },
     {
@@ -2398,6 +2404,7 @@
     "src",
     "scripts",
     "test",
+    "verification/live",
     "docs/architecture/runtime-layout-baseline-v1.json"
   ],
   "production_import_edges": [

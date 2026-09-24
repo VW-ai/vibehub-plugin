@@ -1,0 +1,57 @@
+{
+  "acceptance_ids": [
+    "live-jev-verification-vertical-is-exact",
+    "live-jev-commands-and-offline-contracts-are-preserved",
+    "live-jev-relocation-is-traceable",
+    "full-and-standalone-verification-remain-honest",
+    "live-jev-extraction-calibrates-before-expanding"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "live-jev-verification-vertical-is-exact",
+      "identity": "sha256:cab3f572fa53c59150fd68f488677a92c8a0cd9026a629544e5ca735b6b14a87",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-jev-commands-and-offline-contracts-are-preserved",
+      "identity": "sha256:52d8ca507d1bc2bcd0107e49e359248780945c7fd942a8b051dd48e2790b6d12",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-jev-relocation-is-traceable",
+      "identity": "sha256:cc8950939ff39a8bbf40f791307ea9cd863b96b94c3733992887aa154b879f04",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "full-and-standalone-verification-remain-honest",
+      "identity": "sha256:1ec1b628257ff7748418a837f001a239a480da40317cc254d3cc694f007f6832",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "live-jev-extraction-calibrates-before-expanding",
+      "identity": "sha256:cd54d53336d75b1d2bff6d49c35df86ab255b50e35600f1f69880e55154835b2",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-live-jev-verification-isolation-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T00:40:44.491Z",
+  "refs": [
+    "commit:7f479715bb661a25449320f0399e5f966a2b09d0",
+    "semantic-runtime/verification/live/jev",
+    "semantic-runtime/package.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/README.md",
+    ".vibehub/tickets/ticket-runtime-isolate-live-jev-verification.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 7f479715bb661a25449320f0399e5f966a2b09d0 isolates the exact audited live JEV verification closure under verification/live/jev: eleven runners, eight offline harness tests and one guide. All twenty old paths are absent, all twenty destinations exist, and normalized content comparison proves each file differs only by required relative-path updates. The twelve existing live command names keep their arguments and environment-loading behavior, a dedicated test:live:jev:offline command passes all 17 assertions, and ordinary npm test retains the moved harnesses. Sixteen JEV measurement reports, nine shared helpers, product adapters/runtime, research and public exports remain untouched; production imports no verification module and no provider or credential was accessed. The append-only relocation manifest contains exactly twenty unique live-jev-verification records bound to the implementation commit, and all twenty old_blob values match that commit parent. Focused layout/boundary verification passes 33/33 across 249 files with zero production SCCs, zero direction exceptions and zero errors. Full offline npm run verify passes 1008 Runtime tests (1006 pass, two expected skips, zero failures) plus Phase 0 32/32. A first standalone run was mistakenly executed concurrently with the full resource-heavy suite and reported two timing-sensitive failures; with no code change, the required isolated standalone rerun passes 1008 tests (986 pass, 22 deliberate historical/research exclusions, zero failures) and scans 214 files. Root plugin artifact verification passes with 79 files and 3670088 bytes. Project/Ticket validation passes at 237 Tickets, 544 pre-Evidence records and 183 Outcomes; Context guard has no authorities or violations, git diff checking passes, and the semantic-runtime Room was aligned. The visible pre-expansion checkpoint matched plan exactly: 11 runners, 8 tests, 1 guide, 12 commands and 17 assertions.",
+  "ticket_id": "ticket-runtime-isolate-live-jev-verification"
+}
