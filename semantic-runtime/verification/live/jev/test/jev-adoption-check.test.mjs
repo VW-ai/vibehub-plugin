@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkAdoptionJev } from '../check-jev-adoption.mjs';
 import { cases } from '../check-jev-synthetic.mjs';
-import { judgeResponse } from '../../../../test/helpers/judge-runtime-fixture.mjs';
+import { judgeResponse } from '../../../../test/support/judge-runtime-fixture.mjs';
 
 test('adoption smoke sends only fixed synthetic text and exact A/B targets through actual Judge service', async t => {
   let calls = 0;

@@ -202,5 +202,5 @@ disaster allowance cannot excuse ACK loss during ordinary restart. Backup/restor
 and capacity Tickets must prove targets or report failure; do not lower them
 after a failed drill. No reliability claim follows from this protocol alone.
 
-Run `node --test test/observability-contract.test.mjs` and
+Run `node --test test/decisions/observability-contract.test.mjs` and
 `npm run check:boundaries` from `semantic-runtime/`.

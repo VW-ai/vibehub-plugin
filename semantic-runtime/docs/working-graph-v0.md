@@ -270,7 +270,7 @@ endpoints, historical snapshots, stale Workers, source tombstones, ACL tightenin
 unknown access and two observers of the same commit.
 
 ```sh
-node --test test/working-graph.test.mjs test/working-graph-integration.test.mjs
+node --test test/graph/working-graph.test.mjs test/graph/working-graph-integration.test.mjs
 npm run check:boundaries
 ```
 

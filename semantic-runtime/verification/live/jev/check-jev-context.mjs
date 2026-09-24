@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { graphHash, graphEqual } from '../../../src/application/graph/graph-inputs.mjs';
-import { contextJudgeFixture, CONTEXT_JUDGE_ACTIONS, capture, publish, adoption, rows, head } from '../../../test/helpers/context-judge-fixture.mjs';
+import { contextJudgeFixture, CONTEXT_JUDGE_ACTIONS, capture, publish, adoption, rows, head } from '../../../test/support/context-judge-fixture.mjs';
 
 export const CONTEXT_JEV_CASES = Object.freeze([
   { id: 'own-relevant', branch: 'A', text: 'The durable project store will use PostgreSQL; add its connection pooling and transaction support.', expected: true },

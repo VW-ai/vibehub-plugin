@@ -210,7 +210,7 @@ correlation and strict schema/pin
 rejections. It never changes the user's real refs or invokes external services.
 
 ```sh
-node --test test/git-provenance.test.mjs test/git-provenance-integration.test.mjs
+node --test test/sources/git-provenance.test.mjs test/sources/git-provenance-integration.test.mjs
 npm run check:boundaries
 ```
 

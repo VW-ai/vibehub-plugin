@@ -255,7 +255,7 @@ callback, live cursor and canonical dispatch. This module performs no such effec
 ## Verification
 
 ```sh
-node --test test/worker-protocol.test.mjs test/worker-protocol-integration.test.mjs
+node --test test/work/worker-protocol.test.mjs test/work/worker-protocol-integration.test.mjs
 npm run check:boundaries
 ```
 

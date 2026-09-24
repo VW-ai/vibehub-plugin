@@ -158,14 +158,14 @@ active). Restore only with the matching application version, or apply an
 explicit forward-fix migration. Every future destructive transition needs its
 own tested data-retention/backup/compatibility policy; v2 invents none.
 
-`node --test test/domain-store.test.mjs` uses real temporary databases and two
+`node --test test/support/domain-store.test.mjs` uses real temporary databases and two
 independent child processes for CAS races and SIGKILL-before-commit recovery.
 It verifies migration failure/retry, scope isolation, read-only planning,
 atomic record/source/outbox writes, projection rebuild, malformed inputs,
 revocation/expiry, stale handles and bounded errors. No models or real secrets
 are used.
 
-`node --test test/domain-store-selected-reads.test.mjs` additionally exercises real
+`node --test test/support/domain-store-selected-reads.test.mjs` additionally exercises real
 WAL snapshots across two independent connections, 2,048 retained source rows,
 the actual bounded iterator and SQLite query plans in both directions, authority
 and handle lifetime, aggregate capacity failures and connection recovery.

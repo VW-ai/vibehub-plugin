@@ -108,7 +108,7 @@ checked before a send; a supplied deadline can only tighten the runtime limit.
 
 ## Verification
 
-`node --test test/context-judge*.test.mjs` uses disposable real Git/SQLite stores,
+`node --test test/context/context-judge*.test.mjs` uses disposable real Git/SQLite stores,
 admitted events, typed Context mutation/adoption and recorded provider transport.
 The existing Judge and Context suites cover the reused paths.
 

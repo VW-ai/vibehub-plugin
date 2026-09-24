@@ -8,7 +8,7 @@ never installs a tool or proves that the host can call it.
 
 The implementation is `src/core/agent-work-request.mjs`. Its constructors,
 validators and reference transitions are exposed through the Runtime public entry.
-The conformance fixture is `test/agent-work-request.test.mjs`; its names, tools,
+The conformance fixture is `test/work/agent-work-request.test.mjs`; its names, tools,
 content, identities, grants and clock values are deliberately synthetic.
 
 ## Request and exact references
@@ -193,7 +193,7 @@ hook runs during validation.
 Unsupported values, keys, versions, schemas and cycles reject. Outputs are copied
 and deeply frozen. Validators perform no I/O and leave inputs unchanged.
 
-Run `node --test test/agent-work-request.test.mjs` and `npm run check:boundaries`.
+Run `node --test test/work/agent-work-request.test.mjs` and `npm run check:boundaries`.
 These synthetic tests establish the pure protocol, not real capture, model work,
 host registration, delivery, schema migration, durable receipt storage or product
 value. Later host/session and runner Tickets retain their integration obligations.

@@ -384,8 +384,10 @@ to connect two components that happen to share a repository.
 
 - `src/core/`: host- and provider-independent policy, semantic state, and context logic.
 - `src/adapters/`: host, model, storage, and Git/source integrations.
-- `test/`: Runtime tests and intentionally selected fixtures.
-- `scripts/`: Repository maintenance, layout, boundary, and standalone-verification tools.
+- `test/<capability>/`: Deterministic Runtime tests grouped by business capability;
+  shared harness helpers live in `test/support/`, while selected fixtures remain
+  in `test/fixtures/`.
+- `tools/`: Repository maintenance, layout, boundary, and standalone-verification tools.
 - `verification/live/`: Explicit live-provider runners, their offline contract
   harnesses, and operator guides.
 - `docs/`: product and architecture documents.
@@ -395,7 +397,7 @@ concrete adapters. Host lifecycle details and model-provider APIs stay in adapte
 
 `check:boundaries` parses ESM imports, rejects cross-component imports, core-to-
 adapter dependencies, undeclared/parent dependencies, source symlinks, and
-computed imports. It checks `src/`, `scripts/`, `test/`, `tools/`, `verification/`,
+computed imports. It checks `src/`, legacy `scripts/`, `test/`, `tools/`, `verification/`,
 and `research/`; it is a development dependency check, not a security sandbox. `verify:standalone` copies just the
 component's source, policies, tooling, fixtures, and manifests to a temporary
 directory, installs from its own lockfile, and repeats verification there.

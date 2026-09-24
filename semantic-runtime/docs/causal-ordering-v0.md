@@ -199,6 +199,6 @@ pure contract is not an operating-system sandbox for arbitrary third-party code.
 Run the synthetic conformance and public integration checks with:
 
 ```sh
-node --test test/causal-ordering.test.mjs test/causal-integration.test.mjs
+node --test test/sources/causal-ordering.test.mjs test/sources/causal-integration.test.mjs
 npm run check:boundaries
 ```

@@ -61,6 +61,6 @@ request objects, SDK errors or issuer return values. Synthetic canary tests cove
 bearer/model/Git/connector/deployment credentials across these new boundaries; they
 do not claim that every future payload is automatically free of secrets.
 
-Run `node --test test/service-auth.test.mjs test/local-service.test.mjs` for actual
+Run `node --test test/identity/service-auth.test.mjs test/app/local-service.test.mjs` for actual
 loopback requests, scoped negative cases, source intersections, expiry, revocation,
 restart, duplicate Authorization headers and credential persistence checks.

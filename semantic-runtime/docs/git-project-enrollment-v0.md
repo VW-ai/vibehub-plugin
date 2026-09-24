@@ -116,7 +116,7 @@ retains the removed origin and records the changed selection. If none remains,
 the checkout is unavailable. The module does not search a user's disk for a
 replacement. A moved checkout still requires an explicit declaration.
 
-`node --test test/git-projects.test.mjs` exercises real temporary repositories
+`node --test test/sources/git-projects.test.mjs` exercises real temporary repositories
 and SQLite, including restart, clone isolation, observed and unobserved ref
 recreation, worktree disappearance, explicit moves, symlinks/spaces, auth
 failures, CAS races, immutable snapshots and initialization preservation.

@@ -147,7 +147,7 @@ the command digest, with no external delivery. Audit envelopes use the existing
 strict allowlist, aliased correlation IDs and exact policy digest; raw events,
 payloads and generation details remain in authorized command records.
 
-`node --test test/policy-kernel.test.mjs test/policy-kernel-integration.test.mjs`
+`node --test test/decisions/policy-kernel.test.mjs test/decisions/policy-kernel-integration.test.mjs`
 covers all typed handlers/actions, reverse completion/failure/retry order,
 budgets, deadlines, guards, joins, late results, atomic faults, CAS, exact retries,
 and post-commit acknowledgement loss. All inputs are synthetic; no model,

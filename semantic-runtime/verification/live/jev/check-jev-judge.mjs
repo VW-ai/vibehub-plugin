@@ -4,9 +4,9 @@ import { createHash } from 'node:crypto';
 import { LocalJudgeRuntime, ProviderSettings, DurableIngress } from '../../../src/index.mjs';
 import { graphHash, graphEqual } from '../../../src/application/graph/graph-inputs.mjs';
 import { cases } from './check-jev-synthetic.mjs';
-import { fixture, bind, executionFor, git, SCOPE, register, mutation, assertion, rows } from '../../../test/helpers/exploration-fixture.mjs';
-import { JUDGE_ACTIONS } from '../../../test/helpers/judge-fixture.mjs';
-import { judgeArtifact } from '../../../test/helpers/judge-runtime-fixture.mjs';
+import { fixture, bind, executionFor, git, SCOPE, register, mutation, assertion, rows } from '../../../test/support/exploration-fixture.mjs';
+import { JUDGE_ACTIONS } from '../../../test/support/judge-fixture.mjs';
+import { judgeArtifact } from '../../../test/support/judge-runtime-fixture.mjs';
 
 const questions = {
   durable_cross_ticket_value: 'Does this event contain project knowledge useful beyond the current task?',

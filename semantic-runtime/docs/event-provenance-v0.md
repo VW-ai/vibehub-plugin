@@ -216,7 +216,7 @@ four observations of one commit, deny-all propagation, snapshot authorization,
 mutable pointers, payload tampering, deterministic output and nonmutation.
 
 ```sh
-node --test test/event-provenance.test.mjs test/event-integration.test.mjs
+node --test test/sources/event-provenance.test.mjs test/sources/event-integration.test.mjs
 npm run check:boundaries
 ```
 

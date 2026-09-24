@@ -47,7 +47,7 @@ OpenRouter request was made during implementation. Recorded transport tests veri
 adapter compatibility; the app must complete a real synthetic request before
 showing this route as verified. Existing Vercel/TypeSafe benchmarks are unchanged.
 
-Run `node --test test/openrouter-jev-judge.test.mjs` to exercise the actual installed
+Run `node --test test/judge/openrouter-jev-judge.test.mjs` to exercise the actual installed
 SDK against synthetic HTTP responses, including endpoint/body, boolean and score
 semantics, target mapping, metadata, malformed replies, unsupported model/question,
 rate limits/retry exhaustion, deadline and cancellation. All these tests are offline.

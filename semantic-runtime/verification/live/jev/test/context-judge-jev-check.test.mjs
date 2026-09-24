@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkContextJev, CONTEXT_JEV_CASES } from '../check-jev-context.mjs';
-import { judgeResponse, judgeJSON } from '../../../../test/helpers/judge-runtime-fixture.mjs';
+import { judgeResponse, judgeJSON } from '../../../../test/support/judge-runtime-fixture.mjs';
 
 for (const mode of ['matched', 'mismatched', 'incomplete-fourth']) test(`four-call Context JEV checker reports ${mode} honestly with actual-send revocation`, async t => {
   let calls = 0;

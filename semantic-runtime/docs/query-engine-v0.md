@@ -109,7 +109,7 @@ rank metadata must fit first. Candidate text may become an explicit pointer;
 mandatory metadata never disappears silently. At most 16 completed windows
 and 8 MiB of serialized retained material are kept per engine process.
 
-`node --test test/query*.test.mjs` covers real disposable Git/SQLite selected
+`node --test test/query/query*.test.mjs` covers real disposable Git/SQLite selected
 Context, canonical Ticket/Room/repository scope, adoption, conflicts, full-text,
 replay, pagination, budgets, provider fallback and post-model races. Ordinary
 verification needs no credential and makes no network call.

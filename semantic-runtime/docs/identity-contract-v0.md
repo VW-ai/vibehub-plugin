@@ -150,7 +150,7 @@ and a repository-free notes Project. The test suite adds malformed and lifecycle
 variants and verifies explicit failure rather than inferred scope.
 
 ```sh
-node --test test/identity.test.mjs
+node --test test/identity/identity.test.mjs
 npm run check:boundaries
 ```
 

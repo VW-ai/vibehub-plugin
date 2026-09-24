@@ -6,7 +6,7 @@ import { DurableIngress, TypeSafeJevJudge, verifyEventPayload } from '../../../s
 import { ResilientJudge } from '../../../src/adapters/providers/resilient-judge.mjs';
 import { canonical, validateDecision } from '../../../src/domain/shared/contracts.mjs';
 import { edgeCases } from './check-jev-synthetic.mjs';
-import { fixture, bind, executionFor, git, register, rows } from '../../../test/helpers/exploration-fixture.mjs';
+import { fixture, bind, executionFor, git, register, rows } from '../../../test/support/exploration-fixture.mjs';
 
 // These four existing synthetic cases are the complete source allowlist. Local
 // labels never determine which target text enters a Graph or the model input.

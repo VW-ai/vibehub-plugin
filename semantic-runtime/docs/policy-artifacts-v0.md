@@ -136,7 +136,7 @@ the original policy unchanged in a frozen wrapper, and retains its original
 into new semantics. Feed its `policy` to the existing evaluator only. Schema 1
 does not pass as a schema 2 publication.
 
-`node --test test/policy-artifacts.test.mjs` covers the full node schema,
+`node --test test/decisions/policy-artifacts.test.mjs` covers the full node schema,
 adversarial malformed graphs, type/branch/budget checks, structured joins,
 hash invariance, operation identity changes, registry mutation/CAS/rollback,
 and actual before/after Phase 0 judge inputs, input hashes, results and candidate

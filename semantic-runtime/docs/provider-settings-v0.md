@@ -86,8 +86,8 @@ uses a fresh random app-owned account, only synthetic values, validates fresh
 instance lookup and replacement, and deletes the entry in `finally`:
 
 ```sh
-node --test test/provider-settings.test.mjs test/macos-secret-store.test.mjs
-VIBEHUB_TEST_KEYCHAIN=1 node --test test/macos-secret-store.test.mjs
+node --test test/judge/provider-settings.test.mjs test/support/macos-secret-store.test.mjs
+VIBEHUB_TEST_KEYCHAIN=1 node --test test/support/macos-secret-store.test.mjs
 ```
 
 The opt-in test is separate from ordinary CI because it touches the OS Keychain.

@@ -170,7 +170,7 @@ Overflow refuses rather than dropping provenance.
 
 ## Verification
 
-`node --test test/context-*.test.mjs` exercises actual Git/SQLite fixtures,
+`node --test test/context/context-*.test.mjs` exercises actual Git/SQLite fixtures,
 profile/proof validation, transitions, A/B independence, applicability, authority,
 permissions, historical pages, lineage and race/continuation bounds. Existing
 process harnesses verify two-writer idempotency and SIGKILL before commit and

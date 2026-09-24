@@ -136,7 +136,7 @@ disabled interval or App outage. There is no automatic backfill.
 
 ## Verification and integration boundary
 
-`test/project-activation.test.mjs` uses temporary Git/SQLite, opaque grants and
+`test/project/project-activation.test.mjs` uses temporary Git/SQLite, opaque grants and
 synthetic queue state. It checks all four stages, current enrollment, no-op/CAS,
 restart, revoked/expired authority, rollback, delayed results/delivery, explicit
 gaps and cancellation/recovery composition. No model calls, private traces,

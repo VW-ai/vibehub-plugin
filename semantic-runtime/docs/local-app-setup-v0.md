@@ -111,9 +111,9 @@ and removes only a fresh synthetic app-owned Keychain entry with finally cleanup
 It never reads an existing user credential.
 
 ```sh
-node --test test/app-setup.test.mjs
+node --test test/app/app-setup.test.mjs
 VIBEHUB_TEST_KEYCHAIN=1 node --test \
-  --test-name-pattern='fresh synthetic native app-owned' test/app-setup.test.mjs
+  --test-name-pattern='fresh synthetic native app-owned' test/app/app-setup.test.mjs
 ```
 
 Actual host plugins, subscription execution and the complete capture → model →

@@ -67,7 +67,7 @@ coding agent because no hooks are installed and no Git operations are intercepte
 
 ## Verification and choice
 
-`node --test test/local-service.test.mjs` exercises real loopback HTTP, SQLite and
+`node --test test/app/local-service.test.mjs` exercises real loopback HTTP, SQLite and
 child processes: startup, status, both stop signals, restart/data preservation,
 occupied port, invalid configuration, foreign/corrupt/unavailable storage,
 readiness versus liveness and bounded HTTP exposure. These checks run in

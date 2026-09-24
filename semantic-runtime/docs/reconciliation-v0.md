@@ -176,7 +176,7 @@ resolution, an Outcome, canonical writes or human decisions.
 ## Reproducible synthetic checks
 
 ```sh
-node --test test/reconciliation.test.mjs
+node --test test/work/reconciliation.test.mjs
 npm run check:boundaries
 ```
 

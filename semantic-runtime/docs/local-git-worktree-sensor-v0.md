@@ -187,7 +187,7 @@ completion, Graph mutation or model call.
 
 ## Verification
 
-`node --test test/git-worktree-sensor.test.mjs` uses only new temporary synthetic
+`node --test test/sources/git-worktree-sensor.test.mjs` uses only new temporary synthetic
 repositories and SQLite. It covers real external worktrees, SHA-1/SHA-256,
 unborn/detached/packed refs, staged/unstaged/binary/Gitlink/conflict/intent-to-add
 state, exact pathname bytes, races, source ACL/activation/expiry, cancellation,

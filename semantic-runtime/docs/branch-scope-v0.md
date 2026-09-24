@@ -172,7 +172,7 @@ exploration origin stays unscoped. This is a local in-process service boundary;
 explicit adoption, base updates, merge lineage and host/UI integration remain
 follow-up work.
 
-Conformance: `node --test test/branch-scope.test.mjs` exercises the public package
+Conformance: `node --test test/explorations/branch-scope.test.mjs` exercises the public package
 entry; `npm run check:boundaries` checks independent component imports. All
 fixtures are synthetic. No model call, host collection or live integration is
 claimed by these tests.
