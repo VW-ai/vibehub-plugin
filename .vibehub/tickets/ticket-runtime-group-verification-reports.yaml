@@ -1,0 +1,128 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "verification-report-layout-is-exact",
+      "criterion": "Exactly the twenty-seven selected JSON files under semantic-runtime/docs/measurements move byte-for-byte, without renaming, to semantic-runtime/verification/reports grouped as sources 3, context 4, explorations 5, graph 4, support 5, project 1, judge 2, query 2 and app 1. Their total original size remains 81,153 bytes; all old paths are absent, all unique destinations exist, no target or case-fold collision exists, and the three already-settled host-probe reports remain unchanged.",
+      "identity": "sha256:915550d5e18c88c2b24670983ecbf590c52ad5e10f9a311b4f3888baa560597f",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification-report-metadata-is-honest",
+      "criterion": "One adjacent report-metadata-v1.json manifest contains exactly twenty-seven records and classifies them as deterministic-local-measurement 3, verification-summary 7, live-provider-measurement 16 and local-app-walkthrough 1. Every record binds the final path, curation category, original Git blob, original SHA-256 and byte count, and represents command, working directory, sanitized input summary, source revision, runtime/provider versions, tested boundaries and untested boundaries using recorded JSON pointers or explicit not_recorded status. Missing history is never inferred, credentials and private trajectories are absent, and the one embedded historical full old path has an explicit alias to its current report.",
+      "identity": "sha256:6eec3837447df6d1dc573781c19c5c3d5db9a299978792de09b5f3b8a7cbbc26",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification-report-references-remain-resolvable",
+      "criterion": "All 106 current selected-report path or basename occurrences are accounted for: exactly seventy-nine old-location references are rewritten and the twenty-seven pre-existing baseline intended_destination values are regenerated and verified. The baseline contributes fifty-four occurrences comprising twenty-seven source paths and twenty-seven intended destinations; sixteen references in nine current contract documents, four live-verification documentation references, one deterministic test reference and thirty-one semantic-runtime Room references are handled according to their current value. Five sibling report references still resolve inside their capability group. The one full old path embedded in original report data remains byte-preserved and resolves through metadata aliasing. The fifteen historical Evidence files containing twenty-four selected-report old-path mentions remain byte-for-byte unchanged.",
+      "identity": "sha256:10576324e8d42080d53cf1c87387296f7a08a322e03548d72fbc11de0d15a789",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification-report-relocation-is-traceable",
+      "criterion": "The append-only relocation manifest preserves its existing 309 entries unchanged and in order, then records exactly twenty-seven unique selected-report old/new paths, original Git blobs, one actual migration commit and one verification-report-layout category, for 336 total entries. verification/reports becomes a first-class inventory root; every report has role verification-report, the metadata manifest has role verification-report-manifest, all have intended destination equal to their path, and the regenerated baseline contains 371 inventory records and ten inventory roots while standalone copy paths remain seven and continue to exclude verification/reports.",
+      "identity": "sha256:19367b805680ba2e5468de8c62447f2f6b81282a28b88ba2e73b3023cf39ef47",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "verification-report-governance-is-calibrated-and-verified",
+      "criterion": "Before broad verification, execution records planned-versus-actual counts for 27 moves, 81,153 bytes, group counts 3/4/5/4/5/1/2/2/1, metadata records 27 with categories 3/7/16/1, current occurrences 106 with 79 old-location rewrites, internal references 6, protected Evidence 15 files/24 mentions, prior relocation entries 309 and inventory 371/roots 10/standalone roots 7. Focused report/layout/boundary checks, npm run check:boundaries, full npm run verify, serial npm run verify:standalone, root npm run verify:artifact, VibeHub project/Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking pass. Root exports remain 200, production import edges 315, contract constants 29, npm command names 37, production SCCs and direction exceptions zero. Any report-byte change, unexpected destination/reference count, historical Evidence change, production/package/lock/schema/API change or required credential/provider access stops execution for replanning.",
+      "identity": "sha256:ef3e5e8edf6d539f7a12a65662dfca1408c0d2e8a72bf7bba130b1413c7ce57e",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat the exact 27 selected measurement files as one coherent report migration; do not split it by capability directory or individual report.",
+    "Move every original report byte-for-byte. Add one adjacent metadata manifest; do not normalize, annotate or repair the original report JSON.",
+    "Record only metadata present in the selected reports or immutable Git objects. Use explicit not_recorded status for missing facts and never invent command, cwd, input, revision, runtime/provider version or limitation history.",
+    "Update only current references, the Room inventory, layout tool and focused guard. Keep all existing Evidence and Outcomes byte-for-byte unchanged, including historical old-path references; preserve the prior 309 relocation entries unchanged and in order.",
+    "Do not move or edit the three already-settled host-probe reports under research/host-probes, and do not add verification/reports to standalone copy paths.",
+    "Do not change production source, dependencies, lockfiles, exports, wire/schema versions, database behavior, provider adapters, prompts or npm command names.",
+    "Do not read .env.local, Keychain or credentials and do not call JEV, Claude, Codex, Vercel, OpenRouter, TypeSafe or another provider.",
+    "Leave unrelated untracked repository files untouched."
+  ],
+  "context": "The Runtime production, research, live verification, deterministic tests, tools, and current Markdown documentation now follow the accepted layout. The remaining coherent governance boundary is the twenty-seven selected measurement JSON files still under docs/measurements. They form one report set because byte preservation, metadata truth, current references, inventory, relocation provenance, and Room alignment must change together. This Ticket relocates that complete set without rerunning providers or inventing missing experimental history.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, deterministic verification, live-provider and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted report role, byte-preservation rule, adjacent metadata requirements and migration verification contract.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen selected report inventory, intended capability destinations and Runtime invariants.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and exact prior-entry preservation boundary.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Successful predecessor that deliberately deferred these twenty-seven reports as a separate coherent batch.",
+      "ref": ".vibehub/outcomes/ticket-runtime-group-current-documentation/contract-v1.yaml"
+    },
+    {
+      "purpose": "Project execution rule requiring a visible outcome-based checkpoint before work expands.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    },
+    {
+      "purpose": "Current inventory roots, report destination classifier and standalone-copy boundary that this migration must make truthful.",
+      "ref": "semantic-runtime/tools/runtime-layout.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "verification-report-governance-is-calibrated-and-verified",
+          "identity": "sha256:ef3e5e8edf6d539f7a12a65662dfca1408c0d2e8a72bf7bba130b1413c7ce57e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification-report-layout-is-exact",
+          "identity": "sha256:915550d5e18c88c2b24670983ecbf590c52ad5e10f9a311b4f3888baa560597f",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification-report-metadata-is-honest",
+          "identity": "sha256:6eec3837447df6d1dc573781c19c5c3d5db9a299978792de09b5f3b8a7cbbc26",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification-report-references-remain-resolvable",
+          "identity": "sha256:10576324e8d42080d53cf1c87387296f7a08a322e03548d72fbc11de0d15a789",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "verification-report-relocation-is-traceable",
+          "identity": "sha256:19367b805680ba2e5468de8c62447f2f6b81282a28b88ba2e73b3023cf39ef47",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:bbaf317a9aa8f8513ed40d1863eb4af52f00e1ba3784f76ea6edac710754d8a8",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The twenty-seven selected Semantic Runtime measurements live in capability-grouped verification/report homes with their original bytes preserved, honest adjacent metadata, current references repaired, and layout verification enforcing the new structure.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-code-governance",
+    "audit:runtime-verification-reports-batch-2026-09-23",
+    "inventory:runtime-layout-baseline-v1",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-group-verification-reports"
+}
