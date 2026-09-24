@@ -1,0 +1,42 @@
+{
+  "acceptance_ids": [
+    "budgeting-preserves-semantics",
+    "compiler-enforces-layer-order",
+    "package-is-reproducible"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "budgeting-preserves-semantics",
+      "identity": "sha256:8aa8bca21df261d23e036156472f268d513754ffbd9f2226d98dedc58161571b",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "compiler-enforces-layer-order",
+      "identity": "sha256:6e7602a1a8f6a599cd82f1fc1446994f9b32488a8ab8e958c08d00457b0b4f1c",
+      "revision": 2
+    },
+    {
+      "acceptance_id": "package-is-reproducible",
+      "identity": "sha256:80e843ac3f5d3064dec54989504e0b73cbee3cefc6dc39e72b1b7787633d8f5a",
+      "revision": 2
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "context-compiler-query-pointer-provenance-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T04:32:01Z",
+  "refs": [
+    "git:5ca18496eda9738f4e6343563955455b1bbe5905",
+    "semantic-runtime/src/application/context/context-compiler.mjs",
+    "semantic-runtime/test/context/context-compiler.test.mjs",
+    "semantic-runtime/docs/contracts/context-compiler-v0.md",
+    "semantic-runtime/tools/check-boundaries.mjs",
+    "semantic-runtime/tools/verify-standalone.mjs",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 2,
+  "summary": "Independent pre-closeout review reproduced a missing budget boundary: when LocalQueryEngine substituted a pointer before compilation, the compiler discarded the compact pointer's role, lifecycle status, source events and transition, then incorrectly materialized an empty body. Commit 5ca18496 fixes the compiler to preserve compact pointer layer/status/provenance, retain the Query omission, and leave absent text pointer-only. A real SQLite/Graph/Query regression publishes five source-backed evidence assertions and uses an 85000-byte nested Query budget to force this path; the resulting ContextPackage preserves the exact source events and create transition, remains in the evidence layer, keeps candidate status, and contains no invented text. Focused compiler/layout/boundary verification passes 43/43. Full Runtime verification after the fix reports 1018 tests, 1016 passed, two opt-in Keychain skips and zero failures; Phase 0 passes 32/32. Clean standalone verification reports 1018 tests, 993 passed, 25 deliberate history/environment skips and zero failures. Plugin artifact verification remains 79 files and 3670088 bytes. No provider, credential or model call occurred.",
+  "ticket_id": "ticket-runtime-context-compiler-v0"
+}
