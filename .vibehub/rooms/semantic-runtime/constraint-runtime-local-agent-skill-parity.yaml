@@ -8,7 +8,7 @@
     },
     {
       "note": "保留 Policy、Working Graph、检索编译、来源和权限边界；当前讨论调整产品表达及交付顺序。",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     }
   ],
   "kind": "context",

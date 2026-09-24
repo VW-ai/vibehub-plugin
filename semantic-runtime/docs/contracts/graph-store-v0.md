@@ -131,7 +131,7 @@ Deterministic tests use real temporary Git repositories and SQLite files. They
 cover source/publisher authority, historical views, access changes, conflict
 resolution, exact retries, corruption, paged repair, concurrent processes and
 SIGKILL before commit and after commit before reply. The retained
-[SQLite measurement](measurements/graph-store-sqlite-20260922.json) exercises
+[SQLite measurement](../measurements/graph-store-sqlite-20260922.json) exercises
 1,040 transitions and 600 objects in one generation, including actual query plans,
 bounded early/late reads, page sizes and rebuild/storage costs. Timings describe
 one local synthetic run, not a throughput guarantee.
@@ -146,12 +146,12 @@ provenance therefore inherits every input source. Restart verifies all 17
 exact reads/retries and checks this source closure. Labels, ACLs, runtime/storage IDs, paths, provenance and credentials are not
 sent as model input. Network calls run after all database views close.
 
-The [2026-09-22 live run](measurements/jev-graph-round-trip-20260922.json) completed
+The [2026-09-22 live run](../measurements/jev-graph-round-trip-20260922.json) completed
 8/8 expected judgments, 96–347 ms per successful request, with no retries or rate
 limits. All 17 source intents remain pending. This verifies composition; it does
 not establish extraction quality, an automatic Policy loop or plugin coverage.
 
-The [source-closure follow-up](measurements/jev-graph-source-closure-20260922.json)
+The [source-closure follow-up](../measurements/jev-graph-source-closure-20260922.json)
 also completed 8/8 expected judgments, 127–337 ms per successful request, with
 no retries or rate limits. It verifies 17 supporting source pins across the
 eight judgment revisions after reopening the database. Both runs use the same
@@ -161,21 +161,21 @@ in the smoke harness, without changing the Graph Store or model adapter.
 `npm run check:jev:source-fence` tests a separate fixed synthetic case: materialize
 a Graph context, dispatch one JEV call, revoke that context's registration before
 awaiting the response, and attempt to publish the result with its exact parent.
-The [live source-fence run](measurements/jev-inflight-source-fence-20260922.json)
+The [live source-fence run](../measurements/jev-inflight-source-fence-20260922.json)
 completed a correct JEV judgment in 296 ms, then rejected publication with
 `graph_access_denied`. The direct event remained readable, the Graph head did
 not change and no result receipt was created. Automatic retries are disabled.
 This tests the local result fence; it does not recall already-dispatched input
 or implement production dispatch authorization, cancellation or a Policy loop.
 
-The [final invalidation composition run](measurements/jev-invalidation-composition-final-20260922.json)
+The [final invalidation composition run](../measurements/jev-invalidation-composition-final-20260922.json)
 repeated both checks after the source-invalidation changes: 8/8 Graph judgments
 matched at 107–241 ms per successful attempt, and the in-flight revocation case
 completed at 344 ms but was rejected on publication. Both checks had no retries;
 the eight-call route reported no rate limits. These are fixed synthetic checks,
 with the same limits as the earlier runs.
 
-The [canonical-reader Graph regression](measurements/jev-canonical-graph-regression-20260922.json)
+The [canonical-reader Graph regression](../measurements/jev-canonical-graph-regression-20260922.json)
 ran these existing synthetic routes after adding the optional mutation fence:
 8/8 judgments matched at 127–379 ms, with zero retries or rate limits. The
 325 ms in-flight request was rejected on publication with the Graph unchanged.

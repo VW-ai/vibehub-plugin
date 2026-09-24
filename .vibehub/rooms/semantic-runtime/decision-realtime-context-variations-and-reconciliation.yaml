@@ -4,11 +4,11 @@
   "evidence": [
     {
       "note": "The design principle score frequently, mutate rarely separates continuous semantic perception from structural context mutation.",
-      "ref": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/history/01_thought_log_semantic_runtime.md"
     },
     {
       "note": "The architecture already requires unresolved conflicts to remain visible and fast judges to stop short of canonical truth.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "note": "The owner explicitly identified concurrent agent and human changes, contradictory variations, live awareness, and eventual resolution as the key online-service tradeoff.",

@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "The technical design already introduces tenant, workspace, project, repository, session, and worktree identity but does not yet implement their online lifecycle.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "note": "Phase 0 currently scopes records only by tenant and project, making the missing repository and execution dimensions concrete.",

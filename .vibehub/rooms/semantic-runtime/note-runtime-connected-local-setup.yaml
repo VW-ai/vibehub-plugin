@@ -8,7 +8,7 @@
     },
     {
       "note": "Launch and composition, scoped operations, recovery and remaining product work.",
-      "ref": "semantic-runtime/docs/local-app-setup-v0.md"
+      "ref": "semantic-runtime/docs/operations/local-app-setup-v0.md"
     },
     {
       "note": "Real temporary Git/SQLite plus synthetic secure-store and expiry regression.",

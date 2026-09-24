@@ -12,7 +12,7 @@
     },
     {
       "note": "Typed atomic command and receipt uncertainty contract; durable adapters retain authentication, persistence and crash-recovery responsibility.",
-      "ref": "semantic-runtime/docs/policy-kernel-v0.md"
+      "ref": "semantic-runtime/docs/contracts/policy-kernel-v0.md"
     }
   ],
   "kind": "context",
@@ -25,7 +25,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T00:18:05.816Z",
-    "ref": "semantic-runtime/docs/policy-kernel-v0.md"
+    "ref": "semantic-runtime/docs/contracts/policy-kernel-v0.md"
   },
   "state": "active",
   "summary": "A lost commit acknowledgement preserves the original command identity for reconciliation; cancellation is not rollback",

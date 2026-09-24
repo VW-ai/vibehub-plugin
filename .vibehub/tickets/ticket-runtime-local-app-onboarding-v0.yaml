@@ -56,7 +56,7 @@
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "purpose": "Independent component and ordinary Agent degradation boundaries.",
@@ -64,7 +64,7 @@
     },
     {
       "purpose": "Current local-first delivery sequence and retained later hosting scope.",
-      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+      "ref": "semantic-runtime/docs/product/online-delivery-plan.md"
     },
     {
       "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",
@@ -72,7 +72,7 @@
     },
     {
       "purpose": "Observed CLI and primary SDK interfaces; research is not an integration success claim.",
-      "ref": "semantic-runtime/docs/local-app-integration-notes.md"
+      "ref": "semantic-runtime/docs/architecture/local-app-integration-notes.md"
     },
     {
       "purpose": "近期产品是可启动的本地 App，包含插件和本地重任务执行",

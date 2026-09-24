@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "Versioned interface, compatibility, trusted selection and storage boundary.",
-      "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+      "ref": "semantic-runtime/docs/contracts/incremental-graph-v0.md"
     },
     {
       "note": "Authority, event/catalog, complete provenance and immutable receipt regressions.",
@@ -25,7 +25,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T11:32:11.278655Z",
-    "ref": "semantic-runtime/docs/incremental-graph-v0.md"
+    "ref": "semantic-runtime/docs/contracts/incremental-graph-v0.md"
   },
   "state": "active",
   "summary": "Incremental graph commits retain semantic history through selected records; repository completeness and current authority remain adapter responsibilities",

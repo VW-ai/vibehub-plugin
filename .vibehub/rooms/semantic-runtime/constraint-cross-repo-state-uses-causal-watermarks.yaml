@@ -4,11 +4,11 @@
   "evidence": [
     {
       "note": "The design selects eventual semantic consistency with strict canonical boundaries and an append-only event/audit plane.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "note": "The thought log records eventual consolidation rather than continuous mutation of a single supposedly authoritative context.",
-      "ref": "semantic-runtime/docs/01_thought_log_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/history/01_thought_log_semantic_runtime.md"
     }
   ],
   "kind": "context",

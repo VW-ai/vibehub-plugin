@@ -19,36 +19,36 @@ For the connected local setup App, run `npm run app -- --port 0` in an interacti
 terminal, open its printed URL and approve browser pairing in that terminal.
 It enrolls actual Git folders/worktrees, stores provider settings with macOS
 Keychain, and controls the durable Project switch. Plugins and Workers remain
-not connected; saved keys are unverified. See [local App setup](docs/local-app-setup-v0.md).
+not connected; saved keys are unverified. See [local App setup](docs/operations/local-app-setup-v0.md).
 
 For the local service bootstrap, run `npm start` in this directory and open the
 printed URL; `npm run status` checks readiness and Ctrl+C stops it. This starts
 only a local status page and SQLite bootstrap, with no collection or model calls.
-See the [local service profile](docs/local-service-profile.md) for setup and limits.
+See the [local service profile](docs/operations/local-service-profile.md) for setup and limits.
 
-The local modules now also provide [scoped authentication](docs/service-auth-v0.md),
-[provider settings with macOS Keychain](docs/provider-settings-v0.md) and the
-[exploration/worktree scope contract](docs/branch-scope-v0.md), plus a
-[scoped SQLite domain store](docs/domain-store-v0.md) and
-[Git folder/worktree registry](docs/git-project-enrollment-v0.md), and
-[durable Project activation](docs/project-activation-v0.md). Project enrollment
+The local modules now also provide [scoped authentication](docs/operations/service-auth-v0.md),
+[provider settings with macOS Keychain](docs/operations/provider-settings-v0.md) and the
+[exploration/worktree scope contract](docs/contracts/branch-scope-v0.md), plus a
+[scoped SQLite domain store](docs/contracts/domain-store-v0.md) and
+[Git folder/worktree registry](docs/contracts/git-project-enrollment-v0.md), and
+[durable Project activation](docs/contracts/project-activation-v0.md). Project enrollment
 and the settings UI are composed in the explicit setup mode; installing these
 modules does not enable collection or background work.
 
-The [local Graph Store](docs/graph-store-v0.md) now persists authenticated
+The [local Graph Store](docs/contracts/graph-store-v0.md) now persists authenticated
 semantic revisions, exact historical reads, competing claims and resumable
 projection repair in SQLite. Its in-process API consumes actual admitted ingress
 sources. `npm run check:jev:graph` separately exercises a fixed synthetic Graph
 context → JEV → candidate/restart round trip with a locally supplied TypeSafe key.
 
-The [exploration projection](docs/exploration-projection-v0.md) adds explicit
+The [exploration projection](docs/contracts/exploration-projection-v0.md) adds explicit
 worktree bindings, one Graph generation per exploration, fixed canonical bases
 and a separate Project selection. Guarded writes preserve exact origins across
-switching and retry. [Per-item adoption](docs/exploration-adoption-v0.md) now copies
+switching and retry. [Per-item adoption](docs/contracts/exploration-adoption-v0.md) now copies
 an explicitly selected entity or relation into another exploration as a new
 candidate with retained lineage. App integration remains pending.
 
-The [selected Judge runtime](docs/judge-runtime-v0.md) now evaluates one compiled
+The [selected Judge runtime](docs/contracts/judge-runtime-v0.md) now evaluates one compiled
 Judge node against exact admitted event/target revisions, using the configured
 TypeSafe, Vercel or OpenRouter route. It checks permissions and pinned state before
 send, on return and on cache reuse; it exposes a narrow typed node bridge.
@@ -56,23 +56,23 @@ send, on return and on cache reuse; it exposes a narrow typed node bridge.
 revocation with fixed synthetic inputs. Full Policy execution, App/plugin wiring
 and candidate publication remain separate caller responsibilities.
 
-The [local Git worktree sensor](docs/local-git-worktree-sensor-v0.md) captures
+The [local Git worktree sensor](docs/operations/local-git-worktree-sensor-v0.md) captures
 bounded HEAD/index/worktree metadata for an enrolled execution and submits it
 through durable ingress. It reports unsupported or racing observations as gaps.
 The caller drives capture; the setup App and host plugins do not yet run it.
 
-The [canonical source reader](docs/canonical-source-reader-v0.md) reads explicitly
+The [canonical source reader](docs/contracts/canonical-source-reader-v0.md) reads explicitly
 selected Context, Room, Ticket, Evidence and Outcome records from one immutable
 Git commit. It checks their version bindings, admits exact source observations
 and publishes one atomic candidate selection in Graph. Reads retain citations
 and distinguish historical or quarantined selections. This is an in-process
 API; automatic discovery and the App/plugin connection remain follow-up work.
 
-[Source invalidation](docs/source-invalidation-v0.md) blocks content reads across every supporting source,
+[Source invalidation](docs/contracts/source-invalidation-v0.md) blocks content reads across every supporting source,
 retains ordered lifecycle notices, and exposes a fence for future query consumers.
 `npm run check:jev:source-fence` tests a fixed synthetic JEV request whose source
 access is revoked while the model is running: publication must fail without
-changing the Graph. See [Graph access and lifecycle rules](docs/graph-store-v0.md).
+changing the Graph. See [Graph access and lifecycle rules](docs/contracts/graph-store-v0.md).
 
 For the separate [synthetic App interaction preview](research/ux/project-exploration/project-exploration-ux-v0.md),
 run `node research/ux/project-exploration/serve.mjs 51987` and open
@@ -262,7 +262,7 @@ injection, worker execution, or canonical writes occur in this prototype.
 
 ## Current product checkpoint
 
-The [OpenRouter JEV adapter](docs/openrouter-jev-adapter.md) now has offline
+The [OpenRouter JEV adapter](docs/contracts/openrouter-jev-adapter.md) now has offline
 conformance tests and an explicit synthetic smoke command. Its live route has
 not been tested with a real key; it is not yet a verified app provider setting.
 
@@ -273,8 +273,8 @@ the user's selected local subscription executor. Tickets define outcomes and
 constraints while leaving development methods optional. Cloud deployment and
 remote Workers remain later capabilities.
 
-The [delivery plan](docs/online-delivery-plan.md) and
-[integration research](docs/local-app-integration-notes.md) separate this goal
+The [delivery plan](docs/product/online-delivery-plan.md) and
+[integration research](docs/architecture/local-app-integration-notes.md) separate this goal
 from delivered foundations. Automatic collection, extraction/resolution,
 Context compilation, plugin integration and Worker orchestration still require
 implementation. The first bounded scoped Query library is described below; it
@@ -287,55 +287,55 @@ retains the offline boundaries stated above.
 The first online delivery slice adds executable, host- and store-independent
 contracts through the package's public entry:
 
-- [Identity and source resolution](docs/identity-contract-v0.md): tenant/project
+- [Identity and source resolution](docs/contracts/identity-contract-v0.md): tenant/project
   scope, repository membership, stable checkout/worktree/session identities,
   and explicit ambiguous or unmapped results.
-- [Events and provenance](docs/event-provenance-v0.md): mechanically normalized
+- [Events and provenance](docs/contracts/event-provenance-v0.md): mechanically normalized
   observations, source-object identity, access restrictions and immutable replay
   inputs, with mutable pointers explicitly marked non-replayable.
-- [Causal ordering and replay](docs/causal-ordering-v0.md): per-source receipt and
+- [Causal ordering and replay](docs/contracts/causal-ordering-v0.md): per-source receipt and
   projection cursors, explicit gaps and captured-head freshness, immutable Git
   ancestry versus ref movement, and isolated replay generations.
-- [Git provenance](docs/git-provenance-v0.md): read-only local commit inspection,
+- [Git provenance](docs/contracts/git-provenance-v0.md): read-only local commit inspection,
   explicit diff bases, correlated source observations and scoped ref movement.
-- [Working Graph](docs/working-graph-v0.md): immutable semantic revisions and
+- [Working Graph](docs/contracts/working-graph-v0.md): immutable semantic revisions and
   snapshots, explicit competing assertions, exact relation endpoints and
   provenance-based access checks.
-- [Incremental Working Graph](docs/incremental-graph-v0.md): selected-record
+- [Incremental Working Graph](docs/contracts/incremental-graph-v0.md): selected-record
   transitions and bounded historical pages, retaining the existing semantic
-  revision format. Both the pure fixture and the [local SQLite adapter](docs/graph-store-v0.md)
+  revision format. Both the pure fixture and the [local SQLite adapter](docs/contracts/graph-store-v0.md)
   exercise retained long histories; host and Policy integration remain pending.
-- [Typed Context lifecycle](docs/context-lifecycle-v0.md): sourced meaning and
+- [Typed Context lifecycle](docs/contracts/context-lifecycle-v0.md): sourced meaning and
   applicability, exact revision/adoption lineage, bounded current/as-of reads,
   and separate shared Authority views over the existing local Graph transaction.
   Automatic extraction and query integration remain pending.
-- [Selected Context relevance](docs/context-judge-bridge-v0.md): exact authorized
+- [Selected Context relevance](docs/contracts/context-judge-bridge-v0.md): exact authorized
   typed Context versions use the existing Judge dispatch path, with lifecycle,
   applicability and source checks before sending and before returning a result.
-- [Bounded Context Query](docs/query-engine-v0.md): one authorized selected
+- [Bounded Context Query](docs/contracts/query-engine-v0.md): one authorized selected
   own/related exploration window with positional text search, atomic conflicts,
   replayable ranking, stable pagination and optional actual Context Judge input.
-- [Policy artifacts](docs/policy-artifacts-v0.md): typed graph validation,
+- [Policy artifacts](docs/contracts/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.
-- [Policy kernel](docs/policy-kernel-v0.md): bounded non-model execution,
+- [Policy kernel](docs/contracts/policy-kernel-v0.md): bounded non-model execution,
   deterministic joins and atomic, idempotent action commands.
-- [Worker protocol](docs/worker-protocol-v0.md): pinned job inputs, permission
+- [Worker protocol](docs/contracts/worker-protocol-v0.md): pinned job inputs, permission
   ceilings, fenced attempts and structured proposal results.
-- [Agent work requests](docs/agent-work-request-v0.md): actionable requests for
+- [Agent work requests](docs/contracts/agent-work-request-v0.md): actionable requests for
   an existing Agent session, with verified host-tool bindings, return arguments,
   exact input versions and idempotent proposal receipts. The pure contract does
   not require a separate Worker or implement live host delivery.
-- [Reconciliation](docs/reconciliation-v0.md): a pinned instruction and output
+- [Reconciliation](docs/contracts/reconciliation-v0.md): a pinned instruction and output
   schema bundle that preserves all competing claims and citations, with
   explicit unresolved, stale and human-decision-required proposals.
-- [Observability and budgets](docs/observability-contract-v0.md): safe audit and
+- [Observability and budgets](docs/contracts/observability-contract-v0.md): safe audit and
   metric contracts, a reproducible alpha workload, numerical SLO targets and
   bounded resource admission.
 
 These contracts have synthetic conformance tests in `npm run verify`. They
 provide inputs for the later execution, storage, worker and service Tickets in
-the [online delivery plan](docs/online-delivery-plan.md). The online service and
+the [online delivery plan](docs/product/online-delivery-plan.md). The online service and
 capacity drill are still pending; numerical targets are not measured results.
 
 The isolated [platform evaluation](research/platform/node-postgres/platform-evaluation-v0.md) compares
@@ -347,9 +347,9 @@ the prototype is not the online service or a platform selection.
 
 ## Design baseline
 
-- [Thought log](docs/01_thought_log_semantic_runtime.md): how the direction evolved.
-- [PRD](docs/02_prd_vibehub_semantic_runtime.md): product goals and rollout phases.
-- [Technical design](docs/03_tech_design_semantic_runtime.md): architecture and prototype.
+- [Thought log](docs/history/01_thought_log_semantic_runtime.md): how the direction evolved.
+- [PRD](docs/product/02_prd_vibehub_semantic_runtime.md): product goals and rollout phases.
+- [Technical design](docs/architecture/03_tech_design_semantic_runtime.md): architecture and prototype.
 
 These are unchanged copies of the supplied 2026-09-19 drafts. Their proposed
 status and open questions remain intact. Sharing a repository is now the chosen

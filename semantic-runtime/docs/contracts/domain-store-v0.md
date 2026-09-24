@@ -172,7 +172,7 @@ and handle lifetime, aggregate capacity failures and connection recovery.
 
 The opt-in `npm run check:jev:ingress` also uses this coherent view to materialize
 an admitted synthetic event and its approved text after database restart. It
-closes the view before dispatching JEV. The [2026-09-22 measurement](measurements/jev-selected-read-20260922.json)
+closes the view before dispatching JEV. The [2026-09-22 measurement](../measurements/jev-selected-read-20260922.json)
 completed and matched all eight fixed cases, with no retry or rate-limit response;
 successful requests took 98–294 ms. This is a small regression measurement,
 not a general accuracy or throughput claim, and does not mark the pending events

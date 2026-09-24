@@ -60,7 +60,7 @@
   "context_refs": [
     {
       "purpose": "Primary architecture baseline: Policy Graph, Semantic Working Graph, Compiler, Worker and canonical/source boundaries; read the sections named in this Ticket.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "purpose": "Independent component, provider/host/store-independent core, private-state and graceful-degradation boundaries.",
@@ -68,7 +68,7 @@
     },
     {
       "purpose": "Current scope, rollout slices, protocol ownership, operational acceptance rules, dependency map, and migration of the five coarse Contracts.",
-      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+      "ref": "semantic-runtime/docs/product/online-delivery-plan.md"
     },
     {
       "purpose": "Exact input/handoff contract and explicit transfer of unfinished event consumer delivery recovery; this draft remains unimplemented.",

@@ -121,7 +121,7 @@ and one unrelated event. It reports the actual labels, score changes, hashes,
 latency and observed-or-unknown usage honestly. It does not retry disagreement,
 read private traces, promote Context or claim global retrieval accuracy.
 
-The [2026-09-22 measurement](measurements/jev-query-20260922.json) used official
+The [2026-09-22 measurement](../measurements/jev-query-20260922.json) used official
 `jev-1.13.0`. Both expected labels matched: the relevant Context score changed
 from 16 to 46 and the unrelated Context from 16 to -14. Model latency was
 338–418 ms; observed cost was unavailable. This is a two-case composition

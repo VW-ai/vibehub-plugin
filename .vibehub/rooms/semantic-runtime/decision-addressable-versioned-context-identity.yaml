@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "The design requires semantic pointers, immutable provenance, explicit promotion, and conflict visibility but does not yet specify the user-facing identity protocol.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "note": "Existing governed writeback semantics establish that durable Context changes need provenance and an explicit management layer.",

@@ -12,7 +12,7 @@
     },
     {
       "note": "§18.1 推荐本地 embedded SQLite/WAL。",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     }
   ],
   "kind": "context",
@@ -25,7 +25,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T07:30:19.991255+00:00",
-    "ref": "semantic-runtime/docs/local-service-profile.md"
+    "ref": "semantic-runtime/docs/operations/local-service-profile.md"
   },
   "state": "active",
   "summary": "本地启动基础采用单个 Node 进程和内置 SQLite，域服务另行接入",

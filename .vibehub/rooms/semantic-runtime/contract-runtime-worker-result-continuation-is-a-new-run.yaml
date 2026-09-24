@@ -8,11 +8,11 @@
     },
     {
       "note": "Documents enqueue-success versus trusted continuation hint and separately validated new-run entry; structured business artifact boundary.",
-      "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+      "ref": "semantic-runtime/docs/contracts/worker-protocol-v0.md"
     },
     {
       "note": "Existing plan gives durable submission to scheduler and result validation/new PolicyRun to result-ingress.",
-      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+      "ref": "semantic-runtime/docs/product/online-delivery-plan.md"
     }
   ],
   "kind": "context",
@@ -25,7 +25,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T00:20:44.880Z",
-    "ref": "semantic-runtime/docs/worker-protocol-v0.md"
+    "ref": "semantic-runtime/docs/contracts/worker-protocol-v0.md"
   },
   "state": "active",
   "summary": "Worker enqueue success and result continuation are distinct boundaries; results start a separately validated policy run",

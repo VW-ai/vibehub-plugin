@@ -120,6 +120,6 @@ environment. It sends four fixed synthetic examples through `LocalJudgeRuntime`
 to the official TypeSafe endpoint. It verifies that B cannot use A's foreign
 revision before adoption, both branches judge their own exact target afterward,
 and source revocation prevents another send. The adoption itself uses zero
-model calls. The [retained live measurement](measurements/jev-adoption-20260922.json)
+model calls. The [retained live measurement](../measurements/jev-adoption-20260922.json)
 records 4/4 expected decisions from `jev-1.13.0`, at 108–342 ms model time.
 These examples are a transport/integration check, not a general accuracy claim.

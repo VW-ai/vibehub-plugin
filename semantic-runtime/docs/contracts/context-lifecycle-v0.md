@@ -179,5 +179,5 @@ after commit before reply for typed mutations and adoption.
 The existing four-case real JEV adoption regression was rerun after this
 integration using fixed synthetic text: 4/4 matched, with source revocation
 refused before sending. See
-[the measurement](measurements/jev-context-regression-20260922.json). This is
+[the measurement](../measurements/jev-context-regression-20260922.json). This is
 regression evidence for the existing Judge path, not new typed Context support.

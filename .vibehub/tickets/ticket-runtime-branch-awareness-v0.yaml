@@ -42,7 +42,7 @@
   "context_refs": [
     {
       "purpose": "Original proposed architecture; retain Policy Graph, Working Graph, query/compiler and canonical boundaries.",
-      "ref": "semantic-runtime/docs/03_tech_design_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/architecture/03_tech_design_semantic_runtime.md"
     },
     {
       "purpose": "Independent component and ordinary Agent degradation boundaries.",
@@ -50,7 +50,7 @@
     },
     {
       "purpose": "Current local-first delivery sequence and retained later hosting scope.",
-      "ref": "semantic-runtime/docs/online-delivery-plan.md"
+      "ref": "semantic-runtime/docs/product/online-delivery-plan.md"
     },
     {
       "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",

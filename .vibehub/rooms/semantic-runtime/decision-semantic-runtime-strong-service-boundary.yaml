@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "The PRD defines the Runtime as the product kernel for policy, semantic working state, retrieval, context compilation, and workers.",
-      "ref": "semantic-runtime/docs/02_prd_vibehub_semantic_runtime.md"
+      "ref": "semantic-runtime/docs/product/02_prd_vibehub_semantic_runtime.md"
     },
     {
       "note": "The component contract makes Runtime isolated and preserves graceful degradation and provider-independent core boundaries.",
