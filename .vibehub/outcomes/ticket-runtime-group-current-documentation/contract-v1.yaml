@@ -1,0 +1,31 @@
+{
+  "accepted_acceptance_ids": [
+    "current-documentation-layout-is-exact",
+    "current-documentation-links-remain-resolvable",
+    "current-documentation-content-is-preserved",
+    "current-documentation-relocation-is-traceable",
+    "documentation-layout-keeps-runtime-invariants",
+    "documentation-layout-calibrates-before-expanding"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-24T02:08:00.000Z",
+  "contract_revision": {
+    "identity": "sha256:b8b2e925c661675a98a93d6ac65a4e639b21f6914e0ff6d0264ad565729fc5c7",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-current-documentation-layout-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent /root/runtime_docs_closeout. I did not plan or implement this Ticket and did not author its code, documentation migration, Ticket, Evidence, manifest, baseline, guard or Room update. I read the exact Contract and bound Evidence, inspected immutable commits and current repository state, reran focused offline audits and validation, and authored only this Outcome.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout accepts all six active Acceptance revisions of exact Contract 1. Direct inspection of implementation commit 35a8d06c43633061fc9c1ba670b932723ca9e706, proof commit 16ae0d34bbcab2068bb29f5d6f3886d27f34716b and their immutable parent confirms one exact current-documentation migration: 37 Markdown documents move without renaming into history 1, product 2, architecture 2, contracts 27 and operations 5; all old paths are absent and all unique destinations exist. Independent migration replay shows ten documents differ only by exactly 245 mechanically rebased relative hrefs, 27 retain their exact original blobs, and every checked moved-document link resolves. The 27 measurement JSON reports remain deferred and unmoved.\n\nLive-reference review confirms the implementation transforms exactly one README with 39 migration references, 45 active Tickets with 95 Context refs, and 21 semantic-runtime Room Context records with 28 refs, comprising four source.ref values and 24 evidence[].ref values. The proof commit fixes one additional pre-existing README Phase 0 stale link; its diff is exactly that link. The Room inventory and regenerated baseline use the new paths. The append-only relocation manifest preserves its prior 272 entries in order and adds exactly 37 unique current-documentation-layout entries, all bound to the actual implementation commit and to old blobs that resolve from its parent. Protected history remains byte-identical: 45 completed Ticket files retain 187 old-location mentions, comprising 186 complete repository paths and one Runtime-relative docs/branch-scope-v0.md mention; 82 existing Evidence files retain 82 mentions; existing Outcomes contain none.\n\nIndependent focused verification passes: both migration/reference audits; layout plus boundary tests 35/35; boundary inspection over 249 files with zero errors, direction exceptions or production SCCs; project format-4 validation at 239 Tickets, 547 Evidence records and 185 pre-closeout Outcomes; Ticket validation; Context guard from both the prior governance closeout and this Ticket's planning commit with no authority or violation; semantic-runtime Room FRESH; git diff checking; object integrity; and clean tracked worktree state. The regenerated baseline contains 370 records, 200 root exports, 315 production import edges, 29 contract constants, 37 npm command names and zero SCCs. Production and package hashes are unchanged. The implementation/proof range changes no dependency, lockfile, production behavior, provider path or standalone-copy policy.\n\nThe bound Evidence records the authorized full Runtime verification at 1010 total, 1008 passed, two expected platform skips and zero failures plus Phase 0 at 32/32; locked standalone verification at 1010 total, 986 passed, 24 deliberate history/research/platform skips and zero failures; and root artifact verification at 79 files and 3670088 bytes. I relied on these expensive-suite results after reproducing the focused audits and inspecting the commits, as requested. The visible calibration is corroborated by the frozen plan, implementation/proof chronology, exact manifest, diff and Evidence: 37 moves, 1/2/2/27/5 destinations, 39 README references, 45/95 active Ticket references, 21/28 Room Context references, 245 href rebases across ten documents, 27 byte-identical documents, 27 deferred reports and the protected-history counts. No stop condition occurred and no credential, provider or external network was accessed. The two unrelated untracked Ticket files remain untouched. The installed closeout Skill references a missing contracts/agent-session.md, so I did not invent a Session report; this missing auxiliary contract does not change the Git-native acceptance result.",
+  "ticket_id": "ticket-runtime-group-current-documentation",
+  "unresolved_acceptance_ids": []
+}
