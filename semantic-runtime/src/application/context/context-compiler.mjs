@@ -98,7 +98,7 @@ function sharedLayer(document, query) {
 function candidateLayer(unit) {
   if (unit.layer === 'notice') return 'other_exploration_awareness';
   if (unit.kind === 'conflict') return 'unresolved';
-  const role = unit.item?.meaning?.role;
+  const role = unit.item?.meaning?.role ?? unit.pointer?.role;
   if (['decision', 'constraint'].includes(role)) return 'decisions_and_constraints';
   if (role === 'evidence') return 'evidence';
   if (role === 'question') return 'unresolved';
@@ -112,14 +112,17 @@ function sharedPointer(document) {
 }
 
 function candidatePointer(unit) {
+  const compact = unit.pointer ?? {};
   return { key: pointerKey(['semantic', unit.key]), kind: unit.kind === 'conflict' ? 'semantic_conflict' : 'semantic_context',
     ref: unit.ref ?? null, exploration_id: unit.exploration_id, publication: unit.publication ?? null,
-    sources: unit.item?.sources ?? null, transition: unit.item?.transition ?? null, source_reasons: unit.source_reasons ?? [] };
+    sources: unit.item?.sources ?? compact.sources ?? null,
+    transition: unit.item?.transition ?? compact.transition ?? null,
+    source_reasons: unit.source_reasons ?? [] };
 }
 
-function semanticItem({ key, title, body, status, pointer_keys, mandatory = false, variants }) {
+function semanticItem({ key, title, body, status, pointer_keys, mandatory = false, text_available = true, variants }) {
   return { key, title, body: mandatory ? body : null, text_state: mandatory ? 'materialized' : 'pointer', status,
-    pointer_keys, ...(variants ? { variants } : {}), _body: body, _mandatory: mandatory };
+    pointer_keys, ...(variants ? { variants } : {}), _body: body, _mandatory: mandatory, _text_available: text_available };
 }
 
 function classify(query) {
@@ -153,7 +156,8 @@ function classify(query) {
       const variants = unit.members.map(member => {
         const memberPointer = candidatePointer(member); pointers.set(memberPointer.key, memberPointer);
         return { key: member.key, title: member.item?.meaning?.summary ?? member.ref.entity_id,
-          body: null, text_state: 'pointer', pointer_keys: [memberPointer.key], _body: member.item?.meaning?.detail ?? '' };
+          body: null, text_state: 'pointer', pointer_keys: [memberPointer.key], _body: member.item?.meaning?.detail ?? '',
+          _text_available: member.item !== null };
       });
       layers.get(layer).push(semanticItem({ key: unit.key, title: `Unresolved alternatives (${variants.length})`, body: '',
         status: 'contested', pointer_keys: [pointer.key, ...variants.flatMap(variant => variant.pointer_keys)], mandatory: true, variants }));
@@ -161,13 +165,17 @@ function classify(query) {
     }
     const pointer = candidatePointer(unit), text = unit.item?.meaning;
     add(layer, semanticItem({ key: unit.key, title: text?.summary ?? unit.ref.entity_id, body: text?.detail ?? '',
-      status: unit.item?.assertion_status ?? unit.item?.projection?.status ?? 'unknown', pointer_keys: [pointer.key] }), pointer);
+      status: unit.item?.assertion_status ?? unit.pointer?.assertion_status
+        ?? unit.item?.projection?.status ?? unit.pointer?.projection?.status ?? 'unknown',
+      pointer_keys: [pointer.key], text_available: unit.item !== null }), pointer);
   }
   for (const [layer, items] of layers) {
     if (layer === 'source_pointers') continue;
     for (const item of items) {
-      if (!item._mandatory) omissions.push({ key: item.key, reason: 'text_budget', source: 'compiler' });
-      for (const variant of item.variants ?? []) omissions.push({ key: variant.key, reason: 'text_budget', source: 'compiler' });
+      if (!item._mandatory && item._text_available) omissions.push({ key: item.key, reason: 'text_budget', source: 'compiler' });
+      for (const variant of item.variants ?? []) if (variant._text_available) {
+        omissions.push({ key: variant.key, reason: 'text_budget', source: 'compiler' });
+      }
     }
   }
   layers.set('source_pointers', [...pointers.values()].sort((left, right) => left.key.localeCompare(right.key)));
@@ -201,9 +209,9 @@ function recommendation(request, classified, query) {
 }
 
 function publicItem(item) {
-  const { _body: _body, _mandatory: _mandatory, ...value } = item;
+  const { _body: _body, _mandatory: _mandatory, _text_available: _textAvailable, ...value } = item;
   if (value.variants) value.variants = value.variants.map(variant => {
-    const { _body: _variantBody, ...publicVariant } = variant; return publicVariant;
+    const { _body: _variantBody, _text_available: _variantTextAvailable, ...publicVariant } = variant; return publicVariant;
   });
   return value;
 }
@@ -228,7 +236,7 @@ export function compileContextPages(pages, rawRequest) {
   if (!fits(draft)) throw contextPackageFailure('context_package_budget_too_small');
   const publicLayers = new Map(draft.layers.map(layer => [layer.id, layer]));
   const candidates = CONTEXT_PACKAGE_LAYERS.slice(0, -1).flatMap(id => classified.layers.get(id)
-    .filter(item => !item._mandatory).map(item => ({ layer: id, item })));
+    .filter(item => !item._mandatory && item._text_available).map(item => ({ layer: id, item })));
   for (const candidate of candidates) {
     const selected = publicLayers.get(candidate.layer).items.find(item => item.key === candidate.item.key);
     selected.body = candidate.item._body; selected.text_state = 'materialized';
@@ -244,6 +252,7 @@ export function compileContextPages(pages, rawRequest) {
     const selected = publicLayers.get(layer)?.items.find(value => value.key === item.key);
     if (!selected) continue;
     for (let index = 0; index < item.variants.length; index++) {
+      if (!item.variants[index]._text_available) continue;
       selected.variants[index].body = item.variants[index]._body; selected.variants[index].text_state = 'materialized';
       const omissionIndex = draft.omissions.findIndex(omission => omission.key === item.variants[index].key && omission.reason === 'text_budget');
       const [omission] = omissionIndex < 0 ? [] : draft.omissions.splice(omissionIndex, 1);

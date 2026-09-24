@@ -77,6 +77,30 @@ test('deterministic budgeting deduplicates meaning, retains every source pointer
   assert.notEqual(compact.package_id, first.package_id);
 });
 
+test('nested Query pointer substitution retains layer, lifecycle, and provenance without inventing empty text', async t => {
+  const f = await queryFixture(t);
+  for (let index = 0; index < 5; index++) publish(f, `compiler-query-pointer-${index}`, { typed: {
+    role: 'evidence', summary: `Budget pointer provenance ${index}`,
+    detail: `${index}:` + ' source-backed body'.repeat(260),
+  } });
+  const query = f.queryRequest({ request_id: 'compiler-query-pointer-budget',
+    budget: { max_results: 16, token_budget: 85000 } });
+  const raw = await f.engine.query(f.context, query);
+  const omitted = raw.items.find(item => item.text_omitted && item.pointer?.sources?.events?.length);
+  assert(omitted); assert.equal(omitted.pointer.role, 'evidence'); assert.equal(omitted.pointer.transition.kind, 'create');
+
+  const result = await new LocalContextCompiler({ query_engine: f.engine }).compile(f.context,
+    compilerRequest(f, { query: { request_id: query.request_id, budget: query.budget } }));
+  const pointer = layer(result, 'source_pointers').items.find(item =>
+    item.ref?.revision_digest === omitted.ref.revision_digest);
+  assert(pointer); assert.deepEqual(pointer.sources, omitted.pointer.sources);
+  assert.deepEqual(pointer.transition, omitted.pointer.transition);
+  const compiled = layer(result, 'evidence').items.find(item => item.pointer_keys.includes(pointer.key));
+  assert(compiled); assert.equal(compiled.status, omitted.pointer.assertion_status);
+  assert.equal(compiled.text_state, 'pointer'); assert.equal(compiled.body, null);
+  assert(result.omissions.some(entry => entry.key === omitted.key && entry.reason === 'text_budget' && entry.source === 'query'));
+});
+
 test('conflicts, stale shared bases, unavailable canonical state, and no-callback consumers remain explicit', async t => {
   const f = await queryFixture(t, { canonical: true });
   const base = publish(f, 'compiler-conflict-base');

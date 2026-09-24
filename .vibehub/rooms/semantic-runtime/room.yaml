@@ -574,7 +574,7 @@
         "path": "semantic-runtime/src/app/local/ui/style.css"
       },
       {
-        "blob": "a60399902ec3ba6742b68c9a019ff7f558f29bf3",
+        "blob": "80f15b0531a8bd5942276e722ff7ec341a6311e7",
         "path": "semantic-runtime/src/application/context/context-compiler.mjs"
       },
       {
@@ -794,7 +794,7 @@
         "path": "semantic-runtime/test/context/context-capacity.test.mjs"
       },
       {
-        "blob": "aa47382fcfaa2e67ccb260e4656455869c3229a5",
+        "blob": "0a466f55a49b7ce355ea9de2130de3d65e8e1606",
         "path": "semantic-runtime/test/context/context-compiler.test.mjs"
       },
       {
@@ -1502,8 +1502,8 @@
         "path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json"
       }
     ],
-    "checked_at": "2026-09-24T04:18:18.219Z",
-    "last_aligned_commit": "3ccd9249bdda5666dc84102552b29166a534392e"
+    "checked_at": "2026-09-24T04:27:17.338Z",
+    "last_aligned_commit": "a06fe3f2f3b1001121552e147b13b8ba41e6b7d6"
   },
   "anchors": [
     "semantic-runtime/"
