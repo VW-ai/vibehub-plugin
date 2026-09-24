@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "live-jev-verification-vertical-is-exact",
+    "live-jev-commands-and-offline-contracts-are-preserved",
+    "live-jev-relocation-is-traceable",
+    "full-and-standalone-verification-remain-honest",
+    "live-jev-extraction-calibrates-before-expanding"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-24T00:46:18Z",
+  "contract_revision": {
+    "identity": "sha256:8e1d0acc9cbe6eeef079f657aff3983e32a3e887accf2783b699ab6135f5bd57",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-live-jev-verification-isolation-20260923"
+  ],
+  "independence": {
+    "note": "A fresh subagent with no executor context independently inspected the exact Ticket revision, Evidence binding, both commits, diffs, moved content, provenance, layout, documentation and focused verification before adjudicating.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent subagent closeout accepts all five active Acceptance revisions of exact Contract 1. Direct inspection of implementation commit 7f479715bb661a25449320f0399e5f966a2b09d0 and provenance commit 1fb8ad30810e52b6428813fa918937948f51617a confirms exactly twenty unique moves: eleven live runners, eight offline checker-contract tests and one operator guide. Every old path is absent, every destination exists, and independent normalized comparison shows all twenty files differ from their immutable parent blobs only by relocation-required relative import or documentation-link updates. The twelve named live package commands preserve their arguments and environment flags while targeting the relocated runners; test:live:jev:offline is dedicated to the same eight moved tests, ordinary npm test includes them, and the focused offline target independently passes all 17 assertions with intercepted transports. The implementation changes no production src, research, shared helper, measurement report, credential or response artifact; all sixteen JEV measurement reports are identical across the migration. The append-only manifest has exactly the twenty expected old/new pairs, one live-jev-verification category, the actual migration commit, and old_blob values resolving to the migration parent. Current README and product/contract documentation resolve the new paths, while historical completed Tickets, Outcomes, Context and Evidence are untouched; the only VibeHub changes are the new bound Evidence and current semantic-runtime Room alignment. Runtime inventory and standalone copy metadata include verification/live, exclude reports and research from standalone copying, and production has no verification import. Independent focused checks pass: live JEV offline 17/17; layout plus boundary tests 33/33; boundary scanner 249 files with zero production SCCs, direction exceptions or errors; runtime layout check; root plugin artifact verification at 79 files and 3670088 bytes; Ticket validation; project validation with no unverifiable Context refs; Context guard with no authorities or violations; semantic-runtime Room FRESH; and git diff checks. The bound Evidence records the earlier full Runtime, Phase 0 and isolated locked-standalone passes, including its corrected sequential standalone rerun; static inspection confirms the standalone verifier copies STANDALONE_COPY_PATHS and runs verify:runtime in a temporary component. The planned-versus-actual calibration is exact at 11 runners, 8 tests, 1 guide, 12 commands and 17 assertions, and diff inspection finds none of the stipulated stop conditions. No credential, .env.local content, Keychain, model provider or external network was accessed. The two unrelated untracked Ticket files were left untouched. The installed closeout Skill references a missing contracts/agent-session.md, so no session report was invented; this does not alter the Git-native acceptance result.",
+  "ticket_id": "ticket-runtime-isolate-live-jev-verification",
+  "unresolved_acceptance_ids": []
+}
