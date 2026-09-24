@@ -2163,6 +2163,195 @@
       "old_blob": "378ff308ed3682b08cca2e4abd657c5966284385",
       "migration_commit": "35a8d06c43633061fc9c1ba670b932723ca9e706",
       "category": "current-documentation-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/canonical-reader-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/sources/canonical-reader-20260922.json",
+      "old_blob": "c935d9d8c66ab048e657d5e1070db8e13c8fc849",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/canonical-reader-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/sources/canonical-reader-verification-20260922.json",
+      "old_blob": "f6bf7e41a6c6d7c0f2169b5b1954dd8ca2e9e663",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/context-judge-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/context/context-judge-verification-20260922.json",
+      "old_blob": "badfd224f2cc60dfba814fca95d4a9a872566841",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/context-lifecycle-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/context/context-lifecycle-verification-20260922.json",
+      "old_blob": "cce0f3c2b4c2cd3c0b687e440e86a71927fedcd9",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/exploration-adoption-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/explorations/exploration-adoption-verification-20260922.json",
+      "old_blob": "597f5f60c77298b43adbfc57357ec432e9caceb8",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/exploration-projection-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/explorations/exploration-projection-20260922.json",
+      "old_blob": "25003f188a8ed67ad4f59ea7f346c1fb10aa709f",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/exploration-projection-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/explorations/exploration-projection-verification-20260922.json",
+      "old_blob": "a0858512514522934a02c8baa387da08e9395fc8",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/graph-store-sqlite-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/graph/graph-store-sqlite-20260922.json",
+      "old_blob": "5f4df0f4247c35e87958df63484a845ee3f3c45c",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-adoption-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/explorations/jev-adoption-20260922.json",
+      "old_blob": "98290a6989f5c41f4892c4c974efeb76500755f5",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-canonical-graph-regression-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/graph/jev-canonical-graph-regression-20260922.json",
+      "old_blob": "d7e190633968536f9500469ab7d475cba4101063",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-context-bridge-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/context/jev-context-bridge-20260922.json",
+      "old_blob": "d8f7a59e62494b8b1e81d09410fbdaf2fd33134c",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-context-regression-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/context/jev-context-regression-20260922.json",
+      "old_blob": "15c2bfdc32e5379ec30550c1c80ee6aff7e577b7",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-edge-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/support/jev-edge-20260922.json",
+      "old_blob": "44e27698d4ef69befcda945d9bc3022f306b6601",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-edge-timing-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/support/jev-edge-timing-20260922.json",
+      "old_blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-exploration-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/explorations/jev-exploration-20260922.json",
+      "old_blob": "2fe827cd1c9ede54441e67f052d6c91799fab17c",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-graph-round-trip-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/graph/jev-graph-round-trip-20260922.json",
+      "old_blob": "a4ce7d980d1745a7bc48ca7c641c5a7f534f3426",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-graph-source-closure-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/graph/jev-graph-source-closure-20260922.json",
+      "old_blob": "8da8cbcc51e8d8454b4f9e56c4951a1a1df5757f",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-inflight-source-fence-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/sources/jev-inflight-source-fence-20260922.json",
+      "old_blob": "1ce0e52ad4e6b1b8352d63795c0e0361ae6247a6",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-ingress-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/project/jev-ingress-20260922.json",
+      "old_blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-invalidation-composition-final-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/support/jev-invalidation-composition-final-20260922.json",
+      "old_blob": "c13e6a8ebc1b5c94e3745794b271e7d693bf659e",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-judge-runtime-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/judge/jev-judge-runtime-20260922.json",
+      "old_blob": "9bb98839c89ec1658d4de1aa4cbebb0a3142b2a9",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-query-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/query/jev-query-20260922.json",
+      "old_blob": "7839290e07180459034fb20316ea722768c7ec73",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-selected-read-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/support/jev-selected-read-20260922.json",
+      "old_blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json",
+      "old_blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/judge-runtime-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/judge/judge-runtime-verification-20260922.json",
+      "old_blob": "047a1d9a39448e3907f38f59beecda270ea0ab52",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/local-app-setup-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/app/local-app-setup-20260922.json",
+      "old_blob": "7db1a452a90527bcc925ca749820c7f654a85241",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
+    },
+    {
+      "old_path": "semantic-runtime/docs/measurements/query-verification-20260922.json",
+      "new_path": "semantic-runtime/verification/reports/query/query-verification-20260922.json",
+      "old_blob": "3e34a8c8ebce4bd8ac8e70bb0ed36385d46eb7aa",
+      "migration_commit": "0126decaf4d6d948cd478657650acdd4770615a6",
+      "category": "verification-report-layout"
     }
   ]
 }

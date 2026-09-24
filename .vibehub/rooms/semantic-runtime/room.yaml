@@ -26,7 +26,7 @@
         "path": "semantic-runtime/docs/architecture/local-app-integration-notes.md"
       },
       {
-        "blob": "8b2ad6771af748808f4238b11d7d257914070b05",
+        "blob": "72d3bfebcf3072df25dcabd04f96e2188a8d751a",
         "path": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
       },
       {
@@ -42,7 +42,7 @@
         "path": "semantic-runtime/docs/contracts/branch-scope-v0.md"
       },
       {
-        "blob": "e058d58583bdb435068170009b7783a84d964c1e",
+        "blob": "5348fdceaf3b4b2c004c6332b46cd0941a9c48d8",
         "path": "semantic-runtime/docs/contracts/canonical-source-reader-v0.md"
       },
       {
@@ -50,15 +50,15 @@
         "path": "semantic-runtime/docs/contracts/causal-ordering-v0.md"
       },
       {
-        "blob": "4edd9e7a5e01f01a2bf2f6efcbad019f21bf0668",
+        "blob": "6ad86237ed6704006f488aa179cce1a3d6491e17",
         "path": "semantic-runtime/docs/contracts/context-judge-bridge-v0.md"
       },
       {
-        "blob": "71f560d4a01ee37af364f149c23ef199f4a5a05f",
+        "blob": "141f2af173cc473107e2b610cb06c88fdadc21e0",
         "path": "semantic-runtime/docs/contracts/context-lifecycle-v0.md"
       },
       {
-        "blob": "e068354ea513bcc8f40bd9e771ce74a8f5ce2711",
+        "blob": "d06b801c3b1be3ccbf39378f046594cad4aa535d",
         "path": "semantic-runtime/docs/contracts/domain-store-v0.md"
       },
       {
@@ -70,11 +70,11 @@
         "path": "semantic-runtime/docs/contracts/event-provenance-v0.md"
       },
       {
-        "blob": "804878d13dc2b3c5730d595686a4458c1804d11e",
+        "blob": "86885c7f3e6edaa9916a40cc746d5e6e9ae31ed9",
         "path": "semantic-runtime/docs/contracts/exploration-adoption-v0.md"
       },
       {
-        "blob": "ed3b7a571cf0fedefd553d207c7c2173fb593a88",
+        "blob": "d69403ffae62987471e26ce8d9b4787483b88999",
         "path": "semantic-runtime/docs/contracts/exploration-projection-v0.md"
       },
       {
@@ -86,7 +86,7 @@
         "path": "semantic-runtime/docs/contracts/git-provenance-v0.md"
       },
       {
-        "blob": "c6ced1c3e97c2ca4d62213656a7d3ece14a9afb3",
+        "blob": "24fe48bf261acf767dd383c62b27ae4d1fc69c24",
         "path": "semantic-runtime/docs/contracts/graph-store-v0.md"
       },
       {
@@ -98,7 +98,7 @@
         "path": "semantic-runtime/docs/contracts/incremental-graph-v0.md"
       },
       {
-        "blob": "2087d232a556eeaedb443ca9324acc019618e29d",
+        "blob": "3d77093e9b537e8c308832a7d3a457c607d596ea",
         "path": "semantic-runtime/docs/contracts/judge-runtime-v0.md"
       },
       {
@@ -122,7 +122,7 @@
         "path": "semantic-runtime/docs/contracts/project-activation-v0.md"
       },
       {
-        "blob": "31c468cb1b90989dc1cca792dcdb8b0eac2b30e2",
+        "blob": "2263592fdf5ee3f3c62746204b6e07c6d4103371",
         "path": "semantic-runtime/docs/contracts/query-engine-v0.md"
       },
       {
@@ -146,116 +146,8 @@
         "path": "semantic-runtime/docs/history/01_thought_log_semantic_runtime.md"
       },
       {
-        "blob": "e9de1444f0a56762ac1dd4bda5d9fcd7ed99dc08",
+        "blob": "b8376fc5ddc94eb4eb3f3e923f29dd0eeb0e44ef",
         "path": "semantic-runtime/docs/history/runtime-relocations-v1.json"
-      },
-      {
-        "blob": "c935d9d8c66ab048e657d5e1070db8e13c8fc849",
-        "path": "semantic-runtime/docs/measurements/canonical-reader-20260922.json"
-      },
-      {
-        "blob": "f6bf7e41a6c6d7c0f2169b5b1954dd8ca2e9e663",
-        "path": "semantic-runtime/docs/measurements/canonical-reader-verification-20260922.json"
-      },
-      {
-        "blob": "badfd224f2cc60dfba814fca95d4a9a872566841",
-        "path": "semantic-runtime/docs/measurements/context-judge-verification-20260922.json"
-      },
-      {
-        "blob": "cce0f3c2b4c2cd3c0b687e440e86a71927fedcd9",
-        "path": "semantic-runtime/docs/measurements/context-lifecycle-verification-20260922.json"
-      },
-      {
-        "blob": "597f5f60c77298b43adbfc57357ec432e9caceb8",
-        "path": "semantic-runtime/docs/measurements/exploration-adoption-verification-20260922.json"
-      },
-      {
-        "blob": "25003f188a8ed67ad4f59ea7f346c1fb10aa709f",
-        "path": "semantic-runtime/docs/measurements/exploration-projection-20260922.json"
-      },
-      {
-        "blob": "a0858512514522934a02c8baa387da08e9395fc8",
-        "path": "semantic-runtime/docs/measurements/exploration-projection-verification-20260922.json"
-      },
-      {
-        "blob": "5f4df0f4247c35e87958df63484a845ee3f3c45c",
-        "path": "semantic-runtime/docs/measurements/graph-store-sqlite-20260922.json"
-      },
-      {
-        "blob": "98290a6989f5c41f4892c4c974efeb76500755f5",
-        "path": "semantic-runtime/docs/measurements/jev-adoption-20260922.json"
-      },
-      {
-        "blob": "d7e190633968536f9500469ab7d475cba4101063",
-        "path": "semantic-runtime/docs/measurements/jev-canonical-graph-regression-20260922.json"
-      },
-      {
-        "blob": "d8f7a59e62494b8b1e81d09410fbdaf2fd33134c",
-        "path": "semantic-runtime/docs/measurements/jev-context-bridge-20260922.json"
-      },
-      {
-        "blob": "15c2bfdc32e5379ec30550c1c80ee6aff7e577b7",
-        "path": "semantic-runtime/docs/measurements/jev-context-regression-20260922.json"
-      },
-      {
-        "blob": "44e27698d4ef69befcda945d9bc3022f306b6601",
-        "path": "semantic-runtime/docs/measurements/jev-edge-20260922.json"
-      },
-      {
-        "blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
-        "path": "semantic-runtime/docs/measurements/jev-edge-timing-20260922.json"
-      },
-      {
-        "blob": "2fe827cd1c9ede54441e67f052d6c91799fab17c",
-        "path": "semantic-runtime/docs/measurements/jev-exploration-20260922.json"
-      },
-      {
-        "blob": "a4ce7d980d1745a7bc48ca7c641c5a7f534f3426",
-        "path": "semantic-runtime/docs/measurements/jev-graph-round-trip-20260922.json"
-      },
-      {
-        "blob": "8da8cbcc51e8d8454b4f9e56c4951a1a1df5757f",
-        "path": "semantic-runtime/docs/measurements/jev-graph-source-closure-20260922.json"
-      },
-      {
-        "blob": "1ce0e52ad4e6b1b8352d63795c0e0361ae6247a6",
-        "path": "semantic-runtime/docs/measurements/jev-inflight-source-fence-20260922.json"
-      },
-      {
-        "blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
-        "path": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
-      },
-      {
-        "blob": "c13e6a8ebc1b5c94e3745794b271e7d693bf659e",
-        "path": "semantic-runtime/docs/measurements/jev-invalidation-composition-final-20260922.json"
-      },
-      {
-        "blob": "9bb98839c89ec1658d4de1aa4cbebb0a3142b2a9",
-        "path": "semantic-runtime/docs/measurements/jev-judge-runtime-20260922.json"
-      },
-      {
-        "blob": "7839290e07180459034fb20316ea722768c7ec73",
-        "path": "semantic-runtime/docs/measurements/jev-query-20260922.json"
-      },
-      {
-        "blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
-        "path": "semantic-runtime/docs/measurements/jev-selected-read-20260922.json"
-      },
-      {
-        "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
-        "path": "semantic-runtime/docs/measurements/jev-synthetic-20260922.json"
-      },
-      {
-        "blob": "047a1d9a39448e3907f38f59beecda270ea0ab52",
-        "path": "semantic-runtime/docs/measurements/judge-runtime-verification-20260922.json"
-      },
-      {
-        "blob": "7db1a452a90527bcc925ca749820c7f654a85241",
-        "path": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
-      },
-      {
-        "blob": "3e34a8c8ebce4bd8ac8e70bb0ed36385d46eb7aa",
-        "path": "semantic-runtime/docs/measurements/query-verification-20260922.json"
       },
       {
         "blob": "95ea788f17b3b1eb28414dc312470b0acb807752",
@@ -1102,7 +994,7 @@
         "path": "semantic-runtime/test/graph/graph-store-crash.test.mjs"
       },
       {
-        "blob": "7492bd4de9387d0d295db086097e4e7a1dca6a40",
+        "blob": "14e6ff5bf78e7ced101277b40d50132a40412daa",
         "path": "semantic-runtime/test/graph/graph-store-scale.test.mjs"
       },
       {
@@ -1358,7 +1250,7 @@
         "path": "semantic-runtime/test/support/query-fixture.mjs"
       },
       {
-        "blob": "243ec2ff693d132f34e614b266113cb9be313584",
+        "blob": "51f6f663e388c4d8c449acbd2025620a72dc6888",
         "path": "semantic-runtime/test/support/runtime-layout.test.mjs"
       },
       {
@@ -1394,7 +1286,7 @@
         "path": "semantic-runtime/tools/check-boundaries.mjs"
       },
       {
-        "blob": "f788faacc01256d23d580fe0ae4b4c77e6d8252b",
+        "blob": "90dbed3c165399e6bd51c516bfaaf9358923133f",
         "path": "semantic-runtime/tools/runtime-layout.mjs"
       },
       {
@@ -1434,7 +1326,7 @@
         "path": "semantic-runtime/verification/live/jev/check-jev-synthetic.mjs"
       },
       {
-        "blob": "df6f6782e871195b078bca0976bc3274b6807b77",
+        "blob": "a9e8be700d57f0153adc5b3c45b8db274d481255",
         "path": "semantic-runtime/verification/live/jev/jev-synthetic-check.md"
       },
       {
@@ -1480,10 +1372,122 @@
       {
         "blob": "362aa061dd7e611e74eaff72197142f4e4790553",
         "path": "semantic-runtime/verification/live/jev/test/synthetic-jev-check.test.mjs"
+      },
+      {
+        "blob": "7db1a452a90527bcc925ca749820c7f654a85241",
+        "path": "semantic-runtime/verification/reports/app/local-app-setup-20260922.json"
+      },
+      {
+        "blob": "badfd224f2cc60dfba814fca95d4a9a872566841",
+        "path": "semantic-runtime/verification/reports/context/context-judge-verification-20260922.json"
+      },
+      {
+        "blob": "cce0f3c2b4c2cd3c0b687e440e86a71927fedcd9",
+        "path": "semantic-runtime/verification/reports/context/context-lifecycle-verification-20260922.json"
+      },
+      {
+        "blob": "d8f7a59e62494b8b1e81d09410fbdaf2fd33134c",
+        "path": "semantic-runtime/verification/reports/context/jev-context-bridge-20260922.json"
+      },
+      {
+        "blob": "15c2bfdc32e5379ec30550c1c80ee6aff7e577b7",
+        "path": "semantic-runtime/verification/reports/context/jev-context-regression-20260922.json"
+      },
+      {
+        "blob": "597f5f60c77298b43adbfc57357ec432e9caceb8",
+        "path": "semantic-runtime/verification/reports/explorations/exploration-adoption-verification-20260922.json"
+      },
+      {
+        "blob": "25003f188a8ed67ad4f59ea7f346c1fb10aa709f",
+        "path": "semantic-runtime/verification/reports/explorations/exploration-projection-20260922.json"
+      },
+      {
+        "blob": "a0858512514522934a02c8baa387da08e9395fc8",
+        "path": "semantic-runtime/verification/reports/explorations/exploration-projection-verification-20260922.json"
+      },
+      {
+        "blob": "98290a6989f5c41f4892c4c974efeb76500755f5",
+        "path": "semantic-runtime/verification/reports/explorations/jev-adoption-20260922.json"
+      },
+      {
+        "blob": "2fe827cd1c9ede54441e67f052d6c91799fab17c",
+        "path": "semantic-runtime/verification/reports/explorations/jev-exploration-20260922.json"
+      },
+      {
+        "blob": "5f4df0f4247c35e87958df63484a845ee3f3c45c",
+        "path": "semantic-runtime/verification/reports/graph/graph-store-sqlite-20260922.json"
+      },
+      {
+        "blob": "d7e190633968536f9500469ab7d475cba4101063",
+        "path": "semantic-runtime/verification/reports/graph/jev-canonical-graph-regression-20260922.json"
+      },
+      {
+        "blob": "a4ce7d980d1745a7bc48ca7c641c5a7f534f3426",
+        "path": "semantic-runtime/verification/reports/graph/jev-graph-round-trip-20260922.json"
+      },
+      {
+        "blob": "8da8cbcc51e8d8454b4f9e56c4951a1a1df5757f",
+        "path": "semantic-runtime/verification/reports/graph/jev-graph-source-closure-20260922.json"
+      },
+      {
+        "blob": "9bb98839c89ec1658d4de1aa4cbebb0a3142b2a9",
+        "path": "semantic-runtime/verification/reports/judge/jev-judge-runtime-20260922.json"
+      },
+      {
+        "blob": "047a1d9a39448e3907f38f59beecda270ea0ab52",
+        "path": "semantic-runtime/verification/reports/judge/judge-runtime-verification-20260922.json"
+      },
+      {
+        "blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
+        "path": "semantic-runtime/verification/reports/project/jev-ingress-20260922.json"
+      },
+      {
+        "blob": "7839290e07180459034fb20316ea722768c7ec73",
+        "path": "semantic-runtime/verification/reports/query/jev-query-20260922.json"
+      },
+      {
+        "blob": "3e34a8c8ebce4bd8ac8e70bb0ed36385d46eb7aa",
+        "path": "semantic-runtime/verification/reports/query/query-verification-20260922.json"
+      },
+      {
+        "blob": "f9feb4a54184c7ebdb9103f6b1567e081cc8a6ca",
+        "path": "semantic-runtime/verification/reports/report-metadata-v1.json"
+      },
+      {
+        "blob": "c935d9d8c66ab048e657d5e1070db8e13c8fc849",
+        "path": "semantic-runtime/verification/reports/sources/canonical-reader-20260922.json"
+      },
+      {
+        "blob": "f6bf7e41a6c6d7c0f2169b5b1954dd8ca2e9e663",
+        "path": "semantic-runtime/verification/reports/sources/canonical-reader-verification-20260922.json"
+      },
+      {
+        "blob": "1ce0e52ad4e6b1b8352d63795c0e0361ae6247a6",
+        "path": "semantic-runtime/verification/reports/sources/jev-inflight-source-fence-20260922.json"
+      },
+      {
+        "blob": "44e27698d4ef69befcda945d9bc3022f306b6601",
+        "path": "semantic-runtime/verification/reports/support/jev-edge-20260922.json"
+      },
+      {
+        "blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
+        "path": "semantic-runtime/verification/reports/support/jev-edge-timing-20260922.json"
+      },
+      {
+        "blob": "c13e6a8ebc1b5c94e3745794b271e7d693bf659e",
+        "path": "semantic-runtime/verification/reports/support/jev-invalidation-composition-final-20260922.json"
+      },
+      {
+        "blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
+        "path": "semantic-runtime/verification/reports/support/jev-selected-read-20260922.json"
+      },
+      {
+        "blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
+        "path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json"
       }
     ],
-    "checked_at": "2026-09-24T01:37:58.934Z",
-    "last_aligned_commit": "35a8d06c43633061fc9c1ba670b932723ca9e706"
+    "checked_at": "2026-09-24T02:13:06.795Z",
+    "last_aligned_commit": "0126decaf4d6d948cd478657650acdd4770615a6"
   },
   "anchors": [
     "semantic-runtime/"

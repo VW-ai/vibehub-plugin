@@ -6,6 +6,7 @@
     "tools",
     "test",
     "verification/live",
+    "verification/reports",
     "research",
     "policies",
     "docs",
@@ -191,141 +192,6 @@
       "path": "docs/history/runtime-relocations-v1.json",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/history/runtime-relocations-v1.json"
-    },
-    {
-      "path": "docs/measurements/canonical-reader-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/sources/canonical-reader-20260922.json"
-    },
-    {
-      "path": "docs/measurements/canonical-reader-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/sources/canonical-reader-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/context-judge-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/context/context-judge-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/context-lifecycle-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/context/context-lifecycle-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/exploration-adoption-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/explorations/exploration-adoption-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/exploration-projection-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/explorations/exploration-projection-20260922.json"
-    },
-    {
-      "path": "docs/measurements/exploration-projection-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/explorations/exploration-projection-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/graph-store-sqlite-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/graph/graph-store-sqlite-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-adoption-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-adoption-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-canonical-graph-regression-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/graph/jev-canonical-graph-regression-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-context-bridge-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/context/jev-context-bridge-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-context-regression-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/context/jev-context-regression-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-edge-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-edge-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-edge-timing-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-edge-timing-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-exploration-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/explorations/jev-exploration-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-graph-round-trip-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/graph/jev-graph-round-trip-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-graph-source-closure-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/graph/jev-graph-source-closure-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-inflight-source-fence-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/sources/jev-inflight-source-fence-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-ingress-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/project/jev-ingress-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-invalidation-composition-final-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-invalidation-composition-final-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-judge-runtime-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/judge/jev-judge-runtime-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-query-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/query/jev-query-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-selected-read-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-selected-read-20260922.json"
-    },
-    {
-      "path": "docs/measurements/jev-synthetic-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/support/jev-synthetic-20260922.json"
-    },
-    {
-      "path": "docs/measurements/judge-runtime-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/judge/judge-runtime-verification-20260922.json"
-    },
-    {
-      "path": "docs/measurements/local-app-setup-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/app/local-app-setup-20260922.json"
-    },
-    {
-      "path": "docs/measurements/query-verification-20260922.json",
-      "current_role": "documentation-or-report",
-      "intended_destination": "verification/reports/query/query-verification-20260922.json"
     },
     {
       "path": "docs/operations/local-app-setup-v0.md",
@@ -1861,6 +1727,146 @@
       "path": "verification/live/jev/test/synthetic-jev-check.test.mjs",
       "current_role": "live-verification",
       "intended_destination": "verification/live/jev/test/synthetic-jev-check.test.mjs"
+    },
+    {
+      "path": "verification/reports/app/local-app-setup-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/app/local-app-setup-20260922.json"
+    },
+    {
+      "path": "verification/reports/context/context-judge-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/context/context-judge-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/context/context-lifecycle-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/context/context-lifecycle-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/context/jev-context-bridge-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/context/jev-context-bridge-20260922.json"
+    },
+    {
+      "path": "verification/reports/context/jev-context-regression-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/context/jev-context-regression-20260922.json"
+    },
+    {
+      "path": "verification/reports/explorations/exploration-adoption-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/explorations/exploration-adoption-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/explorations/exploration-projection-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/explorations/exploration-projection-20260922.json"
+    },
+    {
+      "path": "verification/reports/explorations/exploration-projection-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/explorations/exploration-projection-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/explorations/jev-adoption-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/explorations/jev-adoption-20260922.json"
+    },
+    {
+      "path": "verification/reports/explorations/jev-exploration-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/explorations/jev-exploration-20260922.json"
+    },
+    {
+      "path": "verification/reports/graph/graph-store-sqlite-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/graph/graph-store-sqlite-20260922.json"
+    },
+    {
+      "path": "verification/reports/graph/jev-canonical-graph-regression-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/graph/jev-canonical-graph-regression-20260922.json"
+    },
+    {
+      "path": "verification/reports/graph/jev-graph-round-trip-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/graph/jev-graph-round-trip-20260922.json"
+    },
+    {
+      "path": "verification/reports/graph/jev-graph-source-closure-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/graph/jev-graph-source-closure-20260922.json"
+    },
+    {
+      "path": "verification/reports/judge/jev-judge-runtime-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/judge/jev-judge-runtime-20260922.json"
+    },
+    {
+      "path": "verification/reports/judge/judge-runtime-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/judge/judge-runtime-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/project/jev-ingress-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/project/jev-ingress-20260922.json"
+    },
+    {
+      "path": "verification/reports/query/jev-query-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/query/jev-query-20260922.json"
+    },
+    {
+      "path": "verification/reports/query/query-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/query/query-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/report-metadata-v1.json",
+      "current_role": "verification-report-manifest",
+      "intended_destination": "verification/reports/report-metadata-v1.json"
+    },
+    {
+      "path": "verification/reports/sources/canonical-reader-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/sources/canonical-reader-20260922.json"
+    },
+    {
+      "path": "verification/reports/sources/canonical-reader-verification-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/sources/canonical-reader-verification-20260922.json"
+    },
+    {
+      "path": "verification/reports/sources/jev-inflight-source-fence-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/sources/jev-inflight-source-fence-20260922.json"
+    },
+    {
+      "path": "verification/reports/support/jev-edge-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/support/jev-edge-20260922.json"
+    },
+    {
+      "path": "verification/reports/support/jev-edge-timing-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/support/jev-edge-timing-20260922.json"
+    },
+    {
+      "path": "verification/reports/support/jev-invalidation-composition-final-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/support/jev-invalidation-composition-final-20260922.json"
+    },
+    {
+      "path": "verification/reports/support/jev-selected-read-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/support/jev-selected-read-20260922.json"
+    },
+    {
+      "path": "verification/reports/support/jev-synthetic-20260922.json",
+      "current_role": "verification-report",
+      "intended_destination": "verification/reports/support/jev-synthetic-20260922.json"
     }
   ],
   "root_exports": [

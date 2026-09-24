@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { test } from 'node:test';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -6,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { checkRuntimeLayout, inspectRuntimeLayout } from '../../tools/runtime-layout.mjs';
 
 const compareEdges = (left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to);
+const sha256 = value => createHash('sha256').update(value).digest('hex');
 const markdownLinkPattern = /!?\[[^\]\n]*\]\((<[^>\n]+>|[^)\s]+)(?:\s+["'][^"'\n]*["'])?\)/g;
 
 function assertRelativeMarkdownLinksResolve(paths) {
@@ -177,6 +179,103 @@ test('current documentation layout is one exact linked relocation batch', t => {
   const unsettledDocuments = inspectRuntimeLayout().inventory.filter(record =>
     record.current_role === 'documentation-or-report' && record.path !== record.intended_destination);
   assert.deepEqual(unsettledDocuments, []);
+});
+
+test('verification reports form one exact byte-preserving capability batch', t => {
+  const manifestUrl = new URL('../../docs/history/runtime-relocations-v1.json', import.meta.url);
+  const metadataUrl = new URL('../../verification/reports/report-metadata-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl) || !existsSync(metadataUrl)) {
+    t.skip('standalone production verification deliberately excludes report history and measurements');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const metadata = JSON.parse(readFileSync(metadataUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'verification-report-layout');
+  assert.equal(entries.length, 27);
+  assert.deepEqual([...new Set(entries.map(item => item.migration_commit))], [
+    '0126decaf4d6d948cd478657650acdd4770615a6',
+  ]);
+  assert.equal(new Set(entries.map(item => item.old_path)).size, 27);
+  assert.equal(new Set(entries.map(item => item.new_path)).size, 27);
+  assert.deepEqual(Object.fromEntries(['sources', 'context', 'explorations', 'graph', 'support', 'project', 'judge', 'query', 'app']
+    .map(group => [group, entries.filter(item => item.new_path.startsWith(`semantic-runtime/verification/reports/${group}/`)).length])), {
+    sources: 3,
+    context: 4,
+    explorations: 5,
+    graph: 4,
+    support: 5,
+    project: 1,
+    judge: 2,
+    query: 2,
+    app: 1,
+  });
+
+  assert.equal(metadata.schema_version, 1);
+  assert.equal(metadata.report_count, 27);
+  assert.equal(metadata.records.length, 27);
+  assert.deepEqual(metadata.curation_category_counts, {
+    'deterministic-local-measurement': 3,
+    'live-provider-measurement': 16,
+    'local-app-walkthrough': 1,
+    'verification-summary': 7,
+  });
+  assert.deepEqual(metadata.field_status_counts, {
+    command: { recorded: 6, not_recorded: 21 },
+    cwd: { recorded: 0, not_recorded: 27 },
+    input: { recorded: 27, not_recorded: 0 },
+    source_revision: { recorded: 0, not_recorded: 27 },
+    runtime_versions: { recorded: 0, not_recorded: 27 },
+    provider_versions: { recorded: 0, not_recorded: 27 },
+    tested_boundaries: { recorded: 25, not_recorded: 2 },
+    untested_boundaries: { recorded: 12, not_recorded: 15 },
+  });
+  assert.deepEqual(metadata.historical_path_aliases, [{
+    containing_report_path: 'semantic-runtime/verification/reports/context/context-judge-verification-20260922.json',
+    json_pointer: '/live_measurement',
+    historical_path: 'semantic-runtime/docs/measurements/jev-context-bridge-20260922.json',
+    current_report_path: 'semantic-runtime/verification/reports/context/jev-context-bridge-20260922.json',
+    reason: 'preserve-original-bytes-and-map-in-report-metadata',
+  }]);
+
+  const byPath = new Map(metadata.records.map(item => [item.final_report_path, item]));
+  let bytes = 0;
+  for (const entry of entries) {
+    assert.equal(existsSync(new URL(`../../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    const reportUrl = new URL(`../../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url);
+    assert.equal(existsSync(reportUrl), true);
+    const report = readFileSync(reportUrl);
+    const record = byPath.get(entry.new_path);
+    assert.ok(record, entry.new_path);
+    assert.equal(record.original_git_blob, entry.old_blob);
+    assert.equal(record.original_sha256, sha256(report));
+    assert.equal(record.bytes, report.length);
+    bytes += report.length;
+  }
+  assert.equal(bytes, 81153);
+
+  const siblingReferences = [
+    ['context/context-lifecycle-verification-20260922.json', 'live_jev_report'],
+    ['explorations/exploration-adoption-verification-20260922.json', 'live_jev_report'],
+    ['explorations/exploration-projection-verification-20260922.json', 'live_jev_report'],
+    ['judge/judge-runtime-verification-20260922.json', 'live_jev_report'],
+    ['query/query-verification-20260922.json', 'actual_jev', 'report'],
+  ];
+  for (const [path, first, second] of siblingReferences) {
+    const reportUrl = new URL(`../../verification/reports/${path}`, import.meta.url);
+    const report = JSON.parse(readFileSync(reportUrl, 'utf8'));
+    const sibling = second === undefined ? report[first] : report[first][second];
+    assert.equal(existsSync(new URL(sibling, reportUrl)), true, `${path}:${sibling}`);
+  }
+
+  const current = inspectRuntimeLayout();
+  const reportInventory = current.inventory.filter(item => item.path.startsWith('verification/reports/'));
+  assert.equal(reportInventory.length, 28);
+  assert.equal(reportInventory.filter(item => item.current_role === 'verification-report').length, 27);
+  assert.equal(reportInventory.filter(item => item.current_role === 'verification-report-manifest').length, 1);
+  assert.ok(reportInventory.every(item => item.path === item.intended_destination));
+  assert.equal(current.inventory.length, 371);
+  assert.equal(current.inventory_roots.includes('verification/reports'), true);
+  assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
 });
 
 test('Phase 0 replay is one complete research vertical with explicit split lineage', t => {
