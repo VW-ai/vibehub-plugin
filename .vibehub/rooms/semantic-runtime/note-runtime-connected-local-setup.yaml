@@ -4,7 +4,7 @@
   "evidence": [
     {
       "note": "Actual browser observations and explicit proof limits.",
-      "ref": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
+      "ref": "semantic-runtime/verification/reports/app/local-app-setup-20260922.json"
     },
     {
       "note": "Launch and composition, scoped operations, recovery and remaining product work.",
@@ -29,7 +29,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T10:56:53.126Z",
-    "ref": "semantic-runtime/docs/measurements/local-app-setup-20260922.json"
+    "ref": "semantic-runtime/verification/reports/app/local-app-setup-20260922.json"
   },
   "state": "active",
   "summary": "The local setup App now composes real Project enrollment, secure provider settings and activation; live plugins and Workers remain separate",

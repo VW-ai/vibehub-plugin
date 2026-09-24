@@ -171,7 +171,7 @@ private repository or trace is selected. Reports contain only bounded decisions,
 hashes, usage and measurements. Other routes remain recorded-transport tests
 unless separately measured live.
 
-The [2026-09-22 live measurement](../measurements/jev-judge-runtime-20260922.json)
+The [2026-09-22 live measurement](../../verification/reports/judge/jev-judge-runtime-20260922.json)
 used official `jev-1.13.0`: 8/8 expected decisions, eight cache hits without extra
 sends, four explicit candidate writes, and one completed-but-refused result
 after source revocation. Successful model calls took 104–349 ms. This small

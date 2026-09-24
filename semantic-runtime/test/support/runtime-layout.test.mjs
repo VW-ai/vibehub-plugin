@@ -176,8 +176,7 @@ test('current documentation layout is one exact linked relocation batch', t => {
 
   const unsettledDocuments = inspectRuntimeLayout().inventory.filter(record =>
     record.current_role === 'documentation-or-report' && record.path !== record.intended_destination);
-  assert.equal(unsettledDocuments.length, 27);
-  assert.ok(unsettledDocuments.every(record => record.path.startsWith('docs/measurements/')));
+  assert.deepEqual(unsettledDocuments, []);
 });
 
 test('Phase 0 replay is one complete research vertical with explicit split lineage', t => {
@@ -686,7 +685,7 @@ test('layout inspection captures public surface, command modes, constants and an
   assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
   assert.equal(current.standalone_copy_paths.includes('research'), false);
   assert.equal(current.inventory_roots.includes('verification/live'), true);
-  assert.equal(current.inventory_roots.includes('verification/reports'), false);
+  assert.equal(current.inventory_roots.includes('verification/reports'), true);
   const liveVerification = current.inventory.filter(item => item.path.startsWith('verification/live/'));
   if (existsSync(new URL('../../verification/live', import.meta.url))) {
     assert.ok(liveVerification.length > 0);

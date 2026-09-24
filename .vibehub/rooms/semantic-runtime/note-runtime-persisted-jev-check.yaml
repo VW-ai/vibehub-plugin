@@ -8,7 +8,7 @@
     },
     {
       "note": "Safe observed 8/8 actual JEV report, without source bodies or secrets.",
-      "ref": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+      "ref": "semantic-runtime/verification/reports/project/jev-ingress-20260922.json"
     },
     {
       "note": "Two offline tests verify minimal inputs and safe transport/semantic failure reporting.",
@@ -29,7 +29,7 @@
   "schema_version": 1,
   "source": {
     "captured_at": "2026-09-22T09:58:21.357Z",
-    "ref": "semantic-runtime/docs/measurements/jev-ingress-20260922.json"
+    "ref": "semantic-runtime/verification/reports/project/jev-ingress-20260922.json"
   },
   "state": "active",
   "summary": "Approved synthetic snapshot bytes survive local intake and restart before reaching the real JEV adapter",

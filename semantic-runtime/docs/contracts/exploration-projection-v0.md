@@ -137,11 +137,11 @@ probe switches/rebinds the worktree while the fifth call is pending and verifies
 that its result cannot be published under the old binding. This does not
 implement the Policy consumer or certify product-level semantic quality.
 
-The [retained scale measurement](../measurements/exploration-projection-20260922.json)
+The [retained scale measurement](../../verification/reports/explorations/exploration-projection-20260922.json)
 keeps 601 origins, a 600-origin page horizon and at most 32 range rows per page.
-The [live JEV report](../measurements/jev-exploration-20260922.json) records four
+The [live JEV report](../../verification/reports/explorations/jev-exploration-20260922.json) records four
 matching cases and the fifth completed evaluation rejected after rebinding,
 with no retries or rate-limit responses. Its pending evaluation may include
 request pacing; it does not prove the Git switch preceded the provider's exact
 network send. Final suite results are retained in the
-[verification report](../measurements/exploration-projection-verification-20260922.json).
+[verification report](../../verification/reports/explorations/exploration-projection-verification-20260922.json).

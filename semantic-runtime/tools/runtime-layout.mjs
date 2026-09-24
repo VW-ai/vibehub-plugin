@@ -5,7 +5,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parse } from 'acorn';
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'tools', 'test', 'verification/live', 'research', 'policies', 'docs']);
+const INVENTORY_ROOTS = Object.freeze([
+  'src',
+  'scripts',
+  'tools',
+  'test',
+  'verification/live',
+  'verification/reports',
+  'research',
+  'policies',
+  'docs',
+]);
 const ROOT_INVENTORY_EXCLUDES = new Set(['.env.local']);
 const BASELINE_PATH = 'docs/architecture/runtime-layout-baseline-v1.json';
 
@@ -155,7 +165,10 @@ function documentDestination(path) {
       const host = basename.includes('codex') ? 'codex' : 'claude';
       return `research/host-probes/${host}/reports/${basename}`;
     }
-    return `verification/reports/${capabilityFromName(path)}/${basename}`;
+    const capability = basename === 'jev-adoption-20260922.json'
+      ? 'explorations'
+      : capabilityFromName(path);
+    return `verification/reports/${capability}/${basename}`;
   }
   if (basename === '01_thought_log_semantic_runtime.md') return `docs/history/${basename}`;
   if (['02_prd_vibehub_semantic_runtime.md', 'online-delivery-plan.md'].includes(basename)) return `docs/product/${basename}`;
@@ -185,6 +198,15 @@ function inventoryRecord(path) {
   if (path.startsWith('tools/')) return { path, current_role: 'governance-tool', intended_destination: path };
   if (path.startsWith('test/')) return { path, current_role: 'test-or-fixture', intended_destination: testDestination(path) };
   if (path.startsWith('verification/live/')) return { path, current_role: 'live-verification', intended_destination: path };
+  if (path.startsWith('verification/reports/')) {
+    return {
+      path,
+      current_role: path === 'verification/reports/report-metadata-v1.json'
+        ? 'verification-report-manifest'
+        : 'verification-report',
+      intended_destination: path,
+    };
+  }
   if (path.startsWith('research/ux/')) return { path, current_role: 'ux-research', intended_destination: path };
   if (path.startsWith('research/platform/')) return { path, current_role: 'platform-research', intended_destination: path };
   if (path.startsWith('research/host-probes/')) return { path, current_role: 'host-research', intended_destination: path };

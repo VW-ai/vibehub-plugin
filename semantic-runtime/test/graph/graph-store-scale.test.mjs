@@ -84,6 +84,6 @@ test('real SQLite retains1040 transitions/600 objects with bounded indexed reads
   assert(maxPlanBytes <= 1048576 && maxPageBytes <= 1048576 && afterRepair.max_bytes <= 1048576);
   // Fixed support does not make late requests scan the accumulated semantic log.
   assert.equal(samples[3].queries, samples[5].queries); assert.equal(samples[3].rows, samples[5].rows);
-  if (process.env.VH_WRITE_GRAPH_STORE_MEASUREMENT === '1') writeFileSync(new URL('../../docs/measurements/graph-store-sqlite-20260922.json', import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
+  if (process.env.VH_WRITE_GRAPH_STORE_MEASUREMENT === '1') writeFileSync(new URL('../../verification/reports/graph/graph-store-sqlite-20260922.json', import.meta.url), `${JSON.stringify(report, null, 2)}\n`);
   t.diagnostic(JSON.stringify(report));
 });

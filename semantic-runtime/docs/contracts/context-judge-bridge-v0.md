@@ -121,7 +121,7 @@ with no expected model label. Missing credentials, mismatches or incomplete
 responses cannot count as a successful live check. No ordinary test, constructor
 or verification command reads a credential or makes a live model call.
 
-The [2026-09-22 measurement](../measurements/jev-context-bridge-20260922.json) used
+The [2026-09-22 measurement](../../verification/reports/context/jev-context-bridge-20260922.json) used
 official `jev-1.13.0`: three of three expected labels, three cache hits with no
 extra sends, and the completed fourth response discarded after revocation.
 The three model calls took 159–287 ms; observed cost was unavailable. This fixed

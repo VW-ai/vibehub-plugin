@@ -1,0 +1,2460 @@
+{
+  "schema_version": 1,
+  "report_count": 27,
+  "curation_category_counts": {
+    "deterministic-local-measurement": 3,
+    "live-provider-measurement": 16,
+    "local-app-walkthrough": 1,
+    "verification-summary": 7
+  },
+  "field_status_counts": {
+    "command": {
+      "recorded": 6,
+      "not_recorded": 21
+    },
+    "cwd": {
+      "recorded": 0,
+      "not_recorded": 27
+    },
+    "input": {
+      "recorded": 27,
+      "not_recorded": 0
+    },
+    "source_revision": {
+      "recorded": 0,
+      "not_recorded": 27
+    },
+    "runtime_versions": {
+      "recorded": 0,
+      "not_recorded": 27
+    },
+    "provider_versions": {
+      "recorded": 0,
+      "not_recorded": 27
+    },
+    "tested_boundaries": {
+      "recorded": 25,
+      "not_recorded": 2
+    },
+    "untested_boundaries": {
+      "recorded": 12,
+      "not_recorded": 15
+    }
+  },
+  "extraction_policy": {
+    "evidence_only": true,
+    "missing_value_status": "not_recorded",
+    "no_textual_inference": true,
+    "pointer_key_allowlists": {
+      "command": [
+        "command"
+      ],
+      "cwd": [
+        "cwd",
+        "workdir",
+        "working_directory"
+      ],
+      "input": [
+        "capability",
+        "data",
+        "dataset",
+        "scope"
+      ],
+      "source_revision": [
+        "git_revision",
+        "git_sha",
+        "head_commit",
+        "source_revision"
+      ],
+      "runtime_versions": [
+        "ai_sdk_version",
+        "node_version",
+        "runtime_version",
+        "sdk_version"
+      ],
+      "provider_versions": [
+        "model_version",
+        "provider_version"
+      ],
+      "tested_boundaries": [
+        "actual_jev",
+        "affected",
+        "boundaries",
+        "completed",
+        "focused_query",
+        "full",
+        "git_adapter",
+        "graph",
+        "graph_round_trip",
+        "graph_unchanged",
+        "independent_review",
+        "inflight_revocation",
+        "ingress",
+        "matched",
+        "passed",
+        "plugin_artifact",
+        "reader",
+        "recovery",
+        "result_publication",
+        "results",
+        "routing",
+        "runtime_verify",
+        "selected_bounds",
+        "source_fence",
+        "standalone",
+        "verification_correction"
+      ],
+      "untested_boundaries": [
+        "embeddings",
+        "global_recall",
+        "limitations",
+        "limits",
+        "live_boundary",
+        "note",
+        "skip_reason",
+        "skipped_tests",
+        "skips",
+        "verification_note"
+      ]
+    },
+    "note": "Pointers identify fields actually present in original report bytes. They do not infer commands, revisions, versions, providers, working directories, tested scope, or limitations from filenames, current code, prose, or migration time."
+  },
+  "records": [
+    {
+      "final_report_path": "semantic-runtime/verification/reports/sources/canonical-reader-20260922.json",
+      "curation_category": "deterministic-local-measurement",
+      "original_git_blob": "c935d9d8c66ab048e657d5e1070db8e13c8fc849",
+      "original_sha256": "88f0ed992cfd87d85f194c3d0f388b2ec6074e509d7da541c8c8a47c2119d77c",
+      "bytes": 3996,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/reader",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/git_adapter",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/git_adapter/limits",
+            "value_type": "object"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/sources/canonical-reader-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "f6bf7e41a6c6d7c0f2169b5b1954dd8ca2e9e663",
+      "original_sha256": "9d4ccc24927c5b6698bb042ac0accba2f66c27bcdae71dec34ee8134a6d958eb",
+      "bytes": 1436,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/affected/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/affected",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/affected/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/full/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/skipped_tests",
+            "value_type": "array"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/context/context-judge-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "badfd224f2cc60dfba814fca95d4a9a872566841",
+      "original_sha256": "742ca6e13ba3a857de77c27266949e0a172170a19ddad731e6650bc19640a1fd",
+      "bytes": 2434,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/verification_correction",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/live_summary/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/passed",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/skips",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/limits",
+            "value_type": "array"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/context/context-lifecycle-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "cce0f3c2b4c2cd3c0b687e440e86a71927fedcd9",
+      "original_sha256": "3e2bbae4524fd44a6ae5a04e502a44b25f43cb5b7567d1bcce60967f648e262f",
+      "bytes": 2502,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/full/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/recovery",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/selected_bounds",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/verification_note",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/live_boundary",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/explorations/exploration-adoption-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "597f5f60c77298b43adbfc57357ec432e9caceb8",
+      "original_sha256": "c63a22374ca695acf810afd9d57ebfe08e8d02cc3627dea641b485ca4e181668",
+      "bytes": 2107,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/full/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/new_focused_cases/recovery",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/new_focused_cases/independent_review",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/verification_note",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/explorations/exploration-projection-20260922.json",
+      "curation_category": "deterministic-local-measurement",
+      "original_git_blob": "25003f188a8ed67ad4f59ea7f346c1fb10aa709f",
+      "original_sha256": "d3400ef40b9e447aa7ac340ca731b4403eb74d4f097d1414d8a6f48f3876c904",
+      "bytes": 1830,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/note",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/explorations/exploration-projection-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "a0858512514522934a02c8baa387da08e9395fc8",
+      "original_sha256": "f2ffa73d6ba3016057143664172fd5d1c49f865e4a3c24a78935ca21cc65d75e",
+      "bytes": 1944,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/affected/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/affected",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/affected/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/full/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/verification_note",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/graph/graph-store-sqlite-20260922.json",
+      "curation_category": "deterministic-local-measurement",
+      "original_git_blob": "5f4df0f4247c35e87958df63484a845ee3f3c45c",
+      "original_sha256": "58a53bef0c1dc63c4bbac34398ce6f43c55a9e98a193cd6a0298901c2ca7e110",
+      "bytes": 2059,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/note",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/explorations/jev-adoption-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "98290a6989f5c41f4892c4c974efeb76500755f5",
+      "original_sha256": "1179036e4a0458e2912658ff8cb731dd1f42c63767be6912ac9df630e98a299a",
+      "bytes": 2323,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/results",
+            "value_type": "array"
+          },
+          {
+            "pointer": "/results/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/3/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/graph/jev-canonical-graph-regression-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "d7e190633968536f9500469ab7d475cba4101063",
+      "original_sha256": "a8b9dcf2e7793c1d41d129182d7b12732989c718a9226879d283e0057aae75f9",
+      "bytes": 4871,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/graph_round_trip/dataset",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/inflight_revocation/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/graph_round_trip",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/graph_round_trip/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/graph_round_trip/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/graph",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/graph_round_trip/ingress",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/inflight_revocation",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/inflight_revocation/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/inflight_revocation/result_publication",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/inflight_revocation/graph_unchanged",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/context/jev-context-bridge-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "d8f7a59e62494b8b1e81d09410fbdaf2fd33134c",
+      "original_sha256": "884439c6b051d6cf19cb83c319bd4622de19eeaa3f80981c68be81330365b4ab",
+      "bytes": 6699,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/results/0/selected_ref/scope",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/results/1/selected_ref/scope",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/results/2/selected_ref/scope",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/results/3/selected_ref/scope",
+            "value_type": "object"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results",
+            "value_type": "array"
+          },
+          {
+            "pointer": "/results/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/2/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/context/jev-context-regression-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "15c2bfdc32e5379ec30550c1c80ee6aff7e577b7",
+      "original_sha256": "55b2a25d848056f220028d700864ceb8c2497e296cd32a1599ea61fe5dc272e9",
+      "bytes": 2323,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/results",
+            "value_type": "array"
+          },
+          {
+            "pointer": "/results/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/3/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/support/jev-edge-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "44e27698d4ef69befcda945d9bc3022f306b6601",
+      "original_sha256": "53a56482c88459cb26d614f26a63c1c545cd6ed6376bdf2686d8bb67071fde93",
+      "bytes": 2886,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/support/jev-edge-timing-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "5c01aa7af8667a838746270a9ec8c1aa05ce0dcb",
+      "original_sha256": "dbac17a33ce925066756c941d86af39773e7a80087fd811c8a271816ed0656a8",
+      "bytes": 3174,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/explorations/jev-exploration-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "2fe827cd1c9ede54441e67f052d6c91799fab17c",
+      "original_sha256": "41c473a3220c269702293126aec9971b31a72cd6fedc794d75ee8b256ce6a484",
+      "bytes": 2459,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/routing",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/graph/jev-graph-round-trip-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "a4ce7d980d1745a7bc48ca7c641c5a7f534f3426",
+      "original_sha256": "6d56ab044bb32661a4945e8f326d476557b09ae262b652b43a5da8ee3a70b45f",
+      "bytes": 3643,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/graph/jev-graph-source-closure-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "8da8cbcc51e8d8454b4f9e56c4951a1a1df5757f",
+      "original_sha256": "c835daa90fdec8585a44f4cdfed2570c3732a9d20766c2f7cd08ab08068101ea",
+      "bytes": 3692,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/sources/jev-inflight-source-fence-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "1ce0e52ad4e6b1b8352d63795c0e0361ae6247a6",
+      "original_sha256": "1d248196237f0fcae86c3b543f065253f3d3afcefbe3a8ef437e509c810549ac",
+      "bytes": 582,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/result_publication",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/graph_unchanged",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/project/jev-ingress-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "d594a0ab6573624ae023fbfbd050828b4a0c999e",
+      "original_sha256": "8f6d16d1d67814fe7aaa0d3e10284821737cca9fabfbecd6349f0958f9c32b42",
+      "bytes": 3356,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/support/jev-invalidation-composition-final-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "c13e6a8ebc1b5c94e3745794b271e7d693bf659e",
+      "original_sha256": "dcb0d85f2d862f6a20fc105a1c327f8c575f8fe2e8e60fa54b610265f3017d9a",
+      "bytes": 4748,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/source_fence/dataset",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/graph_round_trip/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/source_fence",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/source_fence/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/source_fence/result_publication",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/source_fence/graph_unchanged",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/graph_round_trip/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/graph_round_trip/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/graph_round_trip/graph",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/graph_round_trip/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/judge/jev-judge-runtime-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "9bb98839c89ec1658d4de1aa4cbebb0a3142b2a9",
+      "original_sha256": "267b977fcf48403261b7869bcf1c3fb6ee076c177c069b9d5882d2884bee39c7",
+      "bytes": 5905,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/inflight_revocation",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/inflight_revocation/graph_unchanged",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results",
+            "value_type": "array"
+          },
+          {
+            "pointer": "/results/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/7/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/query/jev-query-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "7839290e07180459034fb20316ea722768c7ec73",
+      "original_sha256": "1cf1f4a63852fafed666f4abc32ac10d55014c753baf70cf69f2c6ff8ad2e4a1",
+      "bytes": 2362,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results",
+            "value_type": "array"
+          },
+          {
+            "pointer": "/results/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/results/1/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/global_recall",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/embeddings",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/support/jev-selected-read-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "f6555fca980647ba1e61d534d4c11ed76d7ae8cc",
+      "original_sha256": "12646d2dd6d91ce7af990eb75668ea1af3b5d8351e9917668709954bd7154431",
+      "bytes": 3388,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/ingress",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/support/jev-synthetic-20260922.json",
+      "curation_category": "live-provider-measurement",
+      "original_git_blob": "44dcce7574ec0ee0fd00804dcdd8f3b0b0534c68",
+      "original_sha256": "3f739941d873fd1a0b5cdda85b80d25a602c101d7d9ee2eb19e66d7514c4cbd5",
+      "bytes": 2588,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/dataset",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/completed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/rows/0/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/1/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/2/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/3/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/4/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/5/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/6/matched",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/rows/7/matched",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "not_recorded",
+        "json_pointers": []
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/judge/judge-runtime-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "047a1d9a39448e3907f38f59beecda270ea0ab52",
+      "original_sha256": "27a02c9786b0c1e3a01509ff2efc6d58f4fa2aa42dadfe7d0ea352abb9bf55cf",
+      "bytes": 2304,
+      "command": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/standalone/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/affected_before_final_additions/command",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/plugin_artifact/command",
+            "value_type": "string"
+          }
+        ]
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/scope",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/full",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/full/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/standalone/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/boundaries",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/affected_before_final_additions/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/skip_reason",
+            "value_type": "string"
+          },
+          {
+            "pointer": "/verification_note",
+            "value_type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/app/local-app-setup-20260922.json",
+      "curation_category": "local-app-walkthrough",
+      "original_git_blob": "7db1a452a90527bcc925ca749820c7f654a85241",
+      "original_sha256": "87955ded678a7a5fa8e919b3f89cf51142cb9de2710583a2f7abda71f860b428",
+      "bytes": 3997,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/data",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/results",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/limits",
+            "value_type": "array"
+          }
+        ]
+      }
+    },
+    {
+      "final_report_path": "semantic-runtime/verification/reports/query/query-verification-20260922.json",
+      "curation_category": "verification-summary",
+      "original_git_blob": "3e34a8c8ebce4bd8ac8e70bb0ed36385d46eb7aa",
+      "original_sha256": "ba41ea1130caf372de8a191ec1014d8c651bd4f191e6857dea484a0cc2cdebfd",
+      "bytes": 1545,
+      "command": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "cwd": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "input": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/capability",
+            "value_type": "string"
+          }
+        ]
+      },
+      "source_revision": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "runtime_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "provider_versions": {
+        "status": "not_recorded",
+        "json_pointers": []
+      },
+      "tested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/focused_query",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/focused_query/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/runtime_verify",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/runtime_verify/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/standalone_verify/passed",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/plugin_artifact",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/plugin_artifact/passed",
+            "value_type": "boolean"
+          },
+          {
+            "pointer": "/actual_jev",
+            "value_type": "object"
+          },
+          {
+            "pointer": "/actual_jev/matched",
+            "value_type": "number"
+          },
+          {
+            "pointer": "/independent_review",
+            "value_type": "object"
+          }
+        ]
+      },
+      "untested_boundaries": {
+        "status": "recorded",
+        "json_pointers": [
+          {
+            "pointer": "/limitations",
+            "value_type": "array"
+          }
+        ]
+      }
+    }
+  ],
+  "historical_path_aliases": [
+    {
+      "containing_report_path": "semantic-runtime/verification/reports/context/context-judge-verification-20260922.json",
+      "json_pointer": "/live_measurement",
+      "historical_path": "semantic-runtime/docs/measurements/jev-context-bridge-20260922.json",
+      "current_report_path": "semantic-runtime/verification/reports/context/jev-context-bridge-20260922.json",
+      "reason": "preserve-original-bytes-and-map-in-report-metadata"
+    }
+  ]
+}

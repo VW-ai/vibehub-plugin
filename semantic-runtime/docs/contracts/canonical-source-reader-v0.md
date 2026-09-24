@@ -175,7 +175,7 @@ serialization bound `invalid_store_input`. No content is truncated; no failed
 Graph/storage transaction publishes a partial selection. Successful refresh returns actual selected-read counts
 and timings, not a service-wide performance guarantee.
 
-The [local synthetic measurement](../measurements/canonical-reader-20260922.json)
+The [local synthetic measurement](../../verification/reports/sources/canonical-reader-20260922.json)
 read eight records with 38 Git commands, eight blobs and three trees, both before
 and after adding 1,000 unrelated files. Refresh took 532–611 ms in these two
 samples. Restarted exact retry took 84–88 ms with the checkout removed; the eight

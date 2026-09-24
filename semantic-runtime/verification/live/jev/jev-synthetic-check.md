@@ -54,25 +54,25 @@ No retry, rate-limit or transient-failure response was observed. Per-case total
 elapsed time was 335–550 ms, including pacing wait; accumulated pacing wait was
 2206 ms. These times are not isolated model latency or a load-test SLO.
 
-The checked-in [safe report](../../../docs/measurements/jev-synthetic-20260922.json) contains no
+The checked-in [safe report](../../reports/support/jev-synthetic-20260922.json) contains no
 credential or project trace. The run used the previously authorized TypeSafe
 Keychain entry in a private local launcher; its bytes were passed only through
 process memory/environment and never surfaced to the conversation or report.
 The launcher is outside the repository and is not a product credential solution.
 
-The [edge report](../../../docs/measurements/jev-edge-20260922.json) records a second actual
+The [edge report](../../reports/support/jev-edge-20260922.json) records a second actual
 eight-request run: 8 completed and matched (including exact target associations),
 no retries or observed rate limits, 226–555 ms including 2271 ms accumulated
 pacing wait. This one quoted-instruction example does not establish resistance
 to prompt injection; authorization still depends on deterministic checks.
 
-A [third run with separate timing](../../../docs/measurements/jev-edge-timing-20260922.json)
+A [third run with separate timing](../../reports/support/jev-edge-timing-20260922.json)
 verified the explicitly pinned TypeSafe origin and repeated all eight edge cases:
 8/8 matched, no retry or rate-limit response. Successful adapter requests took
 141–505 ms; whole cases took 308–526 ms, with 1769 ms total pacing. Together the
 three runs comprise 24 actual decisions, not a concurrency/load measurement.
 
-The [persisted-input run](../../../docs/measurements/jev-ingress-20260922.json) then exercised
+The [persisted-input run](../../reports/project/jev-ingress-20260922.json) then exercised
 the real temporary intake/reopen/read path: all eight snapshots persisted and
 materialized, eight retries recovered their original receipts, and all eight
 JEV decisions matched the same edge expectations. The requested `jev-latest`
