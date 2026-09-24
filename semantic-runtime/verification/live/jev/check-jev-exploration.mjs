@@ -2,11 +2,11 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
-import { DurableIngress, TypeSafeJevJudge, verifyEventPayload } from '../src/index.mjs';
-import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
-import { canonical, validateDecision } from '../src/domain/shared/contracts.mjs';
+import { DurableIngress, TypeSafeJevJudge, verifyEventPayload } from '../../../src/index.mjs';
+import { ResilientJudge } from '../../../src/adapters/providers/resilient-judge.mjs';
+import { canonical, validateDecision } from '../../../src/domain/shared/contracts.mjs';
 import { edgeCases } from './check-jev-synthetic.mjs';
-import { fixture, bind, executionFor, git, register, rows } from '../test/helpers/exploration-fixture.mjs';
+import { fixture, bind, executionFor, git, register, rows } from '../../../test/helpers/exploration-fixture.mjs';
 
 // These four existing synthetic cases are the complete source allowlist. Local
 // labels never determine which target text enters a Graph or the model input.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkSyntheticJev, cases, edgeCases } from '../scripts/check-jev-synthetic.mjs';
+import { checkSyntheticJev, cases, edgeCases } from '../check-jev-synthetic.mjs';
 
 test('synthetic live check keeps labels local and records semantic misses separately from transport failure', async () => {
   let calls = 0;

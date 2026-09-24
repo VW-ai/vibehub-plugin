@@ -82,7 +82,7 @@ it does not connect to the Runtime or accept real credentials.
 
 For a small real JEV check, run `npm run check:jev:synthetic` with the TypeSafe key
 configured locally; add `-- edge` for the targeted edge suite.
-[Inputs, results and limits](docs/jev-synthetic-check.md).
+[Inputs, results and limits](verification/live/jev/jev-synthetic-check.md).
 
 `npm run check:jev:ingress` additionally verifies that approved synthetic text
 survives actual local intake, SQLite reopen and retry before being read back
@@ -99,6 +99,7 @@ development dependency for boundary checks.
 ```sh
 cd semantic-runtime
 npm ci --ignore-scripts
+npm run test:live:jev:offline
 npm run verify
 npm run verify:standalone
 npm run replay -- --events research/phase0-replay/fixtures/synthetic/events.jsonl \
@@ -384,7 +385,9 @@ to connect two components that happen to share a repository.
 - `src/core/`: host- and provider-independent policy, semantic state, and context logic.
 - `src/adapters/`: host, model, storage, and Git/source integrations.
 - `test/`: Runtime tests and intentionally selected fixtures.
-- `scripts/`: Runtime development and replay tools.
+- `scripts/`: Repository maintenance, layout, boundary, and standalone-verification tools.
+- `verification/live/`: Explicit live-provider runners, their offline contract
+  harnesses, and operator guides.
 - `docs/`: product and architecture documents.
 
 The core owns its interfaces; adapters implement them. Core code must not import

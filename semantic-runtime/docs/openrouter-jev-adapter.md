@@ -37,7 +37,7 @@ npm run smoke:jev:openrouter
 ```
 
 If already stored in the ignored `.env.local`, run Node with
-`--env-file=.env.local scripts/smoke-openrouter-jev.mjs`. Do not paste the key into
+`--env-file=.env.local verification/live/jev/smoke-openrouter-jev.mjs`. Do not paste the key into
 chat, print it, put it on a command argument or commit it. The smoke uses one
 fixed synthetic decision, sends no project trace and reports only the validated
 decision, latency and bounded telemetry. It makes one attempt with a deadline.

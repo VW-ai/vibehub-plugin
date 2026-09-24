@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parse } from 'acorn';
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'research', 'policies', 'docs']);
+const INVENTORY_ROOTS = Object.freeze(['src', 'scripts', 'test', 'verification/live', 'research', 'policies', 'docs']);
 const ROOT_INVENTORY_EXCLUDES = new Set(['.env.local']);
 const BASELINE_PATH = 'docs/architecture/runtime-layout-baseline-v1.json';
 
@@ -15,6 +15,7 @@ export const STANDALONE_COPY_PATHS = Object.freeze([
   'src',
   'scripts',
   'test',
+  'verification/live',
   BASELINE_PATH,
 ]);
 
@@ -179,6 +180,7 @@ function inventoryRecord(path) {
   if (path.startsWith('src/')) return { path, current_role: 'production', intended_destination: sourceDestination(path) };
   if (path.startsWith('scripts/')) return { path, current_role: 'tooling-or-runner', intended_destination: scriptDestination(path) };
   if (path.startsWith('test/')) return { path, current_role: 'test-or-fixture', intended_destination: testDestination(path) };
+  if (path.startsWith('verification/live/')) return { path, current_role: 'live-verification', intended_destination: path };
   if (path.startsWith('research/ux/')) return { path, current_role: 'ux-research', intended_destination: path };
   if (path.startsWith('research/platform/')) return { path, current_role: 'platform-research', intended_destination: path };
   if (path.startsWith('research/host-probes/')) return { path, current_role: 'host-research', intended_destination: path };

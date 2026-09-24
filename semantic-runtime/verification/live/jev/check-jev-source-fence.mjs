@@ -5,8 +5,8 @@ import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIENCE, scopedReference,
-  GitProjectRegistry, ProjectActivation, DurableIngress, LocalGraphStore, TypeSafeJevJudge } from '../src/index.mjs';
-import { validateDecision, canonical } from '../src/domain/shared/contracts.mjs';
+  GitProjectRegistry, ProjectActivation, DurableIngress, LocalGraphStore, TypeSafeJevJudge } from '../../../src/index.mjs';
+import { validateDecision, canonical } from '../../../src/domain/shared/contracts.mjs';
 import { cases } from './check-jev-synthetic.mjs';
 
 const scope = { tenant_id: 'synthetic', project_id: 'jev-source-fence' };

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkExplorationJev } from '../scripts/check-jev-exploration.mjs';
-import { edgeCases } from '../scripts/check-jev-synthetic.mjs';
-import { DomainStore, LocalExplorationStore } from '../src/index.mjs';
+import { checkExplorationJev } from '../check-jev-exploration.mjs';
+import { edgeCases } from '../check-jev-synthetic.mjs';
+import { DomainStore, LocalExplorationStore } from '../../../../src/index.mjs';
 
 const decision = entry => ({ value: { relevant: entry[4], target_ids: entry[5] }, confidence: 0.9,
   latency_ms: 1, provider: 'synthetic', model: 'fixture', reason_code: 'synthetic' });

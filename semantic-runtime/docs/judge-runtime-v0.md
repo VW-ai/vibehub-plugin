@@ -156,7 +156,7 @@ handler contract. It does not manufacture a legacy Graph snapshot.
 
 ## Verification
 
-`node --test test/judge-*.test.mjs test/jev-judge-check.test.mjs` exercises actual
+`node --test test/judge-*.test.mjs verification/live/jev/test/jev-judge-check.test.mjs` exercises actual
 local stores, actual SDK request/response shapes with recorded transport, and
 negative authorization/race/failure paths. The existing Policy kernel tests
 continue to prove the legacy full-run exclusion.

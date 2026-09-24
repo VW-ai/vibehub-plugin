@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkPersistedJev } from '../scripts/check-jev-ingress.mjs';
-import { edgeCases } from '../scripts/check-jev-synthetic.mjs';
-import { DomainStore, LocalGraphStore } from '../src/index.mjs';
+import { checkPersistedJev } from '../check-jev-ingress.mjs';
+import { edgeCases } from '../check-jev-synthetic.mjs';
+import { DomainStore, LocalGraphStore } from '../../../../src/index.mjs';
 
 test('persisted JEV smoke reopens approved bytes, deduplicates intake and sends only minimal synthetic input', async t => {
   let calls = 0, activeSnapshot = false, snapshots = 0;

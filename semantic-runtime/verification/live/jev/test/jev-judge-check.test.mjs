@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkJudgeJev } from '../scripts/check-jev-judge.mjs';
-import { cases } from '../scripts/check-jev-synthetic.mjs';
-import { judgeResponse } from './helpers/judge-runtime-fixture.mjs';
+import { checkJudgeJev } from '../check-jev-judge.mjs';
+import { cases } from '../check-jev-synthetic.mjs';
+import { judgeResponse } from '../../../../test/helpers/judge-runtime-fixture.mjs';
 
 test('synthetic Judge service check uses all four families, isolated views, cache and actual-send revocation', async t => {
   let calls = 0;

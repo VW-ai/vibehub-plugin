@@ -10,7 +10,7 @@ const compareEdges = (left, right) => left.from.localeCompare(right.from) || lef
 function copyComponent(t) {
   const root = mkdtempSync(join(tmpdir(), 'semantic-layout-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'src', 'scripts', 'test', 'research', 'policies', 'docs']) {
+  for (const path of ['.env.example', '.gitignore', 'AGENTS.md', 'README.md', 'package.json', 'package-lock.json', 'src', 'scripts', 'test', 'verification/live', 'research', 'policies', 'docs']) {
     const source = new URL(`../${path}`, import.meta.url);
     if (existsSync(source)) cpSync(source, join(root, path), { recursive: true });
   }
@@ -501,6 +501,17 @@ test('layout inspection captures public surface, command modes, constants and an
     assert.equal(gatewayExample, undefined);
   }
   assert.equal(current.standalone_copy_paths.includes('index.ts'), false);
+  assert.equal(current.standalone_copy_paths.includes('verification/live'), true);
+  assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
+  assert.equal(current.standalone_copy_paths.includes('research'), false);
+  assert.equal(current.inventory_roots.includes('verification/live'), true);
+  assert.equal(current.inventory_roots.includes('verification/reports'), false);
+  const liveVerification = current.inventory.filter(item => item.path.startsWith('verification/live/'));
+  if (existsSync(new URL('../verification/live', import.meta.url))) {
+    assert.ok(liveVerification.length > 0);
+    assert.ok(liveVerification.every(item => item.current_role === 'live-verification'
+      && item.intended_destination === item.path));
+  }
   assert.deepEqual(current.production_sccs, []);
   assert.ok(current.production_import_edges.some(edge =>
     edge.from === 'src/app/local/cli.mjs' && edge.to === 'src/app/local/service.mjs'));

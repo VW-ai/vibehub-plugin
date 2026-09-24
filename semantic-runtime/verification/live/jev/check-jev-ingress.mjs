@@ -7,9 +7,9 @@ import { TypeSafeClient } from '@typesafe-ai/sdk';
 import { DomainStore, migrateDomainStore, LocalCredentialAuthority, LOCAL_AUDIENCE,
   scopedReference, GitProjectRegistry, ProjectActivation, ACTIVATION_NAMESPACE,
   GIT_ENROLLMENT_NAMESPACE, DurableIngress, INGRESS_NAMESPACE, SOURCE_INVALIDATION_NAMESPACE,
-  verifyEventPayload, TypeSafeJevJudge, LocalGraphStore, WORKING_GRAPH_NAMESPACE } from '../src/index.mjs';
-import { validateDecision, canonical } from '../src/domain/shared/contracts.mjs';
-import { ResilientJudge } from '../src/adapters/providers/resilient-judge.mjs';
+  verifyEventPayload, TypeSafeJevJudge, LocalGraphStore, WORKING_GRAPH_NAMESPACE } from '../../../src/index.mjs';
+import { validateDecision, canonical } from '../../../src/domain/shared/contracts.mjs';
+import { ResilientJudge } from '../../../src/adapters/providers/resilient-judge.mjs';
 import { checkSyntheticJev, edgeCases } from './check-jev-synthetic.mjs';
 
 const digest = text => `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;

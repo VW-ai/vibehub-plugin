@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
-import { checkJevSourceFence } from '../scripts/check-jev-source-fence.mjs';
-import { DomainStore } from '../src/index.mjs';
+import { checkJevSourceFence } from '../check-jev-source-fence.mjs';
+import { DomainStore } from '../../../../src/index.mjs';
 
 test('a completed judgment cannot publish using a parent revoked while its model call was outstanding', async t => {
   let views = 0, calls = 0;

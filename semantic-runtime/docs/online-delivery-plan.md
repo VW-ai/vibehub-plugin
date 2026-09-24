@@ -49,7 +49,7 @@ synthetic smoke succeeds. [Adapter contract and smoke](openrouter-jev-adapter.md
 Local foundation checkpoint 2026-09-22 adds scoped local authentication,
 provider/Keychain settings and pure exploration/worktree scope contracts. These
 are modules awaiting App composition; there is no project picker or activation
-UI yet. The [real synthetic JEV check](jev-synthetic-check.md) completed 8/8 cases
+UI yet. The [real synthetic JEV check](../verification/live/jev/jev-synthetic-check.md) completed 8/8 cases
 through TypeSafe with 8/8 expected classifications and no observed rate limit.
 It is a basic route check, not evidence of nuanced semantic quality.
 The additional JEV edge suite completed another 8/8 matching cases, including

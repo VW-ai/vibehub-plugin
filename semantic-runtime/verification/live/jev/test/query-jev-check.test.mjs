@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkQueryJev, QUERY_JEV_CASES } from '../scripts/check-jev-query.mjs';
-import { judgeResponse } from './helpers/judge-runtime-fixture.mjs';
+import { checkQueryJev, QUERY_JEV_CASES } from '../check-jev-query.mjs';
+import { judgeResponse } from '../../../../test/helpers/judge-runtime-fixture.mjs';
 
 for (const mode of ['matched', 'mismatched']) test(`two-call Query JEV checker reports ${mode} honestly`, async t => {
   let calls = 0;
