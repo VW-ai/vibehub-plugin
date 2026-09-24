@@ -1,0 +1,129 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "live-jev-verification-vertical-is-exact",
+      "criterion": "Exactly eleven scripts/check-jev-* or scripts/smoke-* runners move to verification/live/jev, exactly eight checker-contract tests move to verification/live/jev/test, and docs/jev-synthetic-check.md moves to verification/live/jev: twenty unique old paths are absent and twenty unique destinations are present, with no shim or duplicate. The nine shared product-test helpers, all provider/runtime product tests, every measurement report and all research files remain at their existing paths.",
+      "identity": "sha256:cab3f572fa53c59150fd68f488677a92c8a0cd9026a629544e5ca735b6b14a87",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "live-jev-commands-and-offline-contracts-are-preserved",
+      "criterion": "The twelve existing package command names smoke:jev, smoke:jev:direct, smoke:jev:openrouter, check:jev:synthetic, check:jev:ingress, check:jev:graph, check:jev:source-fence, check:jev:exploration, check:jev:judge, check:jev:adoption, check:jev:context and check:jev:query point to the relocated runners with the same arguments, environment-loading behavior, credential names, models, minimized inputs, redaction, failure classification and explicit-live mode. A dedicated offline live-verification target runs the same eight moved test files and seventeen assertions with intercepted transports, and ordinary npm test plus full npm run verify retain that coverage without any provider call.",
+      "identity": "sha256:52d8ca507d1bc2bcd0107e49e359248780945c7fd942a8b051dd48e2790b6d12",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "live-jev-relocation-is-traceable",
+      "criterion": "The append-only relocation manifest records exactly the twenty old/new paths, original Git blobs, one actual migration commit and one live-jev-verification category. Current README, package commands and product/contract documentation resolve the relocated guide and runner paths; historical completed Tickets, Evidence, Outcomes and Context remain unchanged. No report, response, credential or ignored local artifact is regenerated, moved, copied or committed.",
+      "identity": "sha256:cc8950939ff39a8bbf40f791307ea9cd863b96b94c3733992887aa154b879f04",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "full-and-standalone-verification-remain-honest",
+      "criterion": "Runtime layout inventory recognizes settled verification/live paths and scans them in the full checkout; production src imports no verification module; the layout baseline and repository-aware relocation test describe the twenty-file move with zero production SCCs, zero direction exceptions and zero boundary errors. Standalone copying includes verification/live so all installed live command targets exist, excludes reports and research, and exercises the moved offline contract tests through npm test. Focused harness/layout/boundary checks, full verification, locked standalone verification, root plugin artifact verification, VibeHub project/Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking pass without reading credentials or calling a provider.",
+      "identity": "sha256:1ec1b628257ff7748418a837f001a239a480da40317cc254d3cc694f007f6832",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "live-jev-extraction-calibrates-before-expanding",
+      "criterion": "Before broad verification, execution records a visible planned-versus-actual checkpoint for exactly eleven runners, eight harness tests, one guide, twelve preserved command names and seventeen preserved offline assertions. Any report move, product adapter/runtime change, shared-helper move, fixture extraction, credential-loading change, command rename, provider call, new production dependency edge, cycle or direction exception stops this Ticket for replanning instead of being absorbed.",
+      "identity": "sha256:cd54d53336d75b1d2bff6d49c35df86ab255b50e35600f1f69880e55154835b2",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat this as one executable live-verification capability Ticket, not one Ticket per runner or test.",
+    "Do not move or rewrite any measurement report. Report grouping requires adjacent metadata under the accepted architecture and is a later independently schedulable batch.",
+    "Do not change product adapters, Judge/runtime semantics, shared test helpers, model routes, prompts, credentials, environment-loading behavior, retry/error behavior, schemas, SQLite or formal public exports. Do not extract embedded live-check cases or narrow barrel imports in this relocation.",
+    "Do not read .env.local, Keychain or credentials; do not call JEV, Claude, Codex, Vercel, OpenRouter, TypeSafe or another provider.",
+    "Keep historical VibeHub records unchanged. Update only current live repository references required for validation, and leave unrelated untracked repository files untouched."
+  ],
+  "context": "The accepted Runtime layout classifies live JEV/provider checks outside formal scripts and ordinary product tests. Move the exact executable live-verification closure as one capability: eleven explicit-live runners, eight offline harness-contract tests and the synthetic-check guide. Preserve all twelve package command names and provider/credential behavior, keep shared product helpers and adapter/runtime product tests in place, keep the moved contract tests in ordinary offline npm test and standalone verification, and defer report relocation because the accepted architecture requires truthful adjacent report metadata that is a separate design boundary.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, test, live-provider and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted verification/live ownership, migration order and separate report-metadata requirement.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen current inventory and exact declared destinations for the twenty-file executable live JEV closure.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification pattern.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Twelve existing live command names and full/standalone verification composition to preserve.",
+      "ref": "semantic-runtime/package.json"
+    },
+    {
+      "purpose": "Current classification and standalone-copy rules that must recognize the settled verification/live root.",
+      "ref": "semantic-runtime/scripts/runtime-layout.mjs"
+    },
+    {
+      "purpose": "Successful precedent for one semantic extraction with exact calibration and honest suite boundaries.",
+      "ref": ".vibehub/outcomes/ticket-runtime-isolate-phase0-replay-research/contract-v1.yaml"
+    },
+    {
+      "purpose": "Project execution rule requiring a visible outcome-based checkpoint before work expands.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "full-and-standalone-verification-remain-honest",
+          "identity": "sha256:1ec1b628257ff7748418a837f001a239a480da40317cc254d3cc694f007f6832",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-jev-commands-and-offline-contracts-are-preserved",
+          "identity": "sha256:52d8ca507d1bc2bcd0107e49e359248780945c7fd942a8b051dd48e2790b6d12",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-jev-extraction-calibrates-before-expanding",
+          "identity": "sha256:cd54d53336d75b1d2bff6d49c35df86ab255b50e35600f1f69880e55154835b2",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-jev-relocation-is-traceable",
+          "identity": "sha256:cc8950939ff39a8bbf40f791307ea9cd863b96b94c3733992887aa154b879f04",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "live-jev-verification-vertical-is-exact",
+          "identity": "sha256:cab3f572fa53c59150fd68f488677a92c8a0cd9026a629544e5ca735b6b14a87",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8e1d0acc9cbe6eeef079f657aff3983e32a3e887accf2783b699ab6135f5bd57",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The real-provider JEV verification surface is one explicit verification/live vertical with deterministic contract tests, while formal Runtime scripts and ordinary product tests contain only production or maintenance responsibilities.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-code-governance",
+    "audit:live-jev-dependency-closure-2026-09-23",
+    "audit:live-verification-artifact-map-2026-09-23",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-isolate-live-jev-verification"
+}
