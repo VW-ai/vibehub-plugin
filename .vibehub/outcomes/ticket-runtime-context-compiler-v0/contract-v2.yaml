@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "budgeting-preserves-semantics",
+    "compiler-does-not-own-delivery",
+    "compiler-enforces-layer-order",
+    "package-is-reproducible"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-24T04:37:02Z",
+  "contract_revision": {
+    "identity": "sha256:7b6065a636e9f0fe8e4f67ce2b13298dfed35453bd0b54587ae6a6bfdebcb02a",
+    "revision": 2
+  },
+  "evidence_ids": [
+    "context-compiler-conformance-20260923",
+    "context-compiler-query-pointer-provenance-20260923"
+  ],
+  "independence": {
+    "note": "Fresh independent closeout subagent inspected Contract revision 2, all Evidence, governing documents, the full base-to-head implementation diff, implementation and focused tests without relying on executor narrative.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v2",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent revision-2 adjudication accepted all four criteria. The compiler preserves fixed semantic layering and other-exploration awareness; deterministic bounded packaging retains authority, conflict plurality, exact pointers, and explicit omission provenance; package identity and pins preserve reproducibility and permission-checked retrieval; delivery remains informational and non-executable. Focused real SQLite/Graph/Query tests specifically reproduced nested Query pointer substitution and verified that role, assertion status, source events, and transition survive compilation, omitted text remains pointer-only, and the original Query text-budget omission remains explicit. Repository validation, the base-to-working-tree Context guard, focused compiler/query/layout tests, and component boundary validation all passed.",
+  "ticket_id": "ticket-runtime-context-compiler-v0",
+  "unresolved_acceptance_ids": []
+}
