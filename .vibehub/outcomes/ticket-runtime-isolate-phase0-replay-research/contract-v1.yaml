@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "formal-runtime-has-no-phase0-replay-coupling",
+    "phase0-research-vertical-is-complete",
+    "phase0-contract-and-command-behavior-is-preserved",
+    "production-and-research-verification-stay-honest",
+    "phase0-extraction-calibrates-before-expanding"
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "closed_at": "2026-09-24T00:08:08Z",
+  "contract_revision": {
+    "identity": "sha256:1383234f8288bab889803a7906c7c02384d599aa45ed46bd8a8236aab1035c84",
+    "revision": 1
+  },
+  "evidence_ids": [
+    "runtime-phase0-replay-isolation-verification-20260923"
+  ],
+  "independence": {
+    "note": "Fresh closeout subagent; did not execute or record the implementation or Evidence and independently inspected the exact Contract, Evidence, commits, diff, files, provenance, and deterministic checks.",
+    "source": "subagent"
+  },
+  "kind": "ticket_outcome",
+  "outcome_id": "contract-v1",
+  "schema_version": 2,
+  "status": "successful",
+  "summary": "Independent closeout on HEAD 8f6150c1d8cc701bf199aeecc6f1e943dd7506f3 adjudicated all five current Acceptance revisions against implementation commit aa707aa5b4b8d1c0d41e66628699d727386aaeea, the exact bound Evidence, the diff, source, package routes, layout baseline, relocation manifest, VibeHub records, and fresh deterministic checks. formal-runtime-has-no-phase0-replay-coupling: the shared production contract module exports exactly the accepted 13 symbols; the replay contract module exports exactly its four replay-only symbols; src/core has zero entries; policy-artifacts contains no Phase 0 loader; all accepted replay implementations are absent from src; production has no research import; and boundary inspection reports zero production SCCs, zero direction exceptions, and zero errors across 249 files. phase0-research-vertical-is-complete: all 32 audited old paths are absent and their unique destinations are present under the one Phase 0 vertical except the explicitly accepted formal side of the contracts split; the fresh layout suite passes 22/22; all 32 relocation old_blob values independently resolve to the corresponding path blob in aa707aa5^; and the research inventory includes the contracts/policy/evaluation/replay modules, three adapters, policies, five runners, namespaced fixtures, contract document, six tests, and support helper. phase0-contract-and-command-behavior-is-preserved: all eleven accepted package command names route to research/phase0-replay; the fresh offline Phase 0 suite passes 32/32 with zero skips or failures; comparison, replay, normalization, policy, ordering, hashing, persistence, CLI, and fixture behavior are exercised there; and comparing the pre-migration and current root surfaces finds exactly the six accepted removals, no additions, with judgeInputHash retained. production-and-research-verification-stay-honest: package scripts separate verify:runtime and test:phase0, full verify composes both, standalone copies no research, fresh boundary/layout/Phase 0 checks pass, git diff checking passes, VibeHub Ticket and project validation pass at 236 Tickets, 544 Evidence records, and 182 pre-closeout Outcomes, Context guard has zero violations, and the semantic-runtime Room is FRESH. The exact bound Evidence is also sufficient and internally consistent for the already-completed full 1007-test Runtime run, locked standalone installation, and root plugin artifact verification; those expensive runs were not repeated. phase0-extraction-calibrates-before-expanding: the bound Evidence records the pre-broad-verification checkpoint, while independent reproduction confirms its substantive comparison: 31 whole moves plus one shared-contract split, one policy compatibility-loader extraction, one compatibility-test extraction, and exactly six root export removals, with no extra public removal, production-to-research import, additional research family, cycle, direction exception, or behavior defect found. No credential, live provider, model, host, or JEV capability was read or invoked. The two unrelated untracked Ticket files were left untouched.",
+  "ticket_id": "ticket-runtime-isolate-phase0-replay-research",
+  "unresolved_acceptance_ids": []
+}
