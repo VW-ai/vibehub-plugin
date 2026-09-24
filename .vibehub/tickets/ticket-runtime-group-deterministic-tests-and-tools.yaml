@@ -1,0 +1,130 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "deterministic-test-and-tool-layout-is-exact",
+      "criterion": "Exactly the ninety-three top-level test/*.test.mjs files and seventeen test/helpers/*.mjs files declared by the current layout baseline move to their twelve capability destinations under test/app, context, decisions, explorations, graph, identity, judge, project, query, sources, support and work; exactly scripts/check-boundaries.mjs, scripts/runtime-layout.mjs and scripts/verify-standalone.mjs move to tools. The 113 unique old paths are absent, the 113 destinations exist, test/fixtures remains in place, and no shim or duplicate remains. Destination counts are app 4, context 14, decisions 4, explorations 13, graph 9, identity 2, judge 11, project 3, query 4, sources 15, support 25 and work 6.",
+      "identity": "sha256:7c7d7524ac5b078018b558317de8c1d58c2a287676332ffcd4597134be0c8c55",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "deterministic-suite-behavior-and-command-coverage-are-preserved",
+      "criterion": "All moved test imports, fixture URLs, helper subprocess targets and the opt-in Graph measurement writer resolve from their new directories; normalized comparison against the migration parent shows path-only edits except for one repository-aware relocation guard. The package test command executes every one of the ninety-three deterministic test files plus the eight live JEV offline harness files, test:phase0 remains separate, and the existing check:boundaries and verify:standalone command names point to tools with unchanged behavior. The pre-existing 1008 Runtime cases remain represented exactly once and the new relocation guard is the only added test case.",
+      "identity": "sha256:3087cdcad98118036bc4d3ff6d31a8c20a6a2c0d0c9cf33925bb02fc277f51ca",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "deterministic-layout-relocation-is-traceable",
+      "criterion": "The append-only relocation manifest records exactly 113 unique old/new paths, original Git blobs, one actual migration commit and one deterministic-test-tool-layout category. Every original blob resolves from that commit parent, current README/contract/operations Markdown references point to the relocated tests and tools, and historical completed Tickets, Evidence, Outcomes, Context and measurement JSON remain unchanged. No report, response, credential, fixture, research artifact or ignored local artifact is regenerated, moved, copied or committed.",
+      "identity": "sha256:ed007422556ca47e38d293ceae8a75654e93f24db829d67ee27b130026cb089a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "grouped-tests-and-tools-keep-layout-boundaries-honest",
+      "criterion": "Runtime layout inventory recognizes settled test capability and tools paths, continues scanning the now-empty legacy scripts root so a misplaced reintroduction drifts, and records zero unsettled test/tool files. Standalone copying includes test and tools, excludes research and verification reports, and runs the same deterministic plus live offline coverage. Focused path-resolution/layout/boundary checks, full npm run verify, serial locked npm run verify:standalone, root npm run verify:artifact, VibeHub project/Ticket validation, Context guard, semantic-runtime Room alignment and git diff checking pass with unchanged production import edges, root exports, constants, zero production SCCs, zero direction exceptions and no provider call.",
+      "identity": "sha256:a28d6ed69b82773b9f961d90f07c51248572ddb7cb28a02278f7a7f03790ac17",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "deterministic-layout-calibrates-before-expanding",
+      "criterion": "Before broad verification, execution records a visible planned-versus-actual checkpoint for exactly ninety-three top-level tests, seventeen helpers, three tools, twelve destination groups and the exact set of current Markdown references that require path updates. Any production source edit, documentation/report move, historical-record rewrite, test-semantic change beyond the single relocation guard, command rename, provider call, dependency change, new production edge, cycle or direction exception stops this Ticket for replanning instead of being absorbed.",
+      "identity": "sha256:5ec4f17b23c69b7b83f876bf7686f7bed7d4096a5ba1fb7155e8d5400c74d4ac",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Treat the 110 deterministic test/support files and three directly coupled governance tools as one coherent layout Ticket; do not split it into per-directory or per-file Tickets.",
+    "Do not change production src behavior, public exports, schemas, SQLite, receipts, authorization order, transaction semantics, provider/model behavior, prompts, dependencies or lockfiles.",
+    "Do not move documentation or measurement reports in this Ticket. Update only current Markdown references needed for the relocated tests/tools and the opt-in measurement output path; keep historical measurement JSON and historical VibeHub records unchanged.",
+    "Do not change test semantics or fixtures. Test bodies may change only where relative imports, new URL paths, child-process helper paths, measurement output paths or the new relocation guard require it.",
+    "Do not read .env.local, Keychain or credentials and do not call JEV, Claude, Codex, Vercel, OpenRouter, TypeSafe or another provider.",
+    "Leave unrelated untracked repository files untouched."
+  ],
+  "context": "Production source, Phase 0 replay and executable live JEV verification now follow the accepted Runtime layout. The next complete mechanical boundary is the deterministic suite: move the exact baseline-declared closure of ninety-three top-level test files, seventeen directly coupled helpers and three governance tools as one batch. Keep fixtures in place, preserve all test semantics and command names, update only path-dependent imports, URLs, commands and current documentation, and make the new capability tree independently traceable. This deliberately avoids another one-Ticket-per-file migration and leaves documentation grouping and report metadata as separate later work.",
+  "context_refs": [
+    {
+      "purpose": "Independent component, deterministic test, live-provider and credential boundaries.",
+      "ref": "semantic-runtime/AGENTS.md"
+    },
+    {
+      "purpose": "Accepted test/tools ownership, migration order, historical-record rule and separate report-metadata boundary.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-v0.md"
+    },
+    {
+      "purpose": "Frozen exact destinations for the 110 test/support files and three governance tools plus production invariants.",
+      "ref": "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json"
+    },
+    {
+      "purpose": "Append-only relocation provenance format and repository-aware verification pattern.",
+      "ref": "semantic-runtime/docs/history/runtime-relocations-v1.json"
+    },
+    {
+      "purpose": "Existing test, boundary and standalone command names and verification composition to preserve.",
+      "ref": "semantic-runtime/package.json"
+    },
+    {
+      "purpose": "Current inventory and standalone-copy rules that must follow the tool relocation.",
+      "ref": "semantic-runtime/scripts/runtime-layout.mjs"
+    },
+    {
+      "purpose": "Successful precedent for exact capability extraction, offline live-harness coverage and calibrated verification.",
+      "ref": ".vibehub/outcomes/ticket-runtime-isolate-live-jev-verification/contract-v1.yaml"
+    },
+    {
+      "purpose": "Project execution rule requiring a visible outcome-based checkpoint before work expands.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/constraint-ticket-execution-requires-direction-calibration.yaml"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "deterministic-layout-calibrates-before-expanding",
+          "identity": "sha256:5ec4f17b23c69b7b83f876bf7686f7bed7d4096a5ba1fb7155e8d5400c74d4ac",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "deterministic-layout-relocation-is-traceable",
+          "identity": "sha256:ed007422556ca47e38d293ceae8a75654e93f24db829d67ee27b130026cb089a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "deterministic-suite-behavior-and-command-coverage-are-preserved",
+          "identity": "sha256:3087cdcad98118036bc4d3ff6d31a8c20a6a2c0d0c9cf33925bb02fc277f51ca",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "deterministic-test-and-tool-layout-is-exact",
+          "identity": "sha256:7c7d7524ac5b078018b558317de8c1d58c2a287676332ffcd4597134be0c8c55",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "grouped-tests-and-tools-keep-layout-boundaries-honest",
+          "identity": "sha256:a28d6ed69b82773b9f961d90f07c51248572ddb7cb28a02278f7a7f03790ac17",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:3ba47a49d6be265f3cb2da19aa016df2f4e81eacf87cf6d8b1b609ee658fc870",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The deterministic Runtime suite and its three repository-governance tools are organized by business capability, with every existing test and command still executed and no production or report behavior changed.",
+  "provenance_refs": [
+    "conversation:2026-09-23-runtime-code-governance",
+    "audit:runtime-next-governance-batch-2026-09-23",
+    "inventory:runtime-layout-baseline-v1",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-runtime-group-deterministic-tests-and-tools"
+}
