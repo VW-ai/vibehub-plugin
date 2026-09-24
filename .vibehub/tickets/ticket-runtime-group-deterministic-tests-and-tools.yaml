@@ -69,7 +69,7 @@
     },
     {
       "purpose": "Current inventory and standalone-copy rules that must follow the tool relocation.",
-      "ref": "semantic-runtime/scripts/runtime-layout.mjs"
+      "ref": "semantic-runtime/tools/runtime-layout.mjs"
     },
     {
       "purpose": "Successful precedent for exact capability extraction, offline live-harness coverage and calibrated verification.",

@@ -3,6 +3,7 @@
   "inventory_roots": [
     "src",
     "scripts",
+    "tools",
     "test",
     "verification/live",
     "research",
@@ -712,21 +713,6 @@
       "intended_destination": "research/ux/project-exploration/style.css"
     },
     {
-      "path": "scripts/check-boundaries.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "tools/check-boundaries.mjs"
-    },
-    {
-      "path": "scripts/runtime-layout.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "tools/runtime-layout.mjs"
-    },
-    {
-      "path": "scripts/verify-standalone.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "tools/verify-standalone.mjs"
-    },
-    {
       "path": "src/adapters/auth/local-credential-authority.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/auth/local-credential-authority.mjs"
@@ -1112,232 +1098,177 @@
       "intended_destination": "src/index.mjs"
     },
     {
-      "path": "test/agent-work-request-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/agent-work-request-integration.test.mjs"
-    },
-    {
-      "path": "test/agent-work-request.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/agent-work-request.test.mjs"
-    },
-    {
-      "path": "test/app-setup.test.mjs",
+      "path": "test/app/app-setup.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/app/app-setup.test.mjs"
     },
     {
-      "path": "test/app-transport.test.mjs",
+      "path": "test/app/app-transport.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/app/app-transport.test.mjs"
     },
     {
-      "path": "test/boundaries.test.mjs",
+      "path": "test/app/local-service.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/support/boundaries.test.mjs"
+      "intended_destination": "test/app/local-service.test.mjs"
     },
     {
-      "path": "test/branch-scope.test.mjs",
+      "path": "test/app/setup-ui.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/explorations/branch-scope.test.mjs"
+      "intended_destination": "test/app/setup-ui.test.mjs"
     },
     {
-      "path": "test/canonical-source-reader-authority.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/canonical-source-reader-authority.test.mjs"
-    },
-    {
-      "path": "test/canonical-source-reader-crash.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/canonical-source-reader-crash.test.mjs"
-    },
-    {
-      "path": "test/canonical-source-reader-records.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/canonical-source-reader-records.test.mjs"
-    },
-    {
-      "path": "test/canonical-source-reader.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/canonical-source-reader.test.mjs"
-    },
-    {
-      "path": "test/causal-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/causal-integration.test.mjs"
-    },
-    {
-      "path": "test/causal-ordering.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/causal-ordering.test.mjs"
-    },
-    {
-      "path": "test/claude-cli-judge.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/claude-cli-judge.test.mjs"
-    },
-    {
-      "path": "test/context-capacity.test.mjs",
+      "path": "test/context/context-capacity.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-capacity.test.mjs"
     },
     {
-      "path": "test/context-independent-review.test.mjs",
+      "path": "test/context/context-independent-review.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-independent-review.test.mjs"
     },
     {
-      "path": "test/context-judge-contract.test.mjs",
+      "path": "test/context/context-judge-contract.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-contract.test.mjs"
     },
     {
-      "path": "test/context-judge-independent-review.test.mjs",
+      "path": "test/context/context-judge-independent-review.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-independent-review.test.mjs"
     },
     {
-      "path": "test/context-judge-inputs.test.mjs",
+      "path": "test/context/context-judge-inputs.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-inputs.test.mjs"
     },
     {
-      "path": "test/context-judge-publication-capacity.test.mjs",
+      "path": "test/context/context-judge-publication-capacity.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-publication-capacity.test.mjs"
     },
     {
-      "path": "test/context-judge-races.test.mjs",
+      "path": "test/context/context-judge-races.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-races.test.mjs"
     },
     {
-      "path": "test/context-judge-runtime.test.mjs",
+      "path": "test/context/context-judge-runtime.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-judge-runtime.test.mjs"
     },
     {
-      "path": "test/context-lifecycle.test.mjs",
+      "path": "test/context/context-lifecycle.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-lifecycle.test.mjs"
     },
     {
-      "path": "test/context-lineage.test.mjs",
+      "path": "test/context/context-lineage.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-lineage.test.mjs"
     },
     {
-      "path": "test/context-profile.test.mjs",
+      "path": "test/context/context-profile.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-profile.test.mjs"
     },
     {
-      "path": "test/context-reader.test.mjs",
+      "path": "test/context/context-reader.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-reader.test.mjs"
     },
     {
-      "path": "test/context-recovery.test.mjs",
+      "path": "test/context/context-recovery.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-recovery.test.mjs"
     },
     {
-      "path": "test/context-security.test.mjs",
+      "path": "test/context/context-security.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/context/context-security.test.mjs"
     },
     {
-      "path": "test/domain-store-selected-reads.test.mjs",
+      "path": "test/decisions/observability-contract.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/support/domain-store-selected-reads.test.mjs"
+      "intended_destination": "test/decisions/observability-contract.test.mjs"
     },
     {
-      "path": "test/domain-store-statement-lifetime.test.mjs",
+      "path": "test/decisions/policy-artifacts.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/support/domain-store-statement-lifetime.test.mjs"
+      "intended_destination": "test/decisions/policy-artifacts.test.mjs"
     },
     {
-      "path": "test/domain-store.test.mjs",
+      "path": "test/decisions/policy-kernel-integration.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/support/domain-store.test.mjs"
+      "intended_destination": "test/decisions/policy-kernel-integration.test.mjs"
     },
     {
-      "path": "test/durable-ingress-faults.test.mjs",
+      "path": "test/decisions/policy-kernel.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/project/durable-ingress-faults.test.mjs"
+      "intended_destination": "test/decisions/policy-kernel.test.mjs"
     },
     {
-      "path": "test/durable-ingress.test.mjs",
+      "path": "test/explorations/branch-scope.test.mjs",
       "current_role": "test-or-fixture",
-      "intended_destination": "test/project/durable-ingress.test.mjs"
+      "intended_destination": "test/explorations/branch-scope.test.mjs"
     },
     {
-      "path": "test/event-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/event-integration.test.mjs"
-    },
-    {
-      "path": "test/event-provenance.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/event-provenance.test.mjs"
-    },
-    {
-      "path": "test/exploration-adoption-independent-review.test.mjs",
+      "path": "test/explorations/exploration-adoption-independent-review.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption-independent-review.test.mjs"
     },
     {
-      "path": "test/exploration-adoption-inputs.test.mjs",
+      "path": "test/explorations/exploration-adoption-inputs.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption-inputs.test.mjs"
     },
     {
-      "path": "test/exploration-adoption-materializer.test.mjs",
+      "path": "test/explorations/exploration-adoption-materializer.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption-materializer.test.mjs"
     },
     {
-      "path": "test/exploration-adoption-races.test.mjs",
+      "path": "test/explorations/exploration-adoption-races.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption-races.test.mjs"
     },
     {
-      "path": "test/exploration-adoption-recovery.test.mjs",
+      "path": "test/explorations/exploration-adoption-recovery.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption-recovery.test.mjs"
     },
     {
-      "path": "test/exploration-adoption.test.mjs",
+      "path": "test/explorations/exploration-adoption.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-adoption.test.mjs"
     },
     {
-      "path": "test/exploration-canonical.test.mjs",
+      "path": "test/explorations/exploration-canonical.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-canonical.test.mjs"
     },
     {
-      "path": "test/exploration-inputs.test.mjs",
+      "path": "test/explorations/exploration-inputs.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-inputs.test.mjs"
     },
     {
-      "path": "test/exploration-projection-recovery.test.mjs",
+      "path": "test/explorations/exploration-projection-recovery.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-projection-recovery.test.mjs"
     },
     {
-      "path": "test/exploration-projection-scale.test.mjs",
+      "path": "test/explorations/exploration-projection-scale.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-projection-scale.test.mjs"
     },
     {
-      "path": "test/exploration-projection-security.test.mjs",
+      "path": "test/explorations/exploration-projection-security.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-projection-security.test.mjs"
     },
     {
-      "path": "test/exploration-projection.test.mjs",
+      "path": "test/explorations/exploration-projection.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/explorations/exploration-projection.test.mjs"
     },
@@ -1442,324 +1373,394 @@
       "intended_destination": "test/fixtures/working-graph/scenario.mjs"
     },
     {
-      "path": "test/foundation-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/foundation-integration.test.mjs"
-    },
-    {
-      "path": "test/git-projects.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/git-projects.test.mjs"
-    },
-    {
-      "path": "test/git-provenance-canonical.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/git-provenance-canonical.test.mjs"
-    },
-    {
-      "path": "test/git-provenance-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/git-provenance-integration.test.mjs"
-    },
-    {
-      "path": "test/git-provenance.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/git-provenance.test.mjs"
-    },
-    {
-      "path": "test/git-worktree-sensor.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/git-worktree-sensor.test.mjs"
-    },
-    {
-      "path": "test/graph-source-invalidation.test.mjs",
+      "path": "test/graph/graph-source-invalidation.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/graph-source-invalidation.test.mjs"
     },
     {
-      "path": "test/graph-storage.test.mjs",
+      "path": "test/graph/graph-storage.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/graph-storage.test.mjs"
     },
     {
-      "path": "test/graph-store-crash.test.mjs",
+      "path": "test/graph/graph-store-crash.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/graph-store-crash.test.mjs"
     },
     {
-      "path": "test/graph-store-scale.test.mjs",
+      "path": "test/graph/graph-store-scale.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/graph-store-scale.test.mjs"
     },
     {
-      "path": "test/graph-store.test.mjs",
+      "path": "test/graph/graph-store.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/graph-store.test.mjs"
     },
     {
-      "path": "test/haiku-judge.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/haiku-judge.test.mjs"
-    },
-    {
-      "path": "test/helpers/adoption-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/adoption-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/adoption-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/adoption-process.mjs"
-    },
-    {
-      "path": "test/helpers/canonical-fence-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/canonical-fence-process.mjs"
-    },
-    {
-      "path": "test/helpers/canonical-reader-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/canonical-reader-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/canonical-reader-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/canonical-reader-process.mjs"
-    },
-    {
-      "path": "test/helpers/context-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/context-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/context-judge-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/context-judge-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/exploration-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/exploration-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/exploration-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/exploration-process.mjs"
-    },
-    {
-      "path": "test/helpers/git-sensor-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/git-sensor-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/graph-store-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/graph-store-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/graph-store-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/graph-store-process.mjs"
-    },
-    {
-      "path": "test/helpers/incremental-graph-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/incremental-graph-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/judge-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/judge-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/judge-runtime-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/judge-runtime-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/query-fixture.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/query-fixture.mjs"
-    },
-    {
-      "path": "test/helpers/source-invalidation-process.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/source-invalidation-process.mjs"
-    },
-    {
-      "path": "test/identity.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/identity/identity.test.mjs"
-    },
-    {
-      "path": "test/incremental-graph-security.test.mjs",
+      "path": "test/graph/incremental-graph-security.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/incremental-graph-security.test.mjs"
     },
     {
-      "path": "test/incremental-graph.test.mjs",
+      "path": "test/graph/incremental-graph.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/incremental-graph.test.mjs"
     },
     {
-      "path": "test/jev-judge.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/jev-judge.test.mjs"
-    },
-    {
-      "path": "test/judge-inputs.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/judge-inputs.test.mjs"
-    },
-    {
-      "path": "test/judge-provider.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/judge-provider.test.mjs"
-    },
-    {
-      "path": "test/judge-resilience.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/judge-resilience.test.mjs"
-    },
-    {
-      "path": "test/judge-runtime-races.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/judge-runtime-races.test.mjs"
-    },
-    {
-      "path": "test/judge-runtime.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/judge-runtime.test.mjs"
-    },
-    {
-      "path": "test/local-composition.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/local-composition.test.mjs"
-    },
-    {
-      "path": "test/local-service.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/app/local-service.test.mjs"
-    },
-    {
-      "path": "test/macos-secret-store.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/macos-secret-store.test.mjs"
-    },
-    {
-      "path": "test/observability-contract.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/decisions/observability-contract.test.mjs"
-    },
-    {
-      "path": "test/openrouter-jev-judge.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/openrouter-jev-judge.test.mjs"
-    },
-    {
-      "path": "test/policy-artifacts.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/decisions/policy-artifacts.test.mjs"
-    },
-    {
-      "path": "test/policy-kernel-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/decisions/policy-kernel-integration.test.mjs"
-    },
-    {
-      "path": "test/policy-kernel.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/decisions/policy-kernel.test.mjs"
-    },
-    {
-      "path": "test/project-activation.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/project/project-activation.test.mjs"
-    },
-    {
-      "path": "test/provider-settings.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/provider-settings.test.mjs"
-    },
-    {
-      "path": "test/query-contract.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/query/query-contract.test.mjs"
-    },
-    {
-      "path": "test/query-engine.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/query/query-engine.test.mjs"
-    },
-    {
-      "path": "test/query-inputs.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/query/query-inputs.test.mjs"
-    },
-    {
-      "path": "test/query-pure.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/query/query-pure.test.mjs"
-    },
-    {
-      "path": "test/reconciliation-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/reconciliation-integration.test.mjs"
-    },
-    {
-      "path": "test/reconciliation.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/reconciliation.test.mjs"
-    },
-    {
-      "path": "test/runtime-layout.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/runtime-layout.test.mjs"
-    },
-    {
-      "path": "test/service-auth.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/identity/service-auth.test.mjs"
-    },
-    {
-      "path": "test/setup-ui.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/app/setup-ui.test.mjs"
-    },
-    {
-      "path": "test/source-invalidation-crash.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/source-invalidation-crash.test.mjs"
-    },
-    {
-      "path": "test/source-invalidation.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/sources/source-invalidation.test.mjs"
-    },
-    {
-      "path": "test/typesafe-jev-judge.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/judge/typesafe-jev-judge.test.mjs"
-    },
-    {
-      "path": "test/worker-protocol-integration.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/worker-protocol-integration.test.mjs"
-    },
-    {
-      "path": "test/worker-protocol.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/work/worker-protocol.test.mjs"
-    },
-    {
-      "path": "test/working-graph-integration.test.mjs",
+      "path": "test/graph/working-graph-integration.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/working-graph-integration.test.mjs"
     },
     {
-      "path": "test/working-graph.test.mjs",
+      "path": "test/graph/working-graph.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/graph/working-graph.test.mjs"
+    },
+    {
+      "path": "test/identity/identity.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/identity/identity.test.mjs"
+    },
+    {
+      "path": "test/identity/service-auth.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/identity/service-auth.test.mjs"
+    },
+    {
+      "path": "test/judge/claude-cli-judge.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/claude-cli-judge.test.mjs"
+    },
+    {
+      "path": "test/judge/haiku-judge.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/haiku-judge.test.mjs"
+    },
+    {
+      "path": "test/judge/jev-judge.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/jev-judge.test.mjs"
+    },
+    {
+      "path": "test/judge/judge-inputs.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/judge-inputs.test.mjs"
+    },
+    {
+      "path": "test/judge/judge-provider.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/judge-provider.test.mjs"
+    },
+    {
+      "path": "test/judge/judge-resilience.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/judge-resilience.test.mjs"
+    },
+    {
+      "path": "test/judge/judge-runtime-races.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/judge-runtime-races.test.mjs"
+    },
+    {
+      "path": "test/judge/judge-runtime.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/judge-runtime.test.mjs"
+    },
+    {
+      "path": "test/judge/openrouter-jev-judge.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/openrouter-jev-judge.test.mjs"
+    },
+    {
+      "path": "test/judge/provider-settings.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/provider-settings.test.mjs"
+    },
+    {
+      "path": "test/judge/typesafe-jev-judge.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/judge/typesafe-jev-judge.test.mjs"
+    },
+    {
+      "path": "test/project/durable-ingress-faults.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/project/durable-ingress-faults.test.mjs"
+    },
+    {
+      "path": "test/project/durable-ingress.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/project/durable-ingress.test.mjs"
+    },
+    {
+      "path": "test/project/project-activation.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/project/project-activation.test.mjs"
+    },
+    {
+      "path": "test/query/query-contract.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/query/query-contract.test.mjs"
+    },
+    {
+      "path": "test/query/query-engine.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/query/query-engine.test.mjs"
+    },
+    {
+      "path": "test/query/query-inputs.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/query/query-inputs.test.mjs"
+    },
+    {
+      "path": "test/query/query-pure.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/query/query-pure.test.mjs"
+    },
+    {
+      "path": "test/sources/canonical-source-reader-authority.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/canonical-source-reader-authority.test.mjs"
+    },
+    {
+      "path": "test/sources/canonical-source-reader-crash.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/canonical-source-reader-crash.test.mjs"
+    },
+    {
+      "path": "test/sources/canonical-source-reader-records.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/canonical-source-reader-records.test.mjs"
+    },
+    {
+      "path": "test/sources/canonical-source-reader.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/canonical-source-reader.test.mjs"
+    },
+    {
+      "path": "test/sources/causal-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/causal-integration.test.mjs"
+    },
+    {
+      "path": "test/sources/causal-ordering.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/causal-ordering.test.mjs"
+    },
+    {
+      "path": "test/sources/event-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/event-integration.test.mjs"
+    },
+    {
+      "path": "test/sources/event-provenance.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/event-provenance.test.mjs"
+    },
+    {
+      "path": "test/sources/git-projects.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/git-projects.test.mjs"
+    },
+    {
+      "path": "test/sources/git-provenance-canonical.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/git-provenance-canonical.test.mjs"
+    },
+    {
+      "path": "test/sources/git-provenance-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/git-provenance-integration.test.mjs"
+    },
+    {
+      "path": "test/sources/git-provenance.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/git-provenance.test.mjs"
+    },
+    {
+      "path": "test/sources/git-worktree-sensor.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/git-worktree-sensor.test.mjs"
+    },
+    {
+      "path": "test/sources/source-invalidation-crash.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/source-invalidation-crash.test.mjs"
+    },
+    {
+      "path": "test/sources/source-invalidation.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/sources/source-invalidation.test.mjs"
+    },
+    {
+      "path": "test/support/adoption-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/adoption-fixture.mjs"
+    },
+    {
+      "path": "test/support/adoption-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/adoption-process.mjs"
+    },
+    {
+      "path": "test/support/boundaries.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/boundaries.test.mjs"
+    },
+    {
+      "path": "test/support/canonical-fence-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/canonical-fence-process.mjs"
+    },
+    {
+      "path": "test/support/canonical-reader-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/canonical-reader-fixture.mjs"
+    },
+    {
+      "path": "test/support/canonical-reader-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/canonical-reader-process.mjs"
+    },
+    {
+      "path": "test/support/context-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/context-fixture.mjs"
+    },
+    {
+      "path": "test/support/context-judge-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/context-judge-fixture.mjs"
+    },
+    {
+      "path": "test/support/domain-store-selected-reads.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/domain-store-selected-reads.test.mjs"
+    },
+    {
+      "path": "test/support/domain-store-statement-lifetime.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/domain-store-statement-lifetime.test.mjs"
+    },
+    {
+      "path": "test/support/domain-store.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/domain-store.test.mjs"
+    },
+    {
+      "path": "test/support/exploration-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/exploration-fixture.mjs"
+    },
+    {
+      "path": "test/support/exploration-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/exploration-process.mjs"
+    },
+    {
+      "path": "test/support/foundation-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/foundation-integration.test.mjs"
+    },
+    {
+      "path": "test/support/git-sensor-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/git-sensor-fixture.mjs"
+    },
+    {
+      "path": "test/support/graph-store-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/graph-store-fixture.mjs"
+    },
+    {
+      "path": "test/support/graph-store-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/graph-store-process.mjs"
+    },
+    {
+      "path": "test/support/incremental-graph-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/incremental-graph-fixture.mjs"
+    },
+    {
+      "path": "test/support/judge-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/judge-fixture.mjs"
+    },
+    {
+      "path": "test/support/judge-runtime-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/judge-runtime-fixture.mjs"
+    },
+    {
+      "path": "test/support/local-composition.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/local-composition.test.mjs"
+    },
+    {
+      "path": "test/support/macos-secret-store.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/macos-secret-store.test.mjs"
+    },
+    {
+      "path": "test/support/query-fixture.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/query-fixture.mjs"
+    },
+    {
+      "path": "test/support/runtime-layout.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/runtime-layout.test.mjs"
+    },
+    {
+      "path": "test/support/source-invalidation-process.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/support/source-invalidation-process.mjs"
+    },
+    {
+      "path": "test/work/agent-work-request-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/agent-work-request-integration.test.mjs"
+    },
+    {
+      "path": "test/work/agent-work-request.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/agent-work-request.test.mjs"
+    },
+    {
+      "path": "test/work/reconciliation-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/reconciliation-integration.test.mjs"
+    },
+    {
+      "path": "test/work/reconciliation.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/reconciliation.test.mjs"
+    },
+    {
+      "path": "test/work/worker-protocol-integration.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/worker-protocol-integration.test.mjs"
+    },
+    {
+      "path": "test/work/worker-protocol.test.mjs",
+      "current_role": "test-or-fixture",
+      "intended_destination": "test/work/worker-protocol.test.mjs"
+    },
+    {
+      "path": "tools/check-boundaries.mjs",
+      "current_role": "governance-tool",
+      "intended_destination": "tools/check-boundaries.mjs"
+    },
+    {
+      "path": "tools/runtime-layout.mjs",
+      "current_role": "governance-tool",
+      "intended_destination": "tools/runtime-layout.mjs"
+    },
+    {
+      "path": "tools/verify-standalone.mjs",
+      "current_role": "governance-tool",
+      "intended_destination": "tools/verify-standalone.mjs"
     },
     {
       "path": "verification/live/jev/check-jev-adoption.mjs",
@@ -2102,7 +2103,7 @@
     },
     {
       "name": "check:boundaries",
-      "command": "node scripts/check-boundaries.mjs",
+      "command": "node tools/check-boundaries.mjs",
       "mode": "offline"
     },
     {
@@ -2212,7 +2213,7 @@
     },
     {
       "name": "test",
-      "command": "node --test test/*.test.mjs verification/live/jev/test/*.test.mjs",
+      "command": "node --test test/**/*.test.mjs verification/live/jev/test/*.test.mjs",
       "mode": "offline"
     },
     {
@@ -2247,7 +2248,7 @@
     },
     {
       "name": "verify:standalone",
-      "command": "node scripts/verify-standalone.mjs",
+      "command": "node tools/verify-standalone.mjs",
       "mode": "offline"
     }
   ],
@@ -2402,7 +2403,7 @@
     "package.json",
     "package-lock.json",
     "src",
-    "scripts",
+    "tools",
     "test",
     "verification/live",
     "docs/architecture/runtime-layout-baseline-v1.json"

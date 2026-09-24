@@ -1113,6 +1113,797 @@
       "old_blob": "3dda90fbcdecdbe48a3807ede10b9cf8b523f7e8",
       "migration_commit": "7f479715bb661a25449320f0399e5f966a2b09d0",
       "category": "live-jev-verification"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/check-boundaries.mjs",
+      "new_path": "semantic-runtime/tools/check-boundaries.mjs",
+      "old_blob": "31e9a3beee3ac2502d6b4199915354c0ba2cbdae",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/runtime-layout.mjs",
+      "new_path": "semantic-runtime/tools/runtime-layout.mjs",
+      "old_blob": "fd852e059a7badbed3040389663e49891d207431",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/verify-standalone.mjs",
+      "new_path": "semantic-runtime/tools/verify-standalone.mjs",
+      "old_blob": "0dcd016176a40d7ea2b502dda5fa1d36d7dbeadc",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/agent-work-request-integration.test.mjs",
+      "new_path": "semantic-runtime/test/work/agent-work-request-integration.test.mjs",
+      "old_blob": "e7109b24af94b051141a58cf035fb1413786b0fe",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/agent-work-request.test.mjs",
+      "new_path": "semantic-runtime/test/work/agent-work-request.test.mjs",
+      "old_blob": "bbecd6b738bf503b7b510814d067408387ed9f63",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/app-setup.test.mjs",
+      "new_path": "semantic-runtime/test/app/app-setup.test.mjs",
+      "old_blob": "d9e28b27cef24e74e9bcd27ea56d4600e839dead",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/app-transport.test.mjs",
+      "new_path": "semantic-runtime/test/app/app-transport.test.mjs",
+      "old_blob": "aa602d2ffdc1de76d4534e3f839e23ffcaa1c46f",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/boundaries.test.mjs",
+      "new_path": "semantic-runtime/test/support/boundaries.test.mjs",
+      "old_blob": "60f3113014ec9f52e0ecb4bff5c8c888d8c35001",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/branch-scope.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/branch-scope.test.mjs",
+      "old_blob": "1c7bf1e963a957610913c799af0055bd88b5b729",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/canonical-source-reader-authority.test.mjs",
+      "new_path": "semantic-runtime/test/sources/canonical-source-reader-authority.test.mjs",
+      "old_blob": "2dd5f458b7cffe676a9e9ff52c7adadd93c6cb76",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/canonical-source-reader-crash.test.mjs",
+      "new_path": "semantic-runtime/test/sources/canonical-source-reader-crash.test.mjs",
+      "old_blob": "8f338531b03ad485c5e668893043c5599095bbb8",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/canonical-source-reader-records.test.mjs",
+      "new_path": "semantic-runtime/test/sources/canonical-source-reader-records.test.mjs",
+      "old_blob": "be0134ffb437102cce952f8750d3c91f2e66feb2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/canonical-source-reader.test.mjs",
+      "new_path": "semantic-runtime/test/sources/canonical-source-reader.test.mjs",
+      "old_blob": "fa3cdce6f264bd4bd48d201ca13168a7efe33349",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/causal-integration.test.mjs",
+      "new_path": "semantic-runtime/test/sources/causal-integration.test.mjs",
+      "old_blob": "245235e678bf71aa0ae4cc20c8479a66935ac036",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/causal-ordering.test.mjs",
+      "new_path": "semantic-runtime/test/sources/causal-ordering.test.mjs",
+      "old_blob": "fb3515ed987b2ef0891907779382060eb4c3862b",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/claude-cli-judge.test.mjs",
+      "new_path": "semantic-runtime/test/judge/claude-cli-judge.test.mjs",
+      "old_blob": "1e6cf4fd0d7dcdada940f2a03cbe0db1f2ed63fa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-capacity.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-capacity.test.mjs",
+      "old_blob": "897657e89729a8ff42245454ad2b4b685a0fcedb",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-independent-review.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-independent-review.test.mjs",
+      "old_blob": "588bcf5eb0bbd037ab01e596399266d4b649d0db",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-contract.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-contract.test.mjs",
+      "old_blob": "88e9c0982cd7eb58091112dea842f0b393e645aa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-independent-review.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-independent-review.test.mjs",
+      "old_blob": "6739c110f03c4fa9679fcbf3cbb252a18e1f16d5",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-inputs.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-inputs.test.mjs",
+      "old_blob": "7acb4b7cdde585b2a49d53d2a1f7f67f8fd6337c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-publication-capacity.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-publication-capacity.test.mjs",
+      "old_blob": "ae922451d3f504e7eb35864635ce723abfa09f3e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-races.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-races.test.mjs",
+      "old_blob": "683b6d6b6f4539254a6a4aec86a22a35a0e1fb00",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-judge-runtime.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-judge-runtime.test.mjs",
+      "old_blob": "36750070634d0fe0bd00767ca33818b6a774ecf1",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-lifecycle.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-lifecycle.test.mjs",
+      "old_blob": "0e290e6faef09ea79accfecdb523cb6cb6dcddc1",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-lineage.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-lineage.test.mjs",
+      "old_blob": "4e97cfd55e443a83529d5c0efb17e667b1d97c93",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-profile.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-profile.test.mjs",
+      "old_blob": "5c8aaf82bc032c3f6a515324b0d204d1e7645f12",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-reader.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-reader.test.mjs",
+      "old_blob": "0d547f20ad550bcdd4b72c994ae9fe1aa3617fee",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-recovery.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-recovery.test.mjs",
+      "old_blob": "c78865cd5e19097d22fa6786ce544aaa6f22d9d7",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/context-security.test.mjs",
+      "new_path": "semantic-runtime/test/context/context-security.test.mjs",
+      "old_blob": "fc40eb41272a331ec2ebe1194591cdd1f542e20b",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/domain-store-selected-reads.test.mjs",
+      "new_path": "semantic-runtime/test/support/domain-store-selected-reads.test.mjs",
+      "old_blob": "50fe20556e6b4fb2261c29ca64c9290bf427f1c2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/domain-store-statement-lifetime.test.mjs",
+      "new_path": "semantic-runtime/test/support/domain-store-statement-lifetime.test.mjs",
+      "old_blob": "0bc7d8ff314732b5dae60910146997df56350a32",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/domain-store.test.mjs",
+      "new_path": "semantic-runtime/test/support/domain-store.test.mjs",
+      "old_blob": "20092e0e84a8a0654c5ece0e6521d7eb57bef02a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/durable-ingress-faults.test.mjs",
+      "new_path": "semantic-runtime/test/project/durable-ingress-faults.test.mjs",
+      "old_blob": "24f9443d6350365c1c05f08b10eda245adf8ae0e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/durable-ingress.test.mjs",
+      "new_path": "semantic-runtime/test/project/durable-ingress.test.mjs",
+      "old_blob": "59c3385d474a2d4ca08c52b55896c824f575410c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/event-integration.test.mjs",
+      "new_path": "semantic-runtime/test/sources/event-integration.test.mjs",
+      "old_blob": "479dd73b8b557b3361ba2b3114d446188506caa7",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/event-provenance.test.mjs",
+      "new_path": "semantic-runtime/test/sources/event-provenance.test.mjs",
+      "old_blob": "7fcc6557cadfef6ed181600ec5976e4a4cfc8f12",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption-independent-review.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption-independent-review.test.mjs",
+      "old_blob": "979afb51888bd5233382d794381c9bef269ec1ca",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption-inputs.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption-inputs.test.mjs",
+      "old_blob": "02d14680c1bc226d6cb7a5b12399004658788664",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption-materializer.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption-materializer.test.mjs",
+      "old_blob": "86df279b6decff232714c4566850f3715a896e6d",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption-races.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption-races.test.mjs",
+      "old_blob": "50d126c8577344384ae762faf087332ae597ef49",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption-recovery.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption-recovery.test.mjs",
+      "old_blob": "f7c7400705169211b7ad8e0af57c0afa33ce0ef7",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-adoption.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-adoption.test.mjs",
+      "old_blob": "021952d213837069bc2cf07918877f7314cdc81f",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-canonical.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-canonical.test.mjs",
+      "old_blob": "3c78e9b05c1413f3f4bce6479e20c9f242d662d9",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-inputs.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-inputs.test.mjs",
+      "old_blob": "c8feed4ae73f8d52faedbf049582b1290e26792e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-projection-recovery.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-projection-recovery.test.mjs",
+      "old_blob": "96b5b4af1c5e966d5b80a05f5908b43c249fb328",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-projection-scale.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-projection-scale.test.mjs",
+      "old_blob": "39aff65e9027e763dd082a6595ac90bff9b2078d",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-projection-security.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-projection-security.test.mjs",
+      "old_blob": "ccc8316e100d68c4e64f2523c229bc688302567d",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/exploration-projection.test.mjs",
+      "new_path": "semantic-runtime/test/explorations/exploration-projection.test.mjs",
+      "old_blob": "2374b64b263460a85690e58a8a1e5f74e75b67da",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/foundation-integration.test.mjs",
+      "new_path": "semantic-runtime/test/support/foundation-integration.test.mjs",
+      "old_blob": "fd014d893375ec1c1e2783a5a9116df2047a4136",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/git-projects.test.mjs",
+      "new_path": "semantic-runtime/test/sources/git-projects.test.mjs",
+      "old_blob": "418b6370ceece660bfa717d6aee4b17b5c14db97",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/git-provenance-canonical.test.mjs",
+      "new_path": "semantic-runtime/test/sources/git-provenance-canonical.test.mjs",
+      "old_blob": "2e0f702f8d24b9727a29e7ea379c0e9565ae862e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/git-provenance-integration.test.mjs",
+      "new_path": "semantic-runtime/test/sources/git-provenance-integration.test.mjs",
+      "old_blob": "c68997a1a5a3bbbe97f6d65b49958cfe1f85ffdb",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/git-provenance.test.mjs",
+      "new_path": "semantic-runtime/test/sources/git-provenance.test.mjs",
+      "old_blob": "ffb897ee36bc031248158cd26fb6db059a7a3352",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/git-worktree-sensor.test.mjs",
+      "new_path": "semantic-runtime/test/sources/git-worktree-sensor.test.mjs",
+      "old_blob": "9a4b3fed24af306494d53bfa98303fe9e0e19574",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/graph-source-invalidation.test.mjs",
+      "new_path": "semantic-runtime/test/graph/graph-source-invalidation.test.mjs",
+      "old_blob": "cf2c67b42a6ece80bca6f3ce9e1b536de243d9d5",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/graph-storage.test.mjs",
+      "new_path": "semantic-runtime/test/graph/graph-storage.test.mjs",
+      "old_blob": "eda5a76b36a7e8210e767e4701f88b6a2f6d567a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/graph-store-crash.test.mjs",
+      "new_path": "semantic-runtime/test/graph/graph-store-crash.test.mjs",
+      "old_blob": "3642cbe84911e9c83436491532c3146f728077c5",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/graph-store-scale.test.mjs",
+      "new_path": "semantic-runtime/test/graph/graph-store-scale.test.mjs",
+      "old_blob": "16a05debd45634a2ff38d70e35a721a33072b87f",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/graph-store.test.mjs",
+      "new_path": "semantic-runtime/test/graph/graph-store.test.mjs",
+      "old_blob": "ac67fd36d318719cfe57af952bf3667cfbcf5a0a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/haiku-judge.test.mjs",
+      "new_path": "semantic-runtime/test/judge/haiku-judge.test.mjs",
+      "old_blob": "7772328e5cae70f7fe6d7eb649570b900648a323",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/adoption-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/adoption-fixture.mjs",
+      "old_blob": "c31c97dbc765839481612fa7aaea463ac03abff8",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/adoption-process.mjs",
+      "new_path": "semantic-runtime/test/support/adoption-process.mjs",
+      "old_blob": "e8f41b0db9a64b5aba0b5332a947c017efe64f09",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/canonical-fence-process.mjs",
+      "new_path": "semantic-runtime/test/support/canonical-fence-process.mjs",
+      "old_blob": "a854f515ffa2ddc018dd729cd33af747ee4ba2a6",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/canonical-reader-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/canonical-reader-fixture.mjs",
+      "old_blob": "72e5fb9306497bda0986cd52a5e9f0eeb692f11c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/canonical-reader-process.mjs",
+      "new_path": "semantic-runtime/test/support/canonical-reader-process.mjs",
+      "old_blob": "dfc019d77e0626521c0ff9ab97df1ca799b5412c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/context-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/context-fixture.mjs",
+      "old_blob": "27139aacc06a59fe501d564442cebefaf1f0d29e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/context-judge-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/context-judge-fixture.mjs",
+      "old_blob": "12fcde7f816d9a34df1804b2fb7dc703607d31aa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/exploration-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/exploration-fixture.mjs",
+      "old_blob": "c5dd91b1c64d031df3c3bcbe10eb3b3fea7b54b8",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/exploration-process.mjs",
+      "new_path": "semantic-runtime/test/support/exploration-process.mjs",
+      "old_blob": "c6eec1b79d0ada08c474d976a12357760457cad9",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/git-sensor-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/git-sensor-fixture.mjs",
+      "old_blob": "72ec920b01697eb84d32d33c8aed1127d548de2f",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/graph-store-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/graph-store-fixture.mjs",
+      "old_blob": "82b1d704a47414070cee266ae00bf81039e72329",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/graph-store-process.mjs",
+      "new_path": "semantic-runtime/test/support/graph-store-process.mjs",
+      "old_blob": "8f5db3ff4866a9ed4e6caa076c0612afd37431fa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/incremental-graph-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/incremental-graph-fixture.mjs",
+      "old_blob": "90d0322487a8d0390bf0190ae69993753f5f79a7",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/judge-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/judge-fixture.mjs",
+      "old_blob": "6fd821aeb70570b979237080883875c75b36b640",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/judge-runtime-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/judge-runtime-fixture.mjs",
+      "old_blob": "7e378a2862dc81bceb166ea9615d21c8b6ddb937",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/query-fixture.mjs",
+      "new_path": "semantic-runtime/test/support/query-fixture.mjs",
+      "old_blob": "1f13a726a5564b9ea16d866288f14dd3e84f8d6e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers/source-invalidation-process.mjs",
+      "new_path": "semantic-runtime/test/support/source-invalidation-process.mjs",
+      "old_blob": "da7f8bf14ca3c01e35503f979934230c488406b2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/identity.test.mjs",
+      "new_path": "semantic-runtime/test/identity/identity.test.mjs",
+      "old_blob": "c4a838c2e6595b3d962614c0a3a1282ec184f46a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/incremental-graph-security.test.mjs",
+      "new_path": "semantic-runtime/test/graph/incremental-graph-security.test.mjs",
+      "old_blob": "59dd956501d3537422c1ccb33ae693d6a5f86943",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/incremental-graph.test.mjs",
+      "new_path": "semantic-runtime/test/graph/incremental-graph.test.mjs",
+      "old_blob": "6235e9c9aabb2dae52771b69e7ba935aa525a2e2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-judge.test.mjs",
+      "new_path": "semantic-runtime/test/judge/jev-judge.test.mjs",
+      "old_blob": "fdc8b0e3000d7a9743b9cc181fcfff808a2409d4",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-inputs.test.mjs",
+      "new_path": "semantic-runtime/test/judge/judge-inputs.test.mjs",
+      "old_blob": "fe86d5ac403abd835b9a796c7cda490dfef8f31a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-provider.test.mjs",
+      "new_path": "semantic-runtime/test/judge/judge-provider.test.mjs",
+      "old_blob": "e392e5b3f4b34bf9ab88c6735e7338aafc7abbfa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-resilience.test.mjs",
+      "new_path": "semantic-runtime/test/judge/judge-resilience.test.mjs",
+      "old_blob": "6ec1d986fe4424d833532d75157951b0ceb9aa77",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-runtime-races.test.mjs",
+      "new_path": "semantic-runtime/test/judge/judge-runtime-races.test.mjs",
+      "old_blob": "4c023b32d3c805a497d4afc2b86bb7336b6c735c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-runtime.test.mjs",
+      "new_path": "semantic-runtime/test/judge/judge-runtime.test.mjs",
+      "old_blob": "21bbe3a11cf23edd6384cd8ad523fc12a74abcc9",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/local-composition.test.mjs",
+      "new_path": "semantic-runtime/test/support/local-composition.test.mjs",
+      "old_blob": "c15a551c7987f803ad0d3555793efca5e1e09290",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/local-service.test.mjs",
+      "new_path": "semantic-runtime/test/app/local-service.test.mjs",
+      "old_blob": "f2a110e6d07991b8136515a9d127760d272cf19a",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/macos-secret-store.test.mjs",
+      "new_path": "semantic-runtime/test/support/macos-secret-store.test.mjs",
+      "old_blob": "76d8c868d026c3e9aacdbc9a794cc56d1944eb7c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/observability-contract.test.mjs",
+      "new_path": "semantic-runtime/test/decisions/observability-contract.test.mjs",
+      "old_blob": "e7ec74b874564d94e8ce4bb8eefa45052bbc6f04",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/openrouter-jev-judge.test.mjs",
+      "new_path": "semantic-runtime/test/judge/openrouter-jev-judge.test.mjs",
+      "old_blob": "efb41e471ad1a5f29b3042a6f18c345e85ba860e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/policy-artifacts.test.mjs",
+      "new_path": "semantic-runtime/test/decisions/policy-artifacts.test.mjs",
+      "old_blob": "78364bbac772ed86ad2abb76c1ca317672d1837b",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/policy-kernel-integration.test.mjs",
+      "new_path": "semantic-runtime/test/decisions/policy-kernel-integration.test.mjs",
+      "old_blob": "907b6ab7c25eba17d5fbebcad2d8ad8e25974f37",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/policy-kernel.test.mjs",
+      "new_path": "semantic-runtime/test/decisions/policy-kernel.test.mjs",
+      "old_blob": "b361cdf8f6fb70e5b1b3d6026ea1e679a7d615d2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/project-activation.test.mjs",
+      "new_path": "semantic-runtime/test/project/project-activation.test.mjs",
+      "old_blob": "43eac75ae91ccf574466f7d0b6d98c8dcd030cf8",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/provider-settings.test.mjs",
+      "new_path": "semantic-runtime/test/judge/provider-settings.test.mjs",
+      "old_blob": "9677eab27168eeca5148cef567a0af5251da6f1f",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/query-contract.test.mjs",
+      "new_path": "semantic-runtime/test/query/query-contract.test.mjs",
+      "old_blob": "c742c9c053deb935dd9daa50242a17161c9b93c8",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/query-engine.test.mjs",
+      "new_path": "semantic-runtime/test/query/query-engine.test.mjs",
+      "old_blob": "7432adcc420d326b8ff581c60d926f844e195f52",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/query-inputs.test.mjs",
+      "new_path": "semantic-runtime/test/query/query-inputs.test.mjs",
+      "old_blob": "f09dd69a577d9f2c9f909903712557292a14f93e",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/query-pure.test.mjs",
+      "new_path": "semantic-runtime/test/query/query-pure.test.mjs",
+      "old_blob": "497d437d448352ea3775e373b2418e6f96be22aa",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/reconciliation-integration.test.mjs",
+      "new_path": "semantic-runtime/test/work/reconciliation-integration.test.mjs",
+      "old_blob": "56d59fa62345c761619e76067e4d6a17dd66d6f0",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/reconciliation.test.mjs",
+      "new_path": "semantic-runtime/test/work/reconciliation.test.mjs",
+      "old_blob": "2b9aa27ba0eb527c3549f3bc3bf66a28ff0036ba",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/runtime-layout.test.mjs",
+      "new_path": "semantic-runtime/test/support/runtime-layout.test.mjs",
+      "old_blob": "274a753567f74604a6392314f99919762dab57ea",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/service-auth.test.mjs",
+      "new_path": "semantic-runtime/test/identity/service-auth.test.mjs",
+      "old_blob": "de34073ad74117de8ebab04aa50903aa2fc0f072",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/setup-ui.test.mjs",
+      "new_path": "semantic-runtime/test/app/setup-ui.test.mjs",
+      "old_blob": "d84cf44e5cfeec15e953b63bbb27054404635352",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/source-invalidation-crash.test.mjs",
+      "new_path": "semantic-runtime/test/sources/source-invalidation-crash.test.mjs",
+      "old_blob": "5c5f354d458314a2ff0fcc29a8c63249a9adfb03",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/source-invalidation.test.mjs",
+      "new_path": "semantic-runtime/test/sources/source-invalidation.test.mjs",
+      "old_blob": "5023cafc8d79d1f7d64aa53f4bf0d17e914bbe75",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/typesafe-jev-judge.test.mjs",
+      "new_path": "semantic-runtime/test/judge/typesafe-jev-judge.test.mjs",
+      "old_blob": "4d8266e24f3d1b4249d4bbdb1f27ad02832ff64c",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/worker-protocol-integration.test.mjs",
+      "new_path": "semantic-runtime/test/work/worker-protocol-integration.test.mjs",
+      "old_blob": "5860bb521424fd938049b7037c40b7b0e0670a15",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/worker-protocol.test.mjs",
+      "new_path": "semantic-runtime/test/work/worker-protocol.test.mjs",
+      "old_blob": "fb3bd0fe9c379579fd4ff7ac90c467dac4386307",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/working-graph-integration.test.mjs",
+      "new_path": "semantic-runtime/test/graph/working-graph-integration.test.mjs",
+      "old_blob": "ab145e74a758dfc22761f5f022553c3dd9359303",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
+    },
+    {
+      "old_path": "semantic-runtime/test/working-graph.test.mjs",
+      "new_path": "semantic-runtime/test/graph/working-graph.test.mjs",
+      "old_blob": "45214b815cc72a0cbefc4e49cabb36f0ab9061d2",
+      "migration_commit": "abf2d88f6e24869846dda3309365e8689b0f4f54",
+      "category": "deterministic-test-tool-layout"
     }
   ]
 }

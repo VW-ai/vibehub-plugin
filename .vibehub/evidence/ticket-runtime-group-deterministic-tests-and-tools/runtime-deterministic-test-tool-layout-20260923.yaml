@@ -1,0 +1,58 @@
+{
+  "acceptance_ids": [
+    "deterministic-test-and-tool-layout-is-exact",
+    "deterministic-suite-behavior-and-command-coverage-are-preserved",
+    "deterministic-layout-relocation-is-traceable",
+    "grouped-tests-and-tools-keep-layout-boundaries-honest",
+    "deterministic-layout-calibrates-before-expanding"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "deterministic-test-and-tool-layout-is-exact",
+      "identity": "sha256:7c7d7524ac5b078018b558317de8c1d58c2a287676332ffcd4597134be0c8c55",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "deterministic-suite-behavior-and-command-coverage-are-preserved",
+      "identity": "sha256:3087cdcad98118036bc4d3ff6d31a8c20a6a2c0d0c9cf33925bb02fc277f51ca",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "deterministic-layout-relocation-is-traceable",
+      "identity": "sha256:ed007422556ca47e38d293ceae8a75654e93f24db829d67ee27b130026cb089a",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "grouped-tests-and-tools-keep-layout-boundaries-honest",
+      "identity": "sha256:a28d6ed69b82773b9f961d90f07c51248572ddb7cb28a02278f7a7f03790ac17",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "deterministic-layout-calibrates-before-expanding",
+      "identity": "sha256:5ec4f17b23c69b7b83f876bf7686f7bed7d4096a5ba1fb7155e8d5400c74d4ac",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-deterministic-test-tool-layout-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T01:11:43.090Z",
+  "refs": [
+    "commit:abf2d88f6e24869846dda3309365e8689b0f4f54",
+    "semantic-runtime/test",
+    "semantic-runtime/tools",
+    "semantic-runtime/verification/live/jev/test",
+    "semantic-runtime/package.json",
+    "semantic-runtime/test/support/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    "semantic-runtime/README.md",
+    ".vibehub/tickets/ticket-runtime-group-deterministic-tests-and-tools.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit abf2d88f6e24869846dda3309365e8689b0f4f54 moves the exact audited deterministic suite and governance-tool closure: 93 former top-level test files, 17 former test/helpers files and exactly three scripts, with all 113 old paths absent and 113 unique destinations present. The twelve destination counts match the frozen plan exactly: app 4, context 14, decisions 4, explorations 13, graph 9, identity 2, judge 11, project 3, query 4, sources 15, support 25 and work 6; test/fixtures remains in place. Normalized comparison found only 392 required path rewrites in the 110 test/support files, while nine live JEV consumers received 14 helper-import rewrites; a static scan resolves all 409 relative module references across 137 test/live files. The 37 npm command names and their live/offline modes are unchanged, test discovers all 93 deterministic files plus eight live JEV offline harnesses, and check:boundaries plus verify:standalone now target tools. The append-only manifest contains exactly 113 deterministic-test-tool-layout entries bound to the implementation commit, every old_blob matches that commit parent, and one repository-aware relocation guard is the only added test case. Exactly 25 current Runtime Markdown files received 29 test/tool path updates; completed historical records, measurement JSON, reports, fixtures, research, production source, dependencies and lockfile remain unchanged. The visible calibration checkpoint matched plan before broad verification. Focused layout/boundary checks pass 34/34; 409 relative imports resolve; boundary inspection scans 249 files with zero errors, zero direction exceptions and zero production SCCs. Production invariants remain 200 root exports and 315 import edges. The first sandboxed full run represented all 1009 cases but 12 local HTTP tests failed solely with listen EPERM; the authorized loopback rerun passes 1009 Runtime cases (1007 pass, two platform skips, zero failures) plus Phase 0 32/32. Standalone install and verification passes 1009 cases (986 pass, 23 deliberate historical/research/platform skips, zero failures) and scans 214 files. Root artifact verification passes with 79 files and 3670088 bytes. Project and Ticket validation pass, Context guard reports no authorities or violations, git diff checking passes, and the semantic-runtime Room is aligned. No credential was read and no provider call was made; JEV coverage used the existing offline mocked-transport harnesses.",
+  "ticket_id": "ticket-runtime-group-deterministic-tests-and-tools"
+}

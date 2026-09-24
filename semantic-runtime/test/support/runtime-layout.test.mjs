@@ -63,6 +63,68 @@ test('complete production source layout relocation is recorded as one exact batc
     && record.path !== record.intended_destination), []);
 });
 
+test('deterministic tests and governance tools form one exact relocation batch', t => {
+  const manifestUrl = new URL('../../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes historical relocation records');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'deterministic-test-tool-layout');
+  assert.equal(entries.length, 113);
+  assert.deepEqual([...new Set(entries.map(item => item.migration_commit))], [
+    'abf2d88f6e24869846dda3309365e8689b0f4f54',
+  ]);
+  assert.equal(new Set(entries.map(item => item.old_path)).size, 113);
+  assert.equal(new Set(entries.map(item => item.new_path)).size, 113);
+  assert.equal(entries.filter(item => /^semantic-runtime\/test\/[^/]+\.test\.mjs$/.test(item.old_path)).length, 93);
+  assert.equal(entries.filter(item => item.old_path.startsWith('semantic-runtime/test/helpers/')).length, 17);
+  assert.equal(entries.filter(item => item.old_path.startsWith('semantic-runtime/scripts/')).length, 3);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    const currentPath = resolveRelocationDestination(manifest, entry.new_path);
+    assert.equal(existsSync(new URL(`../../${currentPath.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+
+  const destinationCounts = Object.fromEntries([
+    'app', 'context', 'decisions', 'explorations', 'graph', 'identity',
+    'judge', 'project', 'query', 'sources', 'support', 'work',
+  ].map(group => [group, entries.filter(item => item.new_path.startsWith(`semantic-runtime/test/${group}/`)).length]));
+  assert.deepEqual(destinationCounts, {
+    app: 4,
+    context: 14,
+    decisions: 4,
+    explorations: 13,
+    graph: 9,
+    identity: 2,
+    judge: 11,
+    project: 3,
+    query: 4,
+    sources: 15,
+    support: 25,
+    work: 6,
+  });
+
+  const current = inspectRuntimeLayout();
+  assert.equal(current.inventory.filter(record => /^test\/(?:app|context|decisions|explorations|graph|identity|judge|project|query|sources|support|work)\/[^/]+\.test\.mjs$/.test(record.path)).length, 93);
+  assert.deepEqual(current.inventory.filter(record => /^(?:test|tools|scripts)\//.test(record.path)
+    && record.path !== record.intended_destination), []);
+  assert.equal(current.inventory_roots.includes('scripts'), true);
+  assert.equal(current.inventory_roots.includes('tools'), true);
+  assert.equal(current.npm_commands.find(item => item.name === 'test')?.command,
+    'node --test test/**/*.test.mjs verification/live/jev/test/*.test.mjs');
+  assert.equal(current.npm_commands.find(item => item.name === 'check:boundaries')?.command,
+    'node tools/check-boundaries.mjs');
+  assert.equal(current.npm_commands.find(item => item.name === 'verify:standalone')?.command,
+    'node tools/verify-standalone.mjs');
+  assert.equal(current.standalone_copy_paths.includes('test'), true);
+  assert.equal(current.standalone_copy_paths.includes('tools'), true);
+  assert.equal(current.standalone_copy_paths.includes('scripts'), false);
+  assert.equal(current.standalone_copy_paths.includes('research'), false);
+  assert.equal(current.standalone_copy_paths.includes('verification/reports'), false);
+});
+
 test('Phase 0 replay is one complete research vertical with explicit split lineage', t => {
   const manifestUrl = new URL('../../docs/history/runtime-relocations-v1.json', import.meta.url);
   if (!existsSync(manifestUrl)) {
