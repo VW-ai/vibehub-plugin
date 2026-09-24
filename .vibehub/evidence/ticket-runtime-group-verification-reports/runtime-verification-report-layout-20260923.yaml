@@ -1,0 +1,57 @@
+{
+  "acceptance_ids": [
+    "verification-report-layout-is-exact",
+    "verification-report-metadata-is-honest",
+    "verification-report-references-remain-resolvable",
+    "verification-report-relocation-is-traceable",
+    "verification-report-governance-is-calibrated-and-verified"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "verification-report-layout-is-exact",
+      "identity": "sha256:915550d5e18c88c2b24670983ecbf590c52ad5e10f9a311b4f3888baa560597f",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification-report-metadata-is-honest",
+      "identity": "sha256:6eec3837447df6d1dc573781c19c5c3d5db9a299978792de09b5f3b8a7cbbc26",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification-report-references-remain-resolvable",
+      "identity": "sha256:10576324e8d42080d53cf1c87387296f7a08a322e03548d72fbc11de0d15a789",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification-report-relocation-is-traceable",
+      "identity": "sha256:19367b805680ba2e5468de8c62447f2f6b81282a28b88ba2e73b3023cf39ef47",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "verification-report-governance-is-calibrated-and-verified",
+      "identity": "sha256:ef3e5e8edf6d539f7a12a65662dfca1408c0d2e8a72bf7bba130b1413c7ce57e",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-verification-report-layout-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T02:19:00.000Z",
+  "refs": [
+    "commit:0126decaf4d6d948cd478657650acdd4770615a6",
+    "commit:cac134a9dacc94fc59a25c98b0c27d4ad8b275da",
+    "semantic-runtime/verification/reports",
+    "semantic-runtime/verification/reports/report-metadata-v1.json",
+    "semantic-runtime/tools/runtime-layout.mjs",
+    "semantic-runtime/test/support/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-group-verification-reports.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit 0126decaf4d6d948cd478657650acdd4770615a6 moves exactly 27 selected reports, totaling 81,153 bytes, from docs/measurements into verification/reports without renaming or changing any report byte. Destination counts are sources 3, context 4, explorations 5, graph 4, support 5, project 1, judge 2, query 2 and app 1; the three settled host-probe reports remain unchanged. One adjacent metadata manifest contains exactly 27 records classified deterministic-local-measurement 3, verification-summary 7, live-provider-measurement 16 and local-app-walkthrough 1. Each record binds final path, original Git blob, SHA-256 and byte count, and copies only recorded JSON pointers for command, input and tested/untested boundaries; cwd, source revision, runtime versions and provider versions remain explicitly not_recorded wherever absent. Its single historical alias maps the one preserved full old-path value without rewriting the original report. The frozen reference audit accounts for all 106 current selected-report occurrences: exactly 79 old-location references were rewritten, while 27 baseline intended destinations were already current; the final tree has zero current old-location references. Five sibling report basenames resolve in their capability directories, the historical full path resolves through metadata, and 15 existing Evidence files with 24 selected-report references remain byte-identical. Proof commit cac134a9dacc94fc59a25c98b0c27d4ad8b275da preserves the prior 309 relocation entries and appends 27 entries bound to the actual implementation commit, for 336 total. The regenerated baseline has 371 inventory records and ten roots, including 27 verification-report records and one verification-report-manifest, while standalone copy paths remain seven and exclude reports. The visible calibration matched every planned count before broad verification. Focused layout/boundary tests pass 36/36; boundary inspection scans 249 files with zero errors, direction exceptions or production SCCs. Full Runtime verification passes 1011 tests: 1009 passed, two expected platform skips and zero failures, plus Phase 0 32/32. Serial standalone verification passes the same 1011-test set with 986 passed, 25 deliberate platform/history/research/report skips and zero failures, and scans 214 files. Root artifact verification passes with 79 files and 3,670,088 bytes. Root exports remain 200, production edges 315, contract constants 29, npm commands 37 and SCCs zero. Ticket and project validation pass, Context guard from the planning commit reports no authority or violation, git diff checking passes, and semantic-runtime Room is FRESH. No production source, package, lockfile, schema, public API, credential or provider call changed; JEV coverage was exercised only through offline mocked transports. The two unrelated untracked Tickets remained untouched.",
+  "ticket_id": "ticket-runtime-group-verification-reports"
+}
