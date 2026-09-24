@@ -55,7 +55,7 @@
     },
     {
       "purpose": "Existing implemented baseline and explicitly unevaluated downstream/productization gates; reuse rather than replan it.",
-      "ref": "semantic-runtime/docs/phase0-contracts.md"
+      "ref": "semantic-runtime/research/phase0-replay/phase0-contracts.md"
     },
     {
       "purpose": "Local useful loop precedes hosted deployment or a persistent independent Worker.",

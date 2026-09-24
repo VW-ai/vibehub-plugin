@@ -63,11 +63,11 @@
     },
     {
       "purpose": "Current Phase 0 event, state, judge, failure, and evaluation contracts that the live adapter must preserve.",
-      "ref": "semantic-runtime/docs/phase0-contracts.md"
+      "ref": "semantic-runtime/research/phase0-replay/phase0-contracts.md"
     },
     {
       "purpose": "Executable provider-independent SemanticJudge interface consumed by offline replay.",
-      "ref": "semantic-runtime/src/core/replay.mjs"
+      "ref": "semantic-runtime/research/phase0-replay/src/replay.mjs"
     }
   ],
   "contract_revisions": [

@@ -17,6 +17,18 @@ function copyComponent(t) {
   return root;
 }
 
+function resolveRelocationDestination(manifest, startPath) {
+  const byOldPath = new Map(manifest.relocations.map(entry => [entry.old_path, entry.new_path]));
+  const visited = new Set();
+  let currentPath = startPath;
+  while (byOldPath.has(currentPath)) {
+    assert.equal(visited.has(currentPath), false, `relocation cycle at ${currentPath}`);
+    visited.add(currentPath);
+    currentPath = byOldPath.get(currentPath);
+  }
+  return currentPath;
+}
+
 test('checked Runtime layout baseline matches the complete component', () => {
   const result = checkRuntimeLayout();
   assert.equal(result.inventory_checked, existsSync(new URL('../docs/history/runtime-relocations-v1.json', import.meta.url)));
@@ -40,7 +52,8 @@ test('complete production source layout relocation is recorded as one exact batc
   for (const entry of entries) {
     assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
     assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
-    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+    const currentPath = resolveRelocationDestination(manifest, entry.new_path);
+    assert.equal(existsSync(new URL(`../${currentPath.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
   }
   const current = inspectRuntimeLayout();
   assert.deepEqual(current.inventory.filter(record => record.path.startsWith('src/')
@@ -48,6 +61,36 @@ test('complete production source layout relocation is recorded as one exact batc
     && record.intended_destination.startsWith('src/')), []);
   assert.deepEqual(current.inventory.filter(record => record.path.startsWith('src/')
     && record.path !== record.intended_destination), []);
+});
+
+test('Phase 0 replay is one complete research vertical with explicit split lineage', t => {
+  const manifestUrl = new URL('../docs/history/runtime-relocations-v1.json', import.meta.url);
+  if (!existsSync(manifestUrl)) {
+    t.skip('standalone production verification deliberately excludes research provenance');
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestUrl, 'utf8'));
+  const entries = manifest.relocations.filter(item => item.category === 'phase0-replay-research');
+  assert.equal(entries.length, 32);
+  assert.deepEqual([...new Set(entries.map(item => item.migration_commit))], [
+    'aa707aa5b4b8d1c0d41e66628699d727386aaeea',
+  ]);
+  assert.equal(new Set(entries.map(item => item.old_path)).size, 32);
+  assert.equal(new Set(entries.map(item => item.new_path)).size, 32);
+  for (const entry of entries) {
+    assert.match(entry.old_blob, /^[0-9a-f]{40}$/);
+    assert.equal(existsSync(new URL(`../${entry.old_path.slice('semantic-runtime/'.length)}`, import.meta.url)), false);
+    assert.equal(existsSync(new URL(`../${entry.new_path.slice('semantic-runtime/'.length)}`, import.meta.url)), true);
+  }
+  const splitEntry = entries.find(item => item.old_path === 'semantic-runtime/src/core/contracts.mjs');
+  assert.equal(splitEntry?.new_path, 'semantic-runtime/src/domain/shared/contracts.mjs');
+  assert.equal(existsSync(new URL('../research/phase0-replay/src/contracts.mjs', import.meta.url)), true);
+  const current = inspectRuntimeLayout();
+  assert.deepEqual(current.inventory.filter(record => record.path.startsWith('research/phase0-replay/')
+    && record.path !== record.intended_destination), []);
+  assert.deepEqual(['compareRuns', 'loadPhaseZeroPolicyArtifact', 'normalizeEvent', 'normalizeState', 'replay', 'validatePolicy']
+    .filter(name => current.root_exports.includes(name)), []);
+  assert.equal(current.root_exports.includes('judgeInputHash'), true);
 });
 
 test('UX research relocation is complete and recorded', t => {

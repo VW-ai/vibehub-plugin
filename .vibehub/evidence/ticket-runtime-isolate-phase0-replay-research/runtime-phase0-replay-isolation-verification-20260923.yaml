@@ -1,0 +1,61 @@
+{
+  "acceptance_ids": [
+    "formal-runtime-has-no-phase0-replay-coupling",
+    "phase0-research-vertical-is-complete",
+    "phase0-contract-and-command-behavior-is-preserved",
+    "production-and-research-verification-stay-honest",
+    "phase0-extraction-calibrates-before-expanding"
+  ],
+  "acceptance_revisions": [
+    {
+      "acceptance_id": "formal-runtime-has-no-phase0-replay-coupling",
+      "identity": "sha256:16155c5bbe5dd57478e6301bccc8993ae865163450db4d7bafb9c87dbe267afa",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "phase0-research-vertical-is-complete",
+      "identity": "sha256:80d785d3998658cf2be147008e1a4fa105ac629d281fc3dfed2341faa651dbd1",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "phase0-contract-and-command-behavior-is-preserved",
+      "identity": "sha256:52d36459250cfb36863cb648f347a34931668ef314cf71e9f90694d74f9d1e27",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "production-and-research-verification-stay-honest",
+      "identity": "sha256:6b0b549dd10e2092f0e0d4d27d681037015451d6a05e09336e4ce017f7ae3241",
+      "revision": 1
+    },
+    {
+      "acceptance_id": "phase0-extraction-calibrates-before-expanding",
+      "identity": "sha256:2e4894d415e3daf226a43ef614ee915cefd951c48eafa3564d6dfa3d0ae76846",
+      "revision": 1
+    }
+  ],
+  "binding_origin": "native",
+  "binding_state": "bound",
+  "evidence_id": "runtime-phase0-replay-isolation-verification-20260923",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-09-24T00:02:41.752Z",
+  "refs": [
+    "commit:aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+    "semantic-runtime/research/phase0-replay/src/contracts.mjs",
+    "semantic-runtime/src/domain/shared/contracts.mjs",
+    "semantic-runtime/research/phase0-replay/src/replay.mjs",
+    "semantic-runtime/research/phase0-replay/src/policy.mjs",
+    "semantic-runtime/research/phase0-replay/test/policy-compatibility.test.mjs",
+    "semantic-runtime/package.json",
+    "semantic-runtime/scripts/runtime-layout.mjs",
+    "semantic-runtime/scripts/verify-standalone.mjs",
+    "semantic-runtime/test/runtime-layout.test.mjs",
+    "semantic-runtime/docs/architecture/runtime-layout-baseline-v1.json",
+    "semantic-runtime/docs/history/runtime-relocations-v1.json",
+    ".vibehub/tickets/ticket-runtime-isolate-phase0-replay-research.yaml",
+    ".vibehub/rooms/semantic-runtime/room.yaml"
+  ],
+  "schema_version": 2,
+  "summary": "Implementation commit aa707aa5b4b8d1c0d41e66628699d727386aaeea isolates the audited 32-path Phase 0 closure as one research/phase0-replay vertical: 31 whole-file moves plus the deliberate src/core/contracts.mjs split. The formal shared module exports exactly the 13 accepted production symbols; the replay module exports exactly its four replay-only symbols. The policy compatibility loader and its test moved out of the formal Runtime, src/core is empty, production imports no research, and the formal root surface removes exactly replay, compareRuns, validatePolicy, normalizeEvent, normalizeState and loadPhaseZeroPolicyArtifact while retaining judgeInputHash. The existing replay, audit, comparison, benchmark and provenance command names point to the new research paths. Before broad verification, the visible calibration confirmed all 32 old paths absent, all declared destinations present, the 31+1 split, both compatibility extractions, and the exact six export removals; focused formal and Phase 0 verification passed 70/70. The append-only relocation manifest has 32 unique old/new records and every old_blob independently matches the migration parent. Layout and boundary checks pass across 249 files with zero production SCCs, zero direction exceptions and zero errors; the focused layout/boundary suite passes 32/32. Full offline npm run verify passes 1007 Runtime tests (1005 pass, two expected environment skips, zero failures) plus 32/32 Phase 0 tests. Locked standalone installation copies no research, scans 214 formal files and passes 986 tests with 21 deliberate historical/research exclusions and zero failures. Root plugin artifact verification passes with 79 files and 3670088 bytes. Project/Ticket validation passes at 236 Tickets, 543 pre-Evidence records and 182 Outcomes; four current refs in three still-active Tickets follow the relocated research paths while completed historical records remain untouched. Context guard reports no authorities or violations, git diff checking passes, and the semantic-runtime Room is FRESH. No credential, Keychain item, network, host, model provider or live JEV call was used.",
+  "ticket_id": "ticket-runtime-isolate-phase0-replay-research"
+}

@@ -749,6 +749,230 @@
       "old_blob": "6f0018d967ea3181398eaba1dd161e6fa3ab8762",
       "migration_commit": "84b1f1c20c56f5b14534f838c0bb77e81a8bade8",
       "category": "production-source-layout"
+    },
+    {
+      "old_path": "semantic-runtime/src/cli.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/cli.mjs",
+      "old_blob": "7b8b0a9c14eb7142f949ec85c0bf3e60c47d959a",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/contracts.mjs",
+      "new_path": "semantic-runtime/src/domain/shared/contracts.mjs",
+      "old_blob": "39c82e6b40c24bdf49d9f9b514d25cb7a1085f4f",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/evaluation.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/src/evaluation.mjs",
+      "old_blob": "f415c5acde261ab958e9c1203cfba8e96afdf652",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/policy.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/src/policy.mjs",
+      "old_blob": "9345c2ff5cfadb88d1962d1c849b72ab777fc5cf",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/core/replay.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/src/replay.mjs",
+      "old_blob": "55ce0848ac0d03bff221e9e6b7d17e53ee9a6376",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/sqlite-store.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/adapters/sqlite-store.mjs",
+      "old_blob": "d8048bf083c41f22648612290c97c6066463c438",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/providers/heuristic-judge.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/adapters/heuristic-judge.mjs",
+      "old_blob": "2a98223837f13e55084193462a2e3fe1e4588f38",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/src/adapters/providers/recorded-judge.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/adapters/recorded-judge.mjs",
+      "old_blob": "3866eb5f997011d57b26ad0b082bf373314e1b36",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/benchmark-peel-jev.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/benchmark-peel-jev.mjs",
+      "old_blob": "4f6ec987f6aa27a343c3fc86b27239fd4d9da7a0",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/benchmark-peel-typesafe-direct.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/benchmark-peel-typesafe-direct.mjs",
+      "old_blob": "67750afbd0481099a89785141c96187edee8ca31",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/compare-peel-jev-routes.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/compare-peel-jev-routes.mjs",
+      "old_blob": "44630a27eb8f160883798e2b127844fbb1d2a7f7",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/compare-peel-judges.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/compare-peel-judges.mjs",
+      "old_blob": "4076672a35274e9210ecf99ed295819a0812660a",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/scripts/verify-peel-provenance.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/verify-peel-provenance.mjs",
+      "old_blob": "00b00ccb871fede2d993a3fd06b8d10b85227d62",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/cli.test.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/cli.test.mjs",
+      "old_blob": "e1a11ad2701ddd451a6734098bfacc664908d4fe",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/jev-route-comparison.test.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/jev-route-comparison.test.mjs",
+      "old_blob": "b40e1197e754c2a739398185ffb9d40a691fe73d",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/judge-comparison.test.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/judge-comparison.test.mjs",
+      "old_blob": "01baf8bb13d67241c853683aeae70fba5dc9d0e4",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/peel-fixture.test.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/peel-fixture.test.mjs",
+      "old_blob": "238de1fc10354c9ecf78e60d3d74e575d57c5a1e",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/replay.test.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/replay.test.mjs",
+      "old_blob": "a4f5fd1abc041e97991df6fac80af0b50fbcdf02",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/policies/phase0.json",
+      "new_path": "semantic-runtime/research/phase0-replay/policies/phase0.json",
+      "old_blob": "089f5e449244de79c4c14a0c5e6b9f39551613a1",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/policies/peel-benchmark.json",
+      "new_path": "semantic-runtime/research/phase0-replay/policies/peel-benchmark.json",
+      "old_blob": "86f3bc56fc1ce4d7d403d88c8c68696c4c22b04c",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/docs/phase0-contracts.md",
+      "new_path": "semantic-runtime/research/phase0-replay/phase0-contracts.md",
+      "old_blob": "95d3ebd03a199a2008824a749818d50638eeac28",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/README.md",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/README.md",
+      "old_blob": "459ace858871c160a7771565592fd03f7d77e69f",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/curation.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/curation.json",
+      "old_blob": "3383dacdd3e51326373570bf3d5f7303d6fd7af9",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/events.jsonl",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/events.jsonl",
+      "old_blob": "f1ddc653ca107508c57d9cf62009bb36071bba6b",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/labels.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/labels.json",
+      "old_blob": "f3593c0480a80db48af7cb7db2ae4d0f490aaaa0",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/provenance.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/provenance.json",
+      "old_blob": "73e6bf13d3d86aa76d80b19d99e3eb3c8d207d96",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/peel/state.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/peel/state.json",
+      "old_blob": "31fc88a7aa0d421a8e26236bd53a4ef4198b974f",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/README.md",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/synthetic/README.md",
+      "old_blob": "9094eaff2468321b25c72c714941ed5d80a693bc",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/events.jsonl",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/synthetic/events.jsonl",
+      "old_blob": "63658ef39a151897ddfda239cdddfe021831b326",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/labels.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/synthetic/labels.json",
+      "old_blob": "50a7ccdb6e2d49e35a8e46714e201f3feb959b3f",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/fixtures/state.json",
+      "new_path": "semantic-runtime/research/phase0-replay/fixtures/synthetic/state.json",
+      "old_blob": "bd64e00c00bc5885f1b9905da7455a972b51c2f9",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
+    },
+    {
+      "old_path": "semantic-runtime/test/helpers.mjs",
+      "new_path": "semantic-runtime/research/phase0-replay/test/support.mjs",
+      "old_blob": "90f00522bdbb959a2f92f3441aa93f799f6926c1",
+      "migration_commit": "aa707aa5b4b8d1c0d41e66628699d727386aaeea",
+      "category": "phase0-replay-research"
     }
   ]
 }

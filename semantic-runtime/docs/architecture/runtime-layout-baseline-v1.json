@@ -316,11 +316,6 @@
       "intended_destination": "docs/contracts/openrouter-jev-adapter.md"
     },
     {
-      "path": "docs/phase0-contracts.md",
-      "current_role": "documentation-or-report",
-      "intended_destination": "research/phase0-replay/phase0-contracts.md"
-    },
-    {
       "path": "docs/policy-artifacts-v0.md",
       "current_role": "documentation-or-report",
       "intended_destination": "docs/contracts/policy-artifacts-v0.md"
@@ -381,16 +376,6 @@
       "intended_destination": "package.json"
     },
     {
-      "path": "policies/peel-benchmark.json",
-      "current_role": "phase0-research",
-      "intended_destination": "research/phase0-replay/policies/peel-benchmark.json"
-    },
-    {
-      "path": "policies/phase0.json",
-      "current_role": "phase0-research",
-      "intended_destination": "research/phase0-replay/policies/phase0.json"
-    },
-    {
       "path": "README.md",
       "current_role": "component-documentation",
       "intended_destination": "README.md"
@@ -444,6 +429,171 @@
       "path": "research/host-probes/codex/test/codex-host-probe.test.mjs",
       "current_role": "host-research",
       "intended_destination": "research/host-probes/codex/test/codex-host-probe.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/adapters/heuristic-judge.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/adapters/heuristic-judge.mjs"
+    },
+    {
+      "path": "research/phase0-replay/adapters/recorded-judge.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/adapters/recorded-judge.mjs"
+    },
+    {
+      "path": "research/phase0-replay/adapters/sqlite-store.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/adapters/sqlite-store.mjs"
+    },
+    {
+      "path": "research/phase0-replay/benchmark-peel-jev.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/benchmark-peel-jev.mjs"
+    },
+    {
+      "path": "research/phase0-replay/benchmark-peel-typesafe-direct.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/benchmark-peel-typesafe-direct.mjs"
+    },
+    {
+      "path": "research/phase0-replay/cli.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/cli.mjs"
+    },
+    {
+      "path": "research/phase0-replay/compare-peel-jev-routes.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/compare-peel-jev-routes.mjs"
+    },
+    {
+      "path": "research/phase0-replay/compare-peel-judges.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/compare-peel-judges.mjs"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/curation.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/curation.json"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/events.jsonl",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/events.jsonl"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/labels.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/labels.json"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/provenance.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/provenance.json"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/README.md",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/README.md"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/peel/state.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/peel/state.json"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/synthetic/events.jsonl",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/synthetic/events.jsonl"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/synthetic/labels.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/synthetic/labels.json"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/synthetic/README.md",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/synthetic/README.md"
+    },
+    {
+      "path": "research/phase0-replay/fixtures/synthetic/state.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/fixtures/synthetic/state.json"
+    },
+    {
+      "path": "research/phase0-replay/phase0-contracts.md",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/phase0-contracts.md"
+    },
+    {
+      "path": "research/phase0-replay/policies/peel-benchmark.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/policies/peel-benchmark.json"
+    },
+    {
+      "path": "research/phase0-replay/policies/phase0.json",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/policies/phase0.json"
+    },
+    {
+      "path": "research/phase0-replay/src/contracts.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/src/contracts.mjs"
+    },
+    {
+      "path": "research/phase0-replay/src/evaluation.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/src/evaluation.mjs"
+    },
+    {
+      "path": "research/phase0-replay/src/policy.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/src/policy.mjs"
+    },
+    {
+      "path": "research/phase0-replay/src/replay.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/src/replay.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/cli.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/cli.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/jev-route-comparison.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/jev-route-comparison.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/judge-comparison.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/judge-comparison.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/peel-fixture.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/peel-fixture.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/policy-compatibility.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/policy-compatibility.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/replay.test.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/replay.test.mjs"
+    },
+    {
+      "path": "research/phase0-replay/test/support.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/test/support.mjs"
+    },
+    {
+      "path": "research/phase0-replay/verify-peel-provenance.mjs",
+      "current_role": "research",
+      "intended_destination": "research/phase0-replay/verify-peel-provenance.mjs"
     },
     {
       "path": "research/platform/node-postgres/app-spec.template.yaml",
@@ -566,16 +716,6 @@
       "intended_destination": "research/ux/project-exploration/style.css"
     },
     {
-      "path": "scripts/benchmark-peel-jev.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/phase0-replay/benchmark-peel-jev.mjs"
-    },
-    {
-      "path": "scripts/benchmark-peel-typesafe-direct.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/phase0-replay/benchmark-peel-typesafe-direct.mjs"
-    },
-    {
       "path": "scripts/check-boundaries.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "tools/check-boundaries.mjs"
@@ -621,16 +761,6 @@
       "intended_destination": "verification/live/jev/check-jev-synthetic.mjs"
     },
     {
-      "path": "scripts/compare-peel-jev-routes.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/phase0-replay/compare-peel-jev-routes.mjs"
-    },
-    {
-      "path": "scripts/compare-peel-judges.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/phase0-replay/compare-peel-judges.mjs"
-    },
-    {
       "path": "scripts/runtime-layout.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "tools/runtime-layout.mjs"
@@ -649,11 +779,6 @@
       "path": "scripts/smoke-typesafe-direct.mjs",
       "current_role": "tooling-or-runner",
       "intended_destination": "verification/live/jev/smoke-typesafe-direct.mjs"
-    },
-    {
-      "path": "scripts/verify-peel-provenance.mjs",
-      "current_role": "tooling-or-runner",
-      "intended_destination": "research/phase0-replay/verify-peel-provenance.mjs"
     },
     {
       "path": "scripts/verify-standalone.mjs",
@@ -706,11 +831,6 @@
       "intended_destination": "src/adapters/providers/haiku-judge.mjs"
     },
     {
-      "path": "src/adapters/providers/heuristic-judge.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/heuristic-judge.mjs"
-    },
-    {
       "path": "src/adapters/providers/jev-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/jev-judge.mjs"
@@ -736,11 +856,6 @@
       "intended_destination": "src/adapters/providers/provider-settings.mjs"
     },
     {
-      "path": "src/adapters/providers/recorded-judge.mjs",
-      "current_role": "production",
-      "intended_destination": "src/adapters/providers/recorded-judge.mjs"
-    },
-    {
       "path": "src/adapters/providers/resilient-judge.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/providers/resilient-judge.mjs"
@@ -759,11 +874,6 @@
       "path": "src/adapters/secrets/macos-secret-store.mjs",
       "current_role": "production",
       "intended_destination": "src/adapters/secrets/macos-secret-store.mjs"
-    },
-    {
-      "path": "src/adapters/sqlite-store.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/adapters/sqlite-store.mjs"
     },
     {
       "path": "src/adapters/sqlite/domain-store.mjs",
@@ -946,31 +1056,6 @@
       "intended_destination": "src/application/support/local-runtime-composition.mjs"
     },
     {
-      "path": "src/cli.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/cli.mjs"
-    },
-    {
-      "path": "src/core/contracts.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/src/contracts.mjs"
-    },
-    {
-      "path": "src/core/evaluation.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/src/evaluation.mjs"
-    },
-    {
-      "path": "src/core/policy.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/src/policy.mjs"
-    },
-    {
-      "path": "src/core/replay.mjs",
-      "current_role": "production",
-      "intended_destination": "research/phase0-replay/src/replay.mjs"
-    },
-    {
       "path": "src/domain/context/context-profile.mjs",
       "current_role": "production",
       "intended_destination": "src/domain/context/context-profile.mjs"
@@ -1034,6 +1119,11 @@
       "path": "src/domain/query/query-text.mjs",
       "current_role": "production",
       "intended_destination": "src/domain/query/query-text.mjs"
+    },
+    {
+      "path": "src/domain/shared/contracts.mjs",
+      "current_role": "production",
+      "intended_destination": "src/domain/shared/contracts.mjs"
     },
     {
       "path": "src/domain/sources/canonical-records.mjs",
@@ -1144,11 +1234,6 @@
       "path": "test/claude-cli-judge.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/claude-cli-judge.test.mjs"
-    },
-    {
-      "path": "test/cli.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/test/cli.test.mjs"
     },
     {
       "path": "test/context-capacity.test.mjs",
@@ -1351,11 +1436,6 @@
       "intended_destination": "test/fixtures/event-provenance/mapping.json"
     },
     {
-      "path": "test/fixtures/events.jsonl",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/fixtures/events.jsonl"
-    },
-    {
       "path": "test/fixtures/git-provenance/observers.json",
       "current_role": "test-or-fixture",
       "intended_destination": "test/fixtures/git-provenance/observers.json"
@@ -1381,11 +1461,6 @@
       "intended_destination": "test/fixtures/incremental-graph/scale-measurement.json"
     },
     {
-      "path": "test/fixtures/labels.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/fixtures/labels.json"
-    },
-    {
       "path": "test/fixtures/observability/audit.json",
       "current_role": "test-or-fixture",
       "intended_destination": "test/fixtures/observability/audit.json"
@@ -1396,36 +1471,6 @@
       "intended_destination": "test/fixtures/observability/rejected-fields.json"
     },
     {
-      "path": "test/fixtures/peel/curation.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/curation.json"
-    },
-    {
-      "path": "test/fixtures/peel/events.jsonl",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/events.jsonl"
-    },
-    {
-      "path": "test/fixtures/peel/labels.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/labels.json"
-    },
-    {
-      "path": "test/fixtures/peel/provenance.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/provenance.json"
-    },
-    {
-      "path": "test/fixtures/peel/README.md",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/README.md"
-    },
-    {
-      "path": "test/fixtures/peel/state.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/fixtures/state.json"
-    },
-    {
       "path": "test/fixtures/policy-artifacts/ingress.json",
       "current_role": "test-or-fixture",
       "intended_destination": "test/fixtures/policy-artifacts/ingress.json"
@@ -1434,11 +1479,6 @@
       "path": "test/fixtures/policy-kernel/scenario.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/fixtures/policy-kernel/scenario.mjs"
-    },
-    {
-      "path": "test/fixtures/README.md",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/fixtures/README.md"
     },
     {
       "path": "test/fixtures/reconciliation/cases.json",
@@ -1454,11 +1494,6 @@
       "path": "test/fixtures/reconciliation/scenario.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/fixtures/reconciliation/scenario.mjs"
-    },
-    {
-      "path": "test/fixtures/state.json",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/fixtures/state.json"
     },
     {
       "path": "test/fixtures/worker-protocol/scenario.mjs",
@@ -1529,11 +1564,6 @@
       "path": "test/haiku-judge.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/haiku-judge.test.mjs"
-    },
-    {
-      "path": "test/helpers.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "test/support/index.mjs"
     },
     {
       "path": "test/helpers/adoption-fixture.mjs",
@@ -1661,19 +1691,9 @@
       "intended_destination": "test/judge/jev-judge.test.mjs"
     },
     {
-      "path": "test/jev-route-comparison.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/test/jev-route-comparison.test.mjs"
-    },
-    {
       "path": "test/jev-source-fence-check.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "verification/live/jev/test/jev-source-fence-check.test.mjs"
-    },
-    {
-      "path": "test/judge-comparison.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/test/judge-comparison.test.mjs"
     },
     {
       "path": "test/judge-inputs.test.mjs",
@@ -1724,11 +1744,6 @@
       "path": "test/openrouter-jev-judge.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/judge/openrouter-jev-judge.test.mjs"
-    },
-    {
-      "path": "test/peel-fixture.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/test/peel-fixture.test.mjs"
     },
     {
       "path": "test/policy-artifacts.test.mjs",
@@ -1789,11 +1804,6 @@
       "path": "test/reconciliation.test.mjs",
       "current_role": "test-or-fixture",
       "intended_destination": "test/work/reconciliation.test.mjs"
-    },
-    {
-      "path": "test/replay.test.mjs",
-      "current_role": "test-or-fixture",
-      "intended_destination": "research/phase0-replay/test/replay.test.mjs"
     },
     {
       "path": "test/runtime-layout.test.mjs",
@@ -1944,7 +1954,6 @@
     "authorizeLocalRequest",
     "canonicalArtifactAddress",
     "classifyGitRefMovement",
-    "compareRuns",
     "compilePolicyArtifact",
     "completeSourceEvent",
     "correlateGitCommitObservations",
@@ -1978,13 +1987,10 @@
     "graphRevisionAddress",
     "identityKey",
     "judgeInputHash",
-    "loadPhaseZeroPolicyArtifact",
     "migrateDomainStore",
     "normalizeAuditEnvelope",
-    "normalizeEvent",
     "normalizeRawEvent",
     "normalizeResourceBudgets",
-    "normalizeState",
     "normalizeUsageObservation",
     "pageIncrementalGraph",
     "parseCanonicalRecord",
@@ -1995,7 +2001,6 @@
     "rankContextWindowV1",
     "reconciliationPolicyConfig",
     "recordTicketWorkspaceProvenance",
-    "replay",
     "resolveExploration",
     "resolveGraphConflict",
     "resolveIdentity",
@@ -2036,7 +2041,6 @@
     "validateIdentityCatalog",
     "validateMetricLabels",
     "validateNormalizedEvent",
-    "validatePolicy",
     "validatePolicyActionCommand",
     "validatePolicyArtifact",
     "validateProvenanceClosure",
@@ -2067,32 +2071,32 @@
     },
     {
       "name": "audit",
-      "command": "node src/cli.mjs audit",
+      "command": "node research/phase0-replay/cli.mjs audit",
       "mode": "offline"
     },
     {
       "name": "benchmark:peel:compare",
-      "command": "node scripts/compare-peel-judges.mjs --transport claude-cli",
+      "command": "node research/phase0-replay/compare-peel-judges.mjs --transport claude-cli",
       "mode": "explicit-live"
     },
     {
       "name": "benchmark:peel:compare:gateway",
-      "command": "node --env-file=.env.local scripts/compare-peel-judges.mjs --transport gateway",
+      "command": "node --env-file=.env.local research/phase0-replay/compare-peel-judges.mjs --transport gateway",
       "mode": "explicit-live"
     },
     {
       "name": "benchmark:peel:jev",
-      "command": "node --env-file=.env.local scripts/benchmark-peel-jev.mjs",
+      "command": "node --env-file=.env.local research/phase0-replay/benchmark-peel-jev.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "benchmark:peel:jev:direct",
-      "command": "node --env-file=.env.local scripts/benchmark-peel-typesafe-direct.mjs",
+      "command": "node --env-file=.env.local research/phase0-replay/benchmark-peel-typesafe-direct.mjs",
       "mode": "explicit-live"
     },
     {
       "name": "benchmark:peel:jev:routes",
-      "command": "node scripts/compare-peel-jev-routes.mjs",
+      "command": "node research/phase0-replay/compare-peel-jev-routes.mjs",
       "mode": "explicit-live"
     },
     {
@@ -2147,7 +2151,7 @@
     },
     {
       "name": "compare",
-      "command": "node src/cli.mjs compare",
+      "command": "node research/phase0-replay/cli.mjs compare",
       "mode": "offline"
     },
     {
@@ -2167,17 +2171,17 @@
     },
     {
       "name": "replay",
-      "command": "node src/cli.mjs replay",
+      "command": "node research/phase0-replay/cli.mjs replay",
       "mode": "offline"
     },
     {
       "name": "replay:jev",
-      "command": "node --env-file=.env.local src/cli.mjs replay --judge jev",
+      "command": "node --env-file=.env.local research/phase0-replay/cli.mjs replay --judge jev",
       "mode": "explicit-live"
     },
     {
       "name": "replay:peel",
-      "command": "node src/cli.mjs replay --events test/fixtures/peel/events.jsonl --state test/fixtures/peel/state.json --labels test/fixtures/peel/labels.json --tenant benchmark --project peel --dataset-kind real --db .local/peel-replay-v3.sqlite",
+      "command": "node research/phase0-replay/cli.mjs replay --events research/phase0-replay/fixtures/peel/events.jsonl --state research/phase0-replay/fixtures/peel/state.json --labels research/phase0-replay/fixtures/peel/labels.json --tenant benchmark --project peel --dataset-kind real --db .local/peel-replay-v3.sqlite",
       "mode": "offline"
     },
     {
@@ -2216,13 +2220,23 @@
       "mode": "offline"
     },
     {
+      "name": "test:phase0",
+      "command": "node --test research/phase0-replay/test/*.test.mjs",
+      "mode": "offline"
+    },
+    {
       "name": "verify",
-      "command": "npm run check:boundaries && npm test",
+      "command": "npm run verify:runtime && npm run test:phase0",
       "mode": "offline"
     },
     {
       "name": "verify:peel:provenance",
-      "command": "node scripts/verify-peel-provenance.mjs",
+      "command": "node research/phase0-replay/verify-peel-provenance.mjs",
+      "mode": "offline"
+    },
+    {
+      "name": "verify:runtime",
+      "command": "npm run check:boundaries && npm test",
       "mode": "offline"
     },
     {
@@ -2384,14 +2398,9 @@
     "src",
     "scripts",
     "test",
-    "policies",
     "docs/architecture/runtime-layout-baseline-v1.json"
   ],
   "production_import_edges": [
-    {
-      "from": "src/adapters/auth/local-credential-authority.mjs",
-      "to": "src/core/contracts.mjs"
-    },
     {
       "from": "src/adapters/auth/local-credential-authority.mjs",
       "to": "src/domain/identity/access-authority.mjs"
@@ -2401,12 +2410,12 @@
       "to": "src/domain/identity/service-access.mjs"
     },
     {
-      "from": "src/adapters/git/git-projects.mjs",
-      "to": "src/adapters/sqlite/domain-store.mjs"
+      "from": "src/adapters/auth/local-credential-authority.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/git/git-projects.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/adapters/sqlite/domain-store.mjs"
     },
     {
       "from": "src/adapters/git/git-projects.mjs",
@@ -2415,6 +2424,10 @@
     {
       "from": "src/adapters/git/git-projects.mjs",
       "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/adapters/git/git-projects.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/git/git-provenance.mjs",
@@ -2450,11 +2463,11 @@
     },
     {
       "from": "src/adapters/git/git-worktree-sensor.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/adapters/git/git-worktree-sensor.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/git/git-worktree-sensor.mjs",
@@ -2462,7 +2475,7 @@
     },
     {
       "from": "src/adapters/providers/cached-judge.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/providers/claude-cli-judge.mjs",
@@ -2502,7 +2515,7 @@
     },
     {
       "from": "src/adapters/providers/judge-provider.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/providers/openrouter-jev-judge.mjs",
@@ -2510,19 +2523,11 @@
     },
     {
       "from": "src/adapters/providers/openrouter-jev-judge.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/adapters/providers/recorded-judge.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/adapters/providers/typesafe-jev-judge.mjs",
       "to": "src/adapters/providers/judge-input.mjs"
-    },
-    {
-      "from": "src/adapters/sqlite-store.mjs",
-      "to": "src/core/contracts.mjs"
     },
     {
       "from": "src/adapters/sqlite/domain-store.mjs",
@@ -2530,11 +2535,11 @@
     },
     {
       "from": "src/adapters/sqlite/graph-storage.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
       "from": "src/adapters/sqlite/graph-storage.mjs",
-      "to": "src/domain/graph/incremental-graph.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/app/local/app-setup.mjs",
@@ -2606,10 +2611,6 @@
     },
     {
       "from": "src/application/context/context-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/context/context-inputs.mjs",
       "to": "src/domain/context/context-profile.mjs"
     },
     {
@@ -2619,6 +2620,10 @@
     {
       "from": "src/application/context/context-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/context/context-inputs.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/context/context-inputs.mjs",
@@ -2714,11 +2719,11 @@
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
-      "to": "src/domain/graph/working-graph.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/explorations/exploration-adoption.mjs",
@@ -2790,10 +2795,6 @@
     },
     {
       "from": "src/application/explorations/exploration-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/explorations/exploration-inputs.mjs",
       "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
@@ -2803,6 +2804,10 @@
     {
       "from": "src/application/explorations/exploration-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/explorations/exploration-inputs.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/explorations/exploration-store.mjs",
@@ -2834,15 +2839,15 @@
     },
     {
       "from": "src/application/graph/graph-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/graph/graph-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/graph/graph-inputs.mjs",
       "to": "src/domain/identity/identity.mjs"
+    },
+    {
+      "from": "src/application/graph/graph-inputs.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/graph/graph-inputs.mjs",
@@ -2966,10 +2971,6 @@
     },
     {
       "from": "src/application/judge/judge-contract.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/judge/judge-contract.mjs",
       "to": "src/domain/decisions/policy-artifacts.mjs"
     },
     {
@@ -2983,6 +2984,10 @@
     {
       "from": "src/application/judge/judge-contract.mjs",
       "to": "src/domain/judge/judge-node.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-contract.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/judge/judge-inputs.mjs",
@@ -3026,10 +3031,6 @@
     },
     {
       "from": "src/application/judge/judge-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/judge/judge-inputs.mjs",
       "to": "src/domain/context/context-profile.mjs"
     },
     {
@@ -3047,6 +3048,10 @@
     {
       "from": "src/application/judge/judge-inputs.mjs",
       "to": "src/domain/identity/service-access.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-inputs.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/judge/judge-inputs.mjs",
@@ -3078,15 +3083,15 @@
     },
     {
       "from": "src/application/judge/judge-runtime.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/judge/judge-runtime.mjs",
       "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/judge/judge-runtime.mjs",
       "to": "src/domain/judge/judge-node.mjs"
+    },
+    {
+      "from": "src/application/judge/judge-runtime.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/project/durable-ingress.mjs",
@@ -3106,11 +3111,11 @@
     },
     {
       "from": "src/application/project/durable-ingress.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/project/durable-ingress.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/project/durable-ingress.mjs",
@@ -3218,15 +3223,15 @@
     },
     {
       "from": "src/application/query/query-inputs.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/query/query-inputs.mjs",
       "to": "src/domain/graph/working-graph.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
       "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/query/query-inputs.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/query/query-inputs.mjs",
@@ -3270,10 +3275,6 @@
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/application/sources/canonical-source-reader-service.mjs",
       "to": "src/domain/graph/incremental-graph.mjs"
     },
     {
@@ -3283,6 +3284,10 @@
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
       "to": "src/domain/identity/access-authority.mjs"
+    },
+    {
+      "from": "src/application/sources/canonical-source-reader-service.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/sources/canonical-source-reader-service.mjs",
@@ -3298,11 +3303,11 @@
     },
     {
       "from": "src/application/sources/source-invalidation.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/identity/access-authority.mjs"
     },
     {
       "from": "src/application/sources/source-invalidation.mjs",
-      "to": "src/domain/identity/access-authority.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/application/sources/source-invalidation.mjs",
@@ -3329,58 +3334,6 @@
       "to": "src/application/sources/canonical-source-reader-service.mjs"
     },
     {
-      "from": "src/cli.mjs",
-      "to": "src/adapters/providers/heuristic-judge.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/adapters/providers/jev-judge.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/adapters/providers/recorded-judge.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/adapters/sqlite-store.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/core/evaluation.mjs"
-    },
-    {
-      "from": "src/cli.mjs",
-      "to": "src/core/replay.mjs"
-    },
-    {
-      "from": "src/core/evaluation.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/policy.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/replay.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/core/replay.mjs",
-      "to": "src/core/evaluation.mjs"
-    },
-    {
-      "from": "src/core/replay.mjs",
-      "to": "src/core/policy.mjs"
-    },
-    {
-      "from": "src/domain/context/context-profile.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
       "from": "src/domain/context/context-profile.mjs",
       "to": "src/domain/graph/incremental-graph.mjs"
     },
@@ -3390,19 +3343,15 @@
     },
     {
       "from": "src/domain/context/context-profile.mjs",
+      "to": "src/domain/shared/contracts.mjs"
+    },
+    {
+      "from": "src/domain/context/context-profile.mjs",
       "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/domain/decisions/policy-artifacts.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/domain/decisions/policy-artifacts.mjs",
-      "to": "src/core/policy.mjs"
-    },
-    {
-      "from": "src/domain/decisions/policy-kernel.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/decisions/policy-kernel.mjs",
@@ -3418,15 +3367,19 @@
     },
     {
       "from": "src/domain/decisions/policy-kernel.mjs",
+      "to": "src/domain/shared/contracts.mjs"
+    },
+    {
+      "from": "src/domain/decisions/policy-kernel.mjs",
       "to": "src/domain/sources/event-provenance.mjs"
     },
     {
       "from": "src/domain/explorations/branch-scope.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/identity/identity.mjs"
     },
     {
       "from": "src/domain/explorations/branch-scope.mjs",
-      "to": "src/domain/identity/identity.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/graph/incremental-graph.mjs",
@@ -3458,15 +3411,11 @@
     },
     {
       "from": "src/domain/identity/service-access.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/judge/judge-node.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/domain/query/query-ranking.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/query/query-ranking.mjs",
@@ -3481,16 +3430,20 @@
       "to": "src/domain/query/query-text.mjs"
     },
     {
-      "from": "src/domain/query/query-text.mjs",
-      "to": "src/core/contracts.mjs"
+      "from": "src/domain/query/query-ranking.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
-      "from": "src/domain/sources/causal-ordering.mjs",
-      "to": "src/core/contracts.mjs"
+      "from": "src/domain/query/query-text.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/sources/causal-ordering.mjs",
       "to": "src/domain/decisions/policy-artifacts.mjs"
+    },
+    {
+      "from": "src/domain/sources/causal-ordering.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/sources/causal-ordering.mjs",
@@ -3510,7 +3463,7 @@
     },
     {
       "from": "src/domain/work/agent-work-request.mjs",
-      "to": "src/core/contracts.mjs"
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/domain/work/reconciliation.mjs",
@@ -3626,22 +3579,6 @@
     },
     {
       "from": "src/index.mjs",
-      "to": "src/core/contracts.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/evaluation.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/policy.mjs"
-    },
-    {
-      "from": "src/index.mjs",
-      "to": "src/core/replay.mjs"
-    },
-    {
-      "from": "src/index.mjs",
       "to": "src/domain/context/context-profile.mjs"
     },
     {
@@ -3687,6 +3624,10 @@
     {
       "from": "src/index.mjs",
       "to": "src/domain/query/query-ranking.mjs"
+    },
+    {
+      "from": "src/index.mjs",
+      "to": "src/domain/shared/contracts.mjs"
     },
     {
       "from": "src/index.mjs",
