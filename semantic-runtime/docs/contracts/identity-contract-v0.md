@@ -1,6 +1,6 @@
 # Runtime identity contract v0
 
-Wire version: `schema_version: 1`. Implementation: `src/core/identity.mjs`.
+Wire version: `schema_version: 1`. Implementation: `src/domain/identity/identity.mjs`.
 This contract separates semantic Project scope from repositories and from the
 local or connector instances observing them. It implements the identity slice
 of Tech Design §§5, 8.1, 15.1, 20 and 25; it does not establish canonical truth,

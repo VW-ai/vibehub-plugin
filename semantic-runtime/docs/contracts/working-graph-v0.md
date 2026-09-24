@@ -1,7 +1,7 @@
 # Semantic Working Graph v0
 
 Wire version `1` implements active Ticket Contract V2. The versioned schemas are
-executable validators in `src/core/working-graph.mjs`, exported through the public
+executable validators in `src/domain/graph/working-graph.mjs`, exported through the public
 package entry. They reuse the accepted [identity](identity-contract-v0.md),
 [event/provenance](event-provenance-v0.md), and
 [causal watermark/generation](causal-ordering-v0.md) contracts.

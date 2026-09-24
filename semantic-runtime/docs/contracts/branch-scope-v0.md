@@ -1,6 +1,6 @@
 # Exploration and execution-workspace scope v0
 
-`src/core/branch-scope.mjs`, exported through `src/index.mjs`, supplies pure wire
+`src/domain/explorations/branch-scope.mjs`, exported through `src/index.mjs`, supplies pure wire
 version 1 constructors, validation, transitions, resolution and view selection.
 It is a bounded executable contract for the local Git enrollment work. It does
 not add a database, branch-aware Working Graph, sync engine or Ticket lifecycle.

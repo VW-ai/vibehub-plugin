@@ -276,9 +276,9 @@ remote Workers remain later capabilities.
 The [delivery plan](docs/product/online-delivery-plan.md) and
 [integration research](docs/architecture/local-app-integration-notes.md) separate this goal
 from delivered foundations. Automatic collection, extraction/resolution,
-Context compilation, plugin integration and Worker orchestration still require
-implementation. The first bounded scoped Query library is described below; it
-is not yet host-integrated.
+plugin integration and Worker orchestration still require implementation. The
+bounded Query and Context Compiler libraries described below are not yet
+host-integrated.
 Project overview is not the main Git branch. The current executable prototype
 retains the offline boundaries stated above.
 
@@ -308,13 +308,18 @@ contracts through the package's public entry:
 - [Typed Context lifecycle](docs/contracts/context-lifecycle-v0.md): sourced meaning and
   applicability, exact revision/adoption lineage, bounded current/as-of reads,
   and separate shared Authority views over the existing local Graph transaction.
-  Automatic extraction and query integration remain pending.
+  Automatic extraction remains pending; Query and compilation consume this
+  lifecycle through explicit selected snapshots.
 - [Selected Context relevance](docs/contracts/context-judge-bridge-v0.md): exact authorized
   typed Context versions use the existing Judge dispatch path, with lifecycle,
   applicability and source checks before sending and before returning a result.
 - [Bounded Context Query](docs/contracts/query-engine-v0.md): one authorized selected
   own/related exploration window with positional text search, atomic conflicts,
   replayable ranking, stable pagination and optional actual Context Judge input.
+- [Reproducible Context Compiler](docs/contracts/context-compiler-v0.md): one complete
+  Query snapshot becomes an immutable consumer package with fixed semantic
+  layers, exact source pointers, branch awareness, conservative hard budgeting,
+  deterministic identity and a non-executable presentation recommendation.
 - [Policy artifacts](docs/contracts/policy-artifacts-v0.md): typed graph validation,
   deterministic compilation and immutable publication, with a compatibility
   path for the existing Phase 0 policies.
@@ -382,18 +387,22 @@ to connect two components that happen to share a repository.
 
 ## Internal organization
 
-- `src/core/`: host- and provider-independent policy, semantic state, and context logic.
+- `src/domain/`: Pure business contracts, state transitions, and deterministic rules.
+- `src/application/`: Cross-domain operations such as Graph, Query, Context compilation,
+  Project activation, and source lifecycle orchestration.
 - `src/adapters/`: host, model, storage, and Git/source integrations.
+- `src/app/local/`: Local process, HTTP, setup, and UI composition.
 - `test/<capability>/`: Deterministic Runtime tests grouped by business capability;
   shared harness helpers live in `test/support/`, while selected fixtures remain
   in `test/fixtures/`.
 - `tools/`: Repository maintenance, layout, boundary, and standalone-verification tools.
 - `verification/live/`: Explicit live-provider runners, their offline contract
   harnesses, and operator guides.
-- `docs/`: product and architecture documents.
+- `docs/`: current product, architecture, contract, and operations documents.
 
-The core owns its interfaces; adapters implement them. Core code must not import
-concrete adapters. Host lifecycle details and model-provider APIs stay in adapters.
+Domain code stays independent of application and adapters. Application code may
+compose domain capabilities, while concrete storage, Git, model and secret
+integration stays in adapters. Host lifecycle and UI composition stay in `app/`.
 
 `check:boundaries` parses ESM imports, rejects cross-component imports, core-to-
 adapter dependencies, undeclared/parent dependencies, source symlinks, and

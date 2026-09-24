@@ -6,7 +6,7 @@ These are initial engineering requirements, **unproven until the capacity drill*
 They establish neither service availability nor provider speed, product value or
 a commercial SLA. No collector, persistence adapter or model call is implemented.
 
-The provider-independent module `src/core/observability-contract.mjs` implements
+The provider-independent module `src/domain/decisions/observability-contract.mjs` implements
 shared boundaries from Tech Design §§17,23,24,27,30. Platform, telemetry,
 scheduler, audit and recovery Tickets consume these public contracts.
 

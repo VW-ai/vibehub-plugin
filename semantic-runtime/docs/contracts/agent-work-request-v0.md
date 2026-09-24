@@ -6,7 +6,7 @@ It defines no host delivery, plugin installation, model invocation, scheduler,
 authentication, persistent queue or canonical write. A tool name in the request
 never installs a tool or proves that the host can call it.
 
-The implementation is `src/core/agent-work-request.mjs`. Its constructors,
+The implementation is `src/domain/work/agent-work-request.mjs`. Its constructors,
 validators and reference transitions are exposed through the Runtime public entry.
 The conformance fixture is `test/work/agent-work-request.test.mjs`; its names, tools,
 content, identities, grants and clock values are deliberately synthetic.

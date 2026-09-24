@@ -98,3 +98,8 @@ export { LocalContextStore } from './application/context/context-store.mjs';
 export { validateContextContent1, validateContextOperation1 } from './domain/context/context-profile.mjs';
 export { LocalQueryEngine } from './application/query/query-engine.mjs';
 export { rankContextWindowV1 } from './domain/query/query-ranking.mjs';
+export { LocalContextCompiler, contextCompilerRequest } from './application/context/context-compiler.mjs';
+export {
+  CONTEXT_PACKAGE_VERSION, CONTEXT_COMPILER_VERSION, CONTEXT_PACKAGE_LAYERS, CONTEXT_INJECTION_MODES,
+  contextPackageId, validateContextPackage,
+} from './domain/context/context-package.mjs';
