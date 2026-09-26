@@ -1,0 +1,53 @@
+{
+  "context_id": "decision-dashboard-classifies-worktree-format-before-graph-load",
+  "detail": "A connected worktree is not graph-readable merely because it contains .vibehub/version.yaml. Before invoking Ticket graph validation, Dashboard discovery must classify each worktree as current, migration required, unsupported newer, malformed, or unavailable using the same compatibility and migration registry as the engine. Current worktrees remain usable. Legacy worktrees receive a visible Upgrade required state naming the exact path and detected-to-target format transition, plus a copyable Agent handoff or immutable release-paired upgrader when one exists. Malformed, unsupported-newer, and unavailable worktrees preserve actionable structured detail without leaking tokens or unrelated filesystem information. The Dashboard remains read-only: it never migrates, commits, stashes, resets, or pushes a worktree, and one incompatible worktree must not prevent current siblings from being inspected.",
+  "evidence": [
+    {
+      "note": "Current discovery treats the presence of version.yaml as enough to expose a worktree, without a compatibility preflight.",
+      "ref": "skills/vibehub-core/scripts/dashboard-data.mjs"
+    },
+    {
+      "note": "Current graph loading path turns validation failures into the generic Dashboard error observed by the owner.",
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
+    },
+    {
+      "note": "Canonical migration chain and format transition registry that compatibility classification must reuse.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "note": "Executable Ticket for the read-only compatibility and handoff behavior.",
+      "ref": ".vibehub/tickets/ticket-surface-legacy-worktree-upgrades.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-explicit-upgrade-migrates-safe-worktrees",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-agent-driven-upgrade-migration",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-26T03:56:37Z",
+    "quote": "可能是有很多worktree 用了旧版的vibehub",
+    "ref": "conversation:2026-09-21-legacy-worktree-dashboard-failure"
+  },
+  "state": "active",
+  "summary": "The multi-worktree Dashboard classifies project-format compatibility before graph loading and gives legacy worktrees an exact read-only upgrade handoff instead of a generic validation failure",
+  "tags": [
+    "compatibility",
+    "dashboard",
+    "migration",
+    "upgrade",
+    "worktree"
+  ],
+  "type": "decision"
+}

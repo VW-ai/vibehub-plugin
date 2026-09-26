@@ -1,0 +1,49 @@
+{
+  "context_id": "constraint-unified-dashboard-restores-graph-and-filter-parity",
+  "detail": "The unified Dashboard is a continuation of the accepted Workbench rather than permission to discard proven graph behavior. Its graph must offer left-to-right as the desktop default and top-to-bottom as an explicit first-class choice over the same canonical Tickets and relations. Both orientations must use one deterministic dense-layout contract that preserves causal ranks, stable non-overlapping cards, distinct ports, complete relations, and selected causal focus. Status visibility must be composable rather than an exclusive All statuses selector: users must be able to hide Completed in one direct interaction while retaining any meaningful combination of the other states, and board and graph must apply the same semantics. Direction, filters, selection, pan, and zoom are explicit disposable view state, never durable project truth. Restoring these affordances must not roll back the new Dashboard's navigation, Inspector, Context surfaces, or clearer information architecture.",
+  "evidence": [
+    {
+      "note": "Existing shared UI constraint already makes left-to-right the desktop default, top-to-bottom first-class, and deterministic dense geometry canonical.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "note": "Successful historical Outcome for both graph directions and copyable direction state.",
+      "ref": ".vibehub/outcomes/ticket-workbench-layout-direction-choice/contract-v1.yaml"
+    },
+    {
+      "note": "Successful historical Outcome for the dense deterministic graph algorithm.",
+      "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout/contract-v1.yaml"
+    },
+    {
+      "note": "Executable repair Ticket for the Dashboard regression.",
+      "ref": ".vibehub/tickets/ticket-restore-unified-dashboard-graph-controls.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-26T03:56:37Z",
+    "quote": "我个人更希望有个从左到右这样一个 visual……它这边它应该选成一个多选的这样一个东西",
+    "ref": "conversation:2026-09-21-unified-dashboard-feedback"
+  },
+  "state": "active",
+  "summary": "The unified Dashboard may keep its new shell only if it retains the accepted Workbench's graph orientation, dense-layout, and composable visibility capabilities",
+  "tags": [
+    "dashboard",
+    "filters",
+    "graph-layout",
+    "interaction",
+    "workbench"
+  ],
+  "type": "constraint"
+}

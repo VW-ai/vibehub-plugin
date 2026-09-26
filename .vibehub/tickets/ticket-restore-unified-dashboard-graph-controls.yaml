@@ -1,0 +1,182 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "new-dashboard-style-is-preserved",
+      "criterion": "The current unified Dashboard information architecture, project/worktree navigation, board and graph views, visual tokens, card styling, Inspector, Context surfaces, and responsive shell remain recognizably intact; implementation is a targeted graph-control and computation correction rather than a return to the previous Workbench shell or a broad restyle.",
+      "identity": "sha256:4e63999d087d379dac01d94ae63df7601d64bb5793f3dd9c939c1ef447c90133",
+      "revision": 1,
+      "state": "retired"
+    },
+    {
+      "acceptance_id": "both-graph-directions-are-first-class",
+      "criterion": "An accessible control switches the unified Dashboard graph between left-to-right and top-to-bottom layouts over the same visible Tickets and relations; desktop defaults to left-to-right, the selected direction is explicit in copyable URL state, invalid values fall back safely, and switching preserves workspace, goal, filters, selected Ticket, causal highlighting, pan/zoom framing, and Inspector context without a page reload.",
+      "identity": "sha256:ecdc1dbd8c792b4ec0d6a93c8e98225b1c1076f3d9cb63e60664cf6c6ce94a4e",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "status-visibility-is-composable",
+      "criterion": "The exclusive All statuses select is replaced by an accessible multi-select status control or equivalent composable control that supports any meaningful combination of Running, Needs you, Agent ready, Waiting, Needs planning, and Completed; users can hide Completed in one direct interaction without hiding every other state, All remains available, the active selection is visibly summarized, and board and graph apply identical filtering semantics.",
+      "identity": "sha256:5adbe13871fa5bfabf965470f92023e41023b76aef864308cef3abf448748219",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "dashboard-layout-reuses-the-accepted-contract",
+      "criterion": "A checked-in parity analysis compares `dashboard-graph.js` with the accepted `app-layout.js` behavior and removes unjustified computation drift: the Dashboard either consumes one shared dependency-free layout core or proves an intentionally equivalent adapter. In both orientations, deterministic fixtures preserve causal ranks, stable positions, non-overlapping cards, distinct ports, routes that avoid unrelated card interiors, complete canonical Tickets and relations, and the selected transitive causal cone.",
+      "identity": "sha256:e118127587c4b9bf897a62085b90a4d801f05c0b44956d722a4383debd34fa02",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "graph-parity-is-behavior-tested",
+      "criterion": "Automated behavior and geometry tests plus real-browser review cover both directions, multi-status combinations including completed-hidden and completed-only, copied URL restoration, dense split/merge and long-edge fixtures, keyboard and screen-reader names, reduced motion, 1440x960, 1180x820, and 390x844; the full suite and dependency-free Plugin artifact verification pass.",
+      "identity": "sha256:08ae46dc7cc398ec30a27cc29465ec4aade9f22a84b3a7201f7250128b7ba784",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "new-dashboard-style-is-preserved",
+      "criterion": "The unified Dashboard's clearer information architecture, project/worktree navigation, board and graph views, Inspector, Context surfaces, interaction model, and responsive shell remain recognizably intact; the work may refine surface materials, tokens, and card treatment, and must not interpret preservation as retaining the current gradients or as returning to the previous Workbench shell.",
+      "identity": "sha256:f0ea273371f628c5d534aba7d1f0786d2cc51b956b7a4b124c05169023462bed",
+      "revision": 2,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "visual-language-uses-quiet-glass-not-gradients",
+      "authority": "human",
+      "criterion": "The finished Dashboard presents a coherent restrained liquid-glass direction built on cool-neutral solid foundations, controlled translucency or blur, fine borders and highlights, and semantic color only; decorative gradients are removed rather than used as the primary surface, depth, brand, or status treatment. The result preserves readable contrast, clear hierarchy, state recognition without color alone, reduced-motion behavior, and performance fallbacks when backdrop effects are unavailable, and the owner explicitly approves the final representative desktop and narrow-screen browser captures.",
+      "identity": "sha256:5e9d4df893d4d14682fce40cebb5c5fb890e3b2c42b3e1e9d7b33eb99fc8cbb8",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 2,
+  "constraints": [
+    "Preserve the new unified Dashboard's production-ready visual language and navigation; do not treat this as authorization for another redesign.",
+    "Do not hide canonical Tickets or relations, shrink text into unreadability, or change Ticket lifecycle semantics to improve graph density.",
+    "Do not add a frontend framework, graph dependency, worker, service, cache, database, hidden persistence, or parallel state model.",
+    "Keep the Dashboard read-only, keyboard reachable, contrast-readable, reduced-motion safe, and usable with 44px targets on narrow layouts.",
+    "Treat direction and status visibility as disposable explicit view state, never durable project truth."
+  ],
+  "context": "The owner finds the unified Dashboard's overall redesign substantially clearer and production-ready and does not want that visual direction rolled back. The regression is functional: the accepted Workbench already shipped a desktop-default left-to-right layout plus a top-to-bottom choice and a measured dense-graph algorithm, while the new Dashboard canvas uses a separate fixed top-to-bottom implementation. Its All statuses control is also exclusive, so users cannot compose states or simply hide completed Tickets while retaining the rest. Left-to-right is especially valuable because it fits more Tickets into a wide desktop graph. This Ticket restores those proven affordances inside the new shell and checks whether the Dashboard's Ticket placement and routing computation drifted from the accepted algorithm.",
+  "context_refs": [
+    {
+      "purpose": "Backfilled implementation history distinguishing the unified Dashboard structure worth preserving from visual and graph choices that were never recorded as authority.",
+      "ref": ".vibehub/rooms/workbench/change-unified-dashboard-added-goal-ticket-and-context-workspaces.yaml"
+    },
+    {
+      "purpose": "Owner's durable visual direction: preserve the clearer shell while replacing decorative gradients with restrained cool-neutral liquid glass, subject to final human visual judgment.",
+      "ref": ".vibehub/rooms/workbench/intent-unified-dashboard-keeps-structure-and-moves-to-quiet-glass.yaml"
+    },
+    {
+      "purpose": "Dashboard-specific constraint requiring graph-orientation, dense-layout, and composable status-filter parity with the accepted Workbench.",
+      "ref": ".vibehub/rooms/workbench/constraint-unified-dashboard-restores-graph-and-filter-parity.yaml"
+    },
+    {
+      "purpose": "Active shared-UI authority requiring a left-to-right desktop default, a top-to-bottom choice, deterministic dense geometry, complete causality, and the quiet Workbench constraints the redesign must preserve.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Successful historical Outcome proving both orientations, copyable direction state, causal focus preservation, responsive browser behavior, and accessibility.",
+      "ref": ".vibehub/outcomes/ticket-workbench-layout-direction-choice/contract-v1.yaml"
+    },
+    {
+      "purpose": "Successful historical Outcome proving the deterministic dense-layout quality and measurement baseline that the new Dashboard must not silently weaken.",
+      "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout/contract-v1.yaml"
+    },
+    {
+      "purpose": "Current separate Dashboard layout implementation whose fixed vertical ranks and geometry must be compared with the accepted layout core.",
+      "ref": "skills/vibehub-review/assets/dashboard-graph.js"
+    },
+    {
+      "purpose": "Current unified Dashboard controls, including the exclusive status select that cannot compose visibility states.",
+      "ref": "skills/vibehub-review/assets/dashboard.html"
+    },
+    {
+      "purpose": "Accepted dependency-free two-orientation dense-layout implementation and behavioral baseline available for reuse or a narrow adapter.",
+      "ref": "skills/vibehub-review/assets/app-layout.js"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "both-graph-directions-are-first-class",
+          "identity": "sha256:ecdc1dbd8c792b4ec0d6a93c8e98225b1c1076f3d9cb63e60664cf6c6ce94a4e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dashboard-layout-reuses-the-accepted-contract",
+          "identity": "sha256:e118127587c4b9bf897a62085b90a4d801f05c0b44956d722a4383debd34fa02",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-parity-is-behavior-tested",
+          "identity": "sha256:08ae46dc7cc398ec30a27cc29465ec4aade9f22a84b3a7201f7250128b7ba784",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "new-dashboard-style-is-preserved",
+          "identity": "sha256:4e63999d087d379dac01d94ae63df7601d64bb5793f3dd9c939c1ef447c90133",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "status-visibility-is-composable",
+          "identity": "sha256:5adbe13871fa5bfabf965470f92023e41023b76aef864308cef3abf448748219",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:23678066b78f5516295e9cb5439de3d3f6157a54a6dfdddb73d6805189a91a46",
+      "revision": 1
+    },
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "both-graph-directions-are-first-class",
+          "identity": "sha256:ecdc1dbd8c792b4ec0d6a93c8e98225b1c1076f3d9cb63e60664cf6c6ce94a4e",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "dashboard-layout-reuses-the-accepted-contract",
+          "identity": "sha256:e118127587c4b9bf897a62085b90a4d801f05c0b44956d722a4383debd34fa02",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "graph-parity-is-behavior-tested",
+          "identity": "sha256:08ae46dc7cc398ec30a27cc29465ec4aade9f22a84b3a7201f7250128b7ba784",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "new-dashboard-style-is-preserved",
+          "identity": "sha256:f0ea273371f628c5d534aba7d1f0786d2cc51b956b7a4b124c05169023462bed",
+          "revision": 2
+        },
+        {
+          "acceptance_id": "status-visibility-is-composable",
+          "identity": "sha256:5adbe13871fa5bfabf965470f92023e41023b76aef864308cef3abf448748219",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "visual-language-uses-quiet-glass-not-gradients",
+          "identity": "sha256:5e9d4df893d4d14682fce40cebb5c5fb890e3b2c42b3e1e9d7b33eb99fc8cbb8",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:418c90eaa546daf18e7839853251caba8ac7823aeee3f66e73518fd21a215c67",
+      "revision": 2
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The unified Dashboard keeps its production-ready visual redesign while regaining the proven graph controls: explicit left-to-right and top-to-bottom layouts, composable status visibility including hiding completed work, and one deterministic dense-layout contract instead of a weaker parallel algorithm.",
+  "provenance_refs": [
+    "conversation:2026-09-21-unified-dashboard-feedback",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-restore-unified-dashboard-graph-controls"
+}

@@ -1,0 +1,48 @@
+{
+  "context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+  "detail": "Victor's unified Dashboard work established one automatically entered, session-reused local shell over canonical Git-native records. It added connected project, branch, and worktree navigation; Goal overview and progress; Ticket board and graph projections; progressive Ticket inspection and copyable Agent handoffs; Room- and record-type-organized Context; project-authority previews; and bounded read-only artifact rendering. The follow-up prioritized full Ticket descriptions and saved requirements in the Inspector. This Context records the shipped product structure that later refinements should preserve. It does not declare the Dashboard's current gradients, fixed graph orientation, exclusive status selector, or separate layout computation to be design authority; those remain subject to the Workbench contracts and the owner's later feedback.",
+  "evidence": [
+    {
+      "note": "Introduced automatic Dashboard entry, project and worktree discovery, Goal navigation, Ticket board and graph views, Context previews, and the unified shell assets and tests.",
+      "ref": "commit:f547ed0f32dfc0a8d55e3d671c143f97e220e123"
+    },
+    {
+      "note": "Grouped ordinary Context under Room branches and record types.",
+      "ref": "commit:c76b0f1d125f094b950de8426594eeecc04ae3ac"
+    },
+    {
+      "note": "Made Ticket descriptions and saved requirements the primary Inspector content.",
+      "ref": "commit:ce1d904096514b2ce6b9586c3cf31814bbcddf04"
+    },
+    {
+      "note": "Current user-facing description of the unified Dashboard's read-only surfaces and session behavior.",
+      "ref": "docs/DASHBOARD.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-09-26T03:56:37Z",
+    "quote": "victor 开发的时候很明显没有补的context",
+    "ref": "conversation:2026-09-25-backfill-unified-dashboard-context"
+  },
+  "state": "active",
+  "summary": "The September unified Dashboard consolidated project and worktree navigation, Goal monitoring, Ticket board and graph views, Inspector detail, and Room-organized Context into one read-only local shell",
+  "tags": [
+    "dashboard",
+    "implementation-history",
+    "local-ui",
+    "workbench"
+  ],
+  "type": "change"
+}

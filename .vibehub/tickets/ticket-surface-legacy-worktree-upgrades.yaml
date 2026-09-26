@@ -1,0 +1,123 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "discovery-classifies-every-connected-worktree",
+      "criterion": "Dashboard discovery performs the shared read-only project compatibility preflight for every connected available VibeHub worktree and reports CURRENT, MIGRATION_REQUIRED, UNSUPPORTED_NEWER, malformed, or unavailable with detected and target formats plus a stable reason; a version marker alone no longer implies that the graph is loadable, and one incompatible worktree never prevents current worktrees or other projects from loading.",
+      "identity": "sha256:4480da28928ca138818e465bfcd69fc00c48442d12769505638bfdaade75c5cf",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "legacy-worktrees-have-an-upgrade-state",
+      "criterion": "Branches and worktrees that require migration remain visible but render a specific Upgrade required state before any graph request, naming the exact worktree and detected-to-target format path; selecting one presents that state and its next action instead of `Could not read this ticket graph`, while malformed and unsupported-newer formats remain distinct and never masquerade as migratable.",
+      "identity": "sha256:9c62eab187b9e6273cbc84281ea2c80ac8ba24ce34fdd92343ab639e0d6b0e96",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "upgrade-handoff-is-exact-and-actionable",
+      "criterion": "The upgrade state provides a copyable Agent handoff containing the exact worktree path, detected format, target format, and instruction to use the installed VibeHub migration workflow, and names the existing release-paired bounded multi-worktree upgrader when immutable matching release identity is available; it never fabricates a floating `latest` command, implies that downloading Skills migrated data, or asks users to decode raw schema errors.",
+      "identity": "sha256:9fafcd66565ef2fef7a4bcc864f3231bae6ab51c9fd53c080732d5b83365eab5",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "dashboard-preserves-structured-failure-detail",
+      "criterion": "Dashboard APIs and UI preserve structured compatibility or validation diagnostics with actionable worktree context; unexpected validation failures show a bounded summary and details suitable for troubleshooting rather than collapsing every failure to a message-only internal error, without exposing bearer tokens or unrelated filesystem data.",
+      "identity": "sha256:dd68e6792a6d40ed96b63c6b3e79ecfd5fb3e30d49dba0ec829c96635aba0825",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "upgrade-discovery-is-read-only-and-tested",
+      "criterion": "Mixed registered-worktree fixtures covering current format 4, migratable formats 2 and 3, malformed markers, unsupported-newer format, dirty worktrees, and unavailable paths prove discovery and UI rendering are deterministic and read-only: no repository bytes, index, HEAD, branch, refs, commits, hooks, remotes, or migration-pending state change during install, Dashboard start, discovery, selection, or refresh; focused tests, the full suite, and Plugin artifact verification pass.",
+      "identity": "sha256:00ad33b3cfbec46eaf52ad666c45edce0d852d1ab927f13d11519ac1473b95aa",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "Do not run migration during Skill installation, marketplace refresh, Dashboard start, discovery, validation, query, selection, or refresh.",
+    "Reuse the shared compatibility operation, migration registry, vibehub-migrate workflow, and release-paired upgrader; do not add a second detector, migration table, rewrite engine, or background updater.",
+    "Do not scan outside user-selected roots except registered worktrees already authorized by the existing discovery contract.",
+    "Do not stash, reset, checkout, clean, commit, push, run hooks, move refs, or modify an incompatible worktree from the Dashboard.",
+    "Keep current worktrees fully usable when sibling worktrees need migration, repair, or removal."
+  ],
+  "context": "After installing the V4-era plugin, the Dashboard discovered registered worktrees whose checked-in `.vibehub` data still used formats 2 and 3. Seven of nine discovered worktrees failed when the current format-4 runtime tried to load them, yet the UI exposed only `Could not read this ticket graph` and `VibeHub validation failed`. The current checkout validated successfully, so this was not graph corruption; discovery treated any checkout with `.vibehub/version.yaml` as loadable without running compatibility preflight. The owner reasonably expected a visible upgrade or migration experience after obtaining V4. Existing accepted safety contracts deliberately forbid silent migration during installation, refresh, validation, query, or UI launch, and already provide explicit agent-driven migration plus a release-paired bounded multi-worktree upgrader. This Ticket connects those capabilities through honest read-only diagnosis and handoff rather than inventing another migration engine or mutating repositories from the Dashboard.",
+  "context_refs": [
+    {
+      "purpose": "Dashboard-specific product decision requiring format classification and an exact read-only upgrade handoff before attempting graph validation.",
+      "ref": ".vibehub/rooms/workbench/decision-dashboard-classifies-worktree-format-before-graph-load.yaml"
+    },
+    {
+      "purpose": "Backfilled implementation history for the multi-project and worktree Dashboard shell in which compatibility must be surfaced.",
+      "ref": ".vibehub/rooms/workbench/change-unified-dashboard-added-goal-ticket-and-context-workspaces.yaml"
+    },
+    {
+      "purpose": "Successful release-paired bounded multi-project and registered-worktree upgrade contract to expose rather than duplicate.",
+      "ref": ".vibehub/outcomes/ticket-one-command-upgrade-across-projects/contract-v1.yaml"
+    },
+    {
+      "purpose": "Successful compatibility and safety contract separating bundle refresh from explicit reviewable data migration and forbidding UI-launch mutation.",
+      "ref": ".vibehub/outcomes/ticket-format-gated-plugin-upgrades/contract-v1.yaml"
+    },
+    {
+      "purpose": "Current connected-worktree discovery that equates a version marker with `hasTickets` and performs no compatibility classification.",
+      "ref": "skills/vibehub-core/scripts/dashboard-data.mjs"
+    },
+    {
+      "purpose": "Current Dashboard API and error boundary that loads repositories only after selection and collapses validation details into a generic internal error.",
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Single source of the current format, complete mechanical chains, semantic pending guidance, and detected-to-target migration steps.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "dashboard-preserves-structured-failure-detail",
+          "identity": "sha256:dd68e6792a6d40ed96b63c6b3e79ecfd5fb3e30d49dba0ec829c96635aba0825",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "discovery-classifies-every-connected-worktree",
+          "identity": "sha256:4480da28928ca138818e465bfcd69fc00c48442d12769505638bfdaade75c5cf",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "legacy-worktrees-have-an-upgrade-state",
+          "identity": "sha256:9c62eab187b9e6273cbc84281ea2c80ac8ba24ce34fdd92343ab639e0d6b0e96",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "upgrade-discovery-is-read-only-and-tested",
+          "identity": "sha256:00ad33b3cfbec46eaf52ad666c45edce0d852d1ab927f13d11519ac1473b95aa",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "upgrade-handoff-is-exact-and-actionable",
+          "identity": "sha256:9fafcd66565ef2fef7a4bcc864f3231bae6ab51c9fd53c080732d5b83365eab5",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:33104b48449d857ed48303036278a3b495d55d13763c59c939903449ba2941e0",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The unified Dashboard recognizes connected legacy VibeHub worktrees before graph loading and presents an exact, safe upgrade handoff instead of a generic validation failure, while installation and UI launch remain read-only.",
+  "provenance_refs": [
+    "conversation:2026-09-21-unified-dashboard-feedback",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-surface-legacy-worktree-upgrades"
+}
