@@ -1,0 +1,54 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "cause-and-repair",
+      "criterion": "Refine this draft with a reproduced validation failure, precise diagnosis and bounded repair criteria before implementation; preserve proof/acceptance semantics and verify the repaired mirror plan in read-only dry-run mode before any external Issue writes.",
+      "identity": "sha256:97bfe849eceaf5725e756653add1787ad1908b4e767885a489490d85e1b0c329",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "No force-tag, release replacement or unrelated source repair.",
+    "No GitHub Issue writes without explicit authorization; diagnosis and dry-run only until then.",
+    "Do not weaken reference, revision or project validators to hide the failure."
+  ],
+  "context": "After PR136 merged at84545f66b60f1e131c8a149e2b0d50f979cd833d, GitHub run34100137615 Mirror Tickets to Issues failed at Sync with VibeHub validation failed. Release run34100078747 and both Verify runs succeeded; full-history local project validate passes. Current mirror checkout omits fetch-depth while Verify uses full history; this is a diagnostic lead, not an established cause. Record as independently schedulable follow-up; v0.10.0 publication is complete.",
+  "context_refs": [
+    {
+      "purpose": "Failed mirror workflow checkout and invocation.",
+      "ref": ".github/workflows/sync-issues.yml"
+    },
+    {
+      "purpose": "Mirror validator and dry-run surface.",
+      "ref": "scripts/sync-github-issues.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "cause-and-repair",
+          "identity": "sha256:97bfe849eceaf5725e756653add1787ad1908b4e767885a489490d85e1b0c329",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:51cd90b57432cb398e0acee6804879db140852059a7ca68355cef8f3341cf962",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Diagnose and repair the repository validation failure in the post-v0.10.0 Ticket-to-Issue mirror without weakening historical proof validation.",
+  "provenance_refs": [
+    "https://github.com/VW-ai/vibehub-plugin/actions/runs/34100137615",
+    "https://github.com/VW-ai/vibehub-plugin/releases/tag/v0.10.0",
+    "plan-validation:independent"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 3,
+  "ticket_id": "ticket-diagnose-post-v0100-issue-mirror-validation"
+}
