@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openBrowser, parseUiFlags, startVibeHubUi } from './vh-ui.mjs';
 
@@ -49,7 +49,12 @@ export async function enterVibeHub({ repoRoot, roots = [], personalStore = null,
   if (!repoRoot) throw new Error('repoRoot is required');
   const reused = await reusableDashboard(reuseUrl, { repoRoot, roots, personalStore });
   if (reused) return { ...reused, handle: null };
-  const handle = startVibeHubUi({ repoRoot, dashboardRoots: [...new Set([repoRoot, ...roots].map(resolvePath))], personalStore, port });
+  const handle = startVibeHubUi({
+    repoRoot,
+    dashboardRoots: [...new Set([repoRoot, dirname(resolvePath(repoRoot)), ...roots].map(resolvePath))],
+    personalStore,
+    port
+  });
   try {
     const ready = await handle.ready;
     if (open) openUrl(ready.url);
