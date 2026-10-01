@@ -1,0 +1,42 @@
+{
+  "context_id": "convention-dashboard-path-folded-with-github-and-editor",
+  "detail": "For Rooms, Context cards, and the current-checkout path in the project rail: do not dump full paths by default. Group Show path, GitHub, and Open in editor together. Show path is an icon with hover/aria explanation, not a text label. Expanding Show path on a room expands or collapses that room path and every child card path under it in sync. Individual card toggles may still exist; the room control is the bulk switch.",
+  "evidence": [
+    {
+      "note": "Quiet dashboard Rooms UI implements folded paths, icon Show path, GitHub/editor actions, and room bulk path toggle.",
+      "ref": "docs/proposals/quiet-dashboard/index.html"
+    },
+    {
+      "note": "Merged prototype that carried these interaction decisions.",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/141"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-unified-dashboard-keeps-structure-and-moves-to-quiet-glass",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-01T01:17:02Z",
+    "quote": "如果我们show room 的path就会等于展开/收起该room下所有的spec的path",
+    "ref": "conversation:2026-09-30-quiet-dashboard"
+  },
+  "state": "active",
+  "summary": "Dashboard paths stay folded by default; Show path is icon-only beside GitHub and Open in editor, and a room Show path toggles all child specs",
+  "tags": [
+    "context",
+    "dashboard",
+    "path",
+    "rooms",
+    "ux",
+    "workbench"
+  ],
+  "type": "convention"
+}

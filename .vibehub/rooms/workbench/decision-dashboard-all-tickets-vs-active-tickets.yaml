@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-dashboard-all-tickets-vs-active-tickets",
+  "detail": "All tickets means the full state pool for Board (including Done, with Done column collapse when All and volume is high). Currently active tickets means the open work surface the Graph defaults to: Done is omitted unless the user explicitly selects Done or includes it via multi-select filters. The titlebar count and filter chip labels must be honest—Graph default reports Active tickets with the rendered node count, never All with a larger pool that the graph silently dropped. Board may still say All tickets when showing every lane.",
+  "evidence": [
+    {
+      "note": "Quiet dashboard prototype encodes Active vs All heading and count behavior for graph vs board.",
+      "ref": "docs/proposals/quiet-dashboard/index.html"
+    },
+    {
+      "note": "Merged prototype PR that carried the quiet dashboard exploration.",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/141"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-unified-dashboard-restores-graph-and-filter-parity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-01T01:17:02Z",
+    "quote": "我觉得那就是看all ticket和currently active ticket事两个事情",
+    "ref": "conversation:2026-09-30-quiet-dashboard"
+  },
+  "state": "active",
+  "summary": "Dashboard Board All tickets and Graph Active tickets are separate concepts; counts must match what the surface actually shows",
+  "tags": [
+    "dashboard",
+    "filters",
+    "graph",
+    "honesty",
+    "workbench"
+  ],
+  "type": "decision"
+}
