@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-dashboard-board-shows-only-selected-lanes",
+  "detail": "Composable state visibility is the Board filter authority: clicking a state toggles it; All clears the selection and shows every lane. When one or more states are selected, only those columns appear. A single selected category uses the full board width with a responsive card grid so space is not wasted on empty sibling columns. This continues the composable-filter constraint from the unified Dashboard repair work.",
+  "evidence": [
+    {
+      "note": "Quiet dashboard prototype implements multi-select filters and solo-lane full-width board layout.",
+      "ref": "docs/proposals/quiet-dashboard/index.html"
+    },
+    {
+      "note": "Earlier constraint already required composable status visibility rather than exclusive All.",
+      "ref": ".vibehub/rooms/workbench/constraint-unified-dashboard-restores-graph-and-filter-parity.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-unified-dashboard-restores-graph-and-filter-parity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dashboard-all-tickets-vs-active-tickets",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-01T01:17:02Z",
+    "quote": "如果只看某一个category的ticket，我们就只展示那个column",
+    "ref": "conversation:2026-09-30-quiet-dashboard"
+  },
+  "state": "active",
+  "summary": "Board state filters are multi-select; the board renders only selected lanes, and a single selected lane fills the available width",
+  "tags": [
+    "board",
+    "dashboard",
+    "filters",
+    "layout",
+    "workbench"
+  ],
+  "type": "decision"
+}

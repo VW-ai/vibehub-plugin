@@ -1,0 +1,50 @@
+{
+  "context_id": "change-quiet-dashboard-prototype-checked-in",
+  "detail": "docs/proposals/quiet-dashboard/ holds a static HTML prototype plus repo-data snapshot tooling. It explores resizable rail and inspector, parent-root multi-project switching, multi-select lane filters with solo full-width boards, Active vs All graph honesty, and Rooms path/GitHub/editor disclosure. It is not the production review dashboard; production remains skills/vibehub-review until a later adoption Ticket moves proven behavior.",
+  "evidence": [
+    {
+      "note": "Prototype and snapshot builder.",
+      "ref": "docs/proposals/quiet-dashboard/"
+    },
+    {
+      "note": "Merged PR that landed the prototype.",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/141"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-unified-dashboard-keeps-structure-and-moves-to-quiet-glass",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dashboard-all-tickets-vs-active-tickets",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dashboard-default-roots-include-checkout-parent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dashboard-board-shows-only-selected-lanes",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "convention-dashboard-path-folded-with-github-and-editor",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-01T01:17:02Z",
+    "ref": "conversation:2026-09-30-quiet-dashboard"
+  },
+  "state": "active",
+  "summary": "Checked in the quiet-dashboard proposal prototype as an exploration surface for the next Dashboard IA and interaction pass",
+  "tags": [
+    "dashboard",
+    "prototype",
+    "workbench"
+  ],
+  "type": "change"
+}

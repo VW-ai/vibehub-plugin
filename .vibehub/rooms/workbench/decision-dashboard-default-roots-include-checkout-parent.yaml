@@ -1,0 +1,44 @@
+{
+  "context_id": "decision-dashboard-default-roots-include-checkout-parent",
+  "detail": "Bounded discovery remains required: do not grep the whole home for .vibehub. Session entry and vh-start/vh-ui include the current checkout and dirname(checkout) as default dashboardRoots, with additional --root only for locations outside that parent. Projects still appear only when discovery finds a Git repository and an opted-in VibeHub worktree (version.yaml or personal link). Schema-lagging siblings may surface as unavailable rather than fail the whole shell.",
+  "evidence": [
+    {
+      "note": "Entry helper now adds the checkout parent to dashboardRoots.",
+      "ref": "skills/vibehub-core/scripts/vh-start.mjs"
+    },
+    {
+      "note": "Session-entry contract documents checkout + parent defaults.",
+      "ref": "skills/vibehub-core/contracts/session-entry.md"
+    },
+    {
+      "note": "Shared discoverDashboard walk still bounded by explicit roots and depth.",
+      "ref": "skills/vibehub-core/scripts/dashboard-data.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-dashboard-classifies-worktree-format-before-graph-load",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-unified-dashboard-added-goal-ticket-and-context-workspaces",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-01T01:17:02Z",
+    "quote": "那就把root 配成器吗就是我们的repo 的 parent folder",
+    "ref": "conversation:2026-09-30-quiet-dashboard"
+  },
+  "state": "active",
+  "summary": "Dashboard discovery defaults to the current checkout plus its parent directory so sibling VibeHub projects can appear without a global filesystem scan",
+  "tags": [
+    "dashboard",
+    "discovery",
+    "multi-project",
+    "workbench"
+  ],
+  "type": "decision"
+}
