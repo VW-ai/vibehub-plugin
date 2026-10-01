@@ -20,9 +20,10 @@ On the first user-facing VibeHub operation in the current agent session:
 
    Resolve the helper relative to the calling Skill directory. Add repeated
    `--root <projects-directory>` for project locations already selected by the
-   user in this session. The current checkout is always included, along with
-   registered worktrees; unrelated home directories are never scanned by
-   default. Carry the existing dashboard URL with `--reuse-url <complete-url>`
+   user in this session. The current checkout and its parent directory are
+   included by default so sibling repositories under that parent can appear,
+   along with registered worktrees. Pass extra `--root` only for locations
+   outside that parent. Carry the existing dashboard URL with `--reuse-url <complete-url>`
    when known. The helper verifies its capability and scope before reusing it;
    an expired or unavailable host is replaced. The existing personal-hub config
    pointer connects personal goals automatically when present. An explicit

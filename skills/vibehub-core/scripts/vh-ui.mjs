@@ -1234,7 +1234,12 @@ export function parseUiFlags(argv) {
   if ((roots.length || personalStore) && !dashboard) throw new Error("--root and --personal-store require --dashboard");
   if (dashboard && (ticket || view || rooms || room)) throw new Error("Select Ticket or Room focus from the dashboard.");
   const flags = { repo: resolve(repo), port, open, json, ticket, view, rooms: rooms || room !== null, room };
-  if (dashboard) Object.assign(flags, { dashboardRoots: roots.length ? roots : [resolve(repo)], personalStore });
+  if (dashboard) {
+    const repoPath = resolve(repo);
+    const parent = dirname(repoPath);
+    const defaultRoots = parent === repoPath ? [repoPath] : [repoPath, parent];
+    Object.assign(flags, { dashboardRoots: roots.length ? roots : defaultRoots, personalStore });
+  }
   return flags;
 }
 

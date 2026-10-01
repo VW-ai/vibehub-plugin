@@ -34,7 +34,8 @@ not a feature.
 A foreground loopback dashboard starts automatically when a user chooses or
 resumes VibeHub. The entry helper reuses a known live session URL without
 reopening the browser, and startup failure never blocks work. It enumerates
-the current checkout and Git projects under user-supplied roots and their registered worktrees. It may read an explicitly
+the current checkout, Git projects under that checkout's parent directory, any
+extra user-supplied roots, and their registered worktrees. It may read an explicitly
 selected personal-ticket store to show goals and tasks alongside those projects.
 It keeps no durable project registry, starts no agents, and writes no ticket data.
 Users can browse repositories without initializing VibeHub. Record validation
