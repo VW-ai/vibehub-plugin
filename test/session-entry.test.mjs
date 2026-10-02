@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { enterVibeHub, parseStartFlags, personalStoreFromConfig, reusableDashboard } from '../skills/vibehub-core/scripts/vh-start.mjs';
 
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'vibehub-entry-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  return root;
+  const project = join(root, 'project');
+  mkdirSync(project);
+  return project;
 }
 
 test('entering VibeHub opens the built-in home before repository initialization', async (t) => {
@@ -21,7 +23,7 @@ test('entering VibeHub opens the built-in home before repository initialization'
   const response = await fetch(`${session.origin}/api/dashboard`, { headers: { Authorization: `Bearer ${session.handle.token}` } });
   const home = await response.json();
   assert.equal(home.ok, true);
-  assert.deepEqual(home.data.roots, [repoRoot]);
+  assert.deepEqual(home.data.roots, [repoRoot, dirname(repoRoot)]);
   assert.deepEqual(home.data.projects, []);
 });
 

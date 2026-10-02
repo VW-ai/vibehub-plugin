@@ -5,23 +5,13 @@ description: Shared helper script, schemas, and templates that every other VibeH
 
 # VibeHub Core
 
-## Optional workflow and unrestricted responses
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
-
-This folder is infrastructure for the VibeHub Skills, not a workflow. Do not
-invoke it. The Skills that drive work are `vibehub-ticket-plan`,
-`vibehub-ticket-run`, `vibehub-ticket-closeout`, `vibehub-review`,
-`vibehub-ingest`, and the rest of the `vibehub-*` set; each one references
-the files below as `../vibehub-core/...`.
+This folder provides helpers for `vibehub-ticket`, `vibehub-review`, and the
+other VibeHub Skills. It is never invoked directly. The helpers store and read
+task memory and Context. The user's chosen skills own development methods.
 
 - `contracts/session-entry.md` — automatic dashboard entry for opted-in work.
 - `scripts/vh-start.mjs` — start or reuse the built-in unified dashboard.
@@ -29,6 +19,7 @@ the files below as `../vibehub-core/...`.
   Context, Room, and project-format operations.
 - `scripts/revision-contract.mjs` — canonical serialization, identity, initial
   materialization, and append-only Acceptance/Contract mutation helpers.
+- `contracts/ticket-state.md` describes task status, updates, and optional history.
 - `contracts/revision-identity.md` — human-readable semantic identity contract.
 - `scripts/vh-ui.mjs` — read-only loopback host for the local graph UI
   (assets live in `../vibehub-review/assets`).

@@ -5,18 +5,9 @@ description: Upgrade a project's checked-in .vibehub data from an older VibeHub 
 
 # VibeHub Migrate
 
-## Optional workflow and unrestricted responses
-
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
-
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
 ## Automatic dashboard entry
 
@@ -105,3 +96,8 @@ Format 4 → 5 adds Goal/Epic ownership with a marker-only mechanical migration.
 Existing Tickets stay standalone; do not infer parents or rewrite historical
 proof. Read `../vibehub-core/contracts/planning-hierarchy.md` when planning new
 parent records after migration.
+
+Format 5 to 6 adds explicit Ticket status and update history. The mechanical
+migration preserves proof records and marks a task done only when a successful
+Outcome binds its active contract. Other tasks start open. Do not invent
+progress updates or proof.

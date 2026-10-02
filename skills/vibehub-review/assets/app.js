@@ -23,8 +23,6 @@
     localFocusHref,
     normalizeLayoutDirection,
     operationalCounts,
-    ticketAttentionState,
-    ticketNextAction,
     ticketNodePresentation,
     ticketOperationalState,
     ticketPhasePresentation,
@@ -36,17 +34,14 @@
     ["log", "evidence"],
   ]);
   const STATE_ICON_IDS = Object.freeze({
-    DRAFT: "sliders",
+    BLOCKED: "sliders",
     DONE: "check",
-    READY: "play",
-    RUNNING: "running",
+    OPEN: "play",
+    IN_PROGRESS: "running",
     ARCHIVED: "archive",
   });
   const SUBSTATE_ICON_IDS = Object.freeze({
-    DEVIATED: "alert",
-    BLOCKED: "lock",
     NEEDS_YOU: "pending",
-    VERIFYING: "recorded",
     WAITING: "upcoming",
   });
   const ROOM_STATE_PRESENTATION = Object.freeze({
@@ -356,7 +351,7 @@
       const phaseLabel = elements.inspectorContent.querySelector(".recommended-action-phase");
       if (ticket && phaseLabel) {
         const phase = ticketPhasePresentation(ticket);
-        phaseLabel.textContent = phase.substate ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}` : phase.label;
+        phaseLabel.textContent = phase.substate ? `${phase.label.replaceAll("_", " ")} · ${phase.substate.replaceAll("_", " ")}` : phase.label.replaceAll("_", " ");
       }
     }
   }
@@ -374,7 +369,6 @@
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
     const overview = workbenchOverview(graph.tickets, source);
-    const deviatedCount = overview.deviated.length;
     elements.projectName.textContent = project.name;
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
@@ -384,22 +378,14 @@
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
-      `${counts.RUNNING} running · ${counts.READY} ready · `
+      `${counts.IN_PROGRESS} in progress · ${counts.OPEN} open · `
       + `${overview.needsYou.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
-    elements.stateDot.className =
-      `state-dot${
-        deviatedCount > 0 ? " deviated" : source.semanticDirty ? " dirty" : ""
-      }`;
-    elements.stateLabel.textContent = deviatedCount > 0
-      ? `${deviatedCount} execution deviation${
-          deviatedCount === 1 ? "" : "s"
-        }`
-      : source.semanticDirty
-        ? `${dirtyPathCount(source)} local change`
-          + `${source.dirtyPaths.length === 1 && !source.dirtyPathsTruncated ? "" : "s"}`
-        : "Exact Git source";
+    elements.stateDot.className = `state-dot${source.semanticDirty ? " dirty" : ""}`;
+    elements.stateLabel.textContent = source.semanticDirty
+      ? `${dirtyPathCount(source)} local change${source.dirtyPaths.length === 1 && !source.dirtyPathsTruncated ? "" : "s"}`
+      : "Exact Git source";
     elements.emptyState.hidden = graph.tickets.length !== 0;
     elements.minimap.hidden = graph.tickets.length === 0;
   }
@@ -426,9 +412,9 @@
   }
 
   function renderOverview(overview) {
-    elements.summaryDraft.textContent = String(overview.phases.DRAFT.length);
-    elements.summaryReady.textContent = String(overview.phases.READY.length);
-    elements.summaryRunning.textContent = String(overview.phases.RUNNING.length);
+    elements.summaryDraft.textContent = String(overview.phases.BLOCKED.length);
+    elements.summaryReady.textContent = String(overview.phases.OPEN.length);
+    elements.summaryRunning.textContent = String(overview.phases.IN_PROGRESS.length);
     elements.summaryDone.textContent = String(overview.phases.DONE.length);
   }
 
@@ -444,9 +430,9 @@
       item.append(htmlIcon(icon), value, ` ${label}`);
       items.push(item);
     };
-    add(counts.RUNNING, "RUNNING", "running", "phase-running");
-    add(counts.READY, "READY", "play", "phase-ready");
-    add(counts.DRAFT, "DRAFT", "sliders", "phase-draft");
+    add(counts.IN_PROGRESS, "IN PROGRESS", "running", "phase-in-progress");
+    add(counts.OPEN, "OPEN", "play", "phase-open");
+    add(counts.BLOCKED, "BLOCKED", "sliders", "phase-blocked");
     add(counts.DONE, "DONE", "check", "phase-done");
     add(overview.needsYou.length, "NEEDS YOU", "pending", "substate-needs-you");
     elements.graphSummary.replaceChildren(...items);
@@ -831,7 +817,7 @@
           y: NODE.height - 12,
           "text-anchor": "end",
         });
-        status.textContent = visibleState;
+        status.textContent = visibleState.replaceAll("_", " ");
         group.append(stateIcon, status);
       }
       if (phase.live) {
@@ -988,14 +974,14 @@
       elements.inspector.inert = true;
     }
     elements.inspectorEyebrow.textContent = "Current graph";
-    elements.inspectorTitle.textContent = "Execution context";
+    elements.inspectorTitle.textContent = "Task context";
     elements.inspectorOutcome.hidden = false;
     const counts = operationalCounts(state.graph.tickets);
     const overview = workbenchOverview(state.graph.tickets, state.graph.source);
     elements.inspectorOutcome.textContent = graphNarrative(counts, overview);
     const content = document.createDocumentFragment();
     content.append(section(
-      "Execution signal",
+      "Recorded task state",
       stateSummary(counts, overview),
     ));
     content.append(disclosure(
@@ -1145,8 +1131,6 @@
     elements.inspectorTitle.textContent = ticket.outcome;
     elements.inspectorTitle.dataset.fullText = ticket.outcome;
     const operational = ticketOperationalState(ticket);
-    const attention = ticketAttentionState(ticket);
-    const nextAction = ticketNextAction(ticket);
     elements.inspectorOutcome.hidden = true;
     elements.inspectorOutcome.textContent = "";
 
@@ -1154,22 +1138,19 @@
       ticket,
       contextPackage,
       operational,
-      attention,
-      nextAction,
-    );
+      );
     const contract = ticketContractPanel(
       ticket,
       contextPackage,
       inspection,
-      nextAction,
-    );
-    const proof = ticketProofPanel(contextPackage, nextAction);
+      );
+    const proof = ticketProofPanel(contextPackage);
     const view = tabbedTicketView(
       ticket.ticketId,
       [
-        { id: "execution", label: "Execution", panel: execution },
-        { id: "contract", label: "Contract", panel: contract.panel },
-        { id: "evidence", label: "Log", panel: proof.panel },
+        { id: "execution", label: "Task", panel: execution },
+        { id: "contract", label: "Definition", panel: contract.panel },
+        { id: "evidence", label: "History", panel: proof.panel },
       ],
       initialViewId,
     );
@@ -1184,8 +1165,7 @@
       acceptanceCount: (contextPackage.acceptance || []).length,
       activeAcceptanceCount: (contextPackage.acceptance || []).filter((item) => item.state === "active").length,
       activeContractRevision: contextPackage.activeContractRevision || null,
-      nextAction,
-    };
+      };
   }
 
   async function selectRelation(
@@ -1207,7 +1187,7 @@
       `${shortTicketId(relation.prerequisiteTicketId)} → `
       + shortTicketId(relation.dependentTicketId);
     elements.inspectorOutcome.textContent =
-      relation.rationale || "Direct execution dependency.";
+      relation.rationale || "Direct task dependency.";
     elements.inspectorOutcome.hidden = false;
     elements.inspectorContent.replaceChildren(
       facts([
@@ -1256,7 +1236,7 @@
       `${shortTicketId(relation.prerequisiteTicketId)} → `
       + shortTicketId(relation.dependentTicketId);
     elements.inspectorOutcome.textContent =
-      relation.rationale || "Direct execution dependency.";
+      relation.rationale || "Direct task dependency.";
     elements.inspectorOutcome.hidden = false;
     const content = document.createDocumentFragment();
     content.append(disclosure(
@@ -1595,8 +1575,6 @@
     ticket,
     contextPackage,
     operational,
-    attention,
-    nextAction,
   ) {
     const panel = document.createElement("section");
     const incoming = state.graph.relations.filter(
@@ -1620,24 +1598,21 @@
     const copy = document.createElement("span");
     const eyebrow = document.createElement("span");
     eyebrow.className = "eyebrow";
-    eyebrow.textContent = "Recommended action";
+    eyebrow.textContent = "Recorded task state";
     const label = document.createElement("strong");
     label.className = "recommended-action-title";
-    label.textContent = recommendedActionTitle(nextAction?.action);
+    label.textContent = phase.label.replaceAll("_", " ");
     label.tabIndex = 0;
-    label.dataset.fullText = nextAction?.detail
+    label.dataset.fullText = operational?.detail
       || "Inspect the current Ticket context.";
     label.setAttribute("aria-describedby", "textTooltip");
     copy.append(eyebrow, label);
-    const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
       label: "Copy prompt",
-      className: classes("agent-handoff", closeout ? "closeout-handoff" : ""),
+      className: "agent-handoff",
       onClick: () => void copyPayload(
         agentHandoffPayload(ticket, contextPackage, operational),
-        closeout
-          ? `Closeout handoff for ${ticket.ticketId} copied`
-          : `Ticket ${ticket.ticketId} copied for Agent`,
+        `Task brief for ${ticket.ticketId} copied`,
       ),
     });
     heading.append(copy, handoff);
@@ -1645,8 +1620,8 @@
     const phaseMeta = document.createElement("div");
     phaseMeta.className = "recommended-action-phase";
     phaseMeta.textContent = phase.substate
-      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
-      : phase.label;
+      ? `${phase.label.replaceAll("_", " ")} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label.replaceAll("_", " ");
 
     const metrics = document.createElement("div");
     metrics.className = "ticket-signal-metrics";
@@ -1657,25 +1632,30 @@
         "blockers",
       ),
       signalMetric(String(outgoing.length), "unlocks"),
-      signalMetric(nextAction?.action || "—", "next action"),
-      signalMetric("Reading", "evidence", "proof-metric"),
+      signalMetric(String((contextPackage.updates || []).length), "updates"),
     );
     signal.append(heading, phaseMeta, metrics);
     panel.append(signal);
     panel.append(section("Ticket state", facts([
-      ["Workflow", (ticket.workState?.state || operational?.label || "Unknown").replaceAll("_", " ")],
-      ["Basis", "Ticket contract, dependencies, Evidence and Outcome"],
+      ["State", (ticket.workState?.state || operational?.label || "Unknown").replaceAll("_", " ")],
+      ["Basis", "Recorded task status and direct dependencies"],
     ])));
     panel.append(agentSessionsPanel(ticket));
+    const updates = contextPackage.updates || [];
+    if (updates.length) {
+      panel.append(section("Progress and results", traceList(updates.map((update) => ({
+        kind: "update", status: update.status || "recorded", summary: update.summary,
+        occurredAt: update.recorded_at,
+        body: update.status ? `Recorded status: ${update.status}` : "",
+        targets: [], agentPayload: update,
+      })))));
+    }
 
-    const review = closeoutReviewBrief(contextPackage, nextAction);
-    if (review) panel.append(review);
 
-    if (attention) panel.append(humanAttentionBrief(attention));
 
     if (
       operational?.detail
-      && (operational.label === "BLOCKED" || operational.label === "DEVIATED")
+      && operational.label === "BLOCKED"
     ) {
       const exception = document.createElement("p");
       exception.className = "ticket-exception";
@@ -1732,40 +1712,8 @@
     return panel;
   }
 
-  function humanAttentionBrief(attention) {
-    const labels = {
-      UPCOMING: "Human boundary ahead",
-      PENDING: "Human evidence pending",
-      RECORDED: "Human evidence recorded",
-      COMPLETE: "Human boundary accepted",
-    };
-    const brief = document.createElement("div");
-    brief.className = classes(
-      "human-attention-brief",
-      `attention-${attention.key}`,
-    );
-    const marker = document.createElement("span");
-    marker.className = "human-attention-mark";
-    marker.setAttribute("aria-hidden", "true");
-    const copy = document.createElement("span");
-    const title = document.createElement("strong");
-    title.textContent = labels[attention.label];
-    const detail = document.createElement("span");
-    detail.textContent = attention.detail;
-    copy.append(title, detail);
-    const count = document.createElement("span");
-    count.className = "human-attention-count";
-    count.textContent = `${attention.humanEvidenceCount} / ${attention.humanAcceptanceCount}`;
-    brief.append(marker, copy, count);
-    return brief;
-  }
-
   function agentHandoffPayload(ticket, contextPackage, operational) {
-    // The canonical host projection owns routing. Operational state and human
-    // attention remain separate context; the browser never re-derives whether
-    // this Ticket should execute, wait, ask a human, close out, or replan.
     const stateLabel = operational?.label || "UNPROJECTED";
-    const nextAction = ticketNextAction(ticket);
     const canonical = contextPackage.agentPayload ?? {
       kind: "vibehub_ticket_handoff",
       ticketId: ticket.ticketId,
@@ -1773,41 +1721,8 @@
     if (contextPackage.agentPayload) return canonical;
     return {
       ...canonical,
-      instruction: agentHandoffInstruction(ticket.ticketId, nextAction, stateLabel),
+      instruction: agentHandoffInstruction(ticket.ticketId, stateLabel),
     };
-  }
-
-  function recommendedActionTitle(action) {
-    return {
-      EXECUTE: "Start work",
-      REFINE: "Define task",
-      REPLAN: "Revise task",
-      WAIT: "Review blockers",
-      NEEDS_HUMAN: "Respond",
-      CLOSE_OUT: "Verify & close",
-      DONE: "Review outcome",
-    }[action] || "Inspect task";
-  }
-
-  function closeoutReviewBrief(contextPackage, nextAction) {
-    if (nextAction?.action !== "CLOSE_OUT") return null;
-    const acceptance = contextPackage.acceptance || [];
-    const evidence = contextPackage.evidence || [];
-    const brief = document.createElement("div");
-    brief.className = "closeout-review-brief";
-    const marker = document.createElement("span");
-    marker.className = "closeout-review-mark";
-    marker.setAttribute("aria-hidden", "true");
-    const copy = document.createElement("span");
-    const title = document.createElement("strong");
-    title.textContent = "Ready for independent closeout";
-    const detail = document.createElement("span");
-    detail.textContent = `${acceptance.length} / ${acceptance.length} criteria have authority-satisfying Evidence across ${evidence.length} record${evidence.length === 1 ? "" : "s"}. Outcome is pending; Evidence is proof, not judgment.`;
-    copy.append(title, detail);
-    const action = document.createElement("b");
-    action.textContent = "CLOSE OUT";
-    brief.append(marker, copy, action);
-    return brief;
   }
 
   function signalMetric(value, label, extraClass = "") {
@@ -1923,7 +1838,7 @@
     return arrow;
   }
 
-  function ticketContractPanel(ticket, contextPackage, inspection, nextAction) {
+  function ticketContractPanel(ticket, contextPackage, inspection) {
     const panel = document.createElement("section");
     const acceptance = contextPackage.acceptance || [];
     const constraints = contextPackage.constraints || [];
@@ -1933,11 +1848,9 @@
       contextPackage.provenanceRefs || ticket.provenanceRefs || [];
     const summary = contractBrief(acceptance, contextPackage.activeContractRevision);
     panel.append(summary);
-    const review = closeoutReviewBrief(contextPackage, nextAction);
-    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
       "Acceptance conditions",
-      "The exact conditions an independent Outcome can accept.",
+      "Recorded completion criteria for this task.",
     ));
     const acceptanceRail = acceptanceView(acceptance);
     panel.append(acceptanceRail);
@@ -1993,7 +1906,7 @@
 
     if (support.childElementCount) {
       panel.append(ticketSectionHeading(
-        "Supporting contract",
+        "Supporting context",
         "Open boundaries, context, or audit detail only when needed.",
       ));
       panel.append(support);
@@ -2019,15 +1932,15 @@
       ? `Active Contract v${activeContractRevision.revision}`
       : "Definition of done";
     const title = document.createElement("strong");
-    title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`
+    title.textContent = (acceptanceCount ? `${acceptanceCount} completion condition${acceptanceCount === 1 ? "" : "s"} recorded` : "No completion criteria recorded")
       + (humanCount ? ` · ${humanCount} require human authority` : "");
     copy.append(eyebrow, title);
     const status = document.createElement("div");
     status.className = "contract-brief-status";
     const statusValue = document.createElement("strong");
-    statusValue.textContent = "Reading Evidence…";
+    statusValue.textContent = "Reading history…";
     const statusDetail = document.createElement("span");
-    statusDetail.textContent = "Outcome is authoritative";
+    statusDetail.textContent = "Optional historical proof";
     status.append(statusValue, statusDetail);
     brief.append(marker, copy, status);
     return brief;
@@ -2111,8 +2024,8 @@
       status.textContent = item.state === "retired"
         ? "Retired history"
         : authority === "human"
-        ? "Human evidence pending"
-        : "Awaiting evidence";
+        ? "No linked human Evidence"
+        : "No linked Evidence";
       const meta = document.createElement("span");
       meta.className = "acceptance-meta";
       if (authority === "human") {
@@ -2407,21 +2320,19 @@
     return normalized.charAt(0).toUpperCase() + normalized.slice(1);
   }
 
-  function ticketProofPanel(contextPackage, nextAction) {
+  function ticketProofPanel(contextPackage) {
     const panel = document.createElement("section");
     const summary = document.createElement("div");
     summary.className = "proof-summary";
     const label = document.createElement("strong");
-    label.textContent = "Reading Evidence…";
+    label.textContent = "Reading history…";
     const detail = document.createElement("span");
-    detail.textContent = "Acceptance-linked Evidence and independent Outcome appear here.";
+    detail.textContent = "Progress, results and earlier Evidence and Outcomes appear here.";
     summary.append(label, detail);
     panel.append(summary);
-    const review = closeoutReviewBrief(contextPackage, nextAction);
-    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
-      "Evidence & Outcome",
-      "Chronological Evidence and Outcome from the exact Git source.",
+      "Task history",
+      "Recorded updates and historical proof from this worktree.",
     ));
     const traceSection = document.createElement("div");
     traceSection.append(quietMessage("Reading Git trace…"));
@@ -2468,30 +2379,24 @@
       contractValue.textContent = unresolved.size
         ? `${accepted.size} accepted · ${unresolved.size} unresolved`
         : `${accepted.size} / ${target.activeAcceptanceCount} accepted`;
-      contractDetail.textContent = "Independent Outcome recorded";
+      contractDetail.textContent = "Historical Outcome recorded";
       contractStatus.classList.add(
         unresolved.size ? "has-attention" : "is-complete",
       );
     } else {
       contractValue.textContent = `${evidenced.size} / ${target.activeAcceptanceCount} evidenced`;
-      contractDetail.textContent = target.nextAction?.action === "CLOSE_OUT"
-        ? "Authority satisfied · independent Outcome pending"
-        : "Independent Outcome pending";
+      contractDetail.textContent = "Historical Evidence coverage";
     }
 
     const metric = elements.inspectorContent.querySelector(".proof-metric strong");
     if (metric) metric.textContent = `${evidenced.size} / ${target.activeAcceptanceCount}`;
     const label = target.proofSummary.querySelector("strong");
     const detail = target.proofSummary.querySelector("span");
-    if (!records.length) {
-      label.textContent = "No Evidence recorded yet";
-      detail.textContent = `${target.activeAcceptanceCount} active criteria await revision-bound Evidence.`;
-    } else {
-      label.textContent = `${evidence.length} Evidence · ${currentOutcomes.length ? "current Outcome recorded" : `${outcomes.length} historical Outcome${outcomes.length === 1 ? "" : "s"}`}`;
-      detail.textContent = target.nextAction?.action === "CLOSE_OUT"
-        ? `${evidenced.size} of ${target.activeAcceptanceCount} active criteria are authority-satisfied; independent adjudication is next.`
-        : `${evidenced.size} of ${target.activeAcceptanceCount} active criteria have exact-revision Evidence.`;
-    }
+    const updates = records.filter((record) => record.kind === "update");
+    label.textContent = records.length
+      ? `${updates.length} updates · ${evidence.length} Evidence · ${outcomes.length} Outcomes`
+      : "No history recorded yet";
+    detail.textContent = "Task status is recorded separately from historical proof.";
 
     target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
       const id = row.dataset.acceptanceId;
@@ -2510,8 +2415,8 @@
       if (accepted.has(id)) {
         row.classList.add("is-accepted");
         status.textContent = human
-          ? "Human acceptance verified"
-          : "Accepted";
+          ? "Accepted in historical Outcome"
+          : "Accepted in historical Outcome";
       } else if (unresolved.has(id)) {
         row.classList.add("is-unresolved");
         status.textContent = human
@@ -2521,12 +2426,12 @@
         row.classList.add("has-human-evidence");
         status.textContent = "Human evidence recorded";
       } else if (human) {
-        status.textContent = "Human evidence pending";
+        status.textContent = "No linked human Evidence";
       } else if (evidenced.has(id)) {
         row.classList.add("has-evidence");
         status.textContent = "Evidence attached";
       } else {
-        status.textContent = "Awaiting evidence";
+        status.textContent = "No linked Evidence";
       }
     });
   }
@@ -2628,7 +2533,7 @@
     );
     wrapper.setAttribute(
       "aria-label",
-      `${phase.label}${phase.substate ? `. ${phase.substate.replaceAll("_", " ")}` : ""}. ${operational?.detail || ""}`,
+      `${phase.label.replaceAll("_", " ")}${phase.substate ? `. ${phase.substate.replaceAll("_", " ")}` : ""}. ${operational?.detail || ""}`,
     );
 
     const marker = document.createElement("span");
@@ -2638,8 +2543,8 @@
     copy.className = "execution-state-copy";
     const label = document.createElement("strong");
     label.textContent = phase.substate
-      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
-      : phase.label;
+      ? `${phase.label.replaceAll("_", " ")} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label.replaceAll("_", " ");
     copy.append(label);
     if (operational?.detail) {
       const detail = document.createElement("span");

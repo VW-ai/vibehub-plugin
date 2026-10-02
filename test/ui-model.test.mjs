@@ -15,246 +15,80 @@ function loadWorkbenchModel() {
   return sandbox.VibeHubWorkbenchModel;
 }
 
-function projectedTicket(
-  label,
-  attentionLabel = "PENDING",
-  nextAction = label === "READY" ? "EXECUTE" : "REFINE",
-) {
+function projectedTicket(label) {
   return {
-    ticketId: "draft-work",
-    outcome: "Rewrite this draft into an executable Ticket.",
+    ticketId: "task",
+    status: label === "DONE" ? "done" : label === "IN_PROGRESS" ? "in_progress" : "open",
+    outcome: "Remember the task and its result.",
     relationCounts: { prerequisites: 1, dependents: 2 },
     capabilities: {
-      operational: {
-        availability: "available",
-        summary: {
-          label,
-          detail: label === "REFINE"
-            ? "Prerequisites are done, but maturity is draft."
-            : "Executable now.",
-          references: [],
-        },
-      },
-      attention: {
-        availability: "available",
-        summary: {
-          label: attentionLabel,
-          detail: "One owner decision remains.",
-          humanAcceptanceCount: 1,
-          humanEvidenceCount: 0,
-        },
-      },
-      nextAction: {
-        availability: "available",
-        summary: {
-          action: nextAction,
-          reason: "fixture_reason",
-          detail: `The canonical next action is ${nextAction}.`,
-          acceptanceIds: ["works"],
-          blockingTicketIds: [],
-        },
-      },
+      operational: { availability: "available", summary: { label, detail: "Recorded task state.", references: [] } },
     },
   };
 }
 
-test("production workbench derives four primary phases from canonical next action", () => {
+test("Workbench presents recorded task states without prescribing an execution workflow", () => {
   const model = loadWorkbenchModel();
-  const refine = projectedTicket("REFINE");
-  const ready = projectedTicket("READY", "COMPLETE");
-  ready.ticketId = "ready-work";
-
-  const presentation = model.ticketNodePresentation(refine);
-  assert.equal(presentation.stateLabel, "DRAFT");
-  assert.match(presentation.className, /(?:^| )phase-draft(?: |$)/u);
-  assert.doesNotMatch(presentation.className, /attention-pending/u);
-  assert.match(presentation.ariaLabel, /Phase DRAFT/u);
-  assert.match(presentation.ariaLabel, /Next action REFINE/u);
-  assert.match(presentation.ariaLabel, /No live execution claim/u);
-
-  const counts = model.operationalCounts([refine, ready]);
-  assert.equal(counts.READY, 1);
-  assert.equal(counts.DRAFT, 1);
-  assert.equal(counts.RUNNING, 0);
-  assert.match(model.graphSummary(counts), /1 ready · 1 draft/u);
-  assert.match(model.graphNarrative(counts), /1 ready, 1 draft/u);
-  assert.equal(model.causalPriority("DRAFT") < model.causalPriority("DONE"), true);
-
-  const readyFrontier = [refine, ready].filter(
-    (ticket) => model.ticketOperationalState(ticket)?.label === "READY",
-  );
-  assert.deepEqual(readyFrontier.map((ticket) => ticket.ticketId), ["ready-work"]);
-
-  const refineHandoff = model.agentHandoffInstruction(
-    "draft-work",
-    model.ticketNextAction(refine),
-    "REFINE",
-  );
-  assert.match(refineHandoff, /vibehub-ticket-plan/u);
-  assert.match(refineHandoff, /maturity: firm/u);
-  assert.match(refineHandoff, /do not start vibehub-ticket-run/u);
-  const readyHandoff = model.agentHandoffInstruction(
-    "ready-work",
-    model.ticketNextAction(ready),
-    "READY",
-  );
-  assert.match(readyHandoff, /vibehub-ticket-run/u);
-  assert.doesNotMatch(readyHandoff, /vibehub-ticket-plan/u);
-});
-
-test("production workbench routes execution and adjudication from host next action", () => {
-  const model = loadWorkbenchModel();
-  const closeout = projectedTicket("READY", "RECORDED", "CLOSE_OUT");
-  closeout.ticketId = "fully-evidenced";
-  // Runtime presence is intentionally extra presentation state and cannot
-  // rewrite the canonical next-action capability.
-  const next = model.ticketNextAction(closeout);
-  assert.equal(next.action, "CLOSE_OUT");
-  const presentation = model.ticketNodePresentation(closeout);
-  assert.match(presentation.className, /(?:^| )next-close-out(?: |$)/u);
-  assert.match(presentation.className, /(?:^| )phase-running(?: |$)/u);
-  assert.match(presentation.className, /(?:^| )substate-verifying(?: |$)/u);
-  assert.equal(presentation.phase.live, false);
-  assert.match(presentation.ariaLabel, /Next action CLOSE_OUT/u);
-  assert.match(
-    model.agentHandoffInstruction(closeout.ticketId, next, "READY"),
-    /vibehub-ticket-closeout/u,
-  );
-  assert.doesNotMatch(
-    model.agentHandoffInstruction(closeout.ticketId, next, "READY"),
-    /vibehub-ticket-run/u,
-  );
-
-  const needsHuman = projectedTicket("READY", "PENDING", "NEEDS_HUMAN");
-  assert.match(
-    model.agentHandoffInstruction(
-      "owner-decision",
-      model.ticketNextAction(needsHuman),
-      "READY",
-    ),
-    /wait for explicit human input/u,
-  );
-});
-
-test("canonical precedence yields one deterministic phase and substate", () => {
-  const model = loadWorkbenchModel();
-  const cases = [
-    ["DONE", "DONE", null],
-    ["REPLAN", "DRAFT", "DEVIATED"],
-    ["WAIT", "DRAFT", "BLOCKED"],
-    ["REFINE", "DRAFT", null],
-    ["EXECUTE", "READY", null],
-    ["NEEDS_HUMAN", "READY", "NEEDS_YOU"],
-    ["CLOSE_OUT", "RUNNING", "VERIFYING"],
-  ];
-  for (const [action, phase, substate] of cases) {
-    const ticket = projectedTicket("READY", "PENDING", action);
-    ticket.ticketId = action.toLowerCase();
-    const result = model.ticketPhasePresentation(ticket);
-    assert.deepEqual([result.label, result.substate, result.live], [phase, substate, false]);
-    if (["READY", "RUNNING"].includes(phase)) {
-      assert.notEqual(result.substate, "BLOCKED");
-      assert.notEqual(result.substate, "DEVIATED");
-    }
+  const items = ["OPEN", "BLOCKED", "IN_PROGRESS", "DONE"].map(projectedTicket);
+  assert.deepEqual(items.map(item => model.ticketPhasePresentation(item).label), ["OPEN", "BLOCKED", "IN_PROGRESS", "DONE"]);
+  const counts = model.operationalCounts(items);
+  assert.deepEqual({ ...counts }, { OPEN: 1, BLOCKED: 1, IN_PROGRESS: 1, DONE: 1 });
+  assert.equal(model.graphSummary(counts), "1 in progress · 1 open · 1 blocked · 1 done");
+  assert.equal(model.graphNarrative(counts), "1 in progress, 1 open, 1 blocked, 1 done.");
+  const presentation = model.ticketNodePresentation(items[0]);
+  assert.match(presentation.className, /phase-open/u);
+  assert.match(presentation.ariaLabel, /Phase OPEN/u);
+  assert.doesNotMatch(presentation.ariaLabel, /Next action/u);
+  assert.equal("ticketNextAction" in model, false);
+  for (const item of items) {
+    const brief = model.agentHandoffInstruction(item.ticketId, item.status);
+    assert.match(brief, /user's chosen skills/u);
+    assert.match(brief, /Record meaningful progress, results and status/u);
+    assert.doesNotMatch(brief, /independent|vibehub-ticket-(run|plan|closeout)|CLOSE_OUT/u);
   }
 });
 
-test("trusted scoped runtime is the only source of live Running", () => {
+test("live sessions remain separate from recorded task state", () => {
   const model = loadWorkbenchModel();
   const now = Date.parse("2026-08-20T12:00:00Z");
-  const ready = projectedTicket("READY", "COMPLETE", "EXECUTE");
-  ready.ticketId = "ready-work";
-  const runtime = {
+  const item = projectedTicket("OPEN");
+  item.capabilities.runtime = {
     availability: "available",
     summary: {
-      trustedSource: "dsh-runtime",
-      ticketId: "ready-work",
-      runId: "run-1",
-      operation: "execute",
-      state: "running",
-      observedAt: "2026-08-20T11:59:00Z",
-      expiresAt: "2026-08-20T12:01:00Z",
+      trustedSource: "dsh-runtime", ticketId: "task", runId: "run-1",
+      operation: "execute", state: "running",
+      observedAt: "2026-08-20T11:59:00Z", expiresAt: "2026-08-20T12:01:00Z",
     },
   };
-  ready.capabilities.runtime = runtime;
-  assert.deepEqual(
-    { ...model.ticketPhasePresentation(ready, { now }) },
-    {
-      label: "RUNNING",
-      key: "running",
-      substate: null,
-      substateKey: null,
-      stage: "running",
-      live: true,
-      runtime: model.ticketRuntimeState(ready, { now }),
-      operational: model.ticketOperationalState(ready),
-      attention: model.ticketAttentionState(ready),
-      nextAction: model.ticketNextAction(ready),
-    },
-  );
+  const phase = model.ticketPhasePresentation(item, { now });
+  assert.equal(phase.label, "OPEN");
+  assert.equal(phase.live, true);
   for (const mutation of [
-    { trustedSource: "" },
-    { ticketId: "other" },
-    { operation: "plan" },
-    { state: "completed" },
-    { expiresAt: "2026-08-20T11:59:59Z" },
+    { trustedSource: "" }, { ticketId: "other" }, { operation: "plan" },
+    { state: "completed" }, { expiresAt: "2026-08-20T11:59:59Z" },
   ]) {
-    const candidate = structuredClone(ready);
+    const candidate = structuredClone(item);
     Object.assign(candidate.capabilities.runtime.summary, mutation);
-    const phase = model.ticketPhasePresentation(candidate, { now });
-    assert.equal(phase.label, "READY");
-    assert.equal(phase.live, false);
+    assert.equal(model.ticketPhasePresentation(candidate, { now }).live, false);
   }
+  item.capabilities.operational.summary.label = "DONE";
+  assert.equal(model.ticketPhasePresentation(item, { now }).live, false);
 });
 
-test("production workbench model projects four phases and one substate slot", () => {
+test("overview counts explicit progress and blockers independently of historical proof", () => {
   const model = loadWorkbenchModel();
-  const ready = projectedTicket("READY", "COMPLETE", "EXECUTE");
-  ready.ticketId = "ready-work";
-  const refine = projectedTicket("REFINE", "UPCOMING");
-  refine.ticketId = "refine-work";
-  const deviated = projectedTicket("DEVIATED", "COMPLETE", "REPLAN");
-  deviated.ticketId = "deviated-work";
-  const closeout = projectedTicket("READY", "RECORDED", "CLOSE_OUT");
-  closeout.ticketId = "closeout-work";
-  const human = projectedTicket("READY", "PENDING", "NEEDS_HUMAN");
-  human.ticketId = "human-work";
-
-  const overview = model.workbenchOverview(
-    [ready, refine, deviated, closeout, human],
-    {
-      semanticDirty: true,
-      dirtyPaths: [".vibehub/tickets/ready-work.yaml"],
-      dirtyPathsTruncated: false,
-    },
-  );
-  assert.equal(
-    overview.phases.READY.map((ticket) => ticket.ticketId).join(","),
-    "ready-work,human-work",
-  );
-  assert.equal(
-    overview.phases.RUNNING.map((ticket) => ticket.ticketId).join(","),
-    "closeout-work",
-  );
-  assert.equal(
-    overview.phases.DRAFT.map((ticket) => ticket.ticketId).join(","),
-    "refine-work,deviated-work",
-  );
-  assert.equal(
-    overview.needsYou.map((ticket) => ticket.ticketId).join(","),
-    "human-work",
-  );
-  assert.equal(
-    overview.deviated.map((ticket) => ticket.ticketId).join(","),
-    "deviated-work",
-  );
-  assert.equal(overview.substates.VERIFYING[0].ticketId, "closeout-work");
-  const counts = model.operationalCounts([ready, refine, deviated, closeout, human]);
-  assert.match(model.graphSummary(counts, overview), /1 running · 2 ready · 2 draft/u);
-  assert.match(model.graphNarrative(counts, overview), /1 running, 2 ready, 2 draft/u);
-  assert.equal(overview.sourceDirty, true);
+  const open = projectedTicket("OPEN"), blocked = projectedTicket("BLOCKED");
+  const progress = projectedTicket("IN_PROGRESS"), done = projectedTicket("DONE");
+  open.outcomeHistory = [{ status: "successful" }];
+  const overview = model.workbenchOverview([open, blocked, progress, done], {
+    semanticDirty: true, dirtyPaths: [".vibehub/tickets/task.yaml"],
+  });
+  assert.equal(overview.ready[0], open);
+  assert.equal(overview.blocked[0], blocked);
+  assert.equal(overview.running[0], progress);
+  assert.equal(overview.phases.DONE[0], done);
+  assert.equal(overview.needsYou.length, 0);
   assert.equal(overview.sourceDirtyCount, 1);
-  assert.equal("implementing" in overview, false);
 });
 
 test("focused local href preserves the bearer fragment and follows the Inspector lens", () => {

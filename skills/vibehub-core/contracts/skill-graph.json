@@ -12,7 +12,7 @@
   "edge_kinds": {
     "invokes": "The caller runs the target as a step of its own workflow. This subgraph must stay acyclic.",
     "presents": "The caller asks vibehub-review to present a lifecycle event the caller owns.",
-    "routes": "vibehub-review hands work back to the Skill that owns it. Together with `presents` this is the deliberate lifecycle loop governed by the lifecycle contract, so acyclicity is not asserted over these kinds."
+    "routes": "The caller directs an explicit record request to its owning Skill. Routing does not execute a Ticket."
   },
   "lifecycle_contract": "vibehub-review/references/ticket-lifecycle.json",
   "skills": [
@@ -43,7 +43,9 @@
       "presents": [
         "vibehub-review"
       ],
-      "routes": [],
+      "routes": [
+        "vibehub-ticket"
+      ],
       "events": [],
       "note": "Bulk absorption delegates the Room tree to distill and presents the written tree through review's Room tree surface (references/bulk-absorption.md)."
     },
@@ -84,13 +86,12 @@
       "presents": [],
       "routes": [
         "vibehub-distill",
-        "vibehub-ticket-closeout",
-        "vibehub-ticket-plan"
+        "vibehub-ticket"
       ],
       "events": [
         "explicit-review"
       ],
-      "note": "The presenter. It routes CLOSE_OUT to closeout and requested edits to plan, and a proposed Room tree must be written by distill before the read-only UI can show it."
+      "note": "Presents task records and Room context. Requested task edits use the Ticket Skill."
     },
     {
       "name": "vibehub-setup",
@@ -103,66 +104,21 @@
       "events": []
     },
     {
-      "name": "vibehub-ticket-closeout",
+      "name": "vibehub-ticket",
       "entry": "user",
       "invokes": [
-        "vibehub-ingest"
-      ],
-      "presents": [
-        "vibehub-review"
-      ],
-      "routes": [],
-      "events": [
-        "closeout-recorded"
-      ]
-    },
-    {
-      "name": "vibehub-ticket-plan",
-      "entry": "user",
-      "invokes": [
-        "vibehub-distill",
         "vibehub-setup",
-        "vibehub-ticket-validate"
+        "vibehub-query"
       ],
       "presents": [
         "vibehub-review"
       ],
       "routes": [],
       "events": [
-        "draft-needs-refinement",
-        "execution-discovers-work",
-        "plan-applied"
+        "ticket-defined",
+        "ticket-updated"
       ],
-      "note": "Owns the canonical user entry “Start this with VibeHub.”"
-    },
-    {
-      "name": "vibehub-ticket-run",
-      "entry": "user",
-      "invokes": [
-        "vibehub-ingest",
-        "vibehub-query",
-        "vibehub-ticket-closeout",
-        "vibehub-ticket-plan"
-      ],
-      "presents": [
-        "vibehub-review"
-      ],
-      "routes": [],
-      "events": [
-        "execution-needs-human",
-        "ready-execution"
-      ]
-    },
-    {
-      "name": "vibehub-ticket-validate",
-      "entry": "internal",
-      "invokes": [],
-      "presents": [],
-      "routes": [],
-      "events": [
-        "validation-needs-human"
-      ],
-      "note": "Read-only independent validation asked for by vibehub-ticket-plan; its description carries no user trigger."
+      "note": "Defines, reads, and updates task memory. Development methods belong to the user’s chosen skills."
     }
   ],
   "retired": [
@@ -252,6 +208,34 @@
           "reason": "Historical investigation describes the actual asset path in the tested installation; retain the recorded finding without rewriting it as a new observation."
         }
       ]
+    },
+    {
+      "name": "vibehub-ticket-plan",
+      "replacement": "vibehub-ticket",
+      "reason": "Consolidated into task memory. Historical project records retain their original references; shipped Skills use the replacement.",
+      "allowed_paths": [],
+      "reference_scope": "skills"
+    },
+    {
+      "name": "vibehub-ticket-run",
+      "replacement": "vibehub-ticket",
+      "reason": "Consolidated into task memory. Historical project records retain their original references; shipped Skills use the replacement.",
+      "allowed_paths": [],
+      "reference_scope": "skills"
+    },
+    {
+      "name": "vibehub-ticket-validate",
+      "replacement": "vibehub-ticket",
+      "reason": "Consolidated into task memory. Historical project records retain their original references; shipped Skills use the replacement.",
+      "allowed_paths": [],
+      "reference_scope": "skills"
+    },
+    {
+      "name": "vibehub-ticket-closeout",
+      "replacement": "vibehub-ticket",
+      "reason": "Consolidated into task memory. Historical project records retain their original references; shipped Skills use the replacement.",
+      "allowed_paths": [],
+      "reference_scope": "skills"
     }
   ]
 }

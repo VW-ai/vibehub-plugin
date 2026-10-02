@@ -20,7 +20,6 @@ import {
   ticketHierarchy,
   resolveTicketContextRef,
   ticketArchived,
-  ticketNextAction,
   ticketStatus,
   ticketWorkState,
 } from "./vh.mjs";
@@ -222,68 +221,18 @@ function relationRef(prerequisiteTicketId, dependentTicketId) {
   return `rel-${digest({ prerequisiteTicketId, dependentTicketId }).slice(7, 23)}`;
 }
 
-function outcomeState(outcome) {
-  if (!outcome) return null;
-  return outcome.status === "successful" ? "DONE" : "DEVIATED";
-}
-
 function outcomePath(outcome) {
   return outcome?.binding_state === "bound"
     ? `.vibehub/outcomes/${outcome.ticket_id}/${outcome.outcome_id}.yaml`
     : `.vibehub/outcomes/${outcome.ticket_id}.yaml`;
 }
 
-function operationalState(repository, ticket, outcome) {
-  const label = outcomeState(outcome) ?? ticketStatus(repository, ticket);
-  if (label === "DONE") {
-    return {
-      label,
-      detail: "Every acceptance criterion was independently accepted.",
-      references: [{ ref: outcomePath(outcome), label: "Outcome" }],
-    };
-  }
-  if (label === "DEVIATED") {
-    return {
-      label,
-      detail: `The independent Outcome is ${outcome.status}; this Ticket does not unlock dependents.`,
-      references: [{ ref: outcomePath(outcome), label: outcome.status }],
-    };
-  }
-  const blockers = ticket.relations
-    .map((relation) => relation.target_ticket_id)
-    .filter((id) => {
-      const prerequisite = repository.tickets.documents.get(id)?.document;
-      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
-    });
-  if (label === "BLOCKED") {
-    return {
-      label,
-      detail: "Waiting for direct prerequisites to close successfully.",
-      references: blockers.map((ref) => ({ ref, label: "Prerequisite" })),
-    };
-  }
-  if (label === "REFINE") {
-    return {
-      label,
-      detail: "Draft Ticket: unblocked but under-defined; its acceptance must be refined and maturity set to firm before execution.",
-      references: [{ ref: `.vibehub/tickets/${ticket.ticket_id}.yaml`, label: "Draft" }],
-    };
-  }
+function operationalState(repository, ticket) {
+  const state = ticketWorkState(repository, ticket);
   return {
-    label,
-    detail: "No unresolved direct prerequisite prevents execution.",
-    references: [],
-  };
-}
-
-function projectedNextAction(repository, ticket) {
-  const derived = ticketNextAction(repository, ticket);
-  return {
-    action: derived.action,
-    reason: derived.reason,
-    detail: derived.detail,
-    acceptanceIds: derived.acceptance_ids,
-    blockingTicketIds: derived.blocking_ticket_ids,
+    label: state.state,
+    detail: state.detail,
+    references: state.blocking_ticket_ids.map((ref) => ({ ref, label: "Prerequisite" })),
   };
 }
 
@@ -295,43 +244,10 @@ function evidenceOrigin(evidence) {
   return evidence.origin ?? "agent";
 }
 
-function handoffInstruction(ticketId, nextAction) {
-  const routes = {
-    EXECUTE: {
-      skill: "vibehub-ticket-run",
-      instruction: `Execute the READY VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-run.`,
-    },
-    CLOSE_OUT: {
-      skill: "vibehub-ticket-closeout",
-      instruction: `Independently adjudicate VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-closeout. Read the exact current Ticket, Acceptance authority, Evidence, Git diff or refs, and tests; do not execute it again, accept an executor summary as proof, or write a successful Outcome unless every current criterion is independently satisfied.`,
-      requiresIndependentAgent: true,
-    },
-    NEEDS_HUMAN: {
-      skill: "vibehub-review",
-      instruction: `Present the Contract for VibeHub Ticket ${ticketId} with the Skill vibehub-review and wait for explicit human input. Do not substitute Agent-origin Evidence for human authority.`,
-    },
-    REFINE: {
-      skill: "vibehub-ticket-plan",
-      instruction: `Refine VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-plan; do not start vibehub-ticket-run until its contract is firm.`,
-    },
-    REPLAN: {
-      skill: "vibehub-ticket-plan",
-      instruction: `Replan VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-plan, preserving the non-successful Outcome.`,
-    },
-    WAIT: {
-      skill: "vibehub-review",
-      instruction: `Inspect VibeHub Ticket ${ticketId} with the Skill vibehub-review and wait for its direct prerequisites to close successfully.`,
-    },
-    DONE: {
-      skill: "vibehub-review",
-      instruction: `Inspect the recorded Outcome for VibeHub Ticket ${ticketId} with the Skill vibehub-review.`,
-    },
-  };
+function handoffInstruction(ticketId) {
   return {
-    action: nextAction.action,
     readOnly: true,
-    requiresIndependentAgent: false,
-    ...(routes[nextAction.action] ?? routes.DONE),
+    instruction: `Read VibeHub task ${ticketId} and its context in this exact worktree. Use the user's chosen skills and working methods for the requested work. Record meaningful progress, results and status with vibehub-ticket. Keep task records local unless sharing was explicitly requested.`,
   };
 }
 
@@ -368,23 +284,14 @@ function humanAttentionState(repository, ticket, outcome) {
     .map((criterion) => criterion.acceptanceId);
   const humanAcceptanceCount = criteria.length;
   const humanEvidenceCount = recordedAcceptanceIds.length;
-  const operational = ticketStatus(repository, ticket);
   let label = "NONE";
   let detail = "No acceptance criterion reserves human authority.";
-  if (humanAcceptanceCount > 0 && outcome?.status === "successful") {
-    label = "COMPLETE";
-    detail = "Human-authority acceptance was independently accepted.";
-  } else if (humanAcceptanceCount > 0
-    && humanEvidenceCount === humanAcceptanceCount) {
+  if (humanAcceptanceCount > 0 && humanEvidenceCount === humanAcceptanceCount) {
     label = "RECORDED";
-    detail = "Human-origin Evidence is recorded; independent Outcome is pending.";
-  } else if (humanAcceptanceCount > 0
-    && (operational === "BLOCKED" || operational === "REFINE")) {
-    label = "UPCOMING";
-    detail = "A human boundary is ahead; dependency or refinement work comes first.";
+    detail = "Historical human-origin Evidence is recorded for these criteria.";
   } else if (humanAcceptanceCount > 0) {
     label = "PENDING";
-    detail = `${pendingAcceptanceIds.length} human-authority criterion${pendingAcceptanceIds.length === 1 ? "" : "s"} await human-origin Evidence.`;
+    detail = `${pendingAcceptanceIds.length} recorded human-decision criterion${pendingAcceptanceIds.length === 1 ? "" : "s"} have no linked human-origin Evidence. Task status is recorded separately.`;
   }
   return {
     label,
@@ -423,9 +330,11 @@ function projectGraph(repository, queryOptions = {}, sessions = { availability: 
   const tickets = ticketDocuments.map((ticket) => {
     const outcome = currentOutcome(repository, ticket);
     const attention = humanAttentionState(repository, ticket, outcome);
-    const nextAction = projectedNextAction(repository, ticket);
     return {
       ticketId: ticket.ticket_id,
+      status: ticket.status,
+      updates: ticket.updates,
+      blockingTicketIds: ticketWorkState(repository, ticket).blocking_ticket_ids,
       workState: ticketWorkState(repository, ticket),
       ticketRevision: digest(ticket),
       hierarchy: ticketHierarchy(repository, ticket),
@@ -437,15 +346,11 @@ function projectGraph(repository, queryOptions = {}, sessions = { availability: 
       capabilities: {
         operational: {
           availability: "available",
-          summary: operationalState(repository, ticket, outcome),
+          summary: operationalState(repository, ticket),
         },
         attention: {
           availability: "available",
           summary: attention,
-        },
-        nextAction: {
-          availability: "available",
-          summary: nextAction,
         },
         runtime: ticketSessionCapability(sessions, ticket.ticket_id),
       },
@@ -553,8 +458,7 @@ export function ticketContextPackage(ticket, relations, repository, source) {
     }));
   const attention = humanAttentionState(repository, ticket, outcome);
   const maturity = ticket.maturity ?? "firm";
-  const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
-  const nextAction = projectedNextAction(repository, ticket);
+  const operational = ticketStatus(repository, ticket);
   const acceptance = ticket.acceptance.map((item) => ({
     acceptanceId: item.acceptance_id,
     revision: item.revision,
@@ -583,8 +487,10 @@ export function ticketContextPackage(ticket, relations, repository, source) {
     ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
     maturity,
     operationalState: operational,
-    nextAction,
-    handoff: handoffInstruction(ticket.ticket_id, nextAction),
+    status: ticket.status,
+    updates: ticket.updates,
+    blockingTicketIds: ticketWorkState(repository, ticket).blocking_ticket_ids,
+    handoff: handoffInstruction(ticket.ticket_id),
     outcome: ticket.outcome,
     outcomeRecord: outcome,
     outcomeHistory,
@@ -618,7 +524,9 @@ export function ticketContextPackage(ticket, relations, repository, source) {
   return {
     maturity,
     operationalState: operational,
-    nextAction,
+    status: ticket.status,
+    updates: ticket.updates,
+    blockingTicketIds: ticketWorkState(repository, ticket).blocking_ticket_ids,
     outcome: ticket.outcome,
     activeContractRevision: contract
       ? { revision: contract.revision, identity: contract.identity }
@@ -633,7 +541,7 @@ export function ticketContextPackage(ticket, relations, repository, source) {
     relations: ticket.relations.map((relation) => ({
       type: relation.type,
       targetTicketId: relation.target_ticket_id,
-      rationale: relation.rationale ?? "Direct execution dependency.",
+      rationale: relation.rationale ?? "Direct task dependency.",
       relationRef: relations.find((candidate) =>
         candidate.prerequisiteTicketId === relation.target_ticket_id
         && candidate.dependentTicketId === ticket.ticket_id)?.relationRef,
@@ -695,9 +603,6 @@ function outcomeTrace(outcome, source) {
     unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
     occurredAt: outcome.closed_at,
     summary: outcome.summary,
-    // The Log is where the closeout Skill sends a reader, so the declared
-    // independence source has to survive this allowlist or it is invisible on
-    // the surface that matters. Unverified by design: shown, never trusted.
     independence: outcome.independence ?? null,
     body: [
       `Accepted: ${outcome.accepted_acceptance_ids.join(", ") || "none"}`,
@@ -711,7 +616,7 @@ function outcomeTrace(outcome, source) {
     ].filter(Boolean).join("\n"),
     targets: [{
       ...typedReference(source, outcomeRef),
-      label: "Canonical Outcome",
+      label: "Historical Outcome",
     }, ...(outcome.unresolved?.attempted_refs ?? []).map((ref) => typedReference(source, ref))],
     agentPayload: {
       kind: "vibehub_ticket_outcome",
@@ -740,7 +645,18 @@ export function traceRecords(repository, source, ticketId = null) {
   const outcomes = outcomeDocuments(repository)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
     .map((item) => outcomeTrace(item, source));
-  return [...evidence, ...outcomes].sort((left, right) =>
+  const updates = documents(repository.tickets.documents)
+    .filter((item) => ticketId === null || item.ticket_id === ticketId)
+    .flatMap((ticket) => ticket.updates.map((update) => ({
+      kind: "update",
+      status: update.status ?? "recorded",
+      occurredAt: update.recorded_at,
+      summary: update.summary,
+      body: update.status ? `Recorded task status: ${update.status}` : "Progress or result recorded.",
+      targets: update.refs.map((ref) => typedReference(source, ref)),
+      agentPayload: { kind: "vibehub_ticket_update", ticketId: ticket.ticket_id, ...update },
+    })));
+  return [...evidence, ...outcomes, ...updates].sort((left, right) =>
     String(left.occurredAt).localeCompare(String(right.occurredAt)),
   );
 }

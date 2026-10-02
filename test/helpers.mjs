@@ -74,7 +74,7 @@ function upgradeLegacyProofFixture(repo, input) {
 }
 
 function normalizeInitialTicketFixture(candidate) {
-  if (candidate?.schema_version !== 3 || candidate.revision_state !== "bound"
+  if (candidate?.schema_version !== 4 || candidate.revision_state !== "bound"
     || candidate.contract_revisions?.length !== 1
     || candidate.acceptance?.some((item) => item.revision !== undefined && item.revision !== 1)) return candidate;
   return materializeInitialTicket({
@@ -130,9 +130,11 @@ export function writeRoom(repo, roomPath, document) {
 
 export function ticket(id, dependencies = []) {
   return materializeInitialTicket({
-    schema_version: 3,
+    schema_version: 4,
     kind: "ticket",
     ticket_id: id,
+    status: "open",
+    updates: [],
     outcome: `${id} observable outcome`,
     deliveries: [],
     context: `Execute ${id} from its checked-in context.`,

@@ -12,7 +12,6 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
-import { materializeInitialTicket } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 
 const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-verify-"));
 const artifact = join(temp, "plugin");
@@ -48,7 +47,7 @@ try {
     "docs/INSTALL.md",
     "docs/RELEASE.md",
     "skills/vibehub-ingest/SKILL.md",
-    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket/SKILL.md",
     "skills/vibehub-core/scripts/vh.mjs",
     "skills/vibehub-core/scripts/session-store.mjs",
     "skills/vibehub-core/scripts/vh-session.mjs",
@@ -79,21 +78,11 @@ try {
     "skills/vibehub-core/contracts/revision-identity.md",
     "skills/vibehub-core/contracts/acceptance-authority.md",
     "skills/vibehub-core/contracts/dependency-hygiene.json",
-    "skills/vibehub-core/contracts/ticket-next-action.md",
+    "skills/vibehub-core/contracts/ticket-state.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
   const installedReadme = readFileSync(join(artifact, "README.md"), "utf8");
-  for (const narrative of [
-    "Stop managing chats. Manage the work.",
-    "Turn one coding request into a Git-native Ticket with the exact Context needed",
-    "work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context",
-    "Git keeps the history reviewable and reversible",
-  ]) {
-    if (!installedReadme.includes(narrative)) {
-      throw new Error(`installed README is missing public-site narrative: ${narrative}`);
-    }
-  }
   if ([...installedReadme.matchAll(/href="https:\/\/vibehub\.team"/gu)].length !== 1
     || /https:\/\/www\.vibehub\.team|https:\/\/[^"<\s]*\.pages\.dev/iu.test(installedReadme)) {
     throw new Error("installed README does not retain the one canonical vibehub.team link");
@@ -144,29 +133,13 @@ try {
     || !installedInstall.includes("Nothing is pushed")) {
     throw new Error("installed upgrade documentation is missing same-tag, explicit local-only behavior");
   }
-  const installedPlanSkill = readFileSync(
-    join(artifact, "skills", "vibehub-ticket-plan", "SKILL.md"),
-    "utf8",
-  );
-  if (!installedPlanSkill.includes("Start this with VibeHub.")
-    || !installedPlanSkill.includes("$vibehub-setup")
-    || !installedPlanSkill.includes("then\n   resume this workflow")) {
-    throw new Error("installed Ticket Plan does not route the canonical entry through Setup");
-  }
   const lifecycle = JSON.parse(readFileSync(join(
-    artifact,
-    "skills",
-    "vibehub-review",
-    "references",
-    "ticket-lifecycle.json",
+    artifact, "skills", "vibehub-review", "references", "ticket-lifecycle.json",
   ), "utf8"));
   if (lifecycle.presenter !== "vibehub-review"
     || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
-    || lifecycle.planning_contracts?.dependency_hygiene !== "../../vibehub-core/contracts/dependency-hygiene.json"
-    || lifecycle.next_action_routing?.EXECUTE?.owner !== "vibehub-ticket-run"
-    || lifecycle.next_action_routing?.CLOSE_OUT?.owner !== "vibehub-ticket-closeout"
-    || lifecycle.next_action_routing?.CLOSE_OUT?.independent_agent !== true) {
-    throw new Error("installed Ticket lifecycle contract is invalid");
+    || lifecycle.next_action_routing !== undefined) {
+    throw new Error("installed Ticket contract must describe records without execution routing");
   }
 
   const helper = join(artifact, "skills", "vibehub-core", "scripts", "vh.mjs");
@@ -197,114 +170,49 @@ try {
   }, ["--room", "product"]);
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
-  const entryTicket = materializeInitialTicket({
-      schema_version: 3,
-      kind: "ticket",
-      ticket_id: "ticket-build-entry-fixture",
-      outcome: "The concrete entry fixture produces one executable checked-in Ticket.",
-      deliveries: [],
-      context: "A clean installed plugin received a concrete deliverable followed by the exact canonical entry Start this with VibeHub.",
-      acceptance: [{
-        acceptance_id: "entry-reaches-ready-ticket",
-        criterion: "The initialized repository exposes this applied Ticket as READY.",
-      }],
-      constraints: ["Reuse Setup and Ticket Plan without a router or runtime service."],
-      context_refs: [],
-      relations: [],
-      provenance_refs: ["prompt:Start-this-with-VibeHub"],
-    });
-  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [entryTicket],
+  const firstId = "ticket-build-entry-fixture";
+  const secondId = "ticket-dependent-fixture";
+  invoke(helper, "ticket", "put", {
+    ticket_id: firstId,
+    outcome: "A remembered task can use any personal development workflow.",
+    context_refs: [{ ref: ".vibehub/rooms/product/decision-clean-install.yaml", purpose: "Project context" }],
   });
-  const frontier = invoke(helper, "ticket", "frontier");
-  if (frontier.data.count !== 1
-    || frontier.data.ready[0]?.ticket?.ticket_id !== "ticket-build-entry-fixture") {
-    throw new Error("canonical entry scenario did not reach a READY Ticket");
+  invoke(helper, "ticket", "put", {
+    ticket_id: secondId,
+    outcome: "The follow-up retains its dependency on the first task.",
+    relations: [{ type: "depends_on", target_ticket_id: firstId }],
+  });
+  const blocked = invoke(helper, "ticket", "get", { ticket_id: secondId }).data;
+  if (blocked.status !== "BLOCKED" || "next_action" in blocked) {
+    throw new Error("installed tasks must expose dependency facts without workflow routing");
   }
-  invoke(helper, "ticket", "evidence", {
-    schema_version: 2,
-    kind: "ticket_evidence",
-    evidence_id: "entry-human-proof",
-    ticket_id: "ticket-build-entry-fixture",
-    acceptance_ids: ["entry-reaches-ready-ticket"],
-    binding_state: "bound",
-    binding_origin: "native",
-    acceptance_revisions: entryTicket.contract_revisions[0].acceptance_revisions,
-    summary: "The human explicitly confirmed the clean entry fixture.",
-    refs: ["conversation:artifact-verification-human-input"],
-    origin: "human",
-    recorded_at: "2026-08-09T08:00:00.000Z",
-  });
-  const closeoutFrontier = invoke(helper, "ticket", "frontier");
-  if (closeoutFrontier.data.count !== 0
-    || closeoutFrontier.data.ready_to_closeout[0]?.ticket?.ticket_id
-      !== "ticket-build-entry-fixture") {
-    throw new Error("installed next-action projection did not route complete Evidence to closeout");
+  const completion = {
+    ticket_id: firstId, update_id: "completed",
+    status: "done", summary: "Completed with the user's chosen Skills.",
+    refs: ["scripts/verify-plugin-artifact.mjs"],
+  };
+  invoke(helper, "ticket", "update", completion);
+  invoke(helper, "ticket", "update", completion);
+  const done = invoke(helper, "ticket", "get", { ticket_id: firstId }).data;
+  if (done.status !== "DONE" || done.ticket.updates.length !== 1 || done.evidence.length !== 0 || done.outcome) {
+    throw new Error("installed task completion must be idempotent and need no proof workflow");
   }
-  invoke(helper, "ticket", "closeout", {
-    schema_version: 2,
-    kind: "ticket_outcome",
-    outcome_id: "contract-v1",
-    binding_state: "bound",
-    binding_origin: "native",
-    contract_revision: { revision: 1, identity: entryTicket.contract_revisions[0].identity },
-    independence: { source: "subagent", note: "artifact verification fixture" },
-    ticket_id: "ticket-build-entry-fixture",
-    status: "successful",
-    accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
-    unresolved_acceptance_ids: [],
-    evidence_ids: ["entry-human-proof"],
-    summary: "The installed artifact completed the executable entry Ticket.",
-    closed_at: "2026-08-09T08:01:00.000Z",
+  if (invoke(helper, "ticket", "get", { ticket_id: secondId }).data.status !== "OPEN") {
+    throw new Error("installed task completion did not unblock the dependent");
+  }
+  invoke(helper, "ticket", "update", {
+    ticket_id: firstId, update_id: "reopened", status: "open", summary: "A follow-up correction is needed.",
   });
-  const humanTicket = materializeInitialTicket({
-      schema_version: 3,
-      kind: "ticket",
-      ticket_id: "ticket-human-authority-fixture",
-      outcome: "The installed projection preserves criterion-level human authority.",
-      deliveries: [],
-      context: "Exercise human Evidence and attention independently of executable entry routing.",
-      acceptance: [{
-        acceptance_id: "owner-confirms-authority",
-        criterion: "The owner explicitly confirms the protected fixture.",
-        authority: "human",
-      }],
-      constraints: ["Agent Evidence cannot substitute for the owner."],
-      context_refs: [],
-      relations: [],
-      provenance_refs: ["test:installed-human-authority"],
+  const reopened = invoke(helper, "ticket", "get", { ticket_id: firstId }).data;
+  if (reopened.status !== "OPEN" || reopened.ticket.updates.length !== 2
+    || invoke(helper, "ticket", "get", { ticket_id: secondId }).data.status !== "BLOCKED") {
+    throw new Error("installed task reopen did not preserve history and restore dependency facts");
+  }
+  for (const ticket_id of [firstId, secondId]) {
+    invoke(helper, "ticket", "update", {
+      ticket_id, update_id: "finished", status: "done", summary: "The recorded task is complete.",
     });
-  invoke(helper, "ticket", "apply", { validation: { independent: false, note: "artifact verification" }, tickets: [humanTicket],
-  });
-  invoke(helper, "ticket", "evidence", {
-    schema_version: 2,
-    kind: "ticket_evidence",
-    evidence_id: "installed-human-authority-proof",
-    ticket_id: "ticket-human-authority-fixture",
-    acceptance_ids: ["owner-confirms-authority"],
-    binding_state: "bound",
-    binding_origin: "native",
-    acceptance_revisions: humanTicket.contract_revisions[0].acceptance_revisions,
-    summary: "The human explicitly confirmed the protected fixture.",
-    refs: ["conversation:artifact-verification-human-authority"],
-    origin: "human",
-    recorded_at: "2026-08-09T08:02:00.000Z",
-  });
-  invoke(helper, "ticket", "closeout", {
-    schema_version: 2,
-    kind: "ticket_outcome",
-    outcome_id: "contract-v1",
-    binding_state: "bound",
-    binding_origin: "native",
-    contract_revision: { revision: 1, identity: humanTicket.contract_revisions[0].identity },
-    independence: { source: "subagent", note: "artifact verification fixture" },
-    ticket_id: "ticket-human-authority-fixture",
-    status: "successful",
-    accepted_acceptance_ids: ["owner-confirms-authority"],
-    unresolved_acceptance_ids: [],
-    evidence_ids: ["installed-human-authority-proof"],
-    summary: "The installed artifact preserved the protected human boundary.",
-    closed_at: "2026-08-09T08:03:00.000Z",
-  });
+  }
 
   const installedScript = readFileSync(
     join(artifact, "skills", "vibehub-review", "assets", "app.js"),
@@ -355,20 +263,6 @@ try {
     || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
   }
-  if (/id="closeoutQueue"/u.test(installedHtml)
-    || /function renderCloseoutQueue/u.test(installedScript)
-    || !/eyebrow\.textContent = "Recommended action"/u.test(installedScript)
-    || !/label: "Copy prompt"/u.test(installedScript)
-    || !/if \(contextPackage\.agentPayload\) return canonical;/u.test(installedScript)
-    || !/action === "CLOSE_OUT" \|\| runtimeEligible/u.test(installedModel)
-    || !/ticketSessionCapability\(sessions, ticket.ticket_id\)/u.test(installedHost)
-    || !/function agentSessionsPanel/u.test(installedScript)
-    || !/function refreshSessions/u.test(installedScript)
-    || !/requiresIndependentAgent: true/u.test(installedHost)
-    || !/reviewInputs/u.test(installedHost)
-    || !/evidenceRefs/u.test(installedHost)) {
-    throw new Error("installed local UI is missing the bounded independent-closeout handoff");
-  }
   const uiModule = await import(pathToFileURL(
     join(artifact, "skills", "vibehub-core", "scripts", "vh-ui.mjs"),
   ).href);
@@ -405,11 +299,11 @@ try {
     throw new Error("installed UI all-history graph projection failed");
   }
   const installedTicket = allState.data.graph.tickets.find(
-    (ticket) => ticket.ticketId === "ticket-human-authority-fixture",
+    (ticket) => ticket.ticketId === firstId,
   );
-  if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
-    || allState.data.interventions.authority.status !== "available") {
-    throw new Error("installed UI human-attention projection failed");
+  if (installedTicket.status !== "done" || installedTicket.workState.state !== "DONE"
+    || installedTicket.capabilities.nextAction !== undefined) {
+    throw new Error("installed UI does not project recorded task status");
   }
   await uiHost.close();
   uiHost = undefined;

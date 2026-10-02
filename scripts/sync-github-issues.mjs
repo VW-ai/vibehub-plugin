@@ -18,7 +18,6 @@ import {
   assertValid,
   currentOutcome,
   loadRepository,
-  ticketNextAction,
   ticketStatus,
 } from "../skills/vibehub-core/scripts/vh.mjs";
 
@@ -26,19 +25,13 @@ export const TICKET_MARKER = "vibehub:ticket-id";
 export const EVIDENCE_MARKER = "vibehub:evidence-id";
 
 const STATE_LABELS = {
-  DONE: { name: "state: done", color: "8250df", description: "Successful Outcome recorded" },
-  EXECUTE: { name: "state: ready", color: "1f883d", description: "Executable now; acceptance Evidence incomplete" },
-  CLOSE_OUT: { name: "state: close-out", color: "0969da", description: "Evidence complete; awaiting independent adjudication" },
-  NEEDS_HUMAN: { name: "state: needs-human", color: "bf8700", description: "A human-authority criterion needs explicit human Evidence" },
-  WAIT: { name: "state: blocked", color: "cf222e", description: "Waiting on direct prerequisites" },
-  REFINE: { name: "state: refine", color: "6e7781", description: "Draft contract needs firm acceptance" },
-  REPLAN: { name: "state: replan", color: "e16f24", description: "Non-successful Outcome; revise before the next cycle" },
+  DONE: { name: "state: done", color: "8250df", description: "Task recorded as done" },
+  OPEN: { name: "state: open", color: "1f883d", description: "Open task with no unfinished prerequisites" },
+  IN_PROGRESS: { name: "state: in-progress", color: "0969da", description: "Task recorded as in progress" },
+  BLOCKED: { name: "state: blocked", color: "cf222e", description: "Open task with unfinished prerequisites" },
 };
-const MATURITY_LABELS = {
-  firm: { name: "maturity: firm", color: "d0d7de", description: "Acceptance is executable" },
-  draft: { name: "maturity: draft", color: "f6f8fa", description: "Direction known; acceptance not yet firm" },
-};
-export const ALL_LABELS = [...Object.values(STATE_LABELS), ...Object.values(MATURITY_LABELS)];
+export const ALL_LABELS = Object.values(STATE_LABELS);
+const RETIRED_LABELS = ["state: ready", "state: close-out", "state: needs-human", "state: refine", "state: replan", "maturity: firm", "maturity: draft"];
 
 // ---------- pure projection ----------
 
@@ -66,11 +59,10 @@ function isoDate(value) {
   return typeof value === "string" ? value.slice(0, 10) : "";
 }
 
-export function renderIssueBody({ ticket, outcome, nextAction, status, numbers, github }) {
-  const accepted = new Set(outcome?.accepted_acceptance_ids ?? []);
+export function renderIssueBody({ ticket, outcome, status, numbers, github }) {
   const lines = [];
   lines.push(`<!-- ${TICKET_MARKER}=${ticket.ticket_id} -->`);
-  lines.push(`> **Ticket** \`${ticket.ticket_id}\` · **${status}** · next: \`${nextAction.action}\` · maturity: ${ticket.maturity ?? "firm"}`);
+  lines.push(`> **Ticket** \`${ticket.ticket_id}\` · **${status}**`);
   lines.push("");
   lines.push("## Outcome");
   lines.push("");
@@ -78,10 +70,9 @@ export function renderIssueBody({ ticket, outcome, nextAction, status, numbers, 
   lines.push("");
   lines.push("## Acceptance");
   lines.push("");
-  for (const c of ticket.acceptance) {
-    const box = accepted.has(c.acceptance_id) ? "[x]" : "[ ]";
+  for (const c of ticket.acceptance.filter((item) => item.state !== "retired")) {
     const who = (c.authority ?? "agent") === "human" ? " 👤 human" : "";
-    lines.push(`- ${box} **\`${c.acceptance_id}\`**${who} — ${c.criterion}`);
+    lines.push(`- **\`${c.acceptance_id}\`**${who} — ${c.criterion}`);
   }
   if (ticket.constraints?.length) {
     lines.push("");
@@ -111,9 +102,16 @@ export function renderIssueBody({ ticket, outcome, nextAction, status, numbers, 
     lines.push("");
     for (const d of ticket.deliveries) lines.push(`- ${refLink(d.ref, github)} · ${d.state}`);
   }
+  if (ticket.updates?.length) {
+    lines.push("", "## Progress and results", "");
+    for (const update of ticket.updates) {
+      lines.push(`- ${isoDate(update.recorded_at)}${update.status ? ` · ${update.status}` : ""}: ${update.summary}`);
+      for (const ref of update.refs ?? []) lines.push(`  - ${refLink(ref, github)}`);
+    }
+  }
   if (outcome) {
     lines.push("");
-    lines.push(`## Outcome record · ${outcome.status}`);
+    lines.push(`## Historical Outcome · ${outcome.status}`);
     lines.push("");
     lines.push(`Closed ${isoDate(outcome.closed_at)}. ${outcome.summary}`);
     if (outcome.unresolved_acceptance_ids?.length) {
@@ -154,7 +152,6 @@ export function computeProjection(repoRoot, github) {
   const items = [];
   for (const { document: ticket } of repository.tickets.documents.values()) {
     const outcome = currentOutcome(repository, ticket);
-    const nextAction = ticketNextAction(repository, ticket);
     const status = ticketStatus(repository, ticket);
     const evidence = (evidenceByTicket.get(ticket.ticket_id) ?? [])
       .slice()
@@ -163,10 +160,10 @@ export function computeProjection(repoRoot, github) {
       ticket_id: ticket.ticket_id,
       title: humanizeTicketId(ticket.ticket_id),
       state: status === "DONE" ? "closed" : "open",
-      labels: [STATE_LABELS[nextAction.action].name, MATURITY_LABELS[ticket.maturity ?? "firm"].name],
+      labels: [STATE_LABELS[status].name],
       comments: evidence.map((e) => ({ evidence_id: e.evidence_id, body: renderEvidenceComment(e, github) })),
       depends_on: (ticket.relations ?? []).map((r) => r.target_ticket_id),
-      renderBody: (numbers) => renderIssueBody({ ticket, outcome, nextAction, status, numbers, github }),
+      renderBody: (numbers) => renderIssueBody({ ticket, outcome, status, numbers, github }),
     });
   }
   items.sort((a, b) => a.ticket_id.localeCompare(b.ticket_id));
@@ -206,7 +203,7 @@ export function planUpdates(projection, byTicket) {
     if (!issue) continue;
     const body = item.renderBody(numbers);
     const labelsNow = new Set((issue.labels ?? []).map((l) => (typeof l === "string" ? l : l.name)));
-    const managed = new Set(ALL_LABELS.map((l) => l.name));
+    const managed = new Set([...ALL_LABELS.map((l) => l.name), ...RETIRED_LABELS]);
     const addLabels = item.labels.filter((l) => !labelsNow.has(l));
     const removeLabels = [...labelsNow].filter((l) => managed.has(l) && !item.labels.includes(l));
     if (normalize(issue.title) !== item.title || normalize(issue.body) !== normalize(body) || addLabels.length || removeLabels.length) {

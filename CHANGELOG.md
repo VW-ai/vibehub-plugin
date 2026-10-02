@@ -2,14 +2,21 @@
 
 ## Unreleased
 
+- Consolidate Ticket planning, execution, validation, and closeout Skills into
+  `vibehub-ticket` for task memory. Development methods belong to the user's
+  chosen skills. Add compact `ticket put` and append-only `ticket update` writes
+  with explicit open, in-progress, and done status, including reopening.
+- Add explicit project format 5 to 6 migration and Ticket schema 4. Preserve
+  historical Evidence and Outcomes; completion no longer requires either.
+  Dashboard, dependency projections, and optional GitHub mirrors use recorded
+  status and expose task briefs without prescribing an execution workflow.
 - Add the `authority` Context type for golden truth: governed territory in
   Room anchor syntax, canonical repository artifacts, ordered update rules,
   validation checks, and optional human approval. `context governing` finds
   the authority covering paths or a Ticket's refs; `context guard` refuses a
-  canonical change that has no `change` Context recording it. Planning
-  attaches governing authority, execution follows the rules, closeout runs
-  the guard, and the Rooms surface marks authority Context. Additive: Context
-  schema stays at version 1 with no project-format migration.
+  canonical change that has no `change` Context recording it. Task briefs
+  carry governing authority for the chosen development skill, and the Rooms
+  surface marks authority Context. Context schema stays at version 1.
 Development version: 0.11.0-dev.1.
 
 - Default new records to local Git exclusions, leave GitHub setup silent unless

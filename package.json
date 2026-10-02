@@ -2,7 +2,7 @@
   "name": "vibehub-plugin",
   "version": "0.11.0-dev.1",
   "private": true,
-  "description": "Lightweight Skill-first Git-native Tickets and durable project Context.",
+  "description": "Task memory, relationships, and durable project Context with your own Skills.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

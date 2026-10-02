@@ -5,18 +5,9 @@ description: Explicitly capture durable user intent, decisions, constraints, con
 
 # VibeHub Ingest
 
-## Optional workflow and unrestricted responses
-
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
-
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
 ## Automatic dashboard entry
 
@@ -43,10 +34,10 @@ around them. Otherwise continue directly with the workflow.
 
 ## Workflow
 
-1. Decide whether the request is durable Context or executable work. A product
+1. Decide whether the request is durable Context or a task to remember. A product
    decision, constraint, convention, intent, or reusable explanation is
-   Context. A deliverable to implement is a Ticket. When both exist, write both
-   and link them with `context_refs`.
+   Context. A deliverable to implement is a Ticket. When the request includes both, use `$vibehub-ticket` for the task
+   and link the records with `context_refs`.
 2. Query current Context first:
 
    ```text
@@ -83,9 +74,9 @@ widen the anchors rather than leave drift in the golden truth invisible.
 
 A change to a canonical artifact is recorded as a `type: change` Context in the
 same Room that `relates_to` the authority and cites the changed artifact in
-`evidence`. `context guard` reads that record; without it the change blocks
-closeout. Keep `contract` for long-range prose; `authority` is the
-artifact-backed sibling.
+`evidence`. `context guard` reads that record for projects that use the optional
+historical proof checks. Ordinary task updates do not run a closeout gate.
+Use `contract` for prose rules and `authority` for canonical artifacts.
 
 ## Guardrails
 

@@ -67,8 +67,8 @@
   function goalStatus(goal) {
     const children=goalTickets(goal), groups=executionSummary(children,items,edges), own=workflowFor(goal,items,edges);
     if(!children.length||own.lane==='completed') return own;
-    const lane=['attention','running','ready','planned','waiting'].find(key=>groups[key].length)||'completed';
-    const labels={attention:'Needs you',running:'Agent working',ready:'Agent ready',planned:'Needs planning',waiting:'Waiting',completed:'Completed'};
+    const lane=['attention','running','ready','waiting'].find(key=>groups[key].length)||'completed';
+    const labels={attention:'Needs you',running:'In progress',ready:'Open',waiting:'Waiting',completed:'Completed'};
     return {...own,lane,label:labels[lane]};
   }
   function renderGoals() {
@@ -178,7 +178,7 @@
     document.querySelector('[data-view=board]').textContent=surface==='goals'?'Overview':'Board';
     document.title=`VibeHub · ${$('heading').textContent}`;
     document.querySelector('.start').hidden=['contexts','authority'].includes(surface);
-    $('view-description').textContent=selectedGoal?'Executable tickets for this goal. Start with anything that needs you.':surface==='goals'?'Choose an outcome to see its progress and next steps.':surface==='authority'?'Shared project references: design, infrastructure, data, and contracts.':surface==='contexts'?'Decisions and knowledge saved for this project, organized into Rooms.':'Executable work that has not been assigned to a goal.';
+    $('view-description').textContent=selectedGoal?'Tasks for this goal and their recorded progress.':surface==='goals'?'Choose an outcome to see its progress and next steps.':surface==='authority'?'Shared project references: design, infrastructure, data, and contracts.':surface==='contexts'?'Decisions and knowledge saved for this project, organized into Rooms.':'Tasks that have not been assigned to a goal.';
     document.querySelector('.view-controls').hidden=['contexts','authority'].includes(surface);
     document.querySelector('.tabs').hidden=['contexts','authority'].includes(surface);
     $('focus-mode').hidden=['contexts','authority'].includes(surface);
@@ -452,7 +452,7 @@
       if (turn !== generation) return;
       const nativeItems = state.graph.tickets.map((t) => ({ id: t.ticketId, title: t.ticketId.replace(/^ticket-/, '').replaceAll('-', ' '), outcome: t.outcome,
         type: 'ticket', state: t.capabilities.operational.summary.label,
-        nextAction: t.capabilities.nextAction.summary, projects: [state.project.name], relations: [],
+        status: t.status, updates: t.updates, blockingTicketIds: t.blockingTicketIds, workState: t.workState, projects: [state.project.name], relations: [],
         path: `${tree.path}/.vibehub/tickets/${t.ticketId}.yaml`, ticket: true }));
       const merged = mergeTicketSources(items, nativeItems, state.graph.relations.map((r) => ({ from: r.prerequisiteTicketId, to: r.dependentTicketId })));
       items = merged.items; edges.push(...merged.edges);
@@ -475,7 +475,7 @@
     const children=goalTickets(goal), groups=executionSummary(children,items,edges);
     const section=(name,rows)=>`${name}:\n${rows.map(r=>`- ${r.item.originalId||r.item.id}: ${r.item.title} (${r.label})\n  Source: ${r.item.path}`).join('\n')||'- None recorded'}`;
     return `Continue this VibeHub goal: ${goal.title}\n${goal.outcome||''}\nGoal source: ${goal.path}\n${selectedTree()?`Working directory: ${selectedTree().path}\n`:''}
-Keep planning records local. Do not push, open PRs, mirror Issues, or share records unless I explicitly request it. Publishing code does not authorize publishing these records. Read the current records before acting. Break remaining work into executable tickets with clear acceptance and direct dependencies. Surface actionable human decisions early, prepare the information needed to decide, and keep independent agent work moving. Refine uncertain downstream work when its prerequisites resolve. Execute eligible tickets, record evidence, and use independent closeout. Stop only the affected work at human boundaries; never infer approval. Report progress and blockers without constraining the model's response.\n\n${section('Needs human input',groups.attention)}\n\n${section('Already working — inspect before starting duplicate work',groups.running)}\n\n${section('Agent-ready work',groups.ready)}\n\n${section('Needs planning',groups.planned)}\n\n${section('Waiting',groups.waiting)}`;
+Read these tasks and their context before continuing. Use my chosen skills and working methods. Record meaningful progress, results and status with vibehub-ticket. Keep task records local unless I explicitly request sharing. Publishing code does not authorize sharing task records. Preserve recorded human decisions and never infer approval.\n\n${section('Needs human input',groups.attention)}\n\n${section('In progress',groups.running)}\n\n${section('Open tasks',groups.ready)}\n\n${section('Waiting on dependencies',groups.waiting)}`;
   }
   function renderGoalProgress() {
     const bar=$('goal-progress'), goal=items.find(t=>t.id===selectedGoal);
@@ -485,7 +485,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
     progress.append(el('strong',`${groups.completed.length}/${children.length}`),el('span','tickets complete'));
     progress.append(segmentedProgress(groups.completed.length,children.length,'Overall goal progress')); bar.append(progress);
     const stages=el('div',undefined,'execution-stages');
-    for(const [key,label] of [['attention','Needs you'],['running','Working'],['ready','Agent ready'],['waiting','Waiting'],['planned','To plan']]) {
+    for(const [key,label] of [['attention','Needs you'],['running','In progress'],['ready','Open'],['waiting','Waiting']]) {
       if(!groups[key].length) continue;
       const button=el('button',`${groups[key].length} ${label}`,`execution-stat stage-${key}`); button.type='button'; button.setAttribute('aria-pressed',String(filter===key)); button.addEventListener('click',()=>setWorkFilter(key)); stages.append(button);
     }
@@ -540,7 +540,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
     }
     layout.items.forEach(item => {
       const node = nodes.get(item.id), workflow=workflowFor(item,items,edges), done = workflow.lane==='completed';
-      const button = el('button', undefined, `work-card ${done ? 'is-done' : item.state === 'READY' ? 'is-ready' : ''} ${item.type === 'goal' ? 'is-goal' : ''}`);
+      const button = el('button', undefined, `work-card ${done ? 'is-done' : item.state === 'OPEN' ? 'is-open' : ''} ${item.type === 'goal' ? 'is-goal' : ''}`);
       button.type = 'button'; button.setAttribute('aria-pressed', 'false'); button.dataset.lane=workflow.lane;
       button.style.setProperty('--branch-color', branchColors[node.color]);
       button.style.left = `${node.x}px`; button.style.top = `${node.y}px`;
@@ -557,7 +557,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
       if(item.type==='goal') {
         const children=items.filter(t=>t.type!=='goal' && goalScope(item.id,items).has(t.id)), completed=children.filter(t=>stageFor(t)==='completed').length;
         button.append(segmentedProgress(completed,children.length,`${item.title} progress`));
-        const groups=executionSummary(children,items,edges), signal=groups.attention.length?`${groups.attention.length} need your input`:groups.running.length?`${groups.running.length} agent working`:groups.ready.length?`${groups.ready.length} ready for agent`:children.length?`${completed} of ${children.length} complete`:'Ready to break down';
+        const groups=executionSummary(children,items,edges), signal=groups.attention.length?`${groups.attention.length} need your input`:groups.running.length?`${groups.running.length} in progress`:groups.ready.length?`${groups.ready.length} open`:children.length?`${completed} of ${children.length} complete`:'No tasks recorded';
         button.querySelector('.card-project').textContent=`${item.projects.join(' · ')||'Personal'} · ${signal}`;
         button.querySelector('.card-project').classList.toggle('needs-input',!!groups.attention.length);
       }
@@ -615,7 +615,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
 
   function renderGoalOverview(visible) {
     const grid=el('div',undefined,'goal-overview');grid.setAttribute('role','region');grid.setAttribute('aria-label','Project goals');
-    const priority=['attention','running','ready','planned','waiting','completed'];
+    const priority=['attention','running','ready','waiting','completed'];
     for(const goal of [...visible].sort((a,b)=>priority.indexOf(goalStatus(a).lane)-priority.indexOf(goalStatus(b).lane)||a.title.localeCompare(b.title))) {
       const children=goalTickets(goal), groups=executionSummary(children,items,edges), workflow=goalStatus(goal);
       const card=el('button',undefined,`goal-overview-card stage-${workflow.lane}`);card.type='button';
@@ -624,14 +624,14 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
       card.append(top,title);
       if(goal.outcome&&goal.outcome!==goal.title)card.append(el('span',goal.outcome,'goal-overview-outcome'));
       card.append(el('span',`${groups.completed.length} of ${children.length} tickets complete`,'goal-card-count'),segmentedProgress(groups.completed.length,children.length,`${goal.title} progress`));
-      const footer=el('span',undefined,'goal-overview-footer');footer.append(el('span',groups.attention.length?`${groups.attention.length} need you`:groups.running.length?`${groups.running.length} agent working`:workflow.label,groups.attention.length?'goal-attention':''),el('span',`View ${children.length} tickets →`));card.append(footer);
+      const footer=el('span',undefined,'goal-overview-footer');footer.append(el('span',groups.attention.length?`${groups.attention.length} need you`:groups.running.length?`${groups.running.length} in progress`:workflow.label,groups.attention.length?'goal-attention':''),el('span',`View ${children.length} tickets →`));card.append(footer);
       card.addEventListener('click',()=>selectGoal(goal.id));grid.append(card);
     }
     $('work').append(grid);
   }
   function renderBoard(visible) {
-    const board=el('div',undefined,'work-board'); board.tabIndex=0;board.setAttribute('role','region');board.setAttribute('aria-label',`${surface==='goals'?'Goal':'Ticket'} board; scroll horizontally for all six lanes`);
-    for (const [key,title,description] of [['attention','Needs you','Actionable human decisions'],['running','Agent working','Recorded active work'],['ready','Agent ready','Executable work and closeout'],['planned','Needs planning','Refine acceptance or replan'],['waiting','Waiting','Unresolved prerequisites'],['completed','Completed','Recorded completions']]) {
+    const board=el('div',undefined,'work-board'); board.tabIndex=0;board.setAttribute('role','region');board.setAttribute('aria-label',`${surface==='goals'?'Goal':'Ticket'} board; scroll horizontally for all lanes`);
+    for (const [key,title,description] of [['attention','Needs you','Actionable human decisions'],['running','In progress','Recorded task progress'],['ready','Open','Open tasks without unfinished prerequisites'],['waiting','Waiting','Unresolved prerequisites'],['completed','Completed','Recorded completions']]) {
       const column=el('section',undefined,`board-column stage-${key}`), group=visible.filter(t=>(t.type==='goal'?goalStatus(t):workflowFor(t,items,edges)).lane===key);
       const heading=el('h3'); heading.append(el('span',title),el('span',group.length,'column-count')); column.append(heading,el('p',description,'column-description'));
       for(const item of group) {
@@ -707,7 +707,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
         const key = (id) => `${tree.id}:${id}`;
         repositoryItems.push(...graph.tickets.map((t) => ({ id: key(t.ticketId), originalId: t.ticketId, workspace: tree.id,
           title: t.ticketId.replace(/^ticket-/, '').replaceAll('-', ' '), outcome: t.outcome, type: 'ticket',
-          state: t.capabilities.operational.summary.label, nextAction: t.capabilities.nextAction.summary,
+          state: t.capabilities.operational.summary.label, status: t.status, updates: t.updates, blockingTicketIds: t.blockingTicketIds.map(key), workState: t.workState,
           projects: [tree.projectName, tree.branch], relations: [], ticket: true,
           path: `${tree.path}/.vibehub/tickets/${t.ticketId}.yaml` })));
         repositoryEdges.push(...graph.relations.map((r) => ({ from: key(r.prerequisiteTicketId), to: key(r.dependentTicketId) })));
@@ -776,7 +776,7 @@ Keep planning records local. Do not push, open PRs, mirror Issues, or share reco
   $('copy-request').addEventListener('click', () => {
     const request=$('request').value.trim(); if(!request) { $('request').focus(); return; }
     const tree=selectedTree();
-    copyText(`Plan this goal with VibeHub: ${request}\n${tree?`Working directory: ${tree.path}\n`:''}\nKeep this goal, its tickets, and Context local by default; do not push, create GitHub Issues, or share planning records without explicit permission. Never force-add ignored records. Keep the goal distinct from its executable tickets. Give each ticket a clear outcome, acceptance, and direct dependencies. Identify human decisions early, prepare actionable options, and place gating decisions ahead of dependent implementation. Leave uncertain downstream acceptance as draft until the decision is made. Keep independent agent work executable. Show me the plan and the human decisions, then continue eligible work without inferring approvals. Keep recorded status and evidence current so I can monitor progress. VibeHub remains optional and must not restrict model responses.`);
+    copyText(`Record this goal and its tasks with VibeHub: ${request}\n${tree?`Working directory: ${tree.path}\n`:''}\nKeep the goal, tasks and Context local unless I explicitly request sharing. Never force-add ignored records. Record what each task is for, relevant context, and its direct dependencies. Completion criteria are useful when known; an unfinished idea can remain open. Use my chosen skills and working methods for any requested implementation. Record progress, results and status with vibehub-ticket. VibeHub remains optional.`);
   });
   $('close-detail').addEventListener('click', () => closeDetail()); document.addEventListener('keydown', (e) => { if (e.key === 'Escape') {
     for(const menu of document.querySelectorAll('.header-actions details[open]')) { menu.open=false; menu.querySelector('summary').focus(); }

@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { helper, root, run, tempRepo, ticket } from "./helpers.mjs";
 
-import { activeContract, appendTicketContractRevision } from "../skills/vibehub-core/scripts/revision-contract.mjs";
+import { activeContract } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 
 const CONTRACT = "skills/vibehub-core/contracts/skill-graph.json";
 const RETIRED = "vibehub-old-alpha";
@@ -174,14 +174,10 @@ test("a retired name in a live reference fails, and the exempt classes do not", 
   // records a past proof.
   write(repo, "docs/RENAME.md", `${RENAME_LINE}\n`);
   write(repo, ".vibehub/evidence/ticket-old/proof.yaml", `{"note": "${RETIRED}"}\n`);
-  // The Outcome has to say `successful`: that is what makes the Ticket beside it
-  // a closed record rather than a live document. The earlier version of this
-  // case wrote an Outcome with no status at all and expected the Ticket to be
-  // exempt, which encoded the bug that any Outcome counts as closed.
   write(repo, ".vibehub/outcomes/ticket-closed.yaml", `{"status": "successful", "note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/history/snapshot/old.yaml", `{"note": "${RETIRED}"}\n`);
   write(repo, "META/legacy-ui/note.md", `Named skills/${RETIRED}/SKILL.md then.\n`);
-  write(repo, ".vibehub/tickets/ticket-closed.yaml", `{"note": "${RETIRED}"}\n`);
+  write(repo, ".vibehub/tickets/ticket-closed.yaml", `{"status":"done","note": "${RETIRED}"}\n`);
   write(repo, ".vibehub/rooms/product/decision-x.yaml", `${JSON.stringify({
     kind: "context",
     summary: "A decision.",
@@ -347,29 +343,15 @@ test("an allowance may not be shaped into a blanket exemption", () => {
   assert.match(messages(validate(negative)), /occurrences must be a positive integer/u);
 });
 
-// A Ticket is a closed record only once its Outcome says `successful`. A
-// partial, failed or deviated Outcome means the work is still live, so the
-// Ticket YAML is a live document — including the Ticket whose own criterion is
-// the one being adjudicated, which used to be excused by its own failure.
-test("only a successful Outcome turns a Ticket into a historical record", () => {
-  const repo = retiredRepo("skill-graph-retired-outcome-status", []);
-  write(repo, ".vibehub/tickets/ticket-x.yaml", `{"note": "${RETIRED}"}\n`);
-
-  for (const status of ["partial", "failed", "deviated"]) {
-    write(repo, ".vibehub/outcomes/ticket-x.yaml", `{"status": "${status}"}\n`);
-    assert.match(
-      messages(validate(repo)),
-      /\.vibehub\/tickets\/ticket-x\.yaml: Live reference to retired Skill/u,
-      `a ${status} Outcome must not silence its Ticket`,
-    );
+test("only recorded done status turns a current Ticket into a historical record", () => {
+  const repo = retiredRepo("skill-graph-retired-status", []);
+  write(repo, ".vibehub/outcomes/ticket-x.yaml", '{"status":"successful"}\n');
+  for (const status of ["open", "in_progress"]) {
+    write(repo, ".vibehub/tickets/ticket-x.yaml", JSON.stringify({ status, note: RETIRED }));
+    assert.match(messages(validate(repo)), /ticket-x\.yaml: Live reference to retired Skill/u);
   }
-
-  // An Outcome with no status at all is not a closure either.
-  write(repo, ".vibehub/outcomes/ticket-x.yaml", '{"note": "no status"}\n');
-  assert.match(messages(validate(repo)), /ticket-x\.yaml: Live reference to retired Skill/u);
-
-  write(repo, ".vibehub/outcomes/ticket-x.yaml", '{"status": "successful"}\n');
-  assert.equal(validate(repo).ok, true, JSON.stringify(validate(repo)));
+  write(repo, ".vibehub/tickets/ticket-x.yaml", JSON.stringify({ status: "done", note: RETIRED }));
+  assert.equal(validate(repo).ok, true);
 });
 
 // The contract is not exempt from its own rule. It legitimately carries the
@@ -758,32 +740,34 @@ test("this repository's real skill graph passes", () => {
   const envelope = validate(root);
   assert.equal(envelope.ok, true, JSON.stringify(envelope));
   assert.equal(envelope.data.valid, true);
-  assert.ok(envelope.data.skills >= 12);
-  assert.ok(envelope.data.entry_points.includes("vibehub-ticket-plan"));
-  assert.deepEqual(envelope.data.internal, ["vibehub-distill", "vibehub-ticket-validate"]);
+  assert.equal(envelope.data.skills, 9);
+  assert.ok(envelope.data.entry_points.includes("vibehub-ticket"));
+  assert.deepEqual(envelope.data.internal, ["vibehub-distill"]);
   assert.deepEqual(envelope.data.infrastructure, ["vibehub-core"]);
 });
 
-test("revision-bound historical exemption requires success on the active Contract", () => {
-  const repo = baseline("skill-graph-revision-history");
-  const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
-  contract.retired = [{ name: RETIRED, replacement: "vibehub-alpha", reason: "retired", allowed_paths: [] }];
-  write(repo, CONTRACT, JSON.stringify(contract));
-  const initial = { ...ticket("review-history"), context: `Historical implementation used ${RETIRED}.` };
+test("reopening a task restores reference checks while its old proof remains", () => {
+  const repo = retiredRepo("skill-graph-reopened-history", []);
+  const initial = { ...ticket("review-history"), status: "done", context: `Historical implementation used ${RETIRED}.` };
   const path = ".vibehub/tickets/review-history.yaml";
   write(repo, path, JSON.stringify(initial));
-  const v1 = activeContract(initial);
-  const outcomePath = ".vibehub/outcomes/review-history/contract-v1.yaml";
-  const outcome = { status: "successful", binding_state: "bound", contract_revision: { revision: v1.revision, identity: v1.identity } };
-  write(repo, outcomePath, JSON.stringify(outcome));
+  const contract = activeContract(initial);
+  write(repo, ".vibehub/outcomes/review-history/contract-v1.yaml", JSON.stringify({
+    status: "successful", binding_state: "bound", contract_revision: { revision: contract.revision, identity: contract.identity },
+  }));
   assert.equal(validate(repo).ok, true);
-  const revised = appendTicketContractRevision(initial, { acceptance_changes: [{ acceptance_id: "works", criterion: "New work must be reviewed again." }] });
-  write(repo, path, JSON.stringify(revised));
-  assert.match(messages(validate(repo)), /Live reference to retired Skill/);
-  const v2 = activeContract(revised);
-  const nextPath = ".vibehub/outcomes/review-history/contract-v2.yaml";
-  write(repo, nextPath, JSON.stringify({ ...outcome, status: "partial", contract_revision: { revision: v2.revision, identity: v2.identity } }));
-  assert.match(messages(validate(repo)), /Live reference to retired Skill/);
-  write(repo, nextPath, JSON.stringify({ ...outcome, contract_revision: { revision: v2.revision, identity: v2.identity } }));
+  write(repo, path, JSON.stringify({ ...initial, status: "open" }));
+  assert.match(messages(validate(repo)), /Live reference to retired Skill/u);
+});
+
+test("a scoped retirement preserves historical records but rejects live Skill references", () => {
+  const repo = retiredRepo("skill-graph-scoped-retirement", []);
+  const contract = JSON.parse(readFileSync(join(repo, CONTRACT), "utf8"));
+  contract.retired[0].reference_scope = "skills";
+  write(repo, CONTRACT, JSON.stringify(contract));
+  write(repo, "docs/old-design.md", `The old design used ${RETIRED}.`);
+  write(repo, ".vibehub/tickets/old-design.yaml", JSON.stringify({ status: "open", context: RETIRED }));
   assert.equal(validate(repo).ok, true);
+  write(repo, "skills/vibehub-alpha/references/old.md", `The current operation is ${RETIRED}.`);
+  assert.match(messages(validate(repo)), /Live reference to retired Skill/u);
 });

@@ -9,7 +9,6 @@ import {
   loadRepository,
   projectTicketQuery,
   ticketArchived,
-  ticketNextAction,
   ticketStatus,
 } from "../skills/vibehub-core/scripts/vh.mjs";
 import { activeAcceptanceReferenceMap, activeContract } from "../skills/vibehub-core/scripts/revision-contract.mjs";
@@ -195,7 +194,7 @@ function policyImpact(repository, tickets, retainedOutcomeIds, retainedEvidenceI
     done_tickets_retained: doneIds.size,
     archived_tickets_retained: tickets.filter((ticket) => ticketArchived(simulated, ticket)).length,
     human_authority_satisfactions_retained: satisfiedHumanCriteria(simulated, humanCriteria).length,
-    close_out_tickets: tickets.filter((ticket) => ticketNextAction(simulated, ticket).action === "CLOSE_OUT").length,
+    open_tickets: tickets.filter((ticket) => ticket.status !== "done").length,
     current_graph_tickets: projectTicketQuery(simulated, { scope: "current" }).tickets.length,
     all_graph_tickets: projectTicketQuery(simulated, { scope: "all" }).tickets.length,
     ...dependencyImpact(tickets, doneIds),
@@ -292,7 +291,7 @@ export function auditLegacyProof(repo) {
         currentSuccessfulIds,
         grandfatherEvidenceIds,
         humanCriteria,
-        "Current successful closures remain compatible after the atomic upgrade; open legacy Evidence is stale and does not enter CLOSE_OUT.",
+        "Current successful closures remain compatible after the atomic upgrade; open legacy Evidence is stale and does not change recorded task status.",
       ),
       reconstruct_from_git_without_drift: policyImpact(
         repository,

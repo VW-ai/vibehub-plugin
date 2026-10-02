@@ -56,7 +56,7 @@ function initializeLegacyRepo(path) {
   mkdirSync(path, { recursive: true });
   assert.equal(run(path, "project", "init").status, 0);
   const current = ticket("legacy-work");
-  const { revision_state, active_contract_revision, contract_revisions, ...legacy } = current;
+  const { revision_state, active_contract_revision, contract_revisions, status, updates, ...legacy } = current;
   legacy.schema_version = 1;
   legacy.acceptance = current.acceptance.map(({ identity, revision, state, derived_from, presentation, ...item }) => item);
   delete legacy.deliveries;
@@ -240,6 +240,18 @@ test("bounded discovery migrates each safe registered worktree once and reports 
     assert.equal(git(path, "rev-parse", "HEAD").trim(), item.commit_id);
     assert.equal(git(path, "status", "--porcelain=v1", "--untracked-files=all"), "");
     assert.equal(run(path, "project", "validate").status, 0);
+    assert.equal(JSON.parse(readFileSync(join(path, ".vibehub/version.yaml"), "utf8")).format_version, 6);
+    const migratedTicket = JSON.parse(readFileSync(join(path, ".vibehub/tickets/legacy-work.yaml"), "utf8"));
+    assert.equal(migratedTicket.schema_version, 4);
+    assert.equal(migratedTicket.status, "open");
+    assert.deepEqual(migratedTicket.updates, []);
+    assert.deepEqual(item.migration_ids, [
+      "format-1-to-format-2",
+      "format-2-to-format-3",
+      "format-3-to-format-4",
+      "format-4-to-format-5",
+      "format-5-to-format-6",
+    ]);
     assert.deepEqual(item.semantic_pending_refs, [
       "migration-pending:format-1-to-format-2:classify-delivery-membership",
       "migration-pending:format-3-to-format-4:reconstruct-proof-revisions",
@@ -502,4 +514,87 @@ test('commit-producing upgrades preserve ignored personal records without tracki
   assert.equal(result.status,0,result.stderr);
   assert.match(result.stdout,/local-records/);
   assert.deepEqual(snapshot(repo),before);
+});
+
+test("the packaged format-5 upgrade preserves proof and installed retired Skills while recording current completion", () => {
+  const holder = mkdtempSync(join(tmpdir(), "vibehub-upgrade-memory-"));
+  const repo = join(holder, "project");
+  mkdirSync(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [ticket("completed-work"), ticket("revised-work"), ticket("planned-work")],
+  }).status, 0);
+  for (const ticketId of ["completed-work", "revised-work"]) {
+    assert.equal(run(repo, "ticket", "evidence", {
+      schema_version: 1,
+      kind: "ticket_evidence",
+      evidence_id: `${ticketId}-proof`,
+      ticket_id: ticketId,
+      acceptance_ids: ["works"],
+      summary: "The original criterion was checked.",
+      refs: ["conversation:upgrade-fixture"],
+      recorded_at: "2026-09-01T00:00:00.000Z",
+    }).status, 0);
+    assert.equal(run(repo, "ticket", "closeout", {
+      schema_version: 1,
+      kind: "ticket_outcome",
+      ticket_id: ticketId,
+      status: "successful",
+      accepted_acceptance_ids: ["works"],
+      unresolved_acceptance_ids: [],
+      evidence_ids: [`${ticketId}-proof`],
+      summary: "The original criterion passed.",
+      closed_at: "2026-09-01T00:01:00.000Z",
+    }).status, 0);
+  }
+  assert.equal(run(repo, "ticket", "put", {
+    ticket_id: "revised-work",
+    acceptance: [{ acceptance_id: "works", criterion: "The expanded task works." }],
+  }).status, 0);
+  for (const ticketId of ["completed-work", "revised-work", "planned-work"]) {
+    const path = join(repo, ".vibehub", "tickets", `${ticketId}.yaml`);
+    const { status, updates, ...legacy } = JSON.parse(readFileSync(path, "utf8"));
+    writeFileSync(path, `${JSON.stringify({ ...legacy, schema_version: 3 }, null, 2)}\n`);
+  }
+  writeFileSync(join(repo, ".vibehub", "version.yaml"), `${JSON.stringify({
+    schema_version: 1, kind: "vibehub_project", format_version: 5,
+  })}\n`);
+  const retired = JSON.parse(readFileSync(join(root, "skills/vibehub-core/contracts/skill-graph.json"), "utf8"))
+    .retired.filter((entry) => entry.reference_scope === "skills");
+  for (const entry of retired) {
+    const directory = join(repo, ".agents", "skills", entry.name);
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(join(directory, "SKILL.md"), `Historical installation of ${entry.name}.\n`);
+  }
+  git(repo, "init", "-b", "main");
+  git(repo, "config", "user.name", "VibeHub Test");
+  git(repo, "config", "user.email", "vibehub@example.test");
+  git(repo, "add", ".");
+  git(repo, "commit", "-m", "format 5 task memory fixture");
+  const before = snapshot(repo);
+  const bin = packagedBin(join(holder, "runtime"));
+  const first = invokeUpgrade(bin, [repo]);
+  assert.equal(first.status, 0, first.stderr);
+  const migrated = first.envelope.data.worktrees[0];
+  assert.equal(migrated.state, "migrated");
+  assert.deepEqual(migrated.migration_ids, ["format-5-to-format-6"]);
+  assert.equal(run(repo, "project", "validate").status, 0);
+  for (const [ticketId, expected] of [["completed-work", "done"], ["revised-work", "open"], ["planned-work", "open"]]) {
+    const document = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", `${ticketId}.yaml`), "utf8"));
+    assert.equal(document.schema_version, 4);
+    assert.equal(document.status, expected);
+    assert.deepEqual(document.updates, []);
+  }
+  const after = snapshot(repo);
+  const changedPaths = Object.keys(before.files).filter((path) => before.files[path] !== after.files[path]).sort();
+  assert.deepEqual(changedPaths, [
+    ".vibehub/tickets/completed-work.yaml",
+    ".vibehub/tickets/planned-work.yaml",
+    ".vibehub/tickets/revised-work.yaml",
+    ".vibehub/version.yaml",
+  ]);
+  assert.deepEqual(Object.keys(after.files).sort(), Object.keys(before.files).sort());
+  assert.equal(run(repo, "skills", "retired").envelope.data.retired.length, 4);
+  assert.equal(invokeUpgrade(bin, [repo]).envelope.data.worktrees[0].state, "current");
+  assert.deepEqual(snapshot(repo), after);
 });

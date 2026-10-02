@@ -47,7 +47,7 @@ export const UPGRADE_CONTRACT_PATHS = [
   "vibehub-core/contracts/project-format.schema.json",
   "vibehub-core/contracts/revision-identity.md",
   "vibehub-core/contracts/room.schema.json",
-  "vibehub-core/contracts/ticket-next-action.md",
+  "vibehub-core/contracts/ticket-state.md",
   "vibehub-core/contracts/goal.schema.json",
   "vibehub-core/contracts/epic.schema.json",
   "vibehub-core/contracts/planning-hierarchy.md",

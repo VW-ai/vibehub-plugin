@@ -16,6 +16,10 @@
       background: same(details?.context, description) ? '' : details?.context || '',
       criteria: (details?.acceptance || []).filter(c => c.state !== 'retired' && !same(c.criterion, description)),
       constraints: details?.constraints || [],
+      contextRefs: details?.contextRefs || [],
+      updates: details?.updates || item.updates || [],
+      evidence: details?.evidence || [],
+      outcomes: details?.outcomeHistory || [],
     };
   }
   function mount({ container, item, workflow, dependencies, dependents, goals, navigate, loadDetails, copy, contractUrl }) {
@@ -43,6 +47,22 @@
         const node = section('Constraints'), list = el('ul', undefined, 'ticket-constraints');
         content.constraints.forEach(value => list.append(el('li', value)));node.append(list);
       }
+      if (content.updates.length) {
+        const node = section('Progress and results');
+        for (const update of content.updates) {
+          const entry = el('article', undefined, 'ticket-update');
+          entry.append(el('p', update.summary));
+          entry.append(el('small', [update.status, update.recorded_at].filter(Boolean).join(' · ')));
+          if (update.refs?.length) entry.append(el('p', update.refs.join(' · '), 'ticket-update-refs'));
+          node.append(entry);
+        }
+      }
+      if (content.evidence.length || content.outcomes.length) {
+        const node = section('Historical proof');
+        for (const record of [...content.evidence, ...content.outcomes]) {
+          node.append(el('p', record.summary));
+        }
+      }
     }
     render();
     const loadStatus = el('p', item.ticket ? 'Loading requirements…' : '', 'ticket-load-status');
@@ -62,23 +82,26 @@
     if (related.childElementCount) container.append(related);
     const metadata = el('details', undefined, 'ticket-record-details');metadata.append(el('summary', 'Record details'));
     const meta = el('dl');
-    for (const [label, value] of [['Ticket ID', item.originalId || item.id], ['Source', item.path], ['Recorded next action', workflow.detail]]) {
+    for (const [label, value] of [['Ticket ID', item.originalId || item.id], ['Source', item.path], ['Recorded state', workflow.detail]]) {
       if (value) meta.append(el('dt', label), el('dd', value));
     }
     metadata.append(meta);container.append(metadata);
     const actions = document.getElementById('detail-actions');
-    const button = el('button', workflow.lane === 'attention' ? 'Copy decision brief' : 'Copy work brief');button.type = 'button';
+    const button = el('button', 'Copy task brief');button.type = 'button';
     button.addEventListener('click', () => {
       const content = contentFor(item, details);
       copy([item.title, content.description, content.background,
         ...content.criteria.map(c => `Done when: ${c.criterion}${c.authority === 'human' ? ' (human decision)' : ''}`),
         ...content.constraints.map(value => `Constraint: ${value}`),
-        `Source: ${item.path}`, `Next action: ${workflow.detail}`,
-        workflow.lane === 'attention' ? 'Help me review this decision. Prepare options and tradeoffs; this is not approval.' : '',
+        `Source: ${item.path}`, `Recorded state: ${workflow.detail}`,
+        ...dependencies.map(value => `Depends on: ${value.originalId || value.id} (${value.title})`),
+        ...content.contextRefs.map(value => `Context: ${value.ref}${value.purpose ? ` (${value.purpose})` : ''}`),
+        ...content.updates.map(update => `Update: ${update.summary}${update.status ? ` (${update.status})` : ''}`),
+        "Read this task and its context. Use my chosen skills and working methods for the requested work. Record meaningful progress, results and status with vibehub-ticket. Keep task records local unless I explicitly request sharing.",
       ].filter(Boolean).join('\n\n'));
     });
     actions.append(button);
-    if (contractUrl) { const link = el('a', 'Contract & evidence ↗');link.href = contractUrl;actions.append(link); }
+    if (contractUrl) { const link = el('a', 'Definition & history ↗');link.href = contractUrl;actions.append(link); }
     actions.append(el('small', 'Paste the brief into your agent to continue.', 'ticket-handoff-hint'));
     if (item.ticket) loadDetails().then(result => {
       if (!active) return;

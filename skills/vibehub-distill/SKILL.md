@@ -1,21 +1,13 @@
 ---
 name: vibehub-distill
-description: Internal mechanism that writes Room shape and alignment stamps — building or resuming a repository's Room tree when drift reports COLD_START, and refreshing it on request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Invoked by $vibehub-ingest, $vibehub-ticket-plan, and $vibehub-migrate, not called directly by a user.
+description: Internal mechanism that writes Room shape and alignment stamps — building or resuming a repository's Room tree when drift reports COLD_START, and refreshing it on request. Rooms are domain-agnostic bounded workspaces described by room.yaml under .vibehub/rooms/. Invoked by $vibehub-ingest and $vibehub-migrate, not called directly by a user.
 ---
 
 # VibeHub Distill
 
-## Optional workflow and unrestricted responses
-
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
 This Skill's job is Room shape and alignment stamps: boundaries, nesting,
 anchors, and the stamp that makes drift computable. It does not extract
@@ -28,7 +20,7 @@ Context itself.
 > for every Skill) before continuing; every VibeHub Skill needs that folder.
 
 Cold start is the one alignment experience allowed to be perceptible, and it
-runs once per project. Everything afterwards is align-on-use at Ticket start.
+runs once per project. Refresh alignment when the requested Context work needs it.
 
 ## Workflow
 
@@ -71,8 +63,7 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 
 5. Distilled output follows the trust and placement rules in
    `../vibehub-ingest/references/knowledge-governance.json`.
-6. Report one line per room at most; close with totals (rooms, anchored
-   files).
+6. Report the Room changes and any unresolved alignment gaps.
 
 ## Guardrails
 
