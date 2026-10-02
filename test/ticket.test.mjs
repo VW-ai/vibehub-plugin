@@ -29,6 +29,13 @@ function closeSuccessfully(repo, ticketId) {
     summary: `${ticketId} independently passed.`,
     closed_at: at,
   }).status, 0);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: ticketId,
+    update_id: `${ticketId}-done`,
+    summary: `${ticketId} is complete.`,
+    status: "done",
+    recorded_at: at,
+  }).status, 0);
 }
 
 test("delivery archive and shared current/all/delivery/Room queries stay truthful", () => {
@@ -101,7 +108,7 @@ test("delivery schema requires an explicit array and enforces discriminated stat
   legacy.schema_version = 1;
   const rejectedLegacy = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [legacy] });
   assert.notEqual(rejectedLegacy.status, 0);
-  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 3/u);
+  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 4/u);
   const missing = ticket("missing-deliveries");
   delete missing.deliveries;
   assert.notEqual(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [missing] }).status, 0);
@@ -185,7 +192,7 @@ test("archive state table stays orthogonal to Outcome status, revert, and reopen
   ];
   cases.forEach(([status, deliveries, expected], index) => {
     const id = `case-${index}`;
-    const ticketDocument = { ...ticket(id), deliveries };
+    const ticketDocument = { ...ticket(id), status: status === "successful" ? "done" : "open", deliveries };
     const contract = ticketDocument.contract_revisions[0];
     const repository = {
       outcomes: { documents: new Map([[id, { document: {
@@ -203,7 +210,7 @@ test("archive state table stays orthogonal to Outcome status, revert, and reopen
   assert.deepEqual(reopened.provenance_refs, ["reopens:old-history"]);
 });
 
-test("Ticket graph validates dependencies and successful closeout unlocks only direct dependents", () => {
+test("Ticket graph validates dependencies and recorded completion unlocks only direct dependents", () => {
   const repo = tempRepo("ticket-vertical");
   assert.equal(run(repo, "project", "init").status, 0);
   const applied = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [ticket("base"), ticket("dependent", ["base"]), ticket("downstream", ["dependent"])],
@@ -211,7 +218,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
   assert.equal(applied.status, 0, applied.stdout);
 
   let frontier = run(repo, "ticket", "frontier");
-  assert.deepEqual(frontier.envelope.data.ready.map((item) => item.ticket.ticket_id), ["base"]);
+  assert.deepEqual(frontier.envelope.data.open.map((item) => item.ticket.ticket_id), ["base"]);
 
   const badEvidence = run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -250,8 +257,12 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
     closed_at: at,
   });
   assert.equal(closeout.status, 0, closeout.stdout);
+  assert.deepEqual(run(repo, "ticket", "frontier").envelope.data.blocked.map((item) => item.ticket.ticket_id), ["dependent", "downstream"]);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: "base", update_id: "base-done", summary: "Base task complete.", status: "done", recorded_at: at,
+  }).status, 0);
   frontier = run(repo, "ticket", "frontier");
-  assert.deepEqual(frontier.envelope.data.ready.map((item) => item.ticket.ticket_id), ["dependent"]);
+  assert.deepEqual(frontier.envelope.data.open.map((item) => item.ticket.ticket_id), ["dependent"]);
 
   assert.equal(run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -275,7 +286,7 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
     closed_at: at,
   }).status, 0);
   frontier = run(repo, "ticket", "frontier");
-  assert.equal(frontier.envelope.data.ready.some((item) => item.ticket.ticket_id === "downstream"), false);
+  assert.deepEqual(frontier.envelope.data.blocked.map((item) => item.ticket.ticket_id), ["downstream"]);
 });
 
 test("new dependencies on DONE Tickets return deterministic nonblocking planning advice", () => {
@@ -311,7 +322,6 @@ test("new dependencies on DONE Tickets return deterministic nonblocking planning
     message: "Require an explicit causal rationale and review whether the completed target is still an exact input. Keep a justified historical dependency; otherwise replace the edge with an exact Ticket, Outcome, Evidence, Context, or source context_ref.",
     suggested_context_refs: [
       ".vibehub/tickets/completed-baseline.yaml",
-      ".vibehub/outcomes/completed-baseline/contract-v1.yaml",
     ],
   }]);
   assert.equal(
@@ -405,7 +415,7 @@ test("Ticket validation rejects missing endpoints and dependency cycles", () => 
   assert.match(JSON.stringify(cycle.envelope.error.details), /dependency cycle/);
 });
 
-test("human acceptance stays orthogonal to readiness and requires human-origin Evidence", () => {
+test("historical human proof still validates but does not control task readiness", () => {
   const repo = tempRepo("ticket-human-authority");
   assert.equal(run(repo, "project", "init").status, 0);
 
@@ -425,12 +435,8 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   }).status, 0);
   let frontier = run(repo, "ticket", "frontier");
   assert.deepEqual(
-    frontier.envelope.data.ready.map((item) => item.ticket.ticket_id),
-    ["agent-default"],
-  );
-  assert.deepEqual(
-    frontier.envelope.data.needs_human.map((item) => item.ticket.ticket_id),
-    ["human-boundary"],
+    frontier.envelope.data.open.map((item) => item.ticket.ticket_id),
+    ["agent-default", "human-boundary"],
   );
 
   const invalidOrigin = run(repo, "ticket", "evidence", {
@@ -487,8 +493,8 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   }).status, 0);
   frontier = run(repo, "ticket", "frontier");
   assert.deepEqual(
-    frontier.envelope.data.ready_to_closeout.map((item) => item.ticket.ticket_id),
-    ["human-boundary"],
+    frontier.envelope.data.open.map((item) => item.ticket.ticket_id),
+    ["agent-default", "human-boundary"],
   );
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
@@ -503,8 +509,13 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   }).status, 0);
 
   frontier = run(repo, "ticket", "frontier");
+  assert.deepEqual(frontier.envelope.data.blocked.map((item) => item.ticket.ticket_id), ["after-human"]);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: "human-boundary", update_id: "human-done", summary: "Task complete.", status: "done", recorded_at: at,
+  }).status, 0);
+  frontier = run(repo, "ticket", "frontier");
   assert.deepEqual(
-    frontier.envelope.data.ready.map((item) => item.ticket.ticket_id),
+    frontier.envelope.data.open.map((item) => item.ticket.ticket_id),
     ["after-human", "agent-default"],
   );
 });

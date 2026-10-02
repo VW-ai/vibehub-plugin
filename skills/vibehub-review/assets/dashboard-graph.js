@@ -1,6 +1,6 @@
 /* Deterministic card layout. Membership stays distinct from dependency arrows. */
 (function (root) {
-  // Explicit local-file bindings join personal goal membership to native execution.
+  // Explicit local-file bindings join personal goal membership to native task records.
   // Exact paths keep identical ticket IDs in different worktrees independent.
   function mergeTicketSources(personal, native, nativeEdges) {
     const candidates = new Map();
@@ -18,10 +18,11 @@
       const linked = matches[0]; ids.set(item.id, linked.id);
       replacements.set(linked.id, { ...linked, ...item, id: linked.id, originalId: item.originalId || item.id,
         title: linked.title, type: linked.type, relations: linked.relations, personalPath: linked.path,
-        attention: undefined, working: Boolean(linked.working && item.nextAction?.action === 'EXECUTE'),
-        state: linked.working && item.nextAction?.action === 'EXECUTE' ? 'WORKING' : item.state });
+        attention: undefined, working: item.state === 'IN_PROGRESS', state: item.state });
     }
-    return { items: [...personal.map(t => replacements.get(t.id) || t), ...remaining],
+    const mergedItems = [...personal.map(t => replacements.get(t.id) || t), ...remaining];
+    return { items: mergedItems.map(item => item.blockingTicketIds
+      ? { ...item, blockingTicketIds: item.blockingTicketIds.map(id => ids.get(id) || id) } : item),
       edges: nativeEdges.map(e => ({ ...e, from: ids.get(e.from) || e.from, to: ids.get(e.to) || e.to })) };
   }
   function layoutGraph(items, edges, { maxWidth = 1600 } = {}) {
@@ -53,7 +54,7 @@
       components.push(component);
     }
     const hasOpenGoal = ids => ids.some(id => byId.get(id).type === 'goal' && stageFor(byId.get(id)) !== 'completed');
-    const laneOrder={attention:0,running:1,ready:2,planned:3,waiting:4,completed:5};
+    const laneOrder={attention:0,running:1,ready:2,waiting:3,completed:4};
     const priority=new Map(items.map(item=>[item.id,laneOrder[workflowFor(item,items,edges).lane]]));
     const componentPriority=ids=>Math.min(...ids.map(id=>priority.get(id)));
     components.sort((a,b) => Number(hasOpenGoal(b))-Number(hasOpenGoal(a)) || componentPriority(a)-componentPriority(b) || b.length - a.length || a[0].localeCompare(b[0]));
@@ -118,9 +119,9 @@
   function stageFor(item) {
     const state = (item.state || '').toUpperCase();
     if (['DONE','ARCHIVED','COMPLETED'].includes(state)) return 'completed';
-    if (item.attention === 'needs_you' || state === 'NEEDS YOU' || item.nextAction?.action === 'NEEDS_HUMAN') return 'attention';
+    if (item.attention === 'needs_you' || state === 'NEEDS YOU') return 'attention';
     if (item.working || ['WORKING','RUNNING','IN_PROGRESS'].includes(state)) return 'running';
-    return 'planned';
+    return state === 'BLOCKED' ? 'waiting' : 'ready';
   }
   function goalScope(goalId, items) {
     const ids = new Set([goalId]); let changed = true;
@@ -132,29 +133,23 @@
     }
     return ids;
   }
-  // A read projection, never a replacement for the engine's execution authority.
   function workflowFor(item, items, edges) {
-    const byId=new Map(items.map(t=>[t.id,t])), action=item.nextAction?.action;
-    const blockers=edges.filter(e=>!e.membership && e.to===item.id && (!byId.has(e.from) || stageFor(byId.get(e.from))!=='completed')).map(e=>e.from);
+    const byId=new Map(items.map(t=>[t.id,t]));
+    const blockers=[...new Set([...(item.blockingTicketIds || []), ...edges.filter(e=>!e.membership && e.to===item.id && (!byId.has(e.from) || stageFor(byId.get(e.from))!=='completed')).map(e=>e.from)])];
     const downstream=new Set(), pending=[item.id];
     while(pending.length) {
       const id=pending.pop();
       for(const edge of edges) if(!edge.membership && edge.from===id && edge.to!==item.id && !downstream.has(edge.to)) { downstream.add(edge.to); pending.push(edge.to); }
     }
-    let lane='planned', label='Needs planning';
-    if(stageFor(item)==='completed' || action==='DONE') { lane='completed'; label='Completed'; }
-    else if(action==='WAIT' || (!action && blockers.length)) { lane='waiting'; label='Waiting on dependencies'; }
+    let lane='ready', label='Open';
+    if(stageFor(item)==='completed') { lane='completed'; label='Completed'; }
     else if(stageFor(item)==='attention') { lane='attention'; label='Needs your input'; }
-    else if(stageFor(item)==='running') { lane='running'; label='Agent working'; }
-    else if(action==='EXECUTE' || (!action && item.state==='READY')) { lane='ready'; label='Ready to execute'; }
-    else if(action==='CLOSE_OUT') { lane='ready'; label='Ready for review'; }
-    else if(action==='REFINE') label='Refine acceptance';
-    else if(action==='REPLAN') label='Replan required';
-    else if(item.state==='BLOCKED') { lane='waiting'; label='Blocked'; }
-    return {lane,label,action,blockers,downstream:[...downstream].filter(id=>byId.has(id) && stageFor(byId.get(id))!=='completed'),detail:item.nextAction?.detail||label};
+    else if(stageFor(item)==='running') { lane='running'; label='In progress'; }
+    else if(blockers.length || item.state==='BLOCKED') { lane='waiting'; label='Waiting on dependencies'; }
+    return {lane,label,blockers,downstream:[...downstream].filter(id=>byId.has(id) && stageFor(byId.get(id))!=='completed'),detail:item.workState?.detail||label};
   }
   function executionSummary(tickets, items, edges) {
-    const groups={attention:[],running:[],ready:[],waiting:[],planned:[],completed:[]};
+    const groups={attention:[],running:[],ready:[],waiting:[],completed:[]};
     for(const item of tickets.filter(t=>t.type!=='goal')) { const workflow=workflowFor(item,items,edges); groups[workflow.lane].push({item,...workflow}); }
     groups.attention.sort((a,b)=>b.downstream.length-a.downstream.length || a.item.id.localeCompare(b.item.id));
     return groups;

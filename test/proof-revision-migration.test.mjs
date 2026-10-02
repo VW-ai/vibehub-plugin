@@ -107,7 +107,7 @@ test("semantic migration reconstructs drift and reports missing or ambiguous his
   assert.deepEqual(drift.ticket.contract_revisions.map((item) => item.revision), [1, 2]);
   assert.equal(drift.outcome, null);
   assert.equal(drift.outcome_history[0].status, "successful");
-  assert.equal(drift.next_action.action, "EXECUTE");
+  assert.equal(drift.status, "OPEN");
 
   for (const [ticketId, evidenceId, reason] of [["ambiguous-work", "ambiguous-proof", "ambiguous-history"], ["missing-work", "missing-proof", "missing-history"]]) {
     const proof = JSON.parse(readFileSync(evidencePath(ticketId, evidenceId), "utf8"));
@@ -184,5 +184,5 @@ test("semantic migration rejects stale human Evidence for a strengthened Contrac
   assert.equal(existsSync(join(repo, ".vibehub", "outcomes", "human-contract", "contract-v1.yaml")), false);
   assert.equal(run(repo, "project", "validate").status, 0);
   assert.equal(run(repo, "ticket", "get", { ticket_id: "human-contract" })
-    .envelope.data.next_action.reason, "semantic_migration_pending");
+    .envelope.data.status, "OPEN");
 });

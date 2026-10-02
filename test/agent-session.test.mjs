@@ -17,7 +17,7 @@ function report(repo,started,patch={},options={}){const current=readSessions(rep
 test('state reports, heartbeat freshness and meaningful activity are separate from canonical Ticket state',()=>{
  const repo=fixture(),now=Date.now(),before=readFileSync(join(repo,'.vibehub/tickets/work.yaml'),'utf8');
  const s=startSession(repo,{...start,freshness_ms:1000},{now});
- const state=ok(run(repo,'ticket','get',{ticket_id:'work'}));assert.equal(state.ticket_state.state,'READY');assert.equal(state.agent_sessions.sessions.length,1);
+ const state=ok(run(repo,'ticket','get',{ticket_id:'work'}));assert.equal(state.ticket_state.state,'OPEN');assert.equal(state.agent_sessions.sessions.length,1);
  let r=report(repo,s,{}, {now:now+100,heartbeat:true});assert.equal(r.last_activity_at,s.session.last_activity_at);assert.notEqual(r.last_reported_at,s.session.last_reported_at);
  r=report(repo,s,{state:'waiting_human'},{now:now+200});assert.equal(r.last_activity_at,r.last_reported_at);
  assert.equal(readSessions(repo,{now:now+1200}).sessions[0].effective_state,'disconnected');
@@ -25,7 +25,7 @@ test('state reports, heartbeat freshness and meaningful activity are separate fr
  r=report(repo,s,{state:'completed'},{now:now+1400});assert.equal(readSessions(repo,{now:now+999999}).sessions[0].effective_state,'completed');
  assert.throws(()=>report(repo,s,{state:'running'},{now:now+1500}),{code:'invalid_transition'});
  assert.equal(readFileSync(join(repo,'.vibehub/tickets/work.yaml'),'utf8'),before);
- assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'READY');
+ assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'OPEN');
  assert.equal(ok(run(repo,'ticket','get',{ticket_id:'dependent'})).ticket_state.state,'BLOCKED');
  assert.deepEqual(readdirSync(join(repo,'.vibehub/outcomes')),[]);
  assert.doesNotMatch(JSON.stringify(readSessions(repo)),/token|token_hash/);
@@ -58,7 +58,7 @@ test('worktrees isolate observations and malformed records are visible errors, n
 
 test('session heartbeats never change semantic snapshot IDs; authenticated endpoint omits writer credentials',async(t)=>{
  const repo=fixture(),before=buildUiSnapshot(repo),s=startSession(repo,start),after=buildUiSnapshot(repo);
- assert.equal(after.state.graph.snapshotId,before.state.graph.snapshotId);assert.equal(after.graph.tickets.find(t=>t.ticketId==='work').workState.state,'READY');
+ assert.equal(after.state.graph.snapshotId,before.state.graph.snapshotId);assert.equal(after.graph.tickets.find(t=>t.ticketId==='work').workState.state,'OPEN');
  const host=startVibeHubUi({repoRoot:repo});t.after(()=>host.close());const ready=await host.ready;
  const denied=await fetch(`${ready.origin}/api/sessions`);assert.equal(denied.status,401);
  const response=await fetch(`${ready.origin}/api/sessions`,{headers:{authorization:`Bearer ${host.token}`}});const data=(await response.json()).data;
@@ -72,7 +72,7 @@ test('foreground wrapper observes real process I/O, waiting reports, heartbeat a
  const repo=fixture();
  const result=runCommand(repo,`(async()=>{const {readSessions,updateSession}=await import(${JSON.stringify(storeUrl)});const s=readSessions(process.env.VB_SESSION_REPO).sessions[0];updateSession(process.env.VB_SESSION_REPO,{session_id:s.session_id,token:process.env.VB_SESSION_TOKEN,expected_revision:s.revision,state:'waiting_tool'});console.log('child output stays in terminal');setTimeout(()=>{const current=readSessions(process.env.VB_SESSION_REPO).sessions[0];if(current.state!=='waiting_tool'||current.revision<3||current.last_activity_at===current.last_reported_at)process.exit(7);},1200);})()`,{freshness_ms:1000});
  assert.equal(result.status,0,result.stderr+result.stdout);assert.match(result.stdout,/child output stays in terminal/);const s=readSessions(repo).sessions[0];assert.equal(s.source,'process');assert.equal(s.state,'completed');assert.ok(s.revision>=4);assert.doesNotMatch(readFileSync(join(sessionDirectory(repo),`${s.session_id}.json`),'utf8'),/child output stays/);
- assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'READY');
+ assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'OPEN');
  const failure=runCommand(repo,'process.exit(7)');assert.equal(failure.status,7);assert.equal(readSessions(repo).sessions[0].state,'failed');
  const input=join(repo,'missing-start.json');writeFileSync(input,JSON.stringify(start));const missing=spawnSync(process.execPath,[runner,'run','--repo',repo,'--input',input,'--','/nonexistent/vibehub-command'],{encoding:'utf8'});assert.notEqual(missing.status,0);assert.equal(readSessions(repo).sessions[0].state,'failed');
 });
@@ -82,7 +82,7 @@ test('foreground wrapper cancellation records cancelled and does not close the T
  const child=spawn(process.execPath,[runner,'run','--repo',repo,'--input',input,'--',process.execPath,'-e',"console.log('ready-to-cancel');setInterval(()=>{},1000)"],{stdio:['ignore','pipe','pipe']});
  const ready=new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('child did not start')),5000);child.stdout.on('data',chunk=>{if(String(chunk).includes('ready-to-cancel')){clearTimeout(timeout);resolve();}});});
  const exited=new Promise(resolve=>child.on('exit',code=>resolve(code)));
- await ready;child.kill('SIGTERM');assert.equal(await exited,143);assert.equal(readSessions(repo).sessions[0].state,'cancelled');assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'READY');
+ await ready;child.kill('SIGTERM');assert.equal(await exited,143);assert.equal(readSessions(repo).sessions[0].state,'cancelled');assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'OPEN');
 });
 
 test('child reports cannot finalize an observed process before its actual failing exit',()=>{
@@ -90,7 +90,7 @@ test('child reports cannot finalize an observed process before its actual failin
  const result=runCommand(repo,`(async()=>{const {readSessions,updateSession}=await import(${JSON.stringify(storeUrl)});const s=readSessions(process.env.VB_SESSION_REPO).sessions[0];try {updateSession(process.env.VB_SESSION_REPO,{session_id:s.session_id,token:process.env.VB_SESSION_TOKEN,expected_revision:s.revision,state:'completed'});process.exit(9);} catch(error) {if(error.code!=='session_unauthorized')process.exit(8);} process.exit(7);})()`);
  assert.equal(result.status,7,result.stderr+result.stdout);
  assert.equal(readSessions(repo).sessions[0].state,'failed');
- assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'READY');
+ assert.equal(ok(run(repo,'ticket','get',{ticket_id:'work'})).ticket_state.state,'OPEN');
 });
 
 test('cancellation cleans up a signal-ignoring descendant after its leader exits', {skip:process.platform==='win32'}, async(t)=>{

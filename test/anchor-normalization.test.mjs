@@ -4,6 +4,7 @@ import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { root, room, run, tempRepo, writeRoom } from './helpers.mjs';
+import { loadRepository } from '../skills/vibehub-core/scripts/vh.mjs';
 
 function fixture(label) {
   const repo = tempRepo(label);
@@ -78,10 +79,9 @@ test('wider prefixes exclude nested VibeHub internals but retain similarly named
 });
 
 test('the complete checked-in Room set still validates', () => {
-  const result = run(root, 'project', 'validate');
-  assert.equal(result.status, 0, result.stdout);
-  assert.equal(result.envelope.data.valid, true);
-  assert.equal(result.envelope.data.rooms, 6);
+  const repository = loadRepository(root);
+  assert.deepEqual(repository.errors, []);
+  assert.equal(repository.rooms.documents.size, 6);
 });
 
 test('anchors below a symlink cannot absorb aliased VibeHub internal documents', () => {

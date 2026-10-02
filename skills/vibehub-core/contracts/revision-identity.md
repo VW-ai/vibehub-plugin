@@ -27,8 +27,8 @@ ID then revision. It excludes the active Contract selector. Reverting to older
 membership therefore appends a new Contract revision; it never moves the
 selector backwards or mutates history.
 
-Use `ticket revise` (or `appendTicketContractRevision`) as the canonical
-mutation path. A semantic change to an existing responsibility appends its
+Ordinary callers use `ticket put`; the helper maintains these identities.
+Advanced revision writes use `ticket revise` or `appendTicketContractRevision`. A semantic change to an existing responsibility appends its
 next revision; a separately passable responsibility starts a new logical ID
 at v1; split/merge retires predecessors and gives new IDs exact
 `derived_from` references; no-longer-applicable responsibilities retire
@@ -42,3 +42,6 @@ Those mismatched references remain readable history and grant no revision
 coverage. Human authority is never relaxed: every accepted human Acceptance,
 native or reconstructed, needs at least one cited human-origin Evidence record
 bound to that exact revision and identity.
+
+These bindings describe optional historical proof. They do not determine the
+current Ticket status or require a development workflow.

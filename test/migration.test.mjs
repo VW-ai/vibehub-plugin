@@ -107,13 +107,14 @@ test("a semantic-only 0.4 step makes no change, then the engine completes the me
     "format-2-to-format-3",
     "format-3-to-format-4",
     "format-4-to-format-5",
+    "format-5-to-format-6",
   ]);
   assert.deepEqual(completed.envelope.data.changed_paths, [
     ".vibehub/tickets/feature.yaml",
     ".vibehub/version.yaml",
   ]);
   const pendingTicket = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", "feature.yaml"), "utf8"));
-  assert.equal(pendingTicket.schema_version, 3);
+  assert.equal(pendingTicket.schema_version, 4);
   assert.equal(pendingTicket.revision_state, "legacy-pending-reconstruction");
   assert.deepEqual(pendingTicket.deliveries, []);
   assert.ok(pendingTicket.provenance_refs.includes(
@@ -188,7 +189,7 @@ test("a failed post-migration validation restores every original byte", () => {
   assert.equal(run(repo, "project", "init").status, 0);
   const legacy = legacyTicket("feature");
   delete legacy.deliveries;
-  legacy.context_refs = [{ ref: "docs/missing.md", purpose: "Deliberately invalid fixture." }];
+  legacy.context_refs = [{ ref: "../docs/missing.md", purpose: "Deliberately invalid fixture." }];
   const ticketPath = join(repo, ".vibehub", "tickets", "feature.yaml");
   const versionPath = join(repo, ".vibehub", "version.yaml");
   writeFileSync(ticketPath, `${JSON.stringify(legacy, null, 2)}\n`);
@@ -226,10 +227,10 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
 
   const migrated = run(repo, "project", "migrate-mechanical");
   assert.equal(migrated.status, 0, migrated.stdout);
-  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3", "format-3-to-format-4", "format-4-to-format-5"]);
+  assert.deepEqual(migrated.envelope.data.applied_migrations, ["format-2-to-format-3", "format-3-to-format-4", "format-4-to-format-5", "format-5-to-format-6"]);
   assert.deepEqual(migrated.envelope.data.changed_paths, [".vibehub/tickets/current-reference.yaml", ".vibehub/version.yaml"]);
   assert.notEqual(readFileSync(join(repo, ".vibehub", "tickets", "current-reference.yaml"), "utf8"), ticketBefore);
-  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 5);
+  assert.equal(JSON.parse(readFileSync(join(repo, ".vibehub", "version.yaml"), "utf8")).format_version, 6);
   assert.equal(migrated.envelope.data.pending_semantic_steps.length, 2);
   assert.equal(
     migrated.envelope.data.pending_semantic_steps[0].step_id,

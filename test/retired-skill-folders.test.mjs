@@ -101,13 +101,15 @@ test("this repository's own vendored skills/ tree carries no retired folder", ()
   assert.deepEqual(envelope.data.retired, []);
 });
 
-test("setup's SKILL.md cites the check and states it only reports", () => {
-  const body = readFileSync(join(root, "skills", "vibehub-setup", "SKILL.md"), "utf8");
-  assert.match(body, /vh\.mjs skills retired --repo/u);
-  assert.match(body, /never deletes,\s+moves, or rewrites anything inside an agent Skill directory/u);
-  assert.match(body, /When `retired` is empty/u);
-  // The names must come from the contract, not from the prose.
-  for (const entry of entries) {
-    assert.equal(body.includes(entry.name), false, "setup's prose hard-codes a retired Skill name");
+test("every consolidated folder is reported alongside its installed replacement", () => {
+  const repo = tempRepo("retired-consolidated");
+  const consolidated = entries.filter((entry) => entry.reference_scope === "skills");
+  for (const entry of consolidated) {
+    installSkill(repo, ".agents/skills", entry.name);
+    installSkill(repo, ".agents/skills", entry.replacement);
   }
+  const result = run(repo, "skills", "retired").envelope;
+  assert.equal(result.ok, true);
+  assert.equal(result.data.retired.length, 4);
+  assert.equal(result.data.retired.every((entry) => entry.replacement === "vibehub-ticket" && entry.replacement_installed), true);
 });

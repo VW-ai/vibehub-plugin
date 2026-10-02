@@ -20,11 +20,11 @@ What each Issue carries:
 | Ticket fact | On the Issue |
 | --- | --- |
 | `outcome`, `context_refs`, `constraints` | Body sections; refs link to the file on `main` |
-| `acceptance` | Task list, checked from the current Outcome; human-authority criteria marked 👤 |
+| `acceptance` | Task list, with optional historical acceptance proof; human decision owners remain visible |
 | `relations` (`depends_on`) | Native **Blocked by / Blocking** relationships plus a Dependencies section with the rationale |
-| state / maturity | Labels `state: ready · blocked · needs-human · close-out · refine · replan · done` and `maturity: firm · draft` |
+| state / maturity | Labels `state: open · in-progress · blocked · done` and `maturity: firm · draft` |
 | Evidence | One comment per record, in `recorded_at` order |
-| successful Outcome | Issue closed, Outcome record in the body |
+| `status: done` | Issue closed; historical Outcome remains in the body when present |
 
 Mapping lives in a hidden `<!-- vibehub:ticket-id=… -->` marker in the body, so
 renaming or re-creating a Ticket file keeps its Issue. Run
@@ -43,8 +43,8 @@ Zero setup; the sync keeps it current. Blocked Issues show a red
 | View | URL |
 | --- | --- |
 | Everything open | `https://github.com/VW-ai/vibehub-plugin/issues` |
-| Ready to execute | `…/issues?q=is%3Aopen+label%3A%22state%3A+ready%22` |
-| Waiting on a human | `…/issues?q=is%3Aopen+label%3A%22state%3A+needs-human%22` |
+| Open | `…/issues?q=is%3Aopen+label%3A%22state%3A+open%22` |
+| In progress | `…/issues?q=is%3Aopen+label%3A%22state%3A+in-progress%22` |
 | Blocked | `…/issues?q=is%3Aopen+label%3A%22state%3A+blocked%22` |
 | Drafts to refine | `…/issues?q=is%3Aopen+label%3A%22maturity%3A+draft%22` |
 | Done | `…/issues?q=is%3Aclosed+label%3A%22state%3A+done%22` |

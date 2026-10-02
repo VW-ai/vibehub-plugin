@@ -56,13 +56,13 @@ directory, so deleting it stays your action.
 ## Start in a repository
 
 VibeHub is optional. You can chat and implement without creating Tickets. To
-choose the Ticket workflow, describe the deliverable and ask naturally to use
+choose task memory, describe the deliverable and ask naturally to use
 VibeHub. One example is:
 
 > Start this with VibeHub.
 
-Ticket Plan owns this entry. When the exact checkout has not been initialized,
-it uses VibeHub Setup first and then resumes the same development cycle. The
+The Ticket Skill owns this entry. When the exact checkout has not been initialized,
+it uses VibeHub Setup first and then records the requested task. The
 user does not need to choose a Skill or issue another command.
 
 Before writing, setup inspects common overlapping surfaces:
@@ -82,7 +82,7 @@ When overlap exists, setup asks for one choice:
   conversion.
 
 If the user does not grant write permission, VibeHub can still read and advise,
-but cannot claim a complete development cycle.
+without writing records.
 
 After consent, setup creates only:
 
@@ -207,10 +207,8 @@ The default per-repository Workbench command remains available below.
 
 ## Ticket graph presentation
 
-Ticket Skills proactively present the focused graph after planning, at a
-protected human boundary, after closeout, and for PR review. Routine execution
-stays quiet. To open the graph explicitly as a fallback, ask the Agent to use
-`$vibehub-review` or launch the bundled helper:
+The Ticket Skill records definitions and progress. Ask for a graph or task
+history when useful. To open it directly, use `$vibehub-review` or the helper:
 
 ```bash
 node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --repo <repository>

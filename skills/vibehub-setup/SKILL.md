@@ -5,18 +5,9 @@ description: Set up the lightweight Skill-first VibeHub folders and project inst
 
 # VibeHub Setup
 
-## Optional workflow and unrestricted responses
-
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
-
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
 ## Automatic dashboard entry
 
@@ -32,8 +23,8 @@ Subagents reuse the parent's entry; a user request to keep it closed wins.
 
 VibeHub installs as Skills plus local YAML records by default, inside the product
 boundary defined once in `references/architecture-boundary.md`.
-When Ticket Plan invokes Setup for the canonical “Start this with VibeHub.”
-entry, return to Ticket Plan after successful validation so the current
+When Ticket invokes Setup for the canonical “Start this with VibeHub.”
+entry, return to Ticket after successful validation so the current
 deliverable continues without another user command.
 
 ## Workflow
@@ -73,8 +64,8 @@ deliverable continues without another user command.
 3. After the choice, initialize the project-format marker and direct data
    folders. Initialization excludes new records from normal Git staging using
    `.vibehub/.gitignore`; this does not untrack existing shared records. Read
-   the returned sharing notice. Local records still support planning, execution,
-   evidence, closeout, and Context without a GitHub account or remote:
+   the returned sharing notice. Local records still support task definitions, progress,
+   relationships, and Context without a GitHub account or remote:
 
    ```text
    node ../vibehub-core/scripts/vh.mjs project init --repo <root>
@@ -98,10 +89,10 @@ deliverable continues without another user command.
    no host handshake or background activation state exists.
 6. GitHub is off by default. Do not inspect a remote or ask a GitHub setup
    question just because a remote exists. Only when the user explicitly requests
-   GitHub mirroring, explain which records will be shared, copy these six files,
+   GitHub mirroring, explain which records will be shared, copy these files,
    and enable the repository Actions variable `VIBEHUB_GITHUB_SYNC=true` with
    the user's authorization. Nothing for an Agent to run or check during
-   ordinary VibeHub work. Record the authorized setup as Evidence:
+   ordinary VibeHub work. Report the files written:
 
    ```text
    ../vibehub-core/templates/github/sync-issues.yml        → .github/workflows/sync-issues.yml

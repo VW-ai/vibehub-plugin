@@ -83,7 +83,9 @@ export function materializeInitialTicket(ticket) {
   const contract = buildContractRevision(ticket.ticket_id, 1, acceptance);
   return {
     ...ticket,
-    schema_version: 3,
+    schema_version: 4,
+    status: ticket.status ?? "open",
+    updates: ticket.updates ?? [],
     revision_state: "bound",
     acceptance,
     active_contract_revision: 1,

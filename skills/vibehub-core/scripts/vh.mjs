@@ -30,6 +30,7 @@ import {
   buildContractRevision,
   contractIdentity,
   evidenceBoundReferenceMap,
+  materializeInitialTicket,
   outcomeBindsContract,
   semanticDigest,
   stableValue,
@@ -614,6 +615,9 @@ function validateMigrationsReference(reference) {
             if (!Number.isInteger(action[key])) add(errors, `${actionPath}.${key}`, "must be an integer");
           }
           requiredString(errors, action, "pending_semantic_ref", actionPath);
+        } else if (action.type === "initialize-ticket-memory") {
+          strictKeys(errors, action, new Set(["type", "from", "to"]), actionPath);
+          if (action.from !== 3 || action.to !== 4) add(errors, actionPath, "must upgrade Ticket schema 3 to 4");
         } else {
           add(errors, `${actionPath}.type`, "is not a supported mechanical migration action");
         }
@@ -820,7 +824,6 @@ function migrateMechanical(repo) {
           if (!document.provenance_refs.includes(action.pending_semantic_ref)) {
             document.provenance_refs = [...document.provenance_refs, action.pending_semantic_ref];
           }
-          assertValid(validateTicket(document, path), "Mechanically migrated Ticket is invalid");
           plannedWrites.set(path, { document, migration });
         }
         for (const path of nestedYamlFiles(dirs(repo).evidence)) {
@@ -863,6 +866,19 @@ function migrateMechanical(repo) {
           delete document.unresolved;
           assertValid(validateOutcome(document, path), "Mechanically migrated Outcome is invalid");
           plannedWrites.set(path, { document, migration });
+        }
+      } else if (action.type === "initialize-ticket-memory") {
+        for (const path of yamlFiles(dirs(repo).tickets)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (![action.from, action.to].includes(existing.schema_version)) {
+            throw new VibeHubError("migration_error", `${path} has Ticket schema ${existing.schema_version}; expected ${action.from} or ${action.to}`);
+          }
+          const successful = legacyTicketCompleted(existing, nestedYamlFiles(join(dirs(repo).outcomes, existing.ticket_id))
+            .map((file) => plannedWrites.get(file)?.document ?? readDocument(file)));
+          plannedWrites.set(path, {
+            document: { ...existing, schema_version: action.to, status: successful ? "done" : "open", updates: existing.updates ?? [] },
+            migration,
+          });
         }
       }
     }
@@ -1229,6 +1245,14 @@ function migrateProofRevisions(repo) {
         }
       }
     }
+    const reconstructedOutcomeIsSuccessful = [...writes.values()].some((document) =>
+      document.kind === "ticket_outcome"
+      && document.ticket_id === ticketId
+      && document.status === "successful"
+      && outcomeBindsContract(document, contractRevisions.at(-1)));
+    if (!pendingTicket.updates.some((update) => update.status !== undefined)) {
+      reconstructedTicket.status = reconstructedOutcomeIsSuccessful ? "done" : "open";
+    }
   }
 
   for (const [path, document] of writes) {
@@ -1490,6 +1514,8 @@ function validateTicket(document, path = "ticket") {
         "schema_version",
         "kind",
         "ticket_id",
+        "status",
+        "updates",
         "epic_id",
         "revision_state",
         "active_contract_revision",
@@ -1518,6 +1544,30 @@ function validateTicket(document, path = "ticket") {
     add(errors, `${path}.maturity`, "must equal firm or draft when present");
   }
   requiredString(errors, document, "ticket_id", path, { id: true });
+  if (!["open", "in_progress", "done"].includes(document.status)) {
+    add(errors, `${path}.status`, "must equal open, in_progress, or done");
+  }
+  if (!Array.isArray(document.updates)) add(errors, `${path}.updates`, "must be an array");
+  else {
+    const ids = new Set();
+    let latestStatus;
+    document.updates.forEach((update, index) => {
+      const updatePath = `${path}.updates[${index}]`;
+      if (!strictKeys(errors, update, new Set(["update_id", "summary", "refs", "recorded_at", "status"]), updatePath)) return;
+      requiredString(errors, update, "update_id", updatePath, { id: true });
+      requiredString(errors, update, "summary", updatePath);
+      stringArray(errors, update.refs, `${updatePath}.refs`);
+      requiredString(errors, update, "recorded_at", updatePath);
+      if (update.recorded_at && Number.isNaN(Date.parse(update.recorded_at))) add(errors, `${updatePath}.recorded_at`, "must be an ISO-compatible date-time");
+      if (update.status !== undefined) {
+        if (!["open", "in_progress", "done"].includes(update.status)) add(errors, `${updatePath}.status`, "must equal open, in_progress, or done");
+        latestStatus = update.status;
+      }
+      if (ids.has(update.update_id)) add(errors, `${updatePath}.update_id`, "must be unique per Ticket");
+      ids.add(update.update_id);
+    });
+    if (latestStatus !== undefined && latestStatus !== document.status) add(errors, `${path}.status`, "must match the latest status update");
+  }
   if (document.epic_id !== undefined) requiredString(errors, document, "epic_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
   if (!Array.isArray(document.deliveries)) {
@@ -1553,9 +1603,9 @@ function validateTicket(document, path = "ticket") {
         refs.add(delivery.ref);
       });
   }
-  requiredString(errors, document, "context", path);
-  if (!Array.isArray(document.acceptance) || document.acceptance.length === 0) {
-    add(errors, `${path}.acceptance`, "must contain at least one criterion");
+  if (typeof document.context !== "string") add(errors, `${path}.context`, "must be a string");
+  if (!Array.isArray(document.acceptance)) {
+    add(errors, `${path}.acceptance`, "must be an array");
   } else if (document.revision_state === "legacy-pending-reconstruction") {
     const ids = new Set();
     document.acceptance.forEach((item, index) => {
@@ -1815,9 +1865,6 @@ function validateEvidence(document, path = "evidence") {
   return errors;
 }
 
-// A closeout Agent must be independent from the executor. The engine cannot
-// verify that claim and must not try; it requires the claim to be made, so an
-// absent one is a rejected write rather than a silent self-adjudication.
 export const INDEPENDENCE_SOURCES = new Set(["subagent", "separate_session", "different_human"]);
 
 function validateOutcome(document, path = "outcome") {
@@ -1907,13 +1954,13 @@ function validateOutcome(document, path = "outcome") {
   return errors;
 }
 
-function loadMap(files, idField, validator, label) {
+function loadMap(files, idField, validator, label, transform = (document) => document) {
   const documents = new Map();
   const errors = [];
   for (const path of files) {
     let document;
     try {
-      document = readDocument(path);
+      document = transform(readDocument(path));
     } catch (error) {
       add(errors, path, error instanceof Error ? error.message : String(error));
       continue;
@@ -1989,6 +2036,12 @@ export function currentOutcome(repository, ticket) {
   if (!contract) return null;
   return outcomesForTicket(repository, ticket.ticket_id)
     .find((outcome) => outcomeBindsContract(outcome, contract)) ?? null;
+}
+
+function legacyTicketCompleted(ticket, outcomes) {
+  const contract = activeContract(ticket);
+  return Boolean(contract && outcomes.some((outcome) =>
+    outcome.status === "successful" && outcomeBindsContract(outcome, contract)));
 }
 
 const ROOM_FILE = "room.yaml";
@@ -2152,17 +2205,29 @@ function findCycle(tickets) {
 
 export function loadRepository(repo, overrides = {}) {
   const paths = dirs(repo);
+  const versionPath = projectFormatPath(repo);
+  const readLegacyTickets = existsSync(versionPath)
+    && readDocument(versionPath)?.format_version < CURRENT_PROJECT_FORMAT;
   const rooms = loadRooms(paths.rooms);
   const contexts = loadMap(rooms.contextFiles, "context_id", validateContext, "Context");
   const legacyContext = join(paths.root, "context");
   if (yamlFiles(legacyContext).length > 0) {
     add(rooms.errors, legacyContext, "every Context lives in a room now; migrate these entries into their owning rooms under .vibehub/rooms/");
   }
-  const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
+  const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket", (document) =>
+    readLegacyTickets && document?.schema_version === 3
+      ? { ...document, schema_version: 4, status: "open", updates: [] }
+      : document);
   const goals = loadMap(yamlFiles(paths.goals), "goal_id", (doc, path) => validatePlanningDocument(doc, "goal", path), "Goal");
   const epics = loadMap(yamlFiles(paths.epics), "epic_id", (doc, path) => validatePlanningDocument(doc, "epic", path), "Epic");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
   const outcomes = loadOutcomes(paths.outcomes);
+  for (const { document, path } of tickets.documents.values()) {
+    if (readDocument(path)?.schema_version !== 3) continue;
+    if (legacyTicketCompleted(document, outcomesForTicket({ outcomes }, document.ticket_id))) {
+      document.status = "done";
+    }
+  }
   for (const document of overrides.contexts ?? []) {
     contexts.documents.set(document.context_id, { document, path: `<candidate:${document.context_id}>` });
   }
@@ -2222,21 +2287,13 @@ export function loadRepository(repo, overrides = {}) {
     if (document.epic_id !== undefined && !epics.documents.has(document.epic_id)) {
       add(errors, path, `dangling Ticket Epic: ${document.epic_id}`);
     }
-    const closed = outcomes.documents.has(document.ticket_id);
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
-      // Immutable commit refs and current paths use main's strict shared
-      // resolver. Missing plain paths on closed Tickets retain the historical
-      // fallback; malformed/explicit historical refs never gain that fallback.
       try {
         resolveTicketContextRef(repo, ref);
         continue;
       } catch (error) {
-        const target = typeof ref === "string" ? resolve(repo, ref) : "";
-        const fallback = typeof ref === "string" && !ref.startsWith("commit:")
-          && !isAbsolute(ref) && target.startsWith(`${repo}${sep}`)
-          && !existsSync(target) && closed;
-        if (!fallback) {
+        if (error?.code !== "context_ref_missing_path" || parseTicketContextRef(ref).kind !== "current") {
           add(errors, path, error instanceof Error ? error.message : `unreadable Ticket context ref: ${String(ref)}`);
           continue;
         }
@@ -2244,11 +2301,15 @@ export function loadRepository(repo, overrides = {}) {
       const commits = recordedCommits(document);
       if (commits.length === 0) {
         addUnverifiable(unverifiable, path,
-          `unverifiable Ticket context ref: ${ref} (closed Ticket; no recorded commit is readable here)`);
+          `missing current Ticket context ref: ${ref} (no recorded commit is readable here)`);
         continue;
       }
       if (!commits.some((commit) => blobExistsAt(repo, commit, ref))) {
-        add(errors, path, `unreadable Ticket context ref: ${ref} (absent from the working tree and from recorded commit ${commits[0].slice(0, 8)})`);
+        addUnverifiable(unverifiable, path,
+          `missing Ticket context ref: ${ref} (absent from the working tree and recorded commits)`);
+      } else {
+        addUnverifiable(unverifiable, path,
+          `missing current Ticket context ref: ${ref} (available in recorded history)`);
       }
     }
     for (const relation of document.relations ?? []) {
@@ -2646,156 +2707,35 @@ function authorityPlacementAdvice(repository, roomPath, document) {
     }));
 }
 
-export function ticketStatus(repository, ticket) {
-  const outcome = currentOutcome(repository, ticket);
-  if (outcome?.status === "successful") return "DONE";
-  const blocking = ticket.relations
+export function ticketBlockingIds(repository, ticket) {
+  return ticket.relations
+    .filter((relation) => relation.type === "depends_on")
     .map((relation) => relation.target_ticket_id)
-    .filter((id) => {
-      const prerequisite = repository.tickets.documents.get(id)?.document;
-      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
-    });
-  if (blocking.length > 0) return "BLOCKED";
-  // A draft can never become READY: it surfaces as REFINE until planning
-  // rewrites its acceptance for real and marks the Ticket firm.
-  return ticket.maturity === "draft" ? "REFINE" : "READY";
+    .filter((id) => repository.tickets.documents.get(id)?.document?.status !== "done")
+    .sort();
+}
+
+export function ticketStatus(repository, ticket) {
+  if (ticket.status === "done") return "DONE";
+  if (ticket.status === "in_progress") return "IN_PROGRESS";
+  return ticketBlockingIds(repository, ticket).length > 0 ? "BLOCKED" : "OPEN";
 }
 
 export function ticketWorkState(repository, ticket) {
-  const next = ticketNextAction(repository, ticket);
+  const blocking = ticketBlockingIds(repository, ticket);
+  const state = ticketStatus(repository, ticket);
   return {
-    state: { EXECUTE: "READY", WAIT: "BLOCKED", CLOSE_OUT: "AWAITING_REVIEW", NEEDS_HUMAN: "NEEDS_HUMAN", REFINE: "NEEDS_REFINEMENT", REPLAN: "NEEDS_REPLAN", DONE: "DONE" }[next.action],
-    reason: next.reason,
-    detail: next.detail,
-  };
-}
-
-function acceptanceAuthority(criterion) {
-  return criterion.authority ?? "agent";
-}
-
-function evidenceOrigin(evidence) {
-  return evidence.origin ?? "agent";
-}
-
-export function ticketNextAction(repository, ticket) {
-  if (ticket.revision_state === "legacy-pending-reconstruction") {
-    return {
-      action: "WAIT",
-      reason: "semantic_migration_pending",
-      detail: "Legacy proof revision reconstruction must finish in this worktree before revision-bound Ticket work continues.",
-      acceptance_ids: ticket.acceptance.map((criterion) => criterion.acceptance_id),
-      blocking_ticket_ids: [],
-    };
-  }
-  const currentAcceptance = activeAcceptance(ticket);
-  const acceptanceIds = currentAcceptance.map((criterion) => criterion.acceptance_id);
-  const activeReferences = activeAcceptanceReferenceMap(ticket);
-  const outcome = currentOutcome(repository, ticket);
-  if (outcome?.status === "successful") {
-    return {
-      action: "DONE",
-      reason: "successful_outcome",
-      detail: "An independent successful Outcome accepts every current criterion.",
-      acceptance_ids: acceptanceIds,
-      blocking_ticket_ids: [],
-    };
-  }
-  if (outcome) {
-    return {
-      action: "REPLAN",
-      reason: "non_successful_outcome",
-      detail: `The independent Outcome is ${outcome.status}; revise the Ticket before another execution cycle.`,
-      acceptance_ids: outcome.unresolved_acceptance_ids,
-      blocking_ticket_ids: [],
-    };
-  }
-
-  const blockingTicketIds = ticket.relations
-    .map((relation) => relation.target_ticket_id)
-    .filter((id) => {
-      const prerequisite = repository.tickets.documents.get(id)?.document;
-      return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
-    })
-    .sort();
-  if (blockingTicketIds.length > 0) {
-    return {
-      action: "WAIT",
-      reason: "unresolved_direct_dependencies",
-      detail: "Direct prerequisites must close successfully before this Ticket can advance.",
-      acceptance_ids: [],
-      blocking_ticket_ids: blockingTicketIds,
-    };
-  }
-
-  if (ticket.maturity === "draft") {
-    return {
-      action: "REFINE",
-      reason: "draft_contract",
-      detail: "The unblocked draft needs a firm, executable acceptance contract.",
-      acceptance_ids: acceptanceIds,
-      blocking_ticket_ids: [],
-    };
-  }
-
-  const ticketEvidence = documents(repository.evidence.documents)
-    .filter((evidence) => evidence.ticket_id === ticket.ticket_id && evidence.binding_state === "bound");
-  const coversActive = (evidence, acceptanceId) => {
-    const expected = activeReferences.get(acceptanceId);
-    const actual = evidenceBoundReferenceMap(evidence).get(acceptanceId);
-    return expected && actual
-      && expected.revision === actual.revision
-      && expected.identity === actual.identity;
-  };
-  const evidencedIds = new Set(acceptanceIds.filter((acceptanceId) =>
-    ticketEvidence.some((evidence) => coversActive(evidence, acceptanceId))));
-  const humanEvidencedIds = new Set(ticketEvidence
-    .filter((evidence) => evidenceOrigin(evidence) === "human")
-    .flatMap((evidence) => evidence.acceptance_ids.filter((acceptanceId) => coversActive(evidence, acceptanceId))));
-  const missingAgentIds = currentAcceptance
-    .filter((criterion) => acceptanceAuthority(criterion) !== "human"
-      && !evidencedIds.has(criterion.acceptance_id))
-    .map((criterion) => criterion.acceptance_id);
-  if (missingAgentIds.length > 0) {
-    return {
-      action: "EXECUTE",
-      reason: "acceptance_evidence_incomplete",
-      detail: "Agent-authority criteria still need reproducible acceptance-linked Evidence; human authority is routed once it is the remaining blocker.",
-      acceptance_ids: missingAgentIds,
-      blocking_ticket_ids: [],
-    };
-  }
-
-  const missingHumanIds = currentAcceptance
-    .filter((criterion) => acceptanceAuthority(criterion) === "human"
-      && !humanEvidencedIds.has(criterion.acceptance_id))
-    .map((criterion) => criterion.acceptance_id);
-  if (missingHumanIds.length > 0) {
-    return {
-      action: "NEEDS_HUMAN",
-      reason: "missing_human_evidence",
-      detail: "Every agent-authority criterion is evidenced; the reachable human-authority criteria still need explicit human-origin Evidence.",
-      acceptance_ids: missingHumanIds,
-      blocking_ticket_ids: [],
-    };
-  }
-
-  // Every agent-authority criterion is evidenced and every human-authority
-  // criterion carries human-origin Evidence, so the contract is fully
-  // satisfied and only independent adjudication remains.
-  return {
-    action: "CLOSE_OUT",
-    reason: "authority_satisfying_evidence_complete",
-    detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
-    acceptance_ids: acceptanceIds,
-    blocking_ticket_ids: [],
+    state,
+    reason: state === "BLOCKED" ? "unfinished_dependencies" : "recorded_status",
+    detail: state === "BLOCKED"
+      ? "A direct dependency is unfinished."
+      : "This is the Ticket's recorded task status.",
+    blocking_ticket_ids: blocking,
   };
 }
 
 export function ticketArchived(repository, ticket) {
-  if (!ticket) return false;
-  const outcome = currentOutcome(repository, ticket);
-  return outcome?.status === "successful"
+  return ticket?.status === "done"
     && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
 }
 
@@ -2812,7 +2752,6 @@ export function candidateDependencyAdvice(currentRepository, candidateRepository
       if (existingEdges.has(ticketDependencyKey(relation))) return;
       const target = candidateRepository.tickets.documents.get(relation.target_ticket_id)?.document;
       if (!target || ticketStatus(candidateRepository, target) !== "DONE") return;
-      const targetOutcome = currentOutcome(candidateRepository, target);
       advice.push({
         code: DEPENDENCY_HYGIENE.candidate_done_dependency.advice_code,
         level: DEPENDENCY_HYGIENE.candidate_done_dependency.level,
@@ -2823,12 +2762,7 @@ export function candidateDependencyAdvice(currentRepository, candidateRepository
         rationale: relation.rationale ?? null,
         rationale_present: typeof relation.rationale === "string" && relation.rationale.trim() !== "",
         message: DEPENDENCY_HYGIENE.candidate_done_dependency.instruction,
-        suggested_context_refs: [
-          `.vibehub/tickets/${relation.target_ticket_id}.yaml`,
-          targetOutcome?.binding_state === "bound"
-            ? `.vibehub/outcomes/${relation.target_ticket_id}/${targetOutcome.outcome_id}.yaml`
-            : `.vibehub/outcomes/${relation.target_ticket_id}.yaml`,
-        ],
+        suggested_context_refs: [`.vibehub/tickets/${relation.target_ticket_id}.yaml`],
       });
     });
   });
@@ -2972,8 +2906,20 @@ function immutableAcceptanceRevision(item) {
 function validateTicketMutation(existing, candidate, path = "ticket") {
   const errors = [];
   if (!existing) return errors;
+  const priorUpdates = existing.updates ?? [];
+  const nextUpdates = candidate.updates ?? [];
+  if (nextUpdates.length < priorUpdates.length
+    || JSON.stringify(stable(nextUpdates.slice(0, priorUpdates.length))) !== JSON.stringify(stable(priorUpdates))) {
+    add(errors, `${path}.updates`, "previous updates are immutable and append-only");
+  }
+  if (candidate.status !== existing.status
+    && !nextUpdates.slice(priorUpdates.length).some((update) => update.status === candidate.status)) {
+    add(errors, `${path}.status`, "status change needs an appended update");
+  }
   if (existing.revision_state === "legacy-pending-reconstruction") {
-    add(errors, path, "legacy-pending Ticket must finish project migrate-proof-revisions before ticket apply");
+    if (candidate.revision_state !== "legacy-pending-reconstruction") {
+      add(errors, `${path}.revision_state`, "proof revision reconstruction must bind the historical contract");
+    }
     return errors;
   }
   if (candidate.revision_state !== "bound") {
@@ -3002,27 +2948,6 @@ function validateTicketMutation(existing, candidate, path = "ticket") {
   if (candidate.active_contract_revision < existing.active_contract_revision
     || candidate.active_contract_revision > existing.active_contract_revision + 1) {
     add(errors, `${path}.active_contract_revision`, "one ticket apply may retain the active Contract or append exactly its next revision");
-  }
-  const acceptanceGroups = new Map();
-  for (const item of candidate.acceptance) {
-    const items = acceptanceGroups.get(item.acceptance_id) ?? [];
-    items.push(item);
-    acceptanceGroups.set(item.acceptance_id, items);
-  }
-  for (const [acceptanceId, items] of acceptanceGroups) {
-    const seenSemantics = new Set();
-    for (const item of items) {
-      const semantic = semanticDigest({
-        acceptance_id: acceptanceId,
-        criterion: item.criterion,
-        authority: item.authority ?? "agent",
-        derived_from: item.derived_from ?? [],
-      });
-      if (seenSemantics.has(semantic)) {
-        add(errors, `${path}.acceptance`, `${acceptanceId} repeats identical contract semantics; presentation-only edits must not append a revision`);
-      }
-      seenSemantics.add(semantic);
-    }
   }
   for (let index = 1; index < candidate.contract_revisions.length; index += 1) {
     if (contractMembershipKey(candidate.contract_revisions[index - 1].acceptance_revisions)
@@ -3062,7 +2987,7 @@ export function projectHierarchy(repository) {
     });
   return {
     scope: "all",
-    progress_basis: "Current Ticket Outcomes; delivery progress does not establish Goal achievement or Epic acceptance.",
+    progress_basis: "Recorded Ticket status; delivery progress does not establish Goal achievement or Epic acceptance.",
     goals,
     epics,
     standalone_ticket_ids: tickets.filter((ticket) => ticket.epic_id === undefined).map((ticket) => ticket.ticket_id),
@@ -3096,14 +3021,114 @@ function planningOperation(kind, operation, repo, input) {
 }
 
 function ticketOperation(operation, repo, input, options = {}) {
+  if (operation === "put") {
+    assertCurrentProjectFormat(repo);
+    const allowed = new Set(["ticket_id", "outcome", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs", "deliveries", "epic_id", "maturity"]);
+    if (!isObject(input) || Object.keys(input).some((key) => !allowed.has(key))) {
+      throw new VibeHubError("invalid_input", "ticket put accepts only task definition fields");
+    }
+    if (typeof input.ticket_id !== "string" || !ID.test(input.ticket_id)) {
+      throw new VibeHubError("invalid_input", "ticket put needs a valid ticket_id");
+    }
+    if (input.acceptance !== undefined && (!Array.isArray(input.acceptance)
+      || input.acceptance.some((item) => !isObject(item)
+        || Object.keys(item).some((key) => !new Set(["acceptance_id", "criterion", "authority"]).has(key))
+        || !ID.test(item.acceptance_id ?? "")
+        || typeof item.criterion !== "string" || !item.criterion.trim()
+        || (item.authority !== undefined && !ACCEPTANCE_AUTHORITIES.has(item.authority))))) {
+      throw new VibeHubError("invalid_input", "acceptance must contain acceptance_id and criterion, with optional agent or human authority");
+    }
+    const current = loadRepository(repo);
+    assertValid(current.errors);
+    const existing = current.tickets.documents.get(input.ticket_id)?.document;
+    let candidate;
+    if (existing) {
+      candidate = { ...existing };
+      if (input.acceptance !== undefined) {
+        if (!Array.isArray(input.acceptance)) throw new VibeHubError("invalid_input", "acceptance must be an array");
+        const active = existing.revision_state === "bound" ? activeAcceptance(existing) : existing.acceptance;
+        const wanted = new Map(input.acceptance.map((item) => [item.acceptance_id, item]));
+        if (wanted.size !== input.acceptance.length) throw new VibeHubError("invalid_input", "acceptance IDs must be unique");
+        if (existing.revision_state === "bound") {
+          const retire_acceptance_ids = active.filter((item) => !wanted.has(item.acceptance_id)).map((item) => item.acceptance_id);
+          const acceptance_changes = input.acceptance.filter((item) => {
+            const prior = active.find((entry) => entry.acceptance_id === item.acceptance_id);
+            return !prior || prior.criterion !== item.criterion || (prior.authority ?? "agent") !== (item.authority ?? "agent");
+          });
+          candidate = appendTicketContractRevision(existing, { retire_acceptance_ids, acceptance_changes });
+        } else candidate.acceptance = input.acceptance;
+      }
+      for (const key of allowed) {
+        if (key !== "ticket_id" && key !== "acceptance" && input[key] !== undefined) candidate[key] = input[key];
+      }
+    } else {
+      if (typeof input.outcome !== "string" || !input.outcome.trim()) {
+        throw new VibeHubError("invalid_input", "new ticket needs a non-empty outcome");
+      }
+      candidate = materializeInitialTicket({
+        schema_version: CURRENT_TICKET_SCHEMA,
+        kind: "ticket",
+        ticket_id: input.ticket_id,
+        outcome: input.outcome,
+        context: input.context ?? "",
+        acceptance: input.acceptance ?? [],
+        constraints: input.constraints ?? [],
+        context_refs: input.context_refs ?? [],
+        relations: input.relations ?? [],
+        provenance_refs: input.provenance_refs ?? [],
+        deliveries: input.deliveries ?? [],
+        status: "open",
+        updates: [],
+        ...(input.epic_id === undefined ? {} : { epic_id: input.epic_id }),
+        ...(input.maturity === undefined ? {} : { maturity: input.maturity }),
+      });
+    }
+    assertValid([...validateTicket(candidate), ...validateTicketMutation(existing, candidate)], "Ticket is invalid");
+    const repository = loadRepository(repo, { tickets: [candidate] });
+    assertValid(repository.errors);
+    const path = join(repository.paths.tickets, `${candidate.ticket_id}.yaml`);
+    writeDocument(path, candidate);
+    return { status: "written", ticket_id: candidate.ticket_id, path };
+  }
+  if (operation === "update") {
+    assertCurrentProjectFormat(repo);
+    if (!isObject(input) || Object.keys(input).some((key) => !new Set(["ticket_id", "update_id", "summary", "status", "refs", "recorded_at"]).has(key))) {
+      throw new VibeHubError("invalid_input", "ticket update accepts ticket_id, update_id, summary, status, refs, and recorded_at");
+    }
+    const repository = loadRepository(repo);
+    assertValid(repository.errors);
+    const existing = repository.tickets.documents.get(input.ticket_id)?.document;
+    if (!existing) throw new VibeHubError("not_found", `Ticket not found: ${input.ticket_id}`);
+    const prior = existing.updates.find((entry) => entry.update_id === input.update_id);
+    const update = {
+      update_id: input.update_id,
+      summary: input.summary,
+      refs: input.refs ?? [],
+      recorded_at: input.recorded_at ?? prior?.recorded_at ?? new Date().toISOString(),
+      ...(input.status === undefined ? {} : { status: input.status }),
+    };
+    if (prior) {
+      if (JSON.stringify(stable(prior)) !== JSON.stringify(stable(update))) {
+        throw new VibeHubError("invalid_state", `Update ID already has different content: ${input.update_id}`);
+      }
+      return { status: "unchanged", ticket_id: input.ticket_id, update_id: input.update_id };
+    }
+    const candidate = {
+      ...existing,
+      status: input.status ?? existing.status,
+      updates: [...existing.updates, update],
+    };
+    assertValid([...validateTicket(candidate), ...validateTicketMutation(existing, candidate)], "Ticket update is invalid");
+    assertValid(loadRepository(repo, { tickets: [candidate] }).errors, "Ticket update is invalid");
+    const path = join(repository.paths.tickets, `${input.ticket_id}.yaml`);
+    writeDocument(path, candidate);
+    return { status: "written", ticket_id: input.ticket_id, update_id: input.update_id, path };
+  }
+
   if (operation === "revise") {
     assertCurrentProjectFormat(repo);
     if (typeof input.ticket_id !== "string" || !ID.test(input.ticket_id)) {
       throw new VibeHubError("invalid_input", "ticket revise needs a valid ticket_id");
-    }
-    if (typeof input.validation !== "object" || input.validation === null
-      || typeof input.validation.independent !== "boolean") {
-      throw new VibeHubError("missing_validation_declaration", "ticket revise needs the same validation declaration as ticket apply");
     }
     const currentRepository = loadRepository(repo);
     assertValid(currentRepository.errors);
@@ -3115,11 +3140,6 @@ function ticketOperation(operation, repo, input, options = {}) {
     } catch (error) {
       throw new VibeHubError("invalid_input", error instanceof Error ? error.message : String(error));
     }
-    const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
-    candidate.provenance_refs = [
-      ...(candidate.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:")),
-      validationRef,
-    ];
     const errors = [
       ...validateTicket(candidate, "ticket"),
       ...validateTicketMutation(existing, candidate, "ticket"),
@@ -3140,18 +3160,6 @@ function ticketOperation(operation, repo, input, options = {}) {
     assertCurrentProjectFormat(repo);
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
       throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
-    }
-    // The plan Skill asks a separate Agent to validate a candidate "when an
-    // independent Agent is available". Left implicit, an unavailable one is
-    // indistinguishable from an unasked one. The declaration is required so a
-    // skip is recorded rather than merely undetected; like the closeout
-    // declaration, the engine records the claim and never verifies it.
-    if (typeof input.validation !== "object" || input.validation === null
-      || typeof input.validation.independent !== "boolean") {
-      throw new VibeHubError(
-        "missing_validation_declaration",
-        'ticket apply needs a validation declaration: {"validation":{"independent":true|false,"note":"..."}}. State whether a separate Agent validated this candidate; an unrecorded skip is not permitted.',
-      );
     }
     const errors = input.tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
     for (const kind of ["goal", "epic"]) {
@@ -3184,10 +3192,6 @@ function ticketOperation(operation, repo, input, options = {}) {
     const repository = loadRepository(repo, { tickets: input.tickets, goals: input.goals, epics: input.epics });
     assertValid(repository.errors);
     const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
-    // Namespaced deliberately: bare `validation:` is already used in checked-in
-    // Tickets to name the Ticket or decision that validated a claim, and
-    // rewriting that would erase history on every re-apply.
-    const validationRef = input.validation.independent ? "plan-validation:independent" : "plan-validation:none";
     const writes = new Map();
     for (const kind of ["goal", "epic"]) {
       for (const document of input[`${kind}s`] ?? []) {
@@ -3196,8 +3200,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     }
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
-      const provenance = (ticket.provenance_refs ?? []).filter((ref) => !String(ref).startsWith("plan-validation:"));
-      const recorded = { ...ticket, provenance_refs: [...provenance, validationRef] };
+      const recorded = ticket;
       assertValid(validateTicket(recorded, `tickets[${ticket.ticket_id}]`), "Ticket candidate is invalid");
       writes.set(path, recorded);
     }
@@ -3231,12 +3234,6 @@ function ticketOperation(operation, repo, input, options = {}) {
   }
   if (operation === "closeout") {
     assertCurrentProjectFormat(repo);
-    if (input.independence === undefined) {
-      throw new VibeHubError(
-        "missing_independence",
-        `ticket closeout needs an independence declaration: {"independence":{"source":"<${[...INDEPENDENCE_SOURCES].join("|")}>","note":"..."}}. The closeout Agent must be independent from the executor; if no independent source is available, stop and report that rather than adjudicating your own work.`,
-      );
-    }
     if (input.binding_state !== "bound" || input.binding_origin !== "native") {
       throw new VibeHubError("invalid_input", "ordinary ticket closeout must be a native exact Contract revision binding");
     }
@@ -3276,8 +3273,8 @@ function ticketOperation(operation, repo, input, options = {}) {
       ticket_state: ticketWorkState(repository, item),
       agent_sessions: ticketSessionCapability(readSessions(repo), item.ticket_id),
       status: ticketStatus(repository, item),
-      next_action: ticketNextAction(repository, item),
       evidence: ticketEvidence,
+      blocking_ticket_ids: ticketBlockingIds(repository, item),
       outcome: currentOutcome(repository, item),
       outcome_history: outcomesForTicket(repository, input.ticket_id),
     };
@@ -3292,33 +3289,20 @@ function ticketOperation(operation, repo, input, options = {}) {
       ticket_state: ticketWorkState(repository, ticket),
       agent_sessions: ticketSessionCapability(sessions, ticket.ticket_id),
       status: ticketStatus(repository, ticket),
-      next_action: ticketNextAction(repository, ticket),
       archived: ticketArchived(repository, ticket),
-      blocking_ticket_ids: ticket.relations
-        .map((relation) => relation.target_ticket_id)
-        .filter((id) => {
-          const prerequisite = repository.tickets.documents.get(id)?.document;
-          return !prerequisite || currentOutcome(repository, prerequisite)?.status !== "successful";
-        }),
+      blocking_ticket_ids: ticketBlockingIds(repository, ticket),
       outcome: currentOutcome(repository, ticket),
       outcome_history: outcomesForTicket(repository, ticket.ticket_id),
     }));
     if (operation === "frontier") {
-      const byAction = (action) => items
-        .filter((item) => item.next_action.action === action)
+      const byStatus = (status) => items
+        .filter((item) => item.status === status)
         .sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id));
-      const readyToExecute = byAction("EXECUTE");
       return {
-        // Compatibility path for existing callers: `ready` still exists, but
-        // now means genuinely ready to execute rather than merely status READY.
-        ready: readyToExecute,
-        ready_to_execute: readyToExecute,
-        ready_to_closeout: byAction("CLOSE_OUT"),
-        needs_human: byAction("NEEDS_HUMAN"),
-        needs_replan: byAction("REPLAN"),
-        needs_refinement: byAction("REFINE"),
-        waiting: byAction("WAIT"),
-        count: readyToExecute.length,
+        open: byStatus("OPEN"),
+        in_progress: byStatus("IN_PROGRESS"),
+        blocked: byStatus("BLOCKED"),
+        count: items.filter((item) => item.status !== "DONE").length,
       };
     }
     return {
@@ -4278,30 +4262,6 @@ function contextSpans(path, text) {
   return located;
 }
 
-// Historical records, which name a retired Skill because that is what was true
-// when they were written. Detected structurally, never by allowlist:
-//   - .vibehub/evidence/, .vibehub/outcomes/, and the .vibehub/history/ archive
-//   - a Ticket under .vibehub/tickets/ whose Outcome is SUCCESSFUL
-//   - a META/legacy-* tree, matched only as the segment directly under META/
-//
-// A Ticket is a historical record only once its Outcome says `successful`. A
-// partial, failed or deviated Outcome means the work is still live — the
-// Ticket's own next_action is REPLAN — so its YAML is a live document whose
-// references still have to be right. This is deliberately STRICTER than the
-// notion of "closed" loadRepository uses for lifecycle-scoped context_refs,
-// which counts a Ticket as closed the moment any Outcome exists. The two are
-// answering different questions: a context ref is pinned to the commit that
-// closed the loop, whereas a retired name in a still-live Ticket is a reference
-// someone will read and copy tomorrow. The divergence is scoped to this check
-// on purpose; unifying it would change an accepted, closed behaviour.
-// Every one of these is a whole directory whose contents are archived by
-// construction. A file's own name never earns an exemption: a dated basename
-// under META/ used to imply "record", which meant anyone could date-prefix a
-// live spec to silence the rule. A genuine dated record is exempted by an
-// explicit allowlist entry naming the text it carries, like any other file.
-// Everything else under META/ stays live, which is the point: an active META
-// spec naming skills/<retired>/SKILL.md is precisely the reference that slipped
-// past a careful human grep during the rename it documents.
 function isHistoricalRecord(repo, path) {
   if (path.startsWith(".vibehub/evidence/")) return true;
   if (path.startsWith(".vibehub/outcomes/")) return true;
@@ -4310,17 +4270,10 @@ function isHistoricalRecord(repo, path) {
     const id = path.slice(".vibehub/tickets/".length, -".yaml".length);
     try {
       const ticket = readDocument(join(repo, path));
-      if (ticket.revision_state === "bound") {
-        const contract = activeContract(ticket);
-        return nestedYamlFiles(join(repo, ".vibehub", "outcomes", id))
-          .map(readDocument)
-          .some((outcome) => outcome.status === "successful" && outcomeBindsContract(outcome, contract));
+      if (ticket.schema_version === 3) {
+        return legacyTicketCompleted(ticket, nestedYamlFiles(join(repo, ".vibehub", "outcomes", id)).map(readDocument));
       }
-      // Legacy records remain readable during an explicit format migration.
-      const outcomePath = join(repo, ".vibehub", "outcomes", `${id}.yaml`);
-      if (!existsSync(outcomePath)) return false;
-      const outcome = readDocument(outcomePath);
-      return isObject(outcome) && outcome.status === "successful";
+      return ticket.status === "done";
     } catch {
       return false;
     }
@@ -4461,6 +4414,10 @@ function validateRetiredNames(repo, contract, allFiles, errors) {
       }
     }
     if (!ID.test(entry.name) || !ID.test(entry.replacement)) continue;
+    if (entry.reference_scope !== undefined && entry.reference_scope !== "skills") {
+      add(errors, `${path}.reference_scope`, "must equal skills when present");
+      continue;
+    }
     const allowances = [];
     for (const [allowIndex, allowance] of (Array.isArray(entry.allowed_paths) ? entry.allowed_paths : []).entries()) {
       const where = `${path}.allowed_paths[${allowIndex}]`;
@@ -4528,6 +4485,7 @@ function validateRetiredNames(repo, contract, allFiles, errors) {
     }
 
     for (const file of files) {
+      if (entry.reference_scope === "skills" && !file.path.startsWith("skills/")) continue;
       if (countOccurrencesInsensitive(file.text, entry.name) === 0) continue;
       if (isHistoricalRecord(repo, file.path)) continue;
 

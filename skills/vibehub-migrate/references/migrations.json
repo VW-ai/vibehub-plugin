@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 5,
+  "current_format": 6,
   "migrations": [
     {
       "migration_id": "0-4-unversioned-to-0-5-unversioned",
@@ -258,6 +258,38 @@
           {
             "type": "write-project-format",
             "format_version": 5
+          }
+        ]
+      },
+      "semantic": {
+        "steps": []
+      }
+    },
+    {
+      "migration_id": "format-5-to-format-6",
+      "from": "format-5",
+      "to": "format-6",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 3,
+          "to": 4
+        }
+      },
+      "detect": "Project format 5 predates explicit Ticket memory status and updates.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/tickets/*.yaml",
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "initialize-ticket-memory",
+            "from": 3,
+            "to": 4
+          },
+          {
+            "type": "write-project-format",
+            "format_version": 6
           }
         ]
       },

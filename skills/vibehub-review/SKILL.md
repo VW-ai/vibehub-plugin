@@ -1,22 +1,13 @@
 ---
 name: vibehub-review
-description: Present or review the checked-in VibeHub Ticket graph and the canonical Room tree through the read-only local graph UI or in the Agent conversation. Use when a Ticket workflow reaches a presentation event, when a proposed or existing Room tree needs a human gate, or when a human explicitly wants to inspect outcomes, dependencies, blockers, Evidence, current Outcomes, Room nesting, boundaries, or drift.
+description: Present or review the checked-in VibeHub Ticket graph and the canonical Room tree through the read-only local graph UI or in the Agent conversation. Use when the user wants to inspect tasks, progress, dependencies, task history, Room boundaries, or drift.
 ---
 
 # VibeHub Review
 
-## Optional workflow and unrestricted responses
-
-Use this Skill when the user requests its VibeHub operation or has already
-chosen VibeHub for the current work. Installation alone does not opt a user
-into ticketing. Ordinary chat, exploration, and implementation can continue
-without a Ticket, a special phrase, or a prescribed response format. Users can
-leave the workflow at any time; do not block their work for missing VibeHub
-records. Never truncate, rewrite, suppress, or withhold a model response to
-satisfy VibeHub. Schema and lifecycle checks govern explicit VibeHub record
-writes only, not the model's answer or the user's ability to work.
-
-
+Use VibeHub when the user chooses it. Ordinary work needs no Ticket or
+prescribed response format. Record validation applies to explicit record
+writes and never restricts the conversation.
 
 ## Automatic dashboard entry
 
@@ -35,17 +26,16 @@ things and writes nothing: the **Ticket graph** and the **Room tree**.
 
 Read `references/ticket-lifecycle.json` before acting. This Skill owns
 `explicit-review` and is the sole presenter for every event whose
-`presentation` is `review`; semantic transition ownership remains with the
-calling Ticket Skill.
-Read `../vibehub-core/contracts/ticket-next-action.md`. Present the host-derived next action
-beside operational state and human attention; never infer it again from UI
-copy, Evidence counts, or browser state.
-Read `../vibehub-core/contracts/revision-identity.md`. Present the active
-Contract revision separately from historical Outcomes; show each Acceptance's
-logical ID, revision, active/retired state and `derived_from` lineage, plus
-Evidence binding origin. A `legacy-unresolved` record must show its reason and
-attempted provenance as repair guidance, never as globally failed or stale
-proof.
+`presentation` is `review`; record ownership remains with the calling Skill.
+Read `../vibehub-core/contracts/ticket-state.md` for recorded status,
+dependency state, and update history. Present these as task facts. A copied
+task brief carries the source, context, criteria, authority, and current facts
+for the user's chosen skills. It does not prescribe a development sequence.
+
+Optional historical Evidence and Outcomes retain their original revision
+bindings. Read `../vibehub-core/contracts/revision-identity.md` when explaining
+those records. Keep historical proof separate from current status. Show a
+`legacy-unresolved` reason as a provenance gap, not a failed task.
 
 ## Unified home
 
@@ -108,14 +98,10 @@ persistent cache, daemon, review write route, or Decision authority.
 The canonical schemas and repository validation are the complete handoff:
 do not repair, infer, or translate invalid Agent output inside the UI.
 
-For one Ticket awaiting adjudication, focus its Log directly with `--ticket`
-and `--view log`. For a bounded batch review, use the current repository's
-Overview **Independent closeout** queue or `ticket frontier`'s
-`ready_to_closeout` array. That queue contains only Tickets whose host-derived
-action is `CLOSE_OUT`; it never mixes executable READY, REFINE, WAIT, human
-authority, or non-success Outcome work, and it never accepts a batch. A
-closeout action copies the exact read-only Agent handoff for an independent
-closeout Agent; it is not a browser write or a model turn.
+Use `--ticket` and `--view log` to inspect recorded progress and optional
+historical proof. Use `ticket frontier` to list open, in-progress, and blocked
+tasks. The dashboard copies task briefs; it neither starts an Agent nor writes
+completion records.
 
 ## Room tree
 
@@ -160,8 +146,9 @@ node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root> --delivery <canon
 node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
 ```
 
-Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,
-direct dependencies, acceptance, Evidence, and Outcome in the conversation.
+Present the desired outcome, OPEN/IN_PROGRESS/BLOCKED/DONE state, unfinished
+dependencies, completion criteria, and recorded updates. Include historical
+Evidence and Outcomes when they help answer the request.
 Resolve every displayed or consumed `context_ref` through the shared engine
 operation so current paths and immutable historical refs have one source and
 identity contract:
@@ -173,10 +160,6 @@ node ../vibehub-core/scripts/vh.mjs context resolve --repo <root> --input <ref.j
 `ref.json` is `{"ref":"<Ticket context_ref>"}`. Do not check out a historical
 commit or bypass the resolver with ad hoc Git commands. Consume the returned
 source and identity when presenting the reference.
-When `next_action.action` is `CLOSE_OUT`, present it as independent review work
-and route it to `$vibehub-ticket-closeout`; never call Ticket Run again. When a
-bounded list is requested, report only `ready_to_closeout` from this exact
-repository and scope.
 
 When no browser is available, present the same Room tree from `vh.mjs` output:
 
@@ -201,5 +184,5 @@ Use `room drift` when only alignment state is wanted, and
 the Context entries behind a count.
 
 If the user requests an edit, delegate the revised documents to
-`$vibehub-ticket-plan`. Browser state and comments are not Decision authority;
-all durable changes continue through the checked-in Ticket workflow.
+`$vibehub-ticket`. Browser state and comments are not Decision authority;
+requested task changes use the record operations.

@@ -5,7 +5,7 @@ ships no general-purpose or globally installed CLI, MCP server, database,
 daemon, hook cadence, native runtime, background capture,
 or hidden state. Git can own shared history, concurrency, rollback, and
 review; GitHub is optional and disabled by default. Deterministic validation and migration live in bundled
-dependency-free scripts; semantic judgment lives in Skills.
+dependency-free scripts; record judgment lives in VibeHub Skills. Development methods belong to the user's chosen skills.
 
 One narrow exception is the explicitly invoked `vibehub-upgrade` one-shot
 entry shipped as a dependency-free npm-layout tarball on the same GitHub
@@ -42,7 +42,7 @@ Users can browse repositories without initializing VibeHub. Record validation
 affects the selected record view only; one invalid checkout cannot block the home
 or other projects. The existing authenticated Workbench remains the per-checkout
 contract and evidence inspector. VibeHub never dictates model response formats
-or requires users to adopt its Ticket lifecycle for ordinary work.
+or requires a development workflow to record or complete a task.
 ## Explicit local session observation
 
 The user-authorized session integration adds one bounded exception: the

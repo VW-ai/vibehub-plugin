@@ -20,7 +20,7 @@ test("production Workbench uses the selected global visual language", () => {
 });
 
 test("production graph keeps four phases, one substate slot, archive, and live independent", () => {
-  for (const phase of ["draft", "ready", "running", "done"]) {
+  for (const phase of ["blocked", "open", "in-progress", "done"]) {
     assert.match(css, new RegExp(`\\.ticket-node\\.phase-${phase} \\.ticket-boundary \\{ fill:`, "u"));
   }
   assert.match(css, /\.ticket-node\.archived \.ticket-boundary \{ fill:/u);
@@ -44,7 +44,7 @@ test("Workbench visibly separates active revision proof from retired history", (
   assert.match(script, /`Derived from \$\{item\.derivedFrom/u);
   assert.match(script, /actual\.revision === expected\.revision && actual\.identity === expected\.identity/u);
   assert.match(script, /record\.contractRevision\?\.revision === target\.activeContractRevision\?\.revision[\s\S]*record\.contractRevision\?\.identity === target\.activeContractRevision\?\.identity/u);
-  assert.match(script, /`\$\{outcomes\.length\} historical Outcome/u);
+  assert.match(script, /Task status is recorded separately from historical proof/u);
   assert.match(script, /`Contract v\$\{record\.contractRevision\.revision\}`/u);
   assert.match(script, /`\$\{record\.bindingOrigin\} binding`/u);
 });
@@ -69,7 +69,7 @@ test("production canvas exposes exactly four primary phases and one compact subs
   assert.match(script, /renderGraphSummary/u);
   assert.match(
     script,
-    /add\(counts\.RUNNING, "RUNNING", "running", "phase-running"\);[\s\S]*add\(counts\.READY, "READY"[\s\S]*add\(counts\.DRAFT, "DRAFT"[\s\S]*add\(counts\.DONE, "DONE"/u,
+    /add\(counts\.IN_PROGRESS, "IN PROGRESS", "running", "phase-in-progress"\);[\s\S]*add\(counts\.OPEN, "OPEN"[\s\S]*add\(counts\.BLOCKED, "BLOCKED"[\s\S]*add\(counts\.DONE, "DONE"/u,
   );
   assert.doesNotMatch(html, /id="closeoutQueue"/u);
   for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
@@ -87,7 +87,7 @@ test("production canvas exposes exactly four primary phases and one compact subs
 
 test("focused Ticket makes the exact copy handoff the dominant recommended action", () => {
   assert.match(script, /className = classes\("recommended-action"/u);
-  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
+  assert.match(script, /eyebrow\.textContent = "Recorded task state"/u);
   assert.match(script, /label: "Copy prompt"/u);
   assert.match(script, /if \(contextPackage\.agentPayload\) return canonical;/u);
   assert.match(css, /\.recommended-action-title \{[\s\S]*font-size: 15px/u);
@@ -100,9 +100,9 @@ test("card phase pair is label-relative and action detail stays on demand", () =
   assert.match(script, /y: NODE\.height - 22/u);
   assert.match(script, /label\.className = "recommended-action-title"/u);
   assert.match(script, /label\.tabIndex = 0/u);
-  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
+  assert.match(script, /label\.dataset\.fullText = operational\?\.detail/u);
   assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
-  assert.doesNotMatch(script, /detail\.textContent = nextAction\?\.detail/u);
+  assert.doesNotMatch(script, /detail\.textContent = operational\?\.detail/u);
   assert.match(css, /\.recommended-action-title:focus-visible/u);
 });
 

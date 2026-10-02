@@ -1,14 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket.v3.json",
+  "$id": "https://vibehub.dev/schemas/ticket.v4.json",
   "title": "VibeHub Ticket",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "ticket_id", "revision_state", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
+  "required": ["schema_version", "kind", "ticket_id", "status", "updates", "revision_state", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
   "properties": {
-    "schema_version": { "const": 3 },
+    "schema_version": { "const": 4 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
+    "status": { "enum": ["open", "in_progress", "done"] },
+    "updates": { "type": "array", "items": { "$ref": "#/$defs/update" } },
     "epic_id": { "$ref": "#/$defs/id", "description": "Optional owning Epic; Goal is derived through Epic.goal_id. Independent of depends_on." },
     "revision_state": { "enum": ["bound", "legacy-pending-reconstruction"] },
     "active_contract_revision": { "$ref": "#/$defs/revision" },
@@ -20,8 +22,8 @@
     "maturity": { "enum": ["firm", "draft"], "default": "firm" },
     "outcome": { "$ref": "#/$defs/text" },
     "deliveries": { "type": "array", "default": [], "items": { "$ref": "#/$defs/delivery" } },
-    "context": { "$ref": "#/$defs/text" },
-    "acceptance": { "type": "array", "minItems": 1 },
+    "context": { "type": "string" },
+    "acceptance": { "type": "array" },
     "constraints": { "type": "array", "items": { "$ref": "#/$defs/text" } },
     "context_refs": {
       "type": "array",
@@ -68,6 +70,18 @@
   ],
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["update_id", "summary", "refs", "recorded_at"],
+      "properties": {
+        "update_id": { "$ref": "#/$defs/id" },
+        "summary": { "$ref": "#/$defs/text" },
+        "refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "status": { "enum": ["open", "in_progress", "done"] }
+      }
+    },
     "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
     "revision": { "type": "integer", "minimum": 1 },
     "identity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },

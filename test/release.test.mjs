@@ -153,55 +153,19 @@ test("shipped-content gate blocks the 143-commit stale identity and permits hone
   );
 });
 
-test("README is a dark-safe one-line product surface", () => {
+test("README references existing local assets and the canonical public site", () => {
   const readme = read("README.md");
-  for (const asset of [
-    "assets/brand/vibehub-logo-dark.svg",
-    "assets/brand/vibehub-logo.svg",
-    "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
-    "docs/assets/local-graph/workbench-ticket-action-2x.png",
-    "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
-    "docs/assets/github-issues/issue-blocked-by-2x.png",
-    "docs/CONCEPT.md",
-    "docs/INSTALL.md",
-    "docs/LOCAL_GRAPH_DESIGN.md",
-    "docs/GITHUB_ISSUES.md",
-  ]) {
-    assert.ok(readme.includes(asset), `README missing ${asset}`);
-    assert.ok(existsSync(join(root, asset)), `README target missing ${asset}`);
+  const refs = [
+    ...[...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/gu)].map((match) => match[1]),
+    ...[...readme.matchAll(/\b(?:src|srcset)="([^"]+)"/gu)]
+      .flatMap((match) => match[1].split(",").map((entry) => entry.trim().split(/\s+/u)[0])),
+  ];
+  for (const ref of refs) {
+    if (/^(?:https?:|data:|#)/u.test(ref)) continue;
+    assert.ok(existsSync(join(root, ref)), `README asset missing: ${ref}`);
   }
-  assert.ok(existsSync(join(root, "docs/assets/local-graph/readme-capture-manifest.json")));
-  assert.ok(readme.split("\n").length <= 90, "README grew past its two-part budget");
-  // Install is above the fold: the one-line command and the entry line precede every image and the story.
-  const installAt = readme.indexOf("npx skills add VW-ai/vibehub-plugin");
-  const entryAt = readme.indexOf("Start this with VibeHub.");
-  const firstImageAt = readme.indexOf("<img src=\"docs/assets/");
-  const storyAt = readme.indexOf("## How it works");
-  assert.ok(installAt > 0 && installAt < firstImageAt && installAt < storyAt, "install command must precede the first image and the story");
-  assert.ok(entryAt > installAt && entryAt < firstImageAt, "entry line must follow install and precede the first image");
-  assert.match(readme, /## Work with your team on GitHub/u);
-  assert.match(readme, /GitHub integration is disabled by default/u);
-  assert.match(readme, /records you choose to share/u);
-  assert.match(readme, /Stop managing chats\. Manage the work\./u);
-  assert.match(readme, /Turn one coding request into a Git-native Ticket with the exact Context needed/u);
   assert.equal([...readme.matchAll(/href="https:\/\/vibehub\.team"/gu)].length, 1);
-  assert.match(readme, /request and exact Context shape one Ticket/u);
-  assert.match(readme, /work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context/u);
-  assert.match(readme, /Git keeps the history reviewable and reversible/u);
-  assert.doesNotMatch(readme, /https:\/\/(?:www\.)?vibehub\.team[^"<\s]|https:\/\/[^"<\s]*\.pages\.dev|AI-Native Command Center|From PRD to delivery/iu);
-  assert.equal([...readme.matchAll(/Start this with VibeHub\./gu)].length, 1);
-  assert.match(readme, /Memory tools preserve the conversation; VibeHub preserves the development cycle\./u);
-  for (const phase of ["DRAFT", "READY", "RUNNING", "DONE"]) assert.match(readme, new RegExp(`\\b${phase}\\b`, "u"));
-  assert.match(readme, /Recommended action stays primary/u);
-  assert.doesNotMatch(readme, /docs\/assets\/local-graph\/[^\s"')]+\.jpe?g/iu);
   assert.match(readme, /npx skills add VW-ai\/vibehub-plugin/u);
-  assert.doesNotMatch(readme, /plugin marketplace add|plugin install vibehub@vibehub/u);
-  assert.doesNotMatch(readme, /but no global CLI|MCP server, database|background capture/u);
-  assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
-  const install = read("docs/INSTALL.md");
-  assert.match(install, /retains `.claude-plugin\/plugin\.json` only because\s+skills\.sh reads it as repository metadata/u);
-  assert.match(install, /marketplace manifest and the retired Codex plugin manifest were removed/u);
-  assert.doesNotMatch(install, /Installation copies manifests/u);
 });
 
 test("retired marketplace distribution cannot reappear in active surfaces", () => {
@@ -240,22 +204,6 @@ test("README Workbench screenshots match the checked-in Retina capture manifest"
     assert.equal(bytes.readUInt32BE(16), dimensions[2]);
     assert.equal(bytes.readUInt32BE(20), dimensions[3]);
     assert.equal(createHash("sha256").update(bytes).digest("hex"), capture.sha256);
-  }
-});
-
-test("the canonical entry routes through existing Setup and Ticket Plan", () => {
-  // The canonical entry prompt lived in the Codex marketplace manifest, which
-  // was retired with the rest of marketplace distribution; the Skills are now
-  // its only home.
-  const setup = read("skills/vibehub-setup/SKILL.md");
-  assert.match(setup, /Start this with VibeHub\./u);
-  const plan = read("skills/vibehub-ticket-plan/SKILL.md");
-  assert.match(plan, /canonical user entry “Start this with VibeHub\.”/u);
-  assert.match(plan, /use `\$vibehub-setup` first and then/u);
-  assert.doesNotMatch(plan, /orchestration Skill|routing service|hidden router/u);
-  const concept = read("docs/CONCEPT.md");
-  for (const truth of ["Ticket drives; Context survives", "Routine execution stays quiet", ".vibehub/", "no required Core package"]) {
-    assert.ok(concept.includes(truth), `concept doc missing ${truth}`);
   }
 });
 

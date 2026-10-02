@@ -1,7 +1,7 @@
 # Entering VibeHub
 
 The unified dashboard is a built-in VibeHub feature. Choosing or resuming a
-VibeHub workflow starts it automatically; users never need a separate dashboard
+VibeHub task or Context work starts it automatically; users never need a separate dashboard
 command or another approval. Installation, a mere mention of VibeHub, ordinary
 chat, and unrelated implementation do not trigger entry. A user who asks to
 keep the dashboard closed overrides automatic presentation.
@@ -38,14 +38,14 @@ On the first user-facing VibeHub operation in the current agent session:
    cannot start, mention the limitation briefly and continue in conversation.
    Dashboard availability must never gate the work or constrain model output.
 
-Later lifecycle presentations reuse this host and tab. The dashboard's
+Later record presentations reuse this host and tab. The dashboard's
 workspace-scoped links open the requested checkout's Contract, Evidence, or
 Room view inside the same host. Routine work does not repeatedly raise the
 browser. In a new session without a known live URL, run the entry helper again.
 
 ## Local work is the default
 
-GitHub is opt-in. Using VibeHub, creating a goal, executing a Ticket, or recording
+GitHub is opt-in. Using VibeHub, creating a goal, updating a Ticket, or recording
 Context does not authorize a push, PR, Issue, remote sync, or sharing records.
 New `project init` records are ignored by Git. Keep temporary planning inputs
 and copies inside the ignored `.vibehub/` folder or outside the checkout; do
@@ -59,4 +59,4 @@ existing tracked records. Tracked records remain shareable through normal Git
 commits; ignore rules cannot make them private. Keep private information in new
 ignored records rather than editing shared documents with it. Preserve existing
 tracked data and published history. GitHub features are optional and local
-planning, execution, validation, and dashboard use do not require them.
+task records, Context, validation, and dashboard use do not require them.
