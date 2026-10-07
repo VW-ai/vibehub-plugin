@@ -3,7 +3,7 @@
   "name": "vibehub",
   "displayName": "VibeHub",
   "version": "0.11.0-dev.1",
-  "description": "Lightweight Skill-first development cycles with Git-native Tickets and durable project Context.",
+  "description": "Task memory, relationships, and durable project Context with your own Skills.",
   "author": { "name": "VibeHub Team" },
   "license": "Apache-2.0",
   "keywords": ["context", "collaboration", "knowledge", "tickets", "skills"]

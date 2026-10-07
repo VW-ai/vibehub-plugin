@@ -1,4 +1,0 @@
-interface:
-  display_name: "VibeHub Ticket Run"
-  short_description: "Execute one ready checked-in Ticket"
-  default_prompt: "Use $vibehub-ticket-run to execute the requested ready Ticket and record acceptance evidence."

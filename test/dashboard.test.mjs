@@ -136,9 +136,9 @@ test('board separates recorded activity from blockers and completed work', () =>
   assert.equal(stageFor({state:'ARCHIVED',working:true}),'completed');
   assert.equal(stageFor({state:'WORKING',attention:'needs_you'}),'attention');
   assert.equal(stageFor({state:'READY',working:true}),'running');
-  assert.equal(stageFor({state:'BLOCKED'}),'planned');
-  assert.equal(stageFor({state:'READY'}),'planned');
-  assert.equal(stageFor({state:'READY',nextAction:{action:'NEEDS_HUMAN'}}),'attention');
+  assert.equal(stageFor({state:'BLOCKED'}),'waiting');
+  assert.equal(stageFor({state:'OPEN'}),'ready');
+  assert.equal(stageFor({state:'OPEN',outcomeHistory:[{status:'successful'}]}),'ready');
 });
 test('goal selection follows nested membership only and terminates on cycles', () => {
   const {goalScope}=globalThis.VibeHubDashboardGraph;
@@ -173,26 +173,27 @@ test('recorded Context endpoint is authenticated, workspace scoped, and returns 
   assert.equal((await fetch(`${ready.origin}/api/contexts?workspace=unknown`,{headers})).status,404);
 });
 
-test('execution view preserves human authority and separates waiting, planning, execution, and closeout', () => {
+test('task board groups recorded progress and dependencies without execution routing', () => {
   const {workflowFor,executionSummary}=globalThis.VibeHubDashboardGraph;
   const items=[
-    {id:'decision',type:'ticket',state:'READY',nextAction:{action:'NEEDS_HUMAN'}},
-    {id:'waiting',type:'ticket',state:'NEEDS YOU',nextAction:{action:'WAIT'}},
-    {id:'execute',type:'ticket',state:'READY',nextAction:{action:'EXECUTE'}},
-    {id:'review',type:'ticket',state:'READY',nextAction:{action:'CLOSE_OUT'}},
-    {id:'draft',type:'ticket',state:'READY',nextAction:{action:'REFINE'}},
-    {id:'replan',type:'ticket',state:'READY',nextAction:{action:'REPLAN'}},
-    {id:'unknown',type:'ticket',state:'TODO'},
-    {id:'running',type:'ticket',state:'WORKING'},
-    {id:'done',type:'ticket',state:'DONE',nextAction:{action:'DONE'}},
+    {id:'open',type:'ticket',state:'OPEN'},
+    {id:'waiting',type:'ticket',state:'BLOCKED'},
+    {id:'progress',type:'ticket',state:'IN_PROGRESS'},
+    {id:'done',type:'ticket',state:'DONE'},
   ];
-  const edges=[{from:'decision',to:'waiting'}], groups=executionSummary(items,items,edges);
-  assert.deepEqual(groups.attention.map(r=>r.item.id),['decision']);
-  assert.deepEqual(groups.ready.map(r=>r.item.id),['execute','review']);
-  assert.deepEqual(groups.planned.map(r=>r.item.id),['draft','replan','unknown']);
+  const edges=[{from:'open',to:'waiting'},{from:'open',to:'progress'},{from:'open',to:'done'}];
+  const groups=executionSummary(items,items,edges);
+  assert.deepEqual(groups.ready.map(r=>r.item.id),['open']);
   assert.deepEqual(groups.waiting.map(r=>r.item.id),['waiting']);
-  assert.equal(groups.completed.length,1); assert.equal(groups.running.length,1);
-  assert.equal(workflowFor(items[3],items,edges).label,'Ready for review');
+  assert.deepEqual(groups.running.map(r=>r.item.id),['progress']);
+  assert.deepEqual(groups.completed.map(r=>r.item.id),['done']);
+  assert.deepEqual(workflowFor(items[2],items,edges).blockers,['open']);
+  assert.equal('action' in workflowFor(items[0],items,edges),false);
+  items[0].state='DONE';items[1].state='OPEN';
+  assert.equal(workflowFor(items[1],items,edges).lane,'ready');
+  items[0].state='OPEN';
+  assert.equal(workflowFor(items[1],items,edges).lane,'waiting');
+  assert.equal(workflowFor(items[3],items,edges).lane,'completed');
 });
 test('decision queue sorts by unfinished downstream impact and ignores goal membership', () => {
   const {executionSummary}=globalThis.VibeHubDashboardGraph;
@@ -215,16 +216,16 @@ test('explicit native bindings preserve goal membership and remap dependency edg
   const personal = [{id:'goal',type:'goal',relations:[]},
     {id:'decision',type:'task',title:'Choose sharing',relations:[{type:'task_of',target:'goal'}],externalKeys:[{system:'vibehub-ticket',key:'/demo/.vibehub/tickets/choice.yaml'}]},
     {id:'build',type:'task',title:'Build sharing',working:true,relations:[{type:'task_of',target:'goal'}],externalKeys:[{system:'vibehub-ticket',key:'/demo/.vibehub/tickets/build.yaml'}]}];
-  const native = [{id:'tree:choice',originalId:'choice',path:'/demo/.vibehub/tickets/choice.yaml',nextAction:{action:'NEEDS_HUMAN'}},
-    {id:'tree:build',originalId:'build',path:'/demo/.vibehub/tickets/build.yaml',nextAction:{action:'WAIT'}}];
+  const native = [{id:'tree:choice',originalId:'choice',path:'/demo/.vibehub/tickets/choice.yaml',state:'OPEN'},
+    {id:'tree:build',originalId:'build',path:'/demo/.vibehub/tickets/build.yaml',state:'BLOCKED'}];
   const merged=mergeTicketSources(personal,native,[{from:'tree:choice',to:'tree:build'}]);
   assert.equal(merged.items.length,3);
   assert.deepEqual(merged.edges,[{from:'decision',to:'build'}]);
   assert.equal(goalScope('goal',merged.items).size,3);
   const groups=executionSummary(merged.items,merged.items,merged.edges);
-  assert.equal(groups.attention[0].item.title,'Choose sharing');
+  assert.equal(groups.ready[0].item.title,'Choose sharing');
   assert.equal(groups.waiting[0].item.working,false);
-  assert.deepEqual(groups.attention[0].downstream,['build']);
+  assert.deepEqual(groups.ready[0].downstream,['build']);
   assert.equal(mergeTicketSources(personal,[{...native[0],path:'/other/.vibehub/tickets/choice.yaml'}],[]).items.length,4);
   assert.equal(mergeTicketSources([...personal,{...personal[1],id:'ambiguous'}],native,[]).items.length,5);
   assert.equal(mergeTicketSources(personal,[native[0],{...native[0],id:'duplicate'}],[]).items.length,5);

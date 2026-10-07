@@ -71,7 +71,7 @@ test("a closed Ticket's context ref resolves at its recorded commit after the pa
   const validated = run(repo, "project", "validate");
   assert.equal(validated.status, 0, validated.stdout);
   assert.equal(validated.envelope.data.valid, true);
-  assert.deepEqual(validated.envelope.data.unverifiable_context_refs, []);
+  assert.match(JSON.stringify(validated.envelope.data.unverifiable_context_refs), /missing current Ticket context ref: skills\/old-name\/SKILL.md/u);
 
   // The closed Ticket document itself was never rewritten to make this pass.
   const stored = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", "read-the-old-path.yaml"), "utf8"));
@@ -79,7 +79,7 @@ test("a closed Ticket's context ref resolves at its recorded commit after the pa
   assert.equal(sh(repo, "status", "--porcelain", ".vibehub"), "");
 });
 
-test("a closed Ticket's context ref that exists nowhere still fails validation", () => {
+test("a Ticket's missing current context ref remains a visible diagnostic", () => {
   const repo = closedTicketOverARename("ticket-ref-nowhere");
   // Repoint the record at a path that exists in neither the working tree nor
   // any commit. Only the test constructs this; validation must not accept it.
@@ -90,14 +90,14 @@ test("a closed Ticket's context ref that exists nowhere still fails validation",
   sh(repo, "commit", "-aqm", "repoint the closed record at a path that never existed");
 
   const validated = run(repo, "project", "validate");
-  assert.notEqual(validated.status, 0);
+  assert.equal(validated.status, 0, validated.stdout);
   assert.match(
-    JSON.stringify(validated.envelope.error.details),
-    /unreadable Ticket context ref: skills\/never-existed\/SKILL.md/u,
+    JSON.stringify(validated.envelope.data.unverifiable_context_refs),
+    /missing Ticket context ref: skills\/never-existed\/SKILL.md/u,
   );
 });
 
-test("an open Ticket with a dangling context ref still fails against the working tree", () => {
+test("an open Ticket can keep a missing current context ref as a diagnostic", () => {
   const repo = closedTicketOverARename("ticket-ref-open");
   sh(repo, "mv", "skills/old-name", "skills/new-name");
   sh(repo, "commit", "-qm", "rename skills/old-name to skills/new-name");
@@ -107,10 +107,12 @@ test("an open Ticket with a dangling context ref still fails against the working
   const open = ticket("about-to-read-the-old-path");
   open.context_refs = [{ ref: "skills/old-name/SKILL.md", purpose: "About to be read." }];
   const applied = run(repo, "ticket", "apply", { validation: { independent: false, note: "behavioral test fixture" }, tickets: [open] });
-  assert.notEqual(applied.status, 0);
+  assert.equal(applied.status, 0, applied.stdout);
+  const validated = run(repo, "project", "validate");
+  assert.equal(validated.status, 0, validated.stdout);
   assert.match(
-    JSON.stringify(applied.envelope.error.details),
-    /Ticket context ref path does not exist: skills\/old-name\/SKILL.md/u,
+    JSON.stringify(validated.envelope.data.unverifiable_context_refs),
+    /missing current Ticket context ref: skills\/old-name\/SKILL.md/u,
   );
 });
 
@@ -147,6 +149,6 @@ test("without readable git history a closed Ticket's ref is unverifiable, not a 
   assert.equal(validated.envelope.data.unverifiable_context_refs.length, 1);
   assert.match(
     validated.envelope.data.unverifiable_context_refs[0].message,
-    /unverifiable Ticket context ref: skills\/old-name\/SKILL.md/u,
+    /missing current Ticket context ref: skills\/old-name\/SKILL.md/u,
   );
 });

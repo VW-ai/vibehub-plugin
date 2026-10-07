@@ -1,44 +1,29 @@
 # Acceptance authority
 
-Authority is a property of one acceptance criterion, never of a whole Ticket.
-It names the decision owner for that criterion, not the executor of the work.
+Authority names the decision owner for one completion criterion. It does not
+assign the work or select a development process.
 
-- `acceptance.authority` may be `agent` or `human`. When omitted it means
-  `agent`, preserving every existing Ticket.
-- Use `human` only when successful acceptance requires a person's explicit
-  judgment. Missing facts, implementation difficulty, and host permission to
-  perform an already-authorized action do not by themselves change the
-  decision owner. Do not infer authority from prose.
-- `evidence.origin` may be `agent` or `human`. When omitted it means `agent`.
-- An Agent may record `origin: human` only as a faithful record of explicit
-  human input and must keep a readable reference to that input. Agent analysis,
-  suggestions, and assertions remain Agent-origin Evidence.
-- A successful Outcome may accept a human-authority criterion only through
-  referenced human-origin Evidence. A separate Agent still adjudicates the
-  Outcome.
-- Human attention is orthogonal to READY, BLOCKED, REFINE, DONE, and DEVIATED.
-  It never changes dependency or unlock semantics.
+`acceptance.authority` is `agent` or `human` and defaults to `agent`. Use
+`human` only when a person has reserved that decision. Missing information,
+implementation difficulty, and host permission do not change the decision
+owner. Preserve known authority facts in task briefs and context references.
 
-Plan the boundary in the Ticket graph when the decision gates independently
-schedulable downstream work: a proposal Ticket produces a reviewable option, a
-human-decision Ticket records the choice, and implementation depends on its
-successful Outcome. A terminal human sign-off with no downstream work may stay
-as one acceptance criterion in the delivery Ticket.
+A decision may be its own Ticket when other tasks depend on it. A terminal
+sign-off may stay in the delivery Ticket's criteria. These are task-definition
+choices. They do not require a proposal, decision, and implementation sequence.
+Record unknown criteria as unknown until the decision exists.
 
-When the decision determines what downstream acceptance should be, keep that
-dependent Ticket at `maturity: draft` instead of inventing a firm plan. The
-decision's successful Outcome moves it from BLOCKED to REFINE. REFINE is the
-repository-level handoff: it does not assign, wake, or bind an Agent session.
-Any current or later Agent selecting work can read the Ticket plus the
-decision's Outcome and Evidence, apply Ticket Plan semantics to rewrite the
-same Ticket in place, and mark it `maturity: firm` before execution.
+## Optional historical proof
 
-If execution discovers an unplanned human decision, the graph must be replanned
-before execution crosses that boundary. The same or a later Agent either
-revises the current Ticket or creates the smallest new Ticket and direct
-dependency needed to make the boundary canonical. This is a repository state
-change, not an automatic Agent handoff. No Event record or second execution
-package is required.
+`evidence.origin` is `agent` or `human` and defaults to `agent`. A record with
+human origin must faithfully describe explicit human input and cite that
+input. Agent suggestions and assertions remain Agent-origin Evidence.
 
-This is a lightweight provenance claim in checked-in Git documents, not an
-identity, permission, approval, or attestation system.
+A successful historical Outcome can accept a human criterion only through
+referenced human-origin Evidence bound to that criterion's exact revision.
+An independence declaration is optional and unverified. Historical proof does
+not change Ticket status. Neither an update nor a done status creates evidence
+that a person made a reserved decision.
+
+These fields are provenance in Git documents. They are not an identity,
+permission, or approval service.

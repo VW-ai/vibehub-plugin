@@ -101,7 +101,7 @@ test("policy proposal records every protected impact surface", () => {
     "done_tickets_retained",
     "archived_tickets_retained",
     "human_authority_satisfactions_retained",
-    "close_out_tickets",
+    "open_tickets",
     "current_graph_tickets",
     "all_graph_tickets",
     "successful_prerequisite_edges",

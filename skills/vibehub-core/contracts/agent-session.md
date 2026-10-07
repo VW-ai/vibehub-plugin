@@ -1,11 +1,10 @@
 # Ticket state and Agent session observations
 
-Ticket state is a read projection of canonical Git data, exposed as
-`ticket_state` by `ticket get`, `ticket graph`, and `ticket frontier`, and as
-`workState` in the Workbench. The values are READY, BLOCKED, AWAITING_REVIEW,
-NEEDS_HUMAN, NEEDS_REFINEMENT, NEEDS_REPLAN, and DONE. Existing operational
-`status` and `next_action` retain their meanings. Session reports, process exit,
-and browser state never change Ticket completion, authority or unlocks.
+Ticket state comes from the recorded status and unfinished dependencies.
+`ticket-state.md` defines `OPEN`, `IN_PROGRESS`, `BLOCKED`, and `DONE`.
+Session reports, process exit, and browser state never change Ticket completion
+or unlock dependencies. Session reporting is optional and no Ticket write
+requires a session.
 
 `agent-session.schema.json` defines a separate local observation. One session
 belongs to one Ticket in one worktree, and records the agent's ID/name,
@@ -37,8 +36,7 @@ in a session does not itself create a human-authority Ticket criterion.
 
 Local reports are labelled and trusted only as scoped observations, not as
 identity attestations. A fresh, relevant execution/closeout report can light
-up the existing live indicator. The card preserves DONE, blocked, refinement
-and replanning precedence; the Execution inspector always shows Ticket state
+up the existing live indicator. The card preserves the canonical Ticket state; the Execution inspector always shows Ticket state
 and all session states separately. Runtime expiry does not invalidate semantic
 snapshot IDs or Evidence. The read-only browser polls observations every five
 seconds, stops polling while hidden, and clears live claims on fetch failure.

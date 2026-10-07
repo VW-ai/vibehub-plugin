@@ -82,7 +82,7 @@ test("historical success remains queryable but cannot close a newer active Contr
   }).status, 0);
   assert.equal(run(repo, "ticket", "evidence", evidence("revision-work", "proof-v1", ["works"])).status, 0);
   assert.equal(run(repo, "ticket", "closeout", outcome("revision-work", "proof-v1")).status, 0);
-  assert.equal(run(repo, "ticket", "get", { ticket_id: "revision-work" }).envelope.data.next_action.action, "DONE");
+  assert.equal(run(repo, "ticket", "get", { ticket_id: "revision-work" }).envelope.data.status, "OPEN");
 
   assert.equal(run(repo, "ticket", "revise", {
     ticket_id: "revision-work",
@@ -93,7 +93,7 @@ test("historical success remains queryable but cannot close a newer active Contr
   }).status, 0);
   const revised = run(repo, "ticket", "get", { ticket_id: "revision-work" }).envelope.data;
   assert.equal(revised.ticket.active_contract_revision, 2);
-  assert.equal(revised.next_action.action, "EXECUTE");
+  assert.equal(revised.status, "OPEN");
   assert.equal(revised.outcome, null);
   assert.equal(revised.outcome_history.length, 1);
   assert.equal(revised.outcome_history[0].status, "successful");
@@ -101,7 +101,7 @@ test("historical success remains queryable but cannot close a newer active Contr
   assert.equal(run(repo, "ticket", "evidence", evidence("revision-work", "proof-v2", ["works"])).status, 0);
   assert.equal(run(repo, "ticket", "closeout", outcome("revision-work", "proof-v2")).status, 0);
   const closed = run(repo, "ticket", "get", { ticket_id: "revision-work" }).envelope.data;
-  assert.equal(closed.next_action.action, "DONE");
+  assert.equal(closed.status, "OPEN");
   assert.deepEqual(closed.outcome_history.map((item) => item.contract_revision.revision), [1, 2]);
 
   const repository = loadRepository(repo);
@@ -167,5 +167,5 @@ test("native closeout replaces grouped Evidence after one logical Acceptance adv
   )).status, 0);
   assert.equal(closeout(["grouped-current"]).status, 0);
   assert.equal(run(repo, "ticket", "get", { ticket_id: "grouped-proof" })
-    .envelope.data.next_action.action, "DONE");
+    .envelope.data.status, "OPEN");
 });

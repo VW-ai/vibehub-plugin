@@ -18,6 +18,7 @@ const path = (repo, kind, id) => join(repo, '.vibehub', kind, `${id}.yaml`);
 function close(repo, id) {
   ok(run(repo, 'ticket', 'evidence', {schema_version: 1, kind: 'ticket_evidence', evidence_id: `${id}-proof`, ticket_id: id, acceptance_ids: ['works'], summary: 'Behavior passed.', refs: ['test:behavior'], recorded_at: '2026-09-08T12:00:00Z'}));
   ok(run(repo, 'ticket', 'closeout', {schema_version: 1, kind: 'ticket_outcome', ticket_id: id, status: 'successful', independence: { source: 'subagent', note: 'Fixture adjudication' }, accepted_acceptance_ids: ['works'], unresolved_acceptance_ids: [], evidence_ids: [`${id}-proof`], summary: 'Behavior verified.', closed_at: '2026-09-08T12:01:00Z'}));
+  ok(run(repo, 'ticket', 'update', {ticket_id: id, update_id: `${id}-done`, summary: 'Task complete.', status: 'done', recorded_at: '2026-09-08T12:02:00Z'}));
 }
 
 test('a PRD plan persists real ownership while readiness follows only dependencies', () => {
@@ -25,7 +26,7 @@ test('a PRD plan persists real ownership while readiness follows only dependenci
   const input = { validation, goals: [goal()], epics: [epic(), epic('roles')], tickets: [member('persist'), member('email', 'invitations', ['persist']), member('accept'), member('permissions', 'roles', ['email']), ticket('standalone')] };
   ok(run(repo, 'ticket', 'apply', input));
   const graph = ok(run(repo, 'ticket', 'graph'));
-  assert.deepEqual(graph.tickets.map(x => [x.ticket.ticket_id, x.status]), [['accept','READY'],['email','BLOCKED'],['permissions','BLOCKED'],['persist','READY'],['standalone','READY']]);
+  assert.deepEqual(graph.tickets.map(x => [x.ticket.ticket_id, x.status]), [['accept','OPEN'],['email','BLOCKED'],['permissions','BLOCKED'],['persist','OPEN'],['standalone','OPEN']]);
   assert.equal(graph.relations.length, 2);
   assert.equal(graph.hierarchy.goals[0].progress.total_tickets, 4);
   assert.deepEqual(graph.hierarchy.standalone_ticket_ids, ['standalone']);
@@ -39,7 +40,7 @@ test('a PRD plan persists real ownership while readiness follows only dependenci
   assert.equal(ok(run(repo, 'epic', 'list')).length, 2);
   assert.equal(ok(run(repo, 'project', 'validate')).goals, 1);
   close(repo, 'persist');
-  assert.equal(ok(run(repo, 'ticket', 'get', {ticket_id: 'email'})).status, 'READY');
+  assert.equal(ok(run(repo, 'ticket', 'get', {ticket_id: 'email'})).status, 'OPEN');
 });
 
 test('invalid plans reject without writing any new parents or Tickets', () => {
@@ -145,7 +146,7 @@ test('format 4 migration changes only the marker; missing optional parents leave
   assert.equal(run(repo,'goal','put',goal()).envelope.error.code,'format_mismatch');
   const migration = ok(run(repo,'project','migrate-mechanical'));
   assert.deepEqual(migration.changed_paths,['.vibehub/version.yaml']);
-  assert.deepEqual(migration.applied_migrations,['format-4-to-format-5']);
+  assert.deepEqual(migration.applied_migrations,['format-4-to-format-5','format-5-to-format-6']);
   assert.deepEqual(files.map(p=>readFileSync(p,'utf8')),originals);
   assert.deepEqual(ok(run(repo,'project','hierarchy')).standalone_ticket_ids,['legacy']);
   assert.deepEqual(ok(run(repo,'project','migrate-mechanical')).changed_paths,[]);

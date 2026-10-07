@@ -1,4 +1,4 @@
 interface:
-  display_name: "VibeHub Ticket Review"
-  short_description: "Present a focused local Ticket review"
+  display_name: "VibeHub Review"
+  short_description: "Browse task progress and project Context"
   default_prompt: "Use $vibehub-review to present the relevant Ticket graph surface or review it in the conversation."

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { tempRepo } from "./helpers.mjs";
+import { run, tempRepo } from "./helpers.mjs";
 import { materializeInitialTicket } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 import {
   computeProjection, humanizeTicketId, markerValue, planSync, planUpdates, planDependencies,
@@ -24,9 +24,9 @@ function ticket(id, extra = {}) {
 function fixtureRepo() {
   const repo = tempRepo("sync-issues");
   for (const d of ["tickets", "outcomes", "evidence/ticket-done", "rooms"]) mkdirSync(join(repo, ".vibehub", d), { recursive: true });
-  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 4 }));
+  writeFileSync(join(repo, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 6 }));
   writeFileSync(join(repo, "README.md"), "# demo\n");
-  const doneTicket = ticket("ticket-done");
+  const doneTicket = ticket("ticket-done", { status: "done" });
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-done.yaml"), JSON.stringify(doneTicket));
   writeFileSync(join(repo, ".vibehub", "tickets", "ticket-open.yaml"), JSON.stringify(ticket("ticket-open", {
     relations: [{ type: "depends_on", target_ticket_id: "ticket-done", rationale: "needs it" }],
@@ -65,23 +65,21 @@ test("humanizes ticket ids into titles", () => {
   assert.equal(humanizeTicketId("ticket-release-v050"), "Release v050");
 });
 
-test("projection renders state, checklist, dependencies, evidence, and markers", () => {
+test("projection renders state, criteria, dependencies, evidence, and markers", () => {
   const p = computeProjection(fixtureRepo(), GITHUB);
   assert.deepEqual(p.map((x) => x.ticket_id), ["ticket-done", "ticket-open"]);
   const [done, open] = p;
   assert.equal(done.state, "closed");
-  assert.deepEqual(done.labels, ["state: done", "maturity: firm"]);
+  assert.deepEqual(done.labels, ["state: done"]);
   assert.equal(open.state, "open");
-  // `ticket-open` still has an unevidenced agent-authority criterion, so it
-  // routes to EXECUTE even though it also carries a human-authority criterion.
-  assert.deepEqual(open.labels, ["state: ready", "maturity: firm"]);
+  assert.deepEqual(open.labels, ["state: open"]);
   const numbers = new Map([["ticket-done", 7], ["ticket-open", 8]]);
   const doneBody = done.renderBody(numbers);
   assert.equal(markerValue(doneBody, TICKET_MARKER), "ticket-done");
-  assert.match(doneBody, /- \[x\] \*\*`a1`\*\* — first/);
-  assert.match(doneBody, /- \[x\] \*\*`a2`\*\* 👤 human — second/);
+  assert.match(doneBody, /- \*\*`a1`\*\* — first/);
+  assert.match(doneBody, /- \*\*`a2`\*\* 👤 human — second/);
   assert.match(doneBody, /https:\/\/github\.com\/acme\/demo\/blob\/main\/README\.md/);
-  assert.match(doneBody, /## Outcome record · successful/);
+  assert.match(doneBody, /## Historical Outcome · successful/);
   assert.match(open.renderBody(numbers), /Blocked by #7 — needs it/);
   assert.equal(done.comments.length, 2);
   assert.equal(markerValue(done.comments[0].body, EVIDENCE_MARKER), "proof-one");
@@ -115,7 +113,7 @@ test("drift in state, labels, or missing evidence is repaired without touching t
   const { byTicket } = planSync(p, remote);
   const ops = planUpdates(p, byTicket);
   assert.deepEqual(ops.map((o) => `${o.kind}:${o.ticket_id}`), ["comment:ticket-done", "comment:ticket-done", "close:ticket-done", "update:ticket-open"]);
-  assert.deepEqual(ops[3].addLabels, ["state: ready", "maturity: firm"]);
+  assert.deepEqual(ops[3].addLabels, ["state: open"]);
   assert.deepEqual(ops[3].removeLabels, ["state: done"]);
 });
 
@@ -130,4 +128,33 @@ test("native dependencies: add missing, remove stale mirrored, keep foreign, no-
   assert.deepEqual(planDependencies(p, byTicket, new Map([[1, [2]], [2, [1, 99]]])), [
     { kind: "dep-remove", number: 1, ticket_id: "ticket-done", blocker: 2 },
   ]);
+});
+
+
+test("reopening a task changes its mirror while preserving historical proof and progress", () => {
+  const repo = fixtureRepo();
+  const result = run(repo, "ticket", "update", {
+    ticket_id: "ticket-done", update_id: "reopen", status: "open",
+    summary: "Reopened after a user reported an issue.", refs: ["conversation:follow-up"],
+  });
+  assert.equal(result.status, 0, result.stdout);
+  const [reopened, dependent] = computeProjection(repo, GITHUB);
+  assert.equal(reopened.state, "open");
+  assert.deepEqual(reopened.labels, ["state: open"]);
+  assert.deepEqual(dependent.labels, ["state: blocked"]);
+  const body = reopened.renderBody(new Map());
+  assert.match(body, /Reopened after a user reported an issue/);
+  assert.match(body, /Historical Outcome · successful/);
+  assert.match(body, /- \*\*`a1`\*\* — first/);
+  assert.doesNotMatch(body, /- \[[x ]\]/);
+  assert.doesNotMatch(body, /next:|CLOSE_OUT|EXECUTE/);
+});
+
+test("mirroring removes retired workflow labels without removing unrelated labels", () => {
+  const projection = computeProjection(fixtureRepo(), GITHUB);
+  const remote = remoteFrom(projection);
+  remote[1].labels.push({ name: "state: close-out" }, { name: "maturity: firm" }, { name: "bug" });
+  const { byTicket } = planSync(projection, remote);
+  const [update] = planUpdates(projection, byTicket);
+  assert.deepEqual(update.removeLabels, ["state: close-out", "maturity: firm"]);
 });

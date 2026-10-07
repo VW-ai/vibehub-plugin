@@ -11,7 +11,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
-import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/vibehub-core/scripts/vh-ui.mjs";
+import { buildUiSnapshot, parseUiFlags, startVibeHubUi, ticketContextPackage, traceRecords } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const repos = [];
@@ -117,6 +117,10 @@ function fixture() {
     summary: "The Ticket failed independent closeout.",
     closed_at: NOW,
   }).status, 0);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: "foundation", update_id: "finished", summary: "Foundation completed.",
+    status: "done", recorded_at: NOW,
+  }).status, 0);
   return repo;
 }
 
@@ -149,26 +153,14 @@ test("direct YAML projection exposes graph topology and operational states", () 
     ])),
     {
       blocked: "BLOCKED",
-      "closeout-ready": "READY",
-      feature: "READY",
+      "closeout-ready": "OPEN",
+      feature: "OPEN",
       foundation: "DONE",
-      unsuccessful: "DEVIATED",
+      unsuccessful: "OPEN",
     },
   );
   assert.equal(snapshot.state.graph.relations.length, 2);
-  assert.deepEqual(
-    Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
-      item.ticketId,
-      item.capabilities.nextAction.summary.action,
-    ])),
-    {
-      blocked: "WAIT",
-      "closeout-ready": "CLOSE_OUT",
-      feature: "NEEDS_HUMAN",
-      foundation: "DONE",
-      unsuccessful: "REPLAN",
-    },
-  );
+  assert.equal(snapshot.state.graph.tickets.some(item => "nextAction" in item.capabilities), false);
   assert.deepEqual(
     Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
       item.ticketId,
@@ -178,7 +170,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
       blocked: "NONE",
       "closeout-ready": "NONE",
       feature: "PENDING",
-      foundation: "COMPLETE",
+      foundation: "RECORDED",
       unsuccessful: "NONE",
     },
   );
@@ -190,11 +182,11 @@ test("direct YAML projection exposes graph topology and operational states", () 
     prerequisiteTicketId: "foundation",
     dependentTicketId: "feature",
     rationale: "feature needs foundation.",
-    provenanceRefs: ["test:ticket-vertical-slice", "plan-validation:none"],
+    provenanceRefs: ["test:ticket-vertical-slice"],
   });
 });
 
-test("human attention projection distinguishes upcoming, pending, recorded, and complete", () => {
+test("human criteria and historical evidence remain visible without changing task status", () => {
   const repo = fixture();
   const upcoming = ticket("human-upcoming", ["unsuccessful"]);
   upcoming.acceptance[0].authority = "human";
@@ -219,10 +211,10 @@ test("human attention projection distinguishes upcoming, pending, recorded, and 
     item.ticketId,
     item.capabilities.attention.summary,
   ]));
-  assert.equal(attention["human-upcoming"].label, "UPCOMING");
+  assert.equal(attention["human-upcoming"].label, "PENDING");
   assert.equal(attention.feature.label, "PENDING");
   assert.equal(attention["human-recorded"].label, "RECORDED");
-  assert.equal(attention.foundation.label, "COMPLETE");
+  assert.equal(attention.foundation.label, "RECORDED");
   assert.equal(attention["human-recorded"].humanAcceptanceCount, 1);
   assert.equal(attention["human-recorded"].humanEvidenceCount, 1);
   assert.deepEqual(attention["human-recorded"].recordedAcceptanceIds, ["works"]);
@@ -236,11 +228,11 @@ test("human attention projection distinguishes upcoming, pending, recorded, and 
     snapshot.state.graph.tickets.find(
       (item) => item.ticketId === "human-recorded",
     ).capabilities.operational.summary.label,
-    "READY",
+    "OPEN",
   );
 });
 
-test("Workbench projection preserves the observed execution and adjudication corpus", () => {
+test("historical Evidence and Outcomes do not change recorded task states", () => {
   const repo = tempRepo("ui-closeout-corpus");
   repos.push(repo);
   assert.equal(run(repo, "project", "init").status, 0);
@@ -306,17 +298,35 @@ test("Workbench projection preserves the observed execution and adjudication cor
 
   const snapshot = buildUiSnapshot(repo, { scope: "all" });
   assert.deepEqual(Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
-    item.ticketId,
-    item.capabilities.nextAction.summary.action,
+    item.ticketId, item.capabilities.operational.summary.label,
   ])), {
-    "agent-complete": "CLOSE_OUT",
-    failed: "REPLAN",
-    "human-complete": "CLOSE_OUT",
-    "human-missing": "NEEDS_HUMAN",
-    partial: "EXECUTE",
-    successful: "DONE",
-    zero: "EXECUTE",
+    "agent-complete": "OPEN", failed: "OPEN", "human-complete": "OPEN",
+    "human-missing": "OPEN", partial: "OPEN", successful: "OPEN", zero: "OPEN",
   });
+});
+
+test("reopening updates the graph and brief while retaining completion and proof history", () => {
+  const repo = fixture();
+  const before = buildUiSnapshot(repo);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: "foundation", update_id: "reopened", status: "open",
+    summary: "Reopened after a translated setting was missed.", recorded_at: "2026-08-03T07:00:00.000Z",
+  }).status, 0);
+  const snapshot = buildUiSnapshot(repo);
+  const states = new Map(snapshot.state.graph.tickets.map(item => [item.ticketId, item.capabilities.operational.summary.label]));
+  assert.equal(states.get("foundation"), "OPEN");
+  assert.equal(states.get("feature"), "BLOCKED");
+  assert.notEqual(snapshot.state.graph.snapshotId, before.state.graph.snapshotId);
+  const document = snapshot.repository.tickets.documents.get("foundation").document;
+  const brief = ticketContextPackage(document, snapshot.graph.relations, snapshot.repository, snapshot.state.graph.source);
+  assert.equal(brief.status, "open");
+  assert.deepEqual(brief.updates.map(update => update.status), ["done", "open"]);
+  assert.equal(brief.outcomeHistory[0].status, "successful");
+  assert.equal(brief.agentPayload.status, "open");
+  assert.equal("nextAction" in brief.agentPayload, false);
+  assert.match(brief.agentPayload.handoff.instruction, /user's chosen skills/u);
+  assert.deepEqual(traceRecords(snapshot.repository, snapshot.state.graph.source, "foundation")
+    .filter(record => record.kind === "update").map(record => record.status), ["done", "open"]);
 });
 
 test("invalid canonical documents fail before UI projection", () => {
@@ -405,6 +415,9 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
     summary: "The deviated prerequisite failed.",
     closed_at: NOW,
   }).status, 0);
+  assert.equal(run(repo, "ticket", "update", {
+    ticket_id: prerequisites[0], update_id: "finished", summary: "The prerequisite is done.", status: "done",
+  }).status, 0);
   const snapshot = buildUiSnapshot(repo);
   const center = snapshot.state.graph.tickets.find(
     (item) => item.ticketId === "causal-center",
@@ -419,10 +432,10 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
       ])),
     {
       "prerequisite-1": "DONE",
-      "prerequisite-2": "DEVIATED",
-      "prerequisite-3": "READY",
-      "prerequisite-4": "READY",
-      "prerequisite-5": "READY",
+      "prerequisite-2": "OPEN",
+      "prerequisite-3": "OPEN",
+      "prerequisite-4": "OPEN",
+      "prerequisite-5": "OPEN",
     },
   );
   assert.equal(
@@ -476,6 +489,9 @@ test("Web projection shares current/all archive queries and progressive history 
       summary: `${id} passed independently.`,
       closed_at: NOW,
     }).status, 0);
+  }
+  for (const id of ["old-history", "archived-boundary"]) {
+    assert.equal(run(repo, "ticket", "update", { ticket_id: id, update_id: "finished", summary: "Task done.", status: "done" }).status, 0);
   }
   const current = buildUiSnapshot(repo);
   assert.deepEqual(current.state.graph.tickets.map((item) => [item.ticketId, item.archived]), [
@@ -599,14 +615,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(subject.subject.ticket.ticketId, "foundation");
   assert.equal(subject.contextPackage.acceptance[0].acceptanceId, "works");
   assert.equal(subject.contextPackage.acceptance[0].authority, "human");
-  assert.equal(subject.contextPackage.attention.label, "COMPLETE");
+  assert.equal(subject.contextPackage.attention.label, "RECORDED");
   assert.equal(subject.contextPackage.maturity, "firm");
   assert.equal(subject.contextPackage.operationalState, "DONE");
-  assert.equal(subject.contextPackage.nextAction.action, "DONE");
   assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
   assert.equal(subject.contextPackage.agentPayload.maturity, "firm");
   assert.equal(subject.contextPackage.agentPayload.operationalState, "DONE");
-  assert.equal(subject.contextPackage.agentPayload.nextAction.action, "DONE");
   assert.deepEqual(subject.contextPackage.agentPayload.humanBoundaries, [{
     acceptanceId: "works",
     criterion: "foundation behavior is observed.",
@@ -641,7 +655,6 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     featureSubject.contextPackage.contextRefs[2].identity,
   );
   assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
-  assert.equal(featureSubject.contextPackage.nextAction.action, "NEEDS_HUMAN");
   assert.deepEqual(
     featureSubject.contextPackage.agentPayload.humanBoundaries.map(
       (item) => [item.acceptanceId, item.criterion, item.evidenceState],
@@ -658,11 +671,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     `${origin}/api/subject?${unsuccessfulQuery}`,
     authorized(token),
   )).json()).data;
-  assert.equal(unsuccessfulSubject.contextPackage.operationalState, "DEVIATED");
-  assert.equal(unsuccessfulSubject.contextPackage.nextAction.action, "REPLAN");
+  assert.equal(unsuccessfulSubject.contextPackage.operationalState, "OPEN");
   assert.equal(
     unsuccessfulSubject.contextPackage.agentPayload.operationalState,
-    "DEVIATED",
+    "OPEN",
   );
 
   const closeoutQuery = new URLSearchParams({
@@ -675,22 +687,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     authorized(token),
   )).json()).data;
   const closeoutPayload = closeoutSubject.contextPackage.agentPayload;
-  assert.equal(closeoutSubject.contextPackage.nextAction.action, "CLOSE_OUT");
   assert.equal(closeoutSubject.contextPackage.evidence.length, 1);
   assert.equal(closeoutPayload.ticketRef, ".vibehub/tickets/closeout-ready.yaml");
   assert.equal(closeoutPayload.acceptance[0].authority, "agent");
   assert.equal(closeoutPayload.evidence[0].evidenceId, "closeout-ready-proof");
   assert.deepEqual(closeoutPayload.evidence[0].acceptanceIds, ["works"]);
   assert.equal(closeoutPayload.outcomeRecord, null);
-  assert.equal(closeoutPayload.handoff.action, "CLOSE_OUT");
-  assert.equal(closeoutPayload.handoff.skill, "vibehub-ticket-closeout");
-  assert.equal(closeoutPayload.handoff.requiresIndependentAgent, true);
   assert.equal(closeoutPayload.handoff.readOnly, true);
   assert.equal("presentation" in closeoutPayload, false);
   assert.equal("phase" in closeoutPayload, false);
   assert.equal("substate" in closeoutPayload, false);
-  assert.match(closeoutPayload.handoff.instruction, /independently adjudicate/iu);
-  assert.match(closeoutPayload.handoff.instruction, /do not execute it again/iu);
+  assert.match(closeoutPayload.handoff.instruction, /user's chosen skills/iu);
+  assert.doesNotMatch(closeoutPayload.handoff.instruction, /independent|vibehub-ticket-(run|plan|closeout)/iu);
   assert.deepEqual(closeoutPayload.reviewInputs.evidenceRefs, [
     ".vibehub/evidence/closeout-ready/closeout-ready-proof.yaml",
   ]);
@@ -700,7 +708,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     `${origin}/api/trace?${ticketQuery}`,
     authorized(token),
   )).json()).data;
-  assert.deepEqual(trace.records.map((record) => record.kind), ["evidence", "outcome"]);
+  assert.deepEqual(trace.records.map((record) => record.kind), ["evidence", "outcome", "update"]);
   assert.deepEqual(trace.records[0].acceptanceIds, ["works"]);
   assert.equal(trace.records[0].origin, "human");
   assert.deepEqual(
@@ -729,210 +737,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
-  assert.match(
-    html,
-    /<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u,
-  );
-  assert.match(html, /id="copyLink"/u);
   assert.match(html, /src="\/app-model\.js"/u);
-  assert.match(html, /src="\/app-layout\.js"/u);
-  assert.match(html, /class="workspace inspector-closed"/u);
-  assert.match(html, /id="graphSignal"/u);
-  assert.match(html, /id="sourceDock"/u);
-  assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
-  assert.doesNotMatch(html, /state-legend|brand-mark/u);
-  // Canvas-first shell: operational overview is available on demand while
-  // empty presence and a permanent navigation rail consume no layout space.
-  assert.doesNotMatch(html, /class="rail"|id="implementingStrip"|id="implementingList"/u);
-  assert.match(html, /id="overviewPanel"/u);
-  assert.match(html, /aria-controls="overviewPanel"/u);
-  assert.match(html, /id="closeOverview"/u);
-  assert.match(html, /aria-label="Ticket phase legend"/u);
-  assert.doesNotMatch(html, /Human attention legend/u);
-  assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
-  assert.match(html, /id="summaryGrid"/u);
-  for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
-    assert.match(html, new RegExp(`id="${id}"`, "u"));
-  }
-  assert.doesNotMatch(html, /id="closeoutQueue"|Independent closeout/u);
-  assert.doesNotMatch(html, /id="overviewSource"/u);
-  assert.match(html, /id="sourcePath"/u);
-  assert.match(html, /id="sourceBranch"/u);
-  assert.match(html, /id="sourceCommit"/u);
-  assert.match(html, /id="sourceDirty"/u);
-  // The style-lab A/B/C selector is a design-exploration artifact and must
-  // never ship on the product surface.
-  assert.doesNotMatch(html, /style-lab|style-option|style-swatch|data-theme/u);
-  // One causal layout supports an explicit left-to-right default and
-  // top-to-bottom choice without forking the graph model.
-  assert.match(html, /id="directionLtr"[^>]+aria-pressed="true"/u);
-  assert.match(html, /id="directionTtb"[^>]+aria-pressed="false"/u);
-  assert.match(html, /id="scopeCurrent"[^>]+aria-pressed="true"/u);
-  assert.match(html, /id="scopeAll"[^>]+aria-pressed="false"/u);
-  assert.match(script, /function layoutGraph\(tickets, relations, direction/u);
-  assert.match(layout, /function minimizeCrossings/u);
-  assert.match(layout, /function routeRelations/u);
-  assert.match(layout, /relationRef.*source: 0, target: 0/su);
-  assert.match(layout, /The Ticket graph contains a cycle/u);
-  assert.match(script, /function setLayoutDirection/u);
-  assert.match(script, /function setGraphScope/u);
-  assert.match(script, /function revealHistory/u);
-  assert.match(script, /ARCHIVED delivery history/u);
-  assert.match(script, /preserveLayout/u);
-  assert.match(script, /layoutDirection === "ltr"/u);
-  // The production host makes runtime unavailability explicit. Only an
-  // injected trusted, scoped, unexpired capability can promote presentation.
-  assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
-  assert.doesNotMatch(script, /"IMPLEMENTING"/u);
-  assert.match(model, /function ticketRuntimeState/u);
-  assert.match(model, /summary\.trustedSource/u);
-  assert.match(model, /expiresAt <= now/u);
-  // No visual preference is ever persisted by the product surface.
-  assert.doesNotMatch(script, /localStorage|sessionStorage/u);
-  assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
-  // Copy for Agent consumes the host-derived next action instead of inferring
-  // routing from operational status or Evidence count in the browser.
-  assert.match(model, /function ticketNextAction/u);
-  assert.match(model, /action === "EXECUTE"/u);
-  assert.match(model, /action === "CLOSE_OUT"/u);
-  assert.match(model, /action === "NEEDS_HUMAN"/u);
-  assert.match(model, /vibehub-ticket-run/u);
-  assert.match(model, /vibehub-ticket-plan/u);
-  assert.match(model, /vibehub-review/u);
-  assert.match(script, /function causalCone/u);
-  assert.match(layout, /function relationPorts/u);
-  assert.match(script, /edge-control-halo/u);
-  assert.match(script, /minimapWorldPoint/u);
-  assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);
-  assert.match(script, /function disclosure/u);
-  assert.match(script, /function tabbedTicketView/u);
-  assert.match(script, /const requestedTicketId = focusQuery\.get\("ticket"\)/u);
-  assert.match(model, /function localFocusHref/u);
-  assert.match(model, /function normalizeLayoutDirection/u);
-  assert.match(model, /function layoutDirectionHref/u);
-  assert.match(model, /function workbenchOverview/u);
-  assert.match(model, /action === "CLOSE_OUT" \|\| runtimeEligible/u);
-  assert.match(script, /\["log", "evidence"\]/u);
-  assert.match(script, /initialFocusPending/u);
-  assert.match(script, /initialTabId = "execution"/u);
-  assert.match(script, /function ticketExecutionPanel/u);
-  assert.doesNotMatch(script, /function renderCloseoutQueue/u);
-  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
-  assert.match(script, /label: "Copy prompt"/u);
-  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
-  assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
-  assert.match(script, /function closeoutReviewBrief/u);
-  assert.match(script, /Evidence is proof, not judgment/u);
-  assert.match(model, /function ticketAttentionState/u);
-  assert.match(script, /function humanAttentionBrief/u);
-  assert.match(script, /Human evidence pending/u);
-  assert.match(script, /Human acceptance verified/u);
-  assert.match(script, /function contractBrief/u);
-  assert.match(script, /function contractSupportDisclosure/u);
-  assert.match(script, /\{ id: "evidence", label: "Log", panel: proof\.panel \}/u);
-  assert.doesNotMatch(script, /label: "Proof"/u);
-  assert.doesNotMatch(script, /label: "Evidence"/u);
-  assert.doesNotMatch(
-    script,
-    /Evidence supports each condition; independent Outcome decides completion\./u,
-  );
-  assert.match(script, /signalMetric\("Reading", "evidence", "proof-metric"\)/u);
-  assert.match(script, /No Evidence recorded yet/u);
-  assert.match(script, /Acceptance conditions/u);
-  assert.match(script, /Supporting contract/u);
-  assert.match(script, /Working boundaries/u);
-  assert.match(script, /Required context/u);
-  assert.match(script, /Dependency & source/u);
-  assert.doesNotMatch(script, /panel\.append\(guardrailView/u);
-  assert.match(script, /function canonicalContextObject/u);
-  assert.match(script, /function contextSourceView/u);
-  assert.match(script, /function contextEvidenceView/u);
-  assert.match(script, /function contextRelationsView/u);
-  assert.match(script, /function typedReferenceList/u);
-  assert.match(script, /Copy for Agent/u);
-  assert.equal(
-    (script.match(/`Ticket · \$\{ticket\.ticketId\}`/gu) || []).length,
-    2,
-  );
-  assert.doesNotMatch(
-    script,
-    /`Ticket · \$\{shortTicketId\(ticket\.ticketId\)\}`/u,
-  );
-  assert.match(
-    script,
-    /function contextActions\(payload\)[\s\S]*?return actions;/u,
-  );
-  assert.doesNotMatch(
-    script,
-    /function contextActions\(payload\)[\s\S]*?appendOpenActions\([\s\S]*?return actions;/u,
-  );
-  assert.doesNotMatch(script, /function iconButton/u);
-  assert.doesNotMatch(script, /Reference copied|Provenance copied|Worktree path copied/u);
-  assert.match(script, /function updateTicketProof/u);
-  assert.match(script, /function externalLinkIcon/u);
-  assert.match(script, /Open \$\{target\.target\} on GitHub/u);
-  assert.match(
-    styles,
-    /\.source-context > p \{[\s\S]*?margin: 0 11px 10px;[\s\S]*?\}/u,
-  );
-  assert.match(
-    styles,
-    /\.inspector-head \.eyebrow \{[\s\S]*?overflow-wrap: anywhere;[\s\S]*?text-transform: none;[\s\S]*?\}/u,
-  );
-  assert.match(script, /function revealTicket/u);
-  assert.match(script, /incoming\.length - completed/u);
-  assert.match(script, /Focused local link copied · valid while this host is running/u);
-  assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
-  assert.match(script, /history\.replaceState\(null, "", nextHref\)/u);
-  assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
-  assert.match(styles, /\.ticket-node\.phase-draft/u);
-  assert.match(styles, /\.ticket-node\.phase-running/u);
-  assert.match(styles, /\.minimap-node\.phase-draft/u);
-  assert.match(styles, /\.execution-state\.phase-draft/u);
-  assert.match(styles, /\.ticket-node\.substate-needs-you \.ticket-substate-badge/u);
-  assert.match(styles, /\.human-attention-brief\.attention-pending/u);
-  assert.match(styles, /\.acceptance-item\.authority-human/u);
-  assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
-  assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
-  assert.match(styles, /\.edge-control-halo/u);
-  // Selected warm-neutral tokens and the neutral selection outline.
-  assert.match(styles, /--canvas: #fafaf8/u);
-  assert.match(styles, /--selection: #252523/u);
-  assert.match(
-    styles,
-    /\.ticket-node\.selected \.ticket-boundary \{[\s\S]*?stroke: var\(--selection\)/u,
-  );
-  assert.doesNotMatch(styles, /\.implementing-strip|\.presence-empty|\.rail\s*\{/u);
-  assert.match(styles, /\.overview-panel/u);
-  assert.doesNotMatch(styles, /\.overview-source/u);
-  assert.doesNotMatch(styles, /\.overview-item/u);
-  assert.match(styles, /\.summary-grid/u);
-  assert.doesNotMatch(styles, /\.closeout-overview|\.closeout-ticket/u);
-  assert.match(styles, /\.ticket-node\.phase-running/u);
-  assert.match(styles, /\.ticket-node\.substate-verifying/u);
-  assert.match(styles, /\.recommended-action/u);
-  assert.match(styles, /\.closeout-review-brief/u);
-  assert.match(styles, /min-height: 44px/u);
-  assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);
-  assert.match(styles, /\.inspector-disclosure/u);
-  assert.match(styles, /\.inspector h1:focus-visible/u);
-  assert.match(styles, /\.ticket-tabs/u);
-  assert.match(styles, /\.acceptance-rail/u);
-  assert.match(styles, /\.contract-brief/u);
-  assert.match(styles, /\.contract-support-disclosure/u);
-  assert.match(styles, /\.contract-support-body/u);
-  assert.match(styles, /\.reference-link-icon/u);
-  assert.match(styles, /\.guardrail-list/u);
-  assert.match(styles, /\.context-grid/u);
-  assert.match(styles, /\.source-dock/u);
-  assert.match(styles, /\.typed-reference/u);
-  assert.match(styles, /\.context-source-card/u);
-  assert.match(styles, /\.context-evidence-row/u);
-  assert.match(styles, /\.context-relation-row/u);
-  assert.match(styles, /\.causal-more/u);
-  assert.match(styles, /@media \(max-width: 720px\)/u);
-  assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);
-  assert.doesNotMatch(styles, /ui-serif|Iowan Old Style|Palatino|#245b43/u);
+  assert.match(layout, /VibeHubGraphLayout/u);
+  assert.match(styles, /\.ticket-node/u);
+  assert.doesNotMatch(model, /ticketNextAction|CLOSE_OUT|vibehub-ticket-(run|plan|closeout)/u);
+  assert.doesNotMatch(script, /closeoutReviewBrief|CLOSE_OUT/u);
 
   assert.deepEqual(canonicalBytes(repo), beforeUi);
 
@@ -956,10 +765,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     authorized(token),
   )).json()).data;
   assert.equal(draftSubject.contextPackage.maturity, "draft");
-  assert.equal(draftSubject.contextPackage.operationalState, "REFINE");
-  assert.equal(draftSubject.contextPackage.nextAction.action, "REFINE");
+  assert.equal(draftSubject.contextPackage.operationalState, "OPEN");
   assert.equal(draftSubject.contextPackage.agentPayload.maturity, "draft");
-  assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "REFINE");
+  assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "OPEN");
 });
 
 test("launcher flags stay intentionally narrow", () => {

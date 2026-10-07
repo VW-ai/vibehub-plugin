@@ -1,30 +1,9 @@
 (() => {
   "use strict";
 
-  const TICKET_STATES = new Set([
-    "READY",
-    "REFINE",
-    "DONE",
-    "BLOCKED",
-    "DEVIATED",
-  ]);
-  const ATTENTION_STATES = new Set([
-    "UPCOMING",
-    "PENDING",
-    "RECORDED",
-    "COMPLETE",
-  ]);
+  const TICKET_STATES = new Set(["OPEN", "IN_PROGRESS", "DONE", "BLOCKED"]);
+  const ATTENTION_STATES = new Set(["PENDING", "RECORDED"]);
   const LAYOUT_DIRECTIONS = new Set(["ltr", "ttb"]);
-  const NEXT_ACTIONS = new Set([
-    "REFINE",
-    "WAIT",
-    "NEEDS_HUMAN",
-    "EXECUTE",
-    "CLOSE_OUT",
-    "DONE",
-    "REPLAN",
-  ]);
-  const PRIMARY_PHASES = new Set(["DRAFT", "READY", "RUNNING", "DONE"]);
   const LIVE_OPERATIONS = new Set(["execute", "closeout"]);
   const LIVE_STATES = new Set(["running", "waiting_tool", "waiting_human"]);
 
@@ -84,25 +63,6 @@
     };
   }
 
-  function ticketNextAction(ticket) {
-    const slot = ticket?.capabilities?.nextAction;
-    if (slot?.availability !== "available") return null;
-    const action = String(slot.summary?.action || "").toUpperCase();
-    if (!NEXT_ACTIONS.has(action)) return null;
-    return {
-      action,
-      key: action.toLowerCase().replaceAll("_", "-"),
-      reason: slot.summary?.reason || "",
-      detail: slot.summary?.detail || "",
-      acceptanceIds: Array.isArray(slot.summary?.acceptanceIds)
-        ? slot.summary.acceptanceIds
-        : [],
-      blockingTicketIds: Array.isArray(slot.summary?.blockingTicketIds)
-        ? slot.summary.blockingTicketIds
-        : [],
-    };
-  }
-
   function ticketRuntimeState(ticket, { now = Date.now() } = {}) {
     const slot = ticket?.capabilities?.runtime;
     if (slot?.availability !== "available") return null;
@@ -130,61 +90,32 @@
   function ticketPhasePresentation(ticket, options = {}) {
     const operational = ticketOperationalState(ticket);
     const attention = ticketAttentionState(ticket);
-    const nextAction = ticketNextAction(ticket);
-    const action = nextAction?.action ?? null;
-    const runtime = ticketRuntimeState(ticket, options);
-    const runtimeEligible = runtime
-      && !new Set(["DONE", "REPLAN", "WAIT", "REFINE"]).has(action)
-      ? runtime
-      : null;
-    let label = "DRAFT";
-    if (action === "DONE") label = "DONE";
-    else if (["REPLAN", "WAIT", "REFINE"].includes(action)) label = "DRAFT";
-    else if (action === "CLOSE_OUT" || runtimeEligible) label = "RUNNING";
-    else if (["EXECUTE", "NEEDS_HUMAN"].includes(action)) label = "READY";
-    else if (operational?.label === "DONE") label = "DONE";
-    else if (operational?.label === "READY") label = "READY";
-
-    let substate = null;
-    if (action === "REPLAN") substate = "DEVIATED";
-    else if (action === "WAIT") substate = "BLOCKED";
-    else if (runtimeEligible?.state === "waiting_human") substate = "NEEDS_YOU";
-    else if (action === "NEEDS_HUMAN") substate = "NEEDS_YOU";
-    else if (action === "CLOSE_OUT") substate = "VERIFYING";
-    else if (runtimeEligible?.state === "waiting_tool") substate = "WAITING";
-
-    const stage = action === "CLOSE_OUT"
-      ? "verifying"
-      : runtimeEligible?.state?.replaceAll("_", "-") ?? null;
-    const live = label === "RUNNING" && Boolean(runtimeEligible?.live);
+    const label = operational?.label ?? "OPEN";
+    const runtime = label === "DONE" ? null : ticketRuntimeState(ticket, options);
+    const substate = runtime?.state === "waiting_human" ? "NEEDS_YOU"
+      : runtime?.state === "waiting_tool" ? "WAITING" : null;
     return {
-      label: PRIMARY_PHASES.has(label) ? label : "DRAFT",
-      key: label.toLowerCase(),
+      label,
+      key: label.toLowerCase().replaceAll("_", "-"),
       substate,
       substateKey: substate?.toLowerCase().replaceAll("_", "-") ?? null,
-      stage,
-      live,
-      runtime: runtimeEligible || null,
+      stage: runtime?.state?.replaceAll("_", "-") ?? null,
+      live: Boolean(runtime?.live),
+      runtime,
       operational,
       attention,
-      nextAction,
     };
   }
 
   function operationalCounts(tickets, options = {}) {
-    const counts = { DRAFT: 0, READY: 0, RUNNING: 0, DONE: 0 };
-    for (const ticket of tickets) {
-      const label = ticketPhasePresentation(ticket, options).label;
-      counts[label] += 1;
-    }
+    const counts = { OPEN: 0, BLOCKED: 0, IN_PROGRESS: 0, DONE: 0 };
+    for (const ticket of tickets) counts[ticketPhasePresentation(ticket, options).label] += 1;
     return counts;
   }
 
   function workbenchOverview(tickets, source = {}, options = {}) {
-    const phases = { DRAFT: [], READY: [], RUNNING: [], DONE: [] };
-    const substates = {
-      DEVIATED: [], BLOCKED: [], NEEDS_YOU: [], VERIFYING: [], WAITING: [],
-    };
+    const phases = { OPEN: [], BLOCKED: [], IN_PROGRESS: [], DONE: [] };
+    const substates = { NEEDS_YOU: [], WAITING: [] };
     for (const ticket of tickets) {
       const presentation = ticketPhasePresentation(ticket, options);
       phases[presentation.label].push(ticket);
@@ -193,15 +124,12 @@
     return {
       phases,
       substates,
-      ready: phases.READY,
-      running: phases.RUNNING,
+      ready: phases.OPEN,
+      running: phases.IN_PROGRESS,
       needsYou: substates.NEEDS_YOU,
-      deviated: substates.DEVIATED,
-      blocked: substates.BLOCKED,
+      blocked: phases.BLOCKED,
       sourceDirty: Boolean(source.semanticDirty),
-      sourceDirtyCount: Array.isArray(source.dirtyPaths)
-        ? source.dirtyPaths.length
-        : 0,
+      sourceDirtyCount: Array.isArray(source.dirtyPaths) ? source.dirtyPaths.length : 0,
       sourceDirtyTruncated: Boolean(source.dirtyPathsTruncated),
     };
   }
@@ -229,8 +157,8 @@
 
   function graphSummary(counts, overview = null) {
     const parts = [];
-    for (const label of ["RUNNING", "READY", "DRAFT", "DONE"]) {
-      if (counts[label]) parts.push(`${counts[label]} ${label.toLowerCase()}`);
+    for (const label of ["IN_PROGRESS", "OPEN", "BLOCKED", "DONE"]) {
+      if (counts[label]) parts.push(`${counts[label]} ${label.toLowerCase().replaceAll("_", " ")}`);
     }
     const needsYou = overview?.needsYou?.length ?? 0;
     if (needsYou) parts.push(`${needsYou} need you`);
@@ -240,62 +168,29 @@
   function graphNarrative(counts, overview = null) {
     const needsYou = overview?.needsYou?.length ?? 0;
     const sentences = [
-      `${counts.RUNNING} running`,
-      `${counts.READY} ready`,
-      `${counts.DRAFT} draft`,
+      `${counts.IN_PROGRESS} in progress`,
+      `${counts.OPEN} open`,
+      `${counts.BLOCKED} blocked`,
       `${counts.DONE} done`,
     ];
     return `${sentences.join(", ")}.${needsYou ? ` ${needsYou} need human attention.` : ""}`;
   }
 
   function causalPriority(label) {
-    return { RUNNING: 0, READY: 1, DRAFT: 2, DONE: 3 }[label] ?? 4;
+    return { IN_PROGRESS: 0, OPEN: 1, BLOCKED: 2, DONE: 3 }[label] ?? 4;
   }
 
-  function agentHandoffInstruction(ticketId, nextAction, stateLabel = null) {
-    const action = typeof nextAction === "string"
-      ? nextAction
-      : nextAction?.action;
-    if (action === "EXECUTE") {
-      return `Execute the READY VibeHub Ticket ${ticketId} in this exact `
-        + "worktree with the Skill vibehub-ticket-run.";
-    }
-    if (action === "CLOSE_OUT") {
-      return `Independently adjudicate VibeHub Ticket ${ticketId} in this exact `
-        + "worktree with the Skill vibehub-ticket-closeout. Its current "
-        + "acceptance has authority-satisfying Evidence, but no Outcome; do "
-        + "not execute the Ticket again merely to increase Evidence count.";
-    }
-    if (action === "NEEDS_HUMAN") {
-      return `Present the Contract for VibeHub Ticket ${ticketId} with the `
-        + "Skill vibehub-review and wait for explicit human input. "
-        + "Do not substitute Agent-origin Evidence for human authority.";
-    }
-    if (action === "REFINE") {
-      return `Refine the VibeHub Ticket ${ticketId} in this exact worktree `
-        + "with the Skill vibehub-ticket-plan. It is currently REFINE, so "
-        + "rewrite the same Ticket's acceptance for real and set maturity: "
-        + "firm before execution; do not start vibehub-ticket-run.";
-    }
-    if (action === "REPLAN") {
-      return `Replan VibeHub Ticket ${ticketId} in this exact worktree with `
-        + "the Skill vibehub-ticket-plan. Its independent Outcome was not "
-        + "successful; preserve that Outcome and revise the current contract "
-        + "before any new execution.";
-    }
-    if (action === "WAIT") {
-      return `Inspect VibeHub Ticket ${ticketId} with the Skill `
-        + "vibehub-review. It is waiting for direct prerequisites; do "
-        + "not start vibehub-ticket-run until they close successfully.";
-    }
-    return `Inspect VibeHub Ticket ${ticketId} (currently ${stateLabel || "unprojected"}) `
-      + "with the Skill vibehub-review. Its derived next action is "
-      + `${action || "unavailable"}; do not start vibehub-ticket-run.`;
+  function agentHandoffInstruction(ticketId, stateLabel = null) {
+    return `Read VibeHub task ${ticketId} and its context in this exact worktree. `
+      + `Its recorded state is ${stateLabel || "unavailable"}. `
+      + "Use the user's chosen skills and working methods for the requested work. "
+      + "Record meaningful progress, results and status with vibehub-ticket. "
+      + "Keep task records local unless sharing was explicitly requested.";
   }
 
   function ticketNodePresentation(ticket, { selected = false, dimmed = false } = {}) {
     const phase = ticketPhasePresentation(ticket);
-    const { operational, attention, nextAction } = phase;
+    const { operational, attention } = phase;
     const classNames = [
       "ticket-node",
       selected ? "selected" : "",
@@ -303,7 +198,6 @@
       `phase-${phase.key}`,
       phase.substateKey ? `substate-${phase.substateKey}` : "",
       phase.live ? "is-live" : "",
-      nextAction ? `next-${nextAction.key}` : "",
     ].filter(Boolean);
     const relationCounts = ticket.relationCounts || {
       prerequisites: 0,
@@ -314,10 +208,7 @@
       + `${relationCounts.dependents} unlocks.`
       + ` Phase ${phase.label}.`
       + (phase.substate ? ` Substate ${phase.substate.replaceAll("_", " ")}.` : "")
-      + (phase.live ? " Trusted live execution." : " No live execution claim.")
-      + (nextAction
-        ? ` Next action ${nextAction.action}. ${nextAction.detail || ""}`
-        : "");
+      + (phase.live ? " Live agent session observed." : " No live agent session observed.");
     return {
       className: classNames.join(" "),
       ariaLabel,
@@ -325,7 +216,6 @@
       phase,
       operational,
       attention,
-      nextAction,
     };
   }
 
@@ -342,7 +232,6 @@
     ticketAttentionState,
     ticketPhasePresentation,
     ticketNodePresentation,
-    ticketNextAction,
     ticketOperationalState,
     ticketRuntimeState,
     workbenchOverview,

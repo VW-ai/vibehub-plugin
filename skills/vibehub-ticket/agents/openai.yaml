@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket"
+  short_description: "Remember tasks, relationships, and progress"
+  default_prompt: "Use $vibehub-ticket to record this task and its known context and relationships."

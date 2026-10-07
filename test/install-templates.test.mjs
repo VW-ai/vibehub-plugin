@@ -53,7 +53,7 @@ test("the seven-file project copy runs from scripts/vibehub in a clean checkout"
   copyFileSync(join(core, "contracts", "dependency-hygiene.json"), join(project, "scripts", "vibehub", "contracts", "dependency-hygiene.json"));
   // minimal valid project so the projection can be computed without any plugin installed
   for (const d of ["tickets", "outcomes", "evidence", "rooms"]) mkdirSync(join(project, ".vibehub", d), { recursive: true });
-  writeFileSync(join(project, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 4 }));
+  writeFileSync(join(project, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 6 }));
   const { materializeInitialTicket } = await import(join(core, "scripts", "revision-contract.mjs"));
   writeFileSync(join(project, ".vibehub", "tickets", "ticket-demo.yaml"), JSON.stringify(materializeInitialTicket({
     schema_version: 3, kind: "ticket", ticket_id: "ticket-demo", maturity: "firm", outcome: "demo", deliveries: [], context: "c",

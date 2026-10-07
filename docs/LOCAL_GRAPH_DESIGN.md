@@ -1,30 +1,30 @@
 # Local graph design authority
 
-The local graph is VibeHub's quiet execution instrument, not a generic YAML
-viewer and not a small dashboard. Its first question is: **when this Ticket
-finishes, what becomes executable next?**
+The local graph presents tasks and their recorded dependencies. It shows what
+is open, in progress, blocked, or done and which other tasks depend on each
+one. The graph does not choose a development method or next action.
 
 ## Retained product language
 
-- One complete deterministic direct-unlock graph is the primary object.
+- One deterministic dependency graph is the primary object.
   Left-to-right is the desktop default; top-to-bottom remains an explicit
   first-class choice over the same nodes, relations, and causal ranks. Forks,
-  joins, blockers, deviations, and proof stay at their owning graph locus.
+  joins, blockers, and progress remain attached to their tasks.
   Dense ranks are ordered with long-edge waypoints, bounded source and target
   ports, and deterministic orthogonal lanes so routing does not cross through
   cards or achieve clarity by hiding canonical Tickets and relations.
 - The default shell is canvas-first. Overview is a compact operational index
-  that opens on request to answer what is READY, what genuinely needs a person,
-  and whether execution or exact source has deviated; it is not a permanent
+  that opens on request to answer what is open, in progress, blocked, or done,
+  and which prerequisites remain unfinished. It is not a permanent
   navigation rail or a second Inspector.
 - The healthy surface is quiet. Matte cool neutrals carry the base; semantic
-  color is reserved for truthful execution state. Hover and selection remain
+  color is reserved for recorded task state. Hover and selection remain
   neutral interaction states.
-- Tickets are bounded execution objects. Their outcome, position, connectors,
-  and readiness aperture carry the hierarchy before labels, borders, cards, or
+- Tickets are task records. Their outcome, position, connectors,
+  and state label carry the hierarchy before labels, borders, cards, or
   schema terminology.
 - Inspection is progressive and in situ. Selecting a Ticket or relation keeps
-  the graph visible; strict contract, Context, Evidence, Outcome, provenance,
+  the graph visible; completion criteria, Context, updates, historical proof, provenance,
   and Git trace remain one further disclosure away.
 - Compact system typography, the 6/10/16px shape vocabulary, restrained
   elevation, visible keyboard focus, readable contrast, and reduced motion are
@@ -40,7 +40,7 @@ finishes, what becomes executable next?**
   can reopen that exact focus; it is not a remote share, durable permalink, or
   repository switch.
 - The default graph is current work, not the repository's entire lifetime.
-  READY, REFINE, and BLOCKED Tickets seed that view. Only their nearest DONE
+  OPEN, IN_PROGRESS, and BLOCKED Tickets seed that view. Only their nearest DONE
   causal boundary remains visible; deeper completed history appears as
   count-labelled one-hop expansion stubs, and `All` restores the complete
   graph. A delivered boundary also carries the explicit `ARCHIVED` label, but
@@ -69,11 +69,10 @@ fresh schema-valid Context, Ticket, Evidence, and Outcome files mechanically.
 Git remains the only durable truth; selection, layout, pan, and zoom are
 disposable view state.
 
-Compatibility is also checked-in truth, not a permissive parser fallback.
-`skills/vibehub-core/contracts/versions.json` is the runtime version contract. Project
-format 2 requires Ticket schema v2, including an explicit `deliveries` array;
-the format-1-to-format-2 migration declares that document transition and must
-upgrade canonical Tickets before advancing the project marker.
+Project compatibility follows
+`skills/vibehub-core/contracts/versions.json`. Format 6 stores Ticket schema 4
+with explicit status and update history. Reading older formats does not migrate
+the files. Writes require the declared migration first.
 
 ## Interaction depth
 
@@ -82,24 +81,19 @@ workspace without copying another product's brand skin. Black, white, and gray
 carry reading; VibeHub's cool wash and semantic state color appear only where
 they communicate environment, execution, proof, or attention.
 
-- In three seconds, the graph establishes the exact worktree, executable
-  frontier, causal direction, blocker, and deviation state.
-- In ten seconds, selecting a Ticket becomes one execution lens: outcome,
-  operational state, direct prerequisites and unlocks, and proof availability
-  remain visible without repeating state prose.
-- In thirty seconds, Contract and Proof layers expose acceptance as an
-  Evidence rail, constraints as guardrails, bound Context as governing objects,
-  and Evidence plus Outcome as a chronological proof trace.
+- The graph identifies the worktree, current tasks, dependency direction, and blockers.
+- Selecting a Ticket shows its desired outcome, state, prerequisites, and dependent tasks.
+- Further detail exposes completion criteria, Context, progress updates, and optional historical proof.
 
 Different canonical objects do not collapse into one generic text list.
 Tickets, dependencies, acceptance, constraints, Context, Evidence, and Outcome
-each receive a visual primitive matching their role. The UI may request new
-structured mechanical projection when that primitive needs existing canonical
+each receive a presentation matching their role. The UI may request new
+structured mechanical projection when the presentation needs existing canonical
 facts, but it may not infer missing semantics or create a parallel state model.
 
-## Current review surfaces
+## Historical visual references
 
-These real-browser captures use one disposable canonical fork-and-join Ticket
+These captures predate the task-memory status labels and use one disposable canonical fork-and-join Ticket
 fixture. The fixture itself is not product state; the two images are retained
 so owner review and future design drift checks bind to exact visual evidence.
 
