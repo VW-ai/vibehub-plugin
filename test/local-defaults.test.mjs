@@ -53,15 +53,32 @@ for(const [name,module] of [['repository',published],['bundled',bundled]]) {
     assert.throws(()=>module.parseArgs(['--github','owner/repo']),/disabled by default/);
     assert.throws(()=>module.parseArgs(['--publish']),/destination is never inferred/);
     assert.throws(()=>module.parseArgs(['--publish','--dry-run','--github','owner/repo']),/either/);
-    assert.equal(module.parseArgs(['--publish','--github','owner/repo']).publish,true);
-    assert.equal(module.parseArgs(['--dry-run','--github','owner/repo']).publish,false);
+    assert.equal(module.parseArgs(['--publish','--github','owner/repo','--ref','HEAD']).publish,true);
+    assert.equal(module.parseArgs(['--dry-run','--github','owner/repo']).dryRun,true);
+    assert.throws(()=>module.parseArgs(['--publish','--github','owner/repo']),/explicit --ref/);
+    assert.equal(module.parseArgs(['--check']).check,true);
     await assert.rejects(module.sync({repoRoot:'/does-not-exist',github:'owner/repo'}),/disabled by default/);
   });
 }
 test('both Actions workflows require a repository opt-in and explicit publication mode',()=>{
   for(const file of ['.github/workflows/sync-issues.yml','skills/vibehub-core/templates/github/sync-issues.yml']) {
     const source=readFileSync(join(root,file),'utf8');
-    assert.match(source,/if: \$\{\{ vars\.VIBEHUB_GITHUB_SYNC == 'true' \}\}/);
-    assert.match(source,/--dry-run.*--publish/);
+    assert.match(source,/if: \$\{\{ vars\.VIBEHUB_GITHUB_SYNC == 'true' &&/);
+    assert.match(source,/--dry-run/);
+    assert.match(source,/--publish/);
+    assert.match(source,/Publication is disabled/);
+    assert.match(source,/on:\n  push:\n  pull_request:/);
+    assert.doesNotMatch(source,/pull_request_target|paths:/);
+    const check=source.slice(source.indexOf('  check:'),source.indexOf('  preview:'));
+    assert.match(check,/--check/);
+    assert.doesNotMatch(check,/GH_TOKEN|issues: write|concurrency:/);
+    const preview=source.slice(source.indexOf('  preview:'),source.indexOf('  publish:'));
+    assert.match(preview,/issues: read/);
+    assert.doesNotMatch(preview,/issues: write|concurrency:/);
+    const publish=source.slice(source.indexOf('  publish:'));
+    assert.match(publish,/needs: check/);
+    assert.match(publish,/concurrency:/);
+    assert.match(publish,/git fetch.*\$DEFAULT_BRANCH/);
+    assert.match(publish,/--ref \"refs\/remotes\/origin\/\$DEFAULT_BRANCH\"/);
   }
 });

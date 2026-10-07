@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Validate committed Ticket projections on every push and PR. Keep Issue
+  publication opt-in, exclude private working files, read every remote page,
+  preserve human labels and discussion, and verify convergence with run receipts.
+  Repeated syncs perform zero writes, including label definitions.
+
 - Consolidate Ticket planning, execution, validation, and closeout Skills into
   `vibehub-ticket` for task memory. Development methods belong to the user's
   chosen skills. Add compact `ticket put` and append-only `ticket update` writes

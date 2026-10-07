@@ -1,34 +1,116 @@
 # Tickets on GitHub Issues
 
-GitHub integration is **disabled by default**. Local VibeHub work needs no
-GitHub account, remote, or Issue mirror. Only after explicit installation and
-enabling the repository Actions variable `VIBEHUB_GITHUB_SYNC=true` are shared
-Tickets on `main` mirrored by `.github/workflows/sync-issues.yml`.
+GitHub publication is disabled by default. Local VibeHub work requires no
+GitHub account or remote. Installation copies the workflow and its seven-file
+bundle, but publication requires the repository Actions variable
+`VIBEHUB_GITHUB_SYNC=true`. Share only the records you intend to publish.
+New local records are ignored by normal staging; existing tracked records
+remain shared.
 
-New project records are ignored by normal Git staging. Review and explicitly
-share only the chosen records before enabling the mirror. Existing tracked
-records remain tracked; ignoring a file does not undo earlier publication.
-The sync CLI requires an explicit `--github owner/repo` destination and either
-`--publish` or `--dry-run`; a dry run reads GitHub but does not write it. The mirror is one-way: Git is the source
-of truth, the workflow never commits, and nothing written on GitHub flows back
-into `.vibehub/`. Comments on an Issue are discussion; a durable decision still
-enters through `$vibehub-ingest`. No Agent runs or checks the sync — a failure
-is a red check under Actions.
+## Authority and generated content
 
-What each Issue carries:
+Git is the source of truth. This is a one-way projection of committed Tickets.
+The script never imports Issue edits, changes Ticket records, or creates Git
+commits. Human Issue comments remain discussion. Durable decisions enter
+through `$vibehub-ingest`.
 
-| Ticket fact | On the Issue |
+| Ticket fact | Issue representation |
 | --- | --- |
-| `outcome`, `context_refs`, `constraints` | Body sections; refs link to the file on `main` |
-| `acceptance` | Task list, with optional historical acceptance proof; human decision owners remain visible |
-| `relations` (`depends_on`) | Native **Blocked by / Blocking** relationships plus a Dependencies section with the rationale |
-| state / maturity | Labels `state: open · in-progress · blocked · done` and `maturity: firm · draft` |
-| Evidence | One comment per record, in `recorded_at` order |
-| `status: done` | Issue closed; historical Outcome remains in the body when present |
+| `outcome`, `context` | Outcome and Background sections |
+| Active `acceptance` | Criteria with their stable IDs and human decision owners |
+| `constraints`, `context_refs` | Constraints and source links |
+| `relations` | Native Blocked by relationships and dependency rationale |
+| `status` and unfinished prerequisites | One state label: open, in-progress, blocked, or done |
+| `updates`, `deliveries` | Recorded progress, results, and delivery links |
+| Evidence | One comment per Evidence ID, ordered by `recorded_at` |
+| `status: done` | Closed Issue; reopening a Ticket reopens its Issue |
+| Bound historical Outcome | Historical Outcome section, independent of current task status |
 
-Mapping lives in a hidden `<!-- vibehub:ticket-id=… -->` marker in the body, so
-renaming or re-creating a Ticket file keeps its Issue. Run
-`npm run issues:sync:dry-run` to see what a sync would do without writing.
+Identity is the first-line `<!-- vibehub:ticket-id=… -->` header in an Issue
+body. Evidence comments use a first-line `<!-- vibehub:evidence-id=… -->`
+header. Marker examples elsewhere in prose do not establish identity. Duplicate
+Issue or Evidence identities fail before publication. The repository stores no
+Issue numbers. Unmarked Issues, human discussion, foreign labels, and foreign
+blockers remain untouched. Generated titles, bodies, task state, and managed
+labels follow the committed Ticket.
+
+Historical Evidence comments are append-only by ID. A changed comment body is
+reported, not overwritten. Mirrored Issues whose Ticket no longer exists in the
+selected source are reported as orphans and remain untouched.
+
+## CI behavior
+
+The workflow validates the committed candidate on every push and pull request,
+without path filters, a GitHub token, or Issue write permission. This check runs
+even when publication is disabled. The workflow summary states whether the
+repository has enabled publication. A push with several commits validates its
+final tree.
+
+After that check, an enabled default-branch push starts the publisher. Only
+publishing jobs share a concurrency group. Each publisher fetches the current
+default branch after entering that group, validates its committed records, and
+pins that commit for the whole run. This prevents a delayed run from projecting
+an older queued event. Publication depends on projection validation. The separate
+`Verify VibeHub` workflow still runs the complete repository checks independently.
+
+Manual dispatch defaults to a read-only preview. A dispatch can use code from a
+feature branch while projecting current default-branch records. Only a manual
+publish run gets Issue write permission, and it still requires the repository
+opt-in. Preview and publication produce downloadable JSON receipts. Offline
+checks and previews do not enter the publisher's concurrency group.
+
+## Command modes and receipts
+
+All modes read an isolated checkout of a resolved Git commit with its history.
+Ignored, untracked, staged-only, and modified working files cannot enter the
+projection. An absent committed VibeHub project reports `no-shared-project`.
+A partial or invalid committed project fails with its file paths and validation
+diagnostics.
+
+```sh
+# Offline validation; no GitHub account or network is needed.
+node scripts/sync-github-issues.mjs --repo . --ref HEAD --check
+
+# Remote preview; reads GitHub but performs no writes.
+node scripts/sync-github-issues.mjs --repo . --ref origin/main \
+  --github VW-ai/vibehub-plugin --dry-run --report /tmp/issue-preview.json
+
+# Explicit maintenance publication from the current canonical branch commit.
+node scripts/sync-github-issues.mjs --repo . --ref origin/main \
+  --github VW-ai/vibehub-plugin --publish --report /tmp/issue-sync.json
+```
+
+`--ref` defaults to `HEAD` for checking and previewing. Publication requires an
+explicit ref and confirms that its commit equals the destination's current
+default-branch head. Fetch that branch before a local maintenance run. Normal
+publication uses Actions; independent local and Actions writers must not run
+concurrently. The repository variable controls Actions publication. A local
+`--publish` command is itself an explicit opt-in.
+
+`--report` saves the record commit, implementation commit, mode, planned and
+completed operation identities, remaining operations, confirmed mutation-request
+count, diagnostics, and convergence result. It excludes Issue bodies and tokens.
+The record commit belongs in the receipt, so unrelated commits do not rewrite
+every Issue body. Ordinary file links use the canonical branch; versioned
+Context refs link to their recorded commit.
+
+The publisher reads every page of Issues, labels, repository comments, and
+blockers. It skips blocker reads when GitHub reports zero blockers, and skips
+comments when every mirror has zero comments. Missing counts trigger a full read.
+It creates missing Issues before resolving their numbers in bodies and dependencies.
+A dry run lists those future operations by Ticket ID. Label definitions change
+only when their color or description differs. Managed labels are added and
+removed individually so concurrent human changes to unrelated labels survive.
+A repeated, unchanged projection makes zero mutation requests and requires only
+one complete remote read followed by a canonical-head check.
+
+After writes, the publisher reads GitHub again and requires an empty remaining
+plan. A changed canonical branch reports `superseded`, rather than claiming that
+the latest source converged. A failed or ambiguous request stops the run without
+blind retries. Its receipt identifies the failed operation and pending work.
+A fresh run discovers completed writes from the remote markers and resumes.
+This supports recovery from partial runs; it does not guarantee exactly-once
+creation under concurrent independent publishers.
 
 ## Which GitHub view to follow
 
@@ -46,10 +128,9 @@ Zero setup; the sync keeps it current. Blocked Issues show a red
 | Open | `…/issues?q=is%3Aopen+label%3A%22state%3A+open%22` |
 | In progress | `…/issues?q=is%3Aopen+label%3A%22state%3A+in-progress%22` |
 | Blocked | `…/issues?q=is%3Aopen+label%3A%22state%3A+blocked%22` |
-| Drafts to refine | `…/issues?q=is%3Aopen+label%3A%22maturity%3A+draft%22` |
 | Done | `…/issues?q=is%3Aclosed+label%3A%22state%3A+done%22` |
 
-Provides automatically: state, maturity, blocked marker, Evidence count.
+Provides automatically: task state, blocked marker, and Evidence comments.
 Cannot show: the dependency chain beyond one hop, or any ordering by time.
 
 ### 2. Per-Issue sidebar — for walking the graph
