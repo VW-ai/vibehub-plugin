@@ -1,0 +1,60 @@
+{
+  "context_id": "note-install-distribution-alternatives",
+  "detail": "The npx-first investigation showed that skills.sh copies directories containing SKILL.md and omits sibling helper directories. A previously successful install therefore left Skills with missing helper paths. Path A placed scripts, contracts and templates inside non-invocable vibehub-core and was selected. Path B, publishing an npm helper for Skills and humans, was deferred until a real standalone initialization need; the npm name was already unrelated. Path C, declaring skills.sh unsupported, was rejected because it left the silent failure. A missing-core repair line is necessary because the installer has no required-Skill dependency mechanism. The proposal originally kept marketplace distribution and suggested offering GitHub sync during setup; later decisions retired marketplaces and require explicit sharing/opt-in instead. Historical Skill counts and obsolete names do not describe the current nine-Skill installation.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#proposal-npx-first-install-experience; lines 1-8. Historical section excerpt: \"Ticket: ticket-propose-npx-first-install-experience · 2026-08-22 Historical proposal. Path A was implemented, and a later product decision retired host marketplace distribution. The only supported install path now is npx skills add VW-ai/vibehub-plugin; see docs/INSTALL.md.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#the-problem-reproduced; lines 9-28. Historical section excerpt: \"npx skills add VW-ai/vibehub-plugin already works today — and produces a broken install. Run in a scratch project on 2026-08-22 (transcripts checked in as Evidence): | Target | Command | Copied | Missing | | --- | --- | --- | --- | | Claude Code | npx skills add VW-ai/vibehub-plugin -a claude-code…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#what-npx-first-tools-actually-do; lines 29-43. Historical section excerpt: \"heygen-com/hyperframes — the owner's reference — splits into two layers: Agent layer:** npx skills add heygen-com/hyperframes. Skills are plain skills/<name>/SKILL.md folders; one router skill installs the rest on demand. Tool layer:** npx hyperframes init|lint|check|preview|render. Every\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#paths-compared; lines 44-45. Structural heading only; the following named sections carry the substantive claims.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#a-self-contained-skill-tree-skills-sh-compatible-layout; lines 46-71. Historical section excerpt: \"Make the shared helper travel with the skills under skills.sh's own rules: move skills/scripts/ and skills/contracts/ into one folder that *is* a skill, e.g. skills/vibehub-core/ with a one-line SKILL.md (\\\"Shared helper and contracts for the VibeHub Skills; nothing to invoke\\\"), and repoint the 45\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#b-published-npm-package-used-by-skills-and-humans; lines 72-88. Historical section excerpt: \"Publish the helper as a package; Skills say npx <pkg>@^0.8 ticket graph … and humans get npx <pkg> init [--github-issues]. | | | | --- | --- | | User types | npx skills add VW-ai/vibehub-plugin then npx <pkg> init | | Lands on disk | Skills (text only) in the agent dir; helper in the npx cache…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#c-marketplace-only-skills-sh-declared-unsupported; lines 89-98. Historical section excerpt: \"Keep today's three commands; add a note that skills.sh installs are unsupported. | | | | --- | --- | | Cost | one README line | | Effect | none on the defect — skills.sh cannot be opted out of, so broken copies keep happening silently |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#the-github-issues-mirror-as-a-setup-time-option; lines 99-119. Historical section excerpt: \"Independent of A/B/C, vibehub-setup (and any future init) gains one optional step, asked once, after .vibehub/ is initialized: 1. Detect git remote get-url origin matching github.com. 2. Ask: *\\\"Mirror Tickets to GitHub Issues? Adds one workflow and one script;\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#recommendation; lines 120-138. Historical section excerpt: \"Path A was recommended and later implemented.** It fixed a live defect, gave the one-line npx skills add VW-ai/vibehub-plugin the owner wants across every skills-capable host, keeps the no-network, no-registry, no-CLI boundary, and cost one Ticket. A later decision retired the marketplace path…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "Source segment docs/proposals/npx-first-install-experience.md#the-question-for-the-owner; lines 139-146. Historical section excerpt: \"Take path A (self-contained vibehub-core skill folder, skills.sh becomes a supported install path, GitHub mirror offered once during setup), and defer the npm-published init until a human asks for it? Answering \\\"A\\\" lets the implementation Ticket be replanned to firm with exact\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
+  },
+  "state": "active",
+  "summary": "Bundling core inside a Skill fixed the folder-copy installer failure",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

@@ -3,8 +3,8 @@
   "detail": "Composable state visibility is the Board filter authority: clicking a state toggles it; All clears the selection and shows every lane. When one or more states are selected, only those columns appear. A single selected category uses the full board width with a responsive card grid so space is not wasted on empty sibling columns. This continues the composable-filter constraint from the unified Dashboard repair work.",
   "evidence": [
     {
-      "note": "Quiet dashboard prototype implements multi-select filters and solo-lane full-width board layout.",
-      "ref": "docs/proposals/quiet-dashboard/index.html"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Quiet dashboard prototype implements multi-select filters and solo-lane full-width board layout.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/quiet-dashboard/index.html"
     },
     {
       "note": "Earlier constraint already required composable status visibility rather than exclusive All.",

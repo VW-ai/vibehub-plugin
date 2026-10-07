@@ -32,7 +32,7 @@
     "quote": "那这种blocker 后面，我们会有类似于，fuzzy/draft tickets，就是大方向，大概有啥步骤我们是有的，但是具体的验收标准，或者具体的ticket 定义可能是多少欠缺的",
     "ref": "conversation:2026-08-04-fuzzy-draft-tickets"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Tickets explicitly state firm or draft maturity; drafts carry direction, become REFINE after blockers resolve, and firm up in place before execution",
   "tags": [
     "tickets",

@@ -32,7 +32,7 @@
     "quote": "I don't want any extra load for AI to operate this issue and ticket sync. This can be done by scripts automatically. And I didn't even want the agent to run a script.",
     "ref": "conversation:2026-08-22-tickets-as-github-issues"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "GitHub Issues mirror the checked-in Ticket graph one way from main; Git stays the source of truth and Issue comments are discussion, not durable Context",
   "tags": [
     "github",

@@ -27,12 +27,13 @@ test('search retains all matching Room ancestors without including unrelated wor
 test('Context type groups keep active records first within their own type and omit empty groups', () => {
   const records = [
     {type:'note',state:'active',summary:'One note'},
+    {type:'authority',state:'active',summary:'Canonical specification'},
     {type:'decision',state:'superseded',summary:'Earlier decision'},
     {type:'constraint',state:'active',summary:'A limit'},
     {type:'decision',state:'active',summary:'Current decision'},
   ];
   const grouped = sandbox.VibeHubRooms.groupByType(records);
-  assert.deepEqual(Array.from(grouped, group => group.type), ['decision','constraint','note']);
+  assert.deepEqual(Array.from(grouped, group => group.type), ['decision','constraint','note','authority']);
   assert.deepEqual(Array.from(grouped[0].records, record => record.summary), ['Current decision','Earlier decision']);
   assert.equal(records[0].type, 'note', 'grouping does not mutate the source array');
   assert.equal(sandbox.VibeHubRooms.groupByType([]).length, 0);

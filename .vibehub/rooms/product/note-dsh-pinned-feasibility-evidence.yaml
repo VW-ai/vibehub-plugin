@@ -1,0 +1,72 @@
+{
+  "context_id": "note-dsh-pinned-feasibility-evidence",
+  "detail": "The feasibility report records DeepSeek Harness rc.7 at 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca as the executed runtime baseline, including isolated bundle/profile boot on port 31807, client-slot rendering and shutdown. Its matrix separates source-proven facilities from executed checks: plugins/bundles, theme/client extensions, session state and host events, graph/run tabs, overlays/fork and task-to-session association. Unknown durable event types still need a registered schema or ignorable/replay policy; a successful boot alone does not prove restart compatibility. The initial Codex process path is one-shot and does not establish resume, streaming progress or approval transport. A narrow replaceable adapter should carry session association, context handoff, observed lifecycle, evidence proposal and restart recovery without copying executor internals. Later rc.8 commit 141eb6fef83422698aef7a981029e843e8161534 source checks found nine extension seams including assistant-actions and turnTail, but the fresh source boot was unfinished. rc.7 runtime evidence and rc.8 source evidence must remain separate. No production host replacement, durable-event commitment or direct Agent execution follows from this historical spike. The exact original seam matrix, source locations, smoke checklist and stop conditions remain in the pinned report and existing spikes/deepseek-harness artifacts.",
+  "evidence": [
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#deepseek-harness-feasibility-for-vibehub; lines 1-4. Historical section excerpt: \"Status: pinned foundation Spike, not a production architecture commitment.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#baseline; lines 5-14. Historical section excerpt: \"Official repository: <https://github.com/deepseek-ai/deepseek-harness> Commit: 99f6f02fecdb7dff40c3fbc9470f5907c29f74ca Published CLI: @deepseek-ai/dsh@0.1.0-rc.7 Runtime: Node ^22.19.0 || >=24.0.0, pnpm 11.7.0 Product status: developer preview with compatibility-breaking changes\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#executed-boot-proof; lines 15-33. Historical section excerpt: \"The local Bundle in spikes/deepseek-harness/bundle/ was installed through the pinned published CLI into an isolated $DSH_HOME Web Profile. The generated profile contained this exact ordered composition: @deepseek-ai/dsh-base @deepseek-ai/dsh-web-app\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#executed-client-slot-proof; lines 34-59. Historical section excerpt: \"The same out-of-tree Bundle now exports a real DSH browser module rather than only a host plugin. The official Web manifest discovered it as dsh-vibehub-foundation-spike, ordered after runtime, layout, conversation, and workspace client packages. In the running official UI, the Spike exercised:\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#seam-matrix; lines 60-76. Historical section excerpt: \"| Product-critical seam | Result | Source-level finding | VibeHub posture | |---|---|---|---| | Bundle/Profile distribution | Proven | A Bundle is an npm package with a dsh.bundle.patch; a Profile is an ordered bundle composition. Local checkout installation is an official path. | Ship a VibeHub…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#exact-source-proofs; lines 77-87. Historical section excerpt: \"Architecture and extension map Bundle and Profile installation Root layout and shell slots Conversation extension slots Session fork implementation Human-command lifecycle Custom workflow Conversation node Existing Codex provider and limitations\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#proposed-v1-composition; lines 88-113. Historical section excerpt: \"@deepseek-ai/dsh-base → @deepseek-ai/dsh-web-app → dsh-vibehub host: VibeHub commands + canonical Git adapter + Run events client: Chat actions + Context attachments + Ticket craft Conversation Graph + Compare/Bring Back + execution dock → profile cordis.patch.yml\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#vibehub-owned-durable-events; lines 114-133. Historical section excerpt: \"DSH's event log is the transport and replay substrate; it should not define VibeHub's product meaning. The compatibility adapter should initially own a small event family: vibehub/ticket-linked vibehub/run-queued vibehub/run-started vibehub/run-progress\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#codex-executor-boundary; lines 134-153. Historical section excerpt: \"Do not route the primary product execution through the shipped one-shot subagent-codex provider. A VibeHub adapter should own one Codex App Server connection per resumable executor run and translate: | Codex-side fact | VibeHub Run projection |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#initial-repository-shape; lines 154-170. Historical section excerpt: \"Keep development in this repository: apps/harness-prototype/       current UI/UX authority prototype packages/dsh-bundle/          future installable Bundle packages/dsh-adapter/         pinned DSH imports and event compatibility packages/dsh-ui/              client Slot registrations\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#smoke-tests-required-before-implementation-and-upgrades; lines 171-183. Historical section excerpt: \"1. Exact upstream version and commit contract probe 2. Bundle installation into an isolated Web Profile 3. --dump-config proves layer order and VibeHub rows 4. Web boot and graceful shutdown on loopback 5. Human command appends paired lifecycle and no model turn\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "Source segment docs/DEEPSEEK_HARNESS_FEASIBILITY.md#stop-conditions; lines 184-194. Historical section excerpt: \"Pause permanent DSH implementation if any of these becomes true: a required additive Slot cannot be installed without replacing native Chat; custom durable events cannot replay consistently after restart; a Bundle cannot boot from an isolated Profile without upstream patches;\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "note": "The dsh-rc-8-feasibility-note section records rc.8 source commit 141eb6fef83422698aef7a981029e843e8161534 and the unfinished fresh-build check; it is separate from the executed rc.7 baseline.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+  },
+  "state": "active",
+  "summary": "The DSH feasibility spike proved specific pinned seams, not a production integration",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

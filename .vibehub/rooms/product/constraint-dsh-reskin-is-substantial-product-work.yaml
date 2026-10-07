@@ -11,8 +11,8 @@
       "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
     },
     {
-      "note": "The current research separates interaction architecture from visual authority, making a dedicated visual-system workstream necessary after the spatial model settles.",
-      "ref": "docs/HARNESS_INTERACTION_RESEARCH.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: The current research separates interaction architecture from visual authority, making a dedicated visual-system workstream necessary after the spatial model settles.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
     }
   ],
   "kind": "context",

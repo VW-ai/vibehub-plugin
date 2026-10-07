@@ -10,7 +10,7 @@
         "path": "skills/vibehub-core/contracts/room.schema.json"
       },
       {
-        "blob": "163f838714a8164cabc5e0ddd64c43697c6cd946",
+        "blob": "a23efac9b87d64d3bb39f8b2e5d52e3fa0aae6ef",
         "path": "skills/vibehub-distill/SKILL.md"
       },
       {
@@ -18,7 +18,7 @@
         "path": "skills/vibehub-distill/agents/openai.yaml"
       },
       {
-        "blob": "cea21e904c42f144be3ab019618c9ace2272a588",
+        "blob": "bb2e3d57232015c6d4ec2107ee290afe941760c4",
         "path": "skills/vibehub-ingest/SKILL.md"
       },
       {
@@ -34,7 +34,7 @@
         "path": "skills/vibehub-ingest/references/knowledge-governance.json"
       },
       {
-        "blob": "b2fc0b3822543fca063abc617cc4e9dc09a2545b",
+        "blob": "8ce00cc2340a25e435b77e88ec306f7d723bbce1",
         "path": "skills/vibehub-migrate/SKILL.md"
       },
       {
@@ -42,20 +42,24 @@
         "path": "skills/vibehub-migrate/agents/openai.yaml"
       },
       {
-        "blob": "7dac473c02c03ac5b7edb1c3489cd5ed8d070fc2",
+        "blob": "5ef61a7e32aad665826faf26f395b6708570c133",
         "path": "skills/vibehub-migrate/references/migrations.json"
       },
       {
-        "blob": "293861288d8b22adb644cc612544dc74bf64e55a",
+        "blob": "14932a9bdab57f13aee84360910abdd2d093030c",
         "path": "skills/vibehub-query/SKILL.md"
       },
       {
         "blob": "979251aa2a5a6ca887c5a02de7c7cb95e6394a31",
         "path": "skills/vibehub-query/agents/openai.yaml"
+      },
+      {
+        "blob": "5296faa649724c0a198e6fa482b318d5052ee05d",
+        "path": "test/knowledge-governance.test.mjs"
       }
     ],
-    "checked_at": "2026-09-21T14:38:49.506Z",
-    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
+    "checked_at": "2026-10-07T07:37:22.679Z",
+    "last_aligned_commit": "74ef88e39156b1e1e4455426131e4a171335ef60"
   },
   "anchors": [
     "skills/vibehub-core/contracts/context.schema.json",
@@ -63,7 +67,8 @@
     "skills/vibehub-distill/",
     "skills/vibehub-ingest/",
     "skills/vibehub-migrate/",
-    "skills/vibehub-query/"
+    "skills/vibehub-query/",
+    "test/knowledge-governance.test.mjs"
   ],
   "boundary": "How durable knowledge enters, lives in, and leaves .vibehub: Context entries, the Room taxonomy, ingest and query, and the coming distill workflows. Not the Ticket execution lifecycle and not the workbench UI.",
   "description": "The knowledge lifecycle of VibeHub: Context capture, Room taxonomy, retrieval, and distillation.",

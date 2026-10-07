@@ -1,0 +1,40 @@
+{
+  "context_id": "note-harness-lowfidelity-product-walkthrough",
+  "detail": "The Codex-base low-fidelity review separated a task graph home from the focused task workspace and made its phase-specific composer, attention queue, context and execution trail navigable. Its walkthrough covered think-first chat, forming a task, running work, human attention and review. Existing apps/harness-codex-base is a lifecycle simulator with mocked data; no executor adapter, persistence or production backend was proven. The review asked whether the information architecture and movement between workspaces were right before high-fidelity visual work. Preserve that order of reasoning and the unresolved decisions without promoting the old required execution phases into the current Ticket Skill.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_CODEX_BASE_REVIEW.md#vibehub-harness-low-fidelity-review; lines 1-9. Historical section excerpt: \"Status: product-logic prototype for owner review. It deliberately uses the Codex interaction baseline and does not claim high-fidelity visual parity or a finished VibeHub visual identity. The earlier dark custom shell and additive DSH Spike remain rejected as product UI.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CODEX_BASE_REVIEW.md#what-this-version-is-testing; lines 10-29. Historical section excerpt: \"The prototype tests one two-level relationship: Ticket Graph outside; Ticket throughout; Chat before and around; Run during. The application opens on the causal Ticket Graph. Clicking a Ticket enters that Ticket's phase-specific Workspace. ← Tickets returns to the graph rather than to a…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CODEX_BASE_REVIEW.md#information-architecture; lines 30-57. Historical section excerpt: \"The Ticket Graph is the home surface for committed work. It keeps dependencies, blockers, unlocks, Ticket states, human attention, and trusted Runs visible in one causal picture. Needs you, Active, Ready, Review, and Done are graph signals and filters—not separate lists that destroy causality.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CODEX_BASE_REVIEW.md#walkthrough; lines 58-79. Historical section excerpt: \"The prototype opens on the Ticket Graph. It establishes the system of work before entering one Ticket. 1. Inspect dependencies, forks, joins, blockers, attention, and Active Run on the graph. Open the Active Define the Harness product loop Ticket.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CODEX_BASE_REVIEW.md#decisions-to-make-from-this-demo; lines 80-96. Historical section excerpt: \"Does the graph make Tickets—not chats or activity lists—the primary product? Does it explain why work is blocked and what completion unlocks? Is the Ticket identity strong enough after entering one Workspace? Does Run receive enough space and specificity to feel like the place where\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CODEX_BASE_REVIEW.md"
+  },
+  "state": "active",
+  "summary": "The Codex-base mockup tested graph and task-workspace interaction before visual approval",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

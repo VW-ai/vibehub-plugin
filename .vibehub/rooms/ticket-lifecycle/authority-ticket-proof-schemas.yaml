@@ -13,10 +13,7 @@
       "skills/vibehub-core/contracts/outcome.schema.json",
       "skills/vibehub-core/contracts/revision-identity.md",
       "skills/vibehub-core/scripts/revision-contract.mjs",
-      "skills/vibehub-ticket-plan",
-      "skills/vibehub-ticket-run",
-      "skills/vibehub-ticket-validate",
-      "skills/vibehub-ticket-closeout"
+      "skills/vibehub-ticket"
     ],
     "update_rules": [
       "Present the proposed schema or identity change to the owner and wait for the decision before editing a canonical file.",
@@ -32,7 +29,7 @@
     ]
   },
   "context_id": "authority-ticket-proof-schemas",
-  "detail": "A Ticket's acceptance identities, Evidence bindings and Outcome contract revisions are semantic proof objects. Changing their schemas or the identity contract changes what counts as proof for every closed Ticket in every project, so the change is a product decision: append-only revisions, deterministic identities, and explicit migrations are non-negotiable, and a person decides before the canonical documents move.",
+  "detail": "A Ticket's acceptance identities, Evidence bindings and Outcome contract revisions are semantic proof objects. Changing their schemas or the identity contract changes what counts as proof for every closed Ticket in every project, so the change is a product decision: append-only revisions, deterministic identities, and explicit migrations are non-negotiable, and a person decides before the canonical documents move. Current Ticket status is an explicit task record. Optional historical proof does not require an execution or closeout workflow, and these identity protections do not restrict ordinary conversation.",
   "evidence": [
     {
       "note": "Canonical Ticket contract.",
@@ -45,6 +42,10 @@
     {
       "note": "The decision that makes these documents append-only.",
       "ref": ".vibehub/rooms/product/decision-acceptance-contracts-use-append-only-revisions.yaml"
+    },
+    {
+      "note": "Current task-memory status is separate from immutable historical proof.",
+      "ref": "skills/vibehub-core/contracts/ticket-state.md"
     }
   ],
   "kind": "context",
@@ -65,7 +66,7 @@
     "ref": "conversation:2026-09-09-authority-context-type"
   },
   "state": "active",
-  "summary": "The Ticket, Evidence and Outcome schemas plus the revision identity contract are the golden truth of the execution lifecycle",
+  "summary": "Ticket and historical proof schemas preserve explicit task records and immutable proof identity",
   "tags": [
     "authority",
     "schemas",

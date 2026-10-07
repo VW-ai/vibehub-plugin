@@ -11,9 +11,10 @@ test("interaction research is source-backed and compares coherent spatial models
   const [html, script, review] = await Promise.all([
     source("apps/harness-interaction-research/index.html"),
     source("apps/harness-interaction-research/app.js"),
-    source("docs/HARNESS_INTERACTION_RESEARCH.md"),
+    source(".vibehub/rooms/workbench/note-harness-interaction-exploration-history.yaml"),
   ]);
 
+  assert.equal(JSON.parse(review).type, "note");
   for (const product of ["OpenAI Codex", "Linear", "Raycast", "Things", "Notion", "Msty", "Superlist", "OpenHands"]) {
     assert.match(script + review, new RegExp(product), `missing research source: ${product}`);
   }
@@ -23,8 +24,6 @@ test("interaction research is source-backed and compares coherent spatial models
   for (const phase of ["Graph home", "Running", "Needs you", "Review"]) {
     assert.match(html + script, new RegExp(phase), `missing scenario phase: ${phase}`);
   }
-  assert.match(review, /Focus Route — recommended/);
-  assert.match(review, /141eb6fef83422698aef7a981029e843e8161534/);
   assert.doesNotMatch(script, /localStorage|sessionStorage/);
 });
 

@@ -1,0 +1,48 @@
+{
+  "context_id": "note-harness-visual-directions-rejected",
+  "detail": "The historical visual review compared Ambient OS, Spatial Cockpit and Kinetic Command with separate density, hierarchy, navigation and motion hypotheses. The owner rejected all three on 2026-08-17. Research anchors were taste references, not approval of generated claims or capabilities. The next step was taste calibration and a whole-application Codex/Linear quality baseline, not blending the rejected alternatives into a fourth arbitrary dashboard. Existing apps/harness-directions and apps/harness-taste-board remain review studies. Their mock content, source references and constraints stay inspectable through the pinned report; current Dashboard adoption follows its separately accepted Quiet direction.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#harness-visual-direction-review; lines 1-11. Historical section excerpt: \"Status: rejected visual study retained only as negative evidence. On 2026-08-17 the owner rejected all three directions as visually dated and \\\"土土的\\\". Do not iterate, combine, or use them as the baseline for the whole-application prototype. The replacement gate is a taste-calibration board made from…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#how-to-review; lines 12-31. Historical section excerpt: \"Open the local direction study and compare the same scenario in all three directions. Review First frame, Chat at work, and Active runs before opening one direction full-screen. The Notes control explains the intent and risk behind each direction.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#direction-01-ambient-os; lines 32-44. Historical section excerpt: \"The current intention owns the field. Navigation recedes to the edge. Trusted work appears as persistent ambient signals and becomes explicit when it needs attention. The full branch topology is a temporary zoom-out state rather than the default surface.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#direction-02-spatial-cockpit; lines 45-56. Historical section excerpt: \"Conversations, Tickets, Context, and Runs occupy one navigable field. Chat is a focused panel inside that field. Explicit forks create visible paths; semantic similarity never creates graph edges. Reference mix: Msty Branch Explorer, conversation-graph research, and local\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#direction-03-kinetic-command; lines 57-68. Historical section excerpt: \"A compact work queue makes readiness, current activity, and human attention legible in one scan. Branches use tabs and lineage. Runs use precise event rows, progress steps, and a persistent status lane. Reference mix: Linear's hierarchy and density, Warp/Oz run supervision, and\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#research-anchors; lines 69-91. Historical section excerpt: \"OpenAI Codex app: multi-threaded Agent work, review, and long-running tasks <https://openai.com/index/introducing-the-codex-app/> Linear Agent and multi-chat work state <https://linear.app/docs/linear-agent> Linear attention hierarchy and calmer application chrome\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_VISUAL_DIRECTION_REVIEW.md#protected-next-step; lines 92-97. Historical section excerpt: \"Do not combine the three directions automatically. After explicit owner input, record one base environment plus any named interaction elements worth carrying forward. Then replace the rejected prototype with one coherent application; do not ship a visual-style selector.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+  },
+  "state": "active",
+  "summary": "All three early Harness visual directions were rejected before the next taste study",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

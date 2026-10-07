@@ -1,0 +1,44 @@
+{
+  "context_id": "note-release-identity-original-failure",
+  "detail": "The release-identity proposal followed an install that was 143 commits behind while still reporting 0.8.0. The owner selected a shipped-content version gate and distinguishable prerelease identity rather than abandoning semantic release metadata. Updating remained voluntary, but an accepted update should account for affected project data. Later investigation of skills 1.5.23 proved global folder-hash checks and project re-fetch behavior, so version-string cache staleness does not apply to the supported npx path. The current safe upgrade uses an explicit same-tag install and one-shot release asset over bounded roots/worktrees. Earlier floating skills-update and read-only machine-sweep questions are historical alternatives. Pending computed-version and atomic release work has separate decisions and Tickets; this note does not claim it is shipped.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#release-version-identity; lines 1-4. Historical section excerpt: \"What a declared VibeHub version means, and what had to be decided.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    },
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#the-failure-this-answers; lines 5-20. Historical section excerpt: \"An install taken at 648c5f62 sat 143 commits behind 928ed611 — a restructured Skills tree, a new vibehub-core, all eleven SKILL.md files changed, changed migration guidance, replaced Workbench assets. Both declared 0.8.0. The host reported *already at the latest version* and did nothing.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    },
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#options-considered; lines 21-51. Historical section excerpt: \"A. Bump per shipped change.** CI fails when content inside the build-plugin-artifact.mjs allowlist lands on main while the declared version still equals the last published release. Release pipeline: one added gate; no change to how a release is cut.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    },
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#decision; lines 52-60. Historical section excerpt: \"A and B together.** A alone puts the cost on every commit; B alone leaves releases able to ship changed content under a reused number. Together, main carries a pre-release identity so day-to-day work needs no manual bump, and the gate ensures a release number never covers two different artifacts.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    },
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#the-part-that-reaches-users; lines 61-77. Historical section excerpt: \"Updating is never forced. A project may sit on an older version indefinitely; nothing nags, auto-upgrades, or breaks. An update that *is* taken is owned end to end: VibeHub restructures that user's existing project data into the new format rather than reporting that\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    },
+    {
+      "note": "Source segment docs/proposals/release-version-identity.md#why-this-is-not-hypothetical; lines 78-84. Historical section excerpt: \"Surveyed on the owner's machine, 2026-09-01: three VibeHub projects, two of them write-blocked at MIGRATION_REQUIRED — Undercurrent at format_version: 1, nomi at 0.4-unversioned with no version.yaml and 19 flat context entries — with the owner unaware until the survey was run by\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/release-version-identity.md"
+  },
+  "state": "active",
+  "summary": "The original stale-version incident was marketplace-specific and later narrowed by installer evidence",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

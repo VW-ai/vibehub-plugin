@@ -1,0 +1,36 @@
+{
+  "context_id": "note-harness-initial-prototype-rejected",
+  "detail": "The initial Harness prototype exercised task/context/run/attention interactions through additive DSH-style slots. Its checklist was a feasibility and review aid, not product acceptance. The owner rejected the presented interface and required a replacement review that considered the complete experience. Existing apps/harness-prototype preserves the runnable study and source report records the exact questions and walkthrough. Keep the implementation evidence distinct from the visual rejection; neither permits shipping a mock executor or treating the old execution lifecycle as current task state.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_PROTOTYPE_REVIEW.md#harness-prototype-review; lines 1-11. Historical section excerpt: \"Status: rejected as product UI; retained only as an interaction inventory and technical fixture. The next prototype must replace the complete DSH-visible application shell. Run npm run prototype:harness:safari, then use the interface rather than\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PROTOTYPE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PROTOTYPE_REVIEW.md#suggested-walkthrough; lines 12-23. Historical section excerpt: \"1. In **Chat**, fork both “Ticket craft” and “Execution presence.” 2. Open **Branches**, enter each node, and return to the graph. 3. Open **Compare branches** and use **Bring back to Main**. 4. Turn **Context on**, inspect the three selected claims, then send a turn.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PROTOTYPE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PROTOTYPE_REVIEW.md#product-questions-for-the-owner; lines 24-42. Historical section excerpt: \"The next product-direction decision should answer these questions explicitly: 1. Does this feel primarily like a strong Chat for doing work, rather than a workflow tool wrapped around a chatbot? 2. Is the conversation graph useful and quiet enough? Is returning from a fork\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PROTOTYPE_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PROTOTYPE_REVIEW.md#replacement-review-requirement; lines 43-64. Historical section excerpt: \"The next review starts from the whole application, not from VibeHub-specific feature panels. It must answer: 1. Does the first frame feel like a distinct VibeHub application before any Ticket, Context, or Graph feature is opened? 2. Can a person move from capture or Chat into a branch, Ticket, Run,…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PROTOTYPE_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PROTOTYPE_REVIEW.md"
+  },
+  "state": "active",
+  "summary": "The first Harness slot-based prototype was rejected as a product interface",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

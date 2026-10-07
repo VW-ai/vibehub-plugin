@@ -1,0 +1,29 @@
+{
+  "context_id": "contract-ticket-record-progress",
+  "detail": "Project format 6 uses Ticket schema 4 with recorded status open, in_progress or done. Progress entries have stable update IDs, a summary and optional references; repeating the same update is a no-op, and reopening appends another update to the same Ticket. Acceptance criteria are optional task definition, not permission to begin. A direct unsatisfied prerequisite blocks only an open Ticket; in_progress and done remain recorded facts even when a prerequisite later reopens. Dependency edges are direct prerequisites, not parent ownership. Maturity and deterministic next-Skill routing no longer govern current tasks. Completing a task needs no Evidence or Outcome object. Existing acceptance identities, contract revisions, historical proof and frozen context references keep their original meaning and are never rebound to newer work. Current/all graph scope and delivery queries derive from recorded task status and explicit membership, with no inferred run state.",
+  "evidence": [
+    {
+      "note": "Source segment docs/CONCEPT.md#tasks-and-progress; lines 7-22. Public source excerpt: \"A Ticket needs an ID and desired outcome. Context, completion criteria, and relationships can grow as the task becomes clearer. The vibehub-ticket Skill owns definition, reading, and updates. Choosing VibeHub does not select a research, development, testing, or review process.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-draft-ticket-maturity",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+  },
+  "state": "active",
+  "summary": "Task progress is explicit, append-only and independent of execution workflow",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

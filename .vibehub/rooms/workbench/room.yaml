@@ -2,11 +2,43 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "29d5bd308ae50276bb4bce6a1435a2cd05206b5f",
+        "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
+        "path": "assets/screenshots/local-graph/quiet-workbench-desktop-2x.png"
+      },
+      {
+        "blob": "68f9a0219b05a05b158c8f27a29b0da9c57936d0",
+        "path": "assets/screenshots/local-graph/quiet-workbench-desktop.jpg"
+      },
+      {
+        "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
+        "path": "assets/screenshots/local-graph/quiet-workbench-narrow.jpg"
+      },
+      {
+        "blob": "900e846165d3ae1019b2fb96041aaa138863fb9c",
+        "path": "assets/screenshots/local-graph/readme-capture-manifest.json"
+      },
+      {
+        "blob": "9848601c890923d0b17cc9436f8d7ad2d50caff7",
+        "path": "assets/screenshots/local-graph/workbench-rooms-narrow-2x.png"
+      },
+      {
+        "blob": "b139f93c74c772316d49b29f29b52c1e61217b92",
+        "path": "assets/screenshots/local-graph/workbench-rooms-narrow.jpg"
+      },
+      {
+        "blob": "6353976f590a96ae4b456921bea407fa279a650a",
+        "path": "assets/screenshots/local-graph/workbench-ticket-action-2x.png"
+      },
+      {
+        "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
+        "path": "assets/screenshots/local-graph/workbench-ticket-proof.jpg"
+      },
+      {
+        "blob": "de0e0566177fbc01256771f5038c8ac1b09716a3",
         "path": "skills/vibehub-review/SKILL.md"
       },
       {
-        "blob": "dca02ddc29eb16b69a0f9f0068c5c3021e577c57",
+        "blob": "821c21243c27de27422669647d68df837f0515b1",
         "path": "skills/vibehub-review/agents/openai.yaml"
       },
       {
@@ -14,19 +46,19 @@
         "path": "skills/vibehub-review/assets/app-layout.js"
       },
       {
-        "blob": "8e1dfc7081c9dbeed2d0774edafb9bc9ca39c71f",
+        "blob": "2808c320725cf89f147b4bf2e1599848e04e7b0f",
         "path": "skills/vibehub-review/assets/app-model.js"
       },
       {
-        "blob": "1de1212ef50e7ac31f53bb3b41d11194b3897f05",
+        "blob": "efe25aed8fae958417cc768dc63fed5400dbfa89",
         "path": "skills/vibehub-review/assets/app.css"
       },
       {
-        "blob": "43667aff725d07c672cc5896eb67d906f232a143",
+        "blob": "bff2c1cdced0d3973cec33982199a5887435c800",
         "path": "skills/vibehub-review/assets/app.js"
       },
       {
-        "blob": "8a96279633ce677eab40d02e8c07e9570bff5755",
+        "blob": "87371a6bc686a0f7e7766bd05c0db485f08eadc4",
         "path": "skills/vibehub-review/assets/dashboard-graph.js"
       },
       {
@@ -38,23 +70,23 @@
         "path": "skills/vibehub-review/assets/dashboard-rooms.js"
       },
       {
-        "blob": "9373c87efd86e8317e0454e545ace5f8069c01bb",
+        "blob": "2108449f15a8bae2a51266118c5240d2f372ab0f",
         "path": "skills/vibehub-review/assets/dashboard-ticket.js"
       },
       {
-        "blob": "9da00a775e045b8f290bcf50b82a01ba9a3fe028",
+        "blob": "ab430154fcea0b56098e8ee0ce4eae769cf8e6f5",
         "path": "skills/vibehub-review/assets/dashboard.css"
       },
       {
-        "blob": "9245ce6aca3fcf7c132c2fcd8e800f22061dab09",
+        "blob": "47d84a4f576068e8f63187bd35a50ea25693d176",
         "path": "skills/vibehub-review/assets/dashboard.html"
       },
       {
-        "blob": "3aee656988531c7acaf80b78bbe54f23808312a2",
+        "blob": "685701e8e258c4b4f261c98387c6cfacc3ec6925",
         "path": "skills/vibehub-review/assets/dashboard.js"
       },
       {
-        "blob": "5effca213341ab14477c55ffd49755ae0fe10cb7",
+        "blob": "a305763d8fbc4fd189e2217b58eebbea58102022",
         "path": "skills/vibehub-review/assets/index.html"
       },
       {
@@ -62,18 +94,80 @@
         "path": "skills/vibehub-review/assets/vibehub-mark.svg"
       },
       {
-        "blob": "32406a74b65dc06219545ab38033b97b0384ad74",
+        "blob": "b5580280807fd2d03e93deccbc2913b8db1acd7d",
         "path": "skills/vibehub-review/references/ticket-lifecycle.json"
+      },
+      {
+        "blob": "bacec00f101b479b827207901345cea48f42c0f0",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/contract.json"
+      },
+      {
+        "blob": "591749d2a61a287aebacae74cdd5617fc6f5992a",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/fixtures.json"
+      },
+      {
+        "blob": "2a738eb744695cad46b8c59cee146892830f7494",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/index.html"
+      },
+      {
+        "blob": "578540d9054125c2d4f95d63afceb2db668d4f6e",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/phase-model.mjs"
+      },
+      {
+        "blob": "658ad3be5c26fd6a8000761c9518d6900b953f55",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/prototype.css"
+      },
+      {
+        "blob": "89edf0ccce4ffd2e6f8b47c7c4bae85d8954ca34",
+        "path": "test/fixtures/ui-proposals/card-corner-signal/prototype.js"
+      },
+      {
+        "blob": "e5e7aa243c0e9ef091b3d94dc4eb1ff31507fd95",
+        "path": "test/fixtures/ui-proposals/codex-like-workbench/index.html"
+      },
+      {
+        "blob": "a3c2c4c371e300b4d509081d49f65030b65dd1a0",
+        "path": "test/fixtures/ui-proposals/codex-like-workbench/proposal.css"
+      },
+      {
+        "blob": "a58e04ef0059118685c75cb8e2c76bd3134dbe85",
+        "path": "test/fixtures/ui-proposals/codex-like-workbench/proposal.js"
+      },
+      {
+        "blob": "424e1e40d56cfd015af22feb9b4cb58f4ade4f55",
+        "path": "test/fixtures/ui-proposals/codex-like-workbench/state-matrix.json"
+      },
+      {
+        "blob": "e2d21fa748c5dd096ae3e2f328c04bc969a920e2",
+        "path": "test/fixtures/ui-proposals/codex-like-workbench/tokens.json"
+      },
+      {
+        "blob": "ab4e013da5020ff102091f77356df1381483f237",
+        "path": "test/fixtures/ui-proposals/rooms-workbench/contract.json"
+      },
+      {
+        "blob": "e30c3a7ccb9b2d33796bac812ae7bae7c3584f25",
+        "path": "test/fixtures/ui-proposals/rooms-workbench/index.html"
+      },
+      {
+        "blob": "bd7fb3592ef489e1ada3f8f7a8e9ff182c73aaeb",
+        "path": "test/fixtures/ui-proposals/rooms-workbench/rooms.css"
+      },
+      {
+        "blob": "4c6096f6e6c0a9addad816f9973cd23e2152965f",
+        "path": "test/fixtures/ui-proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-09-21T14:38:54.187Z",
-    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
+    "checked_at": "2026-10-07T07:37:28.084Z",
+    "last_aligned_commit": "74ef88e39156b1e1e4455426131e4a171335ef60"
   },
   "anchors": [
-    "skills/vibehub-review/"
+    "skills/vibehub-review/",
+    "assets/screenshots/local-graph/",
+    "test/fixtures/ui-proposals/"
   ],
   "boundary": "The read-only local graph workbench: projection, loopback host, assets, and interaction language. Not the canonical YAML documents it renders.",
-  "description": "The local read-only graph UI that presents the Ticket graph and Context as a quiet, actionable workbench.",
+  "description": "Read-only live Dashboard, graph and Room presentation.",
   "kind": "room",
   "room_id": "workbench",
   "schema_version": 1,

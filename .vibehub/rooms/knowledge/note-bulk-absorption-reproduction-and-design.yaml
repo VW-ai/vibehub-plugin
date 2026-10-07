@@ -1,0 +1,72 @@
+{
+  "context_id": "note-bulk-absorption-reproduction-and-design",
+  "detail": "In the Peel reproduction, a 1,369-line PRD and 672-line HTML source first produced five Context entries, then 32 after the user asked again, followed by three rework Tickets. The failure was incomplete semantic coverage, not merely poor wording. A territorial file-per-Room split could not represent unrelated claims within one long document. The accepted process deterministically segments all supplied sources, surveys semantic ownership, settles the Room tree, extracts per Room and recomputes coverage. Parallel work is per owning Room rather than arbitrary chunks; citations use exact segment IDs, and nonclaims or duplication require a stated exception. The existing ingest Skill owns extraction, distill owns Room shape/alignment, and no additional user-facing Skill or persistent progress manifest is needed. Existing approved Room trees can be reused without asking for a new taxonomy decision. The old twelve-Skill topology is historical. The work also exposed perpetual-live reference validation: completed Ticket refs had blocked legitimate source renames. Current pointers resolve against the working tree; frozen records retain their historical commit. Operational instructions stay once in the ingest bulk-absorption reference; this note records the reproduced failure and why that design was selected.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#proposal-bulk-absorption; lines 1-4. Historical section excerpt: \"Branch: claude/peel-knowledge-ingestion-a85999 · 2026-08-29\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#the-problem-reproduced; lines 5-26. Historical section excerpt: \"The Peel project (~/Peel) cold-started VibeHub on 2026-08-25 from two hand-authored source files: a 1369-line PRD and a 672-line self-contained demo HTML. The result, still checked in: | Signal | Observed | | --- | --- | | Room tree | one room, .vibehub/rooms/product/, no sub-rooms |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#root-causes; lines 27-59. Historical section excerpt: \"1. Nothing in the system defines how a large document becomes Context.** vibehub-distill builds the room tree and stamps alignment. Its only statement about extraction is step 5: \\\"Distilled output follows the trust and placement rules in ../vibehub-ingest/references/knowledge-governance.json.\\\"\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#scope; lines 60-74. Historical section excerpt: \"This proposal fixes cause 1 and 3 directly, and relieves cause 2 by letting the tree be proposed from surveyed content rather than from directory shape. Explicitly **not** in scope: Semantic (non-path) room anchors. An artifact-authority Context type that forces a ticket to diff against a\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#design; lines 75-76. Structural heading only; the following named sections carry the substantive claims.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#no-new-user-facing-skill; lines 77-89. Historical section excerpt: \"Bulk absorption is not a separate capability from ingest. It is what ingest does when the input is large. Users must never be asked to judge whether their material is \\\"big enough\\\" for a different skill; that judgment is internal. vibehub-ingest keeps its current description and its current…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#the-five-passes; lines 90-149. Historical section excerpt: \"Pass 1 — Segment (deterministic, script).** vh.mjs source segment --repo <root> --path <file> splits each source file into stably identified segments: Markdown: by heading hierarchy. Segment id path#heading-slug. Everything else (HTML, code, plain text): fixed line windows, default 60\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#parallelism; lines 150-169. Historical section excerpt: \"Pass 2 and Pass 4 are parallelizable where the harness supports subagents. Pass 4 shards **by room, not by segment**. A claim that appears in three chapters would otherwise be extracted three times by three blind workers, producing duplicate Contexts with inconsistent ids. Pass 3 has already\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#skill-topology; lines 170-182. Historical section excerpt: \"| Skill | Change | | --- | --- | | vibehub-ingest | Sole user-facing knowledge write entry. Gains a bulk branch pointing at references/bulk-absorption.md; owns orchestration and coverage. | | vibehub-distill | Narrowed to room shape and alignment stamps, and marked internal — invoked by ingest,…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#why-distill-survives; lines 183-198. Historical section excerpt: \"An earlier draft of this proposal deleted vibehub-distill and split its two jobs between ingest and ticket-plan. An impact scan reversed that: Historical records — .vibehub/evidence/*, .vibehub/outcomes/*, closed tickets, META/legacy-* — reference it and must not be rewritten.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#mechanical-changes; lines 199-224. Historical section excerpt: \"Schema.** context.schema.json needs no change: source.ref and evidence[].ref are free text, so segment-level references (docs/…/prd.md#4-2-fork-lifecycle) are already legal. Only room.schema.json changes, gaining an optional coverage_exceptions: [{segment, reason}] — required because it declares\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#verification; lines 225-232. Historical section excerpt: \"The proposal is proved by re-running Peel's cold start on the same two source files and comparing against the checked-in single-room result: a tree with more than one room, separating product intent from UX/interaction evidence, and a coverage report reaching zero uncovered segments without the user\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    },
+    {
+      "note": "Source segment docs/proposals/bulk-absorption.md#found-during-execution-reference-validation-is-not-lifecycle-aware; lines 233-268. Historical finding: Renaming the review Skill exposed 37 references across 24 closed Tickets that were incorrectly treated as perpetual live pointers. The repair preserves historical commit resolution without keeping removed directories alive.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+  },
+  "state": "active",
+  "summary": "The bulk-ingest design fixed under-coverage by enumerating source segments before extraction",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

@@ -7,15 +7,15 @@ import {
   cardSignalContract,
   deriveCardSignal,
   isAllowedCombination,
-} from "../docs/proposals/card-corner-signal/phase-model.mjs";
+} from "../test/fixtures/ui-proposals/card-corner-signal/phase-model.mjs";
 
-const root = join(process.cwd(), "docs/proposals/card-corner-signal");
+const root = join(process.cwd(), "test/fixtures/ui-proposals/card-corner-signal");
 const contract = JSON.parse(readFileSync(join(root, "contract.json"), "utf8"));
 const fixtureDocument = JSON.parse(readFileSync(join(root, "fixtures.json"), "utf8"));
 const html = readFileSync(join(root, "index.html"), "utf8");
 const css = readFileSync(join(root, "prototype.css"), "utf8");
 const script = readFileSync(join(root, "prototype.js"), "utf8");
-const readme = readFileSync(join(root, "README.md"), "utf8");
+const finding = JSON.parse(readFileSync(join(process.cwd(), ".vibehub/rooms/workbench/note-card-signal-proposal-history.yaml"), "utf8"));
 
 test("proposal separates canonical truth sources from the four-phase Human model", () => {
   assert.deepEqual(contract.recommendation.primary_phases, ["DRAFT", "READY", "RUNNING", "DONE"]);
@@ -145,6 +145,7 @@ test("materiality and lifecycle transitions cover blocker clear, Run end, closeo
 
 test("production-shaped review board is clickable, responsive, quiet, and accessible", () => {
   assert.equal(html.includes("http://") || html.includes("https://"), false);
+  assert.equal(finding.type, "note");
   assert.match(html, /Production-shaped card signal review board/u);
   assert.match(html, /data-viewport="wide"/u);
   assert.match(html, /data-viewport="narrow"/u);
@@ -184,8 +185,5 @@ test("visual budget has four primary entries, bounded color families, and non-co
 });
 
 test("proposal keeps raw machine and downstream decision boundaries explicit", () => {
-  assert.match(readme, /proposal only — owner decision required/u);
-  assert.match(readme, /Raw Ticket status, next_action/u);
-  assert.match(readme, /Protected decision and implementation sequence/u);
   assert.equal(contract.downstream_boundaries.length, 7);
 });

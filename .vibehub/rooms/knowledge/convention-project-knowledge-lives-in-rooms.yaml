@@ -1,0 +1,37 @@
+{
+  "context_id": "convention-project-knowledge-lives-in-rooms",
+  "detail": "For this repository, root docs is retired. Current durable decisions, constraints, conventions, findings and prose contracts live as typed Context in the lowest existing owning Room. Keep concise README and Skill entry instructions, executable schemas/contracts, code, fixtures and media at their operational locations. Do not rename docs into another parallel knowledge directory or distribute the repository Room tree with installed Skills. Historical META, frozen Evidence, Outcomes and historical Ticket references retain their original source meaning and are not current guidance. Migration reads every source segment, separates current claims from rejected or superseded proposals, and retains exact Git commit/path provenance with section identity in evidence notes. Current pointers move to current Context; frozen records stay historical. Source coverage after deleting the old anchors is insufficient proof of retention, so the migration test checks the fixed baseline section fingerprint. Explicit durable capture remains the trigger; there is no ticket-start or periodic background writeback.",
+  "evidence": [
+    {
+      "note": "Repository-specific Rooms-only instruction.",
+      "ref": "AGENTS.md"
+    },
+    {
+      "note": "Original segment-first extraction and provenance obligations.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-source-segmentation-and-coverage",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ambient-two-mode-distill",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "AGENTS.md"
+  },
+  "state": "active",
+  "summary": "Maintained project knowledge lives in typed Context in the existing Room tree",
+  "tags": [
+    "knowledge-governance",
+    "docs-migration"
+  ],
+  "type": "convention"
+}

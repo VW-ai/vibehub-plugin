@@ -1,0 +1,36 @@
+{
+  "context_id": "note-harness-chat-prototype-rejected",
+  "detail": "The historical Chat V1 review tested a full chat-first scene with fork, compare, bring-back, context activation, task creation/start and run-attention transitions. The owner rejected this custom visual baseline on 2026-08-17. A scripted walkthrough or implemented mock interaction did not approve production visuals or prove a backend. The useful result is the set of interaction questions and taste constraints; existing apps/harness-chat-v1 stays a historical runnable study. Subsequent work should follow later accepted quality and task-memory decisions, not silently revive the rejected appearance.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_CHAT_V1_REVIEW.md#harness-chat-v1-review; lines 1-7. Historical section excerpt: \"Status: rejected visual baseline retained as negative evidence. The owner rejected the complete custom-shell style on 2026-08-17 and redirected the product to begin from the current Codex interaction baseline. Do not polish or extend this visual system; retain only its interaction findings.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CHAT_V1_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CHAT_V1_REVIEW.md#taste-signals-applied; lines 8-19. Historical section excerpt: \"The application shell recedes so current work receives attention. The first frame is a normal Agent Chat, never a Dashboard. Workspace, Session, and model identity stay stable without becoming panels. Branch, Context, and Ticket actions happen beside the conversation that owns\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CHAT_V1_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CHAT_V1_REVIEW.md#exact-walkthrough; lines 20-38. Historical section excerpt: \"1. Read and scroll the normal Main conversation. 2. Hover an assistant answer section and choose Fork from here. 3. Open Branches, enter a branch, or compare the two example forks. 4. Use Bring back to Main; confirm that it appends a source-linked turn rather\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CHAT_V1_REVIEW.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_CHAT_V1_REVIEW.md#owner-judgment; lines 39-53. Historical section excerpt: \"Would this first viewport replace Codex for focused task conversations? Is the shell quiet without feeling empty or generic? Does the conversation still feel like unrestricted Agent Chat? Are Branch and Bring Back understandable without teaching a graph model?\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CHAT_V1_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_CHAT_V1_REVIEW.md"
+  },
+  "state": "active",
+  "summary": "The custom Chat V1 visual treatment was rejected while its interaction study remained useful",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

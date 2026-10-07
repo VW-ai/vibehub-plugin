@@ -1,0 +1,24 @@
+{
+  "context_id": "note-upgrade-surface-alternatives",
+  "detail": "The selected upgrade entry is a single-bin npm-layout tarball attached to the exact GitHub Release, reusing the same migration engine and declared registry as the installed Skills. Running an installed-core path was rejected as ambiguous across different project installations; a required global installation, background scanner and npm-registry publication were rejected as unnecessary authority and distribution paths. Explicit bounded roots and registered worktrees let the tool report each branch snapshot independently. The architecture exception covers deterministic mechanical migrations and local reviewable commits only, while semantic judgment stays with a later Agent in the affected worktree. Its safety contract is preserved by the current install-and-upgrade Context and executable transaction tests.",
+  "evidence": [
+    {
+      "note": "Compared invocation shapes and bounded deterministic transaction semantics; detailed segment retention is in contract-install-and-explicit-upgrade.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+  },
+  "state": "active",
+  "summary": "The explicit release tarball kept upgrade orchestration outside installed Skills without a global service",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

@@ -23,3 +23,16 @@ conversation checkpoints or background capture.
 For changes, deployment, verification, or rollback of `site/` and
 `https://vibehub.team`, use the repository-local Skill at
 `site/release/SKILL.md`.
+
+## Project knowledge
+
+Keep maintained project knowledge as typed Context in the existing
+`.vibehub/rooms/` tree. Use `vibehub-ingest` for authorized durable capture and
+`vibehub-distill` for Room boundaries or alignment. The former root `docs/`
+directory is retired; do not recreate it or move its prose to another parallel
+knowledge directory. README and Skills remain concise user and Agent entrypoints.
+Executable contracts, fixtures and media stay with their owning code or assets.
+`META/` and frozen Evidence, Outcomes and historical Ticket references are legacy
+records, not a second source of current instructions; preserve their provenance.
+For changed knowledge, reconcile existing Context and record exact source refs.
+Publishing code does not authorize adding ignored private records.

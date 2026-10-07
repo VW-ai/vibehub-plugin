@@ -14,9 +14,10 @@ test("taste board uses real product references rather than another VibeHub conce
   const [html, script, review] = await Promise.all([
     source("apps/harness-taste-board/index.html"),
     source("apps/harness-taste-board/app.js"),
-    source("docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"),
+    source(".vibehub/rooms/workbench/note-harness-visual-directions-rejected.yaml"),
   ]);
 
+  assert.equal(JSON.parse(review).type, "note");
   for (const product of ["OpenAI Codex", "Claude Desktop", "Linear", "Raycast", "Warp", "Dia"]) {
     assert.match(script, new RegExp(product), `missing reference product: ${product}`);
   }
@@ -29,8 +30,6 @@ test("taste board uses real product references rather than another VibeHub conce
   assert.match(html, /暂时不设计 VibeHub/);
   assert.match(script, /ephemeral|navigator\.clipboard|ratings = new Map/);
   assert.doesNotMatch(script, /localStorage|sessionStorage/, "taste decisions must not be silently persisted");
-  assert.match(review, /rejected visual study/);
-  assert.match(review, /土土的/);
 });
 
 test("taste board is responsive, keyboard reachable, and reduced-motion safe", async () => {

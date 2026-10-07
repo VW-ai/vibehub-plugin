@@ -15,8 +15,8 @@
       "ref": ".vibehub/outcomes/ticket-add-source-segmentation-and-coverage.yaml"
     },
     {
-      "note": "说明为什么覆盖率必须先于并行化立住。",
-      "ref": "docs/proposals/bulk-absorption.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: 说明为什么覆盖率必须先于并行化立住。",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
     }
   ],
   "kind": "context",

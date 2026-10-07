@@ -116,15 +116,15 @@
     },
     {
       "purpose": "Product-level definitions of Ticket, replaceable Agent, Run, attention, and governed Context activation.",
-      "ref": "docs/HARNESS_PRODUCT_LOGIC.md"
+      "ref": ".vibehub/rooms/product/note-harness-product-model-history.yaml"
     },
     {
       "purpose": "Completed source and runtime evidence for executor adapters, Run projection, resume, approval, and canonical Git boundaries.",
-      "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+      "ref": ".vibehub/rooms/product/note-dsh-pinned-feasibility-evidence.yaml"
     },
     {
       "purpose": "Evidence explaining why the removed generic runtime and hidden state must not be recreated.",
-      "ref": "docs/SPEED_FIRST_CLEANUP.md"
+      "ref": ".vibehub/rooms/product/note-speed-first-cleanup-baseline.yaml"
     }
   ],
   "contract_revisions": [

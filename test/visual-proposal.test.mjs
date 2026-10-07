@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 
-const proposalRoot = join(process.cwd(), "docs/proposals/codex-like-workbench");
+const proposalRoot = join(process.cwd(), "test/fixtures/ui-proposals/codex-like-workbench");
 const tokens = JSON.parse(readFileSync(join(proposalRoot, "tokens.json"), "utf8"));
 const matrix = JSON.parse(readFileSync(join(proposalRoot, "state-matrix.json"), "utf8"));
 const html = readFileSync(join(proposalRoot, "index.html"), "utf8");

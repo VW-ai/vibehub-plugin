@@ -1,0 +1,52 @@
+{
+  "context_id": "note-card-signal-proposal-history",
+  "detail": "The proposal compared DRAFT, READY, RUNNING and DONE with one upper-right signal chosen in DEVIATED, BLOCKED, NEEDS_YOU, VERIFYING, WAITING order. Its exact fixture mapped old nextAction, maturity, acceptance authority, Evidence and Outcome facts. It rejected inferring present human attention merely from authority:human and rejected equating a transient tool failure with contract deviation. Live presence required a trusted source, operation and expiry, and canonical contradiction suppressed motion. The owner accepted only bounded production changes: retain the existing card anatomy, use honest runtime activity and a compact substate, and emphasize the context-aware copy action. The full proposal treatment was not adopted. The executable historical fixture under test/fixtures/ui-proposals/card-corner-signal preserves its exact v0.8 matrix and review examples; format 6 current state comes from explicit recorded progress instead.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#card-corner-signal-contract-proposal; lines 1-6. Historical section excerpt: \"Status: **proposal only — owner decision required**. Nothing in the production Workbench, Ticket projection, routing, Skill behavior, or v0.8 file format is changed by this artifact.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#recommendation; lines 7-30. Historical section excerpt: \"Use one Human-facing phase axis—**Context stability and forward motion**: DRAFT**: the Context or path still needs change. This includes an unblocked draft, a blocked Task, and a materially deviated Task. READY**: the Task is stable and the next actor can act. The next actor may\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#exact-derivation; lines 31-51. Historical section excerpt: \"The first matching row wins: | Priority | Canonical / trusted fact | Primary | Corner slot | | --- | --- | --- | --- | | 1 | Successful Outcome / DONE | DONE | empty | | 2 | Non-success Outcome / REPLAN | DRAFT | DEVIATED | | 3 | Unresolved direct dependency / WAIT | DRAFT | BLOCKED |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#what-v0-8-can-show-today; lines 52-71. Historical section excerpt: \"The all-scope corpus at proposal time contains 64 DONE|DONE, 6 READY|CLOSE_OUT, 4 BLOCKED|WAIT, 3 REFINE|REFINE, 2 READY|EXECUTE, and 1 READY|NEEDS_HUMAN. There is no non-success Outcome in the corpus and the production host exposes no trusted runtime/presence capability.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#draft-needs-you-decision; lines 72-88. Historical section excerpt: \"Do not infer it from authority: human. Human authority can represent future or terminal sign-off, and today BLOCKED/REFINE correctly project that boundary as UPCOMING, not actionable. Two truthful paths remain: 1. Current fallback: model the input as its own Human-decision Ticket. That\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#material-deviation-threshold; lines 89-96. Historical section excerpt: \"For v0.8, every independent non-success Outcome (partial, failed, or deviated) is material and returns the card to DRAFT + DEVIATED. A transient tool retry, temporary wait, resumable Run failure, or implementation-path adjustment inside the current contract is runtime detail, not DEVIATED. A\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#quiet-visual-budget; lines 97-118. Historical section excerpt: \"The review board reuses the approved compact card anatomy: ID, bounded outcome copy, top accent, lower-left causal counts, lower-right primary phase, and one upper-right signal. It spends color on only four families beyond neutrals: one action blue shared by READY and RUNNING (shape, copy, and…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/card-corner-signal/README.md#protected-decision-and-implementation-sequence; lines 119-132. Historical section excerpt: \"The smallest protected Human decision is the exact four-phase derivation, corner taxonomy/priority, short action language, and visual budget above. After that decision, keep downstream work split: 1. additive Human presentation projection over unchanged v0.8 fields;\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
+  },
+  "state": "active",
+  "summary": "The card-signal proposal modeled old v0.8 facts and does not define current task status",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

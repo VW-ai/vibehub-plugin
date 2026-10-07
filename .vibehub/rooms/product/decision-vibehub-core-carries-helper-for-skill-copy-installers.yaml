@@ -7,8 +7,8 @@
       "ref": ".vibehub/evidence/ticket-decide-npx-first-install-experience/owner-chooses-path-a.yaml"
     },
     {
-      "note": "Reproduction of the skills.sh breakage and the empirical comparison of install paths.",
-      "ref": "docs/proposals/npx-first-install-experience.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Reproduction of the skills.sh breakage and the empirical comparison of install paths.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/npx-first-install-experience.md"
     },
     {
       "note": "End-to-end proof that the relocated layout installs and runs on Claude Code and Codex.",

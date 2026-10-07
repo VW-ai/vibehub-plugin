@@ -7,8 +7,8 @@
       "ref": "conversation:2026-08-05-one-ticket-intent-context-loop"
     },
     {
-      "note": "The canonical concept already defines the Ticket as the development-cycle unit and Context as what survives beyond executable work.",
-      "ref": "docs/CONCEPT.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: The canonical concept already defines the Ticket as the development-cycle unit and Context as what survives beyond executable work.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
     }
   ],
   "kind": "context",
@@ -28,7 +28,7 @@
     "quote": "我们应该说是我们ticket是什么?是从context中浮现出来……request让我们创造ticket……evidence最后是outcome,它又回到context……中间的这个交互的个体是ticket",
     "ref": "conversation:2026-08-05-one-ticket-intent-context-loop"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "One Ticket mediates a loop between human intent and long-term Context",
   "tags": [
     "context",

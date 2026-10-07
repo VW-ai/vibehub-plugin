@@ -1,0 +1,32 @@
+{
+  "context_id": "note-rooms-workbench-proposal-history",
+  "detail": "The proposal made the Room tree an optional knowledge lens, with canonical directory containment and FRESH, DRIFTED, WARNING, STALE and COLD states derived from Room records. Related-ticket filtering takes the selected Room subtree union and intersects other graph filters, preserving canonical graph coordinates and restoring them when cleared. It used a floating tree and a narrow-screen bottom sheet, readable counts, 44px controls and no decorative filler labels. It remained read-only. The runnable prototype and machine-readable contract under test/fixtures/ui-proposals/rooms-workbench preserve this exploration; current live Dashboard and Room-schema behavior remain the production authority.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/rooms-workbench/README.md#rooms-in-the-workbench-proposal; lines 1-5. Historical section excerpt: \"Rooms are an optional knowledge lens over the causal Ticket graph, not a second navigation system and not a new graph layout.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/rooms-workbench/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/rooms-workbench/README.md#proposed-direction; lines 6-35. Historical section excerpt: \"A compact Rooms control in the Workbench header opens a floating Rooms browser. No Room panel or left navigation is present by default. The tree uses canonical directory containment. It never turns relates_to or depends_on into containment and never invents a hierarchy.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/rooms-workbench/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/rooms-workbench/README.md#review-states; lines 36-48. Historical section excerpt: \"The prototype exposes three states through its own controls: focused workbench: a FRESH Room with two Context entries and consuming Tickets; focused product: a representative DRIFTED Room with exact changed and added file counts rendered in situ;\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/rooms-workbench/README.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/rooms-workbench/README.md"
+  },
+  "state": "active",
+  "summary": "The Rooms proposal added a knowledge lens while preserving graph position",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

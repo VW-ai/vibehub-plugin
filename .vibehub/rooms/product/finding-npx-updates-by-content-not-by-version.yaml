@@ -7,8 +7,8 @@
       "ref": "conversation:2026-09-01-packaging-and-release-integrity"
     },
     {
-      "note": "Names npx skills add as the recommended path and npx skills update as the update command, which is the path this finding characterises.",
-      "ref": "docs/INSTALL.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Names npx skills add as the recommended path and npx skills update as the update command, which is the path this finding characterises.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
     }
   ],
   "kind": "context",

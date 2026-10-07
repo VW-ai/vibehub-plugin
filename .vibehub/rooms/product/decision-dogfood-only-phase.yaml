@@ -24,7 +24,7 @@
     "quote": "我们理论上，这个新version，只需要dogfood了是不是",
     "ref": "conversation:2026-07-31-dogfood-phase"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "The Skill-first VibeHub has entered a dogfood-only validation phase",
   "tags": [
     "dogfood",

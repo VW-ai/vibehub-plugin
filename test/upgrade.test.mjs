@@ -471,21 +471,30 @@ test("unprovable restoration aborts the command and does not continue writes", (
 });
 
 test("the implemented boundary and release documentation preserve the narrow exception", () => {
-  const proposal = readFileSync(join(root, "docs", "proposals", "cross-project-upgrade-surface.md"), "utf8");
-  const quoted = proposal.split("with exactly:\n\n", 2)[1].split("\n\n### Mechanical assertions", 1)[0]
-    .split("\n")
-    .map((line) => line === ">" ? "" : line.replace(/^> ?/u, ""))
-    .join("\n");
+  const contract = JSON.parse(readFileSync(join(root, ".vibehub", "rooms", "product", "contract-install-and-explicit-upgrade.yaml"), "utf8"));
+  assert.equal(contract.type, "contract");
+  assert.match(contract.detail, /same immutable release tag/u);
+  assert.match(contract.detail, /compare-and-swap ref update/u);
+  assert.match(contract.detail, /recovery_failed stops/u);
+  assert.ok(contract.evidence.some(item => item.ref ===
+    "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"));
   const boundary = readFileSync(join(root, "skills", "vibehub-setup", "references", "architecture-boundary.md"), "utf8");
-  // The later unified-dashboard amendment expands foreground presentation,
-  // while the historical proposal still governs the one-shot upgrade lane.
-  assert.equal(boundary.split("One narrow exception", 2)[1].split("\n## Unified dashboard", 1)[0].trim(),
-    quoted.split("One narrow exception", 2)[1].trim());
+  for (const requirement of [
+    /explicitly invoked `vibehub-upgrade` one-shot/u,
+    /accept bounded discovery roots/u,
+    /enumerate their registered existing worktrees/u,
+    /shared migration engine and migration reference/u,
+    /one local reviewable migration commit/u,
+    /owns no migration semantics and no durable project index/u,
+    /No Skill depends on it for ordinary project work/u,
+    /Nothing invokes it in the\s+background/u,
+    /must not add compatibility shims, telemetry, network reporting/u,
+  ]) assert.match(boundary, requirement);
   assert.match(boundary, /## Explicit local session observation/u);
   assert.match(boundary, /worktree-specific Git metadata/u);
   assert.match(boundary, /No session record is Ticket\s+authority/u);
 
-  const install = readFileSync(join(root, "docs", "INSTALL.md"), "utf8");
+  const install = readFileSync(join(root, "README.md"), "utf8");
   assert.match(install, /tree\/<release-tag>/u);
   assert.match(install, /releases\/download\/<release-tag>\/vibehub-upgrade\.tgz/u);
   assert.match(install, /Nothing is pushed/u);

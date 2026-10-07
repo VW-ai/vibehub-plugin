@@ -1,0 +1,49 @@
+{
+  "context_id": "decision-ticket-records-task-memory",
+  "detail": "VibeHub is optional task memory. A Ticket records the desired outcome, useful context, optional completion criteria, progress and relationships. Creating a task does not choose an implementation workflow, assign an Agent, start execution or prescribe a response format. Personal Skills and the host conversation determine how the work is performed. Ordinary questions and implementation need no Ticket. Shared dependency-free validation checks recorded facts. Git-native files remain the durable source of truth; there is no required database, generic dispatcher, provider runtime or background capture. Optional local read-only presentation and explicitly reported Agent sessions do not own task state. Historical Evidence and Outcome remain inspectable but independent closeout is not required to complete a current task. This supersedes execution-mandatory interpretations of the earlier dogfood and speed-first conventions while preserving their lightweight architecture.",
+  "evidence": [
+    {
+      "note": "Source segment docs/CONCEPT.md#vibehub-product-concept; lines 1-6. Public source excerpt: \"VibeHub preserves task memory and project Context. A Ticket records what the user wants to do, why it matters, how it relates to other work, and what has happened. The user's chosen skills decide how to complete the work.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+    },
+    {
+      "note": "Source segment docs/CONCEPT.md#context-and-authority; lines 23-35. Public source excerpt: \"Context preserves decisions, constraints, conventions, and reusable knowledge. An explicit request to remember future work creates a Ticket. An explicit request to preserve a durable project fact creates Context. One request may need both records, linked by context_refs.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+    },
+    {
+      "note": "Source segment docs/CONCEPT.md#goals-epics-and-relationships; lines 36-43. Public source excerpt: \"A Goal records an intended benefit and success criteria. An Epic groups a capability under one Goal. A Ticket may belong to an Epic or stand alone. Membership describes scope. depends_on describes a prerequisite. Neither membership nor task completion alone proves that a Goal has been achieved.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-dogfood-only-phase",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-ticket-mediates-intent-context-loop",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-manage-the-task-narrative",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+  },
+  "state": "active",
+  "summary": "Tickets remember requested work while people choose how to execute it",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "decision"
+}

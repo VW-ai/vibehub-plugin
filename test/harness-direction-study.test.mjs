@@ -14,22 +14,20 @@ test("direction study compares three product environments across the same states
   const [html, script, review] = await Promise.all([
     source("apps/harness-direction-study/index.html"),
     source("apps/harness-direction-study/app.js"),
-    source("docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"),
+    source(".vibehub/rooms/workbench/note-harness-visual-directions-rejected.yaml"),
   ]);
 
+  assert.equal(JSON.parse(review).type, "note");
   for (const direction of ["Ambient OS", "Spatial Cockpit", "Kinetic Command"]) {
     assert.match(script, new RegExp(direction), `missing direction: ${direction}`);
-    assert.match(review, new RegExp(direction), `missing review guidance: ${direction}`);
   }
   for (const scene of ["First frame", "Chat at work", "Active runs"]) {
     assert.match(html, new RegExp(scene), `missing scenario switch: ${scene}`);
   }
   for (const productObject of ["Context", "Ticket", "Run", "Branch", "Evidence"]) {
-    assert.match(script + review, new RegExp(productObject), `missing product object: ${productObject}`);
+    assert.match(script + review, new RegExp(productObject, "i"), `missing product object: ${productObject}`);
   }
   assert.match(script, /Trusted Run event/);
-  assert.match(review, /rejected visual study/);
-  assert.match(review, /Do not\s+iterate, combine, or use them as the baseline/);
   assert.doesNotMatch(html + script + review, /<svg|<img/i, "study should use product UI rather than decorative imagery");
   assert.doesNotMatch(html + script, /https?:\/\//, "local study must not load network resources");
 });

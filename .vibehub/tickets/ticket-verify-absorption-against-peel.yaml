@@ -47,7 +47,7 @@
   "context_refs": [
     {
       "purpose": "Defines the verification and the exact baseline to compare against.",
-      "ref": "docs/proposals/bulk-absorption.md"
+      "ref": ".vibehub/rooms/knowledge/note-bulk-absorption-reproduction-and-design.yaml"
     }
   ],
   "contract_revisions": [

@@ -15,8 +15,8 @@
       "ref": "commit:ce1d904096514b2ce6b9586c3cf31814bbcddf04"
     },
     {
-      "note": "Current user-facing description of the unified Dashboard's read-only surfaces and session behavior.",
-      "ref": "docs/DASHBOARD.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Current user-facing description of the unified Dashboard's read-only surfaces and session behavior.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DASHBOARD.md"
     }
   ],
   "kind": "context",

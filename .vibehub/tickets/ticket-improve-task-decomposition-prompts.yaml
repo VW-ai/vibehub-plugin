@@ -10,7 +10,7 @@
     },
     {
       "purpose": "任务记忆和个人开发 Skills 的分工。",
-      "ref": "docs/CONCEPT.md"
+      "ref": ".vibehub/rooms/product/decision-ticket-records-task-memory.yaml"
     }
   ],
   "contract_revisions": [

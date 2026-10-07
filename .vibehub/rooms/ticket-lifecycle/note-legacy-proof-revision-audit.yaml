@@ -1,0 +1,72 @@
+{
+  "context_id": "note-legacy-proof-revision-audit",
+  "detail": "The original audit at 59de368 examined 105 Tickets, 307 Evidence records, 95 Outcomes, 94 successful Outcomes and 43 archived tasks. It found 24 Evidence and two Outcome semantic-drift cases. These are dated audit counts, not current repository totals. Reconstruction uses the first appearance of each proof on the current Git ancestry, not unrelated branches collected through --all, timestamps or present filenames. Git co-presence proves what was recorded together, not private evaluator intent. The owner rejected marking all legacy proof stale, grandfathering every old success onto a changed current contract, and calling every known drift unresolved. Acceptance keeps a stable logical ID and monotonic immutable revisions; a new independent obligation gets a new ID, split/merge keeps lineage, retirement preserves history, and contract identity commits the exact acceptance revision set. Evidence binds an exact acceptance revision and Outcome an exact contract. A changed contract never silently rebinds old success. Migration explicitly reconstructs where history suffices, reserves legacy-unresolved for absent/ambiguous history, remains idempotent and preserves rollback proof. Under format 6 these historical proof rules do not derive current task status or dictate a next Skill.",
+  "evidence": [
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#legacy-proof-revision-policy; lines 1-6. Historical section excerpt: \"Status: owner-selected semantic policy; implementation and migration remain a separate downstream Ticket. This document does not itself change schemas, migrate proof, reopen Tickets, or alter current DONE/archive truth.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#question; lines 7-23. Historical section excerpt: \"Future Evidence must bind to the exact Acceptance revision it proves, and an Outcome must bind to the exact complete Contract revision it adjudicates. The protected migration question is how to introduce those identities without deleting history or silently treating proof for an older contract as…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#audited-corpus; lines 24-81. Historical section excerpt: \"Snapshot: 59de368c8a420d2913a6aa7a9d35cf7f52a7e569. | Fact | Count | | --- | ---: | | Tickets | 105 | | Evidence | 307 | | Outcomes | 95 | | Successful Outcomes / current DONE | 94 | | Archived delivered Tickets | 43 | | Human-authority criteria | 22 |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#rejected-interpretations; lines 82-83. Structural heading only; the following named sections carry the substantive claims.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#a-mark-every-legacy-proof-stale; lines 84-91. Historical section excerpt: \"Treating every Evidence and Outcome without a native contract identity as unbound is maximally strict and maximally destructive. It would reopen all 105 Tickets and erase the operational value of 94 successful independent adjudications even though Git can reconstruct every proof binding in this\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#b-grandfather-every-successful-outcome-onto-the-current-contract; lines 92-98. Historical section excerpt: \"This preserves today's projection, but silently reinterprets an old Outcome as having adjudicated criterion wording or Acceptance membership that did not exist when it was written. Historical success may be preserved; automatic rebinding to a newer Contract revision may not.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#c-mark-every-drifted-historical-outcome-unresolved; lines 99-106. Historical section excerpt: \"This correctly prevents old proof from closing a changed current contract, but describes too much as invalid. A reconstructable Outcome remains a successful historical judgment of its old Contract revision. Only its ability to close a different active revision is absent. legacy-unresolved is…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#selected-policy-append-only-acceptance-and-contract-revisions; lines 107-153. Historical section excerpt: \"VibeHub uses an append/mutate model at the semantic layer: mutable presentation and workflow metadata may change in place, while contract meaning evolves by appending immutable revisions. The selected rules are: 1. An Acceptance has a stable logical acceptance_id, a human-readable\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#legacy-reconstruction; lines 154-194. Historical section excerpt: \"Migration applies the selected model deterministically: The existing cross-worktree upgrade contract requires its mechanical half to leave every safe worktree valid and CURRENT while Git-history judgment remains for a later Agent session. The format transition therefore uses one explicit\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#installed-artifact-compatibility; lines 195-205. Historical section excerpt: \"The policy requires one explicit project-format migration, atomic changes to the Ticket, Evidence, and Outcome schema contracts, and rebuilding both Codex and Claude installed Plugin artifacts. It is not compatible with upgrading only source vh.mjs while leaving an older host artifact behind.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#migration-and-rollback-invariants; lines 206-226. Historical section excerpt: \"Every historical Evidence and Outcome remains content-preserved with its prior Git provenance inspectable. Acceptance identity uses stable serialization of logical ID, revision, semantic criterion, explicit/default authority, and immutable lineage while\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#downstream-implementation-boundary; lines 227-256. Historical section excerpt: \"ticket-bind-proof-to-acceptance-revision must implement the selected policy across the complete installed system: Ticket schema: stable logical Acceptance IDs, revision labels, immutable content identities, active/retired state, derived_from lineage, and exact\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    },
+    {
+      "note": "Source segment docs/LEGACY_PROOF_REVISION_POLICY.md#owner-decision; lines 257-265. Historical section excerpt: \"The owner selected the append-only revision policy in the conversation:2026-09-04-versioned-acceptance-lineage discussion: same responsibility means the same logical Acceptance with a new revision; separate responsibilities get separate IDs; split/merge and retirement preserve explicit\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+  },
+  "state": "active",
+  "summary": "The legacy proof audit reconstructed historical contracts without manufacturing acceptance",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}
