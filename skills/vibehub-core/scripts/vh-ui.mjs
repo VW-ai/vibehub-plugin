@@ -102,7 +102,7 @@ function githubWebBase(remote) {
   return match ? `https://github.com/${match[1]}` : null;
 }
 
-function pathActions(source, path) {
+function pathActions(source, path, { directory = false } = {}) {
   const absolutePath = isAbsolute(path)
     ? path
     : resolve(source.worktreeRoot, path);
@@ -116,7 +116,7 @@ function pathActions(source, path) {
     absolutePath,
     editorHref: `vscode://file${encodeURI(absolutePath)}`,
     githubHref: insideRepository && source.githubWebBase && revision
-      ? `${source.githubWebBase}/blob/${encodeURIComponent(revision)}/${repositoryPath
+      ? `${source.githubWebBase}/${directory ? "tree" : "blob"}/${encodeURIComponent(revision)}/${repositoryPath
         .split("/").map(encodeURIComponent).join("/")}`
       : null,
   };
@@ -1027,14 +1027,19 @@ export function startVibeHubUi({
       if (url.pathname === "/api/contexts") {
         const repo = workspace?.path || repoRoot;
         const repository = loadRepository(repo); assertValid(repository.errors);
+        const source = gitSource(repo, digest(documents(repository.contexts.documents)));
         // Which Tickets read each record is the first thing a reader wants to
         // know about it, so the projection carries it per Context.
         const ticketDocuments = documents(repository.tickets.documents);
-        const rooms = projectRooms(repo, repository).rooms.map(room => ({ ...room, contexts: room.contexts.map(context => ({
+        const rooms = projectRooms(repo, repository).rooms.map(room => ({
+          ...room,
+          actions: pathActions(source, `.vibehub/rooms/${room.room}`, { directory: true }),
+          contexts: room.contexts.map(context => ({
           ...repository.contexts.documents.get(context.contextId).document, path: context.path,
+          actions: pathActions(source, context.path),
           consumingTickets: ticketDocuments.filter(ticket => ticket.context_refs.some(({ ref }) => ref === context.path)).map(ticket => ticket.ticket_id).sort(),
         })) }));
-        writeJson(response, 200, { ok: true, data: { rooms } });
+        writeJson(response, 200, { ok: true, data: { rooms, source } });
         return;
       }
       if (url.pathname === "/api/tickets") {

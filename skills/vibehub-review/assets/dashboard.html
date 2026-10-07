@@ -1,47 +1,400 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VibeHub · All work</title><link rel="icon" href="/vibehub-mark.svg">
-<link rel="stylesheet" href="/dashboard.css"><script src="/dashboard-graph.js" defer></script><script src="/dashboard-preview.js" defer></script><script src="/dashboard-rooms.js" defer></script><script src="/dashboard-ticket.js" defer></script><script src="/dashboard.js" defer></script>
-</head>
-<body>
-<a class="skip" href="#main">Skip to work</a>
-<div class="shell">
-<aside class="sidebar" aria-label="Workspace navigation">
-<a class="brand" href="/dashboard"><img src="/vibehub-mark.svg" alt="" width="24" height="24"><span class="brand-copy"><strong>VibeHub</strong><small>Workspace</small></span><span class="local-badge">Local</span></a>
-<div class="sidebar-scroll"><div class="scope-switcher" aria-label="Workspace selection">
-<div class="project-selector"><span class="project-selector-label" id="project-selector-label">Project</span>
-<button id="project-trigger" class="project-trigger" type="button" role="combobox" aria-labelledby="project-selector-label project-selected-name" aria-haspopup="listbox" aria-controls="project-options" aria-expanded="false" disabled><span class="project-avatar" aria-hidden="true">▱</span><span class="project-trigger-copy"><strong id="project-selected-name">Loading projects…</strong><small id="project-selected-description">Connected to VibeHub</small></span><svg class="project-chevrons" viewBox="0 0 16 16" aria-hidden="true"><path d="m5 6 3-3 3 3M5 10l3 3 3-3"/></svg></button>
-<label hidden>Project<select aria-label="Project" id="project-select"><option value="">All projects</option></select></label>
-<div id="project-popover" popover="auto" class="project-popover"><div class="project-query"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><input id="project-query" type="search" role="combobox" aria-label="Search projects" aria-controls="project-options" aria-autocomplete="list" aria-expanded="false" placeholder="Search projects…" autocomplete="off" spellcheck="false"></div><div id="project-options" role="listbox" aria-label="Connected projects"></div><p id="project-picker-status" role="status" aria-live="polite"></p><div class="project-picker-footer">↑ ↓ to navigate <span>↵ select · esc close</span></div></div>
-</div>
-<label class="branch-select-label">Branch<select aria-label="Branch" id="branch-select" disabled><option>All branches</option></select></label>
-<label>Worktree<select aria-label="Worktree" id="worktree-select" disabled><option>All worktrees</option></select></label>
-</div><section class="branch-navigation"><div class="sidebar-label"><span>Branches</span><span id="project-count" class="section-count"></span></div><label class="project-search"><span class="sr-only">Find branch or worktree</span><input id="project-search" type="search" placeholder="Find a branch…"></label><nav id="projects" aria-label="Branches and worktrees"></nav></section>
-<button id="home" class="nav-home" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="12" y="3" width="5" height="5" rx="1"/><rect x="3" y="12" width="5" height="5" rx="1"/><rect x="12" y="12" width="5" height="5" rx="1"/></svg><span>All goals</span><span id="total" class="nav-count"></span></button>
-<section class="nav-section" aria-labelledby="goals-label"><div class="sidebar-label"><span id="goals-label">Goals</span><span id="goal-count" class="section-count"></span></div><nav id="goal-nav" aria-label="Project goals"></nav></section>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>VibeHub</title>
+    <link rel="icon" href="/vibehub-mark.svg" />
+    <link rel="stylesheet" href="/dashboard.css" />
+    <script src="/dashboard-graph.js" defer></script>
+    <script src="/dashboard-preview.js" defer></script>
+    <script src="/dashboard-rooms.js" defer></script>
+    <script src="/dashboard-ticket.js" defer></script>
+    <script src="/dashboard.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to work</a>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-check" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="7" />
+        <path d="M6.2 10.4 8.6 12.8 13.8 7.4" />
+      </symbol>
+      <symbol id="icon-play" viewBox="0 0 20 20"><path d="m7 5 8 5-8 5z" /></symbol>
+      <symbol id="icon-lock" viewBox="0 0 20 20">
+        <rect x="4.5" y="8.5" width="11" height="8" rx="2" />
+        <path d="M7 8.5V6a3 3 0 0 1 6 0v2.5" />
+      </symbol>
+      <symbol id="icon-upcoming" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="6" stroke-dasharray="2 2" />
+        <path d="M10 7v3l2 1" />
+      </symbol>
+      <symbol id="icon-pending" viewBox="0 0 20 20">
+        <path
+          d="M7 10V5.5a1.25 1.25 0 0 1 2.5 0V9M9.5 9V4.5a1.25 1.25 0 0 1 2.5 0V9M12 9V5.5a1.25 1.25 0 0 1 2.5 0v6c0 3-2 5-5 5H8c-1.6 0-2.8-.8-3.7-2.2L2.8 12a1.3 1.3 0 0 1 2.1-1.5L7 12"
+        />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" /></symbol>
+      <symbol id="icon-ltr" viewBox="0 0 20 20"><path d="M3 10h14M12 5l5 5-5 5" /></symbol>
+      <symbol id="icon-ttb" viewBox="0 0 20 20"><path d="M10 3v14M5 12l5 5 5-5" /></symbol>
+      <symbol id="icon-ticket" viewBox="0 0 20 20">
+        <rect x="3" y="4" width="14" height="13" rx="2" />
+        <path d="M6 8h8M6 12h6" />
+      </symbol>
+      <symbol id="icon-context" viewBox="0 0 20 20"><path d="m10 3 7 7-7 7-7-7z" /></symbol>
+      <symbol id="icon-overview" viewBox="0 0 20 20"><path d="M3 4.5h14M3 10h9M3 15.5h6" /></symbol>
+      <symbol id="icon-graph" viewBox="0 0 20 20">
+        <circle cx="5.5" cy="6" r="1.7" />
+        <circle cx="14.5" cy="6" r="1.7" />
+        <circle cx="10" cy="14.2" r="1.7" />
+        <path d="M7 7.2 8.8 12.4M13 7.2 11.2 12.4" />
+      </symbol>
+      <symbol id="icon-columns" viewBox="0 0 20 20"><path d="M4 3.5v13M10 3.5v13M16 3.5v13" /></symbol>
+      <symbol id="icon-running" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="6" />
+        <path d="M10 7v3.2l2 1.2" />
+      </symbol>
+      <symbol id="icon-planned" viewBox="0 0 20 20">
+        <rect x="4" y="3.5" width="12" height="13" rx="2" />
+        <path d="M7 8h6M7 12h4" />
+      </symbol>
+      <symbol id="icon-back" viewBox="0 0 20 20"><path d="M17 10H3M8 5 3 10l5 5" /></symbol>
+      <symbol id="icon-search" viewBox="0 0 20 20">
+        <circle cx="8.5" cy="8.5" r="5" />
+        <path d="m12.5 12.5 4 4" />
+      </symbol>
+      <symbol id="icon-sun" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="3.2" />
+        <path
+          d="M10 2.2v2.2M10 15.6v2.2M2.2 10h2.2M15.6 10h2.2M4.4 4.4l1.6 1.6M14 14l1.6 1.6M15.6 4.4 14 6M6 14l-1.6 1.6"
+        />
+      </symbol>
+      <symbol id="icon-moon" viewBox="0 0 20 20">
+        <path d="M13.5 3.2A6.6 6.6 0 1 0 16.8 14 5.2 5.2 0 0 1 13.5 3.2z" />
+      </symbol>
+      <symbol id="icon-system" viewBox="0 0 20 20">
+        <circle cx="10" cy="10" r="6.5" />
+        <path d="M10 3.5v13" />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" /></symbol>
+      <symbol id="icon-expand" viewBox="0 0 20 20">
+        <path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12" />
+      </symbol>
+      <symbol id="icon-repo" viewBox="0 0 20 20">
+        <path
+          d="M5.5 3.5h9A1.5 1.5 0 0 1 16 5v11.2l-2.3-1.5L11.5 16.2 9.3 14.7 7 16.2V5A1.5 1.5 0 0 1 8.5 3.5z"
+        />
+        <path d="M8 7h4M8 10h4" />
+      </symbol>
+      <symbol id="icon-branch" viewBox="0 0 20 20">
+        <circle cx="5.5" cy="5" r="2" />
+        <circle cx="5.5" cy="15" r="2" />
+        <circle cx="14.5" cy="10" r="2" />
+        <path d="M5.5 7v6M7.3 5.8c2.4 0 4.6 1.5 5.4 3.7" />
+      </symbol>
+      <symbol id="icon-github" viewBox="0 0 20 20">
+        <path
+          d="M10 1.7C5.45 1.7 1.75 5.45 1.75 10.07c0 3.7 2.37 6.84 5.65 7.95.41.08.56-.18.56-.4 0-.2-.01-.85-.01-1.55-2.3.51-2.78-.99-2.78-.99-.38-.97-.92-1.23-.92-1.23-.75-.53.06-.52.06-.52.83.06 1.27.87 1.27.87.74 1.3 1.94.93 2.41.71.07-.55.29-.93.52-1.14-1.84-.22-3.77-.94-3.77-4.18 0-.92.32-1.68.85-2.27-.09-.22-.37-1.1.08-2.29 0 0 .7-.23 2.3.87.66-.19 1.37-.28 2.08-.28.7 0 1.42.09 2.08.28 1.6-1.1 2.3-.87 2.3-.87.45 1.19.17 2.07.08 2.29.53.59.85 1.35.85 2.27 0 3.25-1.94 3.96-3.79 4.17.3.26.56.78.56 1.57 0 1.13-.01 2.04-.01 2.32 0 .22.15.48.56.4A8.43 8.43 0 0 0 18.25 10.07C18.25 5.45 14.55 1.7 10 1.7z"
+        />
+      </symbol>
+      <symbol id="icon-editor" viewBox="0 0 20 20"><path d="M4 5.5 9 10l-5 4.5M10.5 14.5H16" /></symbol>
+      <symbol id="icon-folder" viewBox="0 0 20 20">
+        <path
+          d="M3.5 6.5V15a1.5 1.5 0 0 0 1.5 1.5h10A1.5 1.5 0 0 0 16.5 15V8A1.5 1.5 0 0 0 15 6.5h-5.2L8.2 4.5H5A1.5 1.5 0 0 0 3.5 6z"
+        />
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 20 20"><path d="M4 10h11M11 5l5 5-5 5" /></symbol>
+    </svg>
 
-</div>
-<div class="sidebar-footer"><span>Appearance</span><span id="theme-status">System</span></div>
-</aside>
-<main id="main">
-<header class="workspace-header"><div class="heading-group"><button id="navigation-toggle" type="button" aria-label="Open project navigation">☰</button><button id="back-goals" type="button" hidden aria-label="Back to goals">←</button><div><p id="breadcrumb">Personal workspace</p><div class="title-line"><h1 id="heading">Your goals</h1><span id="count"></span></div><p id="goal-outcome" hidden></p><p id="view-description"></p></div></div><div class="header-actions"><button id="refresh-dashboard" type="button" aria-label="Refresh dashboard">Refresh</button>
-<details id="workspace-menu"><summary>Workspace status <span id="source-alert" hidden>!</span></summary><div class="workspace-panel">
-<div id="activity-summary" class="activity-summary" aria-label="Recorded work status"></div>
-<div id="status" role="status" aria-live="polite">Reading projects and worktrees…</div>
-<details id="warnings" hidden><summary>Some sources need attention</summary><ul></ul></details>
-<button id="refresh" type="button">Refresh sources</button></div></details>
-<details class="start"><summary>New goal</summary><div class="start-panel">
-<label class="sr-only" for="request">Goal for your coding agent</label><textarea id="request" rows="2" placeholder="What outcome do you want? Add constraints and what success looks like…"></textarea>
-<div class="start-bottom"><span id="request-scope">Copy a brief to record the goal and its tasks.</span><button id="copy-request" type="button">Copy goal brief ↗</button></div></div></details>
-</div></header>
-<div class="workbar"><nav class="surface-tabs" aria-label="Project views"><button type="button" data-surface="goals" aria-pressed="true">Goals</button><button type="button" data-surface="tickets" aria-pressed="false">Unassigned tickets</button><button type="button" data-surface="contexts" aria-pressed="false">Context</button></nav><div class="workbar-tools"><label class="search"><span class="sr-only">Search visible work</span><input id="search" type="search" placeholder="Find a goal…"></label><label class="tabs"><span class="sr-only">Filter work by status</span><select id="status-filter" aria-label="Filter work by status"><option value="all">All statuses</option><option value="running">In progress</option><option value="attention">Needs you</option><option value="ready">Open</option><option value="waiting">Waiting</option><option value="completed">Completed</option></select></label><div class="view-controls"><div class="view-tabs" aria-label="Work view"><button type="button" data-view="board" aria-pressed="true">Board</button><button type="button" data-view="canvas" aria-pressed="false">Graph</button></div></div><button id="focus-mode" type="button" aria-pressed="false" title="Expand the canvas">Expand</button></div></div>
-<section id="goal-progress" aria-label="Goal progress" hidden></section>
-<h2 id="list-title" class="sr-only">Goals</h2><p id="legend" class="sr-only">Select a goal to explore its tickets.</p>
-<div id="work" aria-label="Work overview"></div>
-</main>
-<dialog id="inspector" aria-labelledby="detail-title"><div class="detail-header"><p id="detail-kind"></p><button id="close-detail" type="button" aria-label="Close details" autofocus>×</button></div><div class="detail-body"><h2 id="detail-title"></h2><p id="detail-outcome"></p><dl id="detail-meta"></dl></div><div id="detail-actions"></div></dialog>
-</div>
-<dialog id="navigation-dialog" aria-label="Project navigation"><button id="close-navigation" type="button" aria-label="Close project navigation">Close ×</button></dialog>
-</body></html>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <a class="brand" href="/dashboard"><strong>VibeHub</strong><span>Local</span></a>
+        <div class="sidebar-scroll">
+          <div class="scope-switcher" aria-label="Workspace selection">
+            <span class="sr-only" id="project-selector-label">Project</span>
+            <button
+              id="project-trigger"
+              class="project-trigger"
+              type="button"
+              role="combobox"
+              aria-labelledby="project-selector-label project-selected-name"
+              aria-haspopup="listbox"
+              aria-controls="project-options"
+              aria-expanded="false"
+              disabled
+            >
+              <span data-icon="repo"></span
+              ><span class="project-trigger-copy"
+                ><strong id="project-selected-name">Projects</strong
+                ><small id="project-selected-description">Reading workspaces…</small></span
+              ><span data-icon="arrow" class="project-chevron"></span>
+            </button>
+            <label hidden
+              >Project<select aria-label="Project" id="project-select">
+                <option value="">All projects</option>
+              </select></label
+            >
+            <div id="project-popover" popover="auto" class="project-popover">
+              <label class="project-query"
+                ><span data-icon="search"></span
+                ><input
+                  id="project-query"
+                  type="search"
+                  role="combobox"
+                  aria-label="Search projects"
+                  aria-controls="project-options"
+                  aria-autocomplete="list"
+                  aria-expanded="false"
+                  placeholder="Find a project…"
+                  autocomplete="off"
+                  spellcheck="false"
+              /></label>
+              <div id="project-options" role="listbox" aria-label="Connected projects"></div>
+              <p id="project-picker-status" role="status" aria-live="polite"></p>
+            </div>
+            <label class="branch-select-label"
+              ><span data-icon="branch"></span
+              ><select aria-label="Branch" id="branch-select" disabled>
+                <option>All branches</option>
+              </select></label
+            >
+            <label class="worktree-select-label"
+              >Worktree<select aria-label="Worktree" id="worktree-select" disabled>
+                <option>All worktrees</option>
+              </select></label
+            >
+            <div id="checkout-actions"></div>
+          </div>
+          <section class="branch-navigation">
+            <div class="sidebar-label"><span>Branches</span><span id="project-count"></span></div>
+            <label class="project-search"
+              ><span class="sr-only">Find branch or worktree</span
+              ><input id="project-search" type="search" placeholder="Find a branch…"
+            /></label>
+            <nav id="projects" aria-label="Branches and worktrees"></nav>
+          </section>
+          <button id="home" class="nav-home" type="button">
+            <span data-icon="overview"></span><span>Goals</span><span id="total"></span>
+          </button>
+          <button class="nav-home" type="button" data-ticket-scope="all">
+            <span data-icon="ticket"></span><span>All tickets</span>
+          </button>
+          <button class="nav-home" type="button" data-ticket-scope="unassigned">
+            <span data-icon="planned"></span><span>Unassigned</span>
+          </button>
+          <section class="nav-section">
+            <div class="sidebar-label"><span>Goals & epics</span><span id="goal-count"></span></div>
+            <nav id="goal-nav" aria-label="Project goals"></nav>
+          </section>
+        </div>
+        <div class="sidebar-footer">
+          <span class="sidebar-label">Appearance</span>
+          <div id="theme" class="segment" aria-label="Appearance">
+            <button
+              type="button"
+              data-theme="light"
+              aria-label="Light appearance"
+              title="Light appearance"
+              data-icon="sun"
+            ></button
+            ><button
+              type="button"
+              data-theme="dark"
+              aria-label="Dark appearance"
+              title="Dark appearance"
+              data-icon="moon"
+            ></button
+            ><button
+              type="button"
+              data-theme="system"
+              aria-label="System appearance"
+              title="System appearance"
+              data-icon="system"
+            ></button>
+          </div>
+        </div>
+      </aside>
+      <div
+        id="rail-resize"
+        class="panel-resize rail-resize"
+        role="separator"
+        tabindex="0"
+        aria-orientation="vertical"
+        aria-label="Resize sidebar"
+        aria-valuemin="220"
+        aria-valuemax="520"
+        aria-valuenow="268"
+      ></div>
+      <main id="main">
+        <header class="workspace-header">
+          <button
+            id="navigation-toggle"
+            class="icon-button"
+            type="button"
+            aria-label="Open project navigation"
+            data-icon="columns"
+          ></button
+          ><button
+            id="back-goals"
+            class="icon-button"
+            type="button"
+            hidden
+            aria-label="Back to goals"
+            data-icon="back"
+          ></button>
+          <div class="heading-group">
+            <p id="breadcrumb">Workspace</p>
+            <div class="title-line">
+              <h1 id="heading">Goals</h1>
+              <span id="count"></span>
+            </div>
+            <p id="goal-outcome" hidden></p>
+          </div>
+          <div id="repository-actions"></div>
+          <div class="header-actions">
+            <button
+              id="refresh-dashboard"
+              class="icon-button"
+              type="button"
+              aria-label="Refresh dashboard"
+              title="Refresh dashboard"
+              data-icon="running"
+            ></button>
+            <details id="workspace-menu">
+              <summary title="Workspace status" aria-label="Workspace status">
+                <span data-icon="context"></span><span id="source-alert" hidden></span>
+              </summary>
+              <div class="workspace-panel">
+                <div id="activity-summary" class="activity-summary"></div>
+                <div id="status" role="status" aria-live="polite">Reading projects and worktrees…</div>
+                <details id="warnings" hidden>
+                  <summary>Sources need attention</summary>
+                  <ul></ul>
+                </details>
+                <button id="refresh" type="button">Refresh sources</button>
+              </div>
+            </details>
+            <details class="start">
+              <summary><span data-icon="plus"></span><span>New goal</span></summary>
+              <div class="start-panel">
+                <label class="sr-only" for="request">Goal for your coding agent</label
+                ><textarea id="request" rows="4" placeholder="What would you like to accomplish?"></textarea>
+                <p id="request-scope">Copy a brief to your agent.</p>
+                <button id="copy-request" type="button">Copy goal brief</button>
+              </div>
+            </details>
+          </div>
+        </header>
+        <div class="workbar">
+          <nav class="surface-tabs" aria-label="Project views">
+            <button type="button" data-surface="goals" aria-pressed="true">
+              <span data-icon="overview"></span><span>Goals</span></button
+            ><button type="button" data-surface="tickets" aria-pressed="false">
+              <span data-icon="ticket"></span><span>Tickets</span></button
+            ><button type="button" data-surface="contexts" aria-pressed="false">
+              <span data-icon="context"></span><span>Context</span>
+            </button>
+          </nav>
+          <div class="workbar-tools">
+            <label class="search"
+              ><span data-icon="search"></span
+              ><input id="search" type="search" aria-label="Search visible work" placeholder="Find work…"
+            /></label>
+            <div class="view-controls">
+              <div class="view-tabs segment" aria-label="Work view">
+                <button
+                  type="button"
+                  data-view="board"
+                  aria-pressed="true"
+                  aria-label="Board view"
+                  title="Board view"
+                  data-icon="columns"
+                ></button
+                ><button
+                  type="button"
+                  data-view="canvas"
+                  aria-pressed="false"
+                  aria-label="Graph view"
+                  title="Graph view"
+                  data-icon="graph"
+                ></button>
+              </div>
+              <div id="graph-direction" class="segment" aria-label="Graph direction">
+                <button
+                  type="button"
+                  data-direction="ltr"
+                  aria-label="Left to right"
+                  title="Left to right"
+                  data-icon="ltr"
+                ></button
+                ><button
+                  type="button"
+                  data-direction="ttb"
+                  aria-label="Top to bottom"
+                  title="Top to bottom"
+                  data-icon="ttb"
+                ></button>
+              </div>
+              <div id="history-scope" class="segment" aria-label="Graph scope">
+                <button type="button" data-history="active">Active</button
+                ><button type="button" data-history="all">All</button>
+              </div>
+            </div>
+            <button
+              id="focus-mode"
+              class="icon-button"
+              type="button"
+              aria-pressed="false"
+              aria-label="Expand workspace"
+              title="Expand workspace"
+              data-icon="expand"
+            ></button>
+          </div>
+        </div>
+        <div id="status-filters" class="status-filters" aria-label="Filter work by status"></div>
+        <section id="goal-progress" aria-label="Goal progress" hidden></section>
+        <h2 id="list-title" class="sr-only">Work</h2>
+        <p id="legend" class="sr-only"></p>
+        <div id="work" aria-label="Work overview"></div>
+      </main>
+      <div
+        id="inspector-resize"
+        class="panel-resize inspector-resize"
+        role="separator"
+        tabindex="0"
+        aria-orientation="vertical"
+        aria-label="Resize inspector"
+        aria-valuemin="300"
+        aria-valuemax="720"
+        aria-valuenow="400"
+        hidden
+      ></div>
+      <dialog id="inspector" aria-labelledby="detail-title">
+        <div class="detail-header">
+          <p id="detail-kind"></p>
+          <button
+            id="close-detail"
+            class="icon-button"
+            type="button"
+            aria-label="Close details"
+            data-icon="close"
+          ></button>
+        </div>
+        <div class="detail-body">
+          <h2 id="detail-title"></h2>
+          <p id="detail-outcome"></p>
+          <dl id="detail-meta"></dl>
+        </div>
+        <div id="detail-actions"></div>
+      </dialog>
+    </div>
+    <dialog id="navigation-dialog" aria-label="Project navigation">
+      <button
+        id="close-navigation"
+        class="icon-button"
+        type="button"
+        aria-label="Close project navigation"
+        data-icon="close"
+      ></button>
+    </dialog>
+  </body>
+</html>

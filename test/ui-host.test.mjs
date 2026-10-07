@@ -6,6 +6,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -17,6 +18,26 @@ import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 const repos = [];
 const hosts = [];
 const NOW = "2026-08-02T07:00:00.000Z";
+
+test("Room and Context actions point to the exact checkout and revision", async () => {
+  const repo = fixture();
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/project.git"], { cwd: repo });
+  const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  const host = startVibeHubUi({ repoRoot: repo });
+  hosts.push(host);
+  const { origin } = await host.ready;
+  const response = await fetch(`${origin}/api/contexts`, authorized(host.token));
+  assert.equal(response.status, 200);
+  const { rooms, source } = (await response.json()).data;
+  const product = rooms.find(room => room.room === "product");
+  const record = product.contexts.find(context => context.context_id === "decision-use-tickets");
+  assert.equal(source.worktreeRoot, realpathSync(repo));
+  assert.equal(product.actions.absolutePath, join(realpathSync(repo), ".vibehub/rooms/product"));
+  assert.equal(product.actions.githubHref, `https://github.com/example/project/tree/${commit}/.vibehub/rooms/product`);
+  assert.equal(record.actions.absolutePath, join(realpathSync(repo), record.path));
+  assert.equal(record.actions.editorHref, `vscode://file${encodeURI(record.actions.absolutePath)}`);
+  assert.equal(record.actions.githubHref, `https://github.com/example/project/blob/${commit}/.vibehub/rooms/product/decision-use-tickets.yaml`);
+});
 
 afterEach(async () => {
   await Promise.all(hosts.splice(0).map((host) => host.close()));
