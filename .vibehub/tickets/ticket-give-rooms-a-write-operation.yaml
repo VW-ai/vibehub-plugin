@@ -88,6 +88,8 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-give-rooms-a-write-operation"
+  "schema_version": 4,
+  "status": "done",
+  "ticket_id": "ticket-give-rooms-a-write-operation",
+  "updates": []
 }

@@ -329,6 +329,8 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+  "schema_version": 4,
+  "status": "done",
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision",
+  "updates": []
 }

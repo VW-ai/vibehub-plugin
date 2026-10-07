@@ -111,6 +111,8 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-public-founders-brand-icons"
+  "schema_version": 4,
+  "status": "done",
+  "ticket_id": "ticket-public-founders-brand-icons",
+  "updates": []
 }

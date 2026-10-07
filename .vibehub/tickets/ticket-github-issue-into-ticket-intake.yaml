@@ -156,6 +156,8 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-github-issue-into-ticket-intake"
+  "schema_version": 4,
+  "status": "open",
+  "ticket_id": "ticket-github-issue-into-ticket-intake",
+  "updates": []
 }

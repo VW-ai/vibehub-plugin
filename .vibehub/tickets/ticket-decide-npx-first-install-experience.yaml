@@ -48,6 +48,8 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-decide-npx-first-install-experience"
+  "schema_version": 4,
+  "status": "done",
+  "ticket_id": "ticket-decide-npx-first-install-experience",
+  "updates": []
 }

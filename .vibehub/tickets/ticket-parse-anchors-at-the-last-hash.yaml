@@ -88,6 +88,8 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-parse-anchors-at-the-last-hash"
+  "schema_version": 4,
+  "status": "done",
+  "ticket_id": "ticket-parse-anchors-at-the-last-hash",
+  "updates": []
 }
