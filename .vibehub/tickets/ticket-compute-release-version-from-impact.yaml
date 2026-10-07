@@ -127,6 +127,8 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-compute-release-version-from-impact"
+  "schema_version": 4,
+  "status": "open",
+  "ticket_id": "ticket-compute-release-version-from-impact",
+  "updates": []
 }

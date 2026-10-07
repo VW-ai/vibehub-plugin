@@ -118,6 +118,8 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 3,
-  "ticket_id": "ticket-closeout-independence-fails-loudly"
+  "schema_version": 4,
+  "status": "open",
+  "ticket_id": "ticket-closeout-independence-fails-loudly",
+  "updates": []
 }

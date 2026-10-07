@@ -239,15 +239,17 @@ test("format 2 to 3 changes only the marker and leaves current-tree refs for sem
   assert.equal(run(repo, "project", "validate").status, 0);
 });
 
-test("the repository format-5 project keeps Ticket schema 3 and audited delivery structure", () => {
+test("the repository format-6 project keeps Ticket schema 4 and audited delivery structure", () => {
   const version = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
-  assert.equal(version.format_version, 5);
+  assert.equal(version.format_version, 6);
   const ticketRoot = join(root, ".vibehub", "tickets");
   const tickets = readdirSync(ticketRoot)
     .filter((name) => name.endsWith(".yaml"))
     .map((name) => JSON.parse(readFileSync(join(ticketRoot, name), "utf8")));
   assert.ok(tickets.length >= 50);
-  assert.equal(tickets.every((item) => item.schema_version === 3 && item.revision_state === "bound"), true);
+  assert.equal(tickets.every((item) => item.schema_version === 4 && item.revision_state === "bound"), true);
+  assert.equal(tickets.every((item) => ["open", "in_progress", "done"].includes(item.status)), true);
+  assert.equal(tickets.every((item) => Array.isArray(item.updates)), true);
   assert.equal(tickets.every((item) => Array.isArray(item.deliveries)), true);
 
   const delivered = tickets.flatMap((item) => item.deliveries
