@@ -1000,14 +1000,6 @@
       );
     }
     $('detail-actions').append(pathActions(context.actions, `${context.workspace}:${context.context_id}`));
-    const link = el('a', 'Open Room explorer ↗');
-    const url = new URL('/', location.origin);
-    url.searchParams.set('workspace', context.workspace);
-    url.searchParams.set('surface', 'rooms');
-    url.searchParams.set('room', context.room);
-    url.hash = token;
-    link.href = url.href;
-    $('detail-actions').append(link);
     openInspector();
     $('inspector').scrollTop = 0;
     $('close-detail').focus();
@@ -1311,14 +1303,6 @@
             'room-empty',
           ),
         );
-      const link = el('a', 'Open Room explorer ↗', 'room-explorer-link'),
-        url = new URL('/', location.origin);
-      url.searchParams.set('workspace', room.workspace);
-      url.searchParams.set('surface', 'rooms');
-      url.searchParams.set('room', room.room);
-      url.hash = token;
-      link.href = url.href;
-      body.append(link);
       section.append(body);
       list.append(section);
       entries.push({ room, section });
