@@ -7,12 +7,12 @@
       "ref": "conversation:2026-08-19-codex-linear-whole-shell-style-direction"
     },
     {
-      "note": "The interaction study identifies Codex's focused Agent work surface and Linear's receding navigation and earned attention as compatible inputs to a Task-first workbench.",
-      "ref": "docs/HARNESS_INTERACTION_RESEARCH.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: The interaction study identifies Codex's focused Agent work surface and Linear's receding navigation and earned attention as compatible inputs to a Task-first workbench.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
     },
     {
-      "note": "The retained negative study records the rejected paper, editorial, generic dashboard, and visually dated directions this decision must prevent from returning.",
-      "ref": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: The retained negative study records the rejected paper, editorial, generic dashboard, and visually dated directions this decision must prevent from returning.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
     }
   ],
   "kind": "context",

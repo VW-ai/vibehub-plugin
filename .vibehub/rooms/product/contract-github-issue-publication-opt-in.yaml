@@ -1,0 +1,45 @@
+{
+  "context_id": "contract-github-issue-publication-opt-in",
+  "detail": "The repository workflow is disabled unless VIBEHUB_GITHUB_SYNC is true. The user must explicitly choose both record sharing and mirror installation; having a remote is insufficient. On main, Git-native Ticket records determine generated Issue content and recorded completion. Hidden ticket markers identify mirror Issues, Evidence identifiers identify historical proof comments, and direct prerequisites project to GitHub blocked-by relationships. Git remains authoritative. Title edits, Issue comments and manual closure never write back into project files; later sync restores the repository projection. Criteria are informational task text, not an independently authoritative GitHub checklist, and current format 6 has no maturity labels or mandatory successful Outcome for done. The Issues list with filters is the default overview; an Issue sidebar walks dependencies. Projects board/roadmap is optional human-configured presentation, not a canonical graph or automatic publication prerequisite. A failure is reported by Actions. Inbound external issues require deliberate intake and separate authorization for closure/comment writes. This records the current one-way contract; subsequent reliability work must not be described as already shipped.",
+  "evidence": [
+    {
+      "note": "Source segment docs/GITHUB_ISSUES.md#tickets-on-github-issues; lines 1-32. Public source excerpt: \"GitHub integration is **disabled by default**. Local VibeHub work needs no GitHub account, remote, or Issue mirror. Only after explicit installation and enabling the repository Actions variable VIBEHUB_GITHUB_SYNC=true are shared Tickets on main mirrored by .github/workflows/sync-issues.yml.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+    },
+    {
+      "note": "Source segment docs/GITHUB_ISSUES.md#which-github-view-to-follow; lines 33-37. Public source excerpt: \"GitHub has no dependency-graph view; the VibeHub Workbench remains the place to see the whole graph. On GitHub itself there are three useful surfaces.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+    },
+    {
+      "note": "Source segment docs/GITHUB_ISSUES.md#1-issues-list-with-label-filters-recommended-default; lines 38-54. Public source excerpt: \"Zero setup; the sync keeps it current. Blocked Issues show a red Blocked by** pill. Useful saved filters: | View | URL | | --- | --- | | Everything open | https://github.com/VW-ai/vibehub-plugin/issues | | Open | …/issues?q=is%3Aopen+label%3A%22state%3A+open%22 |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+    },
+    {
+      "note": "Source segment docs/GITHUB_ISSUES.md#2-per-issue-sidebar-for-walking-the-graph; lines 55-62. Public source excerpt: \"Also zero setup. The **Relationships** section lists *Blocked by* and Blocking* in both directions, so a reader can traverse upstream and downstream one Issue at a time. gh issue view <n> prints the same rows. Closed blockers are not counted in the Blocked pill, which matches Ticket\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+    },
+    {
+      "note": "Source segment docs/GITHUB_ISSUES.md#3-projects-board-or-roadmap-optional-one-time-human-setup; lines 63-81. Public source excerpt: \"A repository Project can show the mirror as a board grouped by state label, or as a roadmap. It needs one-time setup by a person because the Actions token cannot create Projects: 1. Repository → **Projects** → **New project** → Board. 2. Project **Workflows** → *Auto-add to project* → filter…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-github-issues-are-a-read-only-ticket-projection",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/GITHUB_ISSUES.md"
+  },
+  "state": "active",
+  "summary": "GitHub Issues are an explicitly enabled one-way projection of shared task records",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

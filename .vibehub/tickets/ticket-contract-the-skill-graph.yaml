@@ -45,7 +45,7 @@
   "context_refs": [
     {
       "purpose": "Records the impact scan this contract makes repeatable, including the reversed distill decision.",
-      "ref": "docs/proposals/bulk-absorption.md"
+      "ref": ".vibehub/rooms/knowledge/note-bulk-absorption-reproduction-and-design.yaml"
     },
     {
       "purpose": "Bounds this to deterministic development-time validation in the bundled script.",

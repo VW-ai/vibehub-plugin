@@ -1,0 +1,24 @@
+{
+  "context_id": "contract-local-planning-and-sharing",
+  "detail": "New Goals, Epics, Tickets, Context, Evidence and Outcomes are local by default through project ignore rules. Publishing code, installing Skills, opening a Dashboard or configuring a Git remote does not authorize publishing those records. GitHub projection requires both explicitly shared checked-in records and separate mirror opt-in. Never force-add ignored planning records to make a PR or mirror appear complete. Goal and Epic ownership groups intended benefits and coherent capabilities, while depends_on records direct prerequisites. Ticket completion reports delivery progress and does not establish that a Goal benefit was achieved.",
+  "evidence": [
+    {
+      "note": "Source segment docs/CONCEPT.md#records-and-presentation; lines 44-59. Public source excerpt: \"Records use a JSON-compatible YAML subset under .vibehub/. New records are ignored by Git staging. Users can choose which records to share through Git. GitHub mirroring requires separate opt-in. The dashboard reads the task graph, progress, and Rooms of Context. It can copy\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/CONCEPT.md"
+  },
+  "state": "active",
+  "summary": "Planning records remain local until the user explicitly chooses to share them",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

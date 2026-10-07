@@ -1,0 +1,37 @@
+{
+  "context_id": "contract-dashboard-live-readonly-surface",
+  "detail": "An opted-in VibeHub session automatically starts or reuses its authenticated local Dashboard through the shared session-entry contract. Presentation failure does not block work. Manual startup uses the bundled vh-ui.mjs --dashboard entry with explicit --root additions. Default discovery is bounded to the current checkout and its parent plus explicitly selected roots, never an unbounded or global filesystem scan. The bounded checkout parent may itself be the user's home directory. Projects, branches and registered worktrees remain distinct. Compatibility classification before graph load and an actionable legacy-worktree upgrade handoff are intended requirements in an open follow-up, not verified shipped behavior; the current Dashboard may still report a generic load failure for old worktrees. The shell preserves Goal overview, optional Goal/Epic hierarchy, Ticket board and graph, full task descriptions, acceptance and selected Context, progress/history, and copyable task briefs. Room containment and record-type grouping expose Context, authority and bounded read-only previews of canonical text, Markdown tables, CSV, source, images and SVG. Diagrams without a renderer show source. Paths stay folded behind accessible Show path controls beside GitHub and editor links. Refresh preserves useful selection and view state. User activity renews the host lifetime; background keepalive is not durable activity. The Quiet promotion uses a resizable rail and inspector, coherent large icons and system/light/dark themes. Local copy controls assemble text and never execute work or mutate records. All data comes from authenticated live APIs; no repository snapshot or alternate static Dashboard supplies fallback truth.",
+  "evidence": [
+    {
+      "note": "Source segment docs/DASHBOARD.md#dashboard; lines 1-46. Public source excerpt: \"The dashboard is built into VibeHub. When you choose or resume VibeHub work, your agent opens it automatically and reuses it through the session. New project records stay local and are ignored by Git; existing tracked records are not made private by this default. Sharing code does not imply sharing…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/DASHBOARD.md"
+    },
+    {
+      "note": "Current live implementation supplies the adopted behavior; historical section citations below preserve the prior design sources.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard.js"
+    },
+    {
+      "note": "Verification of the installed/projection contract after Quiet Dashboard adoption.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "change-quiet-dashboard-adopted-by-installed-review",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:34:24Z",
+    "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard.js"
+  },
+  "state": "active",
+  "summary": "The installed Dashboard presents live task and Room records in one read-only workspace",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

@@ -1,0 +1,36 @@
+{
+  "context_id": "note-codex-like-visual-proposal-history",
+  "detail": "The visual proposal used a full-bleed causal canvas, compact header, on-demand overview, progressive right inspector and narrow-screen bottom sheet. Whole-card semantic treatment, human attention distinct from phase, causal focus, stroke icons, system/monospace typography and neutral focus were specified for review at 1440, 1180 and 390-pixel widths. The prototype token JSON and state matrix are retained under test/fixtures/ui-proposals/codex-like-workbench. Their old READY/REFINE/deviation examples are historical fixtures rather than current format-6 state authority. Current shared layout, scope and accessibility constraints own production behavior; the proposal records the considered visual rationale and exact review states.",
+  "evidence": [
+    {
+      "note": "Source segment docs/proposals/codex-like-workbench/README.md#codex-like-workbench-visual-proposal; lines 1-7. Historical section excerpt: \"This proposal keeps the current VibeHub product model and changes only its visual and interaction language. It uses Codex as inspiration for density, quiet surfaces, compact controls, progressive detail, and typographic discipline; it does not reproduce another product's brand skin.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/codex-like-workbench/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/codex-like-workbench/README.md#proposed-production-direction; lines 8-33. Historical section excerpt: \"Keep the causal Ticket graph as the primary full-bleed canvas. Do not add a default navigation or overview rail. Use a compact header, a floating overview button, and a right-side Inspector that becomes a bottom sheet at narrow widths. Give every operational state a restrained whole-card surface.…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/codex-like-workbench/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/codex-like-workbench/README.md#review-states; lines 34-49. Historical section excerpt: \"The standalone prototype uses current repository Ticket names and contains: a selected READY visual-proposal Ticket with its complete causal cone; a BLOCKED human-decision Ticket carrying an UPCOMING attention badge; READY Rooms and integration work, DONE/ARCHIVED foundations, a REFINE card,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/codex-like-workbench/README.md"
+    },
+    {
+      "note": "Source segment docs/proposals/codex-like-workbench/README.md#mechanical-annotations; lines 50-60. Historical section excerpt: \"tokens.json is the concrete token contract. state-matrix.json defines the two independent state axes and their combined truth table. Automated validation checks the required token families, the five operational states, four attention states, redundant\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/codex-like-workbench/README.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/codex-like-workbench/README.md"
+  },
+  "state": "active",
+  "summary": "The Codex-like proposal tested quiet canvas hierarchy and progressive inspection",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

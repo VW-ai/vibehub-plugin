@@ -28,7 +28,7 @@
     "quote": "这样会不会反而有一点复杂了，都不如一个新的项目，上来先跑一次cold start",
     "ref": "conversation:2026-08-03-room-taxonomy-design"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Distill returns as a one-time resumable cold start plus ambient align-on-use updates, with Git as the only review gate",
   "tags": [
     "distill",

@@ -7,8 +7,8 @@
       "ref": "conversation:2026-08-20-owner-corrects-production-task-state-ui"
     },
     {
-      "note": "The reviewed proposal supplies the semantic source matrix and runtime honesty boundary; this decision accepts only the bounded production subset and corrects its visual recommendations.",
-      "ref": "docs/proposals/card-corner-signal/README.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: The reviewed proposal supplies the semantic source matrix and runtime honesty boundary; this decision accepts only the bounded production subset and corrects its visual recommendations.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/card-corner-signal/README.md"
     },
     {
       "note": "The current production Workbench card and panel remain the visual and interaction baseline to preserve.",
@@ -32,7 +32,7 @@
     "quote": "卡片顶的虚线和实线真的没必要；主要就是加一个 live 的效果，用已经有的右上角空间来表达 sub 状态。Ticket 点开后的 panel view 最 important 的是 recommended action。",
     "ref": "conversation:2026-08-20-owner-corrects-production-task-state-ui"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Keep the production Ticket card visually stable: express truthful live activity and one upper-right substate, while making Recommended action the focused panel's dominant interaction",
   "tags": [
     "workbench",

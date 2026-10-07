@@ -38,14 +38,6 @@ try {
     "assets/brand/vibehub-logo-dark.svg",
     "assets/brand/vibehub-logo.svg",
     "CHANGELOG.md",
-    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
-    "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
-    "docs/assets/local-graph/workbench-ticket-action-2x.png",
-    "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
-    "docs/assets/local-graph/readme-capture-manifest.json",
-    "docs/CONCEPT.md",
-    "docs/INSTALL.md",
-    "docs/RELEASE.md",
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket/SKILL.md",
     "skills/vibehub-core/scripts/vh.mjs",
@@ -58,6 +50,13 @@ try {
     "skills/vibehub-core/scripts/vh-start.mjs",
     "skills/vibehub-core/contracts/session-entry.md",
     "skills/vibehub-review/assets/index.html",
+    "skills/vibehub-review/assets/dashboard.html",
+    "skills/vibehub-review/assets/dashboard.css",
+    "skills/vibehub-review/assets/dashboard.js",
+    "skills/vibehub-review/assets/dashboard-graph.js",
+    "skills/vibehub-review/assets/dashboard-ticket.js",
+    "skills/vibehub-review/assets/dashboard-rooms.js",
+    "skills/vibehub-review/assets/dashboard-preview.js",
     "skills/vibehub-review/assets/app.css",
     "skills/vibehub-review/assets/app-layout.js",
     "skills/vibehub-review/assets/app.js",
@@ -99,8 +98,17 @@ try {
       throw new Error(`installed README image target is missing: ${ref}`);
     }
   }
+  for (const [, ref] of installedReadme.matchAll(/\]\(([^)]+)\)/gu)) {
+    if (/^(?:https?:|data:|#)/u.test(ref)) continue;
+    if (!existsSync(join(artifact, ref.split("#")[0]))) {
+      throw new Error(`installed README link target is missing: ${ref}`);
+    }
+  }
   for (const forbidden of [
     ".mcp.json",
+    ".vibehub",
+    "docs",
+    "test/fixtures/ui-proposals",
     "codex",
     "hooks",
     "runtime",
@@ -127,7 +135,7 @@ try {
     || !/must not add compatibility shims, telemetry, network reporting/u.test(installedBoundary)) {
     throw new Error("installed architecture boundary is missing the bounded one-shot upgrade exception");
   }
-  const installedInstall = readFileSync(join(artifact, "docs", "INSTALL.md"), "utf8");
+  const installedInstall = installedReadme;
   if (!installedInstall.includes("tree/<release-tag>")
     || !installedInstall.includes("releases/download/<release-tag>/vibehub-upgrade.tgz")
     || !installedInstall.includes("Nothing is pushed")) {
@@ -317,6 +325,18 @@ try {
   const reused = await entryModule.enterVibeHub({ repoRoot: repo, reuseUrl: entered.url, openUrl: (url) => opened.push(url) });
   if (entered.reused || !reused.reused || reused.handle || opened.length !== 1 || reused.url !== entered.url) {
     throw new Error("installed VibeHub entry failed automatic dashboard startup or live session reuse");
+  }
+  for (const file of [
+    "dashboard.html", "dashboard.css", "dashboard.js", "dashboard-graph.js",
+    "dashboard-ticket.js", "dashboard-rooms.js", "dashboard-preview.js",
+  ]) {
+    const route = file === "dashboard.html" ? "/dashboard" : `/${file}`;
+    const response = await fetch(new URL(route, entered.url));
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const installed = readFileSync(join(artifact, "skills/vibehub-review/assets", file));
+    if (response.status !== 200 || !bytes.equals(installed)) {
+      throw new Error(`installed Dashboard asset did not serve exactly: ${file}`);
+    }
   }
   await uiHost.close();
   uiHost = undefined;

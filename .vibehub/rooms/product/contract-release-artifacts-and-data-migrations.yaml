@@ -1,0 +1,28 @@
+{
+  "context_id": "contract-release-artifacts-and-data-migrations",
+  "detail": "Maintainers verify the exact reviewed change before publishing. The current release workflow builds the plugin archive, the one-shot upgrade tarball and checksums as GitHub Release assets; it does not publish a VibeHub npm-registry package. package.json, retained plugin metadata and release notes agree on identity. Shipped content cannot change while claiming the latest stable version; main between releases uses a distinct prerelease. Prepare and review a release on the mainline, tag the exact approved commit and verify the published archive and paired upgrader. Do not tag a feature branch as the final stable release. Optional future computed-version and atomic-main/tag release work remains separately recorded, not an implemented prerequisite. A data-format change ships a versioned migration registry entry. Mechanical steps declare exact allowed paths and independently reach a valid writable target. Semantic steps state their purpose, authoritative source inputs, what good values mean and forbidden inference shortcuts; empty semantic arrays explicitly mean no additional judgment. No compatibility shims or silent background conversion substitute for migration. Current task-memory development does not require an independent Outcome before code review or release. Installation and artifact checks must prove copied Skills remain self-contained and that local planning records are absent from the distribution.",
+  "evidence": [
+    {
+      "note": "Source segment docs/RELEASE.md#release-vibehub; lines 1-51. Public source excerpt: \"VibeHub's release surface is a versioned plugin archive plus a release-paired one-shot data-upgrade tarball on GitHub Releases. npm is an execution client for that exact asset, not a registry release or global installation surface. 1. Update package.json, .claude-plugin/plugin.json, and…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/RELEASE.md"
+    },
+    {
+      "note": "Source segment docs/RELEASE.md#data-layer-changes; lines 52-64. Public source excerpt: \"Any release that changes the project format or a persisted document schema must update skills/vibehub-migrate/references/migrations.json in the same change. Every added or changed migration entry must declare both mechanical.declared_paths plus mechanical.actions and semantic.steps.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/RELEASE.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/RELEASE.md"
+  },
+  "state": "active",
+  "summary": "A release pairs validated plugin and upgrade artifacts with explicit data-migration guidance",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

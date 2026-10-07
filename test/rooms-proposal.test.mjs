@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 
-const root = join(process.cwd(), "docs/proposals/rooms-workbench");
+const root = join(process.cwd(), "test/fixtures/ui-proposals/rooms-workbench");
 const html = readFileSync(join(root, "index.html"), "utf8");
 const css = readFileSync(join(root, "rooms.css"), "utf8");
 const script = readFileSync(join(root, "rooms.js"), "utf8");

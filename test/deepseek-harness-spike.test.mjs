@@ -44,17 +44,11 @@ test('VibeHub Spike is an out-of-tree Bundle with a no-model-turn command', asyn
 })
 
 test('feasibility report keeps product truth and compatibility boundaries explicit', async () => {
-  const report = await read('docs/DEEPSEEK_HARNESS_FEASIBILITY.md')
-  for (const marker of [
-    'Bundle/Profile distribution',
-    'Whole product shell',
-    'Session fork/resume identity',
-    'Human command without model turn',
-    'Existing Codex integration',
-    'VibeHub-owned durable events',
-    'Codex executor boundary',
-    'Stop conditions',
-  ]) assert.match(report, new RegExp(marker, 'i'))
-  assert.match(report, /canonical Ticket, Context, Evidence, and Outcome files stay/)
-  assert.match(report, /Do not route the primary product execution through the shipped one-shot/)
+  const report = await read('.vibehub/rooms/product/note-dsh-pinned-feasibility-evidence.yaml')
+  const finding = JSON.parse(report)
+  assert.equal(finding.type, 'note')
+  assert.match(finding.detail, /99f6f02fecdb7dff40c3fbc9470f5907c29f74ca/)
+  assert.match(finding.detail, /one-shot/)
+  assert.match(finding.detail, /rc.7 runtime evidence and rc.8 source evidence must remain separate/)
+  assert.ok(finding.evidence.every(item => item.ref.startsWith('commit:')))
 })

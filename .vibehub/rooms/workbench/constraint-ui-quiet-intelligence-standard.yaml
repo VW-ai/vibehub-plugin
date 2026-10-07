@@ -3,8 +3,8 @@
   "detail": "The shared dependency-free Ticket review surface uses A · Quiet Workbench: a compact cool-neutral spatial tool with system typography, restrained elevation, a small shape vocabulary, and semantic color only. The complete causal graph is the primary object and uses one deterministic causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit first-class choice, with completed foundations before READY or BLOCKED downstream work in either orientation. Dense graphs use the same layered algorithm in both directions: long relations reserve virtual waypoints during ordering, cards never overlap, ordinary routes avoid card interiors, source and target ports remain distinct, and deterministic crossing reduction may change geometry but never hide a canonical Ticket or relation. Selection keeps the graph visible and progressively reveals contract, rationale, Context, Evidence, Outcome, and Git trace. Human attention, blockers, deviations, and proof appear at the graph locus that owns them; states are never expressed by color alone and current selection uses a neutral outline. IMPLEMENTING is never inferred from Ticket YAML: without a trusted Active-Run presence source, the surface renders an explicit honest empty state. The UI remains read-only, keyboard reachable, contrast-readable, reduced-motion safe, and uses at least 44px targets on narrow layouts. It has no style selector, network font, third-party resource, hidden persistence, Desktop-only runtime, or parallel state model.",
   "evidence": [
     {
-      "note": "Current UI-only design authority for the shared local graph surface.",
-      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Current UI-only design authority for the shared local graph surface.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
     },
     {
       "note": "Dependency-free deterministic geometry, virtual waypoint ordering, bounded ports, and orthogonal routing implementation.",
@@ -48,7 +48,7 @@
     "quote": "对这个 PR 的期待仅限于 UI 相关的升级和 update；Desktop version 不进入本次交付。",
     "ref": "conversation:2026-08-11-pr18-ui-business-review"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "Every shared VibeHub UI preserves one A · Quiet Workbench causal layout with a left-to-right default and top-to-bottom choice",
   "tags": [
     "design-authority",

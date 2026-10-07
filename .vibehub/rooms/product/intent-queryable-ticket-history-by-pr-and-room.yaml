@@ -40,7 +40,7 @@
     "quote": "一个项目的所有历史工单都会存，但是当前面板肯定不看全部……这个 ticket 在这个 PR 里 close 了，这个 ticket 就属于这个 PR。",
     "ref": "conversation:2026-08-11-queryable-ticket-history-by-pr-and-room"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "VibeHub keeps every historical Ticket durably while the active Workbench defaults to current work and offers full-stack queries over archived history by delivery PR and related Rooms",
   "tags": [
     "archive",

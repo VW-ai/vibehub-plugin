@@ -1,0 +1,48 @@
+{
+  "context_id": "note-speed-first-cleanup-baseline",
+  "detail": "The historical cleanup kept rollback baseline 9dee0f095374211d8d7cbeeacac653ebb87bed91 and measured code files falling from 110 to five, source lines from 40,211 to 1,086 and artifact paths from 74 to 28. These measurements describe that cleanup commit only. It removed the large CLI/runtime/native database, hooks, MCP, dispatcher, leases, compiled ContextBinding and cached synchronization state. Shared schemas, direct file validation, explicit durable capture and Git review remained. The then-current proof-cycle checks and four-test count are historical; later task-memory semantics and the read-only loopback UI/session observation exceptions supersede those parts. Retain the deletion-first decision and exact verification provenance without claiming the current project still has that footprint or needs the old mandatory cycle.",
+  "evidence": [
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#speed-first-cleanup-evidence; lines 1-4. Historical section excerpt: \"Ticket: ticket-speed-first-cleanup\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#rollback-baseline; lines 5-10. Historical section excerpt: \"Commit 9dee0f095374211d8d7cbeeacac653ebb87bed91 captured the completed ticket-first runtime pivot, its independently accepted Evidence/Outcome, and the speed-first cleanup Ticket before hard deletion.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#footprint; lines 11-29. Historical section excerpt: \"The same production-code scope was measured before and after: packages/*/src, runtime/, skills/scripts/, and scripts/. | Measure | Before | After | |---|---:|---:| | Production files | 110 | 5 | | Production lines | 40,211 | 1,086 | | Workspace packages | 3 | 0 |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#removed-product-paths; lines 30-46. Historical section excerpt: \"Core, CLI, and MCP packages and their test suites SQLite/native persistence and package lock/workspace metadata generic operation dispatcher and runtime launcher lifecycle hooks and per-turn context cadence Run coordination, compiled Context copies, and local Decision attestation\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#preserved-minimum-quality; lines 47-60. Historical section excerpt: \"Four shared JSON Schemas cover Context, Ticket, Evidence, and Outcome. The persisted .yaml format is a deterministic JSON-compatible YAML 1.2 subset, so a clean plugin install needs no package dependency. Context validation enforces stable IDs, readable source/evidence, strict\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#verification; lines 61-73. Historical section excerpt: \"npm run verify passed: 4 fresh-process Context/Ticket tests malformed persisted input and dangling Context failures missing Ticket endpoint and dependency-cycle failures acceptance-linked Evidence and success/non-success unlock behavior dependency-free artifact build and installed Context roundtrip\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    },
+    {
+      "note": "Source segment docs/SPEED_FIRST_CLEANUP.md#observed-gaps-and-disposition; lines 74-90. Historical section excerpt: \"The old Ticket-only checkpoint helper could not isolate a new Ticket while previous Ticket Evidence was dirty. We did not repair it; a normal Git commit became the rollback boundary, and the helper was deleted. The old governed reads required opening SQLite outside the restricted\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/SPEED_FIRST_CLEANUP.md"
+  },
+  "state": "active",
+  "summary": "The speed-first cleanup removed a runtime stack while preserving Git-native records",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

@@ -3,8 +3,8 @@
   "detail": "For Rooms, Context cards, and the current-checkout path in the project rail: do not dump full paths by default. Group Show path, GitHub, and Open in editor together. Show path is an icon with hover/aria explanation, not a text label. Expanding Show path on a room expands or collapses that room path and every child card path under it in sync. Individual card toggles may still exist; the room control is the bulk switch.",
   "evidence": [
     {
-      "note": "Quiet dashboard Rooms UI implements folded paths, icon Show path, GitHub/editor actions, and room bulk path toggle.",
-      "ref": "docs/proposals/quiet-dashboard/index.html"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Quiet dashboard Rooms UI implements folded paths, icon Show path, GitHub/editor actions, and room bulk path toggle.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/quiet-dashboard/index.html"
     },
     {
       "note": "Merged prototype that carried these interaction decisions.",

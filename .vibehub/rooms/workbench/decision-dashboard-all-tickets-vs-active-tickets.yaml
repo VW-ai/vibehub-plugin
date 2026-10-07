@@ -3,8 +3,8 @@
   "detail": "All tickets means the full state pool for Board (including Done, with Done column collapse when All and volume is high). Currently active tickets means the open work surface the Graph defaults to: Done is omitted unless the user explicitly selects Done or includes it via multi-select filters. The titlebar count and filter chip labels must be honest—Graph default reports Active tickets with the rendered node count, never All with a larger pool that the graph silently dropped. Board may still say All tickets when showing every lane.",
   "evidence": [
     {
-      "note": "Quiet dashboard prototype encodes Active vs All heading and count behavior for graph vs board.",
-      "ref": "docs/proposals/quiet-dashboard/index.html"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: Quiet dashboard prototype encodes Active vs All heading and count behavior for graph vs board.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/quiet-dashboard/index.html"
     },
     {
       "note": "Merged prototype PR that carried the quiet dashboard exploration.",

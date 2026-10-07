@@ -11,8 +11,8 @@
       "ref": "test/ticket-context-ref-history.test.mjs"
     },
     {
-      "note": "记录该缺陷是如何在执行中被暴露的。",
-      "ref": "docs/proposals/bulk-absorption.md"
+      "note": "Pre-migration readable source snapshot; this is not a claim that the snapshot was the version read by the original attestation. Original note: 记录该缺陷是如何在执行中被暴露的。",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/bulk-absorption.md"
     }
   ],
   "kind": "context",

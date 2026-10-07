@@ -19,7 +19,7 @@
     "quote": "我们不用求稳，我们求快，我们可以错删，能后面发现gap能力重建就好了，不要over engineering",
     "ref": "conversation:2026-07-31-speed-first-cleanup"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "VibeHub is a speed-first Skill plugin built from direct Git-native Tickets and Context",
   "tags": [
     "architecture",

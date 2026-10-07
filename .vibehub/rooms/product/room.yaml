@@ -2,215 +2,61 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "8280acf38ab45a18a29de3a1e313023d04d459e5",
+        "blob": "a155196edddefa39af16bea92d5a9215ef0995c2",
+        "path": "AGENTS.md"
+      },
+      {
+        "blob": "da9884cbb4e50443a1ea71af1350eeda072339ee",
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "4f6484c6ba8cae1d4287a49ecc1a0c642e39135a",
+        "blob": "890a4d0e7afab63b9e5f79687343b1c090cd7ef9",
         "path": "README.md"
       },
       {
-        "blob": "c619eb32834b6b8f553a5890ca5558ca8bddd663",
-        "path": "docs/CONCEPT.md"
-      },
-      {
-        "blob": "029fdbbae07a032062b219e226f796613a815b6b",
-        "path": "docs/DASHBOARD.md"
-      },
-      {
-        "blob": "31f81498982a9b3f14bcf7b16fd235022d473561",
-        "path": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
-      },
-      {
-        "blob": "d1a28c64452fee0c797b707a67cfc4ff9d8729fa",
-        "path": "docs/GITHUB_ISSUES.md"
-      },
-      {
-        "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
-        "path": "docs/HARNESS_CHAT_V1_REVIEW.md"
-      },
-      {
-        "blob": "41f322914129ff1dc9adc59ac6ae4f66a1d5e9ce",
-        "path": "docs/HARNESS_CODEX_BASE_REVIEW.md"
-      },
-      {
-        "blob": "aa7ef18f75d46029f6fcecd31693fac493be409d",
-        "path": "docs/HARNESS_INTERACTION_RESEARCH.md"
-      },
-      {
-        "blob": "1e0117bb212c0b0ec5752a41b87c7a9437b30cd0",
-        "path": "docs/HARNESS_PRODUCT_CONTRACT.md"
-      },
-      {
-        "blob": "ac36ba80f7c611e0dec9acbb1d6681badbd9ad9f",
-        "path": "docs/HARNESS_PRODUCT_LOGIC.md"
-      },
-      {
-        "blob": "26afb5462f3a6ef243d258095d51f3ee7fd19994",
-        "path": "docs/HARNESS_PROTOTYPE_REVIEW.md"
-      },
-      {
-        "blob": "cd40a1fd709635ceb950bb93ac7e04b4dbc13564",
-        "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
-      },
-      {
-        "blob": "7cf080269c1959b3ffe766b8bdfd82350946bb05",
-        "path": "docs/INSTALL.md"
-      },
-      {
-        "blob": "a76765e7ccf8edc8f04bf6894a81ce86d5d973a2",
-        "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
-      },
-      {
-        "blob": "a1bd4b0842407d81092fcd62c613cc8c02773086",
-        "path": "docs/LOCAL_GRAPH_DESIGN.md"
-      },
-      {
-        "blob": "7442405c0be2963782b2967f2d8c25575aa25141",
-        "path": "docs/RELEASE.md"
-      },
-      {
-        "blob": "b5d11fecb58d9e15c672264523a6e4cdda0bb0e0",
-        "path": "docs/SPEED_FIRST_CLEANUP.md"
-      },
-      {
         "blob": "579612a343167c8240b7e690e5ce2eb462cba429",
-        "path": "docs/assets/github-issues/issue-blocked-by-2x.png"
+        "path": "assets/screenshots/github-issues/issue-blocked-by-2x.png"
       },
       {
         "blob": "edd5b9b287edb76dde1f05fa1cc5110a3f6bb03c",
-        "path": "docs/assets/github-issues/issues-list-2x.png"
+        "path": "assets/screenshots/github-issues/issues-list-2x.png"
       },
       {
-        "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
-        "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png"
+        "blob": "a360e66e33a1f356b7cfeac8fbf98c3cf1658b6b",
+        "path": "scripts/build-plugin-artifact.mjs"
       },
       {
-        "blob": "68f9a0219b05a05b158c8f27a29b0da9c57936d0",
-        "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+        "blob": "80d6fa96ea298cc87a7c4b3a7f5aa9dd6af9a8ac",
+        "path": "scripts/build-upgrade-package.mjs"
       },
       {
-        "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
-        "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+        "blob": "09a3f90ed1db87a7d674c5dd8703bafec96d3428",
+        "path": "scripts/sync-github-issues.mjs"
       },
       {
-        "blob": "f057f2e1f1fbb0f24f09e122a8d7c98d0be4f588",
-        "path": "docs/assets/local-graph/readme-capture-manifest.json"
+        "blob": "a3e4cba2a092ccc70bef3dda137ae533a421302a",
+        "path": "scripts/verify-plugin-artifact.mjs"
       },
       {
-        "blob": "9848601c890923d0b17cc9436f8d7ad2d50caff7",
-        "path": "docs/assets/local-graph/workbench-rooms-narrow-2x.png"
-      },
-      {
-        "blob": "b139f93c74c772316d49b29f29b52c1e61217b92",
-        "path": "docs/assets/local-graph/workbench-rooms-narrow.jpg"
-      },
-      {
-        "blob": "6353976f590a96ae4b456921bea407fa279a650a",
-        "path": "docs/assets/local-graph/workbench-ticket-action-2x.png"
-      },
-      {
-        "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
-        "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
-      },
-      {
-        "blob": "0c05e2f281fceeb00ba828f6be3862d912eca78e",
-        "path": "docs/proposals/bulk-absorption.md"
-      },
-      {
-        "blob": "85fafdaebc2668fb4e4f456d23b715c3bf858633",
-        "path": "docs/proposals/card-corner-signal/README.md"
-      },
-      {
-        "blob": "bacec00f101b479b827207901345cea48f42c0f0",
-        "path": "docs/proposals/card-corner-signal/contract.json"
-      },
-      {
-        "blob": "591749d2a61a287aebacae74cdd5617fc6f5992a",
-        "path": "docs/proposals/card-corner-signal/fixtures.json"
-      },
-      {
-        "blob": "2a738eb744695cad46b8c59cee146892830f7494",
-        "path": "docs/proposals/card-corner-signal/index.html"
-      },
-      {
-        "blob": "578540d9054125c2d4f95d63afceb2db668d4f6e",
-        "path": "docs/proposals/card-corner-signal/phase-model.mjs"
-      },
-      {
-        "blob": "658ad3be5c26fd6a8000761c9518d6900b953f55",
-        "path": "docs/proposals/card-corner-signal/prototype.css"
-      },
-      {
-        "blob": "89edf0ccce4ffd2e6f8b47c7c4bae85d8954ca34",
-        "path": "docs/proposals/card-corner-signal/prototype.js"
-      },
-      {
-        "blob": "fe5cafcb8161ccbf6ef4a4aea102d69f5e3f9718",
-        "path": "docs/proposals/codex-like-workbench/README.md"
-      },
-      {
-        "blob": "e5e7aa243c0e9ef091b3d94dc4eb1ff31507fd95",
-        "path": "docs/proposals/codex-like-workbench/index.html"
-      },
-      {
-        "blob": "a3c2c4c371e300b4d509081d49f65030b65dd1a0",
-        "path": "docs/proposals/codex-like-workbench/proposal.css"
-      },
-      {
-        "blob": "a58e04ef0059118685c75cb8e2c76bd3134dbe85",
-        "path": "docs/proposals/codex-like-workbench/proposal.js"
-      },
-      {
-        "blob": "424e1e40d56cfd015af22feb9b4cb58f4ade4f55",
-        "path": "docs/proposals/codex-like-workbench/state-matrix.json"
-      },
-      {
-        "blob": "e2d21fa748c5dd096ae3e2f328c04bc969a920e2",
-        "path": "docs/proposals/codex-like-workbench/tokens.json"
-      },
-      {
-        "blob": "2f0819da0c63b463041eb890ad07b6d4201316f0",
-        "path": "docs/proposals/cross-project-upgrade-surface.md"
-      },
-      {
-        "blob": "6e64fa1bea59eb6c6eeead75d969a452aa94df35",
-        "path": "docs/proposals/npx-first-install-experience.md"
-      },
-      {
-        "blob": "46133ab329a21226613cadbd9bdc943671072f9f",
-        "path": "docs/proposals/release-version-identity.md"
-      },
-      {
-        "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
-        "path": "docs/proposals/rooms-workbench/README.md"
-      },
-      {
-        "blob": "ab4e013da5020ff102091f77356df1381483f237",
-        "path": "docs/proposals/rooms-workbench/contract.json"
-      },
-      {
-        "blob": "e30c3a7ccb9b2d33796bac812ae7bae7c3584f25",
-        "path": "docs/proposals/rooms-workbench/index.html"
-      },
-      {
-        "blob": "bd7fb3592ef489e1ada3f8f7a8e9ff182c73aaeb",
-        "path": "docs/proposals/rooms-workbench/rooms.css"
-      },
-      {
-        "blob": "4c6096f6e6c0a9addad816f9973cd23e2152965f",
-        "path": "docs/proposals/rooms-workbench/rooms.js"
+        "blob": "60190a3be4f2bfb24bf3c616beae1d2b7d8bedcd",
+        "path": "scripts/verify-release-version.mjs"
       }
     ],
-    "checked_at": "2026-09-21T14:38:50.993Z",
-    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
+    "checked_at": "2026-10-07T07:37:19.994Z",
+    "last_aligned_commit": "74ef88e39156b1e1e4455426131e4a171335ef60"
   },
   "anchors": [
     "CHANGELOG.md",
     "README.md",
-    "docs/"
+    "AGENTS.md",
+    "scripts/build-plugin-artifact.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "scripts/verify-release-version.mjs",
+    "scripts/build-upgrade-package.mjs",
+    "scripts/sync-github-issues.mjs",
+    "assets/screenshots/github-issues/"
   ],
-  "boundary": "Product-wide direction: architecture philosophy, development phase, and conventions that govern every other room. Not the implementation of any single subsystem.",
+  "boundary": "Owns product-wide direction, installation, release, publication and cross-Room conventions. Subsystem implementation belongs to its existing owning Room; historical proposals do not override current contracts.",
   "description": "The top room of VibeHub itself: decisions and conventions whose claims span the whole product.",
   "kind": "room",
   "room_id": "product",

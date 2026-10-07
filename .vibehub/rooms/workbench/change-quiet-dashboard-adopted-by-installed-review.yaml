@@ -1,0 +1,58 @@
+{
+  "context_id": "change-quiet-dashboard-adopted-by-installed-review",
+  "detail": "The Quiet Dashboard is the installed /dashboard interface reached by the shared session entry and vh-start helper. It reads authenticated project, worktree, task and Room APIs; a checked-in repo-data snapshot is no longer a presentation fallback. The board and causal graph retain Goal/Epic/Ticket membership, explicit task progress, dependencies and honest active/all visibility. Context is grouped by the canonical Room tree, with canonical-artifact previews alongside ordinary Context detail. The interface retains a resizable rail and inspector, coherent icons and system/light/dark themes. It remains read-only and does not start Agents or change task records. The static proposal and snapshot builder are removed from the current tree and remain available in Git history. Installed-entry browser verification exercised live task and Room data, and all seven served Dashboard files matched the installed bundle. This adoption supersedes the earlier prototype-only boundary and its deferred adoption requirement.",
+  "evidence": [
+    {
+      "note": "The installed Dashboard entry loads the canonical shared frontend bundle.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard.html"
+    },
+    {
+      "note": "The installed session-entry helper was exercised to start the live authenticated Dashboard.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-core/scripts/vh-start.mjs"
+    },
+    {
+      "note": "Artifact verification starts the packaged entry and compares the seven served Dashboard files with the installed bytes.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    },
+    {
+      "note": "Behavior checks preserve native worktree identity, Goal/Epic membership, recorded status and exact dependency projection.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:test/dashboard-model.test.mjs"
+    },
+    {
+      "note": "Room projection checks canonical knowledge grouping and authority presentation.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:test/dashboard-rooms.test.mjs"
+    },
+    {
+      "note": "Browser regression exercises the adopted Dashboard against live local API fixtures.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:test/dashboard-navigation.browser.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "change-quiet-dashboard-prototype-checked-in",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "contract-dashboard-live-readonly-surface",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-current-graph-projection",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:34:24Z",
+    "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard.html"
+  },
+  "state": "active",
+  "summary": "The installed review Skill serves the Quiet Dashboard over live project and Room records",
+  "tags": [
+    "dashboard",
+    "workbench",
+    "installed-ui"
+  ],
+  "type": "change"
+}

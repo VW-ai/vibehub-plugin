@@ -1,0 +1,60 @@
+{
+  "context_id": "note-harness-interaction-exploration-history",
+  "detail": "The research studied official Codex, Linear, Raycast, Things, Notion, Msty, Superlist and OpenHands material for task navigation, conversation branching, comparison, context inspection, human attention and review. Candidate A Focus Route favored a clear focused workspace, B Spatial Lens emphasized graph context and zoom, and C Live Split kept parallel work visible. The author recommended A; this was a recommendation rather than owner approval. Chat and task remain distinct work modes, context selection must be visible, a fork expresses thought provenance rather than automatic task hierarchy, and bring-back preserves selected conclusions instead of concatenating raw histories. The accompanying rc.8 extension investigation was source-level evidence, not the earlier rc.7 boot result or a completed fresh build. Exact research links, candidate descriptions, examples and evidence limits are retained in the pinned report. Existing apps/harness-interaction-research presents the comparison as an exploration artifact.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#task-workbench-interaction-research; lines 1-6. Historical section excerpt: \"Status: decision-ready interaction study. This document is not visual authority and does not authorize production DSH integration. It exists to select the spatial and navigational model that the next prototype will execute.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#fixed-product-premises; lines 7-21. Historical section excerpt: \"The user enters VibeHub to make, understand, steer, review, or close a Task. The Task is durable. A Chat or Agent Session is an execution and exploration resource attached to it. The Ticket Graph is home for committed work. It must show causality,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#research-corpus; lines 22-38. Historical section excerpt: \"The corpus intentionally mixes direct competitors with adjacent products that solve one interaction problem exceptionally well. We extract behavior, not a visual collage. | Product | Pattern worth carrying | Failure to avoid | Official source |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#pattern-map-across-the-vibehub-loop; lines 39-54. Historical section excerpt: \"| Moment | Interaction contract | Research influence | | --- | --- | --- | | First frame | Show the current Task graph and the smallest honest attention summary. No chat-history landing page and no dashboard of vanity counts. | Linear attention hierarchy, Things focus |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#candidate-interaction-architectures; lines 55-59. Historical section excerpt: \"All three candidates share the same objects, lifecycle, and visual restraint. They differ only in how the Graph and one Task Workspace share space.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#a-focus-route-recommended; lines 60-84. Historical section excerpt: \"The Graph is a full home surface. Opening a Task transitions to a focused Task Workspace; the selected node supplies the transition origin and a compact causal breadcrumb. Back returns to the exact graph viewport. The center changes by Task phase, while Chat is a persistent composer plus an…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#b-spatial-lens; lines 85-101. Historical section excerpt: \"The Graph never leaves. Opening a Task expands a wide lens over the selected node while the remaining causal neighborhood recedes behind it. The lens owns Run, Attention, Chat, and Review. Closing it returns immediately to the canvas. Strength: strongest spatial continuity and most distinctive…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#c-live-split; lines 102-119. Historical section excerpt: \"The left region keeps a navigable causal graph or focused subgraph; the right region is the active Task Workspace. Selection switches the right side without a route transition. The split can collapse to Graph-only or Task-only. Strength: dependencies and execution remain simultaneously visible,…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#recommendation; lines 120-139. Historical section excerpt: \"Use **A. Focus Route** as the base interaction architecture. It protects all three product truths simultaneously: 1. the Graph is genuinely home; 2. a Task is the stable unit after commitment; 3. autonomous execution, Chat, and Evidence get a calm full-size workspace.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_INTERACTION_RESEARCH.md#dsh-rc-8-feasibility-note; lines 140-166. Historical section excerpt: \"Current official baseline inspected: @deepseek-ai/dsh@0.1.0-rc.8, commit 141eb6fef83422698aef7a981029e843e8161534. The nine rc.7 structural seams used by the existing Spike remain present: Bundle/Profile composition, Root layout, conversation slots, custom Chat\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_INTERACTION_RESEARCH.md"
+  },
+  "state": "active",
+  "summary": "Interaction research compared focus, spatial and split layouts without selecting a production design",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

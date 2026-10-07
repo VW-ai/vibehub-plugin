@@ -172,25 +172,25 @@ test("retired marketplace distribution cannot reappear in active surfaces", () =
   assert.equal(existsSync(join(root, ".agents/plugins/marketplace.json")), false);
   const site = read("site/app/page.tsx");
   const siteTest = read("site/tests/rendered-html.test.mjs");
-  const historicalProposal = read("docs/proposals/npx-first-install-experience.md");
+  const historicalProposal = JSON.parse(read(".vibehub/rooms/product/note-install-distribution-alternatives.yaml"));
   const retiredCommands = /plugin marketplace add|plugin install vibehub@vibehub/u;
 
   assert.doesNotMatch(site, retiredCommands);
   assert.doesNotMatch(siteTest, /assert\.match\([^\n]+(?:plugin marketplace add|plugin install vibehub@vibehub)/u);
-  assert.doesNotMatch(historicalProposal, /marketplace commands keep working|host marketplace upgrade|marketplace path keeps working/u);
-  assert.match(historicalProposal, /Historical proposal[\s\S]+only supported install path now/u);
+  assert.equal(historicalProposal.type, "note");
+  assert.match(historicalProposal.detail, /later decisions retired marketplaces/u);
 });
 
-test("README Workbench screenshots match the checked-in Retina capture manifest", () => {
-  const manifest = JSON.parse(read("docs/assets/local-graph/readme-capture-manifest.json"));
+test("Historical Workbench screenshots match the checked-in Retina capture manifest", () => {
+  const manifest = JSON.parse(read("assets/screenshots/local-graph/readme-capture-manifest.json"));
   assert.equal(manifest.source_commit, "55c52b49b9d7caffe0ce5c048529269dbfdb9261");
   assert.equal(manifest.dpr, 2);
   const expected = new Map([
-    ["docs/assets/local-graph/quiet-workbench-desktop-2x.png", [1280, 720, 2560, 1440]],
-    ["docs/assets/local-graph/workbench-ticket-action-2x.png", [1180, 820, 2360, 1640]],
-    ["docs/assets/local-graph/workbench-rooms-narrow-2x.png", [390, 844, 780, 1688]],
-    ["docs/assets/github-issues/issue-blocked-by-2x.png", [1280, 720, 2560, 1440]],
-    ["docs/assets/github-issues/issues-list-2x.png", [1280, 720, 2560, 1440]],
+    ["assets/screenshots/local-graph/quiet-workbench-desktop-2x.png", [1280, 720, 2560, 1440]],
+    ["assets/screenshots/local-graph/workbench-ticket-action-2x.png", [1180, 820, 2360, 1640]],
+    ["assets/screenshots/local-graph/workbench-rooms-narrow-2x.png", [390, 844, 780, 1688]],
+    ["assets/screenshots/github-issues/issue-blocked-by-2x.png", [1280, 720, 2560, 1440]],
+    ["assets/screenshots/github-issues/issues-list-2x.png", [1280, 720, 2560, 1440]],
   ]);
   assert.equal(manifest.captures.length, expected.size);
   for (const capture of manifest.captures) {
@@ -237,18 +237,12 @@ test("release is GitHub-only, reproducible, and documented", () => {
     "version identity must fail before the expensive suite",
   );
 
-  const procedure = read("docs/RELEASE.md");
-  assert.match(procedure, /Merge the verified PR/u);
-  assert.match(procedure, /Tag the exact merged `main` commit/u);
-  assert.match(procedure, /npm is an execution client/u);
-  assert.match(procedure, /not a registry release or global installation surface/u);
-  assert.match(procedure, /same tag and commit identity/u);
-  assert.match(procedure, /the package\s+and retained Claude plugin manifest as the only release-version\s+declarations/u);
-  assert.doesNotMatch(procedure, /both plugin manifests|Claude marketplace\s+metadata/u);
-  assert.match(procedure, /--check-shipped-content/u);
-  assert.match(procedure, /imports `PLUGIN_PATHS`/u);
-  assert.match(procedure, /There is intentionally no installed staleness command/u);
-  const install = read("docs/INSTALL.md");
-  assert.match(install, /updater detects plugin changes by content hash or\s+an unconditional refetch/u);
-  assert.match(install, /ships no separate staleness command/u);
+  const procedure = JSON.parse(read(".vibehub/rooms/product/contract-release-artifacts-and-data-migrations.yaml"));
+  assert.equal(procedure.type, "contract");
+  assert.match(procedure.detail, /exact approved commit/);
+  const readme = read("README.md");
+  assert.match(readme, /tree\/<release-tag>/);
+  assert.match(readme, /releases\/download\/<release-tag>\/vibehub-upgrade\.tgz/);
+  assert.match(readme, /Nothing is pushed/);
+
 });

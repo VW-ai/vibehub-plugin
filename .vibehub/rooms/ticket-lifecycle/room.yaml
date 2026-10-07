@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "5a8f155f44b67d13ff4c61524b28c2f5eef987d4",
+        "blob": "21b839e082c92c24d219e279a110b7ba3d88d137",
         "path": "skills/vibehub-core/contracts/dependency-hygiene.json"
       },
       {
@@ -22,7 +22,7 @@
         "path": "skills/vibehub-core/contracts/outcome.schema.json"
       },
       {
-        "blob": "e0d69404173f8af44cafae9cdac4a9bb87b15936",
+        "blob": "756f627a79c45b1bdb7ac03a9ae159a4497fece0",
         "path": "skills/vibehub-core/contracts/planning-hierarchy.md"
       },
       {
@@ -30,56 +30,36 @@
         "path": "skills/vibehub-core/contracts/project-format.schema.json"
       },
       {
-        "blob": "df39d4c14c689d8b9dda0de9cb32e1da857bdc8f",
+        "blob": "e5611908b0a5a680d17c434fb8d800138f951ea2",
         "path": "skills/vibehub-core/contracts/revision-identity.md"
       },
       {
-        "blob": "ac15127892bc5d25d80fca594d76818f7f6f7a59",
+        "blob": "a80a35368fb98c59cb8a66bd5e4c5e048444fe89",
+        "path": "skills/vibehub-core/contracts/ticket-state.md"
+      },
+      {
+        "blob": "29b716f743af4e3097973cbfdf2210da0a9fbe26",
         "path": "skills/vibehub-core/contracts/ticket.schema.json"
       },
       {
-        "blob": "4e304ff47532a0c7b9c82e67d49d16123fdbf5f9",
+        "blob": "b3031b124c5846b5fc61a99719e8542d7512f977",
         "path": "skills/vibehub-core/scripts/revision-contract.mjs"
       },
       {
-        "blob": "c3c2aabf53ce1549b2da82c2fa29be81aef0a739",
+        "blob": "ef67f9b166ace875501e61d93d6cd52cd496e8bf",
         "path": "skills/vibehub-core/scripts/vh.mjs"
       },
       {
-        "blob": "40b44c07b899d70e2a0550d6dc2a6e4aab173c53",
-        "path": "skills/vibehub-ticket-closeout/SKILL.md"
+        "blob": "16a46e4ce9686a0a08a7732b7febe044e9ae495b",
+        "path": "skills/vibehub-ticket/SKILL.md"
       },
       {
-        "blob": "849c09d87bde8bb13d372650cf48db71898dd676",
-        "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
-      },
-      {
-        "blob": "84a9bcceb5c286f1db04b7a5469a035d7a25a5ef",
-        "path": "skills/vibehub-ticket-plan/SKILL.md"
-      },
-      {
-        "blob": "4b4435a0aea6a7842c4fd9595e9b885f608b7429",
-        "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
-      },
-      {
-        "blob": "9cd29666687d6ee3936f451453db0df29192b692",
-        "path": "skills/vibehub-ticket-run/SKILL.md"
-      },
-      {
-        "blob": "d10e7b0f27eca775babc62bd6951f5346b05f86a",
-        "path": "skills/vibehub-ticket-run/agents/openai.yaml"
-      },
-      {
-        "blob": "8dd40e909b52bb02ffadf191b628a0527737ca05",
-        "path": "skills/vibehub-ticket-validate/SKILL.md"
-      },
-      {
-        "blob": "6aa6b1344f587bb968c605698afee6b6e3e80514",
-        "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
+        "blob": "3ddfea58da9f1bf3446aabea03bc614e7531a9a3",
+        "path": "skills/vibehub-ticket/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-09-21T14:38:52.488Z",
-    "last_aligned_commit": "34ab003849a5f9425bb9a25ce9d2d6cbe377ea2b"
+    "checked_at": "2026-10-07T07:37:25.426Z",
+    "last_aligned_commit": "74ef88e39156b1e1e4455426131e4a171335ef60"
   },
   "anchors": [
     "skills/vibehub-core/contracts/dependency-hygiene.json",
@@ -93,13 +73,11 @@
     "skills/vibehub-core/contracts/ticket.schema.json",
     "skills/vibehub-core/scripts/revision-contract.mjs",
     "skills/vibehub-core/scripts/vh.mjs",
-    "skills/vibehub-ticket-closeout/",
-    "skills/vibehub-ticket-plan/",
-    "skills/vibehub-ticket-run/",
-    "skills/vibehub-ticket-validate/"
+    "skills/vibehub-ticket/",
+    "skills/vibehub-core/contracts/ticket-state.md"
   ],
-  "boundary": "The Ticket execution lifecycle from plan through independent closeout, including the deterministic vh.mjs validation surface. Not knowledge capture and not the workbench UI.",
-  "description": "Goal and Epic planning scope plus Ticket planning, validation, execution, evidence, and independent closeout.",
+  "boundary": "Owns task definition and explicit recorded progress, dependency facts, canonical record validation and optional historical proof identity. Personal Skills own execution; presentation and durable knowledge ownership live in their own Rooms.",
+  "description": "Task records, progress, dependencies and immutable historical proof.",
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,

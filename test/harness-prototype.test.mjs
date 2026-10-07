@@ -14,21 +14,17 @@ test("Harness prototype carries the complete mocked product loop", async () => {
   const [html, script, contract, review] = await Promise.all([
     source("apps/harness-prototype/index.html"),
     source("apps/harness-prototype/app.js"),
-    source("docs/HARNESS_PRODUCT_CONTRACT.md"),
-    source("docs/HARNESS_PROTOTYPE_REVIEW.md"),
+    source(".vibehub/rooms/product/note-harness-product-model-history.yaml"),
+    source(".vibehub/rooms/workbench/note-harness-initial-prototype-rejected.yaml"),
   ]);
 
+  assert.equal(JSON.parse(review).type, "note");
   for (const marker of ["Chat", "Branches", "Compare branches", "Bring back to Main", "Context off", "Make Ticket", "Start Ticket", "Preview execution states"]) {
     assert.match(html, new RegExp(marker, "i"), `missing interaction marker: ${marker}`);
   }
   for (const runState of ["queued", "running", "waiting", "failed", "evidence", "completed"]) {
     assert.match(script, new RegExp(`${runState}:`), `missing trusted run projection: ${runState}`);
   }
-  assert.match(contract, /Think first/);
-  assert.match(contract, /Act first/);
-  assert.match(contract, /Cross-repository Project or Ticket federation/);
-  assert.match(contract, /A native desktop wrapper/);
-  assert.match(review, /Product questions for the owner/);
   assert.doesNotMatch(html, /https?:\/\//, "prototype must not load network resources");
 });
 

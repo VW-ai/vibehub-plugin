@@ -1,0 +1,124 @@
+{
+  "context_id": "note-harness-product-model-history",
+  "detail": "The Harness contract and product-logic reports explored a graph home with a focused Ticket workspace: Ticket throughout, Chat before and around work, Run during execution. Think-first chat could fork, compare and bring conclusions back before forming a task; act-first began with a bounded outcome. The prototype phases were explore, ready, running, needs-you, review and done, with phase-specific composer and attention behavior. Task, Chat, Agent Session, Run, selected Context, Evidence and Outcome were deliberately distinct. The initial proposal treated DSH as engine under a complete VibeHub shell; later owner decisions chose additive task pages inside the DSH shell instead. The proposed full execution/independent-closeout loop is historical and does not govern current task-memory Skills. V1 scope was one browser workspace, not a cloud service, personal automatic knowledge graph, team administration or new database. Source walkthroughs and their unanswered owner questions remain pinned evidence. Future runtime implementation must reconcile the newer task-memory boundary and obtain its own bounded product decision rather than treating these mockups as shipped functionality.",
+  "evidence": [
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#vibehub-harness-product-contract; lines 1-7. Historical section excerpt: \"Status: whole-application product-direction proposal for human review. The first additive-slot Spike proved DSH compatibility but its UI is rejected as a product direction. This document and the replacement prototype do not authorize production backend architecture.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#product-promise; lines 8-17. Historical section excerpt: \"VibeHub Harness is the place where a person turns thought into bounded work and stays oriented while an Agent executes it. Normal Agent Chat remains capable and unconstrained. VibeHub contributes explicit branch navigation, scoped Context, Ticket craft, execution presence, attention return, and…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#product-identity-dsh-is-the-engine-not-the-application; lines 18-38. Historical section excerpt: \"The user should not experience VibeHub as several panels installed into the stock DeepSeek Harness interface. DSH supplies the runtime, plugin graph, Sessions, tools, permissions, models, and host lifecycle underneath. VibeHub owns the complete visible application:\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#whole-application-information-architecture; lines 39-57. Historical section excerpt: \"The application has one stable frame rather than a collection of product pages: Command / capture layer** starts a thought, finds a Ticket or Session, or jumps to work without first choosing a subsystem. Work navigation** exposes the current Workspace, conversations, Tickets,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#near-term-scenario-one-workspace; lines 58-62. Historical section excerpt: \"The first product operates inside one selected Git Workspace that already owns its VibeHub Rooms and canonical documents.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#think-first; lines 63-76. Historical section excerpt: \"1. Open the Workspace and start a normal Agent Chat. 2. Fork any useful thought without changing the parent conversation. 3. Enter branches from a visible conversation graph. 4. Compare sibling branches and bring a chosen synthesis back as a new turn.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#act-first; lines 77-84. Historical section excerpt: \"1. Describe the desired work directly. 2. Let the Agent ask only for genuinely missing boundaries. 3. Optionally activate scoped Workspace Context. 4. Preview readiness and craft the Ticket. 5. Start and follow the same execution loop.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#interaction-grammar; lines 85-103. Historical section excerpt: \"Chat is the primary thinking surface. VibeHub objects appear around it as compact, inspectable attachments: Branch** identifies the exact conversation lineage. It is created only by an explicit fork and never inferred from semantic similarity.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#execution-presence; lines 104-118. Historical section excerpt: \"Execution must feel present without becoming a wall of logs. A quiet persistent dock answers whether anything is really running, the current step, and whether the user is needed. A dedicated Run surface exposes queued, running, waiting-for-human, failed,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#initial-product-shell; lines 119-131. Historical section excerpt: \"V1 is a local browser application optimized for Safari and normal desktop browsers. It should feel like an application through stable navigation, focused work surfaces, keyboard reachability, responsive layout, and a narrow local lifecycle. A later desktop wrapper may own window and launch behavior,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#v1-non-goals; lines 132-142. Historical section excerpt: \"Cross-repository Project or Ticket federation A personal automatic knowledge graph Cloud sync, accounts, or multi-user collaboration A native desktop wrapper A second durable database or hidden UI authority A new general-purpose Agent runtime\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#longer-term-direction; lines 143-150. Historical section excerpt: \"After the single-Workspace loop earns daily use, VibeHub may add a Workspace catalog, project-independent personal Tickets, cross-repository dependencies, additional Context providers, a broader personal Knowledge Park, executor routing, hosted synchronization, collaboration, and a desktop or…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_CONTRACT.md#development-gate; lines 151-158. Historical section excerpt: \"Permanent implementation begins only after: 1. the owner uses the product prototype and records the chosen interaction direction; 2. source-level DeepSeek Harness spikes establish the usable extension seams; 3. the draft vertical-slice Ticket is refined from those two Outcomes.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#vibehub-harness-product-logic; lines 1-6. Historical section excerpt: \"Status: low-fidelity product authority for the next prototype. It defines what the application is and how its main objects behave. It does not authorize a production backend or settle high-fidelity visual design.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#product-thesis; lines 7-31. Historical section excerpt: \"VibeHub Harness is where a person turns an intention into bounded work, lets an Agent carry most of that work, and regains attention only when judgment or authority is actually needed. The application starts from the familiar Codex desktop interaction model:\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#the-two-level-application; lines 32-52. Historical section excerpt: \"The first frame is the **Ticket Graph**, not a conversation, inbox, project dashboard, or one Ticket's execution state. It presents the current causal system of work: every visible Ticket, direct dependency, blocker, unlock, operational state, human-attention signal, and trusted Active-Run presence.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#product-objects; lines 53-71. Historical section excerpt: \"| Object | Product meaning | Authority | | --- | --- | --- | | Workspace | The selected V1 Git project and its local VibeHub Context | Git and local project configuration | | Conversation | A normal Agent interaction stream | DSH Session log |\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#two-ways-work-begins; lines 72-73. Structural heading only; the following named sections carry the substantive claims.",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#think-first; lines 74-84. Historical section excerpt: \"1. Start a normal Chat with no workflow constraint. 2. Explicitly fork a useful assistant turn when parallel exploration is useful. 3. Enter either Branch, Compare siblings, or Bring Back a synthesis as a new turn while preserving both sources.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#act-first; lines 85-94. Historical section excerpt: \"1. Describe the desired outcome directly from New task or capture. 2. The Agent asks only for boundaries that materially affect execution. 3. Optionally activate scoped Workspace Context. 4. Preview the proposed Ticket, inspect readiness, then create it.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#the-complete-loop; lines 95-113. Historical section excerpt: \"Explore → Draft Ticket → Ready → Start → Queued / Running ↘ Needs you ↗ ↘ Failed / Retry → Review → Done ↘ Reopen / Follow-up Ticket lifecycle and Run lifecycle remain separate: Ticket: draft → ready → blocked → in review → done / reopened Run: queued → running → waiting for human → failed /…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#default-surface-by-phase; lines 114-130. Historical section excerpt: \"The application keeps one frame and changes the dominant center surface. The Composer never disappears. | Phase | Dominant center surface | Primary human action | Composer role | | --- | --- | --- | --- | | Explore | Normal Chat and explicit branch lineage | Ask, fork, compare, bring back, activate…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#graph-navigation-and-attention; lines 131-156. Historical section excerpt: \"The Ticket Graph is the primary navigation for committed work. It uses the existing VibeHub causal Workbench grammar: left-to-right causal rank by default; direct dependency edges and explicit fork/join geometry; operational state on every Ticket card;\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#interaction-laws; lines 157-176. Historical section excerpt: \"1. **No compulsory workflow in Chat.** Skills and protocols can be invoked by explicit controls; the user does not need to know their names. 2. **Ticket becomes primary after commitment.** Once created, it remains the stable identity through Start, execution, attention, review, and closeout.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#v1-boundary; lines 177-188. Historical section excerpt: \"V1 is a local browser application for one selected Workspace. It may use mocked state while the product loop is reviewed. It does not include cross-repository coordination, cloud accounts, collaboration, an automatic personal knowledge graph, a native wrapper, or a second canonical database.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "note": "Source segment docs/HARNESS_PRODUCT_LOGIC.md#longer-term-direction; lines 189-200. Historical section excerpt: \"After the single-Workspace loop earns daily use, the same attention model can span many Workspaces and project-independent Tickets. A personal Context layer may resolve relevant knowledge across work and life, while each project keeps its own specialized Room ontology. Organization systems remain…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_LOGIC.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/HARNESS_PRODUCT_CONTRACT.md"
+  },
+  "state": "active",
+  "summary": "The earlier Harness model explored an execution workspace and remains historical design input",
+  "tags": [
+    "docs-migration",
+    "historical-design"
+  ],
+  "type": "note"
+}

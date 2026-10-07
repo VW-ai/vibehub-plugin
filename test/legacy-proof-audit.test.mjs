@@ -94,9 +94,9 @@ test("legacy proof reconstruction follows current HEAD ancestry, not unrelated r
   assert.equal(firstCurrentAddition(repo, "proof.json"), mainAddition);
 });
 
-test("policy proposal records every protected impact surface", () => {
+test("historical proof policy retains protected impact and ancestry requirements", () => {
   const source = readFileSync(join(root, "scripts", "audit-legacy-proof.mjs"), "utf8");
-  const proposal = readFileSync(join(root, "docs", "LEGACY_PROOF_REVISION_POLICY.md"), "utf8");
+  const policy = JSON.parse(readFileSync(join(root, ".vibehub", "rooms", "ticket-lifecycle", "note-legacy-proof-revision-audit.yaml"), "utf8"));
   for (const field of [
     "done_tickets_retained",
     "archived_tickets_retained",
@@ -108,7 +108,12 @@ test("policy proposal records every protected impact surface", () => {
     "open_dependents_unblocked",
     "installed_artifact_compatibility",
   ]) assert.match(source, new RegExp(field, "u"));
-  assert.match(proposal, /Installed-artifact compatibility/u);
-  assert.match(proposal, /current `HEAD` ancestry/u);
+  assert.equal(policy.type, "note");
+  assert.match(policy.detail, /current Git ancestry/u);
+  assert.match(policy.detail, /never silently rebinds old success/u);
+  assert.ok(policy.evidence.some(item =>
+    item.ref === "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LEGACY_PROOF_REVISION_POLICY.md"
+    && item.note.includes("#installed-artifact-compatibility;")));
+
   assert.doesNotMatch(source, /"log", "--all"/u);
 });

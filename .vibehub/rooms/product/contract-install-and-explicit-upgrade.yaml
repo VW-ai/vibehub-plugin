@@ -1,0 +1,105 @@
+{
+  "context_id": "contract-install-and-explicit-upgrade",
+  "detail": "The supported installation path is npx skills add VW-ai/vibehub-plugin. Install every required Skill, including vibehub-core, which contains shared scripts, schemas and templates; missing core is repaired with npx skills add VW-ai/vibehub-plugin -s vibehub-core. Skills.sh copies Skill folders, so installed behavior cannot depend on repository docs, a global CLI, npm-registry VibeHub package or a daemon. Node 20 or newer and Git are required. Host marketplaces are retired; retained plugin metadata is not a supported marketplace distribution. Setup inspects the exact repository for existing knowledge and follows the user-selected VibeHub-only or explicit dual-write arrangement. It keeps new records local and never silently enables GitHub publication. Code version and checked-in data format are separate. CURRENT can be written; MIGRATION_REQUIRED requires an explicit declared upgrade; UNSUPPORTED_NEWER fails visibly. An update uses the same immutable release tag for npx skills add https://github.com/VW-ai/vibehub-plugin/tree/<release-tag> and the release asset https://github.com/VW-ai/vibehub-plugin/releases/download/<release-tag>/vibehub-upgrade.tgz. A floating skills update followed by an unrelated upgrader does not establish that pairing. The one-shot upgrader receives bounded explicit roots and enumerates registered worktrees. Current worktrees are no-ops. Only attached, reachable, writable, completely clean worktrees without an in-progress Git operation and with a recognized migration chain qualify for mechanical changes. Preview twice at the same HEAD, require identical allowed paths and a valid target, recheck HEAD/status, then materialize through a compare-and-swap ref update. Never stash, reset, checkout, push or invoke arbitrary repository hooks to manufacture eligibility. Prove restoration before reporting a failed pre-commit attempt as safely pending; recovery_failed stops rather than continuing. Once the terminal ref update succeeds, report migrated rather than pretending a rollback occurred. Every unsafe, malformed or newer worktree receives a precise skip/pending reason. Semantic enrichment runs later in that worktree with the release guidance; the mechanical half alone leaves a valid writable project. Uninstall removes the user-selected installed Skill folders; historical renamed folders require explicit cleanup and must not coexist silently as duplicate entrypoints.",
+  "evidence": [
+    {
+      "note": "Source segment docs/INSTALL.md#install-vibehub; lines 1-9. Public source excerpt: \"VibeHub is Skill-first. npx skills add copies the Skill directories, including their bundled schemas, dependency-free helper scripts, and local graph UI assets. It does not copy a marketplace bundle or install a global CLI, MCP server, hook process, database, native module, or daemon. The built-in…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#install; lines 10-49. Public source excerpt: \"Any skills-capable agent (recommended).** One command installs every VibeHub Skill into the agent directories it detects (.claude/skills/, .agents/skills/, …) through skills.sh: npx skills add VW-ai/vibehub-plugin Choose **Select all** in the picker. The shared helper and contracts ship\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#requirements; lines 50-55. Public source excerpt: \"Claude Code or Codex with plugin/Skill support Node.js 20+ for bundled validation scripts Git for history, collaboration, and rollback\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#start-in-a-repository; lines 56-112. Public source excerpt: \"VibeHub is optional. You can chat and implement without creating Tickets. To choose task memory, describe the deliverable and ask naturally to use VibeHub. One example is: Start this with VibeHub. The Ticket Skill owns this entry. When the exact checkout has not been initialized,\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#upgrade-the-plugin-and-project-data; lines 113-163. Public source excerpt: \"Plugin code and checked-in project data have separate lifecycles. Updating a plugin bundle never writes .vibehub/. The installed helper first reports the repository compatibility state: The supported npx skills updater detects plugin changes by content hash or\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#unified-dashboard; lines 164-207. Public source excerpt: \"When you choose VibeHub, your agent automatically opens one home for projects, registered worktrees, goals, and tickets before continuing your request. A live host already known in the session is reused without another tab. You do not need to run a dashboard command. Asking to keep it closed…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#ticket-graph-presentation; lines 208-226. Public source excerpt: \"The Ticket Skill records definitions and progress. Ask for a graph or task history when useful. To open it directly, use $vibehub-review or the helper: node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --repo <repository> The default command opens the complete short-lived URL in your normal system\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#uninstall; lines 227-232. Public source excerpt: \"Remove the plugin through the host. Repository Context and Tickets remain ordinary Git files. Delete them only when you intentionally want to remove the project history; Git can restore earlier versions.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/INSTALL.md#dashboard-hierarchy-and-recorded-context; lines 233-245. Public source excerpt: \"A project opens its goal graph. Selecting a goal opens the graph of its linked tickets; Back to goal graph returns to the project. Goals use the connected personal store's explicit project_refs; task_of and sub_goal_of establish membership. Dependency edges remain distinct from membership. Existing…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#proposal-explicit-cross-project-upgrade-surface; lines 1-4. Public source excerpt: \"Ticket: ticket-decide-cross-project-upgrade-surface · 2026-09-02\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#decision; lines 5-37. Public source excerpt: \"Ship one dependency-free, npm-layout vibehub-upgrade.tgz as an asset of each existing GitHub Release. It contains only one vibehub-upgrade bin plus the same vh.mjs, contracts, and migration reference as that release's Skill artifact. It is a one-shot outside-project entry, not an npm-registry…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#invocation-shapes-compared; lines 38-63. Public source excerpt: \"| Concern | One-shot GitHub Release package — selected | Installed vibehub-core entry — rejected | | --- | --- | --- | | First install | One immutable release tag is repeated in the tagged Skill install and the data command; no installed-path lookup | Default skills.sh installation is…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#exact-replacement-architecture-boundary; lines 64-99. Public source excerpt: \"After this Ticket closes successfully, replace the complete body of skills/vibehub-setup/references/architecture-boundary.md with exactly: # VibeHub Architecture Boundary VibeHub is Skills plus checked-in Git-native YAML documents. The product\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#mechanical-assertions-for-that-boundary; lines 100-142. Public source excerpt: \"Implementation is not complete unless tests prove all of the following: 1. The release workflow builds the one-shot package from an explicit allowlist, gives it exactly one bin, embeds the exact release's shared engine, contracts, and migration reference, emits a checksum and immutable\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#deterministic-safety-state-machine; lines 143-148. Public source excerpt: \"The coordinator processes one repository at a time and one registered worktree at a time. It may parallelize read-only discovery, but writes and commits are serialized per repository.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#1-bounded-discovery; lines 149-164. Public source excerpt: \"Require one or more explicit --root values. Resolve each to an existing, readable directory without following directory symlinks. Search only below those roots for a .vibehub/ directory; never descend into .git/ or .vibehub/ itself. A candidate must resolve through\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#2-read-only-preflight-for-one-worktree; lines 165-190. Public source excerpt: \"Capture a baseline containing the canonical worktree path, common Git directory, named branch ref, 40-hex HEAD, complete porcelain status bytes, index checksum, and checksums plus existence/type for every path a migration may declare. Automatic migration is eligible only when all are true:\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#3-same-head-deterministic-preview; lines 191-205. Public source excerpt: \"Run the shared engine's preview against an isolated disposable copy of the exact baseline bytes. The copy is derived state, never authority, and is deleted after the result is recorded in memory. The preview must finish CURRENT, pass project validate, report only paths\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#4-prove-materialize-and-atomically-commit; lines 206-247. Public source excerpt: \"Treat the second identical disposable engine run as the result-byte source; do not ask a second implementation of migration semantics to rewrite the real worktree. Require its copy to report CURRENT, pass project validate, contain explicit pending markers, and change only declared paths.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    },
+    {
+      "note": "Source segment docs/proposals/cross-project-upgrade-surface.md#5-outcomes-and-failure-rules; lines 248-277. Public source excerpt: \"current: valid current structure; no write and no commit. Existing semantic pending refs are reported for the next in-worktree Agent session. unaffected: registered worktree has no VibeHub data; no write. unsupported: malformed marker/data or a newer project format; no write.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/proposals/cross-project-upgrade-surface.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-release-version-identity-policy",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:00:46Z",
+    "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/INSTALL.md"
+  },
+  "state": "active",
+  "summary": "Installation copies self-contained Skills and data upgrades use an explicit release-paired command",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}

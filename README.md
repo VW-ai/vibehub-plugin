@@ -16,7 +16,7 @@ One line for any skills-capable agent — Claude Code, Codex, Cursor, and more. 
 npx skills add VW-ai/vibehub-plugin
 ```
 
-Update later with `npx skills update`. This is the only supported install path; host marketplace distribution was retired.
+This is the only supported install path; host marketplace distribution was retired. Node 20 or newer and Git are required.
 
 Then open the repository in a fresh Agent session, describe one concrete deliverable, and say:
 
@@ -63,15 +63,45 @@ Outcomes remain available as historical proof with their original bindings.
 
 VibeHub opens its local dashboard when you choose it. Browse tasks, dependencies,
 progress, and Rooms of Context. Copy a task brief to work with your chosen skills.
-The dashboard is read-only and does not start an agent. See the
-[dashboard guide](docs/DASHBOARD.md) for navigation and manual startup.
+The dashboard is read-only and does not start an agent. Switch projects and
+worktrees, use the board or dependency graph, and inspect Room knowledge in the
+Context view. Manual startup from the installed Skill directory is:
+
+```bash
+node ../vibehub-core/scripts/vh-ui.mjs --dashboard --repo /path/to/project
+```
+
+Discovery includes the checkout and its parent. Add `--root /another/project`
+for other locations. Choose System, Light, or Dark in the dashboard.
 
 Optional [session observations](skills/vibehub-core/contracts/agent-session.md)
 show agent activity separately from task status. A process exit never completes
-a task. Shared records can also be [mirrored to GitHub Issues](docs/GITHUB_ISSUES.md).
+a task. To mirror shared records to GitHub Issues, explicitly ask your agent to
+install the mirror through `vibehub-setup`, then enable the repository variable
+`VIBEHUB_GITHUB_SYNC`. The mirror is one-way; Issue comments do not change records.
 
-## Learn more
+## Upgrade
 
-[Product concept](docs/CONCEPT.md) · [Installation, upgrades, and coexistence](docs/INSTALL.md) · [Local graph design](docs/LOCAL_GRAPH_DESIGN.md) · [GitHub Issues mirror](docs/GITHUB_ISSUES.md) · [Release procedure](docs/RELEASE.md)
+For a release upgrade, install the Skills and run the upgrader from the same
+immutable release tag. Replace `<release-tag>` and the explicit project path:
+
+```bash
+npx skills add https://github.com/VW-ai/vibehub-plugin/tree/<release-tag>
+npx --yes --package=https://github.com/VW-ai/vibehub-plugin/releases/download/<release-tag>/vibehub-upgrade.tgz vibehub-upgrade --root /path/to/projects
+```
+
+The upgrader reports every discovered registered worktree, migrates only safe
+clean worktrees, and leaves local reviewable commits. Nothing is pushed. Deferred
+semantic changes use the installed [migration Skill](skills/vibehub-migrate/SKILL.md).
+A plain Skills update does not migrate project data. Remove retired Skill folders
+from your chosen installation scope when replacing older entrypoints.
+
+## Project knowledge
+
+Maintained project decisions and contracts live in the
+[Room tree](https://github.com/VW-ai/vibehub-plugin/tree/main/.vibehub/rooms).
+README and installed Skills provide entry instructions; executable schemas and
+contracts remain beside their code. Historical design sources stay available
+through the exact Git references recorded in Context.
 
 Apache-2.0

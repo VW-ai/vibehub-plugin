@@ -89,7 +89,7 @@
     },
     {
       "purpose": "Current manual prepare, tag, publish, checksum, and data-upgrader procedure to preserve or automate explicitly.",
-      "ref": "docs/RELEASE.md"
+      "ref": ".vibehub/rooms/product/contract-release-artifacts-and-data-migrations.yaml"
     },
     {
       "purpose": "Existing tag-triggered build and GitHub Release implementation to convert into a single trusted main-publication state machine.",

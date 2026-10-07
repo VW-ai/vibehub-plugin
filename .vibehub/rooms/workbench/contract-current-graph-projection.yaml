@@ -1,0 +1,69 @@
+{
+  "context_id": "contract-current-graph-projection",
+  "detail": "Use one deterministic causal layout for left-to-right desktop default and explicit top-to-bottom orientation. Causal ranks, stable non-overlapping cards, complete dependency relations, long-edge waypoints, distinct ports and routes avoiding card interiors remain shared behavior. Current scope shows open work and its nearest completed boundary; All restores canonical history, and explicit history expansion preserves existing geometry. Status visibility is multi-select. The board renders only selected lanes; one selected lane fills the width with a responsive grid. Board All tickets and Graph Active tickets describe different pools, and counts must equal what is rendered. Task state uses recorded open/in_progress/done and derived open-only blocking. Session observations remain separate, source-labelled and expiry-bounded; missing trusted presence never implies active execution. Preserve keyboard navigation, neutral selection, meaningful labels beyond color, reduced motion, 44px narrow targets, focus links with their local bearer authorization, Room filters and progressive inspection. Cool-neutral foundations, system typography, restrained elevation and semantic color define the visual language. Decorative gradients, unrelated style selectors, network fonts and third-party resources are excluded. Historical proof remains accessible without dictating current task workflow.",
+  "evidence": [
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#local-graph-design-authority; lines 1-6. Public source excerpt: \"The local graph presents tasks and their recorded dependencies. It shows what is open, in progress, blocked, or done and which other tasks depend on each one. The graph does not choose a development method or next action.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#retained-product-language; lines 7-54. Public source excerpt: \"One deterministic dependency graph is the primary object. Left-to-right is the desktop default; top-to-bottom remains an explicit first-class choice over the same nodes, relations, and causal ranks. Forks, joins, blockers, and progress remain attached to their tasks.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#deliberately-removed-direction; lines 55-62. Public source excerpt: \"The rejected surface used warm paper, serif display type, decorative forest green, a persistent status legend, floating card treatment, and an always-open schema-forward Inspector. Those choices made the graph feel like an internal data viewer and contradicted the approved Workbench authority. They…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#architecture-that-does-not-return; lines 63-76. Public source excerpt: \"The historical design does not authorize the historical runtime. This surface does not restore SQLite, MCP, hooks, leases, a dispatcher, ContextBinding, attestation, writable review operations, or hidden lifecycle state. It consumes fresh schema-valid Context, Ticket, Evidence, and Outcome files…\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#interaction-depth; lines 77-93. Public source excerpt: \"The surface borrows the calm, content-first interaction logic of a modern AI workspace without copying another product's brand skin. Black, white, and gray carry reading; VibeHub's cool wash and semantic state color appear only where they communicate environment, execution, proof, or attention.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Source segment docs/LOCAL_GRAPH_DESIGN.md#historical-visual-references; lines 94-102. Public source excerpt: \"These captures predate the task-memory status labels and use one disposable canonical fork-and-join Ticket fixture. The fixture itself is not product state; the two images are retained so owner review and future design drift checks bind to exact visual evidence.\".",
+      "ref": "commit:af131b5de868915ffef975cda0533eb1c30ea28e:docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Current live implementation supplies the adopted behavior; historical section citations below preserve the prior design sources.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard-graph.js"
+    },
+    {
+      "note": "Verification of the installed/projection contract after Quiet Dashboard adoption.",
+      "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:test/dashboard-model.test.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-workbench-state-signal-and-action-priority",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "intent-queryable-ticket-history-by-pr-and-room",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "change-quiet-dashboard-adopted-by-installed-review",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-10-07T07:34:24Z",
+    "ref": "commit:74ef88e39156b1e1e4455426131e4a171335ef60:skills/vibehub-review/assets/dashboard-graph.js"
+  },
+  "state": "active",
+  "summary": "Graph geometry and task visibility preserve canonical facts in both directions",
+  "tags": [
+    "docs-migration",
+    "current-contract"
+  ],
+  "type": "contract"
+}
