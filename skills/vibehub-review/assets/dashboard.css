@@ -1909,13 +1909,6 @@ h1 {
   margin-bottom: 10px;
 }
 
-.room-explorer-link {
-  display: inline-block;
-  margin-top: 12px;
-  font-size: 12px;
-  color: var(--quiet);
-}
-
 .room-empty {
   color: var(--quiet);
   font-size: 13px;
