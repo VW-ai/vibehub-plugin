@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { run, tempRepo } from "./helpers.mjs";
 import { materializeInitialTicket } from "../skills/vibehub-core/scripts/revision-contract.mjs";
 import {
-  computeProjection, humanizeTicketId, markerValue, planSync, planUpdates, planDependencies,
+  computeProjection, humanizeTicketId, markerValue, planSync, planUpdates, planDependencies, renderIssueBody,
   TICKET_MARKER, EVIDENCE_MARKER,
 } from "../scripts/sync-github-issues.mjs";
 
@@ -63,6 +63,14 @@ function remoteFrom(projection, startNumber = 1) {
 test("humanizes ticket ids into titles", () => {
   assert.equal(humanizeTicketId("ticket-mirror-tickets-to-github-issues"), "Mirror tickets to GitHub issues");
   assert.equal(humanizeTicketId("ticket-release-v050"), "Release v050");
+});
+
+test("minimal task bodies omit empty background and acceptance sections", () => {
+  const body = renderIssueBody({ ticket: { ticket_id: "small-task", outcome: "Fix the heading", context: "", acceptance: [] },
+    outcome: null, status: "OPEN", numbers: new Map(), github: GITHUB });
+  assert.match(body, /## Outcome\n\nFix the heading/);
+  assert.doesNotMatch(body, /## Background|## Acceptance/);
+  assert.equal(markerValue(body, TICKET_MARKER), "small-task");
 });
 
 test("projection renders state, criteria, dependencies, evidence, and markers", () => {

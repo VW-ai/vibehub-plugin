@@ -1,46 +1,114 @@
 name: Mirror Tickets to Issues
 
-# One-way projection of .vibehub Tickets onto GitHub Issues. Git is the source
-# of truth; this workflow never commits and nothing reads Issues back.
 on:
   push:
-    branches: [main]
-    paths:
-      - ".vibehub/tickets/**"
-      - ".vibehub/outcomes/**"
-      - ".vibehub/evidence/**"
-      - "scripts/vibehub/**"
+  pull_request:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Print the plan without writing to GitHub"
+        description: "Preview current default-branch records without writing to GitHub"
         type: boolean
         default: true
 
 permissions:
   contents: read
-  issues: write
-
-concurrency:
-  group: sync-issues
-  cancel-in-progress: false
 
 jobs:
-  sync:
-    if: ${{ vars.VIBEHUB_GITHUB_SYNC == 'true' }}
+  check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           package-manager-cache: false
-      - name: Sync
+      - name: Validate committed projection offline
+        run: node scripts/vibehub/sync-github-issues.mjs --repo . --ref HEAD --check --report issue-check.json
+      - name: Explain publication status
+        if: always()
+        env:
+          SYNC_ENABLED: ${{ vars.VIBEHUB_GITHUB_SYNC }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+          const report = existsSync('issue-check.json') ? JSON.parse(readFileSync('issue-check.json', 'utf8')) : null;
+          const policy = process.env.SYNC_ENABLED === 'true'
+            ? 'Publication is enabled for default-branch pushes and explicit manual publish runs. It follows projection validation; the separate Verify VibeHub suite is not this job dependency.'
+            : 'Publication is disabled. Set the repository Actions variable VIBEHUB_GITHUB_SYNC=true only after choosing which committed records to share.';
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Projection check: ${report?.status ?? 'failed before reporting'}.\n\n${policy}\n`);
+          NODE
+
+  preview:
+    needs: check
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Preview current default-branch records
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          node scripts/vibehub/sync-github-issues.mjs
-          --repo .
-          --github "${{ github.repository }}"
-          ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '--publish' }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch --no-tags origin "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH"
+          node scripts/vibehub/sync-github-issues.mjs --repo . --ref "refs/remotes/origin/$DEFAULT_BRANCH" --github "$GITHUB_REPOSITORY" --dry-run --report issue-preview.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-preview
+          path: issue-preview.json
+
+  publish:
+    needs: check
+    if: ${{ vars.VIBEHUB_GITHUB_SYNC == 'true' && ((github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+    concurrency:
+      group: vibehub-issues-${{ github.repository }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Reconcile current default-branch records
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch --no-tags origin "+refs/heads/$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH"
+          node scripts/vibehub/sync-github-issues.mjs --repo . --ref "refs/remotes/origin/$DEFAULT_BRANCH" --github "$GITHUB_REPOSITORY" --publish --report issue-sync.json
+      - name: Report reconciliation
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+          const report = existsSync('issue-sync.json') ? JSON.parse(readFileSync('issue-sync.json', 'utf8')) : null;
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, report
+            ? `Issue sync: ${report.status}. Writes: ${report.writes}. Remaining operations: ${report.remaining.length}.\n\nRecord commit: ${report.source?.sha ?? 'unavailable'}. Code commit: ${report.code_sha ?? 'unavailable'}.\n\n${report.error ?? ''}\n`
+            : 'Issue sync failed before producing a receipt. See the step log.\n');
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-sync
+          path: issue-sync.json

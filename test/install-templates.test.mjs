@@ -13,15 +13,15 @@ test("GitHub mirror templates match their sources except for the import path and
   assert.equal(script[0], "#!/usr/bin/env node");
   assert.match(script[1], new RegExp(`^// VibeHub template · plugin ${version.replace(/\./g, "\\.")} ·`));
   const source = readFileSync(join(root, "scripts", "sync-github-issues.mjs"), "utf8")
-    .replace('"../skills/vibehub-core/scripts/vh.mjs"', '"./scripts/vh.mjs"').split("\n");
+    .replaceAll('"../skills/vibehub-core/scripts/vh.mjs"', '"./scripts/vh.mjs"').split("\n");
   assert.deepEqual([script[0], ...script.slice(2)], source);
 
   const workflow = readFileSync(join(templates, "sync-issues.yml"), "utf8");
   const sourceWorkflow = readFileSync(join(root, ".github", "workflows", "sync-issues.yml"), "utf8")
-    .replace("node scripts/sync-github-issues.mjs", "node scripts/vibehub/sync-github-issues.mjs")
-    .replace('- "scripts/sync-github-issues.mjs"', '- "scripts/vibehub/**"');
+    .replaceAll("node scripts/sync-github-issues.mjs", "node scripts/vibehub/sync-github-issues.mjs");
   assert.equal(workflow, sourceWorkflow);
   assert.match(workflow, /permissions:\n\s+contents: read\n\s+issues: write/);
+  assert.match(workflow, /fetch-depth: 0/);
   assert.doesNotMatch(workflow, /git (commit|push)/);
 });
 
@@ -36,10 +36,11 @@ test("vibehub-core is a non-invocable carrier for helper, contracts, and templat
   assert.ok(!existsSync(join(root, "skills", "contracts")));
 });
 
-test("the seven-file project copy runs from scripts/vibehub in a clean checkout", async () => {
+test("the seven-file project copy runs from scripts/vibehub in a clean checkout", async (t) => {
   const { mkdtempSync, mkdirSync, copyFileSync, writeFileSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const project = mkdtempSync(join(tmpdir(), "vibehub-mirror-copy-"));
+  t.after(() => fsSync.rmSync(project, { recursive: true, force: true }));
   const core = join(root, "skills", "vibehub-core");
   mkdirSync(join(project, "scripts", "vibehub", "scripts"), { recursive: true });
   mkdirSync(join(project, "scripts", "vibehub", "contracts"), { recursive: true });
@@ -63,6 +64,18 @@ test("the seven-file project copy runs from scripts/vibehub in a clean checkout"
   const projection = mod.computeProjection(project, "acme/demo");
   assert.equal(projection.length, 1);
   assert.equal(projection[0].title, "Demo");
+  const { spawnSync } = await import("node:child_process");
+  for (const args of [["init", "-q"], ["add", "."], ["-c", "user.name=Fixture", "-c", "user.email=fixture@example.test", "commit", "-qm", "shared project"]]) {
+    const result = spawnSync("git", ["-C", project, ...args], { encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+  }
+  const report = join(project, "check.json");
+  const checked = spawnSync(process.execPath, [join(project, "scripts/vibehub/sync-github-issues.mjs"), "--repo", project, "--check", "--report", report], { encoding: "utf8" });
+  assert.equal(checked.status, 0, checked.stderr);
+  const receipt = JSON.parse(readFileSync(report, "utf8"));
+  assert.equal(receipt.status, "validated");
+  assert.equal(receipt.tickets, 1);
+  assert.equal(receipt.writes, 0);
 });
 
 test("every VibeHub Skill tells an Agent how to repair a partial install", () => {
