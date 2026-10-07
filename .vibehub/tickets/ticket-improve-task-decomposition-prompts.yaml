@@ -1,0 +1,35 @@
+{
+  "acceptance": [],
+  "active_contract_revision": 1,
+  "constraints": [],
+  "context": "用户可能一次说出大量信息，其中包含一个大任务、多个待办和背景信息。后续探索如何识别任务边界、何时保留一个任务或拆分、怎样表达层级和依赖，以及怎样把拆分结果和理由展示给用户。当前先记录方向，具体提示词和展示方式留待后续设计。延续 Ticket 负责记忆任务、开发方法由用户选择的 Skills 负责这一边界。",
+  "context_refs": [
+    {
+      "purpose": "当前任务记录能力与职责边界。",
+      "ref": "skills/vibehub-ticket/SKILL.md"
+    },
+    {
+      "purpose": "任务记忆和个人开发 Skills 的分工。",
+      "ref": "docs/CONCEPT.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [],
+      "identity": "sha256:53d87114bf7b77c4aba49e8af7934450026266006debfd66206cef2a4e2b41f6",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "outcome": "通过更好的启发提示词，从用户长篇描述中识别大任务，合理拆成小任务，并清楚展示给用户。",
+  "provenance_refs": [
+    "conversation:2026-10-06-task-decomposition-and-claude-mod-todos"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 4,
+  "status": "open",
+  "ticket_id": "ticket-improve-task-decomposition-prompts",
+  "updates": []
+}
