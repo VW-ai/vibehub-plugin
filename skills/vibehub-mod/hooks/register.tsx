@@ -3,7 +3,8 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { ActiveTicket, TicketDetail, TicketGroup, TicketItem } from '../types'
 import {
-  GROUPS, brief, composeSection, detailMarkdown, groupLabel, listTickets, matchTickets, mentions, nameOf, reminder,
+  GROUPS, brief, composeSection, detailMarkdown, groupLabel, listTickets, listingText, matchTickets, mentions, nameOf,
+  reminder,
 } from './brief'
 import type { Resolved, Ticket } from './brief'
 
@@ -28,7 +29,9 @@ const findHelper = async ($: EngineInterface): Promise<Helper | string> => {
     return 'VibeHub is not set up in this project (no .vibehub/ directory).'
   }
   const home = (await $.env.get('HOME')) ?? ''
+  // Installed by npx skills add, the mod sits beside vibehub-core.
   const candidates = [
+    `${$.plugin.root}/../vibehub-core/scripts/vh.mjs`,
     `${root}/.claude/skills/vibehub-core/scripts/vh.mjs`,
     `${root}/.agents/skills/vibehub-core/scripts/vh.mjs`,
     `${home}/.claude/skills/vibehub-core/scripts/vh.mjs`,
@@ -129,7 +132,12 @@ export const register: Register = on => {
       await update($, group, () => target.group)
       await select($, target.id)
     }
-    await $.ui.open({ id: PANE, title: 'VibeHub', focus: true })
+    try {
+      await $.ui.open({ id: PANE, title: 'VibeHub', focus: true })
+    } catch {
+      // No surface can seat a pane, as in claude -p: answer with the list.
+      return { text: listingText(list) }
+    }
 
     return { text: `VibeHub: ${list.length} unfinished Tickets. Type # in a message to mention one.` }
   }).catch(() => ({ text: 'VibeHub: /vh failed; see the claude --debug log.' }))

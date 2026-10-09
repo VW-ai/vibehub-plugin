@@ -184,7 +184,8 @@ test("all ten marketplace deleted-path workarounds bind to their exact reviewed 
   }
   const versioned = [...tickets.values()].flatMap((document) => document.context_refs
     .filter(({ ref }) => ref.startsWith("commit:"))
-    .map(({ ref }) => [document.ticket_id, ref]));
+    .map(({ ref }) => [document.ticket_id, ref]))
+    .filter(([, ref]) => expected.some(([, path]) => ref.endsWith(`:${path}`)));
   assert.equal(versioned.length, expected.length);
   assert.equal(git(root, "rev-parse", "9425e0c^"), beforeRetirement);
 

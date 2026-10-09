@@ -51,6 +51,17 @@ export const listTickets = (data: Record<string, unknown>): TicketItem[] =>
     })),
   )
 
+export const listingText = (tickets: TicketItem[]): string => {
+  if (tickets.length === 0) return 'VibeHub: no unfinished Tickets.'
+  const lines = GROUPS.flatMap(({ group, label }) => {
+    const rows = tickets.filter(t => t.group === group)
+
+    return rows.length ? [`${label} ${rows.length}`, ...rows.map(t => `- #${t.id}  ${nameOf(t, 70)}`)] : []
+  })
+
+  return `VibeHub: ${tickets.length} unfinished Tickets. Mention one with #ticket-id.\n${lines.join('\n')}`
+}
+
 export const matchTickets = (tickets: TicketItem[], query: string, limit = 8): TicketItem[] => {
   const q = query.toLowerCase()
   const hits = q

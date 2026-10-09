@@ -740,7 +740,8 @@ test("this repository's real skill graph passes", () => {
   const envelope = validate(root);
   assert.equal(envelope.ok, true, JSON.stringify(envelope));
   assert.equal(envelope.data.valid, true);
-  assert.equal(envelope.data.skills, 9);
+  assert.equal(envelope.data.skills, 10);
+  assert.ok(envelope.data.entry_points.includes("vibehub-mod"));
   assert.ok(envelope.data.entry_points.includes("vibehub-ticket"));
   assert.deepEqual(envelope.data.internal, ["vibehub-distill"]);
   assert.deepEqual(envelope.data.infrastructure, ["vibehub-core"]);

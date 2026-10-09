@@ -1,0 +1,111 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "skills-add-installs-mod",
+      "criterion": "仓库技能目录里的 vibehub-mod 带 SKILL.md 和 .claude-plugin/plugin.json，npx skills add 安装后 claude plugin list 显示 vibehub-mod@skills-dir 已加载。",
+      "identity": "sha256:c464e3bc2bf160b06d64b6ac3fc32a74908df1e845c1c026d6ac14df8ab4b9e9",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "headless-vh-falls-back",
+      "criterion": "没有面板可开时，/vh 用文字列出未完成的 Ticket，而不是报错。",
+      "identity": "sha256:63ff67714f85a19a5d6a612d9ed0e33cc607fae8186dd3fb3f21e68031791e59",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "repo-contracts-know-the-mod",
+      "criterion": "仓库的技能契约、测试和打包校验都认可这个新技能目录并通过。",
+      "identity": "sha256:6ecbd1c32f4328c36ddc2e40f2f8e44d64510bbae89db833de39993f4e8608c8",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "只用现有的 npx skills add 入口，不恢复插件市场。",
+    "技能文件夹对其他 agent 只是说明文档，不能要求它们做任何事。",
+    "无头会话中 /vh 不能因为没有面板而失败。"
+  ],
+  "context": "Claude Code 会把 ~/.claude/skills/ 下带 .claude-plugin/plugin.json 的文件夹当作插件在每个会话自动加载（官方 plugins/create 与 plugins/loading 文档）。2026-10-08 实测：npx skills add 会完整拷贝隐藏的 .claude-plugin 并在 ~/.claude/skills 建链接，claude plugin list 显示 @skills-dir 已加载，钩子在新会话里运行。宿主插件市场分发已下线，这条路让 Mod 跟 Skills 走同一个安装入口。",
+  "context_refs": [
+    {
+      "purpose": "Mod 的说明与安装方式",
+      "ref": "skills/vibehub-mod/README.md"
+    },
+    {
+      "purpose": "让 npx skills add 识别并安装 Mod 的技能入口",
+      "ref": "skills/vibehub-mod/SKILL.md"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "headless-vh-falls-back",
+          "identity": "sha256:63ff67714f85a19a5d6a612d9ed0e33cc607fae8186dd3fb3f21e68031791e59",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "repo-contracts-know-the-mod",
+          "identity": "sha256:6ecbd1c32f4328c36ddc2e40f2f8e44d64510bbae89db833de39993f4e8608c8",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "skills-add-installs-mod",
+          "identity": "sha256:c464e3bc2bf160b06d64b6ac3fc32a74908df1e845c1c026d6ac14df8ab4b9e9",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:62342c1f0730b72b6c881637c1c4a2f0ac684c71a21ff1aa365413d17e77e9af",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/150",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "运行 npx skills add VW-ai/vibehub-plugin 后，Claude Code 的新会话自动加载 VibeHub Mod，不需要插件市场或额外参数。",
+  "provenance_refs": [
+    "https://code.claude.com/docs/en/plugins/create",
+    "https://code.claude.com/docs/en/plugins/loading",
+    "conversation:2026-10-08-mod-npx-distribution-probe"
+  ],
+  "relations": [
+    {
+      "rationale": "分发的是这个探索产出的 Mod。",
+      "target_ticket_id": "ticket-explore-claude-code-mod",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 5,
+  "status": "done",
+  "ticket_id": "ticket-distribute-mod-through-skills",
+  "title": "随 npx skills add 分发 Mod",
+  "updates": [
+    {
+      "recorded_at": "2026-10-09T04:07:54.218Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/150"
+      ],
+      "status": "in_progress",
+      "summary": "Mod 移到 skills/vibehub-mod 并加了 SKILL.md；/vh 在没有面板时改为文字列出；技能清单契约已登记。npm run verify 392 项通过，Mod 自己 5 项测试通过。从本分支用 npx skills add 实测：装上 10 个技能，claude plugin list 显示 vibehub-mod@skills-dir 已加载，无头 /vh 正常返回。本机全局技能已是这个分支的版本。PR #150 已开，等待 CI 和合并。",
+      "update_id": "skills-distribution-pr"
+    },
+    {
+      "recorded_at": "2026-10-09T04:24:50.546Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/150"
+      ],
+      "status": "done",
+      "summary": "三条验收都已满足：npx skills add 装上 vibehub-mod，claude plugin list 显示 vibehub-mod@skills-dir 已加载；/vh 打不开面板时用文字列出（插件测试覆盖）；技能清单契约、仓库测试和打包校验全部通过。另外 SKILL.md 标明仅限 Claude Code，其他 harness 改用 vibehub-query 和 vibehub-ticket。随 PR #150 合并。",
+      "update_id": "skills-distribution-done"
+    }
+  ]
+}

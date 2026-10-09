@@ -12,8 +12,8 @@
       "ref": "skills/vibehub-review/SKILL.md"
     },
     {
-      "purpose": "探索落地的 Mod：# 引用、上下文附带和 /vh 面板。",
-      "ref": "mods/claude-code/README.md"
+      "purpose": "探索落地的 Mod：# 引用、上下文附带和 /vh 面板（之后移到 skills/vibehub-mod）。",
+      "ref": "commit:f445c4e030ff18e23cbef2918910223769345ca3:mods/claude-code/README.md"
     }
   ],
   "contract_revisions": [
