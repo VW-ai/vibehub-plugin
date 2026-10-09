@@ -85,7 +85,7 @@
   ],
   "revision_state": "bound",
   "schema_version": 5,
-  "status": "in_progress",
+  "status": "done",
   "ticket_id": "ticket-distribute-mod-through-skills",
   "title": "随 npx skills add 分发 Mod",
   "updates": [
@@ -97,6 +97,15 @@
       "status": "in_progress",
       "summary": "Mod 移到 skills/vibehub-mod 并加了 SKILL.md；/vh 在没有面板时改为文字列出；技能清单契约已登记。npm run verify 392 项通过，Mod 自己 5 项测试通过。从本分支用 npx skills add 实测：装上 10 个技能，claude plugin list 显示 vibehub-mod@skills-dir 已加载，无头 /vh 正常返回。本机全局技能已是这个分支的版本。PR #150 已开，等待 CI 和合并。",
       "update_id": "skills-distribution-pr"
+    },
+    {
+      "recorded_at": "2026-10-09T04:24:50.546Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/150"
+      ],
+      "status": "done",
+      "summary": "三条验收都已满足：npx skills add 装上 vibehub-mod，claude plugin list 显示 vibehub-mod@skills-dir 已加载；/vh 打不开面板时用文字列出（插件测试覆盖）；技能清单契约、仓库测试和打包校验全部通过。另外 SKILL.md 标明仅限 Claude Code，其他 harness 改用 vibehub-query 和 vibehub-ticket。随 PR #150 合并。",
+      "update_id": "skills-distribution-done"
     }
   ]
 }
