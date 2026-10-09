@@ -76,9 +76,9 @@
       "entry": "user",
       "invokes": [],
       "presents": [],
-      "routes": ["vibehub-ticket"],
+      "routes": ["vibehub-query", "vibehub-ticket"],
       "events": [],
-      "note": "Also a Claude Code plugin that loads from the skills directory. Its mod reads Tickets through ../vibehub-core and writes nothing; progress records route to vibehub-ticket."
+      "note": "Also a Claude Code plugin that loads from the skills directory. Its mod reads Tickets through ../vibehub-core and writes nothing; outside Claude Code it routes Context reads to vibehub-query and progress records to vibehub-ticket."
     },
     {
       "name": "vibehub-query",

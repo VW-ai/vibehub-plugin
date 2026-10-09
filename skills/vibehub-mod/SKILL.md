@@ -1,6 +1,6 @@
 ---
 name: vibehub-mod
-description: Explain the VibeHub mod that Claude Code loads from this folder. Use when the user asks how to mention a Ticket with #, what /vh shows, or why a Ticket's context reached the conversation.
+description: Claude Code only. Explain the VibeHub mod that Claude Code loads from this folder. Use in Claude Code when the user asks how to mention a Ticket with #, what /vh shows, or why a Ticket's context reached the conversation.
 disable-model-invocation: true
 ---
 
@@ -10,6 +10,11 @@ This folder is also a Claude Code plugin. Claude Code loads it from the skills
 directory in the terminal and the desktop Code tab, version 2.1.287 or later
 in the terminal and 2.1.286 or later on the desktop. Other agents can ignore
 it: nothing here asks an Agent to run anything.
+
+Outside Claude Code there is no `/vh` and no `#` typeahead, and a `#ticket-id`
+in a message is plain text. Tell the user these need Claude Code, do not look
+for `/vh`, and use `$vibehub-query` to read a Ticket's context and
+`$vibehub-ticket` to record progress instead.
 
 ## Automatic dashboard entry
 
