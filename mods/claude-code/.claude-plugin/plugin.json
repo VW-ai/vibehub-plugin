@@ -1,0 +1,7 @@
+{
+  "name": "vibehub-mod",
+  "author": { "name": "VibeHub Team" },
+  "version": "0.1.0",
+  "description": "Pick a VibeHub Ticket for this session and load its context with one press.",
+  "types": "./types/index.d.ts"
+}
