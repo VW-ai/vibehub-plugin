@@ -10,6 +10,10 @@
     {
       "purpose": "当前任务、关系和上下文的展示能力，可用于比较原生 Mod 的产品机会。",
       "ref": "skills/vibehub-review/SKILL.md"
+    },
+    {
+      "purpose": "探索落地的 Mod：# 引用、上下文附带和 /vh 面板。",
+      "ref": "mods/claude-code/README.md"
     }
   ],
   "contract_revisions": [
@@ -19,7 +23,13 @@
       "revision": 1
     }
   ],
-  "deliveries": [],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/149",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "探索 VibeHub 的 Claude Code Mod 机会，设计适合放进 Claude Code 原生界面的任务记录与交互体验。",
   "provenance_refs": [
@@ -35,7 +45,7 @@
   ],
   "revision_state": "bound",
   "schema_version": 5,
-  "status": "in_progress",
+  "status": "done",
   "ticket_id": "ticket-explore-claude-code-mod",
   "title": "Claude Code Mod 交互探索",
   "updates": [
@@ -61,6 +71,15 @@
       ],
       "summary": "按用户选定的 C+D 方案重写 Mod（本机开发目录，未进仓库）：输入 # 时按标题补全 Ticket；消息里的 #ticket-id 会把该 Ticket 的记录和上下文作为只给模型看的附加内容带上，同一会话再次引用只附一句提醒；/vh 打开侧边面板，按进行中、可开始、阻塞分组，选中显示目标、约束、验收、依赖、上下文和最近进展，可一键把引用插入输入框。去掉了旧的 /ticket 列表、自动发消息和输入框上方横条。用 2.1.293 跑插件测试 4 项通过（终端和桌面），类型检查通过。还没在真实会话里试用。",
       "update_id": "mention-and-pane-mod"
+    },
+    {
+      "recorded_at": "2026-10-09T02:22:51.052Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/149"
+      ],
+      "status": "done",
+      "summary": "探索完成：确定了 C+D 交互方向（# 引用即附带上下文、/vh 侧边面板），界面统一用英文，用点标记本会话 Ticket，终端和桌面可用，暂不做手机端。Mod 放进仓库 mods/claude-code 并开了 PR #149（叠在 #148 上）；用户已在真实会话中打开 /vh。分发方式另行决定。",
+      "update_id": "mod-checked-in"
     }
   ]
 }
