@@ -180,7 +180,7 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "done",
   "ticket_id": "ticket-prototype-task-harness-experience",
   "updates": []

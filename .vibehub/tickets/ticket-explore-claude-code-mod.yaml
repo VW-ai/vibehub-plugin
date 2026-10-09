@@ -1,7 +1,10 @@
 {
   "acceptance": [],
   "active_contract_revision": 1,
-  "constraints": [],
+  "constraints": [
+    "Mod 必须同时支持 Claude Code 终端版和桌面版（用户 2026-10-07 明确要求）。",
+    "暂不做手机端（用户 2026-10-08 明确要求）。"
+  ],
   "context": "用户将 Claude Code Mods 视为一个重大的产品机会，希望后续做一个 Mod。官方概览介绍了原生面板、命令、按钮和输入控件等扩展能力。待探索这些能力如何承载 VibeHub 的任务、任务关系和上下文，以及最值得先做的交互。具体范围和实现方案尚未确定，本次仅记录待办。 官方入口：https://code.claude.com/docs/en/plugins/mods/overview",
   "context_refs": [
     {
@@ -23,10 +26,33 @@
     "conversation:2026-10-06-task-decomposition-and-claude-mod-todos",
     "https://code.claude.com/docs/en/plugins/mods/overview"
   ],
-  "relations": [],
+  "relations": [
+    {
+      "rationale": "补全和面板需要短标题才能清楚列出 Ticket。",
+      "target_ticket_id": "ticket-add-ticket-title",
+      "type": "depends_on"
+    }
+  ],
   "revision_state": "bound",
-  "schema_version": 4,
-  "status": "open",
+  "schema_version": 5,
+  "status": "in_progress",
   "ticket_id": "ticket-explore-claude-code-mod",
-  "updates": []
+  "title": "Claude Code Mod 交互探索",
+  "updates": [
+    {
+      "recorded_at": "2026-10-07T09:08:09.303Z",
+      "refs": [],
+      "status": "in_progress",
+      "summary": "已读 Claude Code 2.1.289 的 Mod API：桌面端可用 Pane、AbovePrompt 横条、按钮/输入/选择、斜杠命令、Toast；可通过 $.process.run 调用 vh.mjs 读写 Ticket；可通过 prompt.compose 把当前 Ticket 注入系统提示。Client 模块只能用平台元素绘制，不能嵌入现有网页仪表盘，需要原生重画。",
+      "update_id": "mod-api-surveyed"
+    },
+    {
+      "recorded_at": "2026-10-08T07:59:30.777Z",
+      "refs": [
+        "file:~/.claude/dev-mods/be142968-849b-4c81-8d97-46b61078aa5e/vibehub-mod"
+      ],
+      "summary": "做了「一键激活 Ticket」原型 Mod（本机开发目录 ~/.claude/dev-mods/<session>/vibehub-mod，未进仓库）：/ticket 在对话流里列出可推进的 Ticket 按钮（终端、桌面、VS Code、手机四端都能画），点一下读取 Ticket 和 context_refs，把上下文作为只给模型看的消息写进对话，再自动发起一轮让模型复述目标和下一步；/ticket <id> 直接载入；系统提示常驻当前 Ticket；终端和桌面在输入框上方显示当前 Ticket。用 2.1.293 跑 claude plugin test 共 4 项全部通过，validate 和 tsc 通过；在本仓库真实数据上生成的上下文约 1 万到 4.7 万字符。还没在真实会话里点过。",
+      "update_id": "one-press-activation-prototype"
+    }
+  ]
 }

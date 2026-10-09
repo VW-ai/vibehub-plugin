@@ -67,8 +67,9 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "open",
   "ticket_id": "ticket-vibehub-cli",
+  "title": "VibeHub CLI decision",
   "updates": []
 }
