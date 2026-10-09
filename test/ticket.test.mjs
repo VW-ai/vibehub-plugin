@@ -108,7 +108,7 @@ test("delivery schema requires an explicit array and enforces discriminated stat
   legacy.schema_version = 1;
   const rejectedLegacy = run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [legacy] });
   assert.notEqual(rejectedLegacy.status, 0);
-  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 4/u);
+  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 5/u);
   const missing = ticket("missing-deliveries");
   delete missing.deliveries;
   assert.notEqual(run(repo, "ticket", "apply", { validation: { independent: false, note: "test fixture" }, tickets: [missing] }).status, 0);

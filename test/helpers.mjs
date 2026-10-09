@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -11,6 +11,7 @@ import {
 
 export const root = resolve(new URL("..", import.meta.url).pathname);
 export const helper = join(root, "skills", "vibehub-core", "scripts", "vh.mjs");
+export const versions = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "versions.json"), "utf8"));
 
 export function tempRepo(label) {
   return mkdtempSync(join(tmpdir(), `vibehub-${label}-`));
@@ -74,7 +75,7 @@ function upgradeLegacyProofFixture(repo, input) {
 }
 
 function normalizeInitialTicketFixture(candidate) {
-  if (candidate?.schema_version !== 4 || candidate.revision_state !== "bound"
+  if (candidate?.schema_version !== versions.document_schemas.ticket || candidate.revision_state !== "bound"
     || candidate.contract_revisions?.length !== 1
     || candidate.acceptance?.some((item) => item.revision !== undefined && item.revision !== 1)) return candidate;
   return materializeInitialTicket({
@@ -130,7 +131,7 @@ export function writeRoom(repo, roomPath, document) {
 
 export function ticket(id, dependencies = []) {
   return materializeInitialTicket({
-    schema_version: 4,
+    schema_version: versions.document_schemas.ticket,
     kind: "ticket",
     ticket_id: id,
     status: "open",

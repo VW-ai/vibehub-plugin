@@ -37,6 +37,8 @@ import {
 } from "./revision-contract.mjs";
 
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const TICKET_TITLE = /^\S(?:[^\r\n]*\S)?$/u;
+const TICKET_TITLE_MAX = 80;
 const CONTEXT_TYPES = new Set([
   "intent",
   "decision",
@@ -618,6 +620,11 @@ function validateMigrationsReference(reference) {
         } else if (action.type === "initialize-ticket-memory") {
           strictKeys(errors, action, new Set(["type", "from", "to"]), actionPath);
           if (action.from !== 3 || action.to !== 4) add(errors, actionPath, "must upgrade Ticket schema 3 to 4");
+        } else if (action.type === "bump-ticket-schema") {
+          strictKeys(errors, action, new Set(["type", "from", "to"]), actionPath);
+          if (!Number.isInteger(action.from) || action.to !== action.from + 1) {
+            add(errors, actionPath, "must upgrade the Ticket schema by exactly one version");
+          }
         } else {
           add(errors, `${actionPath}.type`, "is not a supported mechanical migration action");
         }
@@ -870,6 +877,9 @@ function migrateMechanical(repo) {
       } else if (action.type === "initialize-ticket-memory") {
         for (const path of yamlFiles(dirs(repo).tickets)) {
           const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          // A Ticket already past this step was written by a newer helper; a
+          // later step in the chain owns it.
+          if (existing.schema_version > action.to) continue;
           if (![action.from, action.to].includes(existing.schema_version)) {
             throw new VibeHubError("migration_error", `${path} has Ticket schema ${existing.schema_version}; expected ${action.from} or ${action.to}`);
           }
@@ -879,6 +889,17 @@ function migrateMechanical(repo) {
             document: { ...existing, schema_version: action.to, status: successful ? "done" : "open", updates: existing.updates ?? [] },
             migration,
           });
+        }
+      } else if (action.type === "bump-ticket-schema") {
+        // Additive schema versions only change the version marker; every
+        // field the older schema allowed keeps its meaning.
+        for (const path of yamlFiles(dirs(repo).tickets)) {
+          const existing = plannedWrites.get(path)?.document ?? readDocument(path);
+          if (existing.schema_version === action.to) continue;
+          if (existing.schema_version !== action.from) {
+            throw new VibeHubError("migration_error", `${path} has Ticket schema ${existing.schema_version}; expected ${action.from} or ${action.to}`);
+          }
+          plannedWrites.set(path, { document: { ...existing, schema_version: action.to }, migration });
         }
       }
     }
@@ -1521,6 +1542,7 @@ function validateTicket(document, path = "ticket") {
         "active_contract_revision",
         "contract_revisions",
         "maturity",
+        "title",
         "outcome",
         "deliveries",
         "context",
@@ -1569,6 +1591,10 @@ function validateTicket(document, path = "ticket") {
     if (latestStatus !== undefined && latestStatus !== document.status) add(errors, `${path}.status`, "must match the latest status update");
   }
   if (document.epic_id !== undefined) requiredString(errors, document, "epic_id", path, { id: true });
+  if (document.title !== undefined && (typeof document.title !== "string"
+    || !TICKET_TITLE.test(document.title) || document.title.length > TICKET_TITLE_MAX)) {
+    add(errors, `${path}.title`, `must be one line of at most ${TICKET_TITLE_MAX} characters without surrounding whitespace`);
+  }
   requiredString(errors, document, "outcome", path);
   if (!Array.isArray(document.deliveries)) {
     add(errors, `${path}.deliveries`, "must be an array");
@@ -2214,10 +2240,12 @@ export function loadRepository(repo, overrides = {}) {
   if (yamlFiles(legacyContext).length > 0) {
     add(rooms.errors, legacyContext, "every Context lives in a room now; migrate these entries into their owning rooms under .vibehub/rooms/");
   }
-  const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket", (document) =>
-    readLegacyTickets && document?.schema_version === 3
-      ? { ...document, schema_version: 4, status: "open", updates: [] }
-      : document);
+  const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket", (document) => {
+    if (!readLegacyTickets) return document;
+    if (document?.schema_version === 3) return { ...document, schema_version: CURRENT_TICKET_SCHEMA, status: "open", updates: [] };
+    if (document?.schema_version === 4) return { ...document, schema_version: CURRENT_TICKET_SCHEMA };
+    return document;
+  });
   const goals = loadMap(yamlFiles(paths.goals), "goal_id", (doc, path) => validatePlanningDocument(doc, "goal", path), "Goal");
   const epics = loadMap(yamlFiles(paths.epics), "epic_id", (doc, path) => validatePlanningDocument(doc, "epic", path), "Epic");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
@@ -3023,7 +3051,7 @@ function planningOperation(kind, operation, repo, input) {
 function ticketOperation(operation, repo, input, options = {}) {
   if (operation === "put") {
     assertCurrentProjectFormat(repo);
-    const allowed = new Set(["ticket_id", "outcome", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs", "deliveries", "epic_id", "maturity"]);
+    const allowed = new Set(["ticket_id", "title", "outcome", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs", "deliveries", "epic_id", "maturity"]);
     if (!isObject(input) || Object.keys(input).some((key) => !allowed.has(key))) {
       throw new VibeHubError("invalid_input", "ticket put accepts only task definition fields");
     }
@@ -3081,6 +3109,7 @@ function ticketOperation(operation, repo, input, options = {}) {
         updates: [],
         ...(input.epic_id === undefined ? {} : { epic_id: input.epic_id }),
         ...(input.maturity === undefined ? {} : { maturity: input.maturity }),
+        ...(input.title === undefined ? {} : { title: input.title }),
       });
     }
     assertValid([...validateTicket(candidate), ...validateTicketMutation(existing, candidate)], "Ticket is invalid");

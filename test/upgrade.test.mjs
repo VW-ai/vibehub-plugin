@@ -240,9 +240,9 @@ test("bounded discovery migrates each safe registered worktree once and reports 
     assert.equal(git(path, "rev-parse", "HEAD").trim(), item.commit_id);
     assert.equal(git(path, "status", "--porcelain=v1", "--untracked-files=all"), "");
     assert.equal(run(path, "project", "validate").status, 0);
-    assert.equal(JSON.parse(readFileSync(join(path, ".vibehub/version.yaml"), "utf8")).format_version, 6);
+    assert.equal(JSON.parse(readFileSync(join(path, ".vibehub/version.yaml"), "utf8")).format_version, 7);
     const migratedTicket = JSON.parse(readFileSync(join(path, ".vibehub/tickets/legacy-work.yaml"), "utf8"));
-    assert.equal(migratedTicket.schema_version, 4);
+    assert.equal(migratedTicket.schema_version, 5);
     assert.equal(migratedTicket.status, "open");
     assert.deepEqual(migratedTicket.updates, []);
     assert.deepEqual(item.migration_ids, [
@@ -251,6 +251,7 @@ test("bounded discovery migrates each safe registered worktree once and reports 
       "format-3-to-format-4",
       "format-4-to-format-5",
       "format-5-to-format-6",
+      "format-6-to-format-7",
     ]);
     assert.deepEqual(item.semantic_pending_refs, [
       "migration-pending:format-1-to-format-2:classify-delivery-membership",
@@ -586,11 +587,11 @@ test("the packaged format-5 upgrade preserves proof and installed retired Skills
   assert.equal(first.status, 0, first.stderr);
   const migrated = first.envelope.data.worktrees[0];
   assert.equal(migrated.state, "migrated");
-  assert.deepEqual(migrated.migration_ids, ["format-5-to-format-6"]);
+  assert.deepEqual(migrated.migration_ids, ["format-5-to-format-6", "format-6-to-format-7"]);
   assert.equal(run(repo, "project", "validate").status, 0);
   for (const [ticketId, expected] of [["completed-work", "done"], ["revised-work", "open"], ["planned-work", "open"]]) {
     const document = JSON.parse(readFileSync(join(repo, ".vibehub", "tickets", `${ticketId}.yaml`), "utf8"));
-    assert.equal(document.schema_version, 4);
+    assert.equal(document.schema_version, 5);
     assert.equal(document.status, expected);
     assert.deepEqual(document.updates, []);
   }

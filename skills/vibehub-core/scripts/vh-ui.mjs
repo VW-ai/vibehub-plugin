@@ -338,6 +338,7 @@ function projectGraph(repository, queryOptions = {}, sessions = { availability: 
       workState: ticketWorkState(repository, ticket),
       ticketRevision: digest(ticket),
       hierarchy: ticketHierarchy(repository, ticket),
+      title: ticket.title ?? null,
       outcome: ticket.outcome,
       archived: ticketArchived(repository, ticket),
       deliveries: ticket.deliveries ?? [],
@@ -491,6 +492,7 @@ export function ticketContextPackage(ticket, relations, repository, source) {
     updates: ticket.updates,
     blockingTicketIds: ticketWorkState(repository, ticket).blocking_ticket_ids,
     handoff: handoffInstruction(ticket.ticket_id),
+    title: ticket.title ?? null,
     outcome: ticket.outcome,
     outcomeRecord: outcome,
     outcomeHistory,
@@ -527,6 +529,7 @@ export function ticketContextPackage(ticket, relations, repository, source) {
     status: ticket.status,
     updates: ticket.updates,
     blockingTicketIds: ticketWorkState(repository, ticket).blocking_ticket_ids,
+    title: ticket.title ?? null,
     outcome: ticket.outcome,
     activeContractRevision: contract
       ? { revision: contract.revision, identity: contract.identity }

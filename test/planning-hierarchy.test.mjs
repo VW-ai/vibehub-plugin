@@ -146,7 +146,7 @@ test('format 4 migration changes only the marker; missing optional parents leave
   assert.equal(run(repo,'goal','put',goal()).envelope.error.code,'format_mismatch');
   const migration = ok(run(repo,'project','migrate-mechanical'));
   assert.deepEqual(migration.changed_paths,['.vibehub/version.yaml']);
-  assert.deepEqual(migration.applied_migrations,['format-4-to-format-5','format-5-to-format-6']);
+  assert.deepEqual(migration.applied_migrations,['format-4-to-format-5','format-5-to-format-6','format-6-to-format-7']);
   assert.deepEqual(files.map(p=>readFileSync(p,'utf8')),originals);
   assert.deepEqual(ok(run(repo,'project','hierarchy')).standalone_ticket_ids,['legacy']);
   assert.deepEqual(ok(run(repo,'project','migrate-mechanical')).changed_paths,[]);

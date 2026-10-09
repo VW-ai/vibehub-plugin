@@ -111,7 +111,7 @@ test("format 5 migration keeps old proof and derives only matching success as do
   const versionPath = join(repo, ".vibehub", "version.yaml");
   writeFileSync(versionPath, `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 5 })}\n`);
   const migrated = ok(run(repo, "project", "migrate-mechanical"));
-  assert.deepEqual(migrated.applied_migrations, ["format-5-to-format-6"]);
+  assert.deepEqual(migrated.applied_migrations, ["format-5-to-format-6", "format-6-to-format-7"]);
   assert.equal(ok(run(repo, "ticket", "get", { ticket_id: "succeeded" })).status, "DONE");
   assert.equal(ok(run(repo, "ticket", "get", { ticket_id: "failed" })).status, "OPEN");
   assert.equal(readFileSync(proofPath, "utf8"), proofBefore);
