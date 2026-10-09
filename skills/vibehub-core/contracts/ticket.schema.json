@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket.v4.json",
+  "$id": "https://vibehub.dev/schemas/ticket.v5.json",
   "title": "VibeHub Ticket",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "kind", "ticket_id", "status", "updates", "revision_state", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
   "properties": {
-    "schema_version": { "const": 4 },
+    "schema_version": { "const": 5 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
     "status": { "enum": ["open", "in_progress", "done"] },
@@ -20,6 +20,13 @@
       "items": { "$ref": "#/$defs/contract_revision" }
     },
     "maturity": { "enum": ["firm", "draft"], "default": "firm" },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^\\S(?:[^\\r\\n]*\\S)?$",
+      "description": "Optional short display name. Lists, typeahead, panes, the dashboard, and GitHub mirrors prefer it over the outcome. It is not part of any acceptance or contract revision identity."
+    },
     "outcome": { "$ref": "#/$defs/text" },
     "deliveries": { "type": "array", "default": [], "items": { "$ref": "#/$defs/delivery" } },
     "context": { "type": "string" },

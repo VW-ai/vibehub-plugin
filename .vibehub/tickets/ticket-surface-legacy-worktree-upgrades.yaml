@@ -118,8 +118,9 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "open",
   "ticket_id": "ticket-surface-legacy-worktree-upgrades",
+  "title": "Surface legacy worktree upgrades",
   "updates": []
 }

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "project_format": 6,
+  "project_format": 7,
   "document_schemas": {
-    "ticket": 4,
+    "ticket": 5,
     "evidence": 2,
     "outcome": 2,
     "goal": 1,

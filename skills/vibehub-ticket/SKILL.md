@@ -77,8 +77,11 @@ A new record needs only a stable ID and its desired outcome:
 {"ticket_id":"password-reset","outcome":"Users can reset a forgotten password."}
 ```
 
-Optional fields include `context`, `acceptance`, `constraints`, `context_refs`,
-`relations`, `provenance_refs`, `deliveries`, and `epic_id`. An acceptance item
+Optional fields include `title`, `context`, `acceptance`, `constraints`,
+`context_refs`, `relations`, `provenance_refs`, `deliveries`, and `epic_id`.
+`title` is a short one-line display name of at most 80 characters; lists and
+mirrors show it in place of the outcome. Give new Tickets one when the outcome
+is long. An acceptance item
 needs `acceptance_id` and `criterion`; `authority` is optional. A dependency
 is `{"type":"depends_on","target_ticket_id":"<ticket-id>","rationale":"<required input>"}`.
 For an existing Ticket, omitted definition fields stay unchanged. The helper

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "owner": "vibehub-migrate",
-  "current_format": 6,
+  "current_format": 7,
   "migrations": [
     {
       "migration_id": "0-4-unversioned-to-0-5-unversioned",
@@ -290,6 +290,38 @@
           {
             "type": "write-project-format",
             "format_version": 6
+          }
+        ]
+      },
+      "semantic": {
+        "steps": []
+      }
+    },
+    {
+      "migration_id": "format-6-to-format-7",
+      "from": "format-6",
+      "to": "format-7",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 4,
+          "to": 5
+        }
+      },
+      "detect": "Project format 6 stores Ticket schema 4, which has no optional title.",
+      "mechanical": {
+        "declared_paths": [
+          ".vibehub/tickets/*.yaml",
+          ".vibehub/version.yaml"
+        ],
+        "actions": [
+          {
+            "type": "bump-ticket-schema",
+            "from": 4,
+            "to": 5
+          },
+          {
+            "type": "write-project-format",
+            "format_version": 7
           }
         ]
       },

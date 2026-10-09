@@ -1,0 +1,110 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "schema-accepts-optional-title",
+      "criterion": "Ticket 结构第 5 版接受可选的单行 title，并拒绝空白、多行或过长的 title。",
+      "identity": "sha256:c4dcc9cbbb62042b6660b036efd856c31eecde68e5fb784def9413334a75849a",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "put-sets-and-keeps-title",
+      "criterion": "ticket put 可以设置或修改 title，省略时保持原值，合同修订身份不因 title 改变。",
+      "identity": "sha256:04c24c791075b8332c049e123e3692049ad8fd91a43cbc954e36f0e0e099f11b",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "mechanical-migration-to-format-7",
+      "criterion": "vibehub-migrate 可以把格式 6 的项目机械迁移到格式 7（Ticket 第 5 版），不需要语义步骤。",
+      "identity": "sha256:600dbc9eb51f739201c50616525cc32cd4dbdd0f853dda981ae2176018681dad",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "surfaces-prefer-title",
+      "criterion": "仪表盘和 GitHub Issue 镜像在有 title 时显示 title，没有时保持现状。",
+      "identity": "sha256:0393502ba8ffd38169e2ace6f8a1c6b89e8c892e34a946d4a3fb46c8db58ec1f",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "title 可选，旧 Ticket 不需要回填也必须有效。",
+    "title 不参与验收与合同修订身份的计算。",
+    "旧版插件遇到新格式仓库时要明确提示升级，而不是校验报错。"
+  ],
+  "context": "仓库 Ticket 的结构里没有标题字段，只有一句较长的 outcome，原生界面（Claude Code Mod 的补全和面板）和仪表盘列表都很挤。Goal 和个人 Ticket 已有 title。Ticket 结构禁止未定义字段，旧版插件遇到带 title 的 Ticket 会校验失败，所以要随结构版本升级和迁移一起发布。",
+  "context_refs": [
+    {
+      "purpose": "Ticket 结构定义",
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "项目格式迁移清单",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "格式与文档结构版本",
+      "ref": "skills/vibehub-core/contracts/versions.json"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "mechanical-migration-to-format-7",
+          "identity": "sha256:600dbc9eb51f739201c50616525cc32cd4dbdd0f853dda981ae2176018681dad",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "put-sets-and-keeps-title",
+          "identity": "sha256:04c24c791075b8332c049e123e3692049ad8fd91a43cbc954e36f0e0e099f11b",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "schema-accepts-optional-title",
+          "identity": "sha256:c4dcc9cbbb62042b6660b036efd856c31eecde68e5fb784def9413334a75849a",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "surfaces-prefer-title",
+          "identity": "sha256:0393502ba8ffd38169e2ace6f8a1c6b89e8c892e34a946d4a3fb46c8db58ec1f",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:5a4d7ff3ead3d04e547e1ce97fb8dd866082381cdc160eca17863d1fa6696022",
+      "revision": 1
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/148",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Ticket 可以带一个可选的短标题 title，列表、补全、面板和仪表盘优先显示它，没有时回退到 outcome。",
+  "provenance_refs": [
+    "conversation:2026-10-08-ticket-title-for-claude-code-mod"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 5,
+  "status": "in_progress",
+  "ticket_id": "ticket-add-ticket-title",
+  "title": "Ticket 支持可选短标题",
+  "updates": [
+    {
+      "recorded_at": "2026-10-09T01:34:18.407Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/148"
+      ],
+      "status": "in_progress",
+      "summary": "实现完成并开了 PR #148：Ticket 结构第 5 版加可选 title，项目格式 7 及机械迁移，仪表盘、Ticket 详情、GitHub Issue 镜像优先显示 title；本仓库已迁移并给 20 个未完成 Ticket 补了标题。npm run verify 全部 392 项通过。本机全局 VibeHub Skill 已从该分支更新。等待 CI 和合并。",
+      "update_id": "title-pr-opened"
+    }
+  ]
+}

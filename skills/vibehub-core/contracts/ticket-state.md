@@ -56,3 +56,9 @@ Format 6 stores Ticket schema 4. The explicit format-5 migration initializes
 updates to an empty list. It sets status to done only for a successful Outcome
 bound to the active contract; otherwise it sets open. Migration preserves the
 original proof and does not manufacture progress updates.
+
+Format 7 stores Ticket schema 5, which adds an optional one-line `title` of at
+most 80 characters. Lists, typeahead, the dashboard, and GitHub mirrors prefer
+it over the outcome and fall back when it is absent. It is not part of any
+acceptance or contract revision identity. The explicit format-6 migration only
+changes each Ticket's schema version and the project marker.

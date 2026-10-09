@@ -87,4 +87,5 @@ standalone and no historical membership is invented. Older helpers reject
 writes to the newer project format. Parent schema versions start at 1.
 
 Format 6 adds Ticket status and progress updates. Evidence and Outcome remain
-optional historical records. Parent progress uses the current Ticket status.
+optional historical records. Format 7 adds an optional Ticket `title`.
+Parent progress uses the current Ticket status.

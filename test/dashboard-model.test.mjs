@@ -307,3 +307,10 @@ test('live all-scope API projection includes unrelated completed tasks and refre
   assert.equal(active.laneFor(reopened), 'running');
   assert.equal(reopened.updates.at(-1).summary, 'More work needed');
 });
+
+test('native Tickets show their title when present and the humanized ID otherwise', () => {
+  const graph = native();
+  graph.tickets[0].title = 'Current release work';
+  const items = fromRepositoryGraph(tree, graph, 'Project').items.filter((item) => item.type === 'ticket');
+  assert.deepEqual(items.map((item) => item.title), ['Current release work', 'done']);
+});

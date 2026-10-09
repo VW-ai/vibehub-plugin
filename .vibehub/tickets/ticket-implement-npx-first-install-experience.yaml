@@ -138,7 +138,7 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "done",
   "ticket_id": "ticket-implement-npx-first-install-experience",
   "updates": []

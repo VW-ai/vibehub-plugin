@@ -60,8 +60,9 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "open",
   "ticket_id": "ticket-build-task-harness-vertical-slice",
+  "title": "Harness vertical slice",
   "updates": []
 }

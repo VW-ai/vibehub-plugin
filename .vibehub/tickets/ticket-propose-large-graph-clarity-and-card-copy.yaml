@@ -129,8 +129,9 @@
     }
   ],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "open",
   "ticket_id": "ticket-propose-large-graph-clarity-and-card-copy",
+  "title": "Large graph clarity and card copy",
   "updates": []
 }

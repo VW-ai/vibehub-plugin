@@ -28,8 +28,9 @@
   ],
   "relations": [],
   "revision_state": "bound",
-  "schema_version": 4,
+  "schema_version": 5,
   "status": "open",
   "ticket_id": "ticket-improve-task-decomposition-prompts",
+  "title": "改进任务拆分提示词",
   "updates": []
 }

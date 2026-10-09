@@ -373,7 +373,7 @@
     for (const ticket of graph.tickets)
       items.push({
         ...base('ticket', ticket.ticketId),
-        title: ticket.ticketId.replace(/^ticket-/, '').replaceAll('-', ' '),
+        title: ticket.title || ticket.ticketId.replace(/^ticket-/, '').replaceAll('-', ' '),
         outcome: ticket.outcome,
         state: ticket.capabilities?.operational?.summary?.label || ticket.status.toUpperCase(),
         status: ticket.status,

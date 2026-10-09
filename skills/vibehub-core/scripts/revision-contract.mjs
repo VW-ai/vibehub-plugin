@@ -1,4 +1,8 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+
+const TICKET_SCHEMA = JSON.parse(readFileSync(new URL("../contracts/versions.json", import.meta.url), "utf8"))
+  .document_schemas.ticket;
 
 export const REVISION_IDENTITY = /^sha256:[0-9a-f]{64}$/u;
 export const REVISION_BINDING_STATES = new Set([
@@ -83,7 +87,7 @@ export function materializeInitialTicket(ticket) {
   const contract = buildContractRevision(ticket.ticket_id, 1, acceptance);
   return {
     ...ticket,
-    schema_version: 4,
+    schema_version: TICKET_SCHEMA,
     status: ticket.status ?? "open",
     updates: ticket.updates ?? [],
     revision_state: "bound",

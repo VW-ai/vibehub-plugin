@@ -159,7 +159,7 @@ export function computeProjection(repoRoot, github) {
       .sort((a, b) => a.recorded_at.localeCompare(b.recorded_at) || a.evidence_id.localeCompare(b.evidence_id));
     items.push({
       ticket_id: ticket.ticket_id,
-      title: humanizeTicketId(ticket.ticket_id),
+      title: ticket.title ?? humanizeTicketId(ticket.ticket_id),
       state: status === "DONE" ? "closed" : "open",
       labels: [STATE_LABELS[status].name],
       comments: evidence.map((e) => ({ evidence_id: e.evidence_id, body: renderEvidenceComment(e, github) })),

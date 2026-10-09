@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add an optional one-line Ticket `title` (Ticket schema 5, project format 7).
+  `ticket put` sets or keeps it; the dashboard, Ticket inspector, and GitHub
+  Issue mirrors prefer it over the outcome. The explicit format 6 to 7
+  migration only bumps the Ticket schema version, and older helpers report the
+  newer format instead of failing validation.
 - Consolidate Ticket planning, execution, validation, and closeout Skills into
   `vibehub-ticket` for task memory. Development methods belong to the user's
   chosen skills. Add compact `ticket put` and append-only `ticket update` writes

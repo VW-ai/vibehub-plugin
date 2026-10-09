@@ -1074,7 +1074,7 @@
     openInspector();
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
-    elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.textContent = ticket.title || ticket.outcome;
     elements.inspectorTitle.dataset.fullText = ticket.outcome;
     elements.inspectorOutcome.hidden = false;
     elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
@@ -1128,7 +1128,7 @@
       subject.contextPackage ?? inspection.contextPackage ?? {};
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
-    elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.textContent = ticket.title || ticket.outcome;
     elements.inspectorTitle.dataset.fullText = ticket.outcome;
     const operational = ticketOperationalState(ticket);
     elements.inspectorOutcome.hidden = true;
