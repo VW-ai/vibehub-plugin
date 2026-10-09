@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Ship the Claude Code mod as the `vibehub-mod` Skill folder. `npx skills add
+  VW-ai/vibehub-plugin` now installs it, and Claude Code loads it from
+  `~/.claude/skills/` as `vibehub-mod@skills-dir`: `#` offers Tickets by title,
+  a `#ticket-id` mention carries that Ticket's context to the model, and `/vh`
+  opens a Ticket pane, or lists Tickets as text where no pane can open.
 - Add an optional one-line Ticket `title` (Ticket schema 5, project format 7).
   `ticket put` sets or keeps it; the dashboard, Ticket inspector, and GitHub
   Issue mirrors prefer it over the outcome. The explicit format 6 to 7

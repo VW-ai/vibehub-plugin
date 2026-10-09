@@ -32,7 +32,7 @@ const FRONTIER = {
   blocked: [{ ticket: { ticket_id: 'ticket-later', outcome: 'Later.' } }],
 }
 
-const world = (on: On, options: { vibehub?: boolean } = {}) => {
+const world = (on: On, options: { vibehub?: boolean; pane?: boolean } = {}) => {
   mock.env(on, { HOME: '/home/me' })
   on('session.root', () => ({ value: ROOT }))
   on('fs.exists', ($, e) => ({ value: e.path === `${ROOT}/.vibehub` ? options.vibehub !== false : e.path === VH }))
@@ -63,7 +63,11 @@ const world = (on: On, options: { vibehub?: boolean } = {}) => {
 
     return { isFilled: true, text: e.text, cursor: e.text.length }
   })
-  on('ui.open', () => ({ value: undefined }) as never)
+  on('ui.open', () => {
+    if (options.pane === false) throw new Error('no surface seats a pane')
+
+    return { value: undefined } as never
+  })
   const toasts: string[] = []
   on('ui.toast', ($, e) => {
     toasts.push(JSON.stringify(e))
@@ -145,6 +149,14 @@ test('the pane groups Tickets, shows details, and fills a mention', async ($, on
     await ui.press({ key: 'mention' })
     expect(fills.at(-1)).toBe('#ticket-mod ')
   }
+})
+
+test('/vh lists Tickets as text where no pane can open', async ($, on) => {
+  world(on, { pane: false })
+  const ran = await $.command.run({ command: 'vh', args: '', origin: ORIGIN, presentation: PRESENTATION })
+  expect(ran.text).toContain('VibeHub: 4 unfinished Tickets.')
+  expect(ran.text).toContain('In progress 1\n- #ticket-mod  Mod 交互探索')
+  expect(ran.text).toContain('Blocked 1\n- #ticket-later  Later.')
 })
 
 test('a project without VibeHub says so and attaches nothing', async ($, on) => {
