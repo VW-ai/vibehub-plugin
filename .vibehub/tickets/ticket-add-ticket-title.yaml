@@ -78,7 +78,13 @@
       "revision": 1
     }
   ],
-  "deliveries": [],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/148",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "Ticket 可以带一个可选的短标题 title，列表、补全、面板和仪表盘优先显示它，没有时回退到 outcome。",
   "provenance_refs": [
@@ -87,8 +93,18 @@
   "relations": [],
   "revision_state": "bound",
   "schema_version": 5,
-  "status": "open",
+  "status": "in_progress",
   "ticket_id": "ticket-add-ticket-title",
   "title": "Ticket 支持可选短标题",
-  "updates": []
+  "updates": [
+    {
+      "recorded_at": "2026-10-09T01:34:18.407Z",
+      "refs": [
+        "https://github.com/VW-ai/vibehub-plugin/pull/148"
+      ],
+      "status": "in_progress",
+      "summary": "实现完成并开了 PR #148：Ticket 结构第 5 版加可选 title，项目格式 7 及机械迁移，仪表盘、Ticket 详情、GitHub Issue 镜像优先显示 title；本仓库已迁移并给 20 个未完成 Ticket 补了标题。npm run verify 全部 392 项通过。本机全局 VibeHub Skill 已从该分支更新。等待 CI 和合并。",
+      "update_id": "title-pr-opened"
+    }
+  ]
 }

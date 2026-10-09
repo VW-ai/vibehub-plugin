@@ -53,6 +53,14 @@
       ],
       "summary": "做了「一键激活 Ticket」原型 Mod（本机开发目录 ~/.claude/dev-mods/<session>/vibehub-mod，未进仓库）：/ticket 在对话流里列出可推进的 Ticket 按钮（终端、桌面、VS Code、手机四端都能画），点一下读取 Ticket 和 context_refs，把上下文作为只给模型看的消息写进对话，再自动发起一轮让模型复述目标和下一步；/ticket <id> 直接载入；系统提示常驻当前 Ticket；终端和桌面在输入框上方显示当前 Ticket。用 2.1.293 跑 claude plugin test 共 4 项全部通过，validate 和 tsc 通过；在本仓库真实数据上生成的上下文约 1 万到 4.7 万字符。还没在真实会话里点过。",
       "update_id": "one-press-activation-prototype"
+    },
+    {
+      "recorded_at": "2026-10-09T01:34:24.815Z",
+      "refs": [
+        "file:~/.claude/dev-mods/be142968-849b-4c81-8d97-46b61078aa5e/vibehub-mod"
+      ],
+      "summary": "按用户选定的 C+D 方案重写 Mod（本机开发目录，未进仓库）：输入 # 时按标题补全 Ticket；消息里的 #ticket-id 会把该 Ticket 的记录和上下文作为只给模型看的附加内容带上，同一会话再次引用只附一句提醒；/vh 打开侧边面板，按进行中、可开始、阻塞分组，选中显示目标、约束、验收、依赖、上下文和最近进展，可一键把引用插入输入框。去掉了旧的 /ticket 列表、自动发消息和输入框上方横条。用 2.1.293 跑插件测试 4 项通过（终端和桌面），类型检查通过。还没在真实会话里试用。",
+      "update_id": "mention-and-pane-mod"
     }
   ]
 }
