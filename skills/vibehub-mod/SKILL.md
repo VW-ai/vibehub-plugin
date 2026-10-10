@@ -34,8 +34,8 @@ The mod writes nothing:
 - A message that mentions `#ticket-id` carries that Ticket's record and
   context refs to the model beside the prompt. A repeat mention in the same
   session adds a one-line reminder.
-- `/vh` opens a pane grouped into In progress, Ready, and Blocked, with the
-  selected Ticket's details and a button that inserts the mention. Without a
+- `/vh` opens a pane with a dependency Graph and a List grouped into In
+  progress, Ready, and Blocked, with the selected Ticket's details and a button that inserts the mention. Without a
   pane, as in `claude -p`, it lists the Tickets as text.
 
 Record progress through `$vibehub-ticket`, not through this mod. See

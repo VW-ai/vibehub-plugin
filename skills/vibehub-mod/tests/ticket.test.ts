@@ -23,13 +23,20 @@ const TICKET = {
   ],
   updates: [{ summary: 'Surveyed the API.', status: 'in_progress', recorded_at: '2026-10-07T10:00:00Z' }],
 }
-const FRONTIER = {
-  in_progress: [{ ticket: { ticket_id: 'ticket-mod', title: 'Mod 交互探索', outcome: 'Ship the VibeHub mod.' } }],
-  open: [
-    { ticket: { ticket_id: 'ticket-title', title: 'Ticket 短标题', outcome: 'Tickets carry a short title.' } },
-    { ticket: { ticket_id: 'ticket-cli', outcome: 'Decide whether VibeHub ships a standalone CLI.' } },
+const entry = (ticket: Record<string, unknown>, state: string) => ({ ticket, ticket_state: { state } })
+const GRAPH = {
+  tickets: [
+    entry(TICKET, 'IN_PROGRESS'),
+    entry({ ticket_id: 'ticket-title', title: 'Ticket 短标题', outcome: 'Tickets carry a short title.' }, 'OPEN'),
+    entry({ ticket_id: 'ticket-cli', outcome: 'Decide whether VibeHub ships a standalone CLI.' }, 'OPEN'),
+    entry({ ticket_id: 'ticket-later', outcome: 'Later.' }, 'BLOCKED'),
+    entry({ ticket_id: 'ticket-base', title: 'Base work', outcome: 'Done before.' }, 'DONE'),
   ],
-  blocked: [{ ticket: { ticket_id: 'ticket-later', outcome: 'Later.' } }],
+  relations: [
+    { prerequisite_ticket_id: 'ticket-title', dependent_ticket_id: 'ticket-mod' },
+    { prerequisite_ticket_id: 'ticket-base', dependent_ticket_id: 'ticket-mod' },
+    { prerequisite_ticket_id: 'ticket-mod', dependent_ticket_id: 'ticket-later' },
+  ],
 }
 
 const world = (on: On, options: { vibehub?: boolean; pane?: boolean } = {}) => {
@@ -42,7 +49,7 @@ const world = (on: On, options: { vibehub?: boolean; pane?: boolean } = {}) => {
     const [, , domain, op] = e.argv
     const input = e.init?.stdin ? JSON.parse(e.init.stdin) : {}
     const data =
-      domain === 'ticket' && op === 'frontier' ? FRONTIER
+      domain === 'ticket' && op === 'graph' ? GRAPH
       : domain === 'ticket' && op === 'get' ? { ticket: TICKET }
       : domain === 'context' && input.ref === TICKET.context_refs[0]!.ref ? { source: ROOM }
       : { source: 'x'.repeat(10) }
@@ -126,28 +133,48 @@ test('a #mention carries the brief once, then a short reminder', async ($, on) =
   expect(composed.sections.at(-1)?.text).toContain('#ticket-mod: Mod 交互探索')
 })
 
-test('the pane groups Tickets, shows details, and fills a mention', async ($, on) => {
-  const { fills } = world(on)
+const pane = { title: 'VibeHub', isFocused: true, bodyColumns: 40, placement: 'dock' } as never
+
+test('the pane opens on the graph and selects a Ticket from it, on terminal and desktop', async ($, on) => {
+  const { calls, fills } = world(on)
   await $.command.run({ command: 'vh', args: '', origin: ORIGIN, presentation: PRESENTATION })
   for (const surface of SURFACES) {
-    const ui = await $.ui.mount({
-      plugin: 'vibehub-mod',
-      surface,
-      component: 'Pane',
-      requestId: 'vibehub',
-      props: { title: 'VibeHub', isFocused: true, bodyColumns: 40, placement: 'dock' } as never,
-    })
-    expect((await ui.find({ key: 'g:in_progress' }))?.text).toBe('In progress 1')
-    expect(await ui.findAll({ text: /Mod 交互探索/ })).not.toHaveLength(0)
-    await ui.press({ key: 'g:open' })
-    expect(await ui.find({ key: 't:ticket-title' })).toBeDefined()
-    await ui.press({ key: 'g:in_progress' })
-    await ui.press({ key: 't:ticket-mod' })
+    const ui = await $.ui.mount({ plugin: 'vibehub-mod', surface, component: 'Pane', requestId: 'vibehub', props: pane })
+    expect(await ui.find({ key: 'n:ticket-mod' })).toBeDefined()
+    expect(await ui.find({ key: 'n:ticket-later' })).toBeDefined()
+    expect(await ui.find({ key: 'n:ticket-base' })).toBeUndefined()
+    expect((await ui.find({ type: 'Text', text: /standalone/ }))?.text).toBe('1 standalone Tickets are in List')
+    if (surface === 'desktop') {
+      const svg = await ui.find({ type: 'Svg' })
+      expect(String(svg?.props.source)).toContain('#ticket-later · blocked')
+      expect(String(svg?.props.alt)).toContain('4 Tickets, 3 dependencies')
+    } else {
+      expect((await ui.find({ key: 'n:ticket-title' }))?.text).toBe('○ Ticket 短标题')
+      expect(await ui.find({ type: 'Text', text: 'Base work' })).toBeDefined()
+      expect(await ui.findAll({ type: 'Text', text: '└─▶ ' })).toHaveLength(2)
+    }
+    const reads = calls.length
+    await ui.press({ key: 'n:ticket-mod' })
+    expect(calls.length).toBe(reads)
     const markdown = await ui.find({ type: 'Markdown' })
     expect(markdown?.text).toContain('**Constraints 1**')
     expect(markdown?.text).toContain('- Ticket 短标题')
+    expect(markdown?.text).toContain('**Unblocks 1**\n- Later')
     await ui.press({ key: 'mention' })
     expect(fills.at(-1)).toBe('#ticket-mod ')
+  }
+})
+
+test('the list view groups unfinished Tickets', async ($, on) => {
+  world(on)
+  await $.command.run({ command: 'vh', args: '', origin: ORIGIN, presentation: PRESENTATION })
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: 'vibehub-mod', surface, component: 'Pane', requestId: 'vibehub', props: pane })
+    await ui.press({ key: 'v:list' })
+    expect((await ui.find({ key: 'g:in_progress' }))?.text).toBe('In progress 1')
+    await ui.press({ key: 'g:open' })
+    expect(await ui.find({ key: 't:ticket-title' })).toBeDefined()
+    await ui.press({ key: 'v:graph' })
   }
 })
 

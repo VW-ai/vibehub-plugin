@@ -1,12 +1,13 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register } from 'claude-code'
+import type { Elements, EngineInterface, Register } from 'claude-code'
 
-import type { ActiveTicket, TicketDetail, TicketGroup, TicketItem } from '../types'
+import type { ActiveTicket, GraphModel, PaneView, TicketDetail, TicketGroup, TicketItem } from '../types'
 import {
   GROUPS, brief, composeSection, detailMarkdown, groupLabel, listTickets, listingText, matchTickets, mentions, nameOf,
   reminder,
 } from './brief'
 import type { Resolved, Ticket } from './brief'
+import { buildGraph, clip, dependentsOf, graphRows, graphSvg, humanize } from './graph'
 
 const COMMAND = 'vh'
 const PANE = 'vibehub'
@@ -14,6 +15,8 @@ const SECTION = 'vibehub-active-ticket'
 const MAX_MENTIONS = 3
 
 const tickets = atom({ plugin: 'vibehub-mod', key: 'tickets' } as const, [] as TicketItem[])
+const graph = atom({ plugin: 'vibehub-mod', key: 'graph' } as const, { nodes: [], edges: [], standalone: [] } as GraphModel)
+const view = atom({ plugin: 'vibehub-mod', key: 'view' } as const, 'graph' as PaneView)
 const group = atom({ plugin: 'vibehub-mod', key: 'group' } as const, 'in_progress' as TicketGroup)
 const selected = atom({ plugin: 'vibehub-mod', key: 'selected' } as const, null as string | null)
 const detail = atom({ plugin: 'vibehub-mod', key: 'detail' } as const, null as TicketDetail | null)
@@ -22,6 +25,10 @@ const attached = atom({ plugin: 'vibehub-mod', key: 'attached' } as const, [] as
 const error = atom({ plugin: 'vibehub-mod', key: 'error' } as const, null as string | null)
 
 type Helper = { root: string; vh: string }
+
+// Full records from the last graph read; details and briefs use them instead
+// of another read. A reload empties it until the next refresh.
+let records = new Map<string, Ticket>()
 
 const findHelper = async ($: EngineInterface): Promise<Helper | string> => {
   const root = await $.session.root()
@@ -62,11 +69,14 @@ const refresh = async ($: EngineInterface): Promise<TicketItem[] | string> => {
   const helper = await findHelper($)
   if (typeof helper === 'string') return helper
   try {
-    const list = listTickets(await vh($, helper, ['ticket', 'frontier']))
-    await update($, tickets, () => list)
+    const data = await vh($, helper, ['ticket', 'graph'])
+    const listed = listTickets(data)
+    records = listed.records
+    await update($, tickets, () => listed.tickets)
+    await update($, graph, () => buildGraph(data))
     await update($, error, () => null)
 
-    return list
+    return listed.tickets
   } catch (cause) {
     await update($, error, () => `Could not read Tickets: ${message(cause)}`)
 
@@ -75,7 +85,13 @@ const refresh = async ($: EngineInterface): Promise<TicketItem[] | string> => {
 }
 
 const getTicket = async ($: EngineInterface, helper: Helper, id: string): Promise<Ticket> =>
-  (await vh($, helper, ['ticket', 'get'], { ticket_id: id })).ticket as Ticket
+  records.get(id) ?? ((await vh($, helper, ['ticket', 'get'], { ticket_id: id })).ticket as Ticket)
+
+const titleOf = (id: string): string | null => {
+  const record = records.get(id)
+
+  return record ? (record.title ?? humanize(id)) : null
+}
 
 const resolveRefs = async ($: EngineInterface, helper: Helper, ticket: Ticket): Promise<Resolved[]> =>
   Promise.all(
@@ -99,13 +115,8 @@ const select = async ($: EngineInterface, id: string) => {
   }
   try {
     const ticket = await getTicket($, helper, id)
-    const list = await read($, tickets)
-    const titleOf = (other: string) => {
-      const found = list.find(t => t.id === other)
-
-      return found ? nameOf(found, 50) : null
-    }
-    await update($, detail, () => ({ id, markdown: detailMarkdown(ticket, titleOf) }))
+    const unblocks = dependentsOf(await read($, graph), id)
+    await update($, detail, () => ({ id, markdown: detailMarkdown(ticket, titleOf, unblocks) }))
   } catch (cause) {
     await update($, error, () => `Could not read ${id}: ${message(cause)}`)
   }
@@ -143,40 +154,115 @@ export const register: Register = on => {
   }).catch(() => ({ text: 'VibeHub: /vh failed; see the claude --debug log.' }))
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Button, Markdown } = $.ui.resolve(e)
+    const elements = $.ui.resolve(e)
+    const { Box, Text, Button, Markdown } = elements
     const list = await read($, tickets)
     const shown = await read($, group)
+    const showing = await read($, view)
+    const model = await read($, graph)
     const picked = await read($, selected)
     const current = await read($, active)
     const opened = await read($, detail)
     const failed = await read($, error)
     const width = Math.max(16, e.props.bodyColumns - 4)
     const rows = list.filter(t => t.group === shown)
+    const nodeState = new Map(model.nodes.map(n => [n.id, n.state]))
+    const mark = (id: string) => (id === current?.id ? '●' : nodeState.get(id) === 'blocked' ? '⊘' : nodeState.get(id) === 'in_progress' ? '◐' : '○')
+    const name = (id: string, max: number) => clip(titleOf(id) ?? id, max)
+    const nodeButton = (id: string, max: number) => (
+      <Button
+        key={`n:${id}`}
+        plain
+        label={`${id === picked ? '▸ ' : ''}${mark(id)} ${name(id, max)}`}
+        dimColor={picked !== null && picked !== id}
+        onPress={() => select($, id)}
+      />
+    )
+    const unfinished = model.nodes.filter(n => n.state !== 'done')
+    const drawn = new Set<string>()
+    const node = (id: string, max: number) => {
+      if (nodeState.get(id) === 'done' || drawn.has(id)) {
+        return <Text dimColor={nodeState.get(id) === 'done'} wrap="truncate-end">{name(id, max)}</Text>
+      }
+      drawn.add(id)
+
+      return nodeButton(id, max)
+    }
+    const graphView = model.nodes.length === 0
+      ? <Text dimColor>No Ticket depends on another yet. See List.</Text>
+      : e.surface === 'desktop'
+        ? (() => {
+            const { Svg } = elements as Elements['desktop']
+
+            return (
+              <Box flexDirection="column" gap={1}>
+                <Svg
+                  key="graph"
+                  source={graphSvg(model, current?.id ?? null, picked)}
+                  alt={`Ticket dependency graph: ${model.nodes.length} Tickets, ${model.edges.length} dependencies`}
+                  isInteractive
+                />
+                <Box flexDirection="row" flexWrap="wrap" columnGap={2}>
+                  {unfinished.map(n => nodeButton(n.id, 32))}
+                </Box>
+              </Box>
+            )
+          })()
+        : (
+            <Box flexDirection="column">
+              {graphRows(model).map(row => (
+                <Box key={`r:${row.id}`} flexDirection="column">
+                  {row.prerequisites.map((p, index) => (
+                    <Box key={`p:${row.id}:${p}`} flexDirection="row">
+                      <Text dimColor>{index === 0 ? '┌ ' : '├ '}</Text>
+                      {node(p, width - 4)}
+                    </Box>
+                  ))}
+                  <Box flexDirection="row">
+                    <Text dimColor>└─▶ </Text>
+                    {node(row.id, width - 6)}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )
 
     return (
       <Box flexDirection="column" gap={1}>
         <Box flexDirection="row" gap={1} flexWrap="wrap">
-          {GROUPS.map(g => (
-            <Button
-              key={`g:${g.group}`}
-              label={`${g.label} ${list.filter(t => t.group === g.group).length}`}
-              variant={g.group === shown ? 'primary' : undefined}
-              onPress={() => update($, group, () => g.group)}
-            />
-          ))}
+          <Button key="v:graph" label="Graph" variant={showing === 'graph' ? 'primary' : undefined} onPress={() => update($, view, () => 'graph')} />
+          <Button key="v:list" label="List" variant={showing === 'list' ? 'primary' : undefined} onPress={() => update($, view, () => 'list')} />
         </Box>
-        <Box flexDirection="column">
-          {rows.length === 0 && <Text dimColor>Nothing here</Text>}
-          {rows.map(t => (
-            <Button
-              key={`t:${t.id}`}
-              plain
-              label={`${t.id === current?.id ? '●' : '○'} ${nameOf(t, width)}`}
-              dimColor={picked !== null && picked !== t.id}
-              onPress={() => select($, t.id)}
-            />
-          ))}
-        </Box>
+        {showing === 'graph' && graphView}
+        {showing === 'graph' && model.standalone.length > 0 && (
+          <Text dimColor>{model.standalone.length} standalone Tickets are in List</Text>
+        )}
+        {showing === 'list' && (
+          <Box flexDirection="row" gap={1} flexWrap="wrap">
+            {GROUPS.map(g => (
+              <Button
+                key={`g:${g.group}`}
+                label={`${g.label} ${list.filter(t => t.group === g.group).length}`}
+                variant={g.group === shown ? 'primary' : undefined}
+                onPress={() => update($, group, () => g.group)}
+              />
+            ))}
+          </Box>
+        )}
+        {showing === 'list' && (
+          <Box flexDirection="column">
+            {rows.length === 0 && <Text dimColor>Nothing here</Text>}
+            {rows.map(t => (
+              <Button
+                key={`t:${t.id}`}
+                plain
+                label={`${t.id === current?.id ? '●' : '○'} ${nameOf(t, width)}`}
+                dimColor={picked !== null && picked !== t.id}
+                onPress={() => select($, t.id)}
+              />
+            ))}
+          </Box>
+        )}
         {opened !== null && opened.id === picked && <Markdown text={opened.markdown} />}
         {picked !== null && (
           <Box flexDirection="row" gap={1} flexWrap="wrap">

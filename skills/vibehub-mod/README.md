@@ -10,9 +10,13 @@ and writes nothing.
   context refs to the model beside the prompt. The transcript shows only what
   you typed. Mentioning the same Ticket again in a session adds a one-line
   reminder instead of the full record.
-- `/vh` opens a pane grouped into In progress, Ready, and Blocked. Selecting a
-  Ticket shows its outcome, constraints, acceptance, dependencies, context, and
-  recent progress. **Mention in prompt** inserts the reference. Where no pane
+- `/vh` opens a pane on the **Graph** view: each unfinished Ticket that waits
+  on others, with its prerequisites joined to it (finished ones faded). The
+  desktop draws it as an SVG that follows the theme; the terminal draws it with
+  box characters. **List** groups every unfinished Ticket into In progress,
+  Ready, and Blocked. Selecting a Ticket shows its outcome, constraints,
+  acceptance, dependencies, the Tickets it unblocks, context, and recent
+  progress, without another read. **Mention in prompt** inserts the reference. Where no pane
   can open, as in `claude -p`, `/vh` lists the Tickets as text.
 - The most recently mentioned Ticket is this session's Ticket. The pane marks
   it with a filled dot, and the system prompt names it.
