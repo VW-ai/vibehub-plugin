@@ -16,7 +16,7 @@ export type Ticket = {
   updates?: { summary: string; status?: string; recorded_at?: string }[]
 }
 
-type FrontierEntry = { ticket: Ticket }
+type GraphEntry = { ticket: Ticket; ticket_state?: { state?: string } }
 
 // Records and prose are inlined; code and anything past the budget is listed
 // so the agent reads it on demand instead of carrying it in every request.
@@ -41,15 +41,18 @@ export const shorten = (text: string, max: number): string => {
 export const nameOf = (ticket: { title?: string | null; outcome: string }, max = 60): string =>
   ticket.title ?? shorten(ticket.outcome, max)
 
-export const listTickets = (data: Record<string, unknown>): TicketItem[] =>
-  GROUPS.flatMap(({ group }) =>
-    ((data[group] as FrontierEntry[] | undefined) ?? []).map(({ ticket }) => ({
-      id: ticket.ticket_id,
-      title: ticket.title ?? null,
-      outcome: ticket.outcome,
-      group,
-    })),
-  )
+const GROUP_OF: Record<string, TicketGroup> = { IN_PROGRESS: 'in_progress', OPEN: 'open', BLOCKED: 'blocked' }
+
+// The unfinished Tickets of a `ticket graph` projection, in group order, and
+// every record it carries so details and briefs need no further read.
+export const listTickets = (data: Record<string, unknown>): { tickets: TicketItem[]; records: Map<string, Ticket> } => {
+  const entries = (data.tickets as GraphEntry[] | undefined) ?? []
+  const tickets = GROUPS.flatMap(({ group }) => entries
+    .filter(e => GROUP_OF[e.ticket_state?.state ?? ''] === group)
+    .map(({ ticket }) => ({ id: ticket.ticket_id, title: ticket.title ?? null, outcome: ticket.outcome, group })))
+
+  return { tickets, records: new Map(entries.map(e => [e.ticket.ticket_id, e.ticket])) }
+}
 
 export const listingText = (tickets: TicketItem[]): string => {
   if (tickets.length === 0) return 'VibeHub: no unfinished Tickets.'
@@ -126,13 +129,14 @@ export const brief = (ticket: Ticket, resolved: Resolved[]): string => {
 export const reminder = (ticket: { id: string; title: string | null; outcome: string }): string =>
   `The user mentioned VibeHub Ticket #${ticket.id} (${nameOf(ticket, 120)}) again. Its full record is earlier in this session; read .vibehub/tickets/${ticket.id}.yaml for the latest state.`
 
-export const detailMarkdown = (ticket: Ticket, titleOf: (id: string) => string | null): string => {
+export const detailMarkdown = (ticket: Ticket, titleOf: (id: string) => string | null, unblocks: string[] = []): string => {
   const out: string[] = [`**${ticket.title ?? shorten(ticket.outcome, 80)}**`, `\`#${ticket.ticket_id}\` · ${ticket.status ?? 'open'}`, '', ticket.outcome]
   if (ticket.constraints?.length) out.push('', `**Constraints ${ticket.constraints.length}**`, ...ticket.constraints.map(c => `- ${c}`))
   const active = (ticket.acceptance ?? []).filter(a => (a.state ?? 'active') === 'active')
   if (active.length) out.push('', `**Acceptance ${active.length}**`, ...active.map(a => `- ${a.criterion}`))
   const deps = (ticket.relations ?? []).filter(r => r.type === 'depends_on')
   if (deps.length) out.push('', `**Depends on ${deps.length}**`, ...deps.map(r => `- ${titleOf(r.target_ticket_id) ?? r.target_ticket_id}`))
+  if (unblocks.length) out.push('', `**Unblocks ${unblocks.length}**`, ...unblocks.map(id => `- ${titleOf(id) ?? id}`))
   const refs = ticket.context_refs ?? []
   if (refs.length) out.push('', `**Context ${refs.length}**`, ...refs.map(r => `- \`${r.ref.replace(/^commit:[0-9a-f]{7}[0-9a-f]*:/, '')}\``))
   const updates = ticket.updates ?? []
