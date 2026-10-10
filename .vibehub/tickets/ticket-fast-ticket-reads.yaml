@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "reads-under-half-second",
+      "criterion": "在本仓库上 ticket frontier 和 ticket get 各自 0.5 秒内返回。",
+      "identity": "sha256:78b5f12bc2f90b7cede9bdbe6077c61cc1765c2a1d8250920a9bc3f6f4029b65",
+      "revision": 1,
+      "state": "active"
+    },
+    {
+      "acceptance_id": "validate-unchanged",
+      "criterion": "project validate 报出的不可验证引用与改动前一致。",
+      "identity": "sha256:d3a169afeeefa5d0a02f99cb210ba5c68b00a79487e209100ac97d5a904a4932",
+      "revision": 1,
+      "state": "active"
+    }
+  ],
+  "active_contract_revision": 1,
+  "constraints": [
+    "project validate 的历史引用检查结果不能变。",
+    "不引入后台进程或持久缓存。"
+  ],
+  "context": "2026-10-08 实测本仓库（131 个 Ticket）每次 frontier 或 get 约 3.6 秒，CPU 分析显示约 3.2 秒花在 loadRepository 为每个 Ticket 逐条起 git 子进程（ticketCommitResolver 的 git log、blobExistsAt 的 git cat-file）核对历史 context ref。这类历史核对属于 project validate 的职责，却在每次只读请求里执行。",
+  "context_refs": [
+    {
+      "purpose": "loadRepository、ticketCommitResolver、blobExistsAt",
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [
+        {
+          "acceptance_id": "reads-under-half-second",
+          "identity": "sha256:78b5f12bc2f90b7cede9bdbe6077c61cc1765c2a1d8250920a9bc3f6f4029b65",
+          "revision": 1
+        },
+        {
+          "acceptance_id": "validate-unchanged",
+          "identity": "sha256:d3a169afeeefa5d0a02f99cb210ba5c68b00a79487e209100ac97d5a904a4932",
+          "revision": 1
+        }
+      ],
+      "identity": "sha256:8be8c08ed67ed2a133338a8628e225ad58874218b1f09d404b4b4f3796c9ee2d",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "outcome": "ticket frontier、ticket get 等只读命令在本仓库规模下 0.5 秒内返回，Mod 面板和仪表盘点击不再等待数秒。",
+  "provenance_refs": [
+    "conversation:2026-10-08-mod-pane-latency-profile"
+  ],
+  "relations": [],
+  "revision_state": "bound",
+  "schema_version": 5,
+  "status": "done",
+  "ticket_id": "ticket-fast-ticket-reads",
+  "title": "Ticket 读取提速",
+  "updates": [
+    {
+      "recorded_at": "2026-10-10T04:51:33.566Z",
+      "refs": [],
+      "status": "done",
+      "summary": "两条验收都已满足：本仓库 ticket frontier 约 0.26 秒、ticket get 约 0.29 秒（原来约 3.6 秒）；project validate 输出与改动前逐字节一致。做法是把历史引用核对从每个 Ticket 每条引用单独起 git，改成一次 git log 加批量 cat-file --batch-check，固定到提交的引用按提交分组用一次 ls-tree 校验。新增回归测试用计数的 git 包装确认调用次数不随 Ticket 数量增长，该测试在旧代码上失败。npm run verify 393 项通过。",
+      "update_id": "batched-history-checks"
+    }
+  ]
+}

@@ -330,6 +330,59 @@ export function resolveTicketContextRef(repo, ref) {
   };
 }
 
+// Validates many refs the way resolveTicketContextRef does, without reading
+// file contents: versioned refs share one type check for all commits and one
+// `git ls-tree` per commit, so validation costs a fixed few git processes.
+// Current refs and anything the batch cannot answer fall back to the resolver.
+function contextRefChecker(repo, refs) {
+  const versioned = new Map();
+  for (const ref of new Set(refs)) {
+    let parsed;
+    try { parsed = parseTicketContextRef(ref); } catch { continue; }
+    if (parsed.kind === "versioned") versioned.set(ref, parsed);
+  }
+  const outcomes = new Map();
+  const commitTypes = gitObjectTypes(repo, [...versioned.values()].map(({ commit }) => commit));
+  const byCommit = new Map();
+  for (const [ref, parsed] of versioned) {
+    const type = commitTypes.get(parsed.commit);
+    if (type === null) {
+      outcomes.set(ref, new VibeHubError("context_ref_missing_commit", `Ticket context ref commit is unavailable: ${parsed.commit}`));
+    } else if (type !== "commit") {
+      outcomes.set(ref, new VibeHubError("context_ref_not_commit", `Ticket context ref revision is not a commit object: ${parsed.commit}`));
+    } else byCommit.set(parsed.commit, [...(byCommit.get(parsed.commit) ?? []), [ref, parsed.path]]);
+  }
+  for (const [commit, entries] of byCommit) {
+    const listed = git(repo, ["ls-tree", "-z", commit, "--", ...entries.map(([, path]) => path)], { allowFailure: true });
+    if (listed.status !== 0) continue;
+    const found = new Map();
+    for (const entry of listed.stdout.split("\0").filter(Boolean)) {
+      const tab = entry.indexOf("\t");
+      if (tab >= 0 && !found.has(entry.slice(tab + 1))) found.set(entry.slice(tab + 1), entry.slice(0, tab).split(" "));
+    }
+    for (const [ref, path] of entries) {
+      const [mode, type] = found.get(path) ?? [];
+      if (!found.has(path)) {
+        outcomes.set(ref, new VibeHubError("context_ref_missing_path", `Ticket context ref path is absent at ${commit}: ${path}`));
+      } else if (type === "tree") {
+        outcomes.set(ref, new VibeHubError("context_ref_directory", `Ticket context ref path is a directory at ${commit}: ${path}`));
+      } else if (mode === "120000") {
+        outcomes.set(ref, new VibeHubError("context_ref_symlink", `Ticket context ref path is a symlink at ${commit}: ${path}`));
+      } else if (mode === "160000" || type === "commit") {
+        outcomes.set(ref, new VibeHubError("context_ref_submodule", `Ticket context ref path is a submodule at ${commit}: ${path}`));
+      } else if (type !== "blob" || !new Set(["100644", "100755"]).has(mode)) {
+        outcomes.set(ref, new VibeHubError("context_ref_not_regular_file", `Ticket context ref path is not a regular blob at ${commit}: ${path}`));
+      } else outcomes.set(ref, null);
+    }
+  }
+  return (ref) => {
+    if (!outcomes.has(ref)) return resolveTicketContextRef(repo, ref);
+    const failure = outcomes.get(ref);
+    if (failure) throw failure;
+    return null;
+  };
+}
+
 function add(errors, path, message) {
   errors.push({ path, message });
 }
@@ -355,10 +408,41 @@ function gitQuiet(repo, args) {
 
 const COMMIT_SHA = /^[0-9a-f]{7,40}$/u;
 
-// True only when <commit>:<path> is a readable regular file (blob) at that
-// commit. Anything else — missing commit, missing path, a tree — is false.
-function blobExistsAt(repo, commit, path) {
-  return (gitQuiet(repo, ["cat-file", "-t", `${commit}:${path}`]) ?? "").trim() === "blob";
+// The object type of each git object name, read in one `git cat-file`
+// process instead of one per name. A missing name, or git being unable to
+// answer at all, maps to null: callers treat it as "cannot verify".
+function gitObjectTypes(repo, names) {
+  const unique = [...new Set(names)];
+  const types = new Map(unique.map((name) => [name, null]));
+  if (unique.length === 0) return types;
+  const result = spawnSync("git", ["-C", repo, "cat-file", "--batch-check=%(objecttype)"], {
+    input: `${unique.join("\n")}\n`,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  if (result.error || result.status !== 0) return types;
+  const lines = result.stdout.split("\n");
+  unique.forEach((name, index) => {
+    const line = (lines[index] ?? "").trim();
+    if (line && !line.endsWith(" missing") && !line.endsWith(" ambiguous")) types.set(name, line);
+  });
+  return types;
+}
+
+// The newest commit that touched each Ticket's Outcome, from one walk of
+// .vibehub/outcomes history: .vibehub/outcomes/<id>.yaml or <id>/.
+function outcomeCloseoutCommits(repo) {
+  const closeouts = new Map();
+  const log = gitQuiet(repo, ["log", "--format=%x00%H", "--name-only", "--relative", "--", ".vibehub/outcomes"]);
+  for (const entry of (log ?? "").split("\0").slice(1)) {
+    const [sha, ...files] = entry.split("\n").map((line) => line.trim()).filter(Boolean);
+    if (!COMMIT_SHA.test(sha ?? "")) continue;
+    for (const file of files) {
+      const id = /^\.vibehub\/outcomes\/([^/]+?)(?:\.yaml$|\/)/u.exec(file)?.[1];
+      if (id && !closeouts.has(id)) closeouts.set(id, sha);
+    }
+  }
+  return closeouts;
 }
 
 // Which commit is "the commit recorded for this Ticket"? Three sources exist
@@ -378,35 +462,54 @@ function blobExistsAt(repo, commit, path) {
 // stood at the moment the Ticket was closed, it exists for every genuinely
 // closed and committed Ticket, and it requires editing no checked-in document
 // to come into being.
-function ticketCommitResolver(repo) {
-  const cache = new Map();
-  return (document) => {
-    const id = document.ticket_id;
-    if (cache.has(id)) return cache.get(id);
-    const candidates = [];
-    for (const provenance of document.provenance_refs ?? []) {
-      if (typeof provenance !== "string" || !provenance.startsWith("commit:")) continue;
-      // Provenance may point at one path inside a commit: "commit:<sha>:<path>".
-      const sha = provenance.slice("commit:".length).split(":")[0];
-      if (COMMIT_SHA.test(sha)) candidates.push(sha);
+function recordedCommitCandidates(document, closeouts) {
+  const candidates = [];
+  for (const provenance of document.provenance_refs ?? []) {
+    if (typeof provenance !== "string" || !provenance.startsWith("commit:")) continue;
+    // Provenance may point at one path inside a commit: "commit:<sha>:<path>".
+    const sha = provenance.slice("commit:".length).split(":")[0];
+    if (COMMIT_SHA.test(sha)) candidates.push(sha);
+  }
+  for (const delivery of document.deliveries ?? []) {
+    const sha = delivery?.delivered_commit;
+    if (typeof sha === "string" && COMMIT_SHA.test(sha)) candidates.push(sha);
+  }
+  const closeout = closeouts.get(document.ticket_id);
+  if (closeout) candidates.push(closeout);
+  return [...new Set(candidates)];
+}
+
+// Classifies every current Ticket context ref missing from the working tree
+// against the Ticket's recorded commits, with a fixed number of git processes
+// however many Tickets and refs there are.
+function reportMissingTicketContextRefs(repo, missing, unverifiable) {
+  if (missing.length === 0) return;
+  const closeouts = outcomeCloseoutCommits(repo);
+  const candidates = new Map();
+  for (const { document } of missing) {
+    if (!candidates.has(document.ticket_id)) candidates.set(document.ticket_id, recordedCommitCandidates(document, closeouts));
+  }
+  // Keep only commits this checkout can actually read: a shallow clone or a
+  // dropped object turns a candidate into "unverifiable", not into a failure.
+  const commitTypes = gitObjectTypes(repo, [...candidates.values()].flat().map((sha) => `${sha}^{commit}`));
+  const readable = new Map([...candidates].map(([id, shas]) =>
+    [id, shas.filter((sha) => commitTypes.get(`${sha}^{commit}`) === "commit")]));
+  // A ref counts as recorded only where <commit>:<path> is a regular file.
+  const blobTypes = gitObjectTypes(repo, missing.flatMap(({ document, ref }) =>
+    readable.get(document.ticket_id).map((commit) => `${commit}:${ref}`)));
+  for (const { document, path, ref } of missing) {
+    const commits = readable.get(document.ticket_id);
+    if (commits.length === 0) {
+      addUnverifiable(unverifiable, path,
+        `missing current Ticket context ref: ${ref} (no recorded commit is readable here)`);
+    } else if (!commits.some((commit) => blobTypes.get(`${commit}:${ref}`) === "blob")) {
+      addUnverifiable(unverifiable, path,
+        `missing Ticket context ref: ${ref} (absent from the working tree and recorded commits)`);
+    } else {
+      addUnverifiable(unverifiable, path,
+        `missing current Ticket context ref: ${ref} (available in recorded history)`);
     }
-    for (const delivery of document.deliveries ?? []) {
-      const sha = delivery?.delivered_commit;
-      if (typeof sha === "string" && COMMIT_SHA.test(sha)) candidates.push(sha);
-    }
-    const outcomePath = `.vibehub/outcomes/${id}.yaml`;
-    const closeout = (gitQuiet(repo, ["log", "-1", "--format=%H", "--", outcomePath, `.vibehub/outcomes/${id}/`]) ?? "").trim();
-    if (COMMIT_SHA.test(closeout)) candidates.push(closeout);
-    // Keep only commits this checkout can actually read: a shallow clone or a
-    // dropped object turns a candidate into "unverifiable", not into a failure.
-    const readable = [];
-    for (const sha of candidates) {
-      if (readable.includes(sha)) continue;
-      if (gitQuiet(repo, ["cat-file", "-e", `${sha}^{commit}`]) !== null) readable.push(sha);
-    }
-    cache.set(id, readable);
-    return readable;
-  };
+  }
 }
 
 function requiredString(errors, document, key, path, { id = false } = {}) {
@@ -2282,12 +2385,19 @@ export function loadRepository(repo, overrides = {}) {
   }
   const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...goals.errors, ...epics.errors, ...evidence.errors, ...outcomes.errors];
   const unverifiable = [];
+  const checkContextRef = contextRefChecker(repo, [
+    ...[...goals.documents.values(), ...epics.documents.values()].flatMap(({ document }) =>
+      (Array.isArray(document.context_refs) ? document.context_refs : []).map((ref) => ref?.ref)),
+    ...[...contexts.documents.values()].flatMap(({ document }) =>
+      document.type === "authority" && isObject(document.authority) ? document.authority.canonical ?? [] : []),
+    ...[...tickets.documents.values()].flatMap(({ document }) => (document.context_refs ?? []).map(({ ref }) => ref)),
+  ]);
   for (const { document, path } of [...goals.documents.values(), ...epics.documents.values()]) {
     if (document.kind === "epic" && !goals.documents.has(document.goal_id)) {
       add(errors, path, `dangling Epic Goal: ${document.goal_id}`);
     }
     if (Array.isArray(document.context_refs)) for (const ref of document.context_refs) {
-      try { resolveTicketContextRef(repo, ref?.ref); }
+      try { checkContextRef(ref?.ref); }
       catch (error) { add(errors, path, error.message); }
     }
   }
@@ -2303,14 +2413,14 @@ export function loadRepository(repo, overrides = {}) {
       for (const ref of document.authority.canonical ?? []) {
         if (typeof ref !== "string") continue;
         try {
-          resolveTicketContextRef(repo, ref);
+          checkContextRef(ref);
         } catch (error) {
           add(errors, path, `authority canonical artifact unreadable: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     }
   }
-  const recordedCommits = ticketCommitResolver(repo);
+  const missingTicketRefs = [];
   for (const { document, path } of tickets.documents.values()) {
     if (document.epic_id !== undefined && !epics.documents.has(document.epic_id)) {
       add(errors, path, `dangling Ticket Epic: ${document.epic_id}`);
@@ -2318,7 +2428,7 @@ export function loadRepository(repo, overrides = {}) {
     for (const contextRef of document.context_refs ?? []) {
       const ref = contextRef.ref;
       try {
-        resolveTicketContextRef(repo, ref);
+        checkContextRef(ref);
         continue;
       } catch (error) {
         if (error?.code !== "context_ref_missing_path" || parseTicketContextRef(ref).kind !== "current") {
@@ -2326,19 +2436,7 @@ export function loadRepository(repo, overrides = {}) {
           continue;
         }
       }
-      const commits = recordedCommits(document);
-      if (commits.length === 0) {
-        addUnverifiable(unverifiable, path,
-          `missing current Ticket context ref: ${ref} (no recorded commit is readable here)`);
-        continue;
-      }
-      if (!commits.some((commit) => blobExistsAt(repo, commit, ref))) {
-        addUnverifiable(unverifiable, path,
-          `missing Ticket context ref: ${ref} (absent from the working tree and recorded commits)`);
-      } else {
-        addUnverifiable(unverifiable, path,
-          `missing current Ticket context ref: ${ref} (available in recorded history)`);
-      }
+      missingTicketRefs.push({ document, path, ref });
     }
     for (const relation of document.relations ?? []) {
       if (!tickets.documents.has(relation.target_ticket_id)) {
@@ -2346,6 +2444,7 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
+  reportMissingTicketContextRefs(repo, missingTicketRefs, unverifiable);
   const cycle = findCycle(tickets.documents);
   if (cycle) add(errors, ".vibehub/tickets", `dependency cycle: ${cycle.join(" -> ")}`);
   for (const { document, path } of evidence.documents.values()) {
