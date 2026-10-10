@@ -1,0 +1,46 @@
+{
+  "acceptance": [],
+  "active_contract_revision": 1,
+  "constraints": [
+    "终端和桌面都要能用；暂不做手机端。",
+    "界面文字用英文，本会话 Ticket 用实心点标记。",
+    "颜色在深色和浅色主题下都要清晰。"
+  ],
+  "context": "用户认为图视图是 VibeHub 最核心的交互。Mod 可用的绘制能力：桌面有 Svg（任意矢量、可开 isInteractive 支持悬停和 CSS 动画，但不跑脚本，点击拿不到具体节点）；终端有 Raster 色块和 kitty 图片；两端都有 Client 自定义交互区，能拿到鼠标坐标和键盘、按帧刷新。点击节点需要 Client 自己做坐标命中。先出桌面 SVG 版和终端字符版低保真，用户选定后再实现。",
+  "context_refs": [
+    {
+      "purpose": "当前 Mod 的能力",
+      "ref": "skills/vibehub-mod/README.md"
+    },
+    {
+      "purpose": "网页仪表盘已有的依赖图布局，可复用布局思路",
+      "ref": "skills/vibehub-review/assets/dashboard-graph.js"
+    }
+  ],
+  "contract_revisions": [
+    {
+      "acceptance_revisions": [],
+      "identity": "sha256:47f17989387db02e32f18631a724298e382174f3114117180dfca1d70b4ea92a",
+      "revision": 1
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "outcome": "在 Claude Code 的 VibeHub 面板里能看到未完成 Ticket 的依赖图，看出哪些在进行、哪些可开始、哪些被阻塞，并能从图上选中 Ticket 查看详情或插入 # 引用。",
+  "provenance_refs": [
+    "conversation:2026-10-08-mod-graph-view"
+  ],
+  "relations": [
+    {
+      "rationale": "在已分发的 Mod 上增加图视图。",
+      "target_ticket_id": "ticket-distribute-mod-through-skills",
+      "type": "depends_on"
+    }
+  ],
+  "revision_state": "bound",
+  "schema_version": 5,
+  "status": "open",
+  "ticket_id": "ticket-mod-ticket-graph-view",
+  "title": "Mod 里的 Ticket 依赖图",
+  "updates": []
+}

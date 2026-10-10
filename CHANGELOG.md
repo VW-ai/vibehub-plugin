@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make Ticket reads fast. Loading a repository checked each historical
+  context ref with its own git processes, so `ticket frontier` and `ticket get`
+  took about 3.6 seconds on this repository. History checks now batch into a
+  fixed few git calls; both reads take about 0.3 seconds, and `project
+  validate` reports exactly what it did before.
 - Ship the Claude Code mod as the `vibehub-mod` Skill folder. `npx skills add
   VW-ai/vibehub-plugin` now installs it, and Claude Code loads it from
   `~/.claude/skills/` as `vibehub-mod@skills-dir`: `#` offers Tickets by title,
