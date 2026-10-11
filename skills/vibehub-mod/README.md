@@ -10,10 +10,15 @@ and writes nothing.
   context refs to the model beside the prompt. The transcript shows only what
   you typed. Mentioning the same Ticket again in a session adds a one-line
   reminder instead of the full record.
-- `/vh` opens a pane grouped into In progress, Ready, and Blocked. Selecting a
-  Ticket shows its outcome, constraints, acceptance, dependencies, context, and
-  recent progress. **Mention in prompt** inserts the reference. Where no pane
-  can open, as in `claude -p`, `/vh` lists the Tickets as text.
+- `/vh` opens a pane that lists unfinished Tickets top to bottom in
+  dependency lanes, like `git log --graph`: a prerequisite sits above the
+  Tickets that wait on it. Marks and words follow the dashboard (▶ Open,
+  ◉ In progress, ⊘ Blocked, ✓ Done) in theme colors, and each row says what it
+  waits on and unblocks. Filters pick a state, **Show finished** draws finished
+  prerequisites into the lanes, at most six lanes are drawn, and a long list
+  shows 40 rows at a time. Selecting a Ticket opens its details in place,
+  without another read. Where no pane can open, as in `claude -p`, `/vh`
+  lists the Tickets as text.
 - The most recently mentioned Ticket is this session's Ticket. The pane marks
   it with a filled dot, and the system prompt names it.
 
