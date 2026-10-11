@@ -2,11 +2,12 @@
 
 ## Unreleased
 
-- Add a Graph view to the Claude Code mod's `/vh` pane. Each waiting Ticket is
-  drawn with its prerequisites joined to it, as a themed SVG on the desktop and
-  with box characters in the terminal; Tickets without a title read by their
-  ID. Selecting a Ticket uses the records the pane already loaded, so it no
-  longer waits on another read.
+- Draw the Claude Code mod's `/vh` pane as dependency lanes: unfinished
+  Tickets top to bottom like `git log --graph`, with the dashboard's state
+  marks in theme colors and a line saying what each waits on and unblocks.
+  Filters, an optional view of finished prerequisites, at most six lanes, and
+  40-row pages keep a thousand-Ticket repository readable. Selecting a Ticket
+  opens its details in place from records already loaded.
 - Ship the Claude Code mod as the `vibehub-mod` Skill folder. `npx skills add
   VW-ai/vibehub-plugin` now installs it, and Claude Code loads it from
   `~/.claude/skills/` as `vibehub-mod@skills-dir`: `#` offers Tickets by title,

@@ -1,23 +1,30 @@
 import { atom, read, update } from 'claude-code'
-import type { Elements, EngineInterface, Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
 
-import type { ActiveTicket, GraphModel, PaneView, TicketDetail, TicketGroup, TicketItem } from '../types'
+import type { ActiveTicket, LaneData, LaneFilter, NodeState, TicketDetail, TicketItem } from '../types'
 import {
-  GROUPS, brief, composeSection, detailMarkdown, groupLabel, listTickets, listingText, matchTickets, mentions, nameOf,
-  reminder,
+  brief, composeSection, detailMarkdown, groupLabel, listTickets, listingText, matchTickets, mentions, nameOf, reminder,
 } from './brief'
 import type { Resolved, Ticket } from './brief'
-import { buildGraph, clip, dependentsOf, graphRows, graphSvg, humanize } from './graph'
+import { buildLanes, clip, humanize } from './lanes'
+import type { Cell, LaneRow } from './lanes'
 
 const COMMAND = 'vh'
+// Theme colors, so the marks follow light and dark; the same words and
+// meaning as the dashboard's lanes.
+const STATE_COLOR: Record<NodeState, string> = { in_progress: 'suggestion', open: 'success', blocked: 'inactive', done: 'subtle' }
+const STATE_LABEL: Record<NodeState, string> = { in_progress: 'In progress', open: 'Open', blocked: 'Blocked', done: 'Done' }
 const PANE = 'vibehub'
 const SECTION = 'vibehub-active-ticket'
 const MAX_MENTIONS = 3
 
 const tickets = atom({ plugin: 'vibehub-mod', key: 'tickets' } as const, [] as TicketItem[])
-const graph = atom({ plugin: 'vibehub-mod', key: 'graph' } as const, { nodes: [], edges: [], standalone: [] } as GraphModel)
-const view = atom({ plugin: 'vibehub-mod', key: 'view' } as const, 'graph' as PaneView)
-const group = atom({ plugin: 'vibehub-mod', key: 'group' } as const, 'in_progress' as TicketGroup)
+const lanes = atom({ plugin: 'vibehub-mod', key: 'lanes' } as const, { tickets: [], relations: [] } as LaneData)
+const filter = atom({ plugin: 'vibehub-mod', key: 'filter' } as const, 'all' as LaneFilter)
+const finished = atom({ plugin: 'vibehub-mod', key: 'finished' } as const, false)
+// Rows drawn at once; a long list grows by a page at a press.
+const PAGE = 40
+const limit = atom({ plugin: 'vibehub-mod', key: 'limit' } as const, PAGE)
 const selected = atom({ plugin: 'vibehub-mod', key: 'selected' } as const, null as string | null)
 const detail = atom({ plugin: 'vibehub-mod', key: 'detail' } as const, null as TicketDetail | null)
 const active = atom({ plugin: 'vibehub-mod', key: 'active' } as const, null as ActiveTicket | null)
@@ -73,7 +80,7 @@ const refresh = async ($: EngineInterface): Promise<TicketItem[] | string> => {
     const listed = listTickets(data)
     records = listed.records
     await update($, tickets, () => listed.tickets)
-    await update($, graph, () => buildGraph(data))
+    await update($, lanes, () => laneData(data))
     await update($, error, () => null)
 
     return listed.tickets
@@ -83,6 +90,16 @@ const refresh = async ($: EngineInterface): Promise<TicketItem[] | string> => {
     return message(cause)
   }
 }
+
+// Only what the lanes need, so the session state stays small.
+const laneData = (data: Record<string, unknown>): LaneData => ({
+  tickets: ((data.tickets as LaneData['tickets'] | undefined) ?? []).map(({ ticket, ticket_state }) => ({
+    ticket: { ticket_id: ticket.ticket_id, title: ticket.title, outcome: ticket.outcome },
+    ticket_state: { state: ticket_state?.state ?? 'OPEN' },
+  })),
+  relations: ((data.relations as LaneData['relations'] | undefined) ?? [])
+    .map(({ prerequisite_ticket_id, dependent_ticket_id }) => ({ prerequisite_ticket_id, dependent_ticket_id })),
+})
 
 const getTicket = async ($: EngineInterface, helper: Helper, id: string): Promise<Ticket> =>
   records.get(id) ?? ((await vh($, helper, ['ticket', 'get'], { ticket_id: id })).ticket as Ticket)
@@ -115,7 +132,11 @@ const select = async ($: EngineInterface, id: string) => {
   }
   try {
     const ticket = await getTicket($, helper, id)
-    const unblocks = dependentsOf(await read($, graph), id)
+    const data = await read($, lanes)
+    const done = new Set(data.tickets.filter(t => t.ticket_state.state === 'DONE').map(t => t.ticket.ticket_id))
+    const unblocks = data.relations
+      .filter(r => r.prerequisite_ticket_id === id && !done.has(r.dependent_ticket_id))
+      .map(r => r.dependent_ticket_id)
     await update($, detail, () => ({ id, markdown: detailMarkdown(ticket, titleOf, unblocks) }))
   } catch (cause) {
     await update($, error, () => `Could not read ${id}: ${message(cause)}`)
@@ -139,10 +160,7 @@ export const register: Register = on => {
     if (typeof list === 'string') return { text: list }
     const id = e.args.trim().replace(/^#/, '')
     const target = list.find(t => t.id === id)
-    if (target) {
-      await update($, group, () => target.group)
-      await select($, target.id)
-    }
+    if (target) await select($, target.id)
     try {
       await $.ui.open({ id: PANE, title: 'VibeHub', focus: true })
     } catch {
@@ -154,136 +172,119 @@ export const register: Register = on => {
   }).catch(() => ({ text: 'VibeHub: /vh failed; see the claude --debug log.' }))
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const elements = $.ui.resolve(e)
-    const { Box, Text, Button, Markdown } = elements
-    const list = await read($, tickets)
-    const shown = await read($, group)
-    const showing = await read($, view)
-    const model = await read($, graph)
+    const { Box, Text, Button, Markdown } = $.ui.resolve(e)
+    const shownFilter = await read($, filter)
+    const showFinished = await read($, finished)
+    const graph = buildLanes(await read($, lanes), shownFilter, showFinished)
+    const shownRows = graph.rows.slice(0, await read($, limit))
     const picked = await read($, selected)
     const current = await read($, active)
     const opened = await read($, detail)
     const failed = await read($, error)
-    const width = Math.max(16, e.props.bodyColumns - 4)
-    const rows = list.filter(t => t.group === shown)
-    const nodeState = new Map(model.nodes.map(n => [n.id, n.state]))
-    const mark = (id: string) => (id === current?.id ? '●' : nodeState.get(id) === 'blocked' ? '⊘' : nodeState.get(id) === 'in_progress' ? '◐' : '○')
-    const name = (id: string, max: number) => clip(titleOf(id) ?? id, max)
-    const nodeButton = (id: string, max: number) => (
-      <Button
-        key={`n:${id}`}
-        plain
-        label={`${id === picked ? '▸ ' : ''}${mark(id)} ${name(id, max)}`}
-        dimColor={picked !== null && picked !== id}
-        onPress={() => select($, id)}
-      />
-    )
-    const unfinished = model.nodes.filter(n => n.state !== 'done')
-    const drawn = new Set<string>()
-    const node = (id: string, max: number) => {
-      if (nodeState.get(id) === 'done' || drawn.has(id)) {
-        return <Text dimColor={nodeState.get(id) === 'done'} wrap="truncate-end">{name(id, max)}</Text>
-      }
-      drawn.add(id)
+    const nameWidth = Math.max(12, e.props.bodyColumns - graph.width * 2 - 18)
+    const name = (id: string) => titleOf(id) ?? humanize(id)
+    const names = (ids: string[]) => (ids.length === 1 ? clip(name(ids[0]!), 40) : `${ids.length} Tickets`)
+    const subline = (row: LaneRow) => [
+      row.waitingOn.length ? `waiting on ${names(row.waitingOn)}` : '',
+      row.unblocks.length ? `unblocks ${names(row.unblocks)}` : '',
+      row.finishedPrerequisites ? `built on ${row.finishedPrerequisites} finished` : '',
+    ].filter(Boolean).join(' · ') || 'no dependencies'
+    const gutter = (cells: Cell[], key: string) => (
+      <Box key={key} flexDirection="row" width={graph.width * 2} flexShrink={0}>
+        {Array.from({ length: graph.width }, (_, index) => {
+          const cell = cells[index]
 
-      return nodeButton(id, max)
-    }
-    const graphView = model.nodes.length === 0
-      ? <Text dimColor>No Ticket depends on another yet. See List.</Text>
-      : e.surface === 'desktop'
-        ? (() => {
-            const { Svg } = elements as Elements['desktop']
-
-            return (
-              <Box flexDirection="column" gap={1}>
-                <Svg
-                  key="graph"
-                  source={graphSvg(model, current?.id ?? null, picked)}
-                  alt={`Ticket dependency graph: ${model.nodes.length} Tickets, ${model.edges.length} dependencies`}
-                  isInteractive
-                />
-                <Box flexDirection="row" flexWrap="wrap" columnGap={2}>
-                  {unfinished.map(n => nodeButton(n.id, 32))}
-                </Box>
-              </Box>
-            )
-          })()
-        : (
-            <Box flexDirection="column">
-              {graphRows(model).map(row => (
-                <Box key={`r:${row.id}`} flexDirection="column">
-                  {row.prerequisites.map((p, index) => (
-                    <Box key={`p:${row.id}:${p}`} flexDirection="row">
-                      <Text dimColor>{index === 0 ? '┌ ' : '├ '}</Text>
-                      {node(p, width - 4)}
-                    </Box>
-                  ))}
-                  <Box flexDirection="row">
-                    <Text dimColor>└─▶ </Text>
-                    {node(row.id, width - 6)}
-                  </Box>
-                </Box>
-              ))}
+          return (
+            <Box key={`${key}:${index}`} width={2} flexShrink={0}>
+              {cell?.icon
+                ? <Text color={STATE_COLOR[cell.icon]} bold={cell.icon !== 'done'}>{cell.glyph}</Text>
+                : <Text dimColor>{cell?.glyph ?? ' '}</Text>}
             </Box>
           )
+        })}
+      </Box>
+    )
+    const chip = (key: LaneFilter, label: string, count: number) => (
+      <Button
+        key={`f:${key}`}
+        label={`${label} ${count}`}
+        variant={shownFilter === key ? 'primary' : undefined}
+        onPress={async () => {
+          await update($, filter, () => key)
+          await update($, limit, () => PAGE)
+        }}
+      />
+    )
+    const unfinished = graph.counts.in_progress + graph.counts.open + graph.counts.blocked
 
     return (
       <Box flexDirection="column" gap={1}>
         <Box flexDirection="row" gap={1} flexWrap="wrap">
-          <Button key="v:graph" label="Graph" variant={showing === 'graph' ? 'primary' : undefined} onPress={() => update($, view, () => 'graph')} />
-          <Button key="v:list" label="List" variant={showing === 'list' ? 'primary' : undefined} onPress={() => update($, view, () => 'list')} />
+          {chip('all', 'All', unfinished)}
+          {graph.counts.in_progress > 0 && chip('in_progress', 'In progress', graph.counts.in_progress)}
+          {chip('open', 'Open', graph.counts.open)}
+          {graph.counts.blocked > 0 && chip('blocked', 'Blocked', graph.counts.blocked)}
+          <Button
+            key="finished"
+            label={showFinished ? 'Hide finished' : 'Show finished'}
+            variant={showFinished ? 'primary' : undefined}
+            onPress={async () => {
+              await update($, finished, shown => !shown)
+              await update($, limit, () => PAGE)
+            }}
+          />
         </Box>
-        {showing === 'graph' && graphView}
-        {showing === 'graph' && model.standalone.length > 0 && (
-          <Text dimColor>{model.standalone.length} standalone Tickets are in List</Text>
-        )}
-        {showing === 'list' && (
-          <Box flexDirection="row" gap={1} flexWrap="wrap">
-            {GROUPS.map(g => (
-              <Button
-                key={`g:${g.group}`}
-                label={`${g.label} ${list.filter(t => t.group === g.group).length}`}
-                variant={g.group === shown ? 'primary' : undefined}
-                onPress={() => update($, group, () => g.group)}
-              />
-            ))}
-          </Box>
-        )}
-        {showing === 'list' && (
-          <Box flexDirection="column">
-            {rows.length === 0 && <Text dimColor>Nothing here</Text>}
-            {rows.map(t => (
-              <Button
-                key={`t:${t.id}`}
-                plain
-                label={`${t.id === current?.id ? '●' : '○'} ${nameOf(t, width)}`}
-                dimColor={picked !== null && picked !== t.id}
-                onPress={() => select($, t.id)}
-              />
-            ))}
-          </Box>
-        )}
-        {opened !== null && opened.id === picked && <Markdown text={opened.markdown} />}
-        {picked !== null && (
-          <Box flexDirection="row" gap={1} flexWrap="wrap">
-            <Button
-              key="mention"
-              variant="primary"
-              label="Mention in prompt"
-              onPress={async () => {
-                const filled = await $.prompt.fill({ text: `#${picked} `, mode: 'insert' })
-                if (!filled.isFilled) $.ui.toast('The prompt box is not available right now')
-              }}
-            />
-            <Button
-              key="refresh"
-              label="Refresh"
-              onPress={async () => {
-                await refresh($)
-                await select($, picked)
-              }}
-            />
-          </Box>
+        <Box flexDirection="column">
+          {graph.rows.length === 0 && <Text dimColor>Nothing here</Text>}
+          {shownRows.map(row => (
+            <Box key={`r:${row.id}`} flexDirection="column">
+              <Box flexDirection="row">
+                {gutter(row.head, `h:${row.id}`)}
+                <Button
+                  key={`n:${row.id}`}
+                  plain
+                  label={clip(name(row.id), nameWidth)}
+                  dimColor={row.state === 'done'}
+                  onPress={() => select($, row.id)}
+                />
+                <Text color={row.id === current?.id ? 'success' : STATE_COLOR[row.state]} dimColor={row.state === 'done'}>
+                  {'  '}{row.id === current?.id ? '● this session' : STATE_LABEL[row.state]}
+                </Text>
+              </Box>
+              {(row.state !== 'done' || row.id === picked) && (
+                <Box flexDirection="row">
+                  {gutter(row.tail, `t:${row.id}`)}
+                  <Box flexDirection="column" flexGrow={1}>
+                    {row.state !== 'done' && <Text dimColor wrap="truncate-end">{subline(row)}</Text>}
+                    {row.id === picked && opened !== null && opened.id === picked && (
+                      <Box flexDirection="column" gap={1} marginY={1}>
+                        <Markdown text={opened.markdown} />
+                        <Box flexDirection="row" gap={1}>
+                          <Button
+                            key="mention"
+                            variant="primary"
+                            label="Mention in prompt"
+                            onPress={async () => {
+                              const filled = await $.prompt.fill({ text: `#${picked} `, mode: 'insert' })
+                              if (!filled.isFilled) $.ui.toast('The prompt box is not available right now')
+                            }}
+                          />
+                          <Button key="close" label="Close" onPress={() => update($, selected, () => null)} />
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          ))}
+        </Box>
+        {graph.rows.length > shownRows.length && (
+          <Button
+            key="more"
+            label={`Show more (${graph.rows.length - shownRows.length} left)`}
+            onPress={() => update($, limit, shown => (shown ?? PAGE) + PAGE)}
+          />
         )}
         {failed !== null && <Text color="error">{failed}</Text>}
       </Box>

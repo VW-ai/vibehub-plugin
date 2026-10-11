@@ -26,7 +26,7 @@ const MENTION = /(?:^|[\s(（])#([a-z0-9]+(?:-[a-z0-9]+)*)/g
 
 export const GROUPS: { group: TicketGroup; label: string }[] = [
   { group: 'in_progress', label: 'In progress' },
-  { group: 'open', label: 'Ready' },
+  { group: 'open', label: 'Open' },
   { group: 'blocked', label: 'Blocked' },
 ]
 
